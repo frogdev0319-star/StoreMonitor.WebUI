@@ -63,7 +63,7 @@
           :options="storeTypeList"
           @changeInput="onChangeStoreType"/>
     </div>
-    
+
   </div>
   <div v-if="showStoreSelected" class="flex-center padding-left" style="text-align: left; margin-top: 20px; justify-content: space-between">
     <div class="paper shadow-light favorite"
@@ -80,9 +80,9 @@
         :placeholder="$t('remotePatrol.stores')"
         :options="storeDataList"
         @changeInput="onChangeStore"/>
-        
+
     <div v-else class="single-select shadow-light">
-      <el-select 
+      <el-select
         :value="curSelectedStore"
         @change="onChangeSelectedStore"
         size="mini">
@@ -105,8 +105,20 @@
           {{changeStoreObj.showInfo}}
         </div>
       </dialog-pop>
+      <dialog-pop
+          v-if="EditRptchangeStoreObj.dialogCosed"
+          :title="EditRptchangeStoreObj.title"
+          :isWarning="EditRptchangeStoreObj.isWarning"
+          :visible="EditRptchangeStoreObj.dialogCosed"
+          :showCancelbtn="false"
+          @confirmHandler="canceldChangeStore"
+          >
+          <div class="dialog-slot">
+            {{EditRptchangeStoreObj.showInfo}}
+          </div>
+        </dialog-pop>
     </div>
-    
+
     <div v-if="!multiStore" class="spacer"></div>
     <slot name="others"></slot>
   </div>
@@ -121,9 +133,11 @@ import MultiSelect from '@/components/MultiSelect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import { mapGetters } from 'vuex';
 import { getBriefStoreList, getStoreDefineGroup, getStoreList, getFavoriteStoreList } from '@/api/store';
+import {ListMysteryModeStoreInfo} from '@/api/mystero'
 import util from '@/common/util.js';
 import DialogPop from '@/components/DialogPop.vue';
 import i18n from '@/lang/index'
+import PermissionHelper from '../api/PermissionHelper';
 
 export default {
   name: 'StoreFilter',
@@ -211,6 +225,8 @@ export default {
       cities: [],
       isFavorite: false,
       isChangeAccount:false,
+      input:'',
+
       checkCurStoreInFavorite:false,
       changeStoreObj: {
         title: this.$t('remotePatrol.confirm'),
@@ -218,42 +234,62 @@ export default {
         isWarning: true,
         dialogCosed: false
       },
+      EditRptchangeStoreObj: {
+        title: this.$t('remotePatrol.prompt'),
+        showInfo: this.$t('remotePatrol.cannotSwitch'),
+        isWarning: false,
+        dialogCosed: false
+      },
+      enableMimicMode:false,
+      mysterStoreIds:[],
     };
   },
 
   computed: {
-    ...mapGetters({ accountChanged: 'accountChanged' })
+    ...mapGetters({ accountChanged: 'accountChanged',mimicMode:'mimicMode' })
   },
 
   watch: {
     async accountChanged(val) {
       const self = this;
       if (val !== 0) {
-        console.log("Account Changed")
+        // console.log("Account Changed")
         self.isChangeAccount = true;
         self.ifGetParamsFromCash = false;
         self.curSelectedStore = '';
         //this.getStoreListAndGroupAndType();
         self.getStoreListAndGroupAndType(true);
         //await self.getSearchParams();
-        
+
       }
     },
     cachedParams() {
       this.getSearchParams();
-    }
+    },
+    mimicMode(){
+      this.enableMimicMode = this.$store.getters.mimicMode;
+      if(this.enableMimicMode) this.ifGetParamsFromCash=false;
+      this.curSelectedStore = "";
+      this.getStoreListAndGroupAndType(true);
+    },
   },
 
   created() {
+    this.enableMimicMode = this.$store.getters.mimicMode;
+    if(this.enableMimicMode) this.ifGetParamsFromCash=false;
     this.getSearchParams();
     this.getStoreListAndGroupAndType(true);
+    this.hasFavoritedStar = this.showFavorite;
   },
-
+  mounted(){
+    this.enableMimicMode = this.$store.getters.mimicMode;
+    if(this.enableMimicMode) this.ifGetParamsFromCash=false;
+  },
   methods: {
     changeFavorite () {
       this.$store.dispatch('setFavoritList',true);
       /*if(!this.isFavorite){
-        
+
         new Promise((resolve,reject)=>{
           this.getFavoriteStoreData().then(result=>{
             resolve(result);
@@ -274,7 +310,11 @@ export default {
         this.isFavorite = false;
         this.getStoreListAndGroupAndType();
       }*/
-      if(this.$store.getters.editCount != 0){
+      if(this.$store.getters.editReport){
+        this.checkCurStoreInFavorite = true;
+        this.EditRptchangeStoreObj.dialogCosed = true;
+      }
+      else if(this.$store.getters.editCount != 0){
         this.checkCurStoreInFavorite = true;
         this.changeStoreObj.dialogCosed = true;
       }else if(this.$store.getters.editCount_storeMonitor!=0){
@@ -282,23 +322,22 @@ export default {
         this.checkCurStoreInFavorite = true;
         this.changeStoreObj.dialogCosed = true;
       }else{
-        this.isFavorite = !this.isFavorite;
+      this.isFavorite = !this.isFavorite;
         this.getStoreListAndGroupAndType();
       }
       //this.isFavorite = !this.isFavorite;
       //this.getStoreListAndGroupAndType();
     },
     getCountryStore(initFilter) {
-      console.log("getCountryStore:"+initFilter)
       let temp = [];
       if (this.storeList.length !== 0) {
-        console.log("2.getCountryStore");
-        console.log("2.this.storeList:",this.storeList);
+        // console.log("2.getCountryStore");
+        // console.log("2.this.storeList:",this.storeList);
         this.storeList.forEach(item => {
           const country = item.country;
           //console.log("2.country:",country);
           //let searchkey = temp.find(x=>{return x.label==country} );
-          
+
           if (temp.map(x => x.label).indexOf(country) === -1) {
             const obj = {
               value: country,
@@ -309,41 +348,41 @@ export default {
         });
       }
       var self = this;
-      console.log("1.tmp:",temp);
+      // console.log("1.tmp:",temp);
       temp.unshift({ value: '-1', label: i18n.t('remotePatrol.all') });
-      console.log("2.tmp:",temp);
+      // console.log("2.tmp:",temp);
       const countryList = temp;
-      console.log("2.countryList[0]:",this.countryList);
+      // console.log("2.countryList[0]:",this.countryList);
       if(this.countryList.length>0){
-        console.log("2.this.countryList:",this.countryList);
+        // console.log("2.this.countryList:",this.countryList);
         this.countryList[0] = {};
         this.countryList[0]['label'] = i18n.t('remotePatrol.country');
         this.countryList[0]['countryList'] = countryList;
         //this.countryList[0].countryList.unshift({ value: '-1', label: this.$t('remotePatrol.all') });
       }else{
-        console.log("3.this.countryList:",self.countryList);
+        // console.log("3.this.countryList:",self.countryList);
         var templist=[];
         //countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
         templist.push({label:i18n.t('remotePatrol.country'),countryList:countryList,});
-        console.log("4.templist:",templist);
-        
+        // console.log("4.templist:",templist);
+
         self.countryList = templist;
-        console.log("5.this.countryList:",self.countryList);
+        // console.log("5.this.countryList:",self.countryList);
       }
       this.curCountry = (!this.ifGetParamsFromCash) ? countryList[0].value : this.curCountry;
       //if(!initFilter)
-       this.selectAllProAndCity(this.curCountry,initFilter);
-      
+      this.selectAllProAndCity(this.curCountry,initFilter);
+
     },
 
     getStoreListAndGroupAndType(init) {
-    
-      const storeListPromise = this.isFavorite ? this.getFavoriteStoreData() : this.getBriefStoreData();
+
+      const storeListPromise = this.isFavorite ? this.getFavoriteStoreData() : ((this.enableMimicMode)? this.getMysteryStore():this.getBriefStoreData());
       const storeGroupPromise = this.getStoreDefineList(1);
       const storeTypePromise = this.getStoreDefineList(0);
       Promise.all([storeListPromise, storeGroupPromise, storeTypePromise]).then(results => {
         var storeList = results[0];
-        console.log(storeList)
+        //console.log(storeList)
         const groupList = results[1];
         const typeList = results[2];
         groupList.map(item => {
@@ -356,7 +395,7 @@ export default {
           item.value = item.defineId;
           item.storeIds = item.contents;
         });
-        console.log("XXXXgetStoreListAndGroupAndType")
+        // console.log("XXXXgetStoreListAndGroupAndType")
         this.storeList = storeList;
         let initFilter =false;
         if(init && ((this.curStoreGroup&& this.curStoreGroup.length>0 && this.curStoreGroup[0]!='-1')||
@@ -367,8 +406,8 @@ export default {
         this.storeGroupList = groupList;
         this.storeTypeList = typeList;
       //  console.log(this.curStoreGroup,this.curStoreType)
-         if(initFilter){
-                console.log("To FIlter stores")
+        if(initFilter){
+                // console.log("To FIlter stores")
                 this.filterStore();
           }
       }).catch(err => {
@@ -378,17 +417,20 @@ export default {
 
     onChangeStore(arr) {
       this.curStore = arr;
-      console.log("Change",this.curStore)
-      console.log("2.go changeStoreNew:",arr);
+      // console.log("Change",this.curStore)
+      // console.log("2.go changeStoreNew:",arr);
       this.changeStoreNew(arr);
     },
     canceldChangeStore() {
       if(this.checkCurStoreInFavorite) {
-        
+
         this.checkCurStoreInFavorite= false;
         //this.getStoreListAndGroupAndType();
       }
-      this.changeStoreObj.dialogCosed = false;
+      if(this.$store.getters.editReport){
+        this.EditRptchangeStoreObj.dialogCosed = false;
+      }else
+        this.changeStoreObj.dialogCosed = false;
       this.curSelectedStore_ = '';
     },
     changeStoreDialog () {
@@ -399,7 +441,7 @@ export default {
         this.getStoreListAndGroupAndType();
         this.$store.dispatch('setEditCountStoreMonitor',0);*/
       }
-      
+
       this.getStoreListAndGroupAndType();
       this.$store.dispatch('setEditCountStoreMonitor',0);
       this.curSelectedStore = this.curSelectedStore_;
@@ -407,10 +449,14 @@ export default {
       this.emitParams();
       this.changeStoreObj.dialogCosed = false;
       this.$store.dispatch('setEditCount', 0);
-      
+
     },
     onChangeSelectedStore(val) {
-      if(this.$store.getters.editCount != 0) {
+      if(this.$store.getters.editReport){
+        this.curSelectedStore_ = val;
+        this.EditRptchangeStoreObj.dialogCosed = true;
+      }
+      else if(this.$store.getters.editCount != 0) {
         this.curSelectedStore_ = val;
         this.changeStoreObj.dialogCosed = true;
       } else if(this.$store.getters.editCount_storeMonitor!=0){
@@ -437,10 +483,10 @@ export default {
 
     changeStoreNew(arr) {
       //this.filterStore();
-      console.log("arr:",arr);
+      // console.log("arr:",arr);
       /*this.filterStoreIds = arr.filter(storeId => storeId !== '-1');
-      
-     
+
+
       console.log(this.filterStoreIds)
       if(this.filterStoreIds){
         let temp=[];
@@ -477,7 +523,7 @@ export default {
 
      // console.log(this.storeList);
      // console.log(this.storeDataList )
-      
+
     },
 
     onChangeProvince(arr) {
@@ -620,7 +666,7 @@ export default {
         //});
         console.log("*this.curStore:",this.curStore);
         console.log("*this.storeList:",this.storeList);
-        
+
         this.storeDataList = temp;
         console.log("*this.storeDataList:",this.storeDataList);
         this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
@@ -664,14 +710,14 @@ export default {
         //});
         console.log("*this.curStore:",this.curStore);
         console.log("*this.storeList:",this.storeList);
-        
+
         this.storeDataList = temp;
         console.log("*this.storeDataList:",this.storeDataList);
         this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
         if(this.curStore.length != this.filterStoreIds.length){
           this.curStore = this.filterStoreIds;
           if(this.filterStoreIds.length == this.storeDataList.length) {
-            
+
             this.curStore.unshift( '-1');
             console.log("**2.select all:",this.curStore);
           }
@@ -707,14 +753,45 @@ export default {
       this.curStoreType = this.filterArr(this.curStoreType, this.storeTypeList);
     },
 
+    getMysteryStore(){
+      return new Promise((resolve, reject) => {
+        ListMysteryModeStoreInfo().then(res => {
+          const errMsg = res.errMsg;
+          if (errMsg && errMsg === 'Success') {
+            resolve(res.data);
+          }
+        }).catch(err => {
+          reject(err);
+        });
+      });
+        /*ListMysteryModeStoreInfo().then(res => {
+          var mimicStore = [];
+          if (res.errCode==0) {
+            res.data.map(store=>{
+              mimicStore.push(store.storeId);
+            });
+            this.mysterStoreIds = mimicStore;
+          }
+        }).catch(err => {
+          console.log("getMysteryStore error:",err);
+        });*/
+    },
     filterStore() {
-      console.log("Filter Store=>>")
+      // console.log("Filter Store=>>")
+      console.log("this.storeDataList:",this.storeDataList);
       let filterStoreId = [];
       let filterStoreStr = '';
       let allfilterStoreStr = '';
       if (this.curStoreGroup.length === 0 && this.curStoreType.length === 0) {
-        console.log("Filter Store=>>curStoreGroup and curStoreType length ==0")
+        // console.log("Filter Store=>>curStoreGroup and curStoreType length ==0")
         filterStoreId = this.curStore;
+        //秘密客模式可選門店取交集
+        /*if(this.enableMimicMode){//秘密客模式可選門店
+          //console.log("MysteryStoreList:",this.mysterStoreIds);
+          var tempStoreList = filterStoreId.slice(0) ;
+          filterStoreId  = util.getIntersectionOfArrs(this.mysterStoreIds,tempStoreList);
+          console.log("**mimic this.filterStoreIds:",filterStoreId);
+        }*/
         let temp=[];
         filterStoreId.forEach(storeId => {
           this.storeList.forEach(store => {
@@ -728,13 +805,12 @@ export default {
                 temp.push(obj);
             }
           });
+          //this.storeDataList = temp;
         });
-        console.log("this.curStore:",this.curStore);
-        console.log("this.storeList:",this.storeList);
-        console.log("this.storeDataList:",this.storeDataList);
-        if(this.storeDataList.length==0)
+
+        if(this.storeDataList.length==0){
           this.storeDataList = temp;
-        //this.storeDataList = temp;
+        }
         this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
         this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
       } else {
@@ -743,11 +819,17 @@ export default {
         console.log("groupIdArray:",groupIdArray);
         const typeIdArr = this.storeTypeList.filter(typeItem => this.curStoreType.find(typeId => typeId === typeItem.value));
         console.log("typeIdArr:",typeIdArr);
-        const filterStoreArray = this.getStoreIdsOfGroupAndType(groupIdArray, typeIdArr);
+        var filterStoreArray = this.getStoreIdsOfGroupAndType(groupIdArray, typeIdArr);
         console.log("filterStoreArray:",filterStoreArray);
         console.log("this.curStore:",this.curStore);
         console.log("this.storeDataList:",this.storeDataList);
-        //let tempstoreList = filterStoreArray;//util.getIntersectionOfArrs(this.storeDataList, filterStoreArray);
+        //已經跟部門群組和類型交集完的結果
+        /*if(this.enableMimicMode){//秘密客模式可選門店
+          //console.log("MysteryStoreList:",this.mysterStoreIds);
+          var tempStoreList = filterStoreArray.slice(0) ;
+          filterStoreArray  = util.getIntersectionOfArrs(tempStoreList, this.mysterStoreIds);
+          console.log("**mimic this.filterStoreIds:",this.filterStoreIds);
+        }*/
         let temp=[];
 
         filterStoreArray.forEach(storeId => {
@@ -782,7 +864,7 @@ export default {
         console.log("filterStoreId:",filterStoreId);
         if(filterStoreId.length==0){
           this.curStore = filterStoreArray;
-          
+
           /*if(this.curStore.length == filterStoreArray.length){
             this.curStore.unshift({ value: '-1', label: i18n.t('remotePatrol.all') });
           }*/
@@ -796,18 +878,18 @@ export default {
         console.log("2.curStore:",this.curStore);
         this.storeStr = (filterStoreId.length==0)?allfilterStoreStr.substr(0, filterStoreStr.length - 1) :filterStoreStr.substr(0, filterStoreStr.length - 1);
       }
+        
 
-      
       this.getStoreGroupString();
       this.getStoreTypeString();
       if(this.emitChanged){
-          console.log('*****emitStoreChange');
+          // console.log('*****emitStoreChange');
           this.$emit('emitStoreChange', this.filterStoreIds);
         }
-      console.log("Emit From fitlerstore")
+      // console.log("Emit From fitlerstore")
       this.emitParams();
      // console.log("emitChanged:",this.emitChanged);
-      
+
     },
 
     getStoreGroupString() {
@@ -829,7 +911,7 @@ export default {
     },
 
     emitParams() {
-      console.log("Emit Params")
+      // console.log("Emit Params")
       const tempsearchParamsObj = {};
       //console.log("*storeFilter>emitParams>this.curCountry:",this.curCountry);
       tempsearchParamsObj.curCountry = this.curCountry;
@@ -852,9 +934,9 @@ export default {
         if(favoritStoreExist){
           tempsearchParamsObj.curSelectedStore = this.curSelectedStore;
         }else{
-          this.curSelectedStore = '';
-          tempsearchParamsObj.curSelectedStore = "";
-      }
+            this.curSelectedStore = '';
+            tempsearchParamsObj.curSelectedStore = "";
+        }
 
       }
       else
@@ -871,7 +953,7 @@ export default {
       if (groupArr.length > 0 && typeArr.length === 0) {
         groupIdArr = groupArr.map(group => group.contents);
         //console.log("1.groupIdArr:",groupIdArr);
-        const arrToSet = new Set(groupIdArr.flat()); 
+        const arrToSet = new Set(groupIdArr.flat());
         const uniqueArray = [...arrToSet];
         console.log("group uniqueArray:",uniqueArray);
         return uniqueArray;
@@ -892,7 +974,7 @@ export default {
     },
     getUniqueStoreId(arrId){
       var arr1=arrId[0];
-      console.log("*1.newIds:",newIds);
+      // console.log("*1.newIds:",newIds);
       for(let i =1; i<arrId.length;i++){
         var arr2 = arrId[i];
         let result = arr1.concat(arr2.filter((e)=>{
@@ -900,7 +982,7 @@ export default {
         }))
         arr1 = result;
       }
-       console.log("*2.newIds:",newIds);
+      // console.log("*2.newIds:",newIds);
       return newIds;
     },
     getSelectCountryOrCity() {
@@ -992,7 +1074,7 @@ export default {
     },
 
     async selectAllProAndCity(val,initFilter) {
-      console.log("contry changed");
+      // console.log("contry changed");
       const self = this;
       const storeList = self.storeList;
       const temp = [];
@@ -1083,7 +1165,7 @@ export default {
           self.curStore = (self.ifGetParamsFromCash && self.curStore.indexOf('-1') === -1) ? self.curStore : storeArr;
           self.ifGetParamsFromCash = false;
           //self.getStoreListAndGroupAndType(true);
-          console.log("go changeStoreNew:",self.curStore);
+          // console.log("go changeStoreNew:",self.curStore);
           self.changeStoreNew(self.curStore);
         }, 100);
       //}
@@ -1091,9 +1173,9 @@ export default {
 
     getSearchParams() {
       const searchParams = this.cachedParams;
-      console.log("getSearchParams > searchParams:",searchParams);
-      if (Object.keys(searchParams).length > 0) {
-        
+      // console.log("getSearchParams > searchParams:",searchParams);
+      if (Object.keys(searchParams).length > 0 && !this.enableMimicMode) {
+
         if (searchParams.curCountry) {
           this.curCountry = searchParams.curCountry;
           this.curProvince = searchParams.curProvince;
@@ -1103,8 +1185,6 @@ export default {
           this.curStoreType = searchParams.curStoreType;
           this.curSelectedStore = searchParams.curSelectedStore;
           this.ifGetParamsFromCash = true;
- 
-         
           if(searchParams.searchFrom == "PatrolPersonStat"){
             this.getStoreListAndGroupAndType();
           }
@@ -1122,18 +1202,18 @@ export default {
     /deep/ .el-input__inner {
       border: none;
       font-size: 15px;
-      height: calc(28/1440*100vw); 
-      line-height: calc(28/1440*100vw); 
+      height: calc(28/1440*100vw);
+      line-height: calc(28/1440*100vw);
     }
   }
   .favorite {
-    width: calc(115/1440*100vw); 
-    height: calc(28/1440*100vw); 
+    width: calc(115/1440*100vw);
+    height: calc(28/1440*100vw);
     font-size: calc(15/1920*100vw);
-    line-height: calc(28/1440*100vw); 
-    user-select: none; 
-    cursor: pointer; 
-    margin-right: calc(20/1440*100vw);  
+    line-height: calc(28/1440*100vw);
+    user-select: none;
+    cursor: pointer;
+    margin-right: calc(20/1440*100vw);
     text-align: center;
   }
   .content{
@@ -1171,13 +1251,13 @@ export default {
       margin-right: calc(15/1920*100vw);
       min-width: 85px;
       min-height: 36px;
-      
+
     }
     .region{
       display:inline;
       width: calc(217/1440*100vw);
     }
-    
+
     .normal-span{
       font-size: calc(14/1920*100vw);
       margin-right: calc(20/1920*100vw);
@@ -1251,11 +1331,11 @@ export default {
     width: calc(100% - 30px);
     position: absolute;
     left: 0;
-    
+
   }
   >>> .el-select .el-input--medium .el-input__suffix{
     top:0px !important;
-    
+
   }
   >>> .el-select__tags{
     opacity: 0;

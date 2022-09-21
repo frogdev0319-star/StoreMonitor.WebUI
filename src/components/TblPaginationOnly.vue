@@ -2,7 +2,7 @@
   <div class="toolbar pagination">
     <el-button class="btnArrow" :style="btnStyle" icon="el-icon-arrow-left" :disabled="currentPage==1" @click="handlePrevClick"></el-button>
     <div class="pageNum">{{currentPage}}</div>
-    <el-button class="btnArrow" :style="btnStyle" icon="el-icon-arrow-right" :disabled="currentPage==total" @click="handleNextClick"></el-button>
+    <el-button class="btnArrow" :style="btnStyle" icon="el-icon-arrow-right" :disabled="currentPage>=total" @click="handleNextClick"></el-button>
     <div v-if="showPageSize" class="pageSizeTitle">{{$t('overview.pageSize')}}</div>
     <div v-if="showPageSize" class="pageSize-select" :class="getLangStyleValue(pageSelectClass)">
           <el-select
@@ -91,8 +91,23 @@ export default {
       immediate: false, 
       deep: true,
       handler (val) {
+        // console.log("page total:",val);
+        // console.log("this.currentPage:",this.currentPage);
           this.total = val;
-          this.currentPage = 1;
+          if(this.currentPage!=1 && this.total< this.currentPage) {
+            this.currentPage = this.currentPage-1;
+            this.handleCurrentChange(this.currentPage);
+          }
+          
+      }
+    },
+    currentPage:{
+      immediate: false, 
+      deep: true,
+      handler (val) {
+        console.log("currentPage:",val);
+        if(val>0)this.currentPage = val;
+        else this.currentPage =1;
       }
     }
   },
@@ -139,7 +154,7 @@ export default {
       }
     },
     handleNextClick(){
-      
+
       if(this.currentPage<this.total){
         this.handleCurrentChange(this.currentPage+1)
       }

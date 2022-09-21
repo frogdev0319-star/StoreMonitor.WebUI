@@ -5,13 +5,12 @@
         <div
           :class="logoClass"
           class="logo-content">
-          <img id="imgLogo" :src="collapsed?miniImgSrc:imgSrc" alt="logo" @click="routerHome" />
-          <div v-if="!collapsed" class="meta">{{$t(`route.meta`)}}</div>
+          <img id="imgLogo" :src="collapsed ? miniImgSrc:imgSrc" alt="logo" @click="routerHome" >
+          <div v-if="!collapsed" class="meta">{{ $t(`route.meta`) }}</div>
           <img
+            :src=" collapsed ? arrowRightIcon : arrowLeftIcon "
             class="img-collapsed"
-            :src="collapsed ? arrowRightIcon : arrowLeftIcon"
-            @click="clickCollapse"
-          />
+            @click="clickCollapse" >
         </div>
         <div>
           <el-breadcrumb separator="|" class="breadcrumb-inner">
@@ -22,50 +21,69 @@
               :to="{ path: item.path }"
               class="breadcrumb-item"
             >
-
               <span
-              v-if="item.name!='remotePatrol'"
+                v-if="item.name!='remotePatrol'"
                 :class="
                   index!=breadList.length-1
                     ? 'bold-breadcrumb-span'
-                    : 'normal-breadcrumb-span'"
-              >
-                {{ $t(`route.${item.name}`)}}</span
-              >
+                  : 'normal-breadcrumb-span'">
+                {{ $t(`route.${item.name}`) }} </span>
+                
+                
               <span
                 @click="backPage"
-               v-if="item.name=='remotePatrol'"
-                 :class="
-                   showIgnoreItem
-                    ? 'bold-breadcrumb-span'
-                    : 'normal-breadcrumb-span'
-                "
-              >
-                {{ $t(`route.${item.name}`)}}</span
-              >
+                v-if="item.name=='remotePatrol'"
+                  :class="
+                    showIgnoreItem
+                      ? 'bold-breadcrumb-span'
+                      : 'normal-breadcrumb-span'
+                  "
+                >
+                {{ $t(`route.${item.name}`)}}</span>
               <span v-if="item.name=='remotePatrol' && showIgnoreItem && breadList.length==2"
-                :class="'normal-breadcrumb-span'"
-              >
-                {{" | " + $t("remotePatrol.clickToContent")}}</span
-              >
+                :class="'normal-breadcrumb-span'" >
+                {{" | " + $t("remotePatrol.clickToContent")}}</span>
+
             </el-breadcrumb-item>
           </el-breadcrumb>
         </div>
         <div>
+          <div v-if="$route.path ==='/reportdetails'"
+              style="background-color: transparent; color: #fff; border: none; position:absolute;top:15px;right:24px">
+            <el-dropdown 
+              style="display:flex; flex-direction: row-reverse; align-items: center;color: #fff;cursor: pointer;">
+              <div class="button-area">
+                <img :src="exportPdf" class="icon-excel" />
+                <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
+              </div>
+              <el-dropdown-menu slot="dropdown" class="dropdown">
+                <el-dropdown-item
+                  class="dropdown-item"
+                  style="width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
+                  @click.native="handleDownload"
+                >{{ $t('remotePatrol.exportPDF') }}</el-dropdown-item>
+                <el-dropdown-item
+                  class="dropdown-item"
+                  style=" width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw); font-size:calc(14/1920*100vw);"
+                  @click.native="handleDownloadExcel"
+                  >{{ $t('remotePatrol.exportExcel') }}</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </div>
           <el-button
-            v-if="$route.path === '/patrolPersonStat'
-             || $route.path === '/patrolCompareStat'
-             || $route.path ==='/eventStat'
-               || $route.path === '/patrolItem'
-             || $route.path ==='/patrolEvaluation'
-             || $route.path ==='/reportdetails'"
+            v-else-if="$route.path === '/patrolPersonStat'
+              || $route.path === '/patrolCompareStat'
+              || $route.path ==='/eventStat'
+                || $route.path === '/patrolItem'
+              || $route.path ==='/patrolEvaluation'"
             style="background-color: transparent; color: #fff; border: none; position:absolute;top:6px;right:24px"
             @click="handleDownload"
           >
-            <div class="button-area">
-              <img :src="exportPdf" class="icon-excel">
-              <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
-            </div>
+          
+          <div class="button-area" >
+            <img :src="exportPdf" class="icon-excel" />
+            <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
+          </div>
             <!--<div>
               <img :src="exportPdf" class="icon-excel">
               <i class="iconfont icon-pdf export" />
@@ -199,18 +217,25 @@
             </el-menu>
           </el-scrollbar>
           <div class="spacer"></div>
-          <div class="headUrl-content flex-center">
-            <el-dropdown class="el-user-drop" style="display:flex; flex-direction: row-reverse; align-items: center">
-              <span v-if="!collapsed" class="username">
-                {{ userName }}
-                <i class="el-icon-arrow-down el-icon--right"/>
+          <div class="headUrl-content flex-center" :style="collapsed?{'justify-content':'center'}:{}">
+            <el-dropdown class="el-user-drop" >
+              <span class="el-dropdown-link" style="display:flex; flex-direction: row-reverse; align-items: center">
+                <div v-if="!collapsed"  class="username">{{ userName }}</div>
+                <div class="headImg" :style="collapsed?{'margin-left':'calc(-20/1920*100vw)'}:{'margin-right':'calc(16/1920*100vw)'}">{{iconName}}</div>
               </span>
-              <div class="headImg" :style="collapsed?{}:{'margin-right':'calc(16/1920*100vw)'}">{{iconName}}</div>
               <el-dropdown-menu slot="dropdown" class="dropdown">
+                <el-dropdown-item
+                  v-if="hasMystery"
+                  class="dropdown-item"
+                  style="width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
+                  @click.native="changeMimicMode">{{showMimicMode? $t('route.generalMode'):$t('route.mimicMode') }}</el-dropdown-item>
                 <el-dropdown-item
                   :disabeled="true"
                   class="dropdown-item"
-                  style="width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);">{{ $t('route.my') }}</el-dropdown-item>
+                  style="width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
+                  @click.native="changePWD"
+                >{{ $t('route.changePWD') }}
+                </el-dropdown-item>
                 <el-dropdown-item
                   class="dropdown-item"
                   style=" width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw); font-size:calc(14/1920*100vw);"
@@ -248,7 +273,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.0.3.18.4i
+                v3.0.4.3
                  &copy; {{ getFullYear }} Advantech Intelligent City
                 Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
@@ -257,6 +282,30 @@
         </section>
       </el-col>
     </el-row>
+    <dialog-pop
+      v-if="leaveObj.dialogCosed"
+      :title="leaveObj.title"
+      :isWarning="leaveObj.isWarning"
+      :visible="leaveObj.dialogCosed"
+      @cancelHandler="cancelLeave"
+      @confirmHandler="leaveDialog"
+      >
+      <div class="dialog-slot">
+        {{leaveObj.showInfo}}
+      </div>
+    </dialog-pop>
+    <dialog-pop
+          v-if="EditRptchangeStoreObj.dialogCosed"
+          :title="EditRptchangeStoreObj.title"
+          :isWarning="EditRptchangeStoreObj.isWarning"
+          :visible="EditRptchangeStoreObj.dialogCosed"
+          :showCancelbtn="false"
+          @confirmHandler="()=>EditRptchangeStoreObj.dialogCosed=false"
+          >
+          <div class="dialog-slot">
+            {{EditRptchangeStoreObj.showInfo}}
+          </div>
+        </dialog-pop>
   </div>
 </template>
 <script>
@@ -264,8 +313,13 @@ import { mapGetters } from "vuex";
 import PubSub from 'pubsub-js';
 import Database from '@/common/Database';
 import util from '@/common/util.js';
+import PermissionHelper from '../../api/PermissionHelper';
+import DialogPop from '@/components/DialogPop.vue';
 export default {
   name: "Home",
+  components: {
+    DialogPop
+  },
   data() {
     return {
       showTag: false,
@@ -303,6 +357,20 @@ export default {
       isMobile: false,
       brandDisabled: false,
       showIgnoreItem:false,
+      showMimicMode:false,
+      hasMystery:false,
+      leaveObj: {
+        title: this.$t('remotePatrol.prompt'),
+        showInfo: this.$t('remotePatrol.changPageInfo'),
+        isWarning: true,
+        dialogCosed: false
+      },
+      EditRptchangeStoreObj: {
+        title: this.$t('remotePatrol.prompt'),
+        showInfo: this.$t('remotePatrol.cannotSwitchMimicMode'),
+        isWarning: false,
+        dialogCosed: false
+      },
     };
   },
 
@@ -338,9 +406,11 @@ export default {
     },
 
     routerList() {
+      //console.log("get routerList:",this.$store.getters.mimicMode);
       const routes = this.$store.state.user.routes
         .slice(1, this.$store.state.user.routes.length)
         .filter((route) => !route.hidden);
+      console.log("get routerList > routes :",routes);
       return routes;
     },
 
@@ -394,8 +464,8 @@ export default {
 
     activePath() {
       let path = this.$route.path;
-      //console.log("activePath:",path);
-      //console.log("active rout name:",this.$route.name);
+      console.log("activePath:",path);
+      console.log("active rout name:",this.$route.name);
       const pathMapArr = [
         {
           curPath: ["/reinspect/confirmrein", "/reinspect/submit"],
@@ -411,15 +481,45 @@ export default {
         { curPath: ["/storedetail"], activePath: "/storemanage" },
         { curPath: ["/ezvizeDeviceSetting"], activePath: "/ezvizDevice" },
         { curPath: ["/beseyeDeviceSetting"], activePath: "/beseyeAccount" },
-     //   { curPath: ["/skywatchDeviceSetting"], activePath: "/skywatchAccount" },
+        //   { curPath: ["/skywatchDeviceSetting"], activePath: "/skywatchAccount" },
         { curPath: ["/titleSetting"], activePath: "/title" },
+
+        { curPath: ["/createWorkflow"], activePath: "/workflows" },
         { curPath: ["/workflowDetail"], activePath: "/workflows" },
+
+        { curPath: ["/createWorkflownode"], activePath: "/createWorkflow" },
+        { curPath: ["/createEditWorkflownode"], activePath: "/createWorkflow" },
+
+        { curPath: ["/workflownode"], activePath: "/workflowDetail" },
+
+
+        { curPath: ["/auditDetail"], activePath: "/audit" },
+        { curPath: ["/auditReportdetails"], activePath: "/auditDetail" },
+
+        { curPath: ["/waitAuditDetail"], activePath: "/waitaudit" },
+        { curPath: ["/waitAuditReportdetails"], activePath: "/waitAuditDetail" },
+        { curPath: ["/handlingReportdetails"], activePath: "/auditHandling" },
+
+        
+        { curPath: ["/transcriptnotifyAuditDetail"], activePath: "/transcriptnotify" },
+        { curPath: ["/transcriptnotifyReportdetails"], activePath: "/transcriptnotifyAuditDetail" },
+        
+
+        { curPath: ["/auditHandling"], activePath: "/waitaudit" },
+        { curPath: ["/reportdetails"], activePath: "/auditHandling" },
+        //神秘客
+        { curPath: ["/mysterioSetting"], activePath: "/mysterio" },
+
       ];
       const pathMAP = pathMapArr.find((item) => item.curPath.includes(path));
+      console.log('pathMAP :>> ', pathMAP);
+
       if (pathMAP) {
         path = pathMAP.activePath;
         this.setBrandListDisabled(true);
-      } else {
+      } else if(this.showMimicMode){
+        this.setBrandListDisabled(true);
+      }else {
         this.setBrandListDisabled(false);
       }
       return path;
@@ -429,7 +529,7 @@ export default {
       return this.$store.state.cachePath;
     },
 
-    ...mapGetters(["token", "name", "availabePathList"]),
+    ...mapGetters(["token", "name", "availabePathList","mimicMode","isMystery"]),
   },
 
   watch: {
@@ -457,6 +557,14 @@ export default {
     $route() {
       this.getBread();
     },
+    mimicMode(){
+      this.showMimicMode = this.$store.getters.mimicMode;
+      
+    },
+    isMystery(){
+      this.hasMystery = this.$store.getters.isMystery;
+      console.log("hasMystery:",this.hasMystery);
+    }
   },
   created() {
     const self = this;
@@ -466,9 +574,11 @@ export default {
     });
     PubSub.subscribe("success-page", (event, data) => {
       if (data.changeStyle) {
-        self.wapper = true;
+        self.wapper = true; 
+        
       }
     });
+    
     window.addEventListener("resize", this.$_isMobile);
     self.$_isMobile();
     this.getBrandList();
@@ -483,9 +593,40 @@ export default {
         );
       });
     }
+    this.$store.dispatch("GetIsMysteryMode");
+    this.showMimicMode = this.$store.getters.ShowMimicMode;
+    this.hasMystery = this.$store.getters.isMystery;
   },
 
   methods: {
+    changeMimicMode(){
+      if(this.$route.path=="/reinspection" && this.$store.getters.editReport){
+        this.EditRptchangeStoreObj.dialogCosed = true;
+      }else if(this.$route.path=="/reinspection" && this.$store.getters.editCount != 0){
+        this.leaveObj.dialogCosed = true;
+      }
+      else{
+        var mode = !this.showMimicMode;
+        this.showMimicMode = !this.showMimicMode;
+        PermissionHelper.setShowMimicMode(this.showMimicMode);
+        this.$store.dispatch('setMimicMode', mode);
+        this.changeRoutes(true);
+      }
+    },
+    leaveDialog() {
+      var mode = !this.showMimicMode;
+      this.showMimicMode = !this.showMimicMode;
+      PermissionHelper.setShowMimicMode(this.showMimicMode);
+      this.$store.dispatch('setMimicMode', mode);
+      this.$store.dispatch('setEditCount', 0);
+      this.leaveObj.dialogCosed = false;
+      this.changeRoutes(true);
+
+    },
+    cancelLeave() {
+      const self = this;
+      self.leaveObj.dialogCosed = false;
+    },
     listenerChild(reply) {
       //console.log("listenerChil="+reply)
       this.showIgnoreItem = reply;
@@ -494,9 +635,14 @@ export default {
       this.showIgnoreItem  =false;
     },
     handleDownload() {
-      console.log(document.getElementById("downloadPdf"))
-      console.log(document.getElementById("downloadPdf").click)
+      // console.log(document.getElementById("downloadPdf"))
+      // console.log(document.getElementById("downloadPdf").click)
       document.getElementById("downloadPdf").click();
+    },
+    handleDownloadExcel() {
+      // console.log(document.getElementById("downloadPdf"))
+      // console.log(document.getElementById("downloadPdf").click)
+      document.getElementById("downloadExcel").click();
     },
     setBrandListDisabled(booleanFlag) {
       this.brandDisabled = booleanFlag;
@@ -535,6 +681,7 @@ export default {
     getBread() {
       this.breadList = [];
       const currentRoute = this.$route.fullPath;
+      
       let matched = [];
       matched = this.$route.matched.filter((x) => x.name);
       matched.length === 2 &&
@@ -543,6 +690,8 @@ export default {
         matched[0].name === "systemSetting" &&
         this.setSystemNavbarBread(matched, currentRoute);
       this.breadList = matched;
+
+      console.log('breadList ------>> ', this.breadList);
     },
 
     setScheduleBread(matched, currentRoute) {
@@ -587,6 +736,7 @@ export default {
     setSecondBread(matched, str, path) {
       matched[1].name = str;
       matched[1].path = path;
+    
     },
 
     setInspectionSettingBread(matched, currentRoute) {
@@ -684,6 +834,75 @@ export default {
           parentBread: { path: "/workFlows", name: "workflowManage" },
         },
         {
+          paths: ["/createWorkflow"],
+          parentBread: { path: "/workFlows", name: "workflowManage" },
+        },
+
+        {
+          paths: ["/createWorkflownode"],
+          parentBread: { path: "/createWorkflow", name: "createWorkflow" },
+        },
+        {
+          paths: ["/createEditWorkflownode"],
+          parentBread: { path: "/createWorkflow", name: "createWorkflow" },
+        },
+        {
+          paths: ["/workflownode"],
+          parentBread: { path: "/workflowDetail", name: "workflowDetail" },
+        },
+
+        {
+          paths: ["/auditDetail"],
+          parentBread: { path: "/audit", name: "SendAuditManage" },
+        },
+        {
+          paths: ["/auditReportdetails"],
+          parentBread: { path: "/auditDetail", name: "reportdetailsAuditDetail" },
+        },
+
+
+        {
+          paths: ["/waitAuditDetail"],
+          parentBread: { path: "/waitaudit", name: "WaitAuditManage" },
+        },
+
+        {
+          paths: ["/waitAuditReportdetails"],
+          parentBread: { path: "/waitAuditDetail", name: "reportdetailsAuditHandling" },
+        },
+
+        {
+          paths: ["/handlingReportdetails"],
+          parentBread: { path: "/auditHandling", name: "reportdetailsAuditHandling" },
+        },
+        
+
+
+        {
+          paths: ["/transcriptnotifyAuditDetail"],
+          parentBread: { path: "/transcriptnotify", name: "TranscriptNotify" },
+        },
+
+        {
+          paths: ["/transcriptnotifyReportdetails"],
+          parentBread: { path: "/transcriptnotifyAuditDetail", name: "reportdetailsAuditTranscriptnotify" },
+        },
+        
+        {
+          paths: ["/auditHandling"],
+          parentBread: { path: "/waitaudit", name: "WaitAuditManage" },
+        },
+        {
+          paths: ["/audit/auditDetail/reportdetails"],
+          parentBread: { path: "/auditDetail", name: "reportdetailsAuditDetail" },
+        },
+        {
+          paths: ["/audit/auditHandling/reportdetails"],
+          parentBread: { path: "/auditHandling", name: "reportdetailsAuditHandling" },
+        },
+
+
+        {
           paths: ["/addroute", "/setroute", "/bindroute"],
           parentBread: { path: "/routeinspection", name: "inspectSetting" },
         },
@@ -703,6 +922,12 @@ export default {
           paths: ["/reinspect/confirmrein", "/reinspect/submit"],
           parentBread: { path: "/reinspection", name: "remotePatrol" },
         },
+        //神秘客
+        {
+          paths: ["/mysterioSetting"],
+          parentBread: { path: "/mysterio", name: "MysterioManage" },
+        },
+
       ];
       const pathAndBreadMap = pathAndBreadMaps.find((map) =>
         map.paths.includes(currentRoute)
@@ -728,18 +953,25 @@ export default {
     fedlogout() {
       Database.destoryDB();
       const url = sessionStorage.getItem("LoginURL");
+      let nowHref = window.location.href;
+      if(!nowHref.includes("http://localhost:8088/"))
+        window.location.href = url;
+      else this.$router.push({ name: 'Login'})
+
+    },
+    changePWD(){
+      const url = sessionStorage.getItem("LoginURL")+"/changepwd";
       window.location.href = url;
     },
-
     logOut() {
       const self = this;
       self.$store.dispatch("logout").then(() => {});
     },
     async getBrandList() {
       await this.changeRoutes();
-      console.log("Get Brand List");
+      // console.log("Get Brand List");
       this.brandList = JSON.parse(sessionStorage.getItem("brandList"));
-      console.log(this.brandList);
+      // console.log(this.brandList);
       const idIndex = this.brandList
         .map((item) => item.accountId)
         .indexOf(this.accountId);
@@ -757,38 +989,41 @@ export default {
       let data = null;
       if(idIndex !== -1)
         data = this.brandList[idIndex].srp.find(item=>item.type == "Custom_Inspection");
-      console.log("Change Account")
-      console.log(this.brandList[idIndex])
+      // console.log("Change Account")
+      // console.log(this.brandList[idIndex])
 
 
       if(!data || !data.enable){
-         this.accountId = this.orgAccountId
-         util.notify(self.$t('route.noInspectionAccessRights'), 'warning', 3000);
-         return ;
+        this.accountId = this.orgAccountId
+        util.notify(self.$t('route.noInspectionAccessRights'), 'warning', 3000);
+        return ;
       }
 
       const params = {
         accountId: accountId,
       };
-      console.log("Change Account:",this.orgAccountId,this.accountId)
+      // console.log("Change Account:",this.orgAccountId,this.accountId)
       self.$store.dispatch("changeAccount", params).then((res) => {
         if (res.errCode === 0) {
           sessionStorage.setItem("accountName", this.brandList[idIndex].name);
           sessionStorage.setItem("accountId", this.accountId);
           self.changeRoutes();
           self.$route.meta.keepAlive = false;
+          self.$store.dispatch("GetIsMysteryMode");
         }
         else{
           this.accountId = this.orgAccountId
-           util.notify(self.$t('route.accountTerminated'), 'warning', 3000);
+          util.notify(self.$t('route.accountTerminated'), 'warning', 3000);
         }
       });
+      
     },
 
-    async changeRoutes() {
-      console.log("Change Routes");
+    async changeRoutes(mimicModeChanged=false) {
+      //console.log("*Change Routes mimicModeChanged:",mimicModeChanged);
       const self = this;
       const result = await self.$store.dispatch("GetUserAuthorities");
+      
       if (result.errCode === 0) {
         await self.$store.dispatch("generateRoutes");
         self.getUserName(result.data);
@@ -797,8 +1032,14 @@ export default {
           this.$router.push("/noRight");
         } else if (!availablePathesList.includes(this.$route.path)) {
           this.$router.push(availablePathesList[0]);
-        } else {
-          console.log(this.$route.path);
+        } else if(mimicModeChanged && this.$route.path=="/auditDetail" || this.$route.path=="/auditReportdetails"){
+          this.$router.push("/audit");
+        //this.$router.path = "/audit";
+        }else if(mimicModeChanged && this.$route.path=="/reportdetails"){
+        this.$router.push("/report");
+        //this.$router.path = "/report";
+        }else {
+          // console.log(this.$route.path);
           this.$router.push(this.$route.path);
         }
       }
@@ -862,7 +1103,7 @@ export default {
     font-size: calc(22/1920*100vw);
     background-color: #FFF;
     color: #484848;
-    height: calc(40/1920*100vw);
+    height: calc(40/1920*100vw) !important;
   }
     /deep/
     .el-select__caret{
@@ -1578,6 +1819,11 @@ $collapseWidth: 5.5%;
 }
 /deep/ #el-menuscrollbar .el-scrollbar__wrap .el-scrollbar__bar.is-horizontal {
   display: none !important;
+}
+.dialog-slot{
+  margin: 0 calc(20/1920*100vw) calc(20/1920*100vw);
+  display: flex;
+  align-items: center;
 }
 </style>
 <style  lang="scss">

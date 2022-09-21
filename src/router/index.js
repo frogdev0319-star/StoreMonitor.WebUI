@@ -5,6 +5,7 @@ import AuthRedirect from '@/views/login/AuthRedirect';
 import Home from '@/views/home/Home';
 import PermissionHelper from '@/api/PermissionHelper';
 import util from '../common/util';
+import store from '@/store';
 
 Vue.use(Router);
 /**
@@ -17,15 +18,15 @@ Router.prototype.push = function push(location) {
   return originalPush.call(this, location).catch(err => err);
 }
 export const constantRoutes = [
-   {
-     path: '/login',
-     name: 'Login',
-     hidden: true,
-     component: LoginForm,
-     meta: {
-       requireAuth: false
-     }
-   },
+  {
+    path: '/login',
+    name: 'Login',
+    hidden: true,
+    component: LoginForm,
+    meta: {
+      requireAuth: false
+    }
+  },
   {
     path: '/:token/:userId/:ezvizAppKey/:ezvizProtocol/:lang/:deviceAuth',
     redirect: '/',
@@ -71,20 +72,21 @@ export const navbarRoute = {
       isReadOnly: false,
       children: []
     };
-    PermissionHelper.enableRemoteOverview() && overviewRoute.children.push({
+    !PermissionHelper.enableMimicMode && PermissionHelper.enableRemoteOverview() && overviewRoute.children.push({
       path: '/patrolOverview',
       name: 'patrolOverview',
       component: resolve => require(['@/views/overview/PatrolOverview'], resolve)
     }) && primaryPathesList.push('/patrolOverview');
-    PermissionHelper.enableEventOverview() && overviewRoute.children.push({
+    !PermissionHelper.enableMimicMode && PermissionHelper.enableEventOverview() && overviewRoute.children.push({
       path: '/eventOverview',
       name: 'eventOverview',
       component: resolve => require(['@/views/overview/EventOverview'], resolve)
     }) && primaryPathesList.push('/eventOverview');
     return overviewRoute;
   },
-
+  
   getPatrolRoute() {
+    console.log("PermissionHelper.enableInspectReport()",PermissionHelper.enableInspectReport());
     const patrolRoute = {
       path: '/home',
       name: 'patrolManage',
@@ -95,7 +97,7 @@ export const navbarRoute = {
       hidden: false,
       children: []
     };
-    PermissionHelper.enableRemoteInspect() && patrolRoute.children.push(
+    (PermissionHelper.enableMimicMode || PermissionHelper.enableRemoteInspect()) && patrolRoute.children.push(
       {
         path: '/reinspection',
         name: 'remotePatrol',
@@ -118,7 +120,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/patrolShop/ReInspectDealPage'], resolve)
       }
     ) && primaryPathesList.push('/reinspection', '/reinspect/confirmrein', '/reinspect/submit');
-    PermissionHelper.enableStoreMonitor() && patrolRoute.children.push(
+    !PermissionHelper.enableMimicMode && PermissionHelper.enableStoreMonitor() && patrolRoute.children.push(
       {
         path: '/storemonitor',
         name: 'storeMonitor',
@@ -136,7 +138,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/patrolShop/StoreSuccessPage'], resolve)
       }
     ) && primaryPathesList.push('/storemonitor', '/storemonitor/submit');
-    PermissionHelper.enableInspectReport() && patrolRoute.children.push(
+    (PermissionHelper.enableMimicMode || PermissionHelper.enableInspectReport()) && patrolRoute.children.push(
       {
         path: '/report',
         name: 'reports',
@@ -171,7 +173,7 @@ export const navbarRoute = {
       hidden: false,
       children: []
     };
-    eventRoute.children.push(
+    !PermissionHelper.enableMimicMode && eventRoute.children.push(
       {
         path: '/event',
         name: 'eventManage',
@@ -191,6 +193,116 @@ export const navbarRoute = {
     return eventRoute;
   },
 
+  getAuditRoute() {
+    const auditRoute = {
+      path: '/home',
+      name: 'AuditManage',
+      component: Home,
+      iconCls: 'iconfont icon-shijian',
+      styles: 'font-size:22px',
+      leaf: false,
+      hidden: false,
+      children: []
+    };
+    (PermissionHelper.enableMimicMode || PermissionHelper.enableSendAudit()) && auditRoute.children.push(
+      {
+        path: '/audit',
+        name: 'SendAuditManage',
+        component: resolve => require(['@/views/audit/SendAuditManage'], resolve),
+        meta: {
+          keepAlive: true, // the component is't to be cache.
+          requireAuth: true
+        },
+        isReadOnly: false
+      },
+      {
+        path: '/auditDetail',
+        name: 'auditDetail',
+        hidden: true,
+        component: resolve => require(['@/views/audit/details/AuditDetail'], resolve)
+      },
+      {
+        path: '/auditReportdetails',
+        name: 'auditReportdetails',
+        hidden: true,
+        meta: {
+          keepAlive: false
+        },
+        component: resolve => require(['@/views/patrolShop/InspectReport'], resolve)
+      }
+    ) && primaryPathesList.push('/audit', '/auditDetail','/auditReportdetails');
+    !PermissionHelper.enableMimicMode && PermissionHelper.enableWaitAudit() && auditRoute.children.push(
+      {
+        path: '/waitaudit',
+        name: 'WaitAuditManage',
+        component: resolve => require(['@/views/audit/WaitAuditManage'], resolve),
+        meta: {
+          requireAuth: true,
+          keepAlive: true
+        },
+        isReadOnly: false
+      },
+      {
+        path: '/auditHandling',
+        name: 'auditHandling',
+        hidden: true,
+        component: resolve => require(['@/views/audit/details/AuditHandling'], resolve)
+      },
+      {
+        path: '/waitAuditDetail',
+        name: 'WaitAuditDetail',
+        hidden: true,
+        component: resolve => require(['@/views/audit/details/AuditDetail'], resolve)
+      },
+      {
+        path: '/waitAuditReportdetails',
+        name: 'WaitAuditReportdetails',
+        hidden: true,
+        meta: {
+          keepAlive: false
+        },
+        component: resolve => require(['@/views/patrolShop/InspectReport'], resolve)
+      },
+      {
+        path: '/handlingReportdetails',
+        name: 'handlingReportdetails',
+        hidden: true,
+        meta: {
+          keepAlive: false
+        },
+        component: resolve => require(['@/views/patrolShop/InspectReport'], resolve)
+      }
+    ) && primaryPathesList.push('/waitaudit', '/auditHandling','/waitAuditDetail','/waitAuditReportdetails','/handingReportdetails');
+    !PermissionHelper.enableMimicMode && PermissionHelper.enableTranscriptNotify() && auditRoute.children.push(
+      {
+        path: '/transcriptnotify',
+        name: 'TranscriptNotify',
+        component: resolve => require(['@/views/audit/TranscriptNotify'], resolve),
+        meta: {
+          requireAuth: true,
+          keepAlive: true
+        },
+        isReadOnly: false
+      },
+      {
+        path: '/transcriptnotifyAuditDetail',
+        name: 'TranscriptnotifyDetail',
+        hidden: true,
+        component: resolve => require(['@/views/audit/details/AuditDetail'], resolve)
+      },
+      {
+        path: '/transcriptnotifyReportdetails',
+        name: 'transcriptnotifyReportdetails',
+        hidden: true,
+        meta: {
+          keepAlive: false
+        },
+        component: resolve => require(['@/views/patrolShop/InspectReport'], resolve)
+      }
+    ) && primaryPathesList.push('/transcriptnotify','/transcriptnotifyAuditDetail','/transcriptnotifyReportdetails');
+    return auditRoute;
+  },
+
   getStatisticalRoute() {
     const statisticsRoute = {
       path: '/home',
@@ -202,7 +314,7 @@ export const navbarRoute = {
       hidden: false,
       children: []
     };
-    PermissionHelper.enablePatrolEvaStatistics() && statisticsRoute.children.push(
+    !PermissionHelper.enableMimicMode && PermissionHelper.enablePatrolEvaStatistics() && statisticsRoute.children.push(
       {
         path: '/patrolEvaluation',
         name: 'patrolAppraisalStat',
@@ -214,7 +326,7 @@ export const navbarRoute = {
         }
       }
     ) && primaryPathesList.push('/patrolEvaluation');
-    PermissionHelper.enableInspectStatistics() && statisticsRoute.children.push(
+    !PermissionHelper.enableMimicMode && PermissionHelper.enableInspectStatistics() && statisticsRoute.children.push(
       {
         path: '/patrolItem',
         name: 'patrolItemsStat',
@@ -227,7 +339,7 @@ export const navbarRoute = {
       },
       {
         path: '/patrolItem_old',
-        name: 'InspectItemStatistics_old',
+        name: 'patrolItem_old',
         component: resolve => require(['@/views/statistical/InspectItemStatistics_old'], resolve),
         hidden: true,
         meta: {
@@ -235,7 +347,7 @@ export const navbarRoute = {
         },
       }
     ) && primaryPathesList.push('/patrolItem','/patrolItem_old');
-    PermissionHelper.enableSupervisionEffStatistics() && statisticsRoute.children.push(
+    !PermissionHelper.enableMimicMode && PermissionHelper.enableSupervisionEffStatistics() && statisticsRoute.children.push(
       {
         path: '/patrolPersonStat',
         name: 'patrolPersonStat',
@@ -247,7 +359,7 @@ export const navbarRoute = {
         }
       }
     ) && primaryPathesList.push('/patrolPersonStat');
-    PermissionHelper.enableEventStatistics() && statisticsRoute.children.push(
+    !PermissionHelper.enableMimicMode && PermissionHelper.enableEventStatistics() && statisticsRoute.children.push(
       {
         path: '/eventStat',
         name: 'eventStat',
@@ -259,7 +371,7 @@ export const navbarRoute = {
         }
       }
     ) && primaryPathesList.push('/eventStat');
-    PermissionHelper.enableAppraisalCompareStatistics() && statisticsRoute.children.push(
+    !PermissionHelper.enableMimicMode && PermissionHelper.enableEventStatistics() && statisticsRoute.children.push(
       {
         path: '/patrolCompareStat',
         name: 'patrolCompareStat',
@@ -299,7 +411,6 @@ export const navbarRoute = {
     // ) && primaryPathesList.push('/checkInStatistics');
     return statisticsRoute;
   },
-
   getSystemSettingRoute() {
     const systemSettingRoute = {
       path: '/home',
@@ -314,7 +425,7 @@ export const navbarRoute = {
 
     const deviceRoutes = this.getDeviceRoutes();
     // console.log(deviceRoutes)
-    PermissionHelper.enableDeviceSetting() && deviceRoutes.length > 0 && systemSettingRoute.children.push(
+    !PermissionHelper.enableMimicMode && PermissionHelper.enableDeviceSetting() && deviceRoutes.length > 0 && systemSettingRoute.children.push(
       {
         path: '/device',
         name: 'deviceManage',
@@ -341,7 +452,7 @@ export const navbarRoute = {
       children: []
     };
 
-    PermissionHelper.enablePatrolSetting() && inspectionRoute.children.push(
+    !PermissionHelper.enableMimicMode && PermissionHelper.enablePatrolSetting() && inspectionRoute.children.push(
       {
         path: '/routeinspection',
         name: 'inspectListSetting',
@@ -369,7 +480,7 @@ export const navbarRoute = {
 
     ) && primaryPathesList.push('/routeinspection', '/addroute', '/setroute', '/bindroute');
 
-    PermissionHelper.enableScheduleSetting() && inspectionRoute.children.push({
+    /*!PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleSetting() && inspectionRoute.children.push({
       path: '/patrolSchedule',
       name: 'scheduleManage',
       isReadOnly: false,
@@ -379,9 +490,9 @@ export const navbarRoute = {
         keepAlive: false, // the component is't to be cache.
         requireAuth: true
       }
-    }) && primaryPathesList.push('/patrolSchedule');
+    }) && primaryPathesList.push('/patrolSchedule');*/
 
-    PermissionHelper.enableReportSetting() &&
+    !PermissionHelper.enableMimicMode && PermissionHelper.enableReportSetting() &&
     inspectionRoute.children.push({
       path: '/insepctionReportSetting',
       name: 'insepctionReportSetting',
@@ -395,7 +506,7 @@ export const navbarRoute = {
     }) && primaryPathesList.push('/insepctionReportSetting');
 
     inspectionRoute.children.length > 0 && systemSettingRoute.children.push(inspectionRoute);
-    PermissionHelper.enableTitleSetting() && systemSettingRoute.children.push(
+    !PermissionHelper.enableMimicMode && PermissionHelper.enableTitleSetting() && systemSettingRoute.children.push(
       {
         path: '/title',
         name: 'titleManage',
@@ -414,25 +525,69 @@ export const navbarRoute = {
         hidden: true
       }
     ) && primaryPathesList.push('/title', '/titleSetting');
-    // systemSettingRoute.children.push(
-    //   {
-    //     path: '/workflows',
-    //     name: 'workflowManage',
-    //     isReadOnly: false,
-    //     component: resolve => require(['@/views/setting/workflow/List'], resolve),
-    //     hidden: false,
-    //     meta: {
-    //       keepAlive: false, // the component is't to be cache.
-    //       requireAuth: true
-    //     }
-    //   },
-    //   {
-    //     path: '/workflowDetail',
-    //     name: 'workflowDetail',
-    //     component: resolve => require(['@/views/setting/workflow/Detail'], resolve),
-    //     hidden: true
-    //   }
-    // ) && primaryPathesList.push('/workflows', '/workflowDetail');
+    !PermissionHelper.enableMimicMode && PermissionHelper.enableWorkflowSetting() && systemSettingRoute.children.push(
+      {
+        path: '/workflows',
+        name: 'workflowManage',
+        isReadOnly: false,
+        component: resolve => require(['@/views/setting/workflow/List'], resolve),
+        hidden: false,
+        meta: {
+          keepAlive: false, // the component is't to be cache.
+          requireAuth: true
+        }
+      },
+      {
+        path: '/createWorkflow',
+        name: 'createWorkflow',
+        component: resolve => require(['@/views/setting/workflow/CreateWorkflow'], resolve),
+        hidden: true,
+      },
+      {
+        path: '/workflowDetail',
+        name: 'workflowDetail',
+        component: resolve => require(['@/views/setting/workflow/Detail'], resolve),
+        hidden: true,
+      },
+      {
+        path: '/createWorkflownode',
+        name: 'createNodeSetting',
+        component: resolve => require(['@/views/setting/workflow/NodeSetting'], resolve),
+        hidden: true,
+      },
+      {
+        path: '/createEditWorkflownode',
+        name: 'createEditNodeSetting',
+        component: resolve => require(['@/views/setting/workflow/NodeSetting'], resolve),
+        hidden: true,
+      },
+      {
+        path: '/workflownode',
+        name: 'nodeSetting',
+        component: resolve => require(['@/views/setting/workflow/NodeSetting'], resolve),
+        hidden: true,
+      }
+      
+    ) && primaryPathesList.push('/workflows', '/workflowDetail', '/createWorkflownode', '/workflownode', '/createWorkflow','/createEditWorkflownode');
+    (store.getters.roleId==1) && !PermissionHelper.enableMimicMode && systemSettingRoute.children.push(
+      {
+        path: '/mysterio',
+        name: 'MysterioManage',
+        isReadOnly: false,
+        component: resolve => require(['@/views/setting/mysterio/MysterioManage'], resolve),
+        hidden: false,
+        meta: {
+          keepAlive: false, // the component is't to be cache.
+          requireAuth: true
+        }
+      },
+      {
+        path: '/mysterioSetting',
+        name: 'MysterioSetting',
+        component: resolve => require(['@/views/setting/mysterio/MysterioSetting'], resolve),
+        hidden: true,
+      },
+    ) && primaryPathesList.push('/mysterio', '/mysteriosetting');
     return systemSettingRoute;
   },
 
@@ -516,7 +671,6 @@ export const navbarRoute = {
   },
 
   getAvailablePath() {
-
     return [...new Set(primaryPathesList)];
   }
 };

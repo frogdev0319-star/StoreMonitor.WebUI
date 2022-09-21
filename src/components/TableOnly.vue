@@ -25,7 +25,16 @@
       @expand-change="expandChange"
       @sort-change="handleSortChange"
       @row-click="handleRowClick"
-    >
+      @selection-change="handleSelectionChange"
+    > 
+      <el-table-column
+        v-if="indexType"
+        label= "節點序號"
+        type= "index"
+        align="left"
+        width="100"
+        :index= "indexMethod"
+      />
       <el-table-column
         v-if="showSelectionColumn"
         type="selection"
@@ -34,7 +43,7 @@
       />
       <el-table-column
         v-for="(_item,_index) in columnData"
-        :key="_index"
+        :key="_item.label+_index"
         :prop="_item.prop"
         :label="_item.label"
         :sortable="canSortable&&!isexportPDF ? _item.sortable : false"
@@ -60,11 +69,64 @@
             </div>
           </template>
           <span v-else-if="_item.formatter" v-html="_item.formatter(row)"/>
-          <template v-else-if="_item.isSwitch">
-            <el-switch :value="row[_item.prop]" @change="$emit('handleSwitchChange', { checked: $event, target: row })"></el-switch>
+
+
+          <!-- workflow switch state -->
+          <template v-else-if="_item.forDescription">
+            <div class="forDescription">
+              <div class="shortdescription">{{row.description}}</div> 
+              <div class="showDescription" 
+                :class ="{ 'width-fit': row.description.length < 50}"
+                v-if="row.description.length > 13" 
+                > {{row.description}}</div>
+            </div>
+            
           </template>
+
+          <!-- workflow switch state -->
+          <template v-else-if="_item.forWorkflowsSwitch">
+            <div class="forWorkflowsSwitch" @click="needAlert(row)">
+              <el-switch
+                v-model = "row.state"
+                active-value="1"
+                inactive-value="0"
+                :disabled = "row.isBind"
+                @change="$emit('handleSwitchChange', { checked: $event, target: row })"
+                />
+              </div>
+          </template>
+          
+          <!-- workflow auditByUsers -->
+          <template v-else-if="_item.auditByUsers">
+            <!-- auditTargetType == 0 顯示為使用者 -->
+            <div class="audit-user-row" v-if="row.auditTargetType == 0">
+              <div class="audit-user" v-for="(item, index) in row.auditByUsers" :key="index">{{item}}</div>
+            </div>
+            <!-- auditTargetType == 1 顯示為部門（auditByGroups） -->
+            <div class="audit-user-row" v-if="row.auditTargetType == 1">
+              <div class="audit-user" v-for="(item, index) in row.auditByGroups" :key="index">{{item}}</div>
+            </div>
+          </template>
+
+          <!-- workflow auditMethod -->
+          <template v-else-if="_item.auditMethod">
+            <el-radio-group class="storevue-radio" @change="changeAuditMethod(row)" v-model="row.auditMethod" v-if="row.name !== $t('audit.workFlows.submitAudit') ">
+              <el-radio :label="0">{{$t('audit.workFlows.countersigned')}}</el-radio>
+              <el-radio :label="1">{{$t('audit.workFlows.coSign')}}</el-radio>
+            </el-radio-group>
+          </template>
+
+          <!-- workflow signature -->
+          <template v-else-if="_item.signature" >
+            <el-radio-group class="storevue-radio" @change="changeSignature(row)" v-model="row.signature" v-if="row.name !==  $t('audit.workFlows.submitAudit') ">
+              <el-radio :label="true">{{$t('audit.workFlows.need')}}</el-radio>
+              <el-radio :label="false">{{$t('audit.workFlows.unnecessary')}}</el-radio>
+            </el-radio-group>
+          </template>
+
+          
           <template v-else>
-            <template v-if="isDevice && _index < 3">
+            <template v-if="isDevice && _index < 3 ">
               <el-tooltip class="item" effect="dark" :content="row[_item.prop]" placement="bottom">
                 <div>{{ row[_item.prop] | addEllipsis}}</div>
               </el-tooltip>
@@ -78,8 +140,12 @@
           <component :is="expandComponent" v-bind="currentProperties"></component>
         </template>
       </el-table-column>
+
+    
+      
+      <!-- 操作 -->
       <el-table-column
-        v-if="tableOperation.label"
+        v-if="tableOperation.label "
         :min-width="tableOperation.minWidth"
         :label="tableOperation.label"
         align="left"
@@ -98,20 +164,55 @@
           <div v-else-if="tableOperation.customIcon" >
             <img :src="tableOperation.src" style="width:24px;height:24px;" @click="handleOperationButton(tableOperation.methods, scope.row, scope.$index)">
           </div>
+
           <div class="flex-center" v-else>
-            <img 
-              :key="index"
-              class="child-space"
-              :class="index === 2 && item.icon.indexOf('disabled') !== -1 && scope.row.scope === 0 ? `${item.icon} icon-disabled` : item.icon"
-              v-for="(item,index) in tableOperation.operation" 
-              :src="`./static/img/table-${item.methods}.png`" 
-              @click="handleOperationButton(item.methods, scope.row, scope.$index)"
-              height="24px"
-              width="24px"
-            />
+              <img 
+                :key="index"
+                class="child-space"
+                :class="index === 2 && item.icon.indexOf('disabled') !== -1 && scope.row.scope === 0 ? `${item.icon} icon-disabled` : item.icon"
+                v-for="(item,index) in tableOperation.operation" 
+                :src="`./static/img/table-${item.methods}.png`" 
+                @click="handleOperationButton(item.methods, scope.row, scope.$index)"
+                height="24px"
+                width="24px"
+              />
           </div>
         </template>
       </el-table-column>
+
+
+      <!-- workflow 操作 -->
+      <el-table-column
+        v-if="tableworkflowOperation.label "
+        :min-width="tableworkflowOperation.minWidth"
+        :label="tableworkflowOperation.label"
+        align="left"
+        class-name="small-padding fixed-width">
+        <template slot-scope="scope">
+          <div class="flex-center" v-if="scope.$index !== 0">
+              <div class="move" v-if="tableworkflowOperation.move" >
+                <div class="move-action" 
+                  :class="{moveup_disable:scope.$index == 1 && item.methods == 'moveUp', movedown_disable: scope.$index == maxIndex && item.methods == 'moveDown'}"
+                  :key="item.text"
+                  v-for="item in tableworkflowOperation.move"
+                  @click="handleMoveButton(item.methods, scope.row, scope.$index)"
+                  >
+                  {{item.text}} </div>
+              </div>
+              <img 
+                :key="index"
+                class="child-space"
+                :class="index === 2 && item.icon.indexOf('disabled') !== -1 && scope.row.scope === 0 ? `${item.icon} icon-disabled` : item.icon"
+                v-for="(item,index) in tableworkflowOperation.operation" 
+                :src="`./static/img/table-${item.methods}.png`" 
+                @click="handleOperationButton(item.methods, scope.row, scope.$index)"
+                height="24px"
+                width="24px"
+              />
+          </div>
+        </template>
+      </el-table-column>
+
       <template v-if="isEvent">
         <el-table-column
           :label="$t('overview.remotePatrol')"
@@ -151,7 +252,7 @@
         </el-table-column>
       </template>
       <div slot="empty">
-        <div v-if="!isLoadingData">
+        <div v-if="!isLoading">
           <i class="iconfont icon-zhengque empty-data-icon"/>
           <span class="empty-text">{{ $t('deviceView.noData') }}</span>
         </div>
@@ -180,6 +281,10 @@ export default {
     EventCommentList
   },
   props: {
+    indexType:{
+      type: Boolean,
+      default: false
+    },
     tableThemes:{
       type:String,
       default:'grey'
@@ -215,6 +320,12 @@ export default {
       default: false
     },
     tableOperation: {
+      type: Object,
+      default: () => {
+        return {};
+      }
+    },
+    tableworkflowOperation: {
       type: Object,
       default: () => {
         return {};
@@ -291,6 +402,7 @@ export default {
       loadingGif: require('../../static/img/loading.svg'),
       expands: "",
       expandRowKeys: [],
+      isLoading:false,
     };
   },
   filters:{
@@ -299,7 +411,6 @@ export default {
       return value.substr(0, 10) + '...';
     }
   },
-
   computed: {
     tableSelection() {
       return this.$refs.tablePagination.selection;
@@ -315,13 +426,29 @@ export default {
         //console.log("this.expands:",this.expands);
         return { storeId: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs,itemId:this.expandCompProperties.itemId,isexportPDF:this.isexportPDF }
       }
+    },
+    maxIndex(){
+      return this.tableData.length - 1
+    },
+  },
+  watch:{
+    isLoadingData(val){
+      this.isLoading = val;
     }
   },
+  created() {},
   mounted() {
     //console.log(this.columnData)
-    //console.log(this.tableData)
   },
   methods: {
+    changeAuditMethod(row){
+      this.$emit('handleAuditMethod', row);
+    },
+  
+    changeSignature(row){
+      this.$emit('handleSignature', row);
+    },
+
     renderHeader(h, { column, $index }) {
       if(util.getWindowWidth()>1366){
       let realWidth = 0;
@@ -391,8 +518,8 @@ export default {
       /*console.log("row click:",row);
       if(this.allowRowExpand){
         if(row.id == this.expands){
-           this.expands="";
-           this.expandRowKeys=[];
+          this.expands="";
+          this.expandRowKeys=[];
         }
         else {
           this.expands = row.id;
@@ -407,6 +534,7 @@ export default {
     handleSortChange(col) {
       const self = this;
       const order = col.order;
+      console.log("col.order:",col.order);
       if (!order) {
         self.getOrderBasedOnDefaultSort();
       } else {
@@ -415,6 +543,7 @@ export default {
         self.defaultSort.prop = property;
         self.defaultSort.order = order;
         if (!self.isEvent) {
+          console.log("property:",property);
           if (property.indexOf('Str') > -1) {
             self.order.property = property.substr(0, property.indexOf('Str'));
           } else {
@@ -438,11 +567,22 @@ export default {
       this.order.direction = defaultSort.order === 'ascending' ? 'asc' : 'desc';
     },
 
+
     handleOperationButton(methods, row, index) {
       this.tableData.map(item => { item.isEditing = false; });
+      // console.log('this.tableData ======>> ', this.tableData);
+      // console.log('row ======>> ', row);
+      // console.log('index ======>> ', index);
       row.isEditing = this.isDevice && methods === 'edit';
+      // console.log('row.isEditing ======>> ', row.isEditing);
+
       this.$emit('handleOperation', { method: methods, row: row, index: index });
     },
+
+    handleMoveButton(methods, row, index){
+      this.$emit('handleMove', { method: methods, row: row, index: index });
+    },
+
 
     confirmEdit(row) {
       if (row.tempDeviceName.trim().length === 0) {
@@ -464,7 +604,63 @@ export default {
     },
     cellClick(row,prop){
       this.$emit('onCellClick',{row,prop});
+    },
+    indexMethod(index){
+      return index 
+    },
+
+
+    handleSelectionChange(val){
+      // console.log('val 1', val)
+      this.rows = val
+      this.$emit('handleSelectionChange',{val});
+    },
+
+    clear(){
+      this.$refs.tablePagination.clearSelection()
+    },
+
+    toggleChecked(tag){
+      console.log('unChecked')
+      console.log('tag !!!', tag)
+      console.log('this.tableData !!!', this.tableData)
+
+      var row = this.tableData.filter(element => 
+          element.userName == tag.userName
+      );
+      console.log('row', row)
+      this.$refs.tablePagination.toggleRowSelection(row[0])
+      
+    },
+
+    fromInputSelect(data){
+      // console.log('data~~~>', data)
+      var temp = []
+      this.tableData.forEach(element => {
+        data.forEach( i =>{
+          if(element.userId == i){
+            temp.push(element)
+          }
+        })
+      });
+      this.$refs.tablePagination.clearSelection()
+      temp.forEach(row => {
+        this.$refs.tablePagination.toggleRowSelection(row, true);
+      });
+    },
+    
+    needAlert(row){
+      // console.log('needAlert :>> ');
+      // console.log('row :>> ', row);
+      if(row.isBind == true){
+          this.$emit('cantCloseAlertPopup', row);
+          // util.notify(`${this.$t('audit.workFlows.isBind')} ${row.inspectTagName} ${this.$t('audit.workFlows.cantClose')}`, 'error', 3000);
+      }else{
+        return
+      }
+
     }
+    
   }
 };
 </script>
@@ -564,8 +760,9 @@ export default {
   }
   .cell-class.el-table__expand-column .cell{
     padding:0;
-    width:100px;
+    width: 0px;
   }
+  
 </style>
 
 <style lang="scss">
@@ -587,6 +784,16 @@ export default {
     tr{
       background-color: #f7f9fa !important;
     }
+    /**** body的scrollbar
+    .el-table__body-wrapper::-webkit-scrollbar {
+	      width: 4px; 
+	      height: 150px; 
+    }
+    .el-table__body-wrapper::-webkit-scrollbar-thumb {
+        box-shadow: 0px 1px 3px #acaeb1 inset; 
+        border-radius: 2px; 
+        background-color: #acaeb1; 
+    }*/
   }
   .table-white {
     .el-table{
@@ -595,6 +802,16 @@ export default {
       border: solid 1px #f5f5f5;
       background-color: #fff;
     }
+    /**** body的scrollbar
+    .el-table__body-wrapper::-webkit-scrollbar {
+	      width: 4px; 
+	      height: 150px; 
+    }
+    .el-table__body-wrapper::-webkit-scrollbar-thumb {
+        box-shadow: 0px 1px 3px #acaeb1 inset; 
+        border-radius: 2px; 
+        background-color: #acaeb1; 
+    }*/
   }
   #el-tablescrollbar {
   height: calc(100% - 225px);
@@ -602,5 +819,82 @@ export default {
 /deep/ #el-tablescrollbar .el-scrollbar__wrap {
   overflow-x: auto;
 }
+/deep/
+    .el-table
+    .el-table__header-wrapper
+    .el-table-column--selection
+    .el-checkbox__inner 
+    {
+      border-radius: 1px;
+      border: solid 1px #acaeb1;
+      background-color: #edf0f2;
+      &::before{
+        display:none;
+      }
+    }
+    /deep/
+    .el-table
+    .el-table__header-wrapper
+    .el-table-column--selection
+    .is-checked
+    .el-checkbox__inner 
+    {
+      border-radius: 1px;
+      border: solid 1px #2c90d9;
+      background-color: #2c90d9;
+    }
+    /deep/
+    .el-table
+    .el-table__body-wrapper
+    .el-table-column--selection
+    .el-checkbox__inner 
+    {
+      border-radius: 1px;
+      border: solid 1px #acaeb1;
+      background-color: #fff;
+    }
+    /deep/
+    .el-table
+    .el-table__body-wrapper
+    .el-table-column--selection
+    .is-checked
+    .el-checkbox__inner 
+    {
+      border-radius: 1px;
+      border: solid 1px #2c90d9;
+      background-color: #e0f2ff;
+      color:#2c90d9;
+      &::after{
+       border-color:#2c90d9;
+      }
+    }
+    
+    
+</style>
+
+<style lang="sass" >
+  .move
+      display: flex
+      flex-direction: row
+      justify-content: flex-start
+      align-items: flex-start
+      .move-action
+        color: #006ab7
+        margin-left: 10px
+        cursor: pointer
+        transition: all .2s
+        &:hover
+          transform: scale(1.1)
+      
+  .icon-copy, .icon-setting, .icon-delete
+    cursor: pointer
+    transition: all .2s
+    &:hover
+      transform: scale(1.1)
+  .moveup_disable, .movedown_disable
+    opacity: 0.3 !important
+    pointer-events: none !important
+  
+
 </style>
 

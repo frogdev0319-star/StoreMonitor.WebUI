@@ -1,5 +1,6 @@
 const getters = {
   token: state => state.user.token,
+  userId: state => state.user.userId,
   name: state => state.user.name,
   avatar: state => state.user.avatar,
   introduction: state => state.user.introduction,
@@ -11,6 +12,7 @@ const getters = {
   authorities: state => state.user.authorities,
   permission_routes: state => state.user.routes,
   PatrolHistory: state => state.user.PatrolHistory,
+  BackPatrolParam:state => state.user.BackPatrolParam,
   InspectHistory: state => state.user.InspectHistory,
   PatrolComment: state => state.user.PatrolComment,
   videoAuthority: state => state.user.videoAuthority,
@@ -24,5 +26,8 @@ const getters = {
   editCount: state => state.user.editCount,
   editCount_storeMonitor: state => state.user.editCount_storeMonitor,
   favoriteList:state => state.user.favoriteList,
+  mimicMode:state => state.user.mimicMode,
+  isMystery:state => state.user.isMystery,
+  editReport:state => state.user.editReport,
 };
 export default getters;

@@ -151,12 +151,52 @@
     </el-col>
     <el-col v-if="mode === 1" :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.inspectionSignature')">
-        <div slot="tableDetail" class="setting-config rule-item">
-          <el-checkbox class="storevue-checkbox-outlined" v-model="onSiteSignature">
+        <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
+          <el-checkbox class="storevue-checkbox-outlined" v-model="onSiteSignature" >
             <span>
               {{ $t('insSettingView.needSignatrue') }}
             </span>
           </el-checkbox>
+
+          <div class="signatrue_section" v-if="onSiteSignature">
+            <div class="define_sign">
+              <div class="title">自定義簽名顯示名稱</div> 
+              <el-button
+                @click="addSignature"
+                v-if="signatureData.extra.length < 4"
+                class="addsign_button_outlined"
+                size="mini" type="primary">
+                <i class="iconfont el-icon-plus"/>新增簽名
+              </el-button>
+            </div>
+            <div class="signatrue_row"  v-for="(item, index) in signatureData.extra" :key="index">
+              負責人
+              <el-input
+                placeholder="請輸入負責人"
+                v-model="item.header"
+                ref="workflowName"
+                style="width: 250px;  margin: 0 20px ;"
+                maxlength="20"
+                show-word-limit
+                />
+              <el-radio-group class="storevue-radio" v-model="item.optional" >
+                <el-radio :label="true">必簽</el-radio> 
+                <el-radio :label="false" v-if="index !== 0">非必簽</el-radio> 
+              </el-radio-group>
+              <div class="delete_sign">
+                <img 
+                  v-if="index !== 0"
+                  :key="index"
+                  class="child-space"
+                  :src="`./static/img/table-delete.png`" 
+                  height="24px"
+                  width="24px"
+                  @click="deleteSign(index)"
+              />
+              </div>
+            </div>
+          </div>
+          
         </div>
       </setting-table>
     </el-col>
@@ -275,11 +315,34 @@
         </div>
       </setting-table>
     </el-col>
+    
+    <!-- binding workflow -->
+    <el-col :span="24" class="el-rute-content">
+      <setting-table :table-name="$t('insSettingView.bindWorkFLow')">
+        <div slot="tableDetail" class="setting-config rule-item">
+          <span style="margin-right: 20px">選擇綁定流程</span>  
+          <el-select v-model="workFlowToBind" placeholder="請選擇">
+              <el-option
+                v-for="item in workFlowList"
+                :key="item.processDefinitionKey"
+                :label="item.name"
+                :value="item.processDefinitionKey"
+                >
+                
+              </el-option>
+            </el-select>
+        </div>
+      </setting-table>
+    </el-col>
+
+
+
   </el-row>
 </template>
 
 <script>
 import { inpectRESTful } from '@/api/index';
+import { workflowItems, bindWorkflow, unbindWorkflow} from '@/api/workflow';
 import util from '@/common/util';
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
@@ -315,7 +378,22 @@ export default {
       itemOptionsForType3: {},
       otherBtnAttr: '',
       standardScore: 100,
-      MinScoreMsg:false
+      MinScoreMsg:false,
+
+      workFlowToBind:'',
+      workFlowList:[],
+      bindWorkFlowData:{},
+      workFlowInfoValue:{},
+      signatureData:{
+          "name": "onSiteSignature",
+          "value": true,
+          "extra": [
+              {
+                "optional": true,
+                "header": ""
+              }
+          ]
+        },
     };
   },
   watch: {
@@ -331,15 +409,47 @@ export default {
         this.$refs.tab3PassInput[0].showPromotMsgFlag = false;
         this.$refs.tab3FailInput[0].showPromotMsgFlag = false;
       }
+    },
+    workFlowToBind(processDefinitionKey){
+      this.bindWorkFlowData.processDefinitionKey = processDefinitionKey
+      this.bindWorkFlowData.type = 0
+      this.bindWorkFlowData.inspectTagId = this.inspectId
+      
+      console.log('this.workFlowToBind ~~~~>> ', this.workFlowToBind);
+
+    },
+    onSiteSignature(){
+      if(!this.onSiteSignature)  this.signatureData = {
+          "name": "onSiteSignature",
+          "value": true,
+          "extra": [
+              {
+                "optional": true,
+                "header": ""
+              }
+          ]
+        }
     }
   },
-  mounted() {
-    this.getRule();
+  async mounted() {
+    await this.getRule();
+    await this.workflowItems()
   },
 
   methods: {
     async submitRule() {
       const self = this;
+
+       // handle bind workflow
+      if( !!this.workFlowToBind ){
+        if(this.bindWorkFlowData.processDefinitionKey == -1){   
+          this.bindWorkFlowData.processDefinitionKey = this.workFlowInfoValue.processDefinitionKey
+          await this.unbindWorkflow(this.bindWorkFlowData)
+        }else {
+          await this.bindWorkflow(this.bindWorkFlowData)
+        }
+      }
+      
       if ((this.passFailBtnAttr === 'userDefined' && !this.validateUserDefinedPassFailBtnValue()) ||
           (this.otherBtnAttr === 'userDefined' && !this.validateUserDefinedOtherBtnValue())) {
         util.notify(this.$t('insSettingView.enterBtnAttr'), 'warning', 3000);
@@ -379,6 +489,9 @@ export default {
             }
           ]
         };
+
+        if(this.onSiteSignature) params.ruleItems.push(this.signatureData)
+        console.log('params', params)
         const res = await self.updateInspectRule(params);
         if (res.errCode === 0) {
           util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
@@ -388,6 +501,7 @@ export default {
           return false;
         }
       }
+
     },
     async getRule() {
       const self = this;
@@ -464,6 +578,7 @@ export default {
       return new Promise((resolve, reject) => {
         inpectRESTful.UpdateInspectRuleSettings(params).then(res => {
           resolve(res);
+          
         }).catch(err => {
           reject(err);
         });
@@ -473,6 +588,16 @@ export default {
       return new Promise((resolve, reject) => {
         inpectRESTful.GetInspectRuleSettings(params).then(res => {
           resolve(res);
+          console.log('res.data ~~~~~~~::>> ', res.data);
+          
+          var tempSign = res.data.filter(i => i.name == "onSiteSignature")
+          console.log('tempSign :>> ', tempSign);
+          this.signatureData = tempSign[0]
+
+          const tempArry = res.data.filter(list => list.name == "workflow")
+          console.log('tempArry :>> ', tempArry);
+          this.workFlowInfoValue = tempArry[0].value
+
         }).catch(err => {
           reject(err);
         });
@@ -548,6 +673,64 @@ export default {
         score = parseFloat(this.minScore);
       }
       this.standardScore = score;
+    },
+    
+
+    async workflowItems(){
+      await workflowItems().then(res=>{
+        this.workFlowList = res.data
+        console.log('this.workFlowList ~~~~>> ', this.workFlowList);
+        console.log('this.workFlowInfoValue 2:>> ', this.workFlowInfoValue);
+        if(this.workFlowInfoValue !== null){
+          const firstObj = {
+            processDefinitionKey: -1,
+            name: "無",
+          }
+          this.workFlowList = [firstObj, ...res.data]
+          this.workFlowToBind = this.workFlowInfoValue.processDefinitionKey
+        }
+        
+      }).catch(err => {
+        console.log('error' + err);
+      });
+    },
+
+    async bindWorkflow(param){
+      console.log('param :>> ', param);
+      await bindWorkflow(param).then(res=>{
+        console.log('bind ~~~~~~>> ', res);
+        
+        // const firstObj = {
+        //   processDefinitionKey: -1,
+        //   name: "無",
+        // }
+        // this.workFlowList = [firstObj, ...this.workFlowList]
+        
+      }).catch(err => {
+        console.log('error' + err);
+      });
+    },
+
+    async unbindWorkflow(param){
+      await unbindWorkflow(param).then(res=>{
+        console.log('unbind :>> ', res);
+        // this.workFlowList.shift()
+
+      }).catch(err => {
+        console.log('error' + err);
+      });
+    },
+
+    addSignature(){
+      var addObj = {
+          "optional": true,
+          "header": ""
+      }
+      if(this.signatureData.extra.length < 4) this.signatureData.extra.push(addObj)
+    },
+    deleteSign(index){
+      console.log('index :>> ', index);
+      this.signatureData.extra.splice(index, 1)
     }
 
   }
@@ -574,6 +757,51 @@ $itemHeight:50px;
 @mixin point($poi,$val){
     #{$poi}:checkRem($val);
 }
+.signatrue_section{
+  width: 100%;
+  background: #f7f9fa;
+  margin-bottom: 20px;
+  padding: 20px;
+  .define_sign{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    .title{
+      margin-right: 20px;
+    }
+    .addsign_button_outlined{
+      border: 1px solid #f31d65;
+      color: #f31d65;
+      background: #FFF;
+      &:hover{
+        background: rgba(243,29,101, .08);
+      }
+    }
+  }
+  .signatrue_row{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    .delete_sign{
+      background: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      margin-left: 20px;
+      transition: all .3s;
+      &:hover{
+        transform: scale(1.2);
+      }
+    }
+  }
+}
+
+
+
 .el-setRule{
     width: 100%;
     height: 100%;
@@ -675,6 +903,7 @@ $itemHeight:50px;
       }
       .setting-config.rule-item{
         padding-left: calc(30/1920*100vw);
+        padding-right: calc(30/1920*100vw);
       }
       .dialog-form-item{
         height: auto;

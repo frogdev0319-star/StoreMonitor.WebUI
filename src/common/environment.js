@@ -41,6 +41,12 @@ const _Environments = {
     VERSION: version,
     clientId: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a'
   },
+  Dev:{
+    CHINA_WEBSITE: 'http://47.103.135.242:8081/storemonitor/api/',
+    GLOBAL_WEBSITE: 'https://dev-inspection.wise-apps.com/storemonitor/api',
+    VERSION: version,
+    clientId: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a'
+  },
   iservice:{
     CHINA_WEBSITE: 'https://inspection.wise-iservice.com/storemonitor/api/',
     GLOBAL_WEBSITE: 'https://inspection.wise-iservice.com/storemonitor/api/',

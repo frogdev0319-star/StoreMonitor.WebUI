@@ -6,6 +6,7 @@
     :height="dialogHeight"
     :show-close="false"
     :class="isForm ? 'storevue-form-dialog' : 'storevue-dialog'"
+    
   >
   <template slot="title">
 
@@ -21,7 +22,7 @@
     </div>
     <div v-if="showButton" slot="footer">
       <div style="display: inline; float: left; color: #f57949;width:45%;word-break:break-word;text-align:left;" v-if="hasIgnore" @click="hasIgnoreHandler">{{$t('remotePatrol.clickToContent')}}</div>
-      <el-button class="cancel-btn" size="mini" @click="cancelHandler">
+      <el-button v-show="showCancelbtn" class="cancel-btn" size="mini" @click="cancelHandler">
         {{ $t('remotePatrol.cancel') }}
       </el-button>
       <el-button :disabled="confirmBtnDisabled" class="confirm-btn" size="mini" type="primary" @click="confirmHandler">
@@ -81,6 +82,10 @@ export default {
       type: Boolean,
       default: false
     },
+    showCancelbtn:{
+      type: Boolean,
+      default: true
+    }
   },
   data() {
     return {
@@ -97,7 +102,9 @@ export default {
       }
     }
   },
-
+  mounted() {
+    ; //方法
+    },
   methods: {
     cancelHandler() {
       this.$emit('cancelHandler');
@@ -110,6 +117,9 @@ export default {
     hasIgnoreHandler() {
       this.$emit('hasIgnoreHandler');
     },
+
+  
+
   }
 };
 </script>

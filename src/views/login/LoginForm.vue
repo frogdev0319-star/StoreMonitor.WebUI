@@ -1,6 +1,6 @@
 <template>
   <el-row :style="{'min-height':varyWindowHeight}" class="login-container">
-    <el-col
+    <!-- <el-col
       :span="16"
       :style="{'min-height':varyWindowHeight}"
       class="lside">
@@ -31,10 +31,10 @@
         <span class="a-href" @click="hrefToWebiste">{{ jumpTitle }}</span>
         <span class="copyright">{{ copyright }}</span>
       </div>
-    </el-col>
+    </el-col> -->
     <el-col :span="8" :style="{'min-height':varyWindowHeight}" class="rside">
       <div class="login-title-content">
-        <span class="login-title">登录</span>
+        <!-- <span class="login-title">登录</span> -->
       </div>
       <el-form
         ref="loginForm"
@@ -94,10 +94,10 @@
           size="small"
           @click.native.prevent="handleLogin">{{ login.loginBtnTitle }}</el-button>
       </el-form>
-      <div class="icon-app">
+      <!-- <div class="icon-app">
         <img :src="imgSrc.androidSrc">
         <img :src="imgSrc.iosSrc">
-      </div>
+      </div> -->
     </el-col>
   </el-row>
 </template>
@@ -212,7 +212,7 @@ export default {
         // password:'abc123'
         username: '',
         password: '',
-        lang: 'zh-CN'
+        lang: 'zh-TW'
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -458,6 +458,7 @@ $red:#fb4c5d;
     overflow: hidden;
     margin:0;
     height: 100%;
+    background: #444;
     .lside{
         float: left;
         height: 100%;
@@ -558,7 +559,7 @@ $red:#fb4c5d;
         position: relative;
         .login-title-content{
             width: 28%;
-            height: 28%;
+            height: 10%;
             @include point(min-height,180);
             @include point(margin-top,20);
            // background-color: #EE626E;

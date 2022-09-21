@@ -1,5 +1,5 @@
 import request from '@/common/request';
-import { serviceAxios } from '@/common/request';
+import { serviceAxios,serviceRpt } from '@/common/request';
 const base = 'http://172.21.84.62:8085';
 const itempath = '/storemonitor/api/v1.0';
 
@@ -218,6 +218,14 @@ export const GetInspectTagList = params => {
   });
 };
 
+export const GetMysteryInspectTagList = params => {
+  return request({
+    url: `${version}/mystery/inspect/tag/list`,
+    method: 'get',
+    params
+  });
+};
+
 export const GetInspectGroupBindList = data => {
   return request({
     url: `${version}/inspect/group/bind/list`,
@@ -260,6 +268,22 @@ export const bindInspectWithStore = data => {
 export const getNotInspectStoresByPerson = data => {
   return request({
     url: `v1.0/statistics/inspect/store`,
+    method: 'post',
+    data
+  });
+};
+
+export const downLoadInspectReportEntireDetail = data => {
+  return serviceRpt({
+    url: `${version}/inspect/report/export/entire/json`,
+    method: 'post',
+    data
+  });
+};
+
+export const getAllReportIds = data => {
+  return serviceRpt({
+    url: `${version}/inspect/report/list/allReportIds`,
     method: 'post',
     data
   });

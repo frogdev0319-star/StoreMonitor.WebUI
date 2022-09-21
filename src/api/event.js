@@ -58,7 +58,7 @@ export const GetEventCountByStatus = data => {
     data
   });
 };
-export const GetEventAndCommentList= data => {
+export const GetEventAndCommentList = data => {
   return request({
     url: `v1.0/event/list/comment`,
     method: 'post',
@@ -66,7 +66,7 @@ export const GetEventAndCommentList= data => {
   });
 };
 
-export const doBatchCloseEventByStore= data => {
+export const doBatchCloseEventByStore = data => {
   return request({
     url: `v1.0/event/batch/close/store`,
     method: 'post',

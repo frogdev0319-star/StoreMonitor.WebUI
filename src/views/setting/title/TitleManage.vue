@@ -95,7 +95,8 @@ export default {
       headerStyle: 'table-header',
       total:0,
       page:1,
-      sizeNum:10
+      sizeNum:10,
+      white:'',
     };
   },
 
@@ -124,6 +125,9 @@ export default {
         this.allTableData = res.data;
         this.total = Math.ceil(this.allTableData.length/this.sizeNum);
         this.setPagingTableData();
+
+        console.log('this.allTableData :>> ', this.allTableData);
+        console.log('this.total :>> ', this.total);
       })
         .catch(err => {
           this.isLoadingData = false;
@@ -152,7 +156,8 @@ export default {
     },
     setPagingTableData(){
       this.tableData = [];
-      this.tableData = [...this.allTableData.slice( (self.page - 1)* this.sizeNum, this.page* this.sizeNum)];
+      this.tableData = [...this.allTableData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
+      console.log('this.tableData :>> ', this.tableData);
     },
     updateTitle(row) {
       this.$router.push({ name: 'titleSetting' });

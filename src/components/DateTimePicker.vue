@@ -62,7 +62,8 @@ export default {
           return time.getTime() > this.$moment(new Date()).endOf('d').toDate();
         },
         onPick:({ maxDate, minDate })=>{
-            console.log("maxDate:"+maxDate+", minDate:"+minDate);
+            console.log("maxDate:"+ maxDate + ", minDate:"+minDate);
+
             if(maxDate==null){
               maxDate = moment();
             }
@@ -156,6 +157,8 @@ export default {
       let start = this.$moment(val[0]).valueOf();
       const end = this.$moment(val[1]).valueOf();
       const daysDiff = this.$moment(end).diff(start, 'days');
+
+
       if (daysDiff > 364) {
         this.$message({
           message: this.$t('overview.changeTimeRange'),
@@ -168,8 +171,12 @@ export default {
         this.dateTimeValue = [this.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
       }
       const endTimeStamp = this.$moment(end).endOf('d').valueOf();
+
       this.$emit('change', [this.dateTimeValue[0], endTimeStamp]);
     },
+
+
+
     getDateRange(val){
         if (this.dateRange == 3) {
             this.dateTimeValue = [this.$moment().subtract(2, 'days'), this.$moment()];

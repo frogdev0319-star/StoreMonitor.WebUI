@@ -3,10 +3,12 @@ import { getDashServerInfo } from '@/api/device';
 import { getToken, setToken, removeToken, getCookie, setCookie } from '@/common/auth';
 import PermissionHelper from '@/api/PermissionHelper';
 import { resetRouter, constantRoutes, navbarRoute } from '@/router';
+import {isMysteryMode} from  '@/api/mystero'
 
 const user = {
   state: {
     user: '',
+    userId:'',
     status: '',
     code: '',
     token: getToken(),
@@ -27,6 +29,7 @@ const user = {
     routes: [],
     addRoutes: [],
     PatrolHistory: null,
+    BackPatrolParam:null,
     InspectHistory: null,
     PatrolComment: '',
     videoAuthority: false,
@@ -39,7 +42,10 @@ const user = {
     storeListCache: [],
     editCount: 0,
     editCount_storeMonitor:0,
-    favoriteList:false
+    favoriteList:false,
+    mimicMode:false,
+    isMystery:false,
+    editReport:false,
   },
 
   mutations: {
@@ -58,7 +64,9 @@ const user = {
     SET_CODE: (state, code) => {
       state.code = code;
     },
-
+    SET_USERID: (state, userId) => {
+      state.userId = userId;
+    },
     SET_TOKEN: (state, token) => {
       state.token = token;
     },
@@ -119,6 +127,10 @@ const user = {
       state.PatrolHistory = PatrolHistory;
     },
 
+    SET_BackPatrolParam: (state, BackPatrolParam) => {
+      state.BackPatrolParam = BackPatrolParam;
+    },
+
     SET_InspectHistory: (state, InspectHistory) => {
       state.InspectHistory = InspectHistory;
     },
@@ -152,7 +164,17 @@ const user = {
     },
     SET_FAVORIT_LIST:(state,favorit)=>{
       state.favoriteList = favorit
-    }
+    },
+    SET_MIMIC_MODE:(state,mode)=>{
+      state.mimicMode = mode
+    },
+    SET_ISMYSTERY:(state,mode)=>{
+      console.log("SET_ISMYSTERY:",mode);
+      state.isMystery = mode;
+    },
+    SET_EDIT_REPORT:(state,mode)=>{
+      state.editReport = mode;
+    },
   },
   actions: {
     setEditCount({ commit }, count) {
@@ -170,8 +192,11 @@ const user = {
     setPatrolHistory({ commit }, PatrolHistory) {
       commit('SET_PatrolHistory', PatrolHistory);
     },
-
+    setBackPatrolParam({ commit }, BackPatrolParam) {
+      commit('SET_BackPatrolParam', BackPatrolParam);
+    },
     setPatrolComment({ commit }, PatrolComment) {
+      console.log("@@setPatrolComment:",PatrolComment);
       commit('SET_PatrolComment', PatrolComment);
     },
 
@@ -189,6 +214,12 @@ const user = {
     },
     setStoreCache({ commit }, store) {
       commit('SET_STORE_CACHE', store);
+    },
+    setMimicMode({ commit }, mode){
+      commit('SET_MIMIC_MODE',mode)
+    },
+    setEditReport({ commit }, mode){
+      commit('SET_EDIT_REPORT',mode)
     },
     GetDash({ commit }) {
       return new Promise((resolve, reject) => {
@@ -248,6 +279,7 @@ const user = {
           // console.log(res);
           const data = res.data;
           if (res.data) {
+            
             commit('SET_TOKEN', data.token);
             setToken(data.token);
           }
@@ -286,13 +318,16 @@ const user = {
       return new Promise((resolve, reject) => {
         getUserAuthorities().then((res) => {
           if (res.data && (!res.data.services || res.data.services.includes('Custom_Inspection'))) {
+            console.log('@@@@',res.data.userId);
             commit('SET_AUTHORITY', res.data.authorities);
             commit('SET_ROLES', [res.data.title]);
             commit('SET_ROLE_ID', res.data.roleId);
+            commit('SET_USERID',res.data.userId);
           } else {
             commit('SET_AUTHORITY', []);
             commit('SET_ROLES', []);
             commit('SET_ROLE_ID', 0);
+            commit('SET_USERID','');
           }
           resolve(res);
         }).catch(error => {
@@ -325,15 +360,17 @@ const user = {
           const patrolRoute = navbarRoute.getPatrolRoute();
           accessedRoutes.length === 0 ? patrolRoute.redirect = ((patrolRoute.children.length>0)?patrolRoute.children[0].path:'') : '';
           if (patrolRoute.children.length > 0) accessedRoutes.push(patrolRoute);
-          
 
           const eventRoute = navbarRoute.getEventRoute();
-          if(PermissionHelper.enableEventHandle() || PermissionHelper.enableEventClose() || PermissionHelper.enableEventAdd() || PermissionHelper.enableEventReturn()){
+          if (PermissionHelper.enableEventHandle() || PermissionHelper.enableEventClose() || PermissionHelper.enableEventAdd() || PermissionHelper.enableEventReturn()) {
             accessedRoutes.push(eventRoute);
           }
-          
+
           const statisticsRoute = navbarRoute.getStatisticalRoute();
-          statisticsRoute.children.length > 0 ? accessedRoutes.push(statisticsRoute) : '';
+          if(statisticsRoute.children.length > 0 && !PermissionHelper.enableMimicMode) accessedRoutes.push(statisticsRoute);
+
+          const auditRoute = navbarRoute.getAuditRoute();
+          auditRoute.children.length >0 ? accessedRoutes.push(auditRoute):'';
 
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();
           systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';
@@ -350,7 +387,22 @@ const user = {
         }
         resolve(accessedRoutes);
       });
-    }
+    },
+    GetIsMysteryMode({ commit }){
+      console.log("GetIsMysteryMode");
+      return new Promise((resolve, reject) => {
+        isMysteryMode().then(res=>{
+          console.log("GetIsMysteryMode:",res);
+          if(res.errCode==0){
+            commit('SET_ISMYSTERY',res.data.isMysteryModeOn);
+          }
+        });
+        resolve(res.data.isMysteryModeOn);
+      }).catch(error => {
+        // reject(error);
+      });
+    },
+
   }
 };
 

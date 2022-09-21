@@ -127,7 +127,7 @@
       @confirmHandler="confirmDeleteSingle"
     >
       <div class="dialog-slot">
-        <div class="dialog-content">{{ $t('insSettingView.confirmCurDel') }}</div>
+        <div class="dialog-content">{{ $t('insSettingView.confirmCurDel') }} </div>
       </div>
     </dialog-pop>
   </div>

@@ -116,7 +116,27 @@
                 <i class="iconfont icon-liebiao iconCard"/>
                 <span class="text-pattern">{{ $t('remotePatrol.listStyle') }}</span>
               </div>
-              <delay-button
+              <el-dropdown 
+                :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                class="export-report-btn dropdown"
+                style="display:flex; flex-direction: row-reverse; align-items: center;cursor:pointer;">
+                <div class="button-area">
+                  <img :src="exportPng" class="icon-excel">
+                  <span>{{ $t('eventView.exportReport') }}</span>
+                </div>
+                <el-dropdown-menu slot="dropdown" class="dropdown">
+                  <el-dropdown-item
+                    class="dropdown-item"
+                    style="width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
+                    @click.native="export2Excel"
+                    >{{ $t('eventView.exportReportDetail') }}</el-dropdown-item>
+                  <el-dropdown-item
+                    class="dropdown-item"
+                    style=" width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw); font-size:calc(14/1920*100vw);"
+                    @click.native="export2ExcelAll">{{ $t('eventView.exportEntailReport') }}</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+              <!--<delay-button
                 :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
                 class="export-report-btn"
                 type="primary"
@@ -127,7 +147,7 @@
                   <img :src="exportPng" class="icon-excel">
                   <span>{{ $t('eventView.exportReport') }}</span>
                 </div>
-              </delay-button>
+              </delay-button>-->
             </div>
           </div>
           <div v-if="ShowCard" class="showCardHeight flex">
@@ -254,10 +274,33 @@
           </div>
       </div>
     </div>
+    <dialog-pop
+      :title="$t('remotePatrol.exportExcelAllWarning')"
+      :isWarning="true"
+      :visible="showExportAllWarn"
+      :showCancelbtn="false"
+      @confirmHandler="showExportAllWarn = false"
+      >
+      <div class="dialog-slot">
+        {{this.$t('remotePatrol.selectOnlyOneInspect')}}
+      </div>
+    </dialog-pop>
+    <dialog-pop
+      :title="$t('remotePatrol.exportExcelAllWarning')"
+      :isWarning="false"
+      :visible="showExportAllNotice"
+      :showCancelbtn="false"
+      @confirmHandler="showExportAllNotice = false"
+      >
+      <div class="noticeDialog">
+        {{this.$t('remotePatrol.exportExcelAllNotice1')}}<br/>
+        {{this.$t('remotePatrol.exportExcelAllNotice2')}}
+      </div>
+    </dialog-pop>
   </div>
 </template>
 <script>
-import { getInspectReportList, GetInspectTagList } from '@/api/inspect';
+import { getInspectReportList, GetInspectTagList,downLoadInspectReportEntireDetail,getAllReportIds,GetMysteryInspectTagList } from '@/api/inspect';
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
 import StoreFilter from '@/components/StoreFilter';
@@ -266,8 +309,10 @@ import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DateTimeSelector from '@/components/DateTimeSelector';
 import SelectedStores from "@/components/SelectedStores";
 import TblPaginationOnly from '@/components/TblPaginationOnly';
-import { getInspectReportInfo } from '@/api/inspect';//為了取是否有設置評分
+import { getInspectReportInfo} from '@/api/inspect';//為了取是否有設置評分
 import TableOnly from '@/components/TableOnly';
+import PermissionHelper from '@/api/PermissionHelper';
+import DialogPop from '@/components/DialogPop';
 export default {
   name: 'InspectReportList',
   components: {
@@ -276,7 +321,8 @@ export default {
     DelayButton,
     StoreFilter,
     TblPaginationOnly,
-    TableOnly
+    TableOnly,
+    DialogPop
   },
   data() {
     return {
@@ -392,7 +438,7 @@ export default {
         {
           'prop': 'datestr',
           'label': this.$t('remotePatrol.patrolDate'),
-          'sortable': true,
+          'sortable': 'custom',
           'width': 100,
           'maxWidth': 100,
           'isExpand': false
@@ -480,6 +526,8 @@ export default {
       searchParams: {},
       ifSearchData: true,
       isScore:true,
+      showExportAllWarn:false,
+      showExportAllNotice:false,
     };
   },
 
@@ -491,7 +539,7 @@ export default {
     iconSrcHeight() {
       return (this.varyWindowWidth / 1920) * 50;
     },
-    ...mapGetters({ accountChanged: 'accountChanged' })
+    ...mapGetters({ accountChanged: 'accountChanged',mimicModeChanged:'mimicMode' })
   },
 
   watch: {
@@ -507,7 +555,15 @@ export default {
         self.ifSaveParams = true;
         self.ifSearchData = true;
       }
+    },
+    mimicModeChanged(val){
+        console.log("mimicMode val:",val);
+        this.isLoading = true;
+        this.ifSearchData = true;
+        this.getInspectList();
+        //this.initData();
     }
+    
   },
 
   activated() {
@@ -517,6 +573,7 @@ export default {
     }
     self.$route.meta.isBack = false;
     self.isFirstLoad = false;
+    
   },
 
   methods: {
@@ -566,7 +623,87 @@ export default {
         sessionStorage.removeItem('!merge');
       });
     },
-
+    async doGetSearchConditionsReportIds(){
+      const self = this;
+      var reportIds = [];
+      var p = self.params;
+      var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,inspectTagId:p.inspectTagId,filter:p.filter}
+      params.endTs = params.endTs - params.endTs % 1000 + 999;
+      if (params.clause.storeId.length === 0) {
+        console.log("No Data")
+        this.setNoData();
+        return [];
+      }
+      console.log("SearchParams:",params);
+      const result = await getAllReportIds(params);
+      if(result.errCode == 0){
+          reportIds = result.data;
+      }
+      return reportIds;
+    },
+    async export2ExcelAll(){
+      const self = this;
+      if(self.inspectId == -1 || self.params.inspectTagId==null){
+        self.ExportAllMsg = this.$t('remotePatrol.selectOnlyOneInspect');
+        self.showExportAllWarn = true;
+        return;
+      }
+      self.showExportAllNotice = true;
+      const reportIds = await this.doGetSearchConditionsReportIds();
+      console.log("reportIds:",reportIds);
+      const params = {
+        beginTs:self.params.beginTs,
+        endTs:self.params.endTs,
+        inspectTagId:self.params.inspectTagId,
+        reportIds:reportIds
+      };
+      const tHeader = [
+        this.$t('remotePatrol.storeName'),
+        this.$t('remotePatrol.inspectName'),//巡檢表名稱
+        this.$t('remotePatrol.category'),
+        this.$t('insSettingView.subCategory'),
+        this.$t('overview.items'),
+        this.$t('remotePatrol.inspectItemScore'),
+        this.$t('remotePatrol.patrolResult'),
+        this.$t('remotePatrol.inspectTotalScore'),
+        this.$t('remotePatrol.exportAllDetail'),
+        this.$t('audit.inceptionRpt.attachment'),
+        this.$t('titleView.description'),
+        this.$t('remotePatrol.createRptDT')];
+      
+      downLoadInspectReportEntireDetail(params).then(res => {
+        console.log("res:",res);
+        const that = this;
+        require.ensure([], async() => {
+          const { export_json_to_excel } = require('@/excel/Export2Excel');
+          const filterVal = ['storename', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 'totlascore', 'detail', 'attachment','comment',
+            'reportts'];
+          const curData = res.data;
+          const tagName = that.inspectTableList.find(item=>item.id ==self.params.inspectTagId ).name;
+          const data = that.formatJson(filterVal, curData);
+          const fileName = tagName+'_'+that.$t('remotePatrol.entailReportExcelList') + '_' + util.getCurDateStr();
+          export_json_to_excel(tHeader, data, fileName);
+        });
+        /*const blob = new Blob([res], {
+          type: 'text/plain'//'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            console.log("e:",e.target.result);
+        }
+        reader.readAsText(blob)
+        const objectUrl = URL.createObjectURL(blob);
+        console.log(objectUrl);
+        const url = objectUrl;
+        self.downLoadSrc = url;
+        var link = document.createElement('a');
+        link.href = url;
+        link.download = "temp.csv";
+        link.click();*/
+      }).catch(err => {
+        console.log('RouteInspection-downItem: ' + err);
+      });
+    },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => v[j]));
     },
@@ -581,7 +718,7 @@ export default {
       return obj;
     },
    getReportList_(p) {
-      console.log("Get Report List")
+      console.log("2.Get Report List")
       console.log(p)
       var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,
       inspectTagId:p.inspectTagId!='-1'?p.inspectTagId:null}
@@ -655,16 +792,21 @@ export default {
       });
     },
    getReportList(p) {
-      console.log("Get Report List")
+      console.log("1.Get Report List")
       console.log(p)
       var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,
-      inspectTagId:p.inspectTagId!='-1'?p.inspectTagId:null}
+      inspectTagId:p.inspectTagId!='-1'?p.inspectTagId:null,isMysteryMode:PermissionHelper.enableMimicMode}
       const self = this;
       params.endTs = params.endTs - params.endTs % 1000 + 999;
       if (params.clause.storeId.length === 0) {
         console.log("No Data")
         this.setNoData();
         return;
+      }
+      console.log("***current user:",this.$store.getters.userId);
+      if(PermissionHelper.enableMimicMode){
+        
+        params['submitter'] = this.$store.getters.userId; 
       }
       return new Promise((resolve) => {
         //console.log("params:",params);
@@ -887,18 +1029,20 @@ export default {
       self.$router.push({ name: 'reportDetails', params: { data: item.routeObj }});
     },
 
-    sortChange(col) {
+    sortChange(sortOrder) {
       const self = this;
-      const order = col.order;
-      if (order === 'ascending') {
+      const order = sortOrder.direction;
+      console.log("report sort:",sortOrder);
+      console.log("report order:",order);
+      if (order === 'asc') {
         self.params.order = {
           'direction': 'asc',
-          'property': col.column.property === 'datestr' ? 'ts' : col.column.property
+          'property': sortOrder.property === 'datestr' ? 'ts' : sortOrder.property
         };
-      } else if (order === 'descending') {
+      } else if (order === 'desc') {
         self.params.order = {
           'direction': 'desc',
-          'property': col.column.property === 'datestr' ? 'ts' : col.column.property
+          'property': sortOrder.property === 'datestr' ? 'ts' : sortOrder.property
         };
       } else {
         self.params.order = {};
@@ -917,9 +1061,21 @@ export default {
       });
     },
 
+    getTagMytery() {
+      return new Promise((resolve, reject) => {
+        GetMysteryInspectTagList().then(res => {
+          const data = res.data;
+          resolve(data);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
+
     async getInspectList() {
       const self = this;
-      const inspectArr = await self.getTagAll();
+      const inspectArr = PermissionHelper.enableMimicMode? await self.getTagMytery() : await self.getTagAll();
       const newArr = [];
       const inspectList = [];
       inspectArr.forEach(_item => {
@@ -1427,6 +1583,10 @@ $filterWidth: (100%-706);
     .time-selector{
       margin-right: calc(30/1920*100vw);
     }
+.noticeDialog{
+  text-align: left;
+  margin-left: calc(20/1920*100vw);
+}
 </style>
 <style scoped>
 
@@ -1455,6 +1615,7 @@ $filterWidth: (100%-706);
     ::-webkit-scrollbar-thumb:hover {
       background: rgb(162, 162, 163);
     }
+
 </style>
 <style>
 @import '../../assets/css/pagination.css';

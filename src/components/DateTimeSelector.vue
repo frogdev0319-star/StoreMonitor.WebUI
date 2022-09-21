@@ -110,7 +110,6 @@ export default {
         this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
       //this.dateTimeValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
       }
-      //this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
     },
     dateChange(val) {
       this.$emit('change', val);

@@ -2,7 +2,7 @@
   <div>
     <store-filter
       :multiStore="false"
-      :showFavorite="true"
+      :showFavorite="enableMimicMode?false:true"
       @storeChange="onStoreChange"
     ></store-filter>
     <div class="el-container" style="margin-top: 20px" :class="{'flex-column': isFullScreenMode}">
@@ -12,7 +12,7 @@
         
       >
         <div class="el-header-title flex-center">
-          <img :src="store.storeUp? starYellowIcon : starGreyIcon"  @click="addStoreUp" style="cursor: pointer">
+          <img v-if="enableMimicMode?false:true" :src="store.storeUp? starYellowIcon : starGreyIcon"  @click="addStoreUp" style="cursor: pointer">
           <span v-if="showStoreUp" class="lside-title store-title">
             {{ store.storeTitle }}
           </span>
@@ -269,6 +269,18 @@
           </div>
         </dialog-pop>
         <dialog-pop
+          v-if="EditRptchangeBrandObj.dialogCosed"
+          :title="EditRptchangeBrandObjtitle"
+          :isWarning="EditRptchangeBrandObj.isWarning"
+          :visible="EditRptchangeBrandObj.dialogCosed"
+          :showCancelbtn="false"
+          @confirmHandler="canceldChangeBrand"
+          >
+          <div class="dialog-slot">
+            {{EditRptchangeBrandObj.showInfo}}
+          </div>
+        </dialog-pop>
+        <dialog-pop
           v-if="changeStoreObj.dialogCosed"
           :title="changeStoreObj.title"
           :isWarning="changeStoreObj.isWarning"
@@ -290,6 +302,18 @@
           >
           <div class="dialog-slot">
             {{changeInspectObj.showInfo}}
+          </div>
+        </dialog-pop>
+        <dialog-pop
+          v-if="EditRptchangeInspectObj.dialogCosed"
+          :title="EditRptchangeInspectObj.title"
+          :isWarning="EditRptchangeInspectObj.isWarning"
+          :visible="EditRptchangeInspectObj.dialogCosed"
+          :showCancelbtn="false"
+          @confirmHandler="canceldChangeInspect"
+          >
+          <div class="dialog-slot">
+            {{EditRptchangeInspectObj.showInfo}}
           </div>
         </dialog-pop>
         <dialog-pop
@@ -588,7 +612,7 @@
                       </div>
                       <div v-if="item.itemType === 0">
                         <el-dropdown v-if="item.groupType !== 1" :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                                      trigger="click" class="item-score" size="small" :disabled="item.manualIgnore">
+                                      trigger="click" class="item-score" size="small" :disabled="(item.manualIgnore || item.notEdit)">
                           <span class="el-dropdown-link">
                             {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
                             <i class="el-icon-arrow-down el-icon--right"/>
@@ -601,7 +625,7 @@
                           </el-dropdown-menu>
                         </el-dropdown>
                         <el-dropdown v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                                      trigger="click" class="item-score" size="small" :disabled="item.manualIgnore">
+                                      trigger="click" class="item-score" size="small" :disabled="(item.manualIgnore || item.notEdit)">
                           <span class="el-dropdown-link">
                             {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
                             <i class="el-icon-arrow-down el-icon--right"/>
@@ -614,7 +638,9 @@
                               @click.native="checkScore({item,itemDS: itemDS,index: index, e:1})">{{ itemDS }}</el-dropdown-item>
                           </el-dropdown-menu>
                         </el-dropdown>
-                        <div v-if="!item.required" class="cancel-text" @click="item.manualIgnore ? CancleIgnoreItem({item,index}) : ignoreItem({item,index,e:0})">{{item.manualIgnore ? $t('remotePatrol.cancel') : $t('remotePatrol.ignore')}}</div>
+                        <div v-if="!item.required" class="cancel-text" 
+                          :style="(item.notEdit && isEditReport)?{'pointer-events':'none'}:{'pointer-events':'auto'}"
+                          @click="item.manualIgnore ? CancleIgnoreItem({item,index}) : ignoreItem({item,index,e:0})">{{item.manualIgnore ? $t('remotePatrol.cancel') : $t('remotePatrol.ignore')}}</div>
                       </div>
                     </div>
                   </div>
@@ -631,6 +657,7 @@
                       <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                         <div v-if="_item.mediaType == 3" class="flex-center">
                           <img
+                            v-if="_item.showDelBtn"
                             :src="deleteInspectIcon"
                             alt="delete"
                             @click="deleteItemResource({ item, index: _index })"
@@ -642,8 +669,9 @@
                             <div style="flex: 1; text-align: left; margin: 5px">
                               {{ _item.src }}
                             </div>
-                            <hr class="hr-vertical" />
+                            <hr v-if="_item.showDelBtn" class="hr-vertical" />
                             <img
+                              v-if="_item.showDelBtn"
                               :src="editInspectIcon"
                               alt="edit"
                               style="margin: 5px"
@@ -656,7 +684,7 @@
                     <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="img-source-content">
                       <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                         <div v-if="_item.mediaType==2" class="img-content">
-                          <i class="el-icon-close icondelete" @click="deleteImg({item,index: _index})" />
+                          <i v-if="_item.showDelBtn" class="el-icon-close icondelete" @click="deleteImg({item,index: _index})" />
                           <el-image
                             :src="_item.src"
                             :style="{width: _item.width, height: _item.height}"
@@ -717,6 +745,7 @@
                       {{ `${index+1}. ${item.eventName}` }}
                       <div class="spacer"></div>
                       <button
+                        v-if="item.showDelBtn"
                         class="feedback-delete-btn"
                         @click="deleteEvent(item,index)"
                       >
@@ -727,6 +756,7 @@
                       v-for="(source, idx) in item.sourceList"
                       :key="idx">
                       <img
+                        v-if="item.showDelBtn"
                         :src="deleteInspectIcon"
                         alt="delete"
                         @click="editFeedback(item, index)"
@@ -737,8 +767,9 @@
                         <div style="flex: 1; text-align: left; margin: 5px">
                           {{source.src}}
                         </div>
-                        <hr class="hr-vertical" />
+                        <hr v-if = "item.showDelBtn" class="hr-vertical" />
                         <img
+                          v-if = "item.showDelBtn"
                           :src="editInspectIcon"
                           alt="edit"
                           style="margin: 5px"
@@ -779,6 +810,7 @@
 import { checkOutInspectItemV3 } from '@/api/inspect';
 import util from '@/common/util';
 import { getStoreList, addFavoriteStore, deleteFavoriteStore, getStoreInfo } from '@/api/store';
+import {ListMysteryModeStoreInfo} from '@/api/mystero';
 import { getUserInfo } from '@/api/login';
 import { mapGetters } from 'vuex';
 import InspectionItem from '@/components/InspectionItem.vue';
@@ -793,6 +825,7 @@ import DashVideo from '@/components/DashVideo';
 import EzvizVideo from '@/components/EzvizVideo';
 import BeseyeVideo from '@/components/BeseyeVideo';
 import StoreFilter from '@/components/StoreFilter';
+import PermissionHelper from '@/api/PermissionHelper';
 
 export default {
   name: 'ReInspection',
@@ -968,6 +1001,18 @@ export default {
         isWarning: true,
         dialogCosed: false
       },
+      EditRptchangeInspectObj: {
+        title: this.$t('remotePatrol.prompt'),
+        showInfo: this.$t('remotePatrol.cannotSwitchInspect'),
+        isWarning: false,
+        dialogCosed: false
+      },
+      EditRptchangeBrandObj: {
+        title: this.$t('remotePatrol.prompt'),
+        showInfo: this.$t('remotePatrol.cannotSwitchBrand'),
+        isWarning: false,
+        dialogCosed: false
+      },
       recorder: null,
       videoCanvasSrc: '',
       isRecordingStarted: false,
@@ -1022,7 +1067,17 @@ export default {
       curEditIndex: -1,
       feedbackInput: '',
       curEditFeedbackIndex: -1,
-      feedbackSourceList: []
+      feedbackSourceList: [],
+      isBindWorkflow:false,
+      workflowInfo:null,
+      backSheetGroup:null,
+      isEditReport:false,
+      curInspectId:-1,
+      reportId:-1,
+      auditState:-1,
+      auditCancelable:false,
+      reportStatus:-1,
+      enableMimicMode:false,
     };
   },
   computed: {
@@ -1031,7 +1086,8 @@ export default {
     },
     ...mapGetters({
       accountChanged: 'accountChanged',
-      videoAuthority: 'videoAuthority'
+      videoAuthority: 'videoAuthority',
+      mimicMode:'mimicMode'
     }),
     storeUpClass() {
       return {
@@ -1059,7 +1115,13 @@ export default {
     },
     vendor(){
       this.currentVideoComponent = ['DashVideo', 'EzvizVideo', 'BeseyeVideo', 'SkywatchVideo'][this.vendor] || 'EzvizVideo';
-    }
+    },
+    mimicMode(){
+      const self = this;
+      self.enableMimicMode = this.$store.getters.mimicMode;
+      self.getAllStore();
+      //console.log("enableMimicMode:",this.enableMimicMode);
+    },
   },
 
   beforeRouteLeave(to, from, next) {
@@ -1074,6 +1136,7 @@ export default {
         cancelButtonClass: 'cancelBtn',
         confirmButtonClass: 'confirmBtn'
       }).then(() => {
+        self.$store.dispatch('setBackPatrolParam', null);
         if (to.name != 'confirmSum') {
           //   from.meta.keepAlive=false;
           self.playState && self.previewplayer && self.previewplayer.dispose();
@@ -1082,12 +1145,15 @@ export default {
           self.$store.dispatch('setStoreList', []);
           self.$store.dispatch('setStoreCache', null);
           self.$store.dispatch('setEditCount', 0);
+          self.$store.dispatch('setEditReport', false);
           Database.addDataToDB(self.userId, {data: {}, rule: {}});
         } else {
           //   from.meta.keepAlive = true;
+
           self.$store.dispatch('setStoreList', self.storeList);
           self.$store.dispatch('setPatrolHistory', self.historyObj);
           self.$store.dispatch('setStoreCache', this.curSelStoreId);
+          self.$store.dispatch('setEditReport', self.isEditReport);
         }
         !self.showGuide &&  self.$refs.vendorVideo.stopVideoPlay();
         next();
@@ -1095,19 +1161,23 @@ export default {
         next(false);
       });
     } else {
+      self.$store.dispatch('setBackPatrolParam', null);
       if (to.name != 'confirmSum') {
         // from.meta.keepAlive=false;
         this.editCount = 0;
         this.$store.dispatch('setEditCount', this.editCount);
+         self.$store.dispatch('setEditReport', false);
         self.$store.dispatch('setPatrolHistory', null);
         self.$store.dispatch('setPatrolComment', null);
         self.$store.dispatch('setStoreList', []);
         self.$store.dispatch('setStoreCache', null);
         Database.addDataToDB(self.userId, {data: {}, rule: {}});
       } else {
+        self.$store.dispatch('setPatrolComment',{suggest:self.suggest,status:self.reportStatus});
         self.$store.dispatch('setPatrolHistory', self.historyObj);
         self.$store.dispatch('setStoreList', self.storeList);
         self.$store.dispatch('setStoreCache', this.curSelStoreId);
+        self.$store.dispatch('setEditReport', self.isEditReport);
       }
       !self.showGuide && this.$refs.vendorVideo.stopVideoPlay();
       next();
@@ -1116,8 +1186,17 @@ export default {
 
   async mounted() {
     const self = this;
+    this.enableMimicMode = this.$store.getters.mimicMode;
     const PatrolHistory = self.$store.getters.PatrolHistory;
     const storeListCache = self.$store.getters.storeListCache;
+    const BackPatrolParam = self.$store.getters.BackPatrolParam;
+    const PatrolComment = self.$store.getters.PatrolComment;
+    if (PatrolComment != null) {
+      self.suggest = PatrolComment.suggest;
+      self.reportStatus = PatrolComment.status;
+    }
+    console.log("*BackPatrolParam:",BackPatrolParam);
+    console.log("*PatrolHistory:",PatrolHistory);
     if (storeListCache) self.storeList = storeListCache
     if (PatrolHistory != null) {
       self.activeIndex = PatrolHistory.activeIndex;
@@ -1150,10 +1229,10 @@ export default {
       self.channel = PatrolHistory.channel;
       self.curItemId = PatrolHistory.curItemId;
       self.vendor = self.channel.vendor;
+      self.eventList = PatrolHistory.eventList;
       const isClick = self.sheetName[self.sheetName.length - 1].isClick;
       if (isClick) {
         if (PatrolHistory.eventList.length > 0) {
-          self.eventList = PatrolHistory.eventList;
           self.showFeedBackInfo = false;
           self.showFeedBack = true;
         } else {
@@ -1170,9 +1249,34 @@ export default {
       if (PatrolHistory.hasIgnoretemp.length === 0) {
         self.notShowAlert = true;
       }
+      self.isBindWorkflow = PatrolHistory.isBindWorkflow;
+      if(PatrolHistory.isEditReport){
+        self.reportId = PatrolHistory.reportId;
+        self.isEditReport = PatrolHistory.isEditReport;
+        self.auditState = PatrolHistory.auditState;
+        self.auditCancelable = PatrolHistory.auditCancelable;
+        
+      }
+    }else if(BackPatrolParam != null){
+      self.getAllStore();
+      self.backSheetGroup = BackPatrolParam.backSheetGroup;
+      self.reportId = BackPatrolParam.reportId;
+      self.reportStatus = BackPatrolParam.reportStaus;
+      self.isEditReport = BackPatrolParam.isEdit;
+      self.auditState = BackPatrolParam.auditState;
+      self.suggest = BackPatrolParam.reportComment;
+      self.curSelStoreId = BackPatrolParam.store;
+      self.patrolstore = BackPatrolParam.tagName;
+      self.curInspectId = BackPatrolParam.tagId;
+      self.showGuide = false;
+      self.isDisabled = true;
+      console.log("BackPatrolParam.auditCancelable:",BackPatrolParam.auditCancelable);
+      self.auditCancelable = BackPatrolParam.auditCancelable;
     } else {
       self.getAllStore();
     }
+    self.$store.dispatch('setEditReport', self.isEditReport);
+    console.log("this.$store.getters.editReport:",this.$store.getters.editReport);
     document.onmouseup = self.mouseUpAction;
     self.getUpLoadBucketInfo();
     self.getOssInfo();
@@ -1244,8 +1348,11 @@ export default {
           storeId: curStoreId
         };
         self.saveStoreObj(storeObj);
+        if(self.backSheetGroup !=null){
+          self.changeInspectList(self.curInspectId); //抓整個全新的巡檢項目,在做分數、附件更新
+        }
       }
-
+      
     },
     changeBrand() {
       const self = this;
@@ -1347,19 +1454,23 @@ export default {
           width: '140px',
           fileName: `${this.bucketImage}/inspect_${util.getCurTimeStr()}_${this.store.storeId}_${this.curItemId}.jpg`,
           file: util.base64ToBlob(src),
-          deviceId: this.channel.id
+          deviceId: this.channel.id,
+          hasUrl : false
         };
 
         const obj = {
+          id:-1,
           eventName: this.eventName,
           eventDes: this.eventDes,
           sourceObj: srcObj,
-          sourceList: this.feedbackSourceList
+          sourceList: this.feedbackSourceList,
+          showDelBtn:true
         };
         this.eventList.push(obj);
       } else {
         this.eventList[this.feedbackIndex].eventName = this.eventName;
         this.eventList[this.feedbackIndex].sourceList = this.feedbackSourceList;
+        this.eventList[this.feedbackIndex].showDelBtn = true;
         // this.eventList[this.feedbackIndex].eventDes = this.eventDes;
       }
       this.showFeedDialog2 = false;
@@ -1369,10 +1480,12 @@ export default {
     confirmAddTextFeedback() {
       if(this.feedbackIndex == -1){
         const obj = {
+          id:-1,
           eventName: this.eventName,
           eventDes: this.eventDes,
           sourceObj: null,
-          sourceList: this.feedbackSourceList
+          sourceList: this.feedbackSourceList,
+          showDelBtn:true
         };
         if (this.eventName.trim().length == 0) {
           this.showEventNameInfo = true;
@@ -1381,7 +1494,8 @@ export default {
         this.eventList.push(obj);
       } else {
         this.eventList[this.feedbackIndex].eventName = this.eventName;
-        this.eventList[this.feedbackIndex].sourceList = this.feedbackSourceList;
+        this.eventList[this.feedbackIndex].sourceList = this.feedbackSourceList; 
+        this.eventList[this.feedbackIndex].showDelBtn = true;
       }
       this.showAddTextFeedbackDialog = false;
       this.showFeedBackInfo = false;
@@ -1392,7 +1506,7 @@ export default {
       let tempId = null;
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
-  
+      
         sheetName.forEach((s_item, s_index) => {
           s_item.inspectList[0].items.forEach((item, index) => {
             if (item.id === id) {
@@ -1540,11 +1654,20 @@ export default {
           'size': 2000
         }
       };
-      return new Promise((resolve, reject) => {
-        getStoreList(params).then(res => {
-          resolve(res);
+      if(PermissionHelper.enableMimicMode){
+        return new Promise((resolve, reject) => {
+          ListMysteryModeStoreInfo().then(res => {
+            resolve(res);
+          });
         });
-      });
+        
+      }else{
+        return new Promise((resolve, reject) => {
+          getStoreList(params).then(res => {
+            resolve(res);
+          });
+        });
+      }
     },
     saveStoreObj(storeObj) {
       const self = this;
@@ -1682,7 +1805,10 @@ export default {
       if (self.$store.getters.editCount > 0) {
         self.changeInspectObj.dialogCosed = true;
         self.beforepatrolstore = val;
-      } else {
+      } if(self.isEditReport){
+        self.EditRptchangeInspectObj.dialogCosed = true;
+        self.beforepatrolstore = val;
+      }else {
         self.changeInspectList(val);
       }
     },
@@ -1717,9 +1843,10 @@ export default {
       const params = {
         storeId: self.store.storeId,
         mode: 0,
-        authorizedOnly: 1,
+        authorizedOnly: this.enableMimicMode?0:1,
         tagName: self.patrolstore,
-        inspectId: val
+        inspectId: val,
+        isMysteryMode:this.enableMimicMode
       };
       self.inspectItemList = [];
       checkOutInspectItemV3(params).then(res => {
@@ -1760,12 +1887,17 @@ export default {
                 inspectSettings.itemOptionsForType3 = item.value;
                 this.itemOptionsForType3 = item.value;
                 break;
+              case 'workflow':
+                inspectSettings.workflowInfo = item.value;
+                break;
               default:
                 break;
             }
           });
           sessionStorage.setItem('inspectSettings', JSON.stringify(inspectSettings));
           sessionStorage.setItem('uuid', res.data.uuid);
+          self.isBindWorkflow = res.data.isBindWorkflow;
+          sessionStorage.setItem('isBindWorkflow', res.data.isBindWorkflow);
           this.checkIfAllItemsAreRemark(data);
           const temp = [];
           data.forEach((item, index) => {
@@ -1825,6 +1957,7 @@ export default {
               itemObj.Ruletip = false;
               itemObj.RuleCountTip = false;
               itemObj.manualIgnore = false;
+              itemObj.notEdit = false;
               itemObj.sourceList = [];
               itemObj.groupType = item.type;
               itemObj.lastUnqualifiedNumber = _item.lastUnqualifiedNumber;
@@ -1883,7 +2016,6 @@ export default {
               });
             }
           }
-
           self.sheetName = te_temp.sort((a, b) => {return a.type - b.type});
           self.sheetName[0].isClick = true;
           const isCategory = self.sheetName[0].isCategory;
@@ -1894,10 +2026,168 @@ export default {
             self.sheetName.push(feedobj);
             self.getItemByGroup(self.sheetName[0].inspectList[0], 0);
           }
-          
-        console.log(this.sheetName)
+          if(self.backSheetGroup!=null && self.isEditReport){
+            const BackPatrolParam = self.$store.getters.BackPatrolParam;
+            self.eventList = BackPatrolParam.eventList;
+            self.showFeedBackInfo = self.eventList.length == 0;
+            self.showFeedBack = false;
+            self.doFillHisScorData();
+            if(self.eventList.length >0) self.doFillFeedBackData();
+          }
         }
       })
+    },
+    doFillFeedBackData(){
+      this.eventList.map(event=>{
+        if(!this.auditCancelable){//不能取消的簽核，不能刪除反饋
+          event['showDelBtn'] = false;
+        }else{
+          event['showDelBtn'] = true;
+        }
+      });
+      console.log("self.eventList:",this.eventList);
+    },
+    doFillHisScorData(){ //報告編輯狀態，取得個項目分數和附件
+      const self = this;
+      var hisData = self.backSheetGroup;
+      //sheet 1
+      Promise.all(
+      this.sheetName.map( sheet =>{
+        sheet.Effective = 1;
+        console.log("sheet:",sheet);
+        if(sheet.groupId!="feedBack"){
+          
+          var tabIncep = hisData.find( hd => hd.groupName==sheet.label );
+          console.log("tabIncep:",tabIncep);
+          if(tabIncep.children){//有三層時的第二層 對應sheet.inspectList
+            var secSheetCat = sheet.inspectList;
+            for(var secCatIdx in tabIncep.children){
+                var secCat = tabIncep.children[secCatIdx];
+                var childIdx = 0;
+                //console.log("secCat:",secCat);
+
+                //console.log("secSheetCat:",secSheetCat);
+                var sheetItem = secSheetCat.find((sec,idx) => {
+                  if(sec.groupId==secCat.groupId){
+                      childIdx = idx;
+                      return sec;
+                  }
+                });
+                //console.log("sheetItem:",sheetItem);
+                var dealCount=0;
+                sheet.inspectList[childIdx].items = this.doGetcateryItems(sheetItem.items,secCat.cateryItems,sheetItem.type);
+                sheet.inspectList[childIdx].items.forEach(it=>{
+                  dealCount += it.inputCount;
+                  it.isIgnore = false;
+                });
+                console.log("1.dealCount:",dealCount);
+                sheet.inspectList[childIdx].dealCount = dealCount;
+            }
+            sheet.dealCount = dealCount;
+          }else{
+            var secSheetCat = sheet.inspectList;
+            var childIdx = 0;
+            var sheetItem = secSheetCat.find((sec,idx) => {
+              if(sec.groupId==tabIncep.groupId){
+                  childIdx = idx;
+                  return sec;
+              }
+            });
+            var dealCount=0;
+            sheet.inspectList[childIdx].items = this.doGetcateryItems(sheetItem.items,tabIncep.cateryItems,sheetItem.type);
+            sheet.inspectList[childIdx].items.forEach(it=>{
+                  dealCount += it.inputCount;
+                  it.isIgnore = false;
+            });
+            console.log("2.dealCount:",dealCount);
+            sheet.inspectList[childIdx].dealCount = dealCount;
+          }
+          sheet.dealCount = dealCount;
+          this.editCount = dealCount;
+          this.$store.dispatch('setEditCount', this.editCount);
+        }
+      })
+      ).then(result =>{
+        self.isDisabled = true;
+        //console.log("2.this.sheetName:",this.sheetName)
+      });
+    },
+    doGetcateryItems(sheetItem,cateryItems,type){ //type:0:合格率評分 1:巡檢評分項 2:附加評分項
+      var dealCount=0;
+      
+      for(let i=0; i<cateryItems.length; i++){
+        var showDelBtn = true;
+        sheetItem[i].id = cateryItems[i].itemId;
+        if(cateryItems[i].grade===-2147483648){ //略過項
+          sheetItem[i].itemScoreTitle="--";
+          sheetItem[i].isIgnore = true;
+        }else if(type!=1){
+          let scoreIdx = (cateryItems[i].grade==1) ? 0:1;
+          sheetItem[i].itemScoreTitle=sheetItem[i].scoreList[scoreIdx].scoreTitle;
+          if(type == 2){
+            if(sheetItem[i].itemScore<0){
+              sheetItem[i].itemgetScore=(cateryItems[i].grade==1)?0:sheetItem[i].itemScore;
+            }else{
+              sheetItem[i].itemgetScore=(cateryItems[i].grade==1)?sheetItem[i].itemScore:0;
+            }
+          }else{
+            sheetItem[i].itemgetScore=(cateryItems[i].grade==1)?sheetItem[i].itemScore:0;
+          }
+          sheetItem[i].scoreList[scoreIdx].isClick = true;
+          sheetItem[i].isQualified = (cateryItems[i].grade==1) ? true:false;
+          sheetItem[i].inputCount++;
+          //dealCount++;
+          if(!this.auditCancelable && cateryItems[i].grade==0){//不能取消且不合格，不能編輯
+            console.log("不能取消，不能編輯不合格項");
+            sheetItem[i].notEdit = true;
+            dealCount++;
+            showDelBtn = false;
+          }
+          console.log("sheetItem[i]",sheetItem[i]);
+        }else{
+          sheetItem[i].itemScoreTitle=cateryItems[i].grade;
+          sheetItem[i].itemgetScore=cateryItems[i].grade;
+          sheetItem[i].inputCount++;
+          if(!this.auditCancelable && cateryItems[i].grade<cateryItems[i].qualifiedScore) {
+            sheetItem[i].notEdit = true;
+            showDelBtn = false;
+            dealCount++;
+          }
+        }
+        if(cateryItems[i].showAttachment){
+          sheetItem[i].dealCount++;
+          dealCount++;
+          var att=[];
+          for(let x=0;x<cateryItems[i].descriptionList.length;x++){
+            var desItem = cateryItems[i].descriptionList[x];
+            var desObj = {
+              mediaType:3,
+              src:desItem.description,
+              showDelBtn :showDelBtn
+            }
+            att.push(desObj);
+          }
+          for(let j=0; j<cateryItems[i].sourceList.length;j++){
+            var attItem = cateryItems[i].sourceList[j];
+              var fileName = attItem.url.substring(attItem.url.lastIndexOf('/')+1); 
+              var attFile ={
+                  mediaType:attItem.mediaType,
+                  src:attItem.url,
+                  height:'100px',
+                  width:'140px',
+                  fileName:fileName,
+                  deviceId:attItem.deviceId,
+                  hasUrl:true,
+                  showDelBtn :showDelBtn
+                }
+              att.push(attFile);
+          }
+          //console.log("sourceList:",attFile);
+          sheetItem[i].sourceList = att;
+        }
+      } 
+      console.log("*after fill sheetItem:",sheetItem);
+      return sheetItem;
     },
     changeStoreDialog() {
       this.changeStoreObj.dialogCosed = false;
@@ -1909,7 +2199,7 @@ export default {
     onStoreChange (storeData) {
       this.curSelStoreId = storeData.curSelectedStore
       const storeItem = this.storeList.find(store => store.storeId === this.curSelStoreId);
-      if (!this.$store.getters.storeCache) {
+      if (!this.$store.getters.storeCache && !this.isEditReport) {
         this.changeStore_(storeItem);
       } else {
         this.$store.dispatch('setStoreCache', '');
@@ -1943,12 +2233,13 @@ export default {
         return temp;
       };
       const allStoreData = await self.getAllStoreList();
+      console.log("allStoreData:",allStoreData);
       if (allStoreData.errCode === 0) {
         self.getInitStoreData(allStoreData);
-        const storeData = allStoreData.data.content;
+        const storeData = (PermissionHelper.enableMimicMode)?allStoreData.data:allStoreData.data.content;
         self.storeList = getStoreTemp(storeData);
         const storeItem = self.storeList.find(store => store.storeId === self.curSelStoreId)
-        self.changeStore_(storeItem)
+        self.changeStore_(storeItem);
       }
     },
     async getFaStoreData() {
@@ -1980,7 +2271,8 @@ export default {
       const allStoreData = await self.getAllStoreList();
       if (allStoreData.errCode === 0) {
         self.getInitStoreData(allStoreData);
-        const storeData = allStoreData.data.content.filter(store => store.favorite === true);
+        var allStores =  (PermissionHelper.enableMimicMode)?data.data:data.data.content;
+        const storeData = allStores.filter(store => store.favorite === true);
         self.tabList[0].storeList = getStoreTemp(storeData);
         if (storeData.length === 0) {
           self.showStoreUp = false;
@@ -2066,7 +2358,7 @@ export default {
         return storeListTemp;
       };
       if (data.errCode == 0) {
-        const storeData = data.data.content;
+        const storeData = (PermissionHelper.enableMimicMode)?data.data:data.data.content;
         self.allInitStoreList = storeData;
         if (storeData.length == 0) {
           self.tabList[2].storeList = [];
@@ -2393,6 +2685,7 @@ export default {
       const self = this;
       self.leaveObj.dialogCosed = false;
       if (self.$refs.vendorVideo) self.$refs.vendorVideo.editCount = 0;
+      
     },
     cancelLeave() {
       const self = this;
@@ -2424,6 +2717,7 @@ export default {
       const inspectList = [];
       const indexFeed = this.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = this.sheetName.slice(0, indexFeed);
+      console.log("resolveConfoirmSummaryData> sheetName:",sheetName);
       const inspectSettings = JSON.parse(sessionStorage.getItem('inspectSettings'));
       if (this.hasIgnoretemp.length === 0) {
         sheetName.forEach(s_item => {
@@ -2488,7 +2782,12 @@ export default {
         event: this.eventList,
         store: this.store,
         channel: this.channel,
-        allRemarkItemsFlag: this.allRemarkItemsFlag
+        allRemarkItemsFlag: this.allRemarkItemsFlag,
+        isBindWorkflow:this.isBindWorkflow||self.isEditReport,
+        isEditReport:this.isEditReport,
+        reportId:this.reportId,
+        auditState:this.auditState,
+        auditCancelable:this.auditCancelable,
       };
       this.historyObj = {
         storeList: this.tabList[Number(this.activeIndex)].storeList,
@@ -2508,11 +2807,17 @@ export default {
         curItemIndex: this.curItemIndex,
         channel: this.channel,
         curItemId: this.curItemId,
-        deviceList: this.deviceList
+        deviceList: this.deviceList,
+        isBindWorkflow:this.isBindWorkflow,
+        isEditReport:this.isEditReport,
+        reportId:this.reportId,
+        auditState:this.auditState,
+        auditCancelable:this.auditCancelable,
       };
       this.hasIgnoretemp = [];
       const params = { _id: this.userId, data: obj, rule: inspectSettings };
       this.$store.dispatch('setStoreList', this.storeList);
+      console.log("submit:",this.historyObj);
       await Database.addDataToDB(this.userId, params);
       this.$router.push({ name: 'confirmSum', params: params });
     },
@@ -2549,11 +2854,9 @@ export default {
           count = count + s_item.count;
         });
       } else {
-        console.log("self.hasIgnoretemp:",self.hasIgnoretemp);
         sheetName.forEach(s_item => {
           const dealtemp = [];
           s_item.inspectList.forEach(item => {
-            console.log("3.item:",item);
             item.items.forEach((_item, _index) => {
               if (_item.inputCount != 0 || _item.manualIgnore) {
                 const obj = {};
@@ -2741,15 +3044,25 @@ export default {
     },
     canceldChangeInspect() {
       const self = this;
-      self.changeInspectObj.dialogCosed = false;
+       if(self.isEditReport)  self.EditRptchangeInspectObj.dialogCosed = false;
+       else self.changeInspectObj.dialogCosed = false;
     },
     canceldChangeStore() {
       const self = this;
-      self.changeStoreObj.dialogCosed = false;
+      if(self.isEditReport){
+        self.EditRptchangeStoreObj.dialogCosed = false;
+      }else{
+        self.changeStoreObj.dialogCosed = false;
+      }
+      
     },
     canceldChangeBrand() {
       const self = this;
-      self.changeBrandObj.dialogCosed = false;
+      if(self.isEditReport){
+        self.EditRptchangeBrandObj.dialogCosed = false;
+      }else{
+        self.changeBrandObj.dialogCosed = false;
+      }
     },
 
     lastBar() {
@@ -2869,6 +3182,7 @@ export default {
     },
 
     checkIfAllItemsAreRemark(groupsArr){
+      console.log("checkIfAllItemsAreRemark:",groupsArr)
       let tempArr = [];
       groupsArr.forEach(group => {
         tempArr.push(...group.items);
@@ -2975,11 +3289,17 @@ export default {
 
     },
     changeSheet(item, index) {
+      console.log("changeSheet:",item);
       const self = this;
       if (item.groupId == 'feedBack') {
         const PatrolHistory = self.$store.getters.PatrolHistory;
         if (PatrolHistory != null) {
           self.eventList = PatrolHistory.eventList;
+          self.showFeedBackInfo = self.eventList.length == 0;
+          self.showFeedBack = true;
+        }else if(self.isEditReport){
+          const BackPatrolParam = self.$store.getters.BackPatrolParam;
+          self.eventList = BackPatrolParam.eventList;
           self.showFeedBackInfo = self.eventList.length == 0;
           self.showFeedBack = true;
         } else {
@@ -3041,6 +3361,7 @@ export default {
       });
     },
     clickStore(item, index, _item, _index) {
+      
       const self = this;
       if (!_item.hasInspect && _item.hasInspect != undefined) {
         return false;
@@ -3056,7 +3377,9 @@ export default {
       if ( (!self.showGuide && self.$refs.vendorVideo && self.$refs.vendorVideo.editCount != 0)
           || (self.$store.getters.PatrolHistory != null) ) {
         self.changeStoreObj.dialogCosed = true;
-      } else {
+      } else if(self.isEditReport){
+        self.EditRptchangeStoreObj.dialogCosed = true;
+      }else {
         self.changeStore(item, index, _item, _index);
       }
     },
@@ -3083,6 +3406,7 @@ export default {
       const self = this;
       // self.sourceList = [];
       const obj = {};
+      console.log("***editEzvizCanvas:",src)
       obj.mediaType = 2;
       obj.src = src;
       obj.height = '100px';
@@ -3090,6 +3414,8 @@ export default {
       obj.fileName = `${self.bucketImage}/inspect_${util.getCurTimeStr()}_${self.store.storeId}_${self.curItemId}.jpg`;
       obj.file = util.base64ToBlob(obj.src);
       obj.deviceId = self.channel.id;
+      obj.hasUrl = false;
+      obj.showDelBtn = true;
       self.sourceList.push(obj);
       const tempId = self.getIndexById(self.curItemId);
       self.sheetName[self.curSheetIndex].inspectList.forEach((inspect, idx) => {
@@ -3098,6 +3424,7 @@ export default {
         })
       })
       if (tempId != null) {
+        console.log("***tempId != null");
           self.inspectList[0].items[tempId.itemIndex].sourceList.push(obj);
           if(self.inspectList[0].items[tempId.itemIndex].itemType === 1){
             if (this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount === 0) {
@@ -3111,7 +3438,8 @@ export default {
             this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount++;
           }
       } else {
-        self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = self.sourceList;
+        console.log("***tempId == null");
+        self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.push(obj);// = self.sourceList;
       }
       if (!this.showIgnoreItem) {
         self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
@@ -3131,21 +3459,24 @@ export default {
         width: '140px',
         fileName:`${self.bucketImage}/inspect_${util.getCurTimeStr()}_${self.store.storeId}_${self.curItemId}.jpg`,
         file: util.base64ToBlob(src),
-        deviceId: self.channel.id
+        deviceId: self.channel.id,
+        hasUrl : false,
+        showDelBtn : true,
       };
 
       const picObj = {
         eventName: obj.eventName,
         eventDes: obj.eventDes,
         sourceObj: srcObj,
-        sourceList: obj.sourceList
+        sourceList: obj.sourceList,
+        showDelBtn:true
       };
       self.eventList.push(picObj);
       self.showFeedBackInfo = false;
     },
-    submitItemResource({ item, index }) {
+    submitItemResource({ item}) {
       const self = this;
-      this.curItemIndex = index;
+      //this.curItemIndex = index;
       if (item.inspectInput.trim().length === 0) return
       if (this.curEditIndex > -1) {
         item.sourceList = item.sourceList.map((source, idx) => {
@@ -3161,6 +3492,7 @@ export default {
           item.sourceList.push({
             mediaType: 3,
             src: item.inspectInput,
+            showDelBtn : true,
           })
         } else {
           item.RuleCountTip = true;

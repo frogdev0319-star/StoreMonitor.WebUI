@@ -4,10 +4,10 @@ import { message } from '@/common/singleton-message';
 import moment from 'moment';
 import { getCookie } from './auth';
 export default {
-  getWindowWidth(){
+  getWindowWidth() {
     return window.innerWidth;
   },
-  getLangStyleValue(langArray){
+  getLangStyleValue(langArray) {
     //console.log("*****screenWidth  :",this.getWindowWidth() );
     var lang_style = langArray.find( item => {return item.key==i18n.locale});
     return lang_style.value;
@@ -609,7 +609,24 @@ export default {
   sortArrayByKeyDesc(sortedArray, key){
     sortedArray.sort((a, b) => { return b[key] - a[key]; })
   },
-
+  sort_by_key(array, key, order)
+  {
+    console.log("order:",order);
+      if(order==='descending'){
+          return array.sort(function(a, b)
+          {
+              var x = a[key].toLowerCase(); var y = b[key].toLowerCase();
+              return ((x > y) ? -1 : ((x < y) ? 1 : 0));
+          });
+      }else{
+          return array.sort(function(a, b)
+          {
+              var x = a[key].toLowerCase(); var y = b[key].toLowerCase();
+              return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+          });
+      }
+      
+  },
   handleInspctionCatergyTree(arr, key='id') {
     let cloneData = JSON.parse(JSON.stringify(arr));
     return cloneData.filter(father => {
@@ -736,6 +753,24 @@ export default {
     "#FC9741"
     ];
     return colorArr;
+  },
+  getAuditStatusName(val){
+    switch (val){
+      case 1:
+        return i18n.t('audit.auditStatus.noteYet');
+      case 2:
+        return i18n.t('audit.auditStatus.processing');
+      case 3:
+        return i18n.t('audit.auditStatus.reject');
+      case 4:
+        return i18n.t('audit.auditStatus.approved');
+      case 5:
+        return i18n.t('audit.auditStatus.cancel');
+      case 6:
+        return i18n.t('audit.auditStatus.rollback');
+      case 7:
+        return i18n.t('audit.auditStatus.systemRollback');
+    }
   }
 
 };
@@ -784,6 +819,8 @@ class indexedDB {
       };
     });
   }
+
+  
 
 }
 export { indexedDB };

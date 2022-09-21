@@ -8,6 +8,7 @@ export default class PermissionHelper {
    * index(3) => ID(8): Statistics
    * index(4) => ID(16): Settings
    * index(5) => ID(16): Video/Message
+   * index(6) => ID(16): Audit
    */
   static data = [];
 
@@ -19,7 +20,9 @@ export default class PermissionHelper {
     if (this.data.length === 0) {
       return true;
     }
-
+    if(index==6 && this.data.length<7){
+      this.data[index] = 274877906944;//全不勾,全勾:274877906951
+    }
     const authority = new Uint64BE(this.data[index].toString()).toString(10);
     const base = new Uint64BE(bigEndian, littleEndian).toString(10);
 
@@ -136,6 +139,9 @@ export default class PermissionHelper {
   static enableReportSetting() {
     return this.enableAuthorities(4, 0x0, 0x20);
   }
+  static enableWorkflowSetting() {
+    return this.enableAuthorities(4, 0x0, 0x40);
+  }
 
   // index(5) => ID(32): Video/Message
   static enableVideo() {
@@ -146,5 +152,23 @@ export default class PermissionHelper {
   }
   static getInterget() {
     const big = new Uint64BE(0x1, 0x1);
+  }
+
+  //index(6) => 簽核流程
+  static enableSendAudit() {
+    return this.enableAuthorities(6, 0x0, 0x01);
+  }
+  static enableWaitAudit() {
+    return this.enableAuthorities(6, 0x0, 0x02);
+  }
+  static enableTranscriptNotify() {
+    return this.enableAuthorities(6, 0x0, 0x04);
+  }
+
+  //秘密客權限
+  static enableMimicMode = false;
+  static setShowMimicMode(val){
+    console.log("setShowMimicMode:",val);
+    this.enableMimicMode = val;
   }
 }

@@ -4,19 +4,37 @@
       <div class="no-print">
         <delay-button
           id="downloadPdf"
-          class="exportbtn"
-          type="primary"
-          size="mini"
           @click="handleDown"
         >
-          <div class="button-area">
-            <i class="iconfont icon-pdf export"/>
-            <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
-          </div>
+        </delay-button>
+        <delay-button
+          id="downloadExcel"
+          @click="handleDownExcel"
+        >
         </delay-button>
       </div>
     </div>
     <div class="el-header">
+      <div class="workflow-edit" v-if="isAuditMode">
+        <p :class="{'pdf-report-title': isexportPDF, 'report-title': !isexportPDF, 'nochart-report-title': !hasChart}">
+          {{ $t('audit.inceptionRpt.auditReport') }}
+        </p>
+        <div style="display:inline-block">
+          <el-button 
+            v-if="showEditBtn"
+            class="confirm-btn"
+            size="'mini'" type="primary" @click="goBackRemoteInception">
+            {{ $t('audit.inceptionRpt.edit') }}
+          </el-button>
+          <el-button
+            v-if="showCancelBtn"
+            class="storevue-button-filled"
+            size="'mini'" type="primary" @click="doCancelAudit">
+            {{ $t('audit.inceptionRpt.cancelAudit') }}
+          </el-button>
+        </div>   
+      </div>
+      <div class="splitline" v-if="isAuditMode"></div>
       <div class="left-header">
         <img :src="report.inspectSrc" :class="isexportPDF ? 'pdf-title-icon' : 'title-icon'">
         <p :class="{'pdf-report-title': isexportPDF, 'report-title': !isexportPDF, 'nochart-report-title': !hasChart}">
@@ -166,6 +184,7 @@
                                 :src="sourceitem.url"
                                 class="imgLittle imgInner">
                               <el-image
+                                v-else
                                 :style="isexportPDF ? exportImageStyle :imageStyle"
                                 :src="sourceitem.url"
                                 :preview-src-list="getImgList(index, item.sourceList)"
@@ -471,11 +490,20 @@
         </el-dialog>
       </div>
     </div>
+    <dialog-pop
+      v-if="cancelAuditDialogShow"
+      :title="confirmCancelAuditInfo"
+      :isWarning="true"
+      :visible="cancelAuditDialogShow"
+      @cancelHandler="onCancelAudit"
+      @confirmHandler="onConfirmCancelAudit">
+    </dialog-pop>
   </div>
 </template>
 <script>
 import ECharts from 'vue-echarts';
-import { getInspectReportInfo } from '@/api/inspect';
+import { getInspectReportInfo,downLoadInspectReportEntireDetail } from '@/api/inspect';
+import { CancelWorkflow,taskDrawback,GetTaskInfo } from '@/api/workflow';
 import util from '@/common/util';
 import videojs from '../../../static/video.js';
 import 'videojs-contrib-hls';
@@ -487,6 +515,7 @@ import ReportDetail from '@/components/ReportDetail';
 import DescriptionText from '@/components/DescriptionText';
 import echartResize from '@/components/mixins/echartResize';
 import i18n from '@/lang/index';
+import DialogPop from '@/components/DialogPop.vue';
 
 export default {
   name: 'InspectReport',
@@ -495,6 +524,7 @@ export default {
     ReportDetail,
     AudioVue,
     DelayButton,
+    DialogPop,
     'v-chart': ECharts
   },
 
@@ -573,7 +603,15 @@ export default {
       weatherImg: '',
       chartLabelArr:[],
       pieColorList:['#6184CE', '#7B9FEB', '#7BD8EB', '#4DE197', '#ACF757','#F7D057', '#FF986E', '#EC5F55', '#A156C5', '#ACABAB'],
-      allRemarkItemsFlag: false
+      allRemarkItemsFlag: false,
+      workflowTaskName:'督导稽核记录表',
+      cancelAuditDialogShow:false,
+      confirmCancelAuditInfo:this.$t('audit.inceptionRpt.confirmCancelAudit'),
+      backSheetGroup:[],
+      isAuditMode:true,
+      showEditBtn:true,
+      showCancelBtn:false,
+      auditState:1,
     };
   },
 
@@ -622,6 +660,7 @@ export default {
     },
     getReportTemplateAndInfo() {
       const templatePromise = ReportSetting.getInspectReportTemplateList({ enable: true });
+      console.log("this.report.reportId:",this.report.reportId);
       const reportInfoPromise = getInspectReportInfo({ reportIds: [this.report.reportId] });
       Promise.all([templatePromise, reportInfoPromise]).then(results => {
         this.getInspectTemplateList(results[0]);
@@ -658,7 +697,49 @@ export default {
       this.getPageDataBasedOnTemplate(this.reportData);
       this.saveTemplateId();
     },
-
+    formatJson(filterVal, jsonData) {
+      return jsonData.map(v => filterVal.map(j => v[j]));
+    },
+    handleDownExcel(){
+      console.log("download excel!!!");
+      console.log("reportIds:",this.report.reportId);
+      const params = {
+        beginTs:this.reportData.ts,
+        endTs:this.reportData.ts,
+        inspectTagId:this.reportData.tagId,
+        reportIds:[this.report.reportId]
+      };
+      const tHeader = [
+        this.$t('remotePatrol.storeName'),
+        this.$t('remotePatrol.inspectName'),//巡檢表名稱
+        this.$t('remotePatrol.category'),
+        this.$t('insSettingView.subCategory'),
+        this.$t('overview.items'),
+        this.$t('remotePatrol.inspectItemScore'),
+        this.$t('remotePatrol.patrolResult'),
+        this.$t('remotePatrol.inspectTotalScore'),
+        this.$t('remotePatrol.exportAllDetail'),
+        this.$t('audit.inceptionRpt.attachment'),
+        this.$t('titleView.description'),
+        this.$t('remotePatrol.createRptDT')];
+      
+      downLoadInspectReportEntireDetail(params).then(res => {
+        console.log("res:",res);
+        const that = this;
+        require.ensure([], async() => {
+          const { export_json_to_excel } = require('@/excel/Export2Excel');
+          const filterVal = ['storename', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 'totlascore', 'detail', 'attachment','comment',
+            'reportts'];
+          const curData = res.data;
+          const tagName = this.report.tagName;
+          const data = that.formatJson(filterVal, curData);
+          const fileName = this.report.storeName+'_'+tagName+'_'+that.$t('remotePatrol.details') + '_' + util.getCurDateStr();
+          export_json_to_excel(tHeader, data, fileName);
+        });
+      }).catch(err => {
+        console.log('RouteInspection-downItem: ' + err);
+      });
+    },
     handleDown() {
       const self = this;
       if (self.hasAttachment !== 0) {
@@ -690,30 +771,49 @@ export default {
 
     getRouterData() {
       const self = this;
+      self.isAuditMode =self.$route.params.isAuditMode
+      self.showEditBtn = self.$route.params.canEdit;
+      self.showCancelBtn = self.$route.params.canCancel;
       const routeData = JSON.parse(sessionStorage.getItem('report_data'));
-      const obj = {};
-      obj.reportId = routeData.id;
-      obj.storeName = routeData.storeName;
-      obj.status = routeData.status;
-      obj.dateStr = util.getDateStr2(routeData.ts);
-      obj.submitterName = routeData.submitterName;
-      obj.tagName = routeData.tagName;
-      obj.iconSrc = this.getIconSrc(routeData.status);
-      switch (routeData.mode) {
-        case 0:
-          obj.inspectSrc = self.inspectSrc;
-          obj.inspectType = self.$t('overview.remotePatrol');
-          break;
-        case 1:
-          obj.inspectSrc = self.insiteInspectSrc;
-          self.isInsiteInspect = true;
-          obj.inspectType = self.$t('overview.onsitePatrol');
-          break;
-        default:
-          obj.inspectSrc = self.videoSrc;
-          break;
+      console.log("report routeData:",routeData);
+      if(routeData && !self.isAuditMode){
+        const obj = {};
+        console.log("self.$route.params.reportId:",self.$route.params.reportId);
+        obj.reportId = routeData.id;
+        obj.storeName = routeData.storeName;
+        obj.status = routeData.status;
+        obj.dateStr = util.getDateStr2(routeData.ts);
+        obj.submitterName = routeData.submitterName;
+        obj.tagName = routeData.tagName;
+        obj.iconSrc = this.getIconSrc(routeData.status);
+        switch (routeData.mode) {
+          case 0:
+            obj.inspectSrc = self.inspectSrc;
+            obj.inspectType = self.$t('overview.remotePatrol');
+            break;
+          case 1:
+            obj.inspectSrc = self.insiteInspectSrc;
+            self.isInsiteInspect = true;
+            obj.inspectType = self.$t('overview.onsitePatrol');
+            break;
+          default:
+            obj.inspectSrc = self.videoSrc;
+            break;
+        }
+        self.report = obj;
+      }else{
+        const obj = {};
+        obj.reportId = self.$route.params.reportId;
+        obj.storeName = '';
+        obj.status = '';
+        obj.dateStr = '';
+        obj.submitterName = '';
+        obj.tagName = '';
+        obj.iconSrc = '';
+        obj.inspectType = self.$t('overview.remotePatrol');
+        obj.inspectSrc = self.inspectSrc;
+        self.report = obj;
       }
-      self.report = obj;
     },
 
     getIconSrc(status) {
@@ -827,6 +927,12 @@ export default {
     async getReportInfo(res) {
       if (res.errCode === 0 && res.data.length > 0) {
         const data = res.data[0].info;  
+        this.report.storeName = data.storeName;
+        this.report.status = data.status;
+        this.report.dateStr = util.getDateStr2(data.ts);
+        this.report.submitterName = data.submitterName;
+        this.report.tagName = data.tagName;
+        this.report.iconSrc = this.getIconSrc(data.status);
         this.totalScore = data.totalScore;
         this.standard = data.standard;
         this.allRemarkItemsFlag = res.data[0].info.type === 1
@@ -834,10 +940,13 @@ export default {
         this.checkinInfo = data.checkinRecord ? `${i18n.t('remotePatrol.checkinSuccess')}  ( ${util.getDateStr2(data.checkinRecord.ts)} )`: '';
         this.weatherImg = data.weatherInfo ? data.weatherInfo.icon : '';
         this.signaturesList = this.isInsiteInspect && data.signatures ? data.signatures : [];
-        this.getGroupsData(data.groups);
         this.reportData = data;
+        this.auditState = data.auditState;
+        this.getGroupsData(data.groups);
+        console.log("this.reportData:",this.reportData);
         this.getTab1AndTab3BtnName(res.data[0].inspectSettings);
         this.getPageDataBasedOnTemplate(this.reportData);
+        this.backSheetGroup = this.getGroupsItems(-1);
       }
     },
 
@@ -854,7 +963,9 @@ export default {
         obj.parentId = groupitem.parentId;
         obj.parentName = '';
         groupitem.items.forEach((item, index) => {
+          console.log("**item:",item);
           const details = {};
+          details.itemId = item.id;
           details.subject = item.subject;
           details.comment = item.comment;
           details.description = item.description;
@@ -897,6 +1008,7 @@ export default {
 
     getPageDataBasedOnTemplate(data) {
       const map = this.getDetailNameAndHandlerMap(data);
+      
       this.sortArrayByKey(this.templateConfig, 'position');
       const pageData = [];
       this.templateConfig.forEach(config => {
@@ -969,6 +1081,7 @@ export default {
       this.getTableHeader();
       const summary = data.summary;
       util.sortArrayByKeyAsc(summary, 'type');
+      console.log("summary:",summary);
       const summaryTree = util.handleInspctionCatergyTree(summary, 'groupId');
       summaryTree.forEach(item => {
         if (!item.children) {
@@ -1019,6 +1132,7 @@ export default {
 
     getReportDetail() {
       const allReportDetails = this.getGroupsItems(-1);
+      console.log("this.backSheetGroup:",this.backSheetGroup);
       return { class: 'row-detail', ifExpand: false, itemCount: -1, data: allReportDetails };
     },
 
@@ -1092,6 +1206,7 @@ export default {
         this.showFeedBacks = true;
         data.feedback.forEach((item, index) => {
           const obj = {};
+          obj.feedbackId = item.id,
           obj.subject = item.subject;
           obj.description = item.description;
           if (item.attachment.length !== 0) {
@@ -1456,7 +1571,7 @@ export default {
 
     getGroupsItems(status) {
       const treeData = util.handleInspctionCatergyTree(this.groups, 'groupId');
-      // console.log('treeData:',treeData);
+      console.log('treeData:',treeData);
       const group = [];
       treeData.forEach(catergy => {
         const tempGroupItem = {};
@@ -1510,7 +1625,6 @@ export default {
           }
         }
       });
-      // console.log('group:',group);
       return group;
     },
 
@@ -1542,7 +1656,148 @@ export default {
       }
     },
 
-    adjustChart(){}
+    adjustChart(){},
+    doGetFeebackItem(){
+      console.log('this.reportData:',this.reportData);
+      return Promise.all(
+        this.reportData.feedback.map(item=>{
+          var obj={
+            id:item.id,
+            eventName:item.subject,
+            eventDes:(item.attachment.length>0)?item.attachment[0].url:'',
+            sourceObj:null,
+            sourceList:[]
+          }
+          for(var att in item.attachment){
+            if(item.attachment[att].mediaType == 2){
+              var objsource = {
+                mediaType:2,
+                height: '100px',
+                width: '140px',
+                fileName:item.attachment[att].url.substring(item.attachment[att].url.lastIndexOf('/')+1),
+                src:item.attachment[att].url,
+                deviceId:item.attachment[att].deviceId,
+                hasUrl:true
+              }
+             obj['sourceObj']  = objsource;
+            }else{
+              var objAtt = {
+                mediaType:item.attachment[att].mediaType,
+                src:item.attachment[att].url,
+                deviceId:item.attachment[att].deviceId,
+              }
+              obj.sourceList.push(objAtt);
+            }
+            
+          }
+          return obj;
+        })
+      ).then(result=>{
+        console.log("doGetFeebackItem:",result);
+        if(result.length ==  this.reportData.feedback.length)
+          return result;
+      })
+    },
+    doGetSheetName(){
+      console.log("backSheetGroup:",this.backSheetGroup);
+      return Promise.all(
+        this.backSheetGroup.map(item=>{
+          var obj={
+            cateryId:item.groupId, //最上面藍色頁籤
+            cateryLabel:item.groupName,
+            inspectList: (item.children)?item.children:item.cateryItems
+          }
+          /*for(var incep in item.cateryItems){
+            var objincep = {
+               groupId:incep.groupId,
+               groupName:incep.groupName,
+               items:incep.cateryItems
+            }
+            obj.inspectList.push(objincep);
+          }*/
+          return obj;
+        })
+      ).then(result=>{
+        console.log("doGetSheetName:",result);
+        if(result.length ==  this.reportData.feedback.length)
+          return result;
+      })
+    },
+    async goBackRemoteInception(){
+      const self = this;
+      console.log("goBackRemoteInception");
+      self.$store.dispatch('setPatrolComment', {suggest:self.reportData.comment, status:self.reportData.status});
+      var BackPatrolParam = {
+        isEdit:true,
+        reportId:self.report.reportId,
+        reportStaus:self.reportData.status,
+        reportComment:self.reportData.comment,
+        tagId:self.reportData.tagId,
+        tagName : self.reportData.tagName,
+        backSheetGroup:self.backSheetGroup,
+        activeIndex : 0,
+        store:self.reportData.storeId,
+        auditCancelable:self.showCancelBtn,
+        //hasIgnoretemp:[],//略過的巡檢項內容
+        //inspectItemList:[], //當下巡檢項內容
+        eventList:await self.doGetFeebackItem(), ////問題回饋內容 info.feedback"
+        curSheetIndex:0,
+        curGroupIndex:0,
+        curItemIndex:0,
+        curItemId:0
+      };
+      
+      var params = {
+        isEdit:true,
+        reportComment:this.reportData.comment
+      };
+      if(self.auditState!=3 && self.auditState!=6  && self.auditState!=7){//撤回跟駁回不需要再drawback
+      console.log("doDrawbak!!!!");
+        var drawbackParam = {inspectReportId:self.report.reportId};
+        taskDrawback(drawbackParam).then(res=>{
+            self.$store.dispatch('setBackPatrolParam', BackPatrolParam);
+          /*self.$store.dispatch('setStoreList', self.storeList);*/
+          self.$store.dispatch('setStoreCache', self.reportData.storeId);
+          this.$router.push({ name: 'remotePatrol', params: params });
+        }).catch(err=>{
+          util.notify(self.$t('audit.inceptionRpt.editAuditFail')+':'+err, 'warning', 3000);
+          self.$store.dispatch('setBackPatrolParam', BackPatrolParam);
+          self.$store.dispatch('setStoreCache', self.reportData.storeId);
+          this.$router.push({ name: 'remotePatrol', params: params });
+        });
+      }else{//除非送簽者自己回去編輯
+        self.$store.dispatch('setBackPatrolParam', BackPatrolParam);
+        self.$store.dispatch('setStoreCache', self.reportData.storeId);
+        this.$router.push({ name: 'remotePatrol', params: params });
+      }
+    },
+    doCancelAudit(){
+      console.log("doCancelAudit");
+      this.cancelAuditDialogShow=true;
+    },
+    onCancelAudit(){
+      this.cancelAuditDialogShow=false;
+    },
+    onConfirmCancelAudit(){
+      const self = this;
+      CancelWorkflow({inspectReportId:self.report.reportId}).then(res=>{
+        if(res.errCode==0){
+          self.$router.push({ name: 'SendAuditManage',params:{curTabIndx:2} });
+          this.cancelAuditDialogShow=false;
+        }else{
+          this.cancelAuditDialogShow=false;
+          util.notify(self.$t('audit.inceptionRpt.cancelAuditFail'), 'warning', 3000);
+        }
+      }).catch(err =>{
+        console.log("CancelWorkflow fail:",err);
+        this.cancelAuditDialogShow=false;
+        util.notify(self.$t('audit.inceptionRpt.cancelAuditFail'), 'warning', 3000);
+      });
+      
+    },
+    doGetTaskInfo(){
+      var resWorkflowTask = GetTaskInfo(self.report.reportId);
+    },
   }
 };
 </script>
@@ -1621,7 +1876,7 @@ export default {
     }
     .el-header {
       width: 100%;
-      height: 76px;
+      height: auto;
       margin-top:29px;
       text-align: left;
       padding-left: calc(30 / 1920 * 100vw);
@@ -1660,6 +1915,17 @@ export default {
       }
       .nochart-report-title{
         font-size: 20px;
+      }
+      .workflow-edit{
+        display: flex;
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+      .splitline{
+          width:100%;
+          border-bottom: 1px solid rgba(172,174,177,.3);
+          margin: 20px 0;
       }
       .left-header{
         width: 100%;

@@ -26,6 +26,14 @@ export const getUserInfo = params => {
   });
 };
 
+export const getAllUserInfoNoAuth = params => {
+  return request({
+    url: `${version}/user/list/all`,
+    method: 'get',
+    params
+  });
+};
+
 export const getAccountList = () => {
   return request({
     url: `${version}/user/account/list`,
@@ -54,3 +62,12 @@ export const getUserAuthorities = () => {
     method: 'get'
   });
 };
+
+export const getDepart = params => {
+  return request({
+    url: `${version}/user/define/list`,
+    method: 'get',
+    params
+  });
+};
+

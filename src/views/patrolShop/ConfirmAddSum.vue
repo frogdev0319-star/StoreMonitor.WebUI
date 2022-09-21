@@ -4,10 +4,21 @@
       <div class="submit-header flex-center margin-bottom-md">
         <span>{{ $t('remotePatrol.summary') }}</span>
         <div class="spacer"></div>
-        <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="storevue-button-filled" type="primary" @click="submit">
-          {{ $t('remotePatrol.submit') }}
-        </el-button>
+        <div v-if="isEditReport"><!--isEditReport-->
+          <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="confirm-btn" type="primary" @click="submit(false)">
+            {{ $t('audit.inceptionRpt.saveReport') }}
+          </el-button>
+          <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="storevue-button-filled" type="primary" @click="showConfirmSubmitMsg=true">
+            {{ $t('audit.inceptionRpt.submitReport') }}
+          </el-button>
+        </div>
+        <div v-else>
+          <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="storevue-button-filled" type="primary" @click="submit(true)">
+            {{ $t('remotePatrol.submit') }}
+          </el-button>
+        </div>
       </div>
+
       <div class="submit-content">
         <div class="submit-radio margin-bottom-md">
           <span v-for="(item,index) in resultList" :key="index">
@@ -31,13 +42,86 @@
         <span v-if="adviceInfoRuletip" class="rules">{{ $t('remotePatrol.comentRuletip_suggest') }}</span>
       </div>
     </el-col>
+    <el-col v-if="isBindWorkflow" :span="24" class="sum-submit paper">
+      <div class="submit-header flex-center margin-bottom-md">
+        <span>{{ $t('audit.inceptionRpt.sendAudit') }}</span>
+      </div>
+      <div class="audit-content">
+        <span class="sug-label" >{{ $t('audit.inceptionRpt.addAttach') }}</span>
+        <div v-if="pdfFileList.length>0" class="attach-area" style="margin-bottom:10px;">
+          <div v-for="(pdfItem,index) in pdfFileList" :key="'pdf'+index" class="source-details" >
+            <div class="img-content">
+              <i class="el-icon-close icondelete" @click="deleteImg({item:pdfItem,index})" />
+              <div class="pdf-content">
+                <span>{{pdfItem.showName}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="attach-area" >
+          <div v-for="(imgItem,index) in imgFileList" :key="'img'+index" class="source-details" >
+            <div class="img-content">
+              <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
+              <el-image
+                :src="imgItem.src"
+                style="width:140px;height:100px"
+                :preview-src-list="getAuditImgList(index)"/>
+            </div>
+          </div>
+          <div v-if="auditFileCount<10" class="attach-add" @click="$refs.auditfile.click()">
+            <input type="file" style="display: none" accept="image/png,image/jpeg,application/pdf" max-size="2" @change="doAddAttachment" ref="auditfile" />
+            <div style="height:16px;display: flex;flex-direction: row;align-items: center;">
+              <img src="../../../static/img/icon_attachment.svg" widht="16px" height="16px" style="border-radius:10px;"/>
+              <div class="att-txt">{{ $t('audit.inceptionRpt.attachment') }}</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:10px;">
+          <span class="sug-label margin-bottom-md" >{{ $t('audit.inceptionRpt.auditNote') }}</span>
+          <el-input
+            :autosize="{ minRows: 2, maxRows: 7}"
+            v-model="auditNote"
+            type="textarea"
+            resize="none"
+            class="sug-input"
+            @input="auditNoteChanged"
+            @blur="notShowAuditNoteRuleTips"
+          />
+          <span v-if="auditNoteRuletip" class="rules">{{ $t('remotePatrol.comentRuletip_suggest') }}</span>
+        </div>
+        <div class="next-audit">
+          <div style="width:47%;">
+            <span class="sug-label margin-bottom-md">{{ $t('audit.inceptionRpt.nextAuditor') }}</span>
+            <el-input
+              :autosize="{ minRows: 3, maxRows: 3}"
+              v-model="workflowInfo.nextAuditUser"
+              type="textarea"
+              resize="none"
+              class="person-audit"
+              disabled="true"
+            />
+          </div>
+          <div style="width:47%;">
+            <span class="sug-label margin-bottom-md">{{ $t('audit.inceptionRpt.ccPeople') }}</span>
+            <el-input
+              :autosize="{ minRows: 3, maxRows: 3}"
+              v-model="workflowInfo.copyToUsers"
+              type="textarea"
+              resize="none"
+              class="person-audit"
+              disabled="true"
+            />
+          </div>
+        </div>
+      </div>
+    </el-col>
     <el-col v-if="!allRemarkItemsFlag" :span="24" class="sum-data">
       <span style="font-size: 18px; font-weight: bold">{{ $t('remotePatrol.preview') }}</span>
       <div class="paper" style="margin-top: 15px; padding: 0 15px">
         <div class="table-content">
           <div class="table-header flex-center">
             <div class="header-store-name">
-              <span v-if="lang=='en' " class="en-store-name">{{ $t('remotePatrol.storeName') }}: </span>
+              <span v-if="lang=='en' " class="en-store-name">{{ $t('remotePatrol.storeName') }}：</span>
               <span v-else class="store-name">{{ $t('remotePatrol.storeName') }}：</span>
               {{ store.storeName }}
             </div>
@@ -348,19 +432,44 @@
         <el-progress :percentage="Math.round(uploadingnumOfPic/totalnumOfPic*100)"/>
       </div>
     </el-dialog>
+    <dialog-pop
+      :title="$t('remotePatrol.resubmiteRpt')"
+      :isWarning="true"
+      :visible="showConfirmSubmitMsg"
+      @cancelHandler = "showConfirmSubmitMsg=false"
+      @confirmHandler="onConfirmSubmitMsgOk">
+      <div class="dialog-slot">
+        <div class="dialog-content">{{ $t('remotePatrol.resubmiteRpt')+'?' }} </div>
+      </div>
+    </dialog-pop>
+    <dialog-pop
+      :title="$t('remotePatrol.systemReject')"
+      :isWarning="true"
+      :visible="showSystemReject"
+      :showCancelbtn="false"
+      @confirmHandler="onshowSystemRejectConfirm">
+      <div class="dialog-slot">
+        <div class="dialog-content">{{ $t('remotePatrol.systemRejectMsg') }} </div>
+      </div>
+    </dialog-pop>
   </el-row>
 </template>
 <script>
 import { getStorageInfo } from '@/api/event';
 import { submitInspectItem1 } from '@/api/inspect';
+import {SubmitWorkflow,getWorkflowInfo,modifyReportWorkflow,taskSummit,getReportWorkflowTask,ReSubmitWorkflow} from '@/api/workflow';
 import util from '@/common/util';
 import { getCookie } from '@/common/auth';
-import { getUserInfo } from '@/api/login';
+import { getDepartmentListAll } from '@/api/checkin';
+import { getUserInfo ,getAllUserInfoNoAuth} from '@/api/login';
 import filterString from '@/common/filterString.js';
 import Database from '@/common/Database.js';
+import PermissionHelper from '@/api/PermissionHelper';
+import DialogPop from '@/components/DialogPop';
 
 export default {
   name: 'ConfirmAddSum',
+  components: {DialogPop},
   data() {
     return {
       dialogCommentVideo: false,
@@ -416,7 +525,23 @@ export default {
       adviceInfoRuletip: false,
       tab1BtnArr: [],
       tab3BtnArr: [],
-      allRemarkItemsFlag: true
+      allRemarkItemsFlag: true,
+      isBindWorkflow:false,
+      auditNote:'',
+      auditNoteRuletip:false,
+      pdfFileList:[],
+      imgFileList:[],
+      auditFileCount:0,
+      workflowInfo:{copyToUsers:"",nextAuditUser:""},
+      userDataList:[],
+      positionsList:[],
+      bucketPdf:'',
+      isEditReport:false,
+      reportId:-1,
+      reportStatus:-1,
+      auditCancelable:false,
+      showConfirmSubmitMsg:false,
+      showSystemReject:false
     };
   },
   computed: {
@@ -439,23 +564,34 @@ export default {
       };
     }
   },
+  watch:{
+    pdfFileList(){
+      this.auditFileCount = this.pdfFileList.length+this.imgFileList.length;
+    },
+    imgFileList(){
+      this.auditFileCount = this.pdfFileList.length+this.imgFileList.length;
+    },
+  },
   beforeRouteLeave(to, from, next) {
     const self = this;
+    console.log("beforeRouteLeave:",to.name)
     if (to.name !== 'remotePatrol') {
       self.$store.dispatch('setPatrolHistory', null);
       self.$store.dispatch('setPatrolComment', null);
       self.$store.dispatch('setStoreList', []);
       self.$store.dispatch('setStoreCache', null);
       this.$store.dispatch('setEditCount', 0);
+      console.log("userId:",self.userId);
       Database.addDataToDB(self.userId, { data: {}, rule: {}});
       next();
     } else {
-      self.$store.dispatch('setPatrolComment', self.suggest);
+      self.$store.dispatch('setPatrolComment', {suggest:self.suggest,status:self.curSumIndex});
       next();
     }
   },
   mounted() {
     const self = this;
+    
     self.getRouteData();
     self.getUpLoadBucketInfo();
     self.getOssInfo();
@@ -491,6 +627,7 @@ export default {
       }
       return arr.filter(source => source.mediaType === 2).map(source => source.src);
     },
+    
     getFileUrl(fileName) {
       const self = this;
       const bucketName = self.oss.ossBucketName;
@@ -558,7 +695,12 @@ export default {
       });
       self.curSumIndex = item.label;
     },
-    async submit() {
+    onConfirmSubmitMsgOk(){
+      this.showConfirmSubmitMsg = false;
+      this.submit(true);
+    },
+
+    async submit(sendEvent) {
       const self = this;
       let upload = 0;
       const inspect = self.inspectList;
@@ -566,6 +708,7 @@ export default {
       let status = 0;
       let flag = false;
       self.uploadingnumOfPic = 0;
+      self.totalnumOfPic += self.imgFileList.length + self.pdfFileList.length; 
       self.resultList.forEach(item => {
         if (item.isActive) {
           flag = true;
@@ -588,16 +731,19 @@ export default {
         for (const g in inspect[i].inspectList) {
           for (const j in inspect[i].inspectList[g].items) {
             const objItem = {};
+            if(this.isEditReport && this.reportId!=-1){
+              objItem.id = inspect[i].inspectList[g].items[j].id;
+            }
             objItem.ts = new Date().getTime();
             // objItem.description = inspect[i].inspectList[g].items[j].inspectText.trim();
             if (inspect[i].inspectList[g].items[j].itemType === 1) {
-              objItem.grade = Math.pow(-2, 31);
+              objItem.grade = objItem.score = Math.pow(-2, 31);
             } else {
               if (inspect[i].type === 0 || inspect[i].type === 2) {
-                objItem.grade = inspect[i].inspectList[g].items[j].isIgnore ||
+                objItem.grade = objItem.score = inspect[i].inspectList[g].items[j].isIgnore ||
                   inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2, 31) : (inspect[i].inspectList[g].items[j].isQualified ? 1 : 0);
               } else {
-                objItem.grade = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore 
+                objItem.grade = objItem.score = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore 
                   ? Math.pow(-2, 31)
                   : inspect[i].inspectList[g].items[j].itemgetScore;
               }
@@ -609,24 +755,31 @@ export default {
               for (const k in inspect[i].inspectList[g].items[j].sourceList) {
                 const obj = {};
                 if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 2 || inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 1) {
-                  await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]).then((url) => {
-                    self.uploadingnumOfPic++;
-                    if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 2) {
-                      obj.mediaType = 2;
-                      obj.url = url;
-                      obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
-                    } else if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 1) {
-                      obj.mediaType = 1;
-                      obj.url = url;
-                      obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                  if(inspect[i].inspectList[g].items[j].sourceList[k].hasUrl){ //已經上傳過的檔案
+                    self.uploadingnumOfPic++
+                    obj.mediaType = inspect[i].inspectList[g].items[j].sourceList[k].mediaType;
+                    obj.url = inspect[i].inspectList[g].items[j].sourceList[k].src;
+                    obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                  }else{
+                    await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]).then((url) => {
+                      self.uploadingnumOfPic++;
+                      if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 2) {
+                        obj.mediaType = 2;
+                        obj.url = url;
+                        obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                      } else if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 1) {
+                        obj.mediaType = 1;
+                        obj.url = url;
+                        obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                      }
+                    }).catch((err) => {
+                      upload++;
+                    });
+                    if (upload !== 0) {
+                      self.uploadProgress = false;
+                      util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+                      return false;
                     }
-                  }).catch((err) => {
-                    upload++;
-                  });
-                  if (upload !== 0) {
-                    self.uploadProgress = false;
-                    util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
-                    return false;
                   }
                 } else {
                   obj.mediaType = 3;
@@ -640,54 +793,129 @@ export default {
           }
         }
       }
+      //feedBack
       const feedEventList = [];
-
       for (const i in self.eventList) {
         const obj = {};
+        obj.id = (self.eventList[i].id)?self.eventList[i].id:-1;
         obj.ts = new Date().getTime();
         obj.storeId = self.store.storeId;
 
         obj.subject = self.eventList[i].eventName;
         // obj.description = self.eventList[i].eventDes;
         const commentTemp = [];
-        if (self.eventList[i].eventDes.trim().length > 0) {
-          let arr = self.eventList[i].eventDes.trim().split('|')
+        console.log("self.eventList:",self.eventList);
+        if (self.eventList[i].sourceList.length > 0) {
+          let arr = self.eventList[i].sourceList;
           arr.forEach(item => {
-            let obj = {};
-            obj.mediaType = 3;
-            obj.url = item;
-            commentTemp.push(obj);
+            if(item.mediaType==3){
+              console.log("***item:",item);
+              let obj = {};
+              obj.mediaType = 3;
+              obj.url = item.src;
+              commentTemp.push(obj);
+            }
           })
+          
         }else{
+          console.log("***self.eventList[i]:",self.eventList[i]);
           let obj = {};
             obj.mediaType = 3;
-            obj.url = "";
+            obj.url = self.eventList[i].eventDes;
             commentTemp.push(obj);
         }
         if (self.eventList[i].sourceObj != null) { 
-          await self.upLoadFile(self.eventList[i].sourceObj).then((url) => {
+          if(self.eventList[i].sourceObj.hasUrl){
             self.uploadingnumOfPic++;
             const commentObj = {
-              mediaType: self.eventList[i].sourceObj.mediaType,
-              url: url,
-              deviceId: self.eventList[i].sourceObj.deviceId
-            };
-            commentTemp.push(commentObj);
-          }).catch((err) => {
-            upload++;
-          });
-          if (upload !== 0) {
-            self.uploadProgress = false;
-            util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
-            return false;
+                mediaType: self.eventList[i].sourceObj.mediaType,
+                url: self.eventList[i].sourceObj.src,
+                deviceId: self.eventList[i].sourceObj.deviceId
+              };
+              commentTemp.push(commentObj);
+          }else{
+            await self.upLoadFile(self.eventList[i].sourceObj).then((url) => {
+              self.uploadingnumOfPic++;
+              const commentObj = {
+                mediaType: self.eventList[i].sourceObj.mediaType,
+                url: url,
+                deviceId: self.eventList[i].sourceObj.deviceId
+              };
+              commentTemp.push(commentObj);
+            }).catch((err) => {
+              upload++;
+            });
+            if (upload !== 0) {imgFileList
+              self.uploadProgress = false;
+              util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+              return false;
+            }
           }
-
           obj.deviceId = self.eventList[i].sourceObj.deviceId;
         } else {
           // obj.diviceId=-1;
         }
         obj.attachment = commentTemp;
         feedEventList.push(obj);
+      }
+      //上傳簽核附件 
+      var auditAttachment = [];
+      //upload audit image
+      for(let idx=0; idx<self.imgFileList.length;idx++){
+        if(!self.imgFileList[idx].hasUrl){
+          await self.upLoadFile(self.imgFileList[idx]).then((url) => {
+            self.uploadingnumOfPic++;
+            const auditImgObj = {
+              mediaType: 2,
+              url: url,
+              ts: Date.now()
+            };
+            auditAttachment.push(auditImgObj);
+          }).catch((err) => {
+            console.log("uploade file error:",err)
+            upload++;
+          });
+        }else{
+          self.uploadingnumOfPic++;
+            const auditImgObj = {
+              mediaType: 2,
+              url: self.imgFileList[idx].src,
+              ts: Date.now()
+            };
+            auditAttachment.push(auditImgObj);
+        }
+      }
+      //upload audit pdf
+      for(let idx=0; idx<self.pdfFileList.length; idx++){
+        if(!self.pdfFileList[idx].hasUrl){
+          await self.upLoadFile(self.pdfFileList[idx]).then((url) => {
+            self.uploadingnumOfPic++;
+            const auditImgObj = {
+              fileName:self.pdfFileList[idx].showName,
+              mediaType: 4,
+              url: url,
+              ts: Date.now()
+            };
+            auditAttachment.push(auditImgObj);
+          }).catch((err) => {
+            console.log("uploade file error:",err)
+            upload++;
+          });
+        }else{
+          self.uploadingnumOfPic++;
+            const auditImgObj = {
+              fileName:self.pdfFileList[idx].showName,
+              mediaType: 4,
+              url: self.pdfFileList[idx].src,
+              ts: Date.now()
+            };
+            auditAttachment.push(auditImgObj);
+        }
+      }
+      if (upload !== 0) {
+          self.uploadProgress = false;
+          util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+          return false;
       }
       let curSumIndex = [];
       curSumIndex = self.resultList.filter(x => x.isActive);
@@ -696,42 +924,278 @@ export default {
       const params = {
         uuid: uuid,
         status: status,
-        comment: self.suggest.trim(),
+        comment: (self.suggest)?self.suggest.trim():"",
         items: temp,
-        feedback: feedEventList
+        feedback: feedEventList,
+        isMysteryMode:PermissionHelper.enableMimicMode,
+        isCreateEvent:sendEvent
       };
+      
       let routeData = null;
-      upload === 0 && submitInspectItem1(params).then(res => {
-        if (res.errCode === 0) {
-          const data = res.data;
-          self.editFlag = true;
-          routeData = {
-            isSuccess: true,
-            user: data.notifiedTo
-          };
-          self.$store.dispatch('setEditCount', 0);
-        } else {
-          routeData = {
-            isSuccess: false,
-            reLoadData: self.$route.params
-          };
-        }
-        self.$router.push({ name: 'submitEvent', params: { data: routeData }});
-      }).catch(err => {
-        util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
-        return false;
-      });
+      if(self.reportId!=-1 && self.isEditReport){
+        params['reportId']=this.reportId;
+        upload === 0 && self.doModifyReportSubmit(params,auditAttachment,sendEvent);
+      } else{
+        upload === 0 && submitInspectItem1(params).then(res => {
+          if (res.errCode === 0) {
+            const data = res.data;
+            self.editFlag = true;
+            if(self.isBindWorkflow){
+              const inspectId = data.inspectId; //取得報告ID
+              const wfParams={
+                inspectReportId:inspectId,
+                comment:{
+                  description:self.auditNote,
+                  attachment:auditAttachment
+                }
+              }
+              SubmitWorkflow(wfParams).then(wfRes=>{
+                console.log("SubmitWorkflow res:",res);
+                if(wfRes.errCode == 0){
+                  if(wfRes.data.isSystemReject){
+                    self.showSystemReject = true;
+                    return;
+                  }
+                  self.$store.dispatch('setEditCount', 0);
+                  routeData = {
+                      isSuccess: true,
+                      user: data.notifiedTo,
+                      isBindWorkflow:!!PermissionHelper.enableSendAudit()
+                  };
+                }else{
+                  util.notify(wfRes.errMsg, 'error', 3000);
+                  routeData = {
+                    isSuccess: false,
+                    reLoadData: self.$route.params,
+                    isBindWorkflow:!!PermissionHelper.enableSendAudit()
+                  };
+                }
+                
+                self.$router.push({ name: 'submitEvent', params: { data: routeData }});
+              }).catch(err=>{
+                  console.log("err:",err);
+                  util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+                  return false;
+                }
+              );
+            }else{
+              routeData = {
+                isSuccess: true,
+                user: data.notifiedTo,
+                isBindWorkflow:false
+              };
+            }
+            
+          } else {
+            util.notify(res.errMsg, 'error', 3000);
+            routeData = {
+              isSuccess: false,
+              reLoadData: self.$route.params,
+              isBindWorkflow:false
+            };
+          }
+          if(!self.isBindWorkflow)
+            self.$router.push({ name: 'submitEvent', params: { data: routeData}});
+        }).catch(err => {
+          util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+          return false;
+        });
+      }
       self.uploadProgress = false;
     },
 
+    doModifyReportSubmit(params,auditAttachment,sendEvent){
+      const self = this;
+      console.log("submit report params:",params);
+      var routeData = {
+        isSuccess: false,
+        reLoadData: self.$route.params,
+        isBindWorkflow:!!PermissionHelper.enableSendAudit() 
+      };
+      var resReportModify = modifyReportWorkflow(params);
+      var resWorkflowTask = getReportWorkflowTask({type:0,inspectReportId:self.reportId});
+      Promise.all([resReportModify,resWorkflowTask]).then( async (result) =>{
+        console.log("doModifyReportSubmit result:",result);
+        var data =[]
+        if(result[0].errCode==0){
+          data = result[0].data;
+          self.editFlag = true;
+        }else{
+          util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+          return false;
+        }
+        if(result[1].errCode!=0) {
+          util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+          return false;
+        }
+        if(!sendEvent){//儲存，非送出報告，不用submit簽核
+          routeData = {
+            reportId: self.reportId, 
+            isAuditMode: true, 
+            canEdit: true,
+            canCancel: this.auditCancelable,
+            auditCancelable:this.auditCancelable
+          };
+          const workflowParams={
+            _id:'rpt'+self.reportId,
+            description:self.auditNote,
+            attachment:auditAttachment
+          };
+          console.log("save db:",workflowParams);
+          await Database.addDataToDB('rpt'+self.reportId, workflowParams);
+          console.log("routeData:",routeData);
+          self.$router.push({ name: 'auditReportdetails', params: routeData});
+        }else{
+          //if(self.auditState==7){ **3.0.4.2 不用判斷都使用reSubmit//系統撤回重送
+            var subTaskParam = {
+              inspectReportId:self.reportId,
+              comment:{
+                description:self.auditNote,
+                attachment:auditAttachment
+              }
+            }
+            console.log("1.subTaskParam:",subTaskParam);
+            self.doReSubmitWorkflow(subTaskParam);
+          /*}else{
+            let task = result[1].data.find(t=>t.parentId==-1 && t.state==2);
+            console.log("task:",task);
+            let taskId = task.tasks[0].taskId;
+            var subTaskParam = {
+              taskId,
+              result:0,
+              comment:{
+                description:self.auditNote,
+                attachment:auditAttachment
+              }
+            };
+            console.log("2.subTaskParam:",subTaskParam);
+            taskSummit(subTaskParam).then(resSubTask => {
+              if(resSubTask.errCode == 0){
+                self.$store.dispatch('setEditCount', 0);
+                routeData = {
+                    isSuccess: true,
+                    isBindWorkflow:!!PermissionHelper.enableSendAudit()
+                };
+                console.log("routeData:",routeData);
+                self.$router.push({ name: 'submitEvent', params: { data: routeData}});
+              }
+            }).catch(errSubTask=>{
+              console.log("errSubTask:",errSubTask);
+              util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+              return false;
+            });
+          }*/
+        }
+      }).catch(err=>{
+        console.log("err:",err);
+        util.notify(self.$t('remotePatrol.sentFail')+':'+err, 'error', 3000);
+        return false;
+      });
+    },
+    doReSubmitWorkflow(wfParams){
+      const self = this;
+      ReSubmitWorkflow(wfParams).then(wfRes=>{
+          console.log("ReSubmitWorkflow res:",wfRes);
+          if(wfRes.errCode == 0){
+            if(wfRes.data.isSystemReject){
+              self.showSystemReject = true;
+              return;
+            }
+            self.$store.dispatch('setEditCount', 0);
+            var routeData = {
+                isSuccess: true,
+                isBindWorkflow:!!PermissionHelper.enableSendAudit() 
+            };
+            Database.removeDataFromDB('rpt'+self.reportId);
+            self.$router.push({ name: 'submitEvent', params: { data: routeData}});
+          }else{
+            util.notify(wfRes.errMsg, 'error', 3000);
+          }
+        }).catch(err=>{
+            console.log("ReSubmitWorkflow err:",err);
+            util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+            return false;
+          }
+        );
+    },
+    doGetReportWorkflowTask(){
+      Database.getDataFromDB('rpt'+this.reportId).then(res => {
+        console.log("**getDataFromDB:",res);
+        this.auditNote = res.description;
+        this.doGetAuditAttachList(res.attachment);
+      }).catch(err=>{ //local DB 已刪除
+        console.log("**getDataFromDB err:",err)
+        getReportWorkflowTask({type:0,inspectReportId:this.reportId}).then(result=>{
+          console.log("getReportWorkflowTask result:",result);
+          if(result.errCode==0){
+            const tasks = result.data.taskList[0].tasks;
+            console.log("tasks:",tasks);
+            if(tasks.length>0){
+              this.auditNote = tasks[0].comment.description;
+              this.doGetAuditAttachList(tasks[0].comment.attachment);
+            }
+          }else{
+            console.log("getReportWorkflowTask error:",result.errMsg);
+          }
+        })
+      }
+      );
+    },
+    doGetAuditAttachList(attachments){
+      var imgList = [];
+      var pdfList = [];
+      attachments.map(att=>{
+        if(att.mediaType==2){//image
+          imgList.push(
+            {
+              fileName:att.fileName,
+              src:att.url,
+              file:att.url,
+              type:'img',
+              size:0,
+              hasUrl:true
+            }
+          );
+        }else if(att.mediaType==4){//pdf
+          pdfList.push({
+            fileName:att.fileName,
+            showName:att.fileName,
+            src:att.url,
+            file:att.fileName,
+            type:'pdf',
+            size:0,
+            hasUrl:true
+          });
+        }
+      });
+        this.imgFileList = imgList;
+        this.pdfFileList = pdfList;
+    },
+    onshowSystemRejectConfirm(){
+      this.showSystemReject = false;
+      this.$store.dispatch('setEditCount', 0);
+      var routeData = {
+          isSuccess: true,
+          isBindWorkflow:!!PermissionHelper.enableSendAudit() 
+      };
+      this.$router.push({ name: 'submitEvent', params: { data: routeData}});
+    },
     async getRouteData() {
       const self = this;
       const PatrolComment = self.$store.getters.PatrolComment;
       if (PatrolComment != null) {
-        self.suggest = PatrolComment;
+        self.suggest = PatrolComment.suggest;
+        self.curSumIndex = PatrolComment.status;
+        self.resultList.map(x => {
+            if(x.label==self.curSumIndex) x.isActive=true;
+          });
       }
+      console.log()
+      self.userId = getCookie('UserId');
+      
       Database.getDataFromDB(getCookie('UserId')).then(res => {
         const inpectResult = res;
+        console.log("***inspect:",inpectResult);
         const routeData = inpectResult.data;
         const inspectSettings = inpectResult.rule;
         const inspect = routeData.inspect;
@@ -741,6 +1205,21 @@ export default {
         self.inspectList = routeData.inspect;
         self.eventList = routeData.event;
         self.allRemarkItemsFlag = routeData.allRemarkItemsFlag;
+        self.isBindWorkflow = routeData.isBindWorkflow;
+        self.isEditReport = routeData.isEditReport;
+        self.auditCancelable = routeData.auditCancelable;
+
+        if(self.isEditReport) {
+          self.reportId = routeData.reportId;
+          console.log("isEditReport");
+          self.doGetReportWorkflowTask();
+        };
+        if(self.isBindWorkflow){
+          console.log('**inspectSettings.workflowInfo',inspectSettings.workflowInfo);
+          self.doGetWorkflowInfo(inspectSettings.workflowInfo);
+          self.auditState = routeData.auditState;
+          console.log("getRouteData auditState:",routeData.auditState );
+        }
         this.getTab1AndTab3BtnName(inspectSettings);
         const allTypeArr = new Set();
         let tempList = [], feedBackTemp = [], ignoreTemp = [], UnqualifiedTemp = [], dealType = [];
@@ -998,7 +1477,7 @@ export default {
         if (!Tab0Status && dealType.length !== 1 && inspect[0].type === 0 || inspect[0].type !== 0) {
           self.resultList.forEach(item => {
             item.isShow = true;
-            item.isActive = false;
+            item.isActive = (item.label==self.curSumIndex)?true:false;
           });
         }
         if (inspectSettings.hundredMarkType === '1') {
@@ -1123,6 +1602,7 @@ export default {
       const userId = getCookie('UserId');
       return new Promise((resolve, reject) => {
         getUserInfo().then(res => {
+          self.userDataList = res.data;
           res.data.forEach(item => {
             if (item.userId === userId) {
               const accountId = item.accountId.toLowerCase();
@@ -1143,6 +1623,7 @@ export default {
       const self = this;
       self.bucketVideo = 'video' + '/' + util.getCurDate2Str();
       self.bucketImage = 'image' + '/' + util.getCurDate2Str();
+      self.bucketPdf = 'pdf' + '/' + util.getCurDate2Str();
     },
 
     notShowInputRuleTips() {
@@ -1185,8 +1666,138 @@ export default {
         { name: this.$t('remotePatrol.TableTotal'), width: 'width:24%;' },
         { name: this.$t('remotePatrol.TableGet'), width: 'width:12%;' }
       ];
-    }
+    },
+    
+    auditNoteChanged(val) {
+      const self = this;
+      const content = filterString.all(val, 600);
+      const length = filterString.getContentLength(val);
+      self.auditNote = content;
+      if (length > 600) {
+        this.auditNoteRuletip = true;
+      } else {
+        this.auditNoteRuletip = false;
+      }
+    },
+    notShowAuditNoteRuleTips() {
+      this.auditNoteRuletip = false;
+    },
+    doAddAttachment(e){
+      const self = this;
+      const maxSize = 4*1024*1024; //不能超過4MB
+      var files = e.target.files || e.dataTransfer.files;
+      console.log("choose file:",files);
+      var fileName = files[0].name;
+      if (!files.length)
+        return;
+      if(self.auditFileCount==10){
+        util.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
+        return;
+      }
+      if(files[0].type.includes("pdf") && files[0].size > maxSize){
+        util.notify(self.$t('audit.inceptionRpt.maxFileSizeAlert'), 'warning', 3000);
+        return;
+      }
+      if(files[0].type.includes("image")){
+        var objImg={
+          fileName:`${self.bucketImage}/inspect_${util.getCurTimeStr()}_${self.store.storeId}_${files[0].name}`,
+          src:'',
+          file:'',
+          type:files[0].type,
+          size:files[0].size
+        };
+        self.createFile(files[0],objImg);
+        self.imgFileList.push(objImg);
+      }else if(files[0].type.includes("pdf")){
+        console.log("choose file:",fileName);
+        var objpdf={
+          fileName:`${self.bucketPdf}/inspect_${util.getCurTimeStr()}_${self.store.storeId}_${files[0].name}`,
+          showName:files[0].name,
+          src:'',
+          file:fileName,
+          type:'pdf',
+          size:files[0].size,
+        }
+        self.createFile(files[0],objpdf);
+        self.pdfFileList.push(objpdf);
+      }
+    },
+    createFile(file, objFile) {
+      //var image = new Image();
+      var reader = new FileReader();
 
+      reader.onload = (e) => {
+        objFile.src = e.target.result;
+        objFile.file = util.base64ToBlob(e.target.result);
+        console.log(objFile.file);
+      };
+      reader.readAsDataURL(file);
+    },
+
+    deleteImg({item, index}) {
+      const self = this;
+      if(item.type==='pdf')
+        self.pdfFileList.splice(index, 1);
+      else
+        self.imgFileList.splice(index, 1);
+    },
+    getAuditImgList(index) {
+      const arr = [];
+      let i = 0;
+      for (i; i < this.imgFileList.length; i++) {
+        arr.push(this.imgFileList[i + index]);
+        if (i + index >= this.imgFileList.length - 1) {
+          index = 0 - (i + 1);
+        }
+      }
+      return arr.map(source => source.src);
+    },
+    async doGetWorkflowInfo(workflow){
+      var wfi = {copyToUsers:"",nextAuditUser:""}
+      const workflowPromise = getWorkflowInfo({processDefinitionKey:workflow.processDefinitionKey});
+      const userPosition = getDepartmentListAll({ type: 0 }); //取得職務
+      const userPromise = getAllUserInfoNoAuth();
+      try {
+        const result = await Promise.all([userPosition, userPromise, workflowPromise]);
+        this.userDataList = result[1].data;
+        this.positionsList = result[0].data;
+        const data = result[2].data;
+        console.log("result[2].data:",result[2].data);
+        wfi.copyToUsers = this.getUserName(data.copyToUsers);
+        if(data.nextAuditNode && data.nextAuditNode.nextAuditNode){
+          var auditType = data.nextAuditNode.nextAuditNode.auditTargetType;
+          if(auditType == 0) //audit by person
+            wfi.nextAuditUser = this.getUserName(data.nextAuditNode.nextAuditNode.auditByUsers);
+          else if(auditType == 1) //audit by group
+            wfi.nextAuditUser = this.getUserPositionList(data.nextAuditNode.nextAuditNode.auditByGroups);
+        }
+        
+        //console.log('*wfi:',wfi);
+        this.workflowInfo = wfi;
+        //return wfi;
+      } catch (e) {
+        console.log(e);
+        //return wfi;
+      }
+    },
+    getUserName(userIds){
+      const self = this;
+      var users = self.userDataList.filter(item=> {return userIds.includes(item.userId);});
+      var auditUsers = "";
+      console.log("users:",users);
+      users.forEach( u=>{
+        auditUsers += u.userName+',';
+      })
+      //console.log('auditUsers:', auditUsers);
+      return auditUsers.slice(0,auditUsers.length-1);
+    },
+    getUserPositionList(groupIds) {
+      var groups = this.positionsList.filter(item => {return groupIds.includes(item.defineId);});
+      var auditGroups="";
+      groups.forEach(g=> auditGroups +=g.defineName+',');
+      //console.log(' auditGroups:', auditGroups);
+      return auditGroups.slice(0,auditGroups.length-1);
+    },
   }
 };
 </script>
@@ -1398,7 +2009,107 @@ export default {
           }
         }
       }
-
+      
+      /*簽核*/
+      .audit-content{
+        .sug-label{
+          font-size: calc(12/1920*100vw);
+          display: block;
+          margin-bottom: 16px;
+        }
+        .rules{
+          font-size: 10px;
+          color:#ff2400;
+          font-weight: 400;
+          line-height: 12px;
+        }
+        .sug-input{
+          width: 99.5%;
+          >>> textarea {
+            background-color: #f4f6f7;
+            border: none;
+          }
+        }
+        .attach-area{
+          display:flex;
+          align-content:flex-start;
+          align-self: flex-start;
+          .attach-add{
+            height:100px;
+            width:161px;
+            border-radius: 10px;
+            box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1);
+            display:flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            .att-txt{
+              font-size: 14px;
+              color: #006ab7;
+              margin-left: 3px;
+            }
+          }
+          .source-details{
+            display: inline-block;
+            margin-right: 15px;
+            position: relative;
+            .icondelete{
+              position: absolute;
+              font-size: 14px;
+              right: 5px;
+              margin-top: 8px;
+              z-index: 2;
+              color: #fff;
+              cursor: pointer;
+              background-color: rgba($color: $black, $alpha: 0.8);
+              border-radius: 50%;
+            }
+            .img-content{
+              width: 100%;
+              height: 100%;
+              position: relative;
+            }
+            .pdf-content{
+              width: 140px;
+              height: 30px;
+              padding: 1px 0px 1px 12px;
+              border-radius: 5px;
+              box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1);
+              background-color: #fff;
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              justify-content: flex-start;
+              span{
+                display:block;
+                width:110px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                font-size:12px;
+              }
+            }
+          
+          }
+        }
+        .next-audit{
+          display:flex; 
+          flex-direction:row;
+          justify-content:space-between;
+          align-content:stretch;
+          margin-top:16px;
+          height:100px;
+          margin-right: 8px;
+          .person-audit{
+            width: 100%;
+            >>> textarea {
+              background-color: #f4f6f7;
+              border: none;
+            }
+          }
+        }
+      }
     }
     .sum-data{
       padding: 20px;
