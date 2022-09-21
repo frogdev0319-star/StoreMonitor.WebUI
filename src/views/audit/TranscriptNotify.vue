@@ -111,7 +111,7 @@ export default{
             curTotalPage:0,
             curPage:1,
             curSizeNum:10,
-            defaultSort:{order:'descending',prop:'processLastUpdateTs'},
+            defaultSort:{order:'descending',prop:'processStartTs'},
             curOrder:{
                 direction:'desc',
                 property:'processStartTs'

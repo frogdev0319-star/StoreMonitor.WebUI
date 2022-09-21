@@ -318,7 +318,8 @@ export default {
             console.log("onChangeSelectedStore idx:",val);
             if(val){
                 this.selStoreValue = val;
-                this.selInspectVaule = null;
+                this.selInspectVaule = {value:null,label:""};
+                this.selInspectId = null;
                 this.selStoreId = val.value;
                 this.selStoreName=val.label;
                 var storeIndex = this.storeDataList.findIndex((store) =>store.value == val.value);

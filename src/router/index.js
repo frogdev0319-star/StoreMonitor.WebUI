@@ -480,7 +480,7 @@ export const navbarRoute = {
 
     ) && primaryPathesList.push('/routeinspection', '/addroute', '/setroute', '/bindroute');
 
-    !PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleSetting() && inspectionRoute.children.push({
+    /*!PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleSetting() && inspectionRoute.children.push({
       path: '/patrolSchedule',
       name: 'scheduleManage',
       isReadOnly: false,
@@ -490,7 +490,7 @@ export const navbarRoute = {
         keepAlive: false, // the component is't to be cache.
         requireAuth: true
       }
-    }) && primaryPathesList.push('/patrolSchedule');
+    }) && primaryPathesList.push('/patrolSchedule');*/
 
     !PermissionHelper.enableMimicMode && PermissionHelper.enableReportSetting() &&
     inspectionRoute.children.push({

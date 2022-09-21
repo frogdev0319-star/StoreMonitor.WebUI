@@ -84,7 +84,7 @@
                   <div class="button-area" >
                       <span style="color:#acaeb1">{{ barchartOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
                       <img :src='barchartOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
-                  </div>    
+                  </div>
               </div>
               <div v-if="ispdf" style="overflow-x:auto;overflow-y:hidden;height:100%;width:1024px">
                 <v-chart ref="itemsChart1" autoresize :options="barchartOption" class="chart-content" width="900px"
@@ -140,7 +140,7 @@
                     :is-event = "false"
                     :default-sort = "defaultSort"
                     :allowRowExpand = "true"
-                    :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                    :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}"
                     :tableHeight = "726"
                     :isexportPDF="ispdf"
                     layout = "prev,pager,next,sizes"
@@ -167,11 +167,11 @@
                   :style="{width:'800px',height:'100%'}"/>
                 </div>
                 <div v-else class="barchart-area"  style="overflow-x:auto;overflow-y:hidden;height:270px">
-                  <v-chart ref="ChartViewMode0" autoresize :options="barchartOptionViewMode0" class="chart-content" 
+                  <v-chart ref="ChartViewMode0" autoresize :options="barchartOptionViewMode0" class="chart-content"
                   :width="barchartWidthMode0"
                 :style="{width:barchartWidthMode0}"/>
                 </div>
-                
+
               </div>
             </div>
           </el-col>
@@ -202,7 +202,7 @@
                 @emitTypeChanged="emitTypeChanged2"
               ></AreaSelected>-->
             </div>
-            
+
             <div class="pie-area">
               <div class="pie-div">
                 <div class="inner"/>
@@ -224,7 +224,7 @@
                     <div class="pei-item-num">{{item.percentage}}%</div>
                     <div class="pei-item-num">{{item.amount}}次</div>
                 </div>
-              </div> 
+              </div>
               </div>
             </div>
             <div class="table-area">
@@ -267,7 +267,7 @@
                   :is-event = "false"
                   :default-sort = "defaultSort"
                   :allowRowExpand = "false"
-                  :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                  :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}"
                   :tableHeight = "726"
                   :isexportPDF="ispdf"
                   @handleChange="handlePageAndSizeChange_eventItem"
@@ -328,7 +328,7 @@
                       :is-event = "false"
                       :default-sort = "eventInvolveTable.defaultSort"
                       :allowRowExpand = "true"
-                      :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                      :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}"
                       :tableHeight = "ispdf?2000:726"
                       :isexportPDF="ispdf"
                       expand-component = "EventCommentList"
@@ -352,8 +352,8 @@
                   :style="{width:'800px',height:'100%'}"/>
                 </div>
                 <div v-else class="barchart-area"  style="overflow-x:auto;overflow-y:hidden;height:270px">
-                  <v-chart ref="ChartViewMode_eventStores" autoresize :options="barchartOptionViewMode_eventStores" 
-                  class="chart-content" 
+                  <v-chart ref="ChartViewMode_eventStores" autoresize :options="barchartOptionViewMode_eventStores"
+                  class="chart-content"
                   :width="barchartWidth_sec"
                     :style="{width:barchartWidth_sec}"/>
                 </div>
@@ -439,7 +439,7 @@
                   <div class="button-area" >
                       <span style="color:#acaeb1">{{ barchartOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
                       <img :src='barchartOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
-                  </div>    
+                  </div>
               </div>
               <div style="overflow-x:auto;overflow-y:hidden;height:100%;">
               <v-chart ref="itemsChart1" :auto-resize="true" :options="barchartOption" class="chart-content" @click="barchartClick"/>
@@ -488,7 +488,7 @@
                     :is-event = "false"
                     :default-sort = "defaultSort"
                     :allowRowExpand = "true"
-                    :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                    :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}"
                     :tableHeight = "726"
                     :isexportPDF="ispdf"
                     layout = "prev,pager,next,sizes"
@@ -543,7 +543,7 @@
                 @emitTypeChanged="emitTypeChanged2"
               ></AreaSelected>-->
             </div>
-            
+
             <div class="pie-area">
               <div class="pie-div">
                 <div class="inner"/>
@@ -565,13 +565,13 @@
                     <div class="pei-item-num">{{item.percentage}}%</div>
                     <div class="pei-item-num">{{item.amount}}次</div>
                 </div>
-              </div> 
+              </div>
               </div>
             </div>
             <div class="table-area">
               <div class="sec-head">
                 <div class="title">{{ selEventItemName+$t('statistics.event.envirmentRate') }}</div>
-                <div class="operation-btns" :class="getLangStyleValue(operationBtnClass)">  
+                <div class="operation-btns" :class="getLangStyleValue(operationBtnClass)">
                   <delay-button
                     :class="getLangStyleValue(exportBtnClass)"
                     style="margin-left:32px;width:210px;background-color:#FFF;color:#006ab7;"
@@ -607,7 +607,7 @@
                   :is-event = "false"
                   :default-sort = "defaultSort"
                   :allowRowExpand = "false"
-                  :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                  :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}"
                   :tableHeight = "726"
                   :isexportPDF="ispdf"
                   @handleChange="handlePageAndSizeChange_eventItem"
@@ -668,7 +668,7 @@
                       :is-event = "false"
                       :default-sort = "eventInvolveTable.defaultSort"
                       :allowRowExpand = "true"
-                      :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                      :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}"
                       :tableHeight = "ispdf?'2000':'726'"
                       :isexportPDF="ispdf"
                       expand-component = "EventCommentList"
@@ -1173,7 +1173,7 @@ export default {
     getLangStyleValue(langArray){
       /*var lang_style = langArray.find( item => {return item.key==this.$i18n.locale});
       return lang_style.value;*/
-      
+
       return util.getLangStyleValue(langArray);
     },
     async initData() {
@@ -1236,8 +1236,8 @@ export default {
         await self.getEventBarChartData();
         self.doGetInspecEvenItems();
       }
-        
-      
+
+
     },
     emitTypeChanged({compareType,compareArr,selectedLabels,selStoreIdArr}){ //劃分類型選擇
       this.compareType = compareType;
@@ -1254,8 +1254,8 @@ export default {
       });
 
       this.compareIds = tempId
-      //console.log("1.emitTypeChanged > this.compareIds:",this.compareIds); 
-      
+      //console.log("1.emitTypeChanged > this.compareIds:",this.compareIds);
+
       this.comapareLabels = selectedLabels;
       //this.getAllEventData();
       this.getEventTableData();
@@ -1269,7 +1269,7 @@ export default {
       params.storeIds = this.storeIds.filter(storeId => storeId !== '-1');
       console.log("getUpperGloableEventData > params.storeIds:",params.storeIds);
       params.regionMode = 0;
-    
+
       try {
         //console.log('params:',params);
         const eventResult = await this.getEventTableDataInfo(params);
@@ -1307,9 +1307,9 @@ export default {
       self.eventKPIs[3].eventNum = (totalEvents==0)? 0 : ((totalProcessed/totalEvents)*100).toFixed(0);
     },
     /**end 取得上方狀態 */
-    
+
     /**事件數量barchart排名**/
-    getEventTableDataInfo(params) { 
+    getEventTableDataInfo(params) {
       return new Promise((resolve, reject) => {
         getEventStatsOverWithGroup(params).then(res => {
           resolve(res);
@@ -1412,16 +1412,16 @@ export default {
           const result = eventResult.data.content;
           if (result.length>0) {
             self.eventBarChartData = result;
-            this.barActiveName=self.eventBarChartData[0].groupName;
+            this.barActiveName='';
           } else {
             self.eventBarChartData =[];
           }
-          
+
         }
       }else{
         self.eventBarChartData = [];
       }
-      
+
       this.doFilterEventListBySelBar( );
       self.setBarchartData()
     },
@@ -1485,7 +1485,7 @@ export default {
           axisLabel: {
             color:'#556679',
             fontSize:12,
-            
+
           },
           name:'('+this.$t('remotePatrol.unit')+')',
            nameTextStyle:{
@@ -1535,7 +1535,7 @@ export default {
             }
           }
         ],
-        
+
       };
       return chartOption;
     },
@@ -1565,7 +1565,7 @@ export default {
       if(this.eventBarChartData.length>0){
         this.eventBarChartData.forEach(item => {
           date_xAxis.push(this.maxLabel(item.groupName));
-          chart_dataset.push({value:item.numOfTotal,name:item.groupName,innerId:item.innerId,itemStyle:{color:(item.groupName==this.barActiveName)?"#7bd8eb":"#D7F3F9"}});
+          chart_dataset.push({value:item.numOfTotal,name:item.groupName,innerId:item.innerId,itemStyle:{color:(item.groupName==this.barActiveName || this.barActiveName=='')?"#7bd8eb":"#D7F3F9"}});
         });
         option.xAxis.data = date_xAxis;
         //this.barchartOption.yAxis.splitLine.show = true;
@@ -1574,7 +1574,7 @@ export default {
         option.series[0].data = chart_dataset;
         if(date_xAxis.length>18){
           var w = ( date_xAxis.length*90) +'px';
-          
+
           option.width = w;
           option.grid.width = w;
           this.barchartWidth = w;
@@ -1599,13 +1599,13 @@ export default {
       }
     },
     /*end 畫barChart */
-    
+
     /*取得門店事件表 */
     onSwitchMode(val){
       this.viewMode=val;
     },
     doDrawEventChartMode(chartData){
-      
+
       var option = this.getBarchartOption();
       let date_xAxis=[];
       let chart_dataset=[];
@@ -1621,7 +1621,7 @@ export default {
         option.series[0].data = chart_dataset;
         if(date_xAxis.length>25){
           var w = ( date_xAxis.length*90) +'px';
-          
+
           option.width = w;
           option.grid.width = w;
           this.barchartWidthMode0 = w;
@@ -1641,9 +1641,9 @@ export default {
         this.barchartOptionViewMode0  = option;
         //
       }
-      
+
     },
-    
+
     async getEventTableData() {
       const self = this;
       self.componentsProps.beginTs = self.params.beginTs;
@@ -1653,7 +1653,7 @@ export default {
       self.params.storeIds = self.compareIds.filter(storeId => storeId !== '-1');
       let searchCondition = {}
       //if(region[0].value<3){ //store, area1, area2
-      //console.log("getEventTableData > this.compareIds:",self.compareIds); 
+      //console.log("getEventTableData > this.compareIds:",self.compareIds);
       searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:0,storeIds:self.compareIds};
           //filter:{"page":this.page-1,"size":this.sizeNum},
           //order:this.order
@@ -1696,7 +1696,7 @@ export default {
           } else {
             self.eventTableData = 0;
           }
-          
+
         }
       }else{
         self.allEventTableData = [];
@@ -1714,21 +1714,21 @@ export default {
       this.doFilterEventListBySelBar();
     },
     barchartClick(bar){
-      //console.log("barchartClick:",bar);
-      /*if(this.barActiveinnerId == bar.data.innerId){
+      if(this.barActiveinnerId == bar.data.innerId){
         this.barActiveinnerId = '-1';
-        this.setEventTableData();
-      }else{*/
+        this.barActiveName = '';
+        this.doFilterEventListBySelBar();
+      }else{
+        this.barActiveinnerId= bar.data.innerId
         this.barActiveName = bar.data.name;
         this.doFilterEventListBySelBar();
-        //return item.groupName == bar.data.name;
-      //}
+      }
       this.setBarchartData();
       //console.log("***filterResult",filterResult);
     },
     doFilterEventListBySelBar(){
       let name = this.barActiveName;
-      let filterData = this.allEventTableData.filter(item=>{
+      let filterData = name==''? this.allEventTableData:this.allEventTableData.filter(item=>{
         if(this.compareType=="area1"){
           return (item.province == name);
         }else if(this.compareType=="area2"){
@@ -1745,7 +1745,7 @@ export default {
       this.doDrawEventChartMode(filterData);
       this.total =Math.ceil( filterData.length/this.sizeNum);
       this.eventTableData = [...filterData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
-      
+
     },
     orderAllTableData(){
       let key = this.defaultSort.prop;
@@ -1773,7 +1773,7 @@ export default {
         export_json_to_excel(tHeader, data, fileName);
       });
     },
-    
+
     handlePageAndSizeChange(pageObj) { //改變一頁顯示
       const self = this;
       self.page = pageObj.page;
@@ -1819,9 +1819,9 @@ export default {
         return params;
     },
     onEvenListNumClick(row){
-      if(!PermissionHelper.enableEventHandle() && 
-          !PermissionHelper.enableEventClose() && 
-          !PermissionHelper.enableEventAdd() && 
+      if(!PermissionHelper.enableEventHandle() &&
+          !PermissionHelper.enableEventClose() &&
+          !PermissionHelper.enableEventAdd() &&
           !PermissionHelper.enableEventReturn()){
         message({
             message: this.$i18n.t('route.noEventAuthority'),
@@ -1833,8 +1833,8 @@ export default {
       const self = this;
       var params = SearchConditionUtil.getSearchCondition('eventManage');
       const rowItem = row.row;
-            
-      
+
+
       params.filterStoreIds=[rowItem.id];
       params.curStore=[rowItem.id];
       params.storeIds=[rowItem.id];
@@ -1845,7 +1845,7 @@ export default {
       params.beginTs=self.params.beginTs;
       params.endTs=self.params.endTs;
       params.searchFrom='EventStatistics';
-            
+
       if(row.prop == "numOfTotal"){
         params.activeName = "4";
         params.curState=[];
@@ -1865,7 +1865,7 @@ export default {
       params.searchParams = {clause : {storeId:[rowItem.id],status:[]},filter:{ page: 0, size: 10 }};
       params.inputSearchValue="";
       params.sizeNum=10;
-      params.page=1; 
+      params.page=1;
       params.clause ={storeId:[rowItem.id],storeName:this.barActiveName};
 
       const searchParamsObj = {
@@ -1914,7 +1914,7 @@ export default {
         let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,inspectTagId:self.inspectId,storeIds:self.compareIds2 };
         //console.log("doGetInspecEvenItems:",params);
         const result = await this.getInspecEvenItems(params);
-        
+
         //self.peiDataSource = result.data;
         self.doGetFirstEventLayer(result.data);
       }else{
@@ -1963,7 +1963,7 @@ export default {
         this.peiDataSource = sourceData;
         this.getEventBySourcePie();
       }
-      
+
     },
     getEventBySourcePie() {
       const self = this;
@@ -1974,7 +1974,7 @@ export default {
       util.sortArrayByKeyDesc(self.peiDataSource,'numOfUnqualified');
       self.peiDataSource.forEach((item,index) => {
         if(item.numOfUnqualified!=0){
-          
+
           seriesData.push({value:item.numOfUnqualified,name:item.groupName,id:index,itemIds:item.itemIds});
           jsonArray.push({id:index,itemName:item.groupName,amount:item.numOfUnqualified,percentage:item.percentage,itemIds:item.itemIds});
           allItemIds = allItemIds.concat(item.itemIds);
@@ -1985,8 +1985,11 @@ export default {
         if(!this.allEventItemIds.includes(id)) this.allEventItemIds.push(id);
       });
       //this.selEventItem = self.peiDataSource[0].id;
-      this.selEventItemIds = self.peiDataSource[0].itemIds;
-      this.selEventItemName = self.peiDataSource[0].groupName;
+      //this.selEventItemIds = self.peiDataSource[0].itemIds;
+      //this.selEventItemName = self.peiDataSource[0].groupName;
+      this.selEventItem = -1
+      this.selEventItemIds = [];
+      this.selEventItemName = self.$t('statistics.event.seeAll');
       const pieOption = self.getEventBySourcePieOption();
       pieOption.series[0].data = seriesData;
       self.eventSourceOptions = pieOption;
@@ -2049,22 +2052,32 @@ export default {
     },
     piechartClick(pei){
       //console.log("piechartClick:",pei);
-      //if(this.selEventItem == pei.data.id){
-      //  this.onSeeAllIncepEventClick();
-      //}else{
+      if(this.selEventItem == pei.data.id){
+          this.selEventItem = -1
+          this.selEventItemIds = [];
+          this.selEventItemName = this.$t('statistics.event.seeAll');
+          this.getItemDetail();
+      }else{
         this.selEventItem = pei.data.id
         this.selEventItemIds = pei.data.itemIds;
         this.selEventItemName = pei.data.name;
         this.getItemDetail();
-      //}
+      }
     },
     onClickEventItem(item,index){
         this.showInvolveTableArea = false;
-        this.selEventItem = item.id;//index;
-        this.selEventItemIds = item.itemIds;
-        this.selEventItemName = item.itemName;
-        //console.log("click item>item.itemIds",item.itemIds)
-        this.getItemDetail();
+        if(this.selEventItem == item.id){
+            this.selEventItem = -1
+            this.selEventItemIds = [];
+            this.selEventItemName = this.$t('statistics.event.seeAll');
+            this.getItemDetail();
+        }else{
+          this.selEventItem = item.id;//index;
+          this.selEventItemIds = item.itemIds;
+          this.selEventItemName = item.itemName;
+          //console.log("click item>item.itemIds",item.itemIds)
+          this.getItemDetail();
+        }
     },
     getInspecItemStatsOverview(params) {
       return new Promise((resolve, reject) => {
@@ -2078,7 +2091,16 @@ export default {
     },
     async getItemDetail(){
       const self = this;
-      if(this.selEventItemIds.length>0){
+      if(this.selEventItem == -1){
+        let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,itemIds:self.allEventItemIds,storeIds:self.compareIds2};
+        //console.log(params)
+        let result = await this.getInspecItemStatsOverview(params);
+        self.eventItemTable.itemAllData = result.data;
+        self.eventItemTable.total = Math.ceil( self.eventItemTable.itemAllData.length/self.eventItemTable.sizeNum );
+        self.eventItemTable.table_data = [...self.eventItemTable.itemAllData.slice((self.eventItemTable.page - 1)* self.eventItemTable.sizeNum, self.eventItemTable.page* self.eventItemTable.sizeNum)];
+      }
+      else if(this.selEventItemIds.length>0){
+        //console.log(params)
         let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,itemIds:self.selEventItemIds,storeIds:self.compareIds2};
         let result = await this.getInspecItemStatsOverview(params);
         self.eventItemTable.itemAllData = result.data;
@@ -2120,7 +2142,7 @@ export default {
         export_json_to_excel(tHeader, data, fileName);
       });
     },
-    
+
     handlePageAndSizeChange_eventItem(pageObj) {
       const self = this;
       self.eventItemTable.page = pageObj.page;
@@ -2140,7 +2162,7 @@ export default {
       this.showInvolveTableArea = true;
       this.doGetEventInvolveStores();
     },
-    
+
     /*End巡檢項事件 sec-row*/
 
     /*事件涉及門店 */
@@ -2209,7 +2231,7 @@ export default {
         export_json_to_excel(tHeader, data, fileName);
       });
     },
-    
+
     handlePageAndSizeChange_eventStores(pageObj) {
       const self = this;
       self.eventInvolveTable.page = pageObj.page;
@@ -2224,7 +2246,7 @@ export default {
     },
     onSwitchMode_eventStores(val){
       this.viewMode_eventStores=val;
-      
+
     },
     doDrawEventInvolveChartMode(chartData){
       var option = this.getBarchartOption();
@@ -2240,10 +2262,10 @@ export default {
         //this.barchartOption.series.name= this.Avg12Num[0].name;
         //console.log("chart_dataset:",chart_dataset);
         option.series[0].data = chart_dataset;
-        
+
         if(date_xAxis.length>28){
           var w = ( date_xAxis.length*90) +'px';
-          
+
           option.width = w;
           option.grid.width = w;
           this.barchartWidth_sec = w;
@@ -2261,15 +2283,15 @@ export default {
            }
         }
         this.barchartOptionViewMode_eventStores = option;
-        
+
       }
-      
+
     },
     /*End 事件涉及門店 */
     getBase64(url,width,height,callback){
     //通過建構函式來建立的 img 例項，在賦予 src 值後就會立刻下載圖片，相比 createElement() 建立 <img> 省去了 append()，也就避免了文件冗餘和汙染
       var Img = new Image();
-      
+
       Img.src=url;
       Img.setAttribute("crossOrigin",'Anonymous')
       Img.onload=function(){ //要先確保圖片完整獲取到，這是個非同步事件
@@ -2282,7 +2304,7 @@ export default {
         //return dataURL;
         callback?callback(dataURL):null; //呼叫回撥函式
       };
-      
+
     },
     handleDown() {
       const self = this;
@@ -2353,8 +2375,8 @@ export default {
             }, 5000);
           //}
         })
-        
-        
+
+
       });
     },
 
@@ -2430,7 +2452,7 @@ export default {
           flex-direction:row;
           height:126.5px;
           align-items:center;
-          
+
           .region-area{
             display: flex;
             flex-direction: row;
@@ -2534,7 +2556,7 @@ export default {
               justify-content: space-between;
             }
             .operation-btns-en{
-              @media screen and (max-width:1559px) { 
+              @media screen and (max-width:1559px) {
                 width: 410px ;
               }
               @media screen and(min-width: 1600px){
@@ -2542,7 +2564,7 @@ export default {
               }
             }
             .operation-btns-zh{
-              @media screen and (max-width:1559px) { 
+              @media screen and (max-width:1559px) {
                 width: 410px ;
               }
               @media screen and(min-width: 1600px){
@@ -2550,7 +2572,7 @@ export default {
               }
             }
             .operation-btns-zhTW{
-              @media screen and (max-width:1559px) { 
+              @media screen and (max-width:1559px) {
                 width: 410px ;
               }
               @media screen and(min-width: 1600px){
@@ -2558,7 +2580,7 @@ export default {
               }
             }
             .operation-btns-ja{
-              @media screen and (max-width:1559px) { 
+              @media screen and (max-width:1559px) {
                 width: 435px;
               }
               @media screen and(min-width: 1600px){
@@ -2566,7 +2588,7 @@ export default {
               }
             }
             .operation-btns-ko{
-              @media screen and (max-width:1559px) { 
+              @media screen and (max-width:1559px) {
                 width: 425px;
               }
               @media screen and(min-width: 1600px){
@@ -2574,7 +2596,7 @@ export default {
               }
             }
             .operation-btns-vi{
-              @media screen and (max-width:1559px) { 
+              @media screen and (max-width:1559px) {
                 width: 425px;
               }
               @media screen and(min-width: 1600px){
@@ -2582,7 +2604,7 @@ export default {
               }
             }
             .operation-btns-th{
-              @media screen and (max-width:1559px) { 
+              @media screen and (max-width:1559px) {
                 width: 425px;
               }
               @media screen and(min-width: 1600px){
@@ -2590,14 +2612,14 @@ export default {
               }
             }
             .operation-btns-id{
-              @media screen and (max-width:1559px) { 
+              @media screen and (max-width:1559px) {
                 width: 410px ;
               }
               @media screen and(min-width: 1600px){
                 width:calc(344/1440*100vw);
               }
             }
-            
+
           }
           .event-table {
             overflow-y: auto;
@@ -2613,12 +2635,12 @@ export default {
             }
           }
         }
-        
+
         .kpi-list{
           height: 100%;
           border-bottom: 1px solid $border;
         }
-        
+
       }
       .second-row {
         height: auto;
@@ -2641,7 +2663,7 @@ export default {
             text-align: left;
             color: $black;
           }
-          
+
         }
         .AllIncepEvent-btns-en{
           width:210px;
@@ -2671,7 +2693,7 @@ export default {
           width:230px;
           font-size: 13px;
         }
-        
+
         .pie-area{
           height:300px;
           margin-left: calc(36/1440*100vw);
@@ -2697,16 +2719,16 @@ export default {
               top:143px;
               border-radius: 50%;
               border-color:#dae4eb;
-              border-style:dashed dashed dashed dashed; 
+              border-style:dashed dashed dashed dashed;
             }
             .pct-panel{
               width: 276px;/*calc(276/1440*100vw);*/
               height: 276px;/*calc(276/1440*100vw);*/
               border-radius: 50%;
               border-color:#dae4eb;
-              border-style:dashed dashed dashed dashed; 
+              border-style:dashed dashed dashed dashed;
               align-self: end;
-              
+
               .chart-content {
                 width:100%;
                 height:100%;
@@ -2775,7 +2797,7 @@ export default {
             }
           }
         }
-        
+
         .table-area{
           height:auto;
           margin-top: 20.5px;
@@ -2802,7 +2824,7 @@ export default {
               justify-content: space-between;
             }
             .operation-btns-en{
-              @media screen and (max-width:1559px) { 
+              @media screen and (max-width:1559px) {
                 width: 410px ;
               }
               @media screen and(min-width: 1600px){
@@ -2810,7 +2832,7 @@ export default {
               }
             }
             .operation-btns-zh{
-              @media screen and (max-width:1559px) { 
+              @media screen and (max-width:1559px) {
                 width: 410px ;
               }
               @media screen and(min-width: 1600px){
@@ -2818,7 +2840,7 @@ export default {
               }
             }
             .operation-btns-zhTW{
-              @media screen and (max-width:1559px) { 
+              @media screen and (max-width:1559px) {
                 width: 410px ;
               }
               @media screen and(min-width: 1600px){
@@ -2826,7 +2848,7 @@ export default {
               }
             }
             .operation-btns-ja{
-              @media screen and (max-width:1559px) { 
+              @media screen and (max-width:1559px) {
                 width: 445px;
               }
               @media screen and(min-width: 1600px){
@@ -2834,7 +2856,7 @@ export default {
               }
             }
             .operation-btns-ko{
-              @media screen and (max-width:1559px) { 
+              @media screen and (max-width:1559px) {
                 width: 425px;
               }
               @media screen and(min-width: 1600px){
@@ -2842,7 +2864,7 @@ export default {
               }
             }
             .operation-btns-vi{
-              @media screen and (max-width:1559px) { 
+              @media screen and (max-width:1559px) {
                 width: 425px;
               }
               @media screen and(min-width: 1600px){
@@ -2850,7 +2872,7 @@ export default {
               }
             }
             .operation-btns-th{
-              @media screen and (max-width:1559px) { 
+              @media screen and (max-width:1559px) {
                 width: 425px;
               }
               @media screen and(min-width: 1600px){
@@ -2858,7 +2880,7 @@ export default {
               }
             }
             .operation-btns-id{
-              @media screen and (max-width:1559px) { 
+              @media screen and (max-width:1559px) {
                 width: 410px ;
               }
               @media screen and(min-width: 1600px){
@@ -2907,7 +2929,6 @@ export default {
       height: '75px';
       border: none;
     }
-    
+
   }
 </style>
-

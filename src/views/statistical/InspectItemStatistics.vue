@@ -50,7 +50,7 @@
                           ></TypeSelectArea>
                 </div>
               <div style="padding:20px">
-                <InspectItemSelect 
+                <InspectItemSelect
                     :inspect-item-list="inspectItemList"
                     @emitItemChanged="emitItemChanged"
                  />
@@ -62,7 +62,7 @@
               </div>
           <el-row :span="24" class="region-overview" style="margin-left:40px;width:400px">
                     <el-col :span="10" class="division">
-                      <el-col class="text-area">        
+                      <el-col class="text-area">
                         <el-row class="top">
                            <span class="mainTitle">{{totalAvgScore!=-9999?totalAvgScore:'N/A'}}</span>
                            <span class="unit">{{$t('statistics.score')}}</span>
@@ -81,10 +81,10 @@
                       <div class="button-area" >
                           <span style="color:#acaeb1">{{ part3.regionOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
                           <img :src='part3.regionOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
-                      </div>    
+                      </div>
               </div>
-           </el-col>   
-        </el-row > 
+           </el-col>
+        </el-row >
         <div class="subtitle-head">
           <span class="title" style="width:80%"  >
             {{ inspectDetailSubTitle }}
@@ -118,7 +118,7 @@
         </div>
        <el-col  style="height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 90px);position:absolute" :style="{width:ispdf?'900px':'calc(100% - 90px)'}">
                   <div  v-if="part3.storeMode==1"  style="height:100%;overflow-y:hidden;overflow-x:auto">
-                      <v-chart 
+                      <v-chart
                                 ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption"   autoresize
                                 :style="{width:part3.barStoreOption?part3.barStoreOption.width :'100%',height:'100%'}" />
                   </div>
@@ -135,7 +135,7 @@
                       :is-event = "false"
                       :default-sort = "defaultSort"
                       :allowRowExpand = "true"
-                      :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                      :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}"
                       :tableHeight = "300"
                       layout = "prev,pager,next,sizes"
                       expand-component = "IncepItemTop5"
@@ -156,15 +156,15 @@
                   />
                 </div>
                 </div>
-                 <div  v-if="part2.storeMode==1"  
+                 <div  v-if="part2.storeMode==1"
                       style="position:absolute;right:40px;top:30px;height:40px" @click='changePart3StoreOrder'>
                     <div class="button-area" >
                       <span style="color:#acaeb1">{{ part3.storeOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
                       <img :src='part3.storeOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
-                    </div>    
+                    </div>
                   </div>
-           </el-col>  
-      </div> 
+           </el-col>
+      </div>
     </el-row>
     <div v-if="ispdf" id="pdf-area" ref="printPDF" class="statistics-container">
             <div style="width:1024px;">
@@ -598,7 +598,7 @@ export default {
           'width': '80',
           'maxWidth': '130'
         },
-    
+
       ],
       part2StoreInfoTableCol: [
         {
@@ -755,23 +755,23 @@ export default {
           'width': '80',
           'maxWidth': '100'
         },
-    
+
       ],
-      part1:{ compareType:'stores', indexRegion:0, content:[],selStoreIdArr:[],
+      part1:{ compareType:'stores', indexRegion:-1, content:[],selStoreIdArr:[],
               compareIds :[],comapareLabels:[],originArray:[],
               indexType:0,
               storeMode:0, barRegionSort:1,barStoreStore:1,
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{}},
       part2:{ standardScore:-1,averageScore:-1,selStoreIdArr:[],
-              compareType:'stores', indexRegion:0, content:[],
+              compareType:'stores', indexRegion:-1, content:[],
               compareIds :[],comapareLabels:[],originArray:[],
               indexType:0,
               storeMode:0, barRegionSort:1,barStoreStore:1,
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{}},
       part3:{ standardScore:-1,averageScore:-1,selStoreIdArr:[],
-              compareType:'stores', indexRegion:0, content:[],
+              compareType:'stores', indexRegion:-1, content:[],
               compareIds :[],comapareLabels:[],originArray:[],
               indexType:0, storeOrder:'desc',regionOrder:'desc',
               storeMode:0, barRegionSort:1,barStoreStore:1,
@@ -951,13 +951,13 @@ export default {
     },
 
     async searchData() {
-      
+
       console.log("Search Data")
       this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
       if (this.pareams.storeIds.length > 0) {
         await this.dataGetOverview();
       } else {
-        
+
         this.totalRegion = 0;
         this.regionTableData = [];
       //  this.getPart1RegionBar();
@@ -1013,7 +1013,7 @@ export default {
 
     async exportStore2Excel() {
  const self = this;
-      const that = this;  
+      const that = this;
       let content =[];
        const params = {};
        params.beginTs = self.params.beginTs;
@@ -1023,16 +1023,21 @@ export default {
               direction:"desc",
               property: "averageScore",
             }
-       console.log(this.part3.content[this.part3.indexRegion])
+       //console.log(this.part3.content[this.part3.indexRegion])
        if(this.part3.compareType == 'stores'){
-         content = [this.part3.content[this.part3.indexRegion]];
+         content = this.part3.indexRegion==-1?this.part3.content: [this.part3.content[this.part3.indexRegion]];
        }
        else{
-        params.storeIds = this.part3.content[this.part3.indexRegion].list;
+        params.storeIds = this.part3.indexRegion==-1 ?this.params.storeIds:this.part3.content[this.part3.indexRegion].list;
        if(this.part3.compareType == 'position'||this.part3.compareType == 'users'){
          params.storeIds = self.params.storeIds;
-         let id = this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName);
-         params.submitters  = [id];
+
+         //let id = this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName);
+         params.submitters = [];
+         if(this.part3.indexRegion!=-1){
+          let id = this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName);
+          params.submitters=[id]
+         }
          params.groupIds   = [];
          params.groupMode = 0;
        }
@@ -1052,8 +1057,8 @@ export default {
             const storeResult = await this.getInspectStatsItemOverGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
-              if (result) {          
-                  content = result.content            
+              if (result) {
+                  content = result.content
               }
             }
 
@@ -1068,7 +1073,7 @@ export default {
                     if(item.code=='')item.code='- -'
                     if(item.storeGroup=='')item.storeGroup='- -'
                     if(item.storeType=='')item.storeType='- -'
-        
+
       });
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
@@ -1077,7 +1082,7 @@ export default {
         const self = this;
         const data = that.formatJson(filterVal, content);
         const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
-        const fileName = this.part3.content[this.part3.indexRegion].groupName + '_Inspection item score_' + util.getCurrentTime();
+        const fileName = (this.part3.indexRegion==-1?this.$t('statistics.event.seeAll'):this.part3.content[this.part3.indexRegion].groupName ) + '_Inspection item score_' + util.getCurrentTime();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
@@ -1096,7 +1101,7 @@ export default {
           });
       });
     },
-    
+
     getInspectStatsItemOverGroup(params) {
       return new Promise((resolve, reject) => {
         getInspectStatsItemOverGroup(params).then(res => {
@@ -1375,7 +1380,7 @@ export default {
             type: 'bar',
             barWidth: 15,
             symbol: 'none',
-            
+
             yAxisIndex: 0,
             smooth: true,
             name: '',
@@ -1409,7 +1414,7 @@ export default {
       return tempData;
     },
   async dataGetOverview() {
-    
+
       const self = this;
       const params = {};
       params.beginTs = self.params.beginTs;
@@ -1430,7 +1435,7 @@ export default {
           else{
             this.overviewCount.avgScore = -1;
           }
-          
+
         }
       } else {
         util.notify(self.$t('overview.queryFail'), 'warning', 3000);
@@ -1438,7 +1443,7 @@ export default {
     },
 
     async dataGetPart1() {
-    
+
       const self = this;
       const params = {};
       this.part1.pieOption = {};
@@ -1479,7 +1484,7 @@ export default {
       this.part3.storeTableData = null;
       this.part3.barRegionOption = {};
       this.part3.barStoreOption = {};
-      console.log("1.getPart3RegionBar");
+    //  console.log("1.getPart3RegionBar");
       await this.getPart3RegionBar();
     },
     async getInspectStatsOverviewOfRegionTable() {
@@ -1553,7 +1558,7 @@ export default {
           output.push(item)
         });;
       }
-     
+
       console.log("Filter content")
       console.log(output);
       return output;
@@ -1618,7 +1623,7 @@ export default {
           const result = storeResult.data;
           console.log("getPart1RegionBar:",result);
           if (result) {
-            self.part1.content = self.filterContent(result.content, 
+            self.part1.content = self.filterContent(result.content,
             self.part1.compareType,
             self.part1.compareIds,
             self.part1.comapareLabels,
@@ -1665,8 +1670,8 @@ export default {
       const option = this.getInspectLineOption();
       const regionData =[];
       const regionLabel =[];
-      
-   
+
+
       if(this.part1.content){
         this.part1.content.map((item,index) => {
           let value = 0;
@@ -1683,8 +1688,8 @@ export default {
           if(this.part1.indexRegion<0 && value>0){
             this.part1.indexRegion = index;
           }
-          
-          if( this.part1.indexRegion == index){   
+
+          if( this.part1.indexRegion == index){
             regionData.push({value:value,itemStyle: {
                 color: '#f11e66',
                 emphasis: {
@@ -1703,7 +1708,7 @@ export default {
                     }
           }})
           }
-  
+
            regionLabel.push(this.maxLabel(item.groupName))
         });
       }
@@ -1752,7 +1757,7 @@ export default {
               }
             }
         }
-        
+
 
         content.map((item,index) => {
           item.storeGroup = item.storeRegion.toString();
@@ -1835,7 +1840,7 @@ export default {
           const result = storeResult.data;
           console.log("getPart2RegionBar result:",result);
           if (result) {
-            this.part2.content = this.filterContent(result.content, 
+            this.part2.content = this.filterContent(result.content,
                                   this.part2.compareType,
                                   this.part2.compareIds,
                                   this.part2.comapareLabels,
@@ -1843,7 +1848,7 @@ export default {
             this.part2.content.forEach(function(item){
                   totalReport += item.numOfTotal;
                   totalStandard +=  item.averageScore * item.numOfTotal;
-            })       
+            })
             this.part2.averageScore =  totalStandard>0? Math.round( (totalStandard) /totalReport):-1;
             console.log("Leave FIlterContent")
             console.log(this.part2.content)
@@ -1865,8 +1870,8 @@ export default {
           if(this.part2.indexRegion<0 && value>0){
             this.part2.indexRegion = index;
           }
-          
-          if( this.part2.indexRegion == index){   
+
+          if( this.part2.indexRegion == index){
             regionData.push({value:value,itemStyle: {
                 color: '#7bd8eb',
                 emphasis: {
@@ -1885,7 +1890,7 @@ export default {
                     }
           }})
           }
-  
+
            regionLabel.push(this.maxLabel(item.groupName))
         });
       }
@@ -1934,7 +1939,7 @@ export default {
               }
             }
         }
-        
+
 
         content.map((item,index) => {
           item.rank = parseInt(index)+1;
@@ -1968,7 +1973,7 @@ export default {
       this.part2.barStoreOption = option;
     },
      async getPart3RegionBar() {
-      
+
       const self = this;
       const params = {};
       this.totalAvgScore =-9999;
@@ -2026,14 +2031,14 @@ export default {
          params.groupIds  = users;
          params.groupMode = 5;
       }
-       
+
       if(this.inspectItem){
         console.log("this.inspectItem:",this.inspectItem);
         params.itemIds = this.inspectItem.item.ids
       }
       let totalReport = 0;
       let totalStandard = 0;
-      
+
       if(params.groupIds.length==0  ){
         //console.log("No group");
         this.part3.content =[];
@@ -2051,7 +2056,7 @@ export default {
           const result = storeResult.data;
           console.log("getPart3RegionBar result:",result);
           if (result) {
-            this.part3.content = this.filterContent(result.content, 
+            this.part3.content = this.filterContent(result.content,
                                   this.part3.compareType,
                                   this.part3.compareIds,
                                   this.part3.comapareLabels,
@@ -2059,11 +2064,11 @@ export default {
             this.part3.content.forEach(function(item){
                   totalReport += item.numOfTotal;
                   totalStandard +=  item.numOfStandard;
-            })       
+            })
             this.part3.averageScore =  totalStandard>0? Math.round( (100*totalStandard) /totalReport):-1;
             console.log("Leave FIlterContent"+Math.round( (100*totalStandard) /totalReport)+ " " + ( (100*totalStandard) /totalReport))
             console.log(this.part3.content)
-            this.part3.indexRegion = 0;
+            this.part3.indexRegion = -1;
             this.drawPart3RegionBar();
           }
         }
@@ -2085,11 +2090,11 @@ export default {
           totalAvgScore += value *item.numOfTotal ;
           count += item.numOfTotal;
 
-          if(this.part3.indexRegion<0 && value>0){
-            this.part3.indexRegion = index;
-          }
-          
-          if( this.part3.indexRegion == index){   
+        //  if(this.part3.indexRegion<0 && value>0){
+        //    this.part3.indexRegion = index;
+        //  }
+
+          if( this.part3.indexRegion == index||this.part3.indexRegion==-1){
             regionData.push({value:value,itemStyle: {
                 color: '#7bd8eb',
                 emphasis: {
@@ -2108,7 +2113,7 @@ export default {
                     }
           }})
           }
-  
+
            regionLabel.push(this.maxLabel(item.groupName))
         });
         if(count>0){
@@ -2153,12 +2158,11 @@ export default {
       const regionData =[];
       const regionLabel =[];
 
-      console.log(this.part3.content[this.part3.indexRegion])
+      //console.log(this.part3.content[this.part3.indexRegion])
       let content = [];
       let max =0 ;
-      if(this.part3.content && this.part3.content[this.part3.indexRegion]){
-        if(this.part3.compareType == 'stores'){
-            console.log("To Store Type")
+      if(this.part3.content){
+        if(this.part3.compareType == 'stores' && this.part3.indexRegion!=-1){
             content =[this.part3.content[this.part3.indexRegion]];
         }
         else{
@@ -2168,14 +2172,11 @@ export default {
             params.endTs = self.params.endTs;
             params.groupMode = 0;
             console.log("To Get Data")
-            params.storeIds = this.part3.content[this.part3.indexRegion].list;
-            params.groupIds = this.part3.content[this.part3.indexRegion].list;
+            params.storeIds = this.part3.indexRegion==-1?self.params.storeIds:this.part3.content[this.part3.indexRegion].list;
+            params.groupIds = this.part3.indexRegion==-1?[]:this.part3.content[this.part3.indexRegion].list;
             if(this.part3.compareType=='users' || this.part3.compareType=='position'){
-              let id = this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName);
-              console.log("Get ID=="+id);
-              
               params.storeIds = self.params.storeIds;
-              params.submitters=[id]
+              params.submitters=this.part3.indexRegion==-1?[]:[ this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName)]
             }
             params.inspectTagId = self.params.inspectId;
             if(this.inspectItem){
@@ -2189,10 +2190,9 @@ export default {
               page:(this.part3.storeMode==1) ? 0:this.part3.table.page-1,
               size:(this.part3.storeMode==1) ?params.storeIds.length: this.part3.table.sizeNum
             }
-            console.log("***params:",params)
+            console.log(params)
             if(params.itemIds.length==0 || typeof params.storeIds == 'undefined' || params.storeIds.length ==0)return
             const storeResult = await this.getInspectStatsItemOverGroup(params);
-            console.log("getPart3StoreBar result:",storeResult)
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
               if (result) {
@@ -2201,7 +2201,7 @@ export default {
               }
             }
         }
-        
+
 
       content.map((item,index) => {
           item.storeGroup = item.storeRegion.toString();
@@ -2293,20 +2293,36 @@ export default {
       };
       return pieOption;
     },
-    async clickPart1Bar(event){
-      this.part1.indexRegion = event.dataIndex;
-      await this.drawPart1RegionBar();
+    async clickPart1Bar(event) {
+        if(this.part1.indexRegion == event.dataIndex){
+            this.part1.indexRegion = -1;
+        }
+        else{
+            this.part1.indexRegion = event.dataIndex;
+        }
+        this.part1.table.page = 1;
+        await this.drawPart1RegionBar();
     },
-      async clickPart2Bar(event){
-      this.part2.indexRegion = event.dataIndex;
-      await this.drawPart2RegionBar();
+    async clickPart2Bar(event) {
+           if(this.part2.indexRegion == event.dataIndex){
+            this.part2.indexRegion = -1;
+        }
+        else{
+            this.part2.indexRegion = event.dataIndex;
+        }
+          this.part2.table.page = 1;
+        await this.drawPart2RegionBar();
     },
-      async clickPart3Bar(event){
-        console.log(event)
-      this.part3.indexRegion = event.dataIndex;
-      await this.drawPart3RegionBar();
+    async clickPart3Bar(event) {
+         if(this.part3.indexRegion == event.dataIndex){
+            this.part3.indexRegion = -1;
+        }
+        else{
+            this.part3.indexRegion = event.dataIndex;
+        }
+        this.part3.table.page = 1;
+        await this.drawPart3RegionBar();
     },
-
     handleRegionsChange(val) {
       const self = this;
       self.curRegion = val;
@@ -2394,7 +2410,7 @@ export default {
       this.part3.storeTableData = {};
       this.part3.barRegionOption = {};
       this.part3.barStoreOption = {};
-             
+
       const searchParamsObj = {
           path: 'inspectItemStatistics',
           params: this.params
@@ -2462,14 +2478,14 @@ export default {
     }
       //console.log(this.params)
       //console.log(searchParams)
-      
-  
+
+
     //  console.log(searchParams)
       //if(this.params.storeIds.length>0){
       //  console.log("Get Part3")
       //  await this.dataGetPart3();
      // }
-      
+
 
     },
 
@@ -2665,13 +2681,13 @@ export default {
         justify-content: space-between;
         padding-left:12px;
         span{
-            width:150px;  
+            width:150px;
             font-family: NotoSansCJKTC;
             font-size: 15px;
             text-align: left;
             color: #484848;
         }
-    
+
      }
     .evalution-pct {
         .pct-content {
@@ -2688,7 +2704,7 @@ export default {
             width: 220px;
             border-radius: 50%;
             border-color:#dae4eb;
-            border-style:dashed dashed dashed dashed; 
+            border-style:dashed dashed dashed dashed;
             display:flex;
             justify-content:center;
             align-items: center;
@@ -2702,7 +2718,7 @@ export default {
                 right:55px;
                 border-radius: 50%;
                 border-color:#dae4eb;
-                border-style:dashed dashed dashed dashed; 
+                border-style:dashed dashed dashed dashed;
             }
             .chart-content {
               width: 100%;
@@ -2815,7 +2831,7 @@ export default {
       }
 
     .region-overview{
-     
+
       .division{
         display: flex;
         align-items:flex-end;
@@ -2857,7 +2873,7 @@ export default {
           width: 1px;
           height: 94px;
           margin-bottom:20px;
-          
+
       }
 
       }

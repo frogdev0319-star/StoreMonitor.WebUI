@@ -300,7 +300,7 @@
   </div>
 </template>
 <script>
-import { getInspectReportList, GetInspectTagList,downLoadInspectReportEntireDetail,getAllReportIds } from '@/api/inspect';
+import { getInspectReportList, GetInspectTagList,downLoadInspectReportEntireDetail,getAllReportIds,GetMysteryInspectTagList } from '@/api/inspect';
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
 import StoreFilter from '@/components/StoreFilter';
@@ -560,6 +560,7 @@ export default {
         console.log("mimicMode val:",val);
         this.isLoading = true;
         this.ifSearchData = true;
+        this.getInspectList();
         //this.initData();
     }
     
@@ -794,7 +795,7 @@ export default {
       console.log("1.Get Report List")
       console.log(p)
       var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,
-      inspectTagId:p.inspectTagId!='-1'?p.inspectTagId:null}
+      inspectTagId:p.inspectTagId!='-1'?p.inspectTagId:null,isMysteryMode:PermissionHelper.enableMimicMode}
       const self = this;
       params.endTs = params.endTs - params.endTs % 1000 + 999;
       if (params.clause.storeId.length === 0) {
@@ -1060,9 +1061,21 @@ export default {
       });
     },
 
+    getTagMytery() {
+      return new Promise((resolve, reject) => {
+        GetMysteryInspectTagList().then(res => {
+          const data = res.data;
+          resolve(data);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
+
     async getInspectList() {
       const self = this;
-      const inspectArr = await self.getTagAll();
+      const inspectArr = PermissionHelper.enableMimicMode? await self.getTagMytery() : await self.getTagAll();
       const newArr = [];
       const inspectList = [];
       inspectArr.forEach(_item => {

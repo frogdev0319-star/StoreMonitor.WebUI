@@ -218,6 +218,14 @@ export const GetInspectTagList = params => {
   });
 };
 
+export const GetMysteryInspectTagList = params => {
+  return request({
+    url: `${version}/mystery/inspect/tag/list`,
+    method: 'get',
+    params
+  });
+};
+
 export const GetInspectGroupBindList = data => {
   return request({
     url: `${version}/inspect/group/bind/list`,

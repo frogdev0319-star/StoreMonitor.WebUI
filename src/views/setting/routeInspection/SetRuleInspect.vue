@@ -154,25 +154,25 @@
         <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
           <el-checkbox class="storevue-checkbox-outlined" v-model="onSiteSignature" >
             <span>
-              {{ $t('insSettingView.needSignatrue') }}
+              {{ $t('insSettingView.needSignature') }}
             </span>
           </el-checkbox>
 
           <div class="signatrue_section" v-if="onSiteSignature">
             <div class="define_sign">
-              <div class="title">自定義簽名顯示名稱</div> 
+              <div class="title">{{$t('insSettingView.defineTitle')}}</div> 
               <el-button
                 @click="addSignature"
                 v-if="signatureData.extra.length < 4"
                 class="addsign_button_outlined"
                 size="mini" type="primary">
-                <i class="iconfont el-icon-plus"/>新增簽名
+                <i class="iconfont el-icon-plus"/>{{$t('insSettingView.addSignature')}}
               </el-button>
             </div>
             <div class="signatrue_row"  v-for="(item, index) in signatureData.extra" :key="index">
-              負責人
+              {{$t('insSettingView.principal')}}
               <el-input
-                placeholder="請輸入負責人"
+                :placeholder="$t('insSettingView.inputData')" 
                 v-model="item.header"
                 ref="workflowName"
                 style="width: 250px;  margin: 0 20px ;"
@@ -180,8 +180,8 @@
                 show-word-limit
                 />
               <el-radio-group class="storevue-radio" v-model="item.optional" >
-                <el-radio :label="true">必簽</el-radio> 
-                <el-radio :label="false" v-if="index !== 0">非必簽</el-radio> 
+                <el-radio :label="true">{{$t('insSettingView.mustSignature')}}</el-radio> 
+                <el-radio :label="false" v-if="index !== 0">{{$t('insSettingView.uncertainSignature')}}</el-radio> 
               </el-radio-group>
               <div class="delete_sign">
                 <img 
@@ -320,8 +320,8 @@
     <el-col :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.bindWorkFLow')">
         <div slot="tableDetail" class="setting-config rule-item">
-          <span style="margin-right: 20px">選擇綁定流程</span>  
-          <el-select v-model="workFlowToBind" placeholder="請選擇">
+          <span style="margin-right: 20px"> {{ $t('insSettingView.bindWorkflow') }}</span>  
+          <el-select v-model="workFlowToBind" :placeholder="$t('insSettingView.select') ">
               <el-option
                 v-for="item in workFlowList"
                 :key="item.processDefinitionKey"
@@ -390,7 +390,7 @@ export default {
           "extra": [
               {
                 "optional": true,
-                "header": "簽名 1"
+                "header": "this.$t('insSettingView.bindWorkflow')"
               }
           ]
         },
@@ -424,7 +424,7 @@ export default {
       if(this.signatureData.value == false) this.signatureData.extra = [
         {
           "optional": true,
-          "header": "簽名 1"
+          "header": this.$t('insSettingView.bindWorkflow')
         }
       ]
     }
@@ -439,12 +439,11 @@ export default {
         this.signatureData.extra = [
           {
             "optional": true,
-            "header": "簽名 1"
+            "header": this.$t('insSettingView.bindWorkflow')
           }
         ]
       }
   },
-
 
   methods: {
     async submitRule() {
