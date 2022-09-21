@@ -683,7 +683,18 @@ export default{
       "itemsOfCate":"类别巡检项",
       "loadingbindstore":"加载中",
       "moreThan":"超过",
-      "needSignatrue":"须进行现场签名",
+      "needSignature":"须进行现场签名",
+
+      "defineTitle":"自定义签名显示名称",
+      "addSignature":"新增签名",
+      "principal":"负责人",
+      "mustSignature":"必签",
+      "uncertainSignature":"非必签",
+      "inputData":"请输入负责人",
+      "signatureOne":"签名 1",
+      "bindWorkflow":"选择绑定流程",
+      "select":"请选择",
+
       "no":"无",
       "notallowA":"合格率评估项和附加评分项",
       "notallowB":"附加评分项",
@@ -1273,6 +1284,7 @@ export default{
     "auditStatus":{
         "noteYet":"尚未开始",
         "processing":"处理中",
+        "agree":"同意",
         "reject":"驳回",
         "approved":"签核通过",
         "cancel":"取消",
@@ -1320,9 +1332,13 @@ export default{
         "saveAndEnable":"储存并启用",
         "comfirmDelete":"确认删除当前签核流程？",
         "comfirmDeleteNode":"确认删除当前签核流程节点？",
-        "canNotDelete":"」此签核流程无法删除",
-        "isBind":"已绑定巡检表「",
-        "cantClose":"」无法禁用",
+
+        "submitterName":"送出人",
+        "canNotDelete":"此签核流程无法删除",
+        "canNotClose":"此流程无法关闭",
+        "makeSureUsign":"请确认以下巡检表是否正在使用流程:",
+
+
         "dulplicateScuccess":"已成功复制流程",
         "deleteScuccess":"删除成功",
         "deleteFail":"删除失败",
@@ -1338,7 +1354,7 @@ export default{
         "canCancel":"可取消签核：",
         "canNotCancel":"不可取消签核",
         "thisModeWithoutEvent":" ※ 此模式不会立即产生事件",
-        "addNode":"新增节点",
+        "addNode":"新增签核节点",
         "nodeIndex":"节点编号",
         "nodeName":"节点名称",
         "nodeAuditName":"签核人员",
@@ -1354,6 +1370,10 @@ export default{
         "findUser":"查询人员",
         "save":"保存",
         "keywords":"关键词",
+
+        "allPosition":"所有职务",
+        "allDepart":"所有部门",
+
         "depart":"部门",
         "position":"职务",
         "searchNameMail":"搜寻人员名称、信箱",

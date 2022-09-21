@@ -325,7 +325,6 @@ import TableOnly from '@/components/TableOnly';
 import DialogPop from '@/components/DialogPop';
 
 import util from "@/common/util";
-import { C } from 'caniuse-lite/data/agents';
 export default {
   name: 'WorkflowDetail',
   components: {
@@ -501,8 +500,9 @@ export default {
             this.departmentStatus = newAuditByGroupsArr[0].defineId
           }
         }
-
-        this.departmentAry.unshift(this.$t('overview.allDepartment'))
+        
+        this.departmentAry = res.data.map( i => i = i.defineName)
+        this.departmentAry.unshift(this.$t('audit.workFlows.allDepart'))
       }).catch(err => {
         console.log('error' + err);
       });
@@ -571,6 +571,7 @@ export default {
       console.log('this.auditUsers :>> ', this.auditUsers);
 
       // 取得部門資訊 & 簽核部門
+      // await this.getDepartmentList() 
       // this.departmentStatus = this.department[0].defineId
       console.log('this.departmentStatus :>> ', this.departmentStatus);
 
