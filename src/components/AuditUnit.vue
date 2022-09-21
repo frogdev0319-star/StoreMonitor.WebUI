@@ -67,7 +67,7 @@
 								<el-image
 									style="background: #FFF;" 
 									:src="blopSign.content"
-									v-if="blopSign.type == 1"
+									v-if="blopSign.type == 2 || blopSign.type == 1"
 									:preview-src-list = "getImgSrcSign(index, blopSign)"
 									/>
 							</div>
@@ -75,12 +75,11 @@
 							<div class="iimg" v-for="(blopImg, index) in task.comment.attachment" :key="blopImg.ts">
 								<el-image
 									:src="blopImg.url"
-									v-if="blopImg.mediaType == 2"
+									v-if="blopImg.mediaType == 2 "
 									:preview-src-list = "getImgSrc(index, blopImg)"
 									/>
 								<a class="pdfLink" :href="blopImg.url" v-if="blopImg.mediaType == 4">
-																	<p class="pdf_name" v-if="blopImg.mediaType == 4">{{blopImg.fileName}}</p>
-
+								<p class="pdf_name" v-if="blopImg.mediaType == 4">{{blopImg.fileName}}</p>
 								</a>
 							</div>
 							

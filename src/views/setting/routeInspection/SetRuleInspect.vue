@@ -390,10 +390,11 @@ export default {
           "extra": [
               {
                 "optional": true,
-                "header": ""
+                "header": "簽名 1"
               }
           ]
         },
+      n : 2
     };
   },
   watch: {
@@ -414,27 +415,36 @@ export default {
       this.bindWorkFlowData.processDefinitionKey = processDefinitionKey
       this.bindWorkFlowData.type = 0
       this.bindWorkFlowData.inspectTagId = this.inspectId
-      
-      console.log('this.workFlowToBind ~~~~>> ', this.workFlowToBind);
+      // console.log('this.workFlowToBind ~~~~>> ', this.workFlowToBind);
 
     },
     onSiteSignature(){
-      if(!this.onSiteSignature)  this.signatureData = {
-          "name": "onSiteSignature",
-          "value": true,
-          "extra": [
-              {
-                "optional": true,
-                "header": ""
-              }
-          ]
+      this.signatureData.value = this.onSiteSignature
+      this.n = 2
+      if(this.signatureData.value == false) this.signatureData.extra = [
+        {
+          "optional": true,
+          "header": "簽名 1"
         }
+      ]
     }
   },
+
   async mounted() {
+    
     await this.getRule();
     await this.workflowItems()
+    console.log('this.signatureData :>> ', this.signatureData);
+    if(this.signatureData.value == true && this.signatureData.extra.length == 0)  {
+        this.signatureData.extra = [
+          {
+            "optional": true,
+            "header": "簽名 1"
+          }
+        ]
+      }
   },
+
 
   methods: {
     async submitRule() {
@@ -490,10 +500,12 @@ export default {
           ]
         };
 
-        if(this.onSiteSignature) params.ruleItems.push(this.signatureData)
+      if(this.onSiteSignature) params.ruleItems.push(this.signatureData)
         console.log('params', params)
         const res = await self.updateInspectRule(params);
-        if (res.errCode === 0) {
+
+
+      if (res.errCode === 0) {
           util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           return false;
         } else {
@@ -591,8 +603,9 @@ export default {
           console.log('res.data ~~~~~~~::>> ', res.data);
           
           var tempSign = res.data.filter(i => i.name == "onSiteSignature")
-          console.log('tempSign :>> ', tempSign);
           this.signatureData = tempSign[0]
+          console.log('this.signatureData :>> ', this.signatureData);
+
 
           const tempArry = res.data.filter(list => list.name == "workflow")
           console.log('tempArry :>> ', tempArry);
@@ -721,16 +734,20 @@ export default {
       });
     },
 
-    addSignature(){
+    addSignature(index){
+    
       var addObj = {
           "optional": true,
-          "header": ""
+          "header": `簽名 ${this.n}`
       }
       if(this.signatureData.extra.length < 4) this.signatureData.extra.push(addObj)
+      return this.n++
     },
+
     deleteSign(index){
       console.log('index :>> ', index);
       this.signatureData.extra.splice(index, 1)
+      
     }
 
   }

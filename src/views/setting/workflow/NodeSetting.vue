@@ -325,6 +325,7 @@ import TableOnly from '@/components/TableOnly';
 import DialogPop from '@/components/DialogPop';
 
 import util from "@/common/util";
+import { C } from 'caniuse-lite/data/agents';
 export default {
   name: 'WorkflowDetail',
   components: {
@@ -444,6 +445,7 @@ export default {
       await this.getNodeInfo() 
       await this.getWorkflowInfo()
       await this.getUserInfo()
+      await this.getDepartmentList()
       
       await this.getTitle()
     }, 
@@ -453,9 +455,6 @@ export default {
       await getAllUserInfoNoAuth().then(res=>{
         this.userInfo = res.data
         
-        console.log('userInfo ------>> ', this.userInfo);
-        console.log('this.nodeData :>> ', this.nodeData);
-
         let newAuditByUsersArr = []
         if(this.auditMembers !== null){
           if(this.nodeData.auditByUsers.length !== 0){  
@@ -466,13 +465,51 @@ export default {
         }
 
         this.userData = this.userInfo
-        console.log('newAuditByUsersArr :>> ', newAuditByUsersArr);
-        console.log('this.userData :>> ', this.userData);
+        // console.log('this.nodeData :>> ', this.nodeData);
+        // console.log('newAuditByUsersArr :>> ', newAuditByUsersArr);
+        // console.log('this.userData :>> ', this.userData);
+
+        // 按編輯要預設簽核人員
+        if(this.nodeData.auditByUsers.length == 0) this.auditUsers = newAuditByUsersArr[0].userId
 
       }).catch(err => {
         console.log('error' + err);
       });
     },
+
+  
+    // get getDepart
+    async getDepartmentList(){
+      await getDepart({ type: 0 }).then(res=>{
+
+        var AllDepartment = res.data
+
+        let newAuditByGroupsArr = []
+        if(this.auditMembers !== null){
+          if(this.nodeData.auditByGroups.length !== 0){  
+            this.auditMembers.auditByGroups = this.auditMembers.auditByGroups.filter(i => i !== this.nodeData.auditByGroups[0])
+            this.departmentStatus = this.nodeData.auditByGroups[0]
+            newAuditByGroupsArr = AllDepartment.filter(i => !this.auditMembers.auditByGroups.includes(i.defineId))
+            
+            this.department = newAuditByGroupsArr
+            // console.log('this.department ::::::::::>> ', this.department);
+            // console.log('this.departmentStatus ::::::::::>> ', this.departmentStatus);
+            // console.log('this.auditMembers.auditByGroups ::::::::::>> ', this.auditMembers.auditByGroups);
+          } else {
+            newAuditByGroupsArr = AllDepartment.filter(i => !this.auditMembers.auditByGroups.includes(i.defineId))
+            this.department = newAuditByGroupsArr
+            this.departmentStatus = newAuditByGroupsArr[0].defineId
+          }
+        }
+
+        this.departmentAry.unshift(this.$t('audit.workFlows.allDepart'))
+      }).catch(err => {
+        console.log('error' + err);
+      });
+    },
+
+
+
 
     // get title 職務
     async getTitle(){
@@ -481,6 +518,8 @@ export default {
         this.titleListAry = this.titleList.map( i => (
           i = i.defineName
         ))
+        this.titleListAry.unshift(this.$t('audit.workFlows.allPosition'))
+
         console.log('this.titleListAry  7:>> ', this.titleListAry);
         this.isLoadingData = false
       }).catch(err => {
@@ -488,44 +527,6 @@ export default {
         console.log('error' + err);
       });
     },
-
-    // get getDepart
-    async getDepartmentList(){
-      await getDepart({ type: 0 }).then(res=>{
-        // this.department = res.data
-        // console.log('res.data ~~~~~>', res.data)
-        
-        let newAuditByGroupsArr = []
-        if(this.nodeData.auditByGroups.length == 0){
-          
-          newAuditByGroupsArr = res.data.filter( i => !this.auditMembers.auditByGroups.includes(i.defineId))
-          this.departmentStatus = newAuditByGroupsArr[0].defineId
-        }else{
-          this.departmentStatus = this.nodeData.auditByGroups[0]
-          newAuditByGroupsArr = res.data
-        }
-
-        // if(this.auditMembers.auditByGroups.length !== 0){
-        //   newauditByGroupsArr = res.data.filter(i => !this.auditMembers.auditByGroups.includes(i.defineId))
-        // }
-
-        console.log('newAuditByGroupsArr :>> ', newAuditByGroupsArr);
-        if(newAuditByGroupsArr.length == 0){
-          this.departmentStatus = ''
-          this.department = []
-        }else{
-          this.department = newAuditByGroupsArr
-        }
-  
-        this.departmentAry = this.department.map( i => (
-          i = i.defineName
-        ))
-      }).catch(err => {
-        console.log('error' + err);
-      });
-    },
-
-
     getWorkflowInfo(){
       const data = sessionStorage.getItem('workflowDetail')
       this.infoForm = JSON.parse(data)
@@ -570,7 +571,6 @@ export default {
       console.log('this.auditUsers :>> ', this.auditUsers);
 
       // 取得部門資訊 & 簽核部門
-      await this.getDepartmentList() 
       // this.departmentStatus = this.department[0].defineId
       console.log('this.departmentStatus :>> ', this.departmentStatus);
 
@@ -582,19 +582,19 @@ export default {
 
     },
     filterCurTemplateDepartment(users){
-        if(this.curTemplateDepartment.length == 0){
+        if(this.curTemplateDepartment.length == 0 || this.curTemplateDepartment == this.departmentAry[0]){
           return users
         }else{
-          return users.filter(item => item.sector == this.curTemplateDepartment )
+          return users.filter(item => item.sector.includes(this.curTemplateDepartment))
         }
     },
     filterCurTemplateTitleList(users){
-      if(this.curTemplateTitleList.length == 0){
+      if(this.curTemplateTitleList.length == 0 || this.curTemplateTitleList == this.titleListAry[0]){
         return users
       }else{
         return users.filter(item => item.title == this.curTemplateTitleList )
       }
-    },  
+    },    
 
     confirmSearchUsersDialog(){
         console.log('this.multipleSelection ~~~~~~~>', this.multipleSelection)
@@ -647,9 +647,14 @@ export default {
         this.titleList.forEach( title =>{
           if(title.contents.length !== 0 && title.contents.includes(user.userId)) user.title = title.defineName 
         })
-        this.department.forEach( dep =>{
-          if(dep.contents.length !==  0 && dep.contents.includes(user.userId)) user.sector = dep.defineName 
-        })
+        // user 會有多個部門
+        user.sector = []
+          this.department.forEach( dep =>{
+            if(dep.contents.length !==  0 && dep.contents.includes(user.userId)) {
+              user.sector.push(dep.defineName)
+            }
+          })
+          user.sector = user.sector.join(", ")
       })
       
        // 等待 dialog 生成
@@ -697,7 +702,6 @@ export default {
       }
 
       
-      console.log('this.nodeData !!!!~~~~~~>> ', this.nodeData);
 
       //自定簽核按鈕不可為空
       console.log('this.nodeData 3', this.nodeData)
@@ -714,19 +718,17 @@ export default {
         return
       }
 
-      
 
       console.log('this.departmentStatus :>> ', this.departmentStatus);
       console.log('this.auditUsers :>> ', this.auditUsers);
+      console.log('this.nodeData auditTargetType :::::::::~~~~~~>> ', this.nodeData.auditTargetType);
 
       // 簽核人員不可為空
-      if(this.departmentStatus == '' && this.auditUsers == ''){
+      if((this.nodeData.auditTargetType == 0 && this.auditUsers == '') || (this.nodeData.auditTargetType == 1 && this.departmentStatus == '')){
         util.notify(this.$t('audit.workFlows.cantEmpty'), 'error', 1200 );
         this.fullscreenLoading = false
         return
       }
-
-
 
       var status = sessionStorage.getItem('pageAction');
       const pageAction = JSON.parse(status)
@@ -792,17 +794,16 @@ export default {
 
         var checkNameResult = reNewNode.filter(i => i.name == this.nodeData.name )
         console.log('checkNameResult', checkNameResult)
+        console.log('this.apiData :::::::>>>', this.apiData)
 
         // create
         if(checkNameResult.length > 0 && pageAction == "create") {
-          console.log('1111')
           util.notify(this.$t('audit.workFlows.cantRepeatNodeName'), 'error', 2000 );
           return
         }
 
         // edit
         if(checkNameResult.length > 0 && pageAction == "edit") {
-          console.log('222')
 
           console.log(' this.nodeData',  this.nodeData)
           console.log('reNewNode', reNewNode)
@@ -812,7 +813,7 @@ export default {
 
           var tt = tempAry.some(i =>
             i.name == this.nodeData.name
-          )
+          ) 
           console.log('tt', tt)
           if(tt){
             util.notify(this.$t('audit.workFlows.cantRepeatNodeName'), 'error', 2000 );

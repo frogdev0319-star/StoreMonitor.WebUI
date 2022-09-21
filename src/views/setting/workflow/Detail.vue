@@ -507,17 +507,17 @@ export default {
   },
   methods: {
     filterInputSearchUser(users){
-        return  users.filter( item => item.userName.indexOf(this.inputSearchUser) > -1 || item.email.indexOf(this.inputSearchUser) > -1)
+        return users.filter( item => item.userName.indexOf(this.inputSearchUser) > -1 || item.email.indexOf(this.inputSearchUser) > -1)
     },
     filterCurTemplateDepartment(users){
-        if(this.curTemplateDepartment.length == 0){
+        if(this.curTemplateDepartment.length == 0 || this.curTemplateDepartment == this.departmentAry[0]){
           return users
         }else{
-          return users.filter(item => item.sector == this.curTemplateDepartment )
+          return users.filter(item => item.sector.includes(this.curTemplateDepartment))
         }
     },
     filterCurTemplateTitleList(users){
-      if(this.curTemplateTitleList.length == 0){
+      if(this.curTemplateTitleList.length == 0 || this.curTemplateTitleList == this.titleListAry[0]){
         return users
       }else{
         return users.filter(item => item.title == this.curTemplateTitleList )
@@ -577,7 +577,7 @@ export default {
       const data = sessionStorage.getItem('workflowDetail')
       this.infoForm = JSON.parse(data)
       // this.infoForm.type = "巡檢表單"
-      console.log('getWorkflowInfo 1 ------>> ', this.infoForm);
+      console.log('this.infoForm 1 ------>> ', this.infoForm);
     },
     
     // get user
@@ -585,7 +585,7 @@ export default {
       await getAllUserInfoNoAuth().then(res=>{
         this.userInfo = res.data
         this.userData = this.userInfo
-        console.log('getWorkflowInfo 2 ------>> ', this.userInfo);
+        console.log('this.userInfo 2 ------>> ', this.userInfo);
       }).catch(err => {
         console.log('error' + err);
       });
@@ -599,6 +599,7 @@ export default {
         this.titleListAry = this.titleList.map( i => (
           i = i.defineName
         ))
+        this.titleListAry.unshift(this.$t('audit.workFlows.allPosition'))
         console.log('this.titleListAry  7:>> ', this.titleListAry);
         this.isLoadingData = false
       }).catch(err => {
@@ -610,12 +611,13 @@ export default {
     // get getDepart 部門
     async getDepartmentList(){
       await getUserStatus({ type: 0 }).then(res=>{
-        this.department = res.data
+        this.department = [...res.data]
         console.log('this.department 7 ------>> ', this.department);
       
         this.departmentAry = this.department.map( i => (
           i = i.defineName
         ))
+        this.departmentAry.unshift(this.$t('audit.workFlows.allDepart'))
         console.log('this.departmentAry  7:>> ', this.departmentAry);
 
       }).catch(err => {
@@ -956,9 +958,15 @@ export default {
           this.titleList.forEach( title =>{
             if(title.contents.length !== 0 && title.contents.includes(user.userId)) user.title = title.defineName 
           })
+          
+          // user 會有多個部門
+          user.sector = []
           this.department.forEach( dep =>{
-            if(dep.contents.length !==  0 && dep.contents.includes(user.userId)) user.sector = dep.defineName 
+            if(dep.contents.length !==  0 && dep.contents.includes(user.userId)) {
+              user.sector.push(dep.defineName)
+            }
           })
+          user.sector = user.sector.join(", ")
         })
       
       // 等待 dialog 生成
