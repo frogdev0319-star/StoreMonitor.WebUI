@@ -614,7 +614,7 @@ export default {
       
       // console.log('this.currentUser 2', this.currentUser)
       // initData[0].auditByUsers.push(this.currentUser)
-      initData[0].auditByUsers.push(this.$t('audit.workFlows.submitterName'))
+      initData[0].auditByUsers.push(this.$t('audit.sendAudit.submitterName'))
       this.newFlatNodeDataView = initData
     },
 
@@ -683,7 +683,7 @@ export default {
         this.titleListAry = this.titleList.map( i => (
           i = i.defineName
         ))
-        this.titleListAry.unshift(this.$t('audit.workFlows.allPosition'))
+        this.titleListAry.unshift(this.$t('overview.allPosition'))
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;
@@ -698,7 +698,7 @@ export default {
         this.departmentAry = this.department.map( i => (
           i = i.defineName
         ))
-        this.departmentAry.unshift(this.$t('audit.workFlows.allDepart'))
+        this.departmentAry.unshift(this.$t('overview.allDepartment'))
 
       }).catch(err => {
         console.log('error' + err);
@@ -948,7 +948,7 @@ export default {
 
       this.newFlatNodeDataView.forEach(item =>{
         var newArr = []
-        if(item.auditByUsers[0] == this.$t('audit.workFlows.submitterName')) newArr.push( this.$t('audit.workFlows.submitterName'))
+        if(item.auditByUsers[0] == this.$t('audit.sendAudit.submitterName')) newArr.push( this.$t('audit.sendAudit.submitterName'))
         
         this.userInfo.forEach( u =>{
           if( item.auditByUsers[0] == u.userId || item.auditByUsers[0] == u.userName){

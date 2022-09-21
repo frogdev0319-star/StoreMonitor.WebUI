@@ -502,7 +502,7 @@ export default {
           }
         }
 
-        this.departmentAry.unshift(this.$t('audit.workFlows.allDepart'))
+        this.departmentAry.unshift(this.$t('overview.allDepartment'))
       }).catch(err => {
         console.log('error' + err);
       });
@@ -518,7 +518,7 @@ export default {
         this.titleListAry = this.titleList.map( i => (
           i = i.defineName
         ))
-        this.titleListAry.unshift(this.$t('audit.workFlows.allPosition'))
+        this.titleListAry.unshift(this.$t('overview.allPosition'))
 
         console.log('this.titleListAry  7:>> ', this.titleListAry);
         this.isLoadingData = false

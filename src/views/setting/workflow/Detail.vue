@@ -599,7 +599,7 @@ export default {
         this.titleListAry = this.titleList.map( i => (
           i = i.defineName
         ))
-        this.titleListAry.unshift(this.$t('audit.workFlows.allPosition'))
+        this.titleListAry.unshift(this.$t('overview.allPosition'))
         console.log('this.titleListAry  7:>> ', this.titleListAry);
         this.isLoadingData = false
       }).catch(err => {
@@ -617,7 +617,7 @@ export default {
         this.departmentAry = this.department.map( i => (
           i = i.defineName
         ))
-        this.departmentAry.unshift(this.$t('audit.workFlows.allDepart'))
+        this.departmentAry.unshift(this.$t('overview.allDepartment'))
         console.log('this.departmentAry  7:>> ', this.departmentAry);
 
       }).catch(err => {
@@ -696,7 +696,7 @@ export default {
       })
 
       this.flatNodeDataView[0].auditByUsers = []
-      this.flatNodeDataView[0].auditByUsers.push(this.$t('audit.workFlows.submitterName'))
+      this.flatNodeDataView[0].auditByUsers.push(this.$t('audit.sendAudit.submitterName'))
       console.log('this.flatNodeDataView 5 ------>> ', this.flatNodeDataView);
     },
     
