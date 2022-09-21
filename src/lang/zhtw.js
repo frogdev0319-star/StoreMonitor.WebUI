@@ -1372,6 +1372,8 @@ export default{
       "findUser":"查詢人員",
       "save":"儲存",
       "keywords":"關鍵字",
+      "allPosition":"所有職務",
+      "allDepart":"所有部門",
       "depart":"部門",
       "position":"職務",
       "searchNameMail":"搜尋人員名稱、信箱",
@@ -1411,7 +1413,7 @@ export default{
       "cantDisabledEdit": "禁用流程無法編輯",
       "orderModified": "流程順序已修改。",
 
-      "mustCreateOneNode": "需要至少新增一個簽核節點",
+      "mustCreateOneNode": "流程必須包含一個以上的簽核節點",
 
       "cantCancel": "不可取消簽核：",
       "tooltipListcant1": "送出巡檢報告時同步送出不合格項產生之事件",
@@ -1425,7 +1427,7 @@ export default{
       "tooltipListcan3": "巡檢報告重新編輯時可以編輯不合格項、合格項及忽略項",
       "tooltipListcan4": "簽核通過後才能檢視巡檢報告",
       "auditFlow":"簽核流程",
-  
+
     
     },
     "inceptionRpt":{
