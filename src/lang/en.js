@@ -684,7 +684,6 @@ export default{
         "loadingbindstore":"loading",
         "moreThan":"more than",
         "needSignature":"Onsite signature required",
-
         "defineTitle":"Custom Signature Display Name",
         "addSignature":"Add signature",
         "principal":"principal",
@@ -694,8 +693,6 @@ export default{
         "signatureOne":"Sign 1",
         "bindWorkflow":"Binde Workflow",
         "select":"Please select",
-    
-
         "no":"No",
         "notallowA":" [Pass-Failed] tab & [Score Items] tab",
         "notallowB":"Single [Others] tab",
@@ -1317,7 +1314,7 @@ export default{
           "operation":"Operate",
           "waiting":"Waiting for sign-off",
           "approved":"Signed off",
-          "submitterName":"Submitted by"
+          "submitterName":"Submitter"
       },
       "workFlows":{
         "workFlowsName":"Process name",
@@ -1333,12 +1330,9 @@ export default{
         "saveAndEnable":"Save and enable",
         "comfirmDelete":"Confirm deletion of current sign-off process?",
         "comfirmDeleteNode":"Confirm deletion of current sign-off process node?",
-
-        "submitterName":"Submitter",
         "canNotDelete":"This process cannot be deleted",
         "canNotClose":"This process cannot be closed",
         "makeSureUsign":"lease confirm whether the following inspection table is in use:",
-
         "dulplicateScuccess":"Process copied successfully",
         "deleteScuccess":"Successfully delete",
         "deleteFail":"Deletion failed",
@@ -1423,7 +1417,8 @@ export default{
         "tooltipListcan2":"“Cancel” can be selected for the sign-off process",
         "tooltipListcan3":"Unqualified items, qualified items and ignored items can be edited when re-editing the inspection report",
         "tooltipListcan4":"Inspection report can only be viewed after sign-off has passed",
-        "auditFlow":"Sign-off process"
+        "auditFlow":"Sign-off process",
+        "nodeOrder":"Node order"
       },
       "inceptionRpt":{
           "sendAudit":"Submit sign-off",

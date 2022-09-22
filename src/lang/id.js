@@ -684,6 +684,15 @@ export default{
       "loadingbindstore":"memuat",
       "moreThan":"lebih dari",
       "needSignatrue":"Tanda tangan di lokasi diperlukan",
+      "defineTitle":"Custom Signature Display Name",
+      "addSignature":"Add signature",
+      "principal":"principal",
+      "mustSignature":"Required signature",
+      "uncertainSignature":"Not required signature",
+      "inputData":"请输入负责人",
+      "signatureOne":"Sign 1",
+      "bindWorkflow":"Binde Workflow",
+      "select":"Please select",
       "no":"Tidak",
       "notallowA":" Tab [Pass-Failed] & tab [Score Items]",
       "notallowB":"Tab [Others] tunggal",
@@ -1273,6 +1282,7 @@ export default{
     "auditStatus":{
         "noteYet":"Belum dimulai",
         "processing":"Memproses",
+        "agree":"Agree",
         "reject":"Ditolak",
         "approved":"Penutup",
         "cancel":"Batalkan",
@@ -1400,7 +1410,8 @@ export default{
         "tooltipListcan2":"“Batal” dapat dipilih untuk proses penutup",
         "tooltipListcan3":"Item yang tidak memenuhi syarat, item yang memenuhi syarat dan item yang diabaikan dapat diedit saat mengedit ulang laporan pemeriksaan",
         "tooltipListcan4":"Laporan pemeriksaan hanya dapat dilihat setelah penutup lolos",
-        "auditFlow":"Proses penutup"
+        "auditFlow":"Proses penutup",
+        "nodeOrder":"Node order"
     },
     "inceptionRpt":{
         "sendAudit":"Kumpulkan penutup",
