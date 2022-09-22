@@ -502,7 +502,6 @@ export default {
       if(this.agree == null){
         util.notify('請選擇簽核意見', 'error', 2000);
         this.isLoadingData = false
-
         return
       }
 
@@ -564,6 +563,7 @@ export default {
       if(this.isSignature == true && this.commentsToApi.comment.signature.length == 0) {
         util.notify(this.$t('audit.auditStatus.needSign'), 'error', 1500);
         this.commentsToApi.comment.attachment = []
+        this.isLoadingData = false;
         return
       }
       console.log('this.commentsToApi ready to Api -------->> ', this.commentsToApi);
@@ -572,11 +572,9 @@ export default {
         this.isLoadingData = false
         console.log('res.data.isSystemReject :>> ', res.data.isSystemReject);
         if(res.data.isSystemReject == true) {
-          console.log('aaaaaaa :>> ');
           this.isSystemRejectDialog = true
           return
         }else {
-          console.log('bbbbbbb :>> ');
           this.$router.push({ name: 'WaitAuditManage'});
         }
       }).catch(err => {

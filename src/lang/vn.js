@@ -684,6 +684,15 @@ export default{
       "loadingbindstore":"đang tải",
       "moreThan":"nhiều hơn",
       "needSignatrue":"Phải có chữ ký tại chỗ",
+      "defineTitle":"Custom Signature Display Name",
+      "addSignature":"Add signature",
+      "principal":"principal",
+      "mustSignature":"Required signature",
+      "uncertainSignature":"Not required signature",
+      "inputData":"请输入负责人",
+      "signatureOne":"Sign 1",
+      "bindWorkflow":"Binde Workflow",
+      "select":"Please select",
       "no":"Không",
       "notallowA":" Thẻ [Đạt - Thất bại] & thẻ [Các mục điểm]",
       "notallowB":"Thẻ [Khác] đơn",
@@ -1273,6 +1282,7 @@ export default{
     "auditStatus":{
         "noteYet":"Vẫn chưa bắt đầu",
         "processing":"Đang xử lý",
+        "agree":"Agree",
         "reject":"Đã từ chối",
         "approved":"Đăng xuất thành công",
         "cancel":"Hủy",
@@ -1400,7 +1410,8 @@ export default{
         "tooltipListcan2":"Có thể chọn “Hủy” cho quy trình đăng xuất",
         "tooltipListcan3":"Có thể sửa các hạng mục chưa đạt yêu cầu, các hạng mục đạt yêu cầu và các hạng mục bị bỏ qua trong khi sửa lại báo cáo kiểm tra",
         "tooltipListcan4":"Chỉ có thể xem báo cáo kiểm tra sau khi đăng xuất thành công",
-        "auditFlow":"Quy trình đăng xuất"
+        "auditFlow":"Quy trình đăng xuất",
+        "nodeOrder":"Node order"
     },
     "inceptionRpt":{
         "sendAudit":"Gửi đăng xuất",

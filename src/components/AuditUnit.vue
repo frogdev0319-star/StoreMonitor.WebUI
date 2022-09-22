@@ -36,22 +36,22 @@
 							<div class="audit-user-name" v-else-if="taskItem.state == 8 && task.comment.result == -999"> {{task.auditByUsers[0].titleName}} -- {{task.auditByUsers[0].userName}} <span>({{task.endTs}})</span> </div>
 						</div>
 						<div class="audit-situation"  v-if="taskItem.parentId !== -1 ">
-							<div class="audit_agree" v-if="taskItem.state == 1 &&  task.comment.result == 0"><i class="iconfont el-icon-check"/> 同意</div>
-							<div class="audit_agree" v-if="task.assignee !== null && taskItem.state == 2 && task.comment.result == 0"><i class="iconfont el-icon-check"/> 同意</div>
-							<div class="audit_agree" v-if="taskItem.state == 5 && task.comment.result == 0"><i class="iconfont el-icon-check"/> 同意</div>
-							<div class="audit_agree" v-if="taskItem.state == 6 && task.comment.result == 0"><i class="iconfont el-icon-check"/> 同意</div>
-							<div class="audit_agree" v-if="taskItem.state == 8 && task.comment.result == 0"><i class="iconfont el-icon-check"/> 同意</div>
+							<div class="audit_agree" v-if="taskItem.state == 1 &&  task.comment.result == 0"><i class="iconfont el-icon-check"/>{{$t('audit.auditStatus.agree')}}</div>
+							<div class="audit_agree" v-if="task.assignee !== null && taskItem.state == 2 && task.comment.result == 0"><i class="iconfont el-icon-check"/> {{$t('audit.auditStatus.agree')}}</div>
+							<div class="audit_agree" v-if="taskItem.state == 5 && task.comment.result == 0"><i class="iconfont el-icon-check"/> {{$t('audit.auditStatus.agree')}}</div>
+							<div class="audit_agree" v-if="taskItem.state == 6 && task.comment.result == 0"><i class="iconfont el-icon-check"/> {{$t('audit.auditStatus.agree')}}</div>
+							<div class="audit_agree" v-if="taskItem.state == 8 && task.comment.result == 0"><i class="iconfont el-icon-check"/> {{$t('audit.auditStatus.agree')}}</div>
 
-							<div class="audit_disagree" v-if="taskItem.state == 5 && task.comment.result == 1"><i class="iconfont el-icon-close"/> 駁回</div>
-							<div class="audit_disagree" v-else-if="taskItem.state == 1 && task.comment.result == 1"><i class="iconfont el-icon-close"/> 駁回</div>
+							<div class="audit_disagree" v-if="taskItem.state == 5 && task.comment.result == 1"><i class="iconfont el-icon-close"/> {{$t('audit.auditStatus.reject')}}</div>
+							<div class="audit_disagree" v-else-if="taskItem.state == 1 && task.comment.result == 1"><i class="iconfont el-icon-close"/> {{$t('audit.auditStatus.reject')}}</div>
 							
-							<div class="audit_disagree" v-else-if="task.assignee !== null && taskItem.state == 2 && task.comment.result == 1"><i class="iconfont el-icon-close"/> 駁回</div>
-							<div class="audit_disagree" v-else-if="taskItem.state == 8 && task.comment.result == 1"><i class="iconfont el-icon-close"/> 駁回</div>
-							<div class="audit_cancel" v-else-if="taskItem.state == 6 && task.comment.result == -2"><i class="iconfont el-icon-info"/> 撤回</div>
-							<div class="audit_disagree" v-else-if="taskItem.state == 6 && task.comment.result == 1"><i class="iconfont el-icon-close"/> 駁回</div>
+							<div class="audit_disagree" v-else-if="task.assignee !== null && taskItem.state == 2 && task.comment.result == 1"><i class="iconfont el-icon-close"/> {{$t('audit.auditStatus.reject')}}</div>
+							<div class="audit_disagree" v-else-if="taskItem.state == 8 && task.comment.result == 1"><i class="iconfont el-icon-close"/> {{$t('audit.auditStatus.reject')}}</div>
+							<div class="audit_cancel" v-else-if="taskItem.state == 6 && task.comment.result == -2"><i class="iconfont el-icon-info"/> {{$t('audit.auditStatus.rollback')}}</div>
+							<div class="audit_disagree" v-else-if="taskItem.state == 6 && task.comment.result == 1"><i class="iconfont el-icon-close"/> {{$t('audit.auditStatus.reject')}}</div>
 
-							<div class="audit_cancel" v-else-if="taskItem.state == 5 && task.comment.result == -1"><i class="iconfont el-icon-info"/> 取消</div>
-							<div class="audit_cancel" v-else-if="taskItem.state == 7 && task.comment.result == -3"><i class="iconfont el-icon-info"/> 系統撤回</div>
+							<div class="audit_cancel" v-else-if="taskItem.state == 5 && task.comment.result == -1"><i class="iconfont el-icon-info"/> {{$t('audit.auditStatus.cancel')}}</div>
+							<div class="audit_cancel" v-else-if="taskItem.state == 7 && task.comment.result == -3"><i class="iconfont el-icon-info"/> {{$t('audit.auditStatus.systemRollback')}}</div>
 						</div>
 					</div>
 					<!-- description -->
@@ -67,7 +67,7 @@
 								<el-image
 									style="background: #FFF;" 
 									:src="blopSign.content"
-									v-if="blopSign.type == 1"
+									v-if="blopSign.type == 2 || blopSign.type == 1"
 									:preview-src-list = "getImgSrcSign(index, blopSign)"
 									/>
 							</div>
@@ -75,12 +75,11 @@
 							<div class="iimg" v-for="(blopImg, index) in task.comment.attachment" :key="blopImg.ts">
 								<el-image
 									:src="blopImg.url"
-									v-if="blopImg.mediaType == 2"
+									v-if="blopImg.mediaType == 2 "
 									:preview-src-list = "getImgSrc(index, blopImg)"
 									/>
 								<a class="pdfLink" :href="blopImg.url" v-if="blopImg.mediaType == 4">
-																	<p class="pdf_name" v-if="blopImg.mediaType == 4">{{blopImg.fileName}}</p>
-
+								<p class="pdf_name" v-if="blopImg.mediaType == 4">{{blopImg.fileName}}</p>
 								</a>
 							</div>
 							

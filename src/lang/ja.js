@@ -684,6 +684,15 @@ export default{
       "loadingbindstore":"読み込み中…",
       "moreThan":"より大きい",
       "needSignatrue":"オンサイト署名が必要",
+      "defineTitle":"Custom Signature Display Name",
+      "addSignature":"Add signature",
+      "principal":"principal",
+      "mustSignature":"Required signature",
+      "uncertainSignature":"Not required signature",
+      "inputData":"请输入负责人",
+      "signatureOne":"Sign 1",
+      "bindWorkflow":"Binde Workflow",
+      "select":"Please select",
       "no":"いいえ",
       "notallowA":"[パスー失敗]タブと[スコア アイテム]タブ。",
       "notallowB":"他のアイテム",
@@ -1273,6 +1282,7 @@ export default{
     "auditStatus":{
         "noteYet":"まだ開始されていません",
         "processing":"処理中",
+        "agree":"Agree",
         "reject":"拒否済み",
         "approved":"承認合格",
         "cancel":"キャンセル",
@@ -1400,7 +1410,8 @@ export default{
         "tooltipListcan2":"承認プロセスの「キャンセル」は選択できます",
         "tooltipListcan3":"検査レポートの再編集時に、不適格な項目、適格な項目、無視された項目を編集できます",
         "tooltipListcan4":"検査レポートは、承認が合格した後にのみ表示できます",
-        "auditFlow":"承認プロセス"
+        "auditFlow":"承認プロセス",
+        "nodeOrder":"Node order"
     },
     "inceptionRpt":{
         "sendAudit":"承認の送信",

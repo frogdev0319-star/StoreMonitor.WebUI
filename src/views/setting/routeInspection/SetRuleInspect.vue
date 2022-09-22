@@ -154,25 +154,25 @@
         <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
           <el-checkbox class="storevue-checkbox-outlined" v-model="onSiteSignature" >
             <span>
-              {{ $t('insSettingView.needSignatrue') }}
+              {{ $t('insSettingView.needSignature') }}
             </span>
           </el-checkbox>
 
           <div class="signatrue_section" v-if="onSiteSignature">
             <div class="define_sign">
-              <div class="title">自定義簽名顯示名稱</div> 
+              <div class="title">{{$t('insSettingView.defineTitle')}}</div> 
               <el-button
                 @click="addSignature"
                 v-if="signatureData.extra.length < 4"
                 class="addsign_button_outlined"
                 size="mini" type="primary">
-                <i class="iconfont el-icon-plus"/>新增簽名
+                <i class="iconfont el-icon-plus"/>{{$t('insSettingView.addSignature')}}
               </el-button>
             </div>
             <div class="signatrue_row"  v-for="(item, index) in signatureData.extra" :key="index">
-              負責人
+              {{$t('insSettingView.principal')}}
               <el-input
-                placeholder="請輸入負責人"
+                :placeholder="$t('insSettingView.inputData')" 
                 v-model="item.header"
                 ref="workflowName"
                 style="width: 250px;  margin: 0 20px ;"
@@ -180,8 +180,8 @@
                 show-word-limit
                 />
               <el-radio-group class="storevue-radio" v-model="item.optional" >
-                <el-radio :label="true">必簽</el-radio> 
-                <el-radio :label="false" v-if="index !== 0">非必簽</el-radio> 
+                <el-radio :label="true">{{$t('insSettingView.mustSignature')}}</el-radio> 
+                <el-radio :label="false" v-if="index !== 0">{{$t('insSettingView.uncertainSignature')}}</el-radio> 
               </el-radio-group>
               <div class="delete_sign">
                 <img 
@@ -320,8 +320,8 @@
     <el-col :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.bindWorkFLow')">
         <div slot="tableDetail" class="setting-config rule-item">
-          <span style="margin-right: 20px">選擇綁定流程</span>  
-          <el-select v-model="workFlowToBind" placeholder="請選擇">
+          <span style="margin-right: 20px"> {{ $t('insSettingView.bindWorkflow') }}</span>  
+          <el-select v-model="workFlowToBind" :placeholder="$t('insSettingView.select') ">
               <el-option
                 v-for="item in workFlowList"
                 :key="item.processDefinitionKey"
@@ -390,10 +390,11 @@ export default {
           "extra": [
               {
                 "optional": true,
-                "header": ""
+                "header": "this.$t('insSettingView.bindWorkflow')"
               }
           ]
         },
+      n : 2
     };
   },
   watch: {
@@ -414,26 +415,34 @@ export default {
       this.bindWorkFlowData.processDefinitionKey = processDefinitionKey
       this.bindWorkFlowData.type = 0
       this.bindWorkFlowData.inspectTagId = this.inspectId
-      
-      console.log('this.workFlowToBind ~~~~>> ', this.workFlowToBind);
+      // console.log('this.workFlowToBind ~~~~>> ', this.workFlowToBind);
 
     },
     onSiteSignature(){
-      if(!this.onSiteSignature)  this.signatureData = {
-          "name": "onSiteSignature",
-          "value": true,
-          "extra": [
-              {
-                "optional": true,
-                "header": ""
-              }
-          ]
+      this.signatureData.value = this.onSiteSignature
+      this.n = 2
+      if(this.signatureData.value == false) this.signatureData.extra = [
+        {
+          "optional": true,
+          "header": this.$t('insSettingView.bindWorkflow')
         }
+      ]
     }
   },
+
   async mounted() {
+    
     await this.getRule();
     await this.workflowItems()
+    console.log('this.signatureData :>> ', this.signatureData);
+    if(this.signatureData.value == true && this.signatureData.extra.length == 0)  {
+        this.signatureData.extra = [
+          {
+            "optional": true,
+            "header": this.$t('insSettingView.bindWorkflow')
+          }
+        ]
+      }
   },
 
   methods: {
@@ -490,10 +499,12 @@ export default {
           ]
         };
 
-        if(this.onSiteSignature) params.ruleItems.push(this.signatureData)
+      if(this.onSiteSignature) params.ruleItems.push(this.signatureData)
         console.log('params', params)
         const res = await self.updateInspectRule(params);
-        if (res.errCode === 0) {
+
+
+      if (res.errCode === 0) {
           util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           return false;
         } else {
@@ -591,8 +602,9 @@ export default {
           console.log('res.data ~~~~~~~::>> ', res.data);
           
           var tempSign = res.data.filter(i => i.name == "onSiteSignature")
-          console.log('tempSign :>> ', tempSign);
           this.signatureData = tempSign[0]
+          console.log('this.signatureData :>> ', this.signatureData);
+
 
           const tempArry = res.data.filter(list => list.name == "workflow")
           console.log('tempArry :>> ', tempArry);
@@ -721,16 +733,20 @@ export default {
       });
     },
 
-    addSignature(){
+    addSignature(index){
+    
       var addObj = {
           "optional": true,
-          "header": ""
+          "header": `簽名 ${this.n}`
       }
       if(this.signatureData.extra.length < 4) this.signatureData.extra.push(addObj)
+      return this.n++
     },
+
     deleteSign(index){
       console.log('index :>> ', index);
       this.signatureData.extra.splice(index, 1)
+      
     }
 
   }

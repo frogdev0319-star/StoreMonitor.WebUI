@@ -684,6 +684,15 @@ export default{
       "loadingbindstore":"로드하는 중...",
       "moreThan":"다음 이상",
       "needSignatrue":"현장 서명 필요",
+      "defineTitle":"Custom Signature Display Name",
+      "addSignature":"Add signature",
+      "principal":"principal",
+      "mustSignature":"Required signature",
+      "uncertainSignature":"Not required signature",
+      "inputData":"请输入负责人",
+      "signatureOne":"Sign 1",
+      "bindWorkflow":"Binde Workflow",
+      "select":"Please select",
       "no":"아니요",
       "notallowA":"[통관-실패] 식별표 & [득점 항목] 식별표",
       "notallowB":"기타 항목",
@@ -1273,6 +1282,7 @@ export default{
     "auditStatus":{
         "noteYet":"아직 시작되지 않음",
         "processing":"처리 중",
+        "agree":"Agree",
         "reject":"거부됨",
         "approved":"최종 서명 승인됨",
         "cancel":"취소",
@@ -1400,7 +1410,8 @@ export default{
         "tooltipListcan2":"최종 서명 프로세스에 대해 “취소”를 선택할 수 있습니다",
         "tooltipListcan3":"검사 보고서 재편집 시 부적격 항목, 적격 항목, 무시 항목 편집 가능",
         "tooltipListcan4":"검사 보고서는 최종 서명이 완료된 후에만 볼 수 있습니다",
-        "auditFlow":"최종 서명 프로세스"
+        "auditFlow":"최종 서명 프로세스",
+        "nodeOrder":"Node order"
     },
     "inceptionRpt":{
         "sendAudit":"최종 서명 제출",

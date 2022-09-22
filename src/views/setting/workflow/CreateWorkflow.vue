@@ -614,7 +614,7 @@ export default {
       
       // console.log('this.currentUser 2', this.currentUser)
       // initData[0].auditByUsers.push(this.currentUser)
-      initData[0].auditByUsers.push(this.$t('audit.workFlows.submitterName'))
+      initData[0].auditByUsers.push(this.$t('audit.sendAudit.submitterName'))
       this.newFlatNodeDataView = initData
     },
 
@@ -683,7 +683,7 @@ export default {
         this.titleListAry = this.titleList.map( i => (
           i = i.defineName
         ))
-        
+        this.titleListAry.unshift(this.$t('overview.allPosition'))
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;
@@ -698,6 +698,8 @@ export default {
         this.departmentAry = this.department.map( i => (
           i = i.defineName
         ))
+        this.departmentAry.unshift(this.$t('overview.allDepartment'))
+
       }).catch(err => {
         console.log('error' + err);
       });
@@ -811,22 +813,23 @@ export default {
 
     //======================================
     filterInputSearchUser(users){
-        return  users.filter( item => item.userName.indexOf(this.inputSearchUser) > -1 || item.email.indexOf(this.inputSearchUser) > -1)
+        return users.filter( item => item.userName.indexOf(this.inputSearchUser) > -1 || item.email.indexOf(this.inputSearchUser) > -1)
     },
     filterCurTemplateDepartment(users){
-        if(this.curTemplateDepartment.length == 0){
+        if(this.curTemplateDepartment.length == 0 || this.curTemplateDepartment == this.departmentAry[0]){
           return users
         }else{
-          return users.filter(item => item.sector == this.curTemplateDepartment )
+          return users.filter(item => item.sector.includes(this.curTemplateDepartment))
         }
     },
     filterCurTemplateTitleList(users){
-      if(this.curTemplateTitleList.length == 0){
+      if(this.curTemplateTitleList.length == 0 || this.curTemplateTitleList == this.titleListAry[0]){
         return users
       }else{
         return users.filter(item => item.title == this.curTemplateTitleList )
       }
     },  
+
     confirmSearchUsersDialog(){
         console.log('this.ccToUSer ~~~~~~~>', this.ccToUSer)
         console.log('this.multipleSelection ~~~~~~~>', this.multipleSelection)
@@ -875,9 +878,14 @@ export default {
         this.titleList.forEach( title =>{
           if(title.contents.length !== 0 && title.contents.includes(user.userId)) user.title = title.defineName 
         })
+        // user 會有多個部門
+        user.sector = []
         this.department.forEach( dep =>{
-          if(dep.contents.length !==  0 && dep.contents.includes(user.userId)) user.sector = dep.defineName 
+          if(dep.contents.length !==  0 && dep.contents.includes(user.userId)) {
+            user.sector.push(dep.defineName)
+          }
         })
+        user.sector = user.sector.join(", ")
       })
       
        // 等待 dialog 生成
@@ -890,8 +898,6 @@ export default {
     },
 
     //======================================
-
-
     // async getNodeList(id){
     //   this.isLoadingData = true
     //   await getNodeList(id).then(res=>{
@@ -920,6 +926,7 @@ export default {
     //   });
     // },
 
+
     // flatten Data by Recursive
     flattenData(data, key = 'nextAuditNode') {
       if(data[key] !== null) {
@@ -941,7 +948,7 @@ export default {
 
       this.newFlatNodeDataView.forEach(item =>{
         var newArr = []
-        if(item.auditByUsers[0] == this.$t('audit.workFlows.submitterName')) newArr.push( this.$t('audit.workFlows.submitterName'))
+        if(item.auditByUsers[0] == this.$t('audit.sendAudit.submitterName')) newArr.push( this.$t('audit.sendAudit.submitterName'))
         
         this.userInfo.forEach( u =>{
           if( item.auditByUsers[0] == u.userId || item.auditByUsers[0] == u.userName){
@@ -962,9 +969,7 @@ export default {
         })
         item.auditByGroups = newArr2
       })
-      
     },
-
 
     handleEmitMove(method){
       // console.log('List method ', method);
@@ -1027,7 +1032,7 @@ export default {
         var currentUser = this.userInfo.filter(u => u.userName == row.auditByUsers[0])
         row.auditByUsers = []
         row.auditByUsers.push(currentUser[0].userId)
-      } else {
+      } else if(row.auditByGroups.length !== 0){
         var currentGroup = this.department.filter(u => u.defineName == row.auditByGroups[0])
         row.auditByGroups = []
         row.auditByGroups.push(currentGroup[0].defineId)
@@ -1047,29 +1052,56 @@ export default {
       ))
 
       this.newFlatNodeDataView.splice(rowPosition , 1)
+
+      // var aaa = [...this.newFlatNodeDataView]
+      // aaa.forEach( item =>{
+      //   if(item.auditByUsers.length !== 0){
+      //     this.userInfo.forEach( u => {
+      //       if(item.auditByUsers[0] == u.userName) {
+      //         item.auditByUsers = []
+      //         item.auditByUsers.push(u.userId)
+      //       }
+      //     })
+      //   }
+      //   if(item.auditByGroups.length !== 0){
+      //     this.department.forEach( g => {
+      //     if(item.auditByGroups[0] == g.defineName) {
+      //       item.auditByGroups = []
+      //       item.auditByGroups.push(g.defineId)
+      //     }
+      //   })
+      //   }
+      // })
+
+      console.log('this.newFlatNodeDataView :~~~~~:::::::>> ', this.newFlatNodeDataView);
+      
       sessionStorage.removeItem('newWorkFlow')
       sessionStorage.setItem('reNewNode', JSON.stringify(this.newFlatNodeDataView))
+
 
       // 處理簽核人員下拉選單顯示(清除已選狀況)
       var tempDeleteNode = [...this.newFlatNodeDataView]
       tempDeleteNode.shift()
+
       var auditMembers  = {}
       auditMembers.auditByUsers = []
       auditMembers.auditByGroups = []
 
-      var aaa = tempDeleteNode.map(u => u = u.auditByUsers[0])
-      aaa.forEach( i =>{
+      console.log('tempDeleteNode :>> ', tempDeleteNode);
+
+      var handleUsers = tempDeleteNode.map(u => u = u.auditByUsers[0])
+      handleUsers.forEach( i =>{
         this.userInfo.forEach(u=>{
           if( i == u.userName) auditMembers.auditByUsers.push(u.userId)
         })
       })
-      var bbb = tempDeleteNode.map(g => g = g.auditByGroups[0])
-      bbb.forEach( i =>{
+      var handleGroup = tempDeleteNode.map(g => g = g.auditByGroups[0])
+      handleGroup.forEach( i =>{
         this.department.forEach(u=>{
-          if( i == u.userName) auditMembers.auditByGroups.push(u.userId)
+          if( i == u.defineName) auditMembers.auditByGroups.push(u.defineId)
         })
       })
-
+      
       sessionStorage.setItem('auditMembers', JSON.stringify(auditMembers))
       this.fullscreenLoading = false
     },
@@ -1227,7 +1259,7 @@ export default {
   .add-node-btn
     position: absolute
     right: 1%
-    top: 3px
+    top: 5px
   
   .search_member
     height: 36px

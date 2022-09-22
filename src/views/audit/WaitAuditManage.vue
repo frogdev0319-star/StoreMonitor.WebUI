@@ -310,7 +310,7 @@ export default{
     },
     activated() {
         const self = this;
-        console.log('wait actived isFirstLoad:',self.isFirstLoad);
+        //console.log('wait actived isFirstLoad:',self.isFirstLoad);
         if (!self.$route.meta.isBack || self.isFirstLoad) {
             self.initData();
         }
@@ -318,7 +318,6 @@ export default{
         self.isFirstLoad = false;
     },
     deactivated() {
-        console.log('wait deactivated');
         this.saveSearchParams();
     },
     methods: {
@@ -338,7 +337,6 @@ export default{
             self.getAllTask()
         },
         onStoreChange(storeObj) {
-            console.log('onStoreChange>storeFilterObj', storeObj);
             this.storeFilterObj = storeObj;
             if(!this.curStoreIds){
                 this.searchParams = this.storeFilterObj;
@@ -399,16 +397,16 @@ export default{
             params['curTabIndx'] = this.curTabIndx;
             params['sizeNum'] = this.curSizeNum;
             params['order'] = this.curOrder;
-            console.log('saveSearchParams:', params);
+            //console.log('saveSearchParams:', params);
             const searchConditon = {
                 path: 'waitAuditManage',
                 params: params
             };
-            console.log("wait saveSearchParams:",params);
+            //console.log("wait saveSearchParams:",params);
             SearchConditionUtil.saveSearchCondition(searchConditon);
         },
         onTabClick(val) {
-            console.log('onTabClick',val);
+            //console.log('onTabClick',val);
             //const self = this;
             this.curTabIndx = Number(val.index);
             this.activeName = val.name;
@@ -457,7 +455,7 @@ export default{
                     size:this.curSizeNum
                 }
             };
-            console.log("this.storeFilterObj.curStore:",this.storeFilterObj.curStore);
+            //console.log("this.storeFilterObj.curStore:",this.storeFilterObj.curStore);
             if(this.curStoreIds!=-1 && !this.storeFilterObj.curStore.includes('-1')){
                 params['storeId'] =this.curStoreIds;
             }
@@ -474,7 +472,7 @@ export default{
             if(this.inputSearchValue.trim()!=''){
                 params['keyword'] = this.inputSearchValue;
             }
-            console.log("params:",params);
+            //console.log("params:",params);
             const self =this;
             return new Promise((resolve) => {
                 workflowRESTful.GetlistWorkflowTaskByType(params).then(res=>{
@@ -507,7 +505,7 @@ export default{
                     self.curTotalPage = self.tableDataList[self.curTabIndx].totalPage;
                     self.curSizeNum = self.tableDataList[self.curTabIndx].sizeNum;
                     self.curOrder = self.tableDataList[self.curTabIndx].order;
-                    console.log("curTotalPage:",self.curTotalPage);
+                    //console.log("curTotalPage:",self.curTotalPage);
                     resolve(tempAll);
                 }).then(result=>{
                     self.isLoading = false;
@@ -519,7 +517,6 @@ export default{
         },
         clickDetail(item, index) {
             const self = this;
-            console.log('item.routeObj ~~~~>> ', item.row);
             if(self.curTabIndx==0){
                 sessionStorage.setItem('auditDetailHandling', JSON.stringify(item.row));
                 self.$router.push({ name: 'auditHandling', params: { data: item.row }});
