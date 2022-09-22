@@ -682,6 +682,15 @@ export default{
       "loadingbindstore":"loading",
       "moreThan":"more than",
       "needSignatrue":"Onsite signature required",
+      "defineTitle":"Custom Signature Display Name",
+      "addSignature":"Add signature",
+      "principal":"principal",
+      "mustSignature":"Required signature",
+      "uncertainSignature":"Not required signature",
+      "inputData":"Please input owner",
+      "signatureOne":"Sign 1",
+      "bindWorkflow":"Binde Workflow",
+      "select":"Please select",
       "no":"No",
       "notallowA":" [Pass-Failed] tab & [Score Items] tab",
       "notallowB":"Single [Others] tab",
@@ -1271,6 +1280,7 @@ export default{
       "auditStatus":{
           "noteYet":"Not started yet",
           "processing":"Processing",
+          "agree":"Agree",
           "reject":"Rejected",
           "approved":"Sign-off passed",
           "cancel":"Cancel",
@@ -1398,7 +1408,8 @@ export default{
           "tooltipListcan2":"“Cancel” can be selected for the sign-off process",
           "tooltipListcan3":"Unqualified items, qualified items and ignored items can be edited when re-editing the inspection report",
           "tooltipListcan4":"Inspection report can only be viewed after sign-off has passed",
-          "auditFlow":"Sign-off process"
+          "auditFlow":"Sign-off process",
+          "nodeOrder":"Node order"
       },
       "inceptionRpt":{
           "sendAudit":"Submit sign-off",

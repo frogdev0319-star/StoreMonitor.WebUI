@@ -684,6 +684,14 @@ export default{
       "loadingbindstore":"載入中",
       "moreThan":"超過",
       "needSignatrue":"須進行現場簽名",
+      "defineTitle":"自定義簽名顯示名稱",
+      "addSignature":"新增簽名",
+      "principal":"負責人",
+      "mustSignature":"必簽",
+      "uncertainSignature":"非必簽",
+      "inputData":"請輸入負責人",
+      "bindWorkflow":"選擇綁定流程",
+      "select":"請選擇",
       "no":"無",
       "notallowA":"合格率評估項和附加評分項",
       "notallowB":"附加評分項",
@@ -1273,6 +1281,7 @@ export default{
     "auditStatus":{
         "noteYet":"尚未開始",
         "processing":"處理中",
+        "agree":"同意",
         "reject":"駁回",
         "approved":"簽核通過",
         "cancel":"取消",
@@ -1400,7 +1409,8 @@ export default{
         "tooltipListcan2":"簽核流程可以選擇「取消」",
         "tooltipListcan3":"巡檢報告重新編輯時可以編輯不合格項、合格項及忽略項",
         "tooltipListcan4":"簽核通過後才能檢視巡檢報告",
-        "auditFlow":"簽核流程"
+        "auditFlow":"簽核流程",
+        "nodeOrder":"節點序號"
     },
     "inceptionRpt":{
         "sendAudit":"送出簽核",
