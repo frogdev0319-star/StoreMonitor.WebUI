@@ -1364,10 +1364,6 @@ export default{
         "findUser":"查询人员",
         "save":"保存",
         "keywords":"关键词",
-
-        "allPosition":"所有职务",
-        "allDepart":"所有部门",
-
         "depart":"部门",
         "position":"职务",
         "searchNameMail":"搜寻人员名称、信箱",
