@@ -372,7 +372,7 @@ export default{
             }
         },
         mimicModeChanged(val){
-            console.log("mimicMode val:",val);
+            //console.log("mimicMode val:",val);
             //this.onSearchClick();
             this.isMimicMode = val;
             this.ifSearchData = true;
@@ -380,11 +380,8 @@ export default{
     },
     created(){
         this.isFirstLoad = true;
-        console.log('this.$route.meta.isBack :::::::>> ', this.$route.meta.isBack);
-        
     },
     activated() {
-        console.log('send actived isFirstLoad:',this.isFirstLoad);
         const self = this;
         if (!self.$route.meta.isBack || self.isFirstLoad) {
             self.initData();
@@ -393,7 +390,6 @@ export default{
         self.isFirstLoad = false;
     },
     deactivated() {
-        console.log('send deactivated');
         this.saveSearchParams();
     },
     mounted() {
@@ -410,14 +406,11 @@ export default{
             self.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
             self.inputSearchValue = '';
             self.curTotalPage = 0;
-            console.log("self.curTabIndx @@?",self.curTabIndx);
             self.getSearchParams();
             //this.tableDataList[Number(this.activeName)].page = 1;
             self.getAllTask()
         },
         onStoreChange(storeObj) {
-            console.log('onStoreChange>storeFilterObj', storeObj);
-            console.log('this.ifSearchData', this.ifSearchData);
             this.storeFilterObj = storeObj;
             if(this.curStoreIds){
                 this.searchParams = this.storeFilterObj;
@@ -427,7 +420,6 @@ export default{
             this.ifSearchData = false;
         },
         onDateChange(val) {
-            console.log('dateChange~~~>' , val);
             const self = this;
             const tabIndex = Number(self.curTabIndx);
             const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
@@ -453,7 +445,7 @@ export default{
             //this.params.endTs = this.dateValue[1].valueOf();
             // console.log('EventMange > getSearchParams > searchParams:', searchParams);
             //console.log("this.$route.params.curTabIndx:",this.$route.params.curTabIndx);
-            console.log("*isMimicMode:",this.isMimicMode);
+            //console.log("*isMimicMode:",this.isMimicMode);
             if (Object.keys(searchParams).length > 0) {
                 this.storeFilterObj = searchParams;
                 this.inputSearchValue = searchParams.inputSearchValue;
@@ -492,7 +484,6 @@ export default{
             SearchConditionUtil.saveSearchCondition(searchConditon);
         },
         onTabClick(val) {
-            console.log('onTabClick',val);
             //const self = this;
             this.curTabIndx = Number(val.index);
             this.activeName = val.name;
@@ -524,7 +515,6 @@ export default{
                 order.property = "auditState";
             }
             self.curOrder = order;
-            console.log("self.curOrder:",self.curOrder);
             self.tableDataList[self.curTabIndx].order = self.curOrder;
             self.getAllTask();
         },
@@ -536,7 +526,6 @@ export default{
                 this.tableDataList[i].taskCount = 0;
                 this.tableDataList[i].totalPage = 0;
             }
-            console.log("this.curTabIndx ::::: >>",this.curTabIndx);
             var params = {
                 beginTs:this.dateValue[0].valueOf(),
                 endTs:this.dateValue[1].valueOf(),
@@ -549,7 +538,7 @@ export default{
                 order:this.curOrder,
                 isMysteryMode:this.isMimicMode,//PermissionHelper.enableMimicMode,
             };
-            console.log("this.storeFilterObj.curStore:",this.storeFilterObj.curStore)
+            //console.log("this.storeFilterObj.curStore:",this.storeFilterObj.curStore)
             if(this.curStoreIds!=-1){// && !this.storeFilterObj.curStore.includes('-1')){
 
                 params['storeId'] =this.curStoreIds;
@@ -565,7 +554,7 @@ export default{
             /*if(Object.keys(this.curOrder).length>0){
                 params['order'] = this.curOrder;
             }*/
-            console.log("params:",params);
+            //console.log("params:",params);
             const self =this;
             return new Promise((resolve) => {
                 workflowRESTful.GetlistWorkflowTaskByType(params).then(res=>{

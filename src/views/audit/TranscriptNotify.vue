@@ -202,7 +202,7 @@ export default{
     },
     activated() {
         const self = this;
-        console.log('Notify actived isFirstLoad:',self.isFirstLoad);
+        //console.log('Notify actived isFirstLoad:',self.isFirstLoad);
         if (!self.$route.meta.isBack || self.isFirstLoad) {
             self.initData();
         }
@@ -210,7 +210,7 @@ export default{
         self.isFirstLoad = false;
     },
     deactivated() {
-        console.log('Notify deactivated');
+        //console.log('Notify deactivated');
         this.saveSearchParams();
     },
     methods: {
@@ -228,9 +228,9 @@ export default{
             self.getAllTask()
         },
         onStoreChange(storeObj) {
-            console.log('onStoreChange>storeFilterObj', storeObj);
+            //console.log('onStoreChange>storeFilterObj', storeObj);
             this.storeFilterObj = storeObj;
-            console.log("this.curStoreIds:",this.curStoreIds);
+            //console.log("this.curStoreIds:",this.curStoreIds);
             if(!this.curStoreIds){
                 this.searchParams = this.storeFilterObj;
                 this.curStoreIds = storeObj.filterStoreIds;
@@ -268,7 +268,7 @@ export default{
                 this.searchParams = searchParams;
             } else {
                 this.searchParams = {};
-                 console.log("notify >getSearchParams>storeFilterObj.filterStoreIds:",this.storeFilterObj.filterStoreIds);
+                // console.log("notify >getSearchParams>storeFilterObj.filterStoreIds:",this.storeFilterObj.filterStoreIds);
                 this.curStoreIds = this.storeFilterObj.filterStoreIds;
                 this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
                 //this.params.beginTs = this.dateValue[0].valueOf();
@@ -280,12 +280,12 @@ export default{
             params['inputSearchValue'] = this.inputSearchValue;
             params['sizeNum'] = this.curSizeNum;
             params['order'] = this.curOrder;
-            console.log('saveSearchParams:', params);
+            //console.log('saveSearchParams:', params);
             const searchConditon = {
                 path: 'transcriptNotify',
                 params: params
             };
-            console.log("Notify saveSearchParams:",params);
+            //console.log("Notify saveSearchParams:",params);
             SearchConditionUtil.saveSearchCondition(searchConditon);
         },
         currentChange(val) {
@@ -340,7 +340,7 @@ export default{
             if(this.inputSearchValue.trim()!=''){
                 params['keyword'] = this.inputSearchValue;
             }
-            console.log("params:",params);
+            //console.log("params:",params);
             const self =this;
             return new Promise((resolve) => {
                 workflowRESTful.GetlistWorkflowTaskByType(params).then(res=>{
@@ -364,7 +364,6 @@ export default{
                     }
                     self.tableData = tempAll;
                     self.curTotalPage = res.data.totalPages;
-                    console.log("curTotalPage:",self.curTotalPage);
                     resolve(tempAll);
                 }).then(result=>{
                     self.isLoading = false;
