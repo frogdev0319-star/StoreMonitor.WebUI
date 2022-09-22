@@ -263,7 +263,7 @@ export default{
                 //this.curState = searchParams.curState;
                 this.curStoreIds = searchParams.filterStoreIds;
                 //this.curSizeNum = (typeof searchParams.sizeNum=='undefined')?10:searchParams.sizeNum;
-                this.curOrder = (typeof searchParams.order=='undefined')?{direction:'desc',property:'processLastUpdateTs'}:searchParams.order;
+                this.curOrder = (typeof searchParams.order=='undefined')?{direction:'desc',property:'processStartTs'}:searchParams.order;
                 this.defaultSort = {order:(this.curOrder.direction=='desc')?'descending':'ascending',prop:this.curOrder.property};
                 this.searchParams = searchParams;
             } else {
