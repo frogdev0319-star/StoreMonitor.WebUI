@@ -281,6 +281,8 @@ export default{
   },
   "remotePatrol":{
       "InspectionDetail":"Export report",
+      "exportPDF":"Export PDF",
+      "exportExcel":"Export EXCEL",
       "Patroltips2":"The inspection list name already exists",
       "TableGet":"Score",
       "TableIgnore":"Ignored",
