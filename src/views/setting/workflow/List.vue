@@ -490,6 +490,8 @@ export default {
       // } else {
         this.$router.push({name: 'workflowDetail'})
         sessionStorage.setItem('workflowDetail', JSON.stringify(row))
+        sessionStorage.setItem('pageAction', JSON.stringify("firstEdit"))
+
       // }
     },
 

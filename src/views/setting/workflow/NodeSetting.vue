@@ -531,6 +531,7 @@ export default {
       const data = sessionStorage.getItem('workflowDetail')
       this.infoForm = JSON.parse(data)
       this.infoForm.type = this.$t('audit.workFlows.inspectionForm')
+      console.log(' this.infoForm :>> ',  this.infoForm);
     },
     
     async getNodeInfo(){
@@ -786,7 +787,7 @@ export default {
       
       
       console.log('to API', this.apiData)
-      if(pageAction == "create" || pageAction == "edit" ){
+      if(pageAction == "create" || pageAction == "edit"){
         console.log('pageAction ---->', pageAction)
       
         //  節點名稱不可為重複
@@ -797,18 +798,16 @@ export default {
         console.log('checkNameResult', checkNameResult)
         console.log('this.apiData :::::::>>>', this.apiData)
 
-        // create
+        // create alert
         if(checkNameResult.length > 0 && pageAction == "create") {
           util.notify(this.$t('audit.workFlows.cantRepeatNodeName'), 'error', 2000 );
           return
         }
 
-        // edit
-        if(checkNameResult.length > 0 && pageAction == "edit") {
-
+        // edit alert
+        if(checkNameResult.length > 0 && pageAction == "edit" ) {
           console.log(' this.nodeData',  this.nodeData)
           console.log('reNewNode', reNewNode)
-
           var tempAry = reNewNode.filter( i => i.id !== this.nodeData.id)
           console.log('tempAry', tempAry)
 
@@ -822,31 +821,77 @@ export default {
           }
         }
         sessionStorage.setItem('newWorkFlow', JSON.stringify(this.apiData))
-        console.log('newWorkFlow 2', this.apiData)
-        this.$router.push({name: 'createWorkflow'})
 
+        const getTo = sessionStorage.getItem('routeTo')
+        const routeTo = JSON.parse(getTo)
 
-      } else if(pageAction == "set"){
-        console.log('pageAction', pageAction)
-        console.log('this.apiData', this.apiData)
-        console.log('this.nodeData', this.nodeData)
-        var checkRepeatArry = this.apiData.orderedAuditNodeArray.map(i => i = i.name)
-        console.log('checkRepeatArry', checkRepeatArry)
-        
-        const repeat = checkRepeatArry.some( (item, index, arr) => arr.indexOf(item) !== index)
-        console.log('repeat', repeat)
-        if(repeat){
-          util.notify(this.$t('audit.workFlows.cantRepeatNodeName'), 'error', 2000 );
-        }else{
-          // call api
-          updateWorkflow(this.apiData).then(res=>{
-            console.log('res :>> ', res);
-            this.$router.push({name: 'workflowDetail'})
-            this.isLoadingData = false
-          }).catch(err => {
-            console.log('error' , err);
-          });
+        if(routeTo == "createWorkflow"){
+          this.$router.push({name: 'createWorkflow'})
+        }else if(routeTo == "workflowDetail"){
+          this.$router.push({name: 'workflowDetail'})
         }
+        
+      }else if(pageAction == "set"){
+
+         //  節點名稱不可為重複
+        var status = sessionStorage.getItem('reNewNode');
+        const reNewNode = JSON.parse(status)
+
+        var checkNameResult = reNewNode.filter(i => i.name == this.nodeData.name )
+        console.log('checkNameResult', checkNameResult)
+        console.log('this.apiData :::::::>>>', this.apiData)
+
+        // edit
+        if(checkNameResult.length > 0 && pageAction == "set" ) {
+          console.log(' this.nodeData',  this.nodeData)
+          console.log('reNewNode', reNewNode)
+          var tempAry = reNewNode.filter( i => i.id !== this.nodeData.id)
+          console.log('tempAry', tempAry)
+
+          var tt = tempAry.some(i =>
+            i.name == this.nodeData.name
+          ) 
+          console.log('tt', tt)
+          if(tt){
+            util.notify(this.$t('audit.workFlows.cantRepeatNodeName'), 'error', 2000 );
+            return
+          }
+        }
+        
+        sessionStorage.setItem('newWorkFlow', JSON.stringify(this.apiData))
+        console.log('newWorkFlow 2', this.apiData)
+        sessionStorage.setItem('pageAction', JSON.stringify("edit"))
+        this.$router.push({name: 'workflowDetail'})
+
+        
+
+
+
+
+
+
+
+
+
+
+        // var checkRepeatArry = this.apiData.orderedAuditNodeArray.map(i => i = i.name)
+        // console.log('checkRepeatArry', checkRepeatArry)
+        
+        // const repeat = checkRepeatArry.some( (item, index, arr) => arr.indexOf(item) !== index)
+        // console.log('repeat', repeat)
+        // if(repeat){
+        //   util.notify(this.$t('audit.workFlows.cantRepeatNodeName'), 'error', 2000 );
+        // }else{
+        //   // call api
+        //   updateWorkflow(this.apiData).then(res=>{
+        //     console.log('res :>> ', res);
+        //     this.$router.push({name: 'workflowDetail'})
+        //     this.isLoadingData = false
+        //   }).catch(err => {
+        //     console.log('error' , err);
+        //   });
+        // }
+
       }
 
     },
