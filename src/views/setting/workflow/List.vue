@@ -488,9 +488,12 @@ export default {
       //   util.notify(this.$t('audit.workFlows.cantDisabledEdit'), 'error', 2000 );
       //   return
       // } else {
-        this.$router.push({name: 'workflowDetail'})
+        var createNewNodeNeed = {"orderedAuditNodeArray":[]}
+        sessionStorage.setItem('nodeDataToApi', JSON.stringify(createNewNodeNeed))
+
         sessionStorage.setItem('workflowDetail', JSON.stringify(row))
         sessionStorage.setItem('pageAction', JSON.stringify("firstEdit"))
+        this.$router.push({name: 'workflowDetail'})
 
       // }
     },
