@@ -504,8 +504,6 @@ export default {
       await this.getUserInfo() 
       await this.getDepartmentList() 
     
-      await this.getWorkflowList(this.apiBody)
-      
       const result = await this.$store.dispatch("GetUserAuthorities");
       this.currentUser = result.data.userId
 
@@ -535,6 +533,8 @@ export default {
       }
       await this.getPickedMember()
       await this.handleData() 
+
+      await this.getWorkflowList(this.apiBody)
     },
 
 
@@ -856,7 +856,11 @@ export default {
     async getWorkflowList(param){
       await getWorkflowList(param).then(res=>{
         this.allTableData = res.data.content
-        // console.log('this.allTableData ======>> ',  this.allTableData );
+        var needToDelIndex = this.allTableData.findIndex(i => i.name == this.workflowDetail.name)
+        this.allTableData.splice(needToDelIndex , 1)
+
+        console.log('needToDelIndex :>> ', needToDelIndex);
+        console.log('this.allTableData ======>> ',  this.allTableData );
       }).catch(err => {
         console.log('error' + err);
       });
@@ -1132,8 +1136,9 @@ export default {
         this.$refs.workflowName.focus()
         return
       }
+  
 
-      var repeatResult = this.allTableData.some(i=>i.name == this.workflowDetail.name)
+      var repeatResult = this.allTableData.some(i => i.name == this.workflowDetail.name)
       console.log('repeatResult~~~~ :>> ', repeatResult);
 
       if(repeatResult == true){
@@ -1181,7 +1186,7 @@ export default {
         }).catch(err => {
           console.log('error' + err);
         });
-      
+        this.fullscreenLoading = false
     }
   }
 
