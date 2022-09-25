@@ -273,7 +273,7 @@ export default {
       taskDrawback(value).then(res=>{
         this.isLoadingData = false
         var reportId = this.auditDetail.inspectReportId
-        this.$router.push({name: "SendAuditManage"})
+        this.$router.push({name: "SendAuditManage",params: {curTabIndx:1}})
       }).catch(err => {
         this.isLoadingData = false;
         console.log('error' + err);

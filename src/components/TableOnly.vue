@@ -29,7 +29,7 @@
     > 
       <el-table-column
         v-if="indexType"
-        label= "節點序號"
+        :label= "$t('audit.workFlows.nodeOrder')"
         type= "index"
         align="left"
         width="100"

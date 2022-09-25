@@ -684,6 +684,15 @@ export default{
       "loadingbindstore":"กำลังโหลด",
       "moreThan":"มากกว่า",
       "needSignatrue":"ต้องมีลายเซ็นจากสถานที่",
+      "defineTitle":"Custom Signature Display Name",
+      "addSignature":"Add signature",
+      "principal":"principal",
+      "mustSignature":"Required signature",
+      "uncertainSignature":"Not required signature",
+      "inputData":"请输入负责人",
+      "signatureOne":"Sign 1",
+      "bindWorkflow":"Binde Workflow",
+      "select":"Please select",
       "no":"ไม่",
       "notallowA":" แท็บ [ผ่าน-ไม่ผ่าน] และแท็บ [รายการคะแนน]",
       "notallowB":"แท็บ [อื่น ๆ] แท็บเดียว",
@@ -1273,6 +1282,7 @@ export default{
     "auditStatus":{
         "noteYet":"ยังไม่เริ่มต้น",
         "processing":"กำลังประมวลผล",
+        "agree":"Agree",
         "reject":"ปฏิเสธแล้ว",
         "approved":"การลงนามผ่านแล้ว",
         "cancel":"ยกเลิก",
@@ -1400,7 +1410,8 @@ export default{
         "tooltipListcan2":"สามารถเลือก “ยกเลิก” สำหรับกระบวนการลงนาม",
         "tooltipListcan3":"สามารถแก้ไขรายการที่ไม่ผ่าน รายการที่ผ่าน และรายการที่ละเว้นเมื่อแก้ไขรายงานการตรวจสอบใหม่",
         "tooltipListcan4":"สามารถดูรายงานการตรวจสอบเฉพาะหลังจากการลงนามผ่านแล้วเท่านั้น",
-        "auditFlow":"กระบวนการลงนาม"
+        "auditFlow":"กระบวนการลงนาม",
+        "nodeOrder":"Node order"
     },
     "inceptionRpt":{
         "sendAudit":"ส่งการลงนาม",

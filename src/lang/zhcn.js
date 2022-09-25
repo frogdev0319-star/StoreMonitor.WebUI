@@ -684,7 +684,6 @@ export default{
       "loadingbindstore":"加载中",
       "moreThan":"超过",
       "needSignature":"须进行现场签名",
-
       "defineTitle":"自定义签名显示名称",
       "addSignature":"新增签名",
       "principal":"负责人",
@@ -694,7 +693,6 @@ export default{
       "signatureOne":"签名 1",
       "bindWorkflow":"选择绑定流程",
       "select":"请选择",
-
       "no":"无",
       "notallowA":"合格率评估项和附加评分项",
       "notallowB":"附加评分项",
@@ -1332,13 +1330,9 @@ export default{
         "saveAndEnable":"储存并启用",
         "comfirmDelete":"确认删除当前签核流程？",
         "comfirmDeleteNode":"确认删除当前签核流程节点？",
-
-        "submitterName":"送出人",
         "canNotDelete":"此签核流程无法删除",
         "canNotClose":"此流程无法关闭",
         "makeSureUsign":"请确认以下巡检表是否正在使用流程:",
-
-
         "dulplicateScuccess":"已成功复制流程",
         "deleteScuccess":"删除成功",
         "deleteFail":"删除失败",
@@ -1370,10 +1364,6 @@ export default{
         "findUser":"查询人员",
         "save":"保存",
         "keywords":"关键词",
-
-        "allPosition":"所有职务",
-        "allDepart":"所有部门",
-
         "depart":"部门",
         "position":"职务",
         "searchNameMail":"搜寻人员名称、信箱",
@@ -1420,7 +1410,8 @@ export default{
         "tooltipListcan2":"签核流程可以选择「取消」",
         "tooltipListcan3":"巡检报告重新编辑时可以编辑不合格项、合格项及忽略项",
         "tooltipListcan4":"签核通过后才能检视巡检报告",
-        "auditFlow":"签核流程"
+        "auditFlow":"签核流程",
+        "nodeOrder":"节点序号"
     },
     "inceptionRpt":{
         "sendAudit":"送出签核",

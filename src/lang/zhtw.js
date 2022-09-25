@@ -684,7 +684,6 @@ export default{
       "loadingbindstore":"載入中",
       "moreThan":"超過",
       "needSignature":"須進行現場簽名",
-      
       "defineTitle":"自定義簽名顯示名稱",
       "addSignature":"新增簽名",
       "principal":"負責人",
@@ -693,12 +692,6 @@ export default{
       "inputData":"請輸入負責人",
       "bindWorkflow":"選擇綁定流程",
       "select":"請選擇",
-
-      
-
-
-
-
       "no":"無",
       "notallowA":"合格率評估項和附加評分項",
       "notallowB":"附加評分項",
@@ -1336,12 +1329,9 @@ export default{
         "saveAndEnable":"儲存並啟用",
         "comfirmDelete":"確認刪除當前簽核流程？",
         "comfirmDeleteNode":"確認刪除當前簽核流程節點？",
-        "submitterName":"送出人",
-
         "canNotDelete":"此流程無法刪除",
         "canNotClose":"此流程無法關閉",
         "makeSureUsign":"請確認以下巡檢表是否正在使用流程:",
-
         "dulplicateScuccess":"已成功複製流程",
         "deleteScuccess":"删除成功",
         "deleteFail":"删除失敗",
@@ -1373,8 +1363,6 @@ export default{
         "findUser":"查詢人員",
         "save":"儲存",
         "keywords":"關鍵字",
-        "allPosition":"所有職務",
-        "allDepart":"所有部門",
         "depart":"部門",
         "position":"職務",
         "searchNameMail":"搜尋人員名稱、信箱",
@@ -1382,7 +1370,6 @@ export default{
         "name":"姓名",
         "email":"信箱",
         "addAuditUser":"新增簽核人員",
-
         "inputNodeName": "請輸入節點名稱",
         "auditDepart": "簽核部門",
         "auditUser": "簽核人員",
@@ -1413,23 +1400,19 @@ export default{
         "cantEmptyBtnName": "自定義簽核按鈕名稱不可為空",
         "cantDisabledEdit": "禁用流程無法編輯",
         "orderModified": "流程順序已修改。",
-
         "mustCreateOneNode": "流程必須包含一個以上的簽核節點",
-
         "cantCancel": "不可取消簽核：",
         "tooltipListcant1": "送出巡檢報告時同步送出不合格項產生之事件",
         "tooltipListcant2": "簽核流程無法選擇「取消」",
         "tooltipListcant3": "巡檢報告重新編輯時無法修改不合格項",
         "tooltipListcant4": "簽核通過後才能檢視巡檢報告",
-
         "canCancel": "可取消簽核：",
         "tooltipListcan1": "送出巡檢報告時不會立即產生不合格項之事件，簽核通過時才會產生",
         "tooltipListcan2": "簽核流程可以選擇「取消」",
         "tooltipListcan3": "巡檢報告重新編輯時可以編輯不合格項、合格項及忽略項",
         "tooltipListcan4": "簽核通過後才能檢視巡檢報告",
         "auditFlow":"簽核流程",
-
-    
+        "nodeOrder":"節點序號"
     },
     "inceptionRpt":{
         "sendAudit":"送出簽核",
