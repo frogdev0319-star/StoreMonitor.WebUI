@@ -482,8 +482,11 @@ export default {
       return obj;
     },
     getRowKeys(row) {
+      //console.log("row",row);
+      if(row.id) return row.id;
+      else if(row.userId) return row.userId;
+      else return row[0];
       
-      return row.id;
     },
     expandChange(row) {
        /*console.log("row click:",row);

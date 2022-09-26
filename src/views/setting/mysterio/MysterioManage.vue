@@ -63,7 +63,7 @@
             @confirmHandler="confirmAddPersonDialog">
             <div style="width:860px;height:516px;margin-left:20px;">
               <table-only
-                ref="elTP"
+                ref="myteryUserList"
                 class="table-white table-person"
                 table-themes="white"
                 :column-data="userColumnData"
@@ -277,6 +277,7 @@ export default {
             var tempUserList = [];
             data.map(user => {
               const userJson = {};
+              userJson.id = user.userId;
               userJson.userName = user.userName;
               userJson.userId = user.userId;
               userJson.email = user.email;
@@ -313,6 +314,7 @@ export default {
                   //console.log("mapUser:",mapUser);
                   let obj = {...item};
                   var position = this.positionsList.find(pos=>{return pos.contents.includes(item.userId)})
+                  obj['id']=item.userId;
                   obj['position'] = (position)? position.label:"";
                   obj['updateTs']=util.getDateStr(item.updateTime),
                   obj['storeAuth']=item.permissionStores,
@@ -378,8 +380,11 @@ export default {
           mysteroRESTful.removeMysterioPerson({userId:this.delUserId}).then(res=>{
             if(res.errCode==0){
               let delIdx = self.allTableData.findIndex(user=>user.userId==this.delUserId);
+              console.log("1.self.allTableData:",self.allTableData);
               self.allTableData.splice(delIdx,1);
-              self.selectedUserList = self.allTableData.slice(0,self.allTableData.length-1);
+              console.log("2.self.allTableData:",self.allTableData);
+              self.selectedUserList = self.allTableData.slice(0,self.allTableData.length);
+              console.log("selectedUserList:",self.selectedUserList);
               //self.getMysterioList(true);
               self.getMysterioList();
             }else{
@@ -495,6 +500,7 @@ export default {
     align-items: flex-start;
 }
 .table-person{
+  
   /deep/ .el-table__header-wrapper .el-table-column--selection{
     padding-left: 0px !important;
     font-size: 14px !important;
@@ -512,6 +518,10 @@ export default {
   }
     /deep/ .el-table__header-wrapper .el-checkbox{
         display:block;
+        .el-checkbox__input.is-indeterminate .el-checkbox__inner{
+          background-color: #fff;
+          border-color: #DCDFE6;
+        }
         .el-checkbox__input.is-checked .el-checkbox__inner {
             color: #1375bc;
             font-weight: 400;
