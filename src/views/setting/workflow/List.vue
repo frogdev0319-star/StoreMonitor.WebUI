@@ -283,7 +283,7 @@ export default {
   methods: {
     async init(){      
       await this.getUserInfo()
-
+      this.inputSearchValue="";
       const data = sessionStorage.getItem('pageInfo')
       const pageInfo = JSON.parse(data)
       if(pageInfo == undefined){

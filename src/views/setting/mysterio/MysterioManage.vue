@@ -146,7 +146,7 @@ export default {
             'isExpand': false
           },
           {
-            'prop': 'updateTs',
+            'prop': 'updateTsStr',
             'label': this.$t('mysterio.lastUpdateTime'),
             'sortable': 'custom',
             'width': 130,
@@ -229,7 +229,8 @@ export default {
           this.searchData = this.allTableData.filter(item => (
               item.userName.indexOf(val) > -1 || item.email.indexOf(val) > -1
           ));
-          this.tableData = this.searchData;
+          //this.tableData = this.searchData;
+          this.setTableBySearch();
         }
         
       }
@@ -244,7 +245,7 @@ export default {
     },
     methods: {
         async init(){
-          
+          //this.inputSearchValue="";
           await this.getUserInfolist();
           this.getMysterioList(true);
           this.getMysterioList();
@@ -316,7 +317,8 @@ export default {
                   var position = this.positionsList.find(pos=>{return pos.contents.includes(item.userId)})
                   obj['id']=item.userId;
                   obj['position'] = (position)? position.label:"";
-                  obj['updateTs']=util.getDateStr(item.updateTime),
+                  obj['updateTs']=item.updateTime,
+                  obj['updateTsStr']=util.getDateStr(item.updateTime),
                   obj['storeAuth']=item.permissionStores,
                   mysterioData.push(obj);
                 });
@@ -396,20 +398,37 @@ export default {
         handleSortChange(order, defaultSort) {
           this.defaultSort = { ...defaultSort };
           //this.order = this.params.order = order;
-          this.getMysterioList();
+          if(this.inputSearchValue.trim()=="") this.getMysterioList();
+          else {
+            if(order.property=="updateTs"){
+              if(order.direction=='asc'){
+                util.sortArrayByKeyAsc(this.searchData,"updateTs")
+              }else{
+                util.sortArrayByKeyDesc(this.searchData,"updateTs")
+              }
+            }
+            this.setTableBySearch();
+          }
         },
         currentChange(val) {
             const self = this;
             self.curPage = val.page;
             //self.params.filter = { page: val.page - 1, size: self.sizeNum };
-            self.getMysterioList();
+            if(self.inputSearchValue.trim()=="") self.getMysterioList();
+            else self.setTableBySearch()
         },
 
         sizeChange(val) {
             const self = this;
             self.curSizeNum = val.size;
             self.curPage = 1;
-            self.getMysterioList();
+            if(self.inputSearchValue.trim()=="") self.getMysterioList();
+            else self.setTableBySearch()
+        },
+        setTableBySearch() {
+          this.total = Math.ceil(this.searchData.length/this.curSizeNum);
+          this.tableData = [];
+          this.tableData = [...this.searchData.slice( (this.curPage - 1)* this.curSizeNum, this.curPage* this.curSizeNum)];
         },
         //Dialog content
         addNewMysterioPerson(){
