@@ -519,8 +519,9 @@ export default {
     /deep/ .el-table__header-wrapper .el-checkbox{
         display:block;
         .el-checkbox__input.is-indeterminate .el-checkbox__inner{
-          background-color: #fff;
-          border-color: #DCDFE6;
+          background-color: #2c90d9;
+          border-color: #2c90d9;
+          color:#FFF;
         }
         .el-checkbox__input.is-checked .el-checkbox__inner {
             color: #1375bc;
