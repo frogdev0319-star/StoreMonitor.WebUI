@@ -245,7 +245,7 @@ export default {
     },
     methods: {
         async init(){
-          //this.inputSearchValue="";
+          this.inputSearchValue="";
           await this.getUserInfolist();
           this.getMysterioList(true);
           this.getMysterioList();
@@ -432,6 +432,7 @@ export default {
         },
         //Dialog content
         addNewMysterioPerson(){
+            this.inputSearchValue="";
             this.getAddUserList();
             this.showAddPersionDialog=true;
         },
