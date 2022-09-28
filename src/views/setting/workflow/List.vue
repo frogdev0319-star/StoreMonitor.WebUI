@@ -706,7 +706,7 @@ export default {
         white-space: nowrap
         width: 200px
       .showDescription
-        position: absolute
+        position: fixed
         width: 500px
         height: fit-content
         font-size: 13px
@@ -715,13 +715,8 @@ export default {
         background: rgba(0,0,0,.75)
         color: #fff
         border-radius: 3px
-        bottom: -10px
-        left: 95%
         z-index: 1000
         display: none
-    &:nth-child(-n+5)
-      .showDescription
-        top: -10px
 
     
 
