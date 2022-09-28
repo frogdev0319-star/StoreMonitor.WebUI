@@ -390,7 +390,7 @@ export default {
           "extra": [
               {
                 "optional": true,
-                "header": "this.$t('insSettingView.bindWorkflow')"
+                "header": this.$t('audit.auditStatus.sign')+"1"
               }
           ]
         },
@@ -424,7 +424,7 @@ export default {
       if(this.signatureData.value == false) this.signatureData.extra = [
         {
           "optional": true,
-          "header": this.$t('insSettingView.bindWorkflow')
+          "header": this.$t('audit.auditStatus.sign')+"1"
         }
       ]
     }
@@ -439,7 +439,7 @@ export default {
         this.signatureData.extra = [
           {
             "optional": true,
-            "header": this.$t('insSettingView.bindWorkflow')
+            "header": this.$t('audit.auditStatus.sign')+"1"
           }
         ]
       }
@@ -737,7 +737,7 @@ export default {
     
       var addObj = {
           "optional": true,
-          "header": `簽名 ${this.n}`
+          "header": this.$t('audit.auditStatus.sign')+`${this.n}`
       }
       if(this.signatureData.extra.length < 4) this.signatureData.extra.push(addObj)
       return this.n++
@@ -746,7 +746,7 @@ export default {
     deleteSign(index){
       console.log('index :>> ', index);
       this.signatureData.extra.splice(index, 1)
-      
+      return this.n--;
     }
 
   }
