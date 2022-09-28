@@ -273,7 +273,7 @@ export default {
     // for search
     inputSearchValue(val){
       this.currentPage = 1;
-      if(val){
+      if(val.trim()!=""){
         this.allTableData =this.allWorkflowList.filter(item => (
           item.name.indexOf(val) > -1 
         ))
