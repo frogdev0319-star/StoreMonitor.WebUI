@@ -223,6 +223,7 @@ export default {
       },
       // for search
       inputSearchValue(val){
+        self.curPage = 1;
         if(val.trim()==""){
           this.getMysterioList();
         }else{
@@ -400,13 +401,6 @@ export default {
           //this.order = this.params.order = order;
           if(this.inputSearchValue.trim()=="") this.getMysterioList();
           else {
-            if(order.property=="updateTs"){
-              if(order.direction=='asc'){
-                util.sortArrayByKeyAsc(this.searchData,"updateTs")
-              }else{
-                util.sortArrayByKeyDesc(this.searchData,"updateTs")
-              }
-            }
             this.setTableBySearch();
           }
         },
@@ -427,6 +421,13 @@ export default {
         },
         setTableBySearch() {
           this.total = Math.ceil(this.searchData.length/this.curSizeNum);
+          if(this.defaultSort.prop=="updateTsStr"){
+            if(this.defaultSort.order=='ascending'){
+              util.sortArrayByKeyAsc(this.searchData,"updateTs")
+            }else{
+              util.sortArrayByKeyDesc(this.searchData,"updateTs")
+            }
+          }
           this.tableData = [];
           this.tableData = [...this.searchData.slice( (this.curPage - 1)* this.curSizeNum, this.curPage* this.curSizeNum)];
         },
