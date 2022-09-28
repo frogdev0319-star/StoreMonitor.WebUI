@@ -216,14 +216,14 @@ export default {
           'label': this.$t('audit.workFlows.workFlowsCreatedTs'),
           'width': 130,
           'maxWidth': 130,
-          'sortable': true
+          'sortable': 'custom',
         },
         {
           'prop': 'updateTs',
           'label': this.$t('audit.workFlows.workFlowsUpdateTs'),
           'width': 100,
           'maxWidth': 100,
-          'sortable': true
+          'sortable': 'custom',
         },
         {
           'prop': 'updatedUser',
