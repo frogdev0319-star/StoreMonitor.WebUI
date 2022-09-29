@@ -422,17 +422,24 @@ export default {
       immediate: false, 
       deep: true,
       handler (val,old ) {
+        const self = this;
         console.log("onSiteSignature:",val)
-        this.signatureData.value = this.onSiteSignature
-        this.n = 1
-        if(val) {
-          this.signatureData.extra = [
-            {
-              "optional": true,
-              "header": this.$t('audit.auditStatus.sign')+this.n
-            }
-          ];
-          this.n++;
+        self.signatureData.value = self.onSiteSignature;
+        console.log("this.signatureData:",self.signatureData)
+        self.n = 1
+        if(val){
+          var tempSign = {
+            "name": "onSiteSignature",
+            "value": true,
+            "extra": [
+                {
+                  "optional": true,
+                  "header": self.$t('audit.auditStatus.sign')+"1"
+                }
+            ]
+          }
+          self.signatureData = tempSign;
+          self.n++;
         }
       }
     },
