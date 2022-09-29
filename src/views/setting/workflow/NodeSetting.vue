@@ -316,7 +316,7 @@
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
 import {updateWorkflow} from "@/api/workflow";
-import {getDepart } from '@/api/login';
+import {getDepart, getDepartAll} from '@/api/login';
 import {
   getUserInfo,
   getAllUserInfoNoAuth
@@ -479,7 +479,7 @@ export default {
   
     // get getDepart
     async getDepartmentList(){
-      await getDepart({ type: 0 }).then(res=>{
+      await getDepartAll({ type: 0 }).then(res=>{
 
         var AllDepartment = res.data
 
@@ -502,7 +502,7 @@ export default {
         }
         
         this.departmentAry = res.data.map( i => i = i.defineName)
-        this.departmentAry.unshift(this.$t('audit.workFlows.allDepart'))
+        this.departmentAry.unshift(this.$t('overview.allDepartment'))
       }).catch(err => {
         console.log('error' + err);
       });
@@ -832,7 +832,6 @@ export default {
         }
         
       }else if(pageAction == "set"){
-
          //  節點名稱不可為重複
         var status = sessionStorage.getItem('reNewNode');
         const reNewNode = JSON.parse(status)
