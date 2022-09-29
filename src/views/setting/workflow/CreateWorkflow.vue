@@ -1172,7 +1172,6 @@ export default {
 
       if(toApiData.nextAuditNode.nextAuditNode == null) {
         this.newFlatNodeDataView.pop()
-        this.handleData()
         util.notify(this.$t('audit.workFlows.mustCreateOneNode'), 'error', 2000 );
         return
       } else {

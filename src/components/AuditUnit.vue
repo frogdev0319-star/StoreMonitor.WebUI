@@ -22,8 +22,8 @@
 							<div class="audit-user-name" v-else-if="taskItem.state == 5 && task.comment.result == 1 "> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
 							<div class="audit-user-name" v-else-if="taskItem.state == 5 && task.comment.result == 0 "> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
 
-							<div class="audit-user-name" v-else-if="taskItem.state == 2 && task.comment == null"> {{task.auditByUsers[0].titleName}} -- {{task.auditByUsers[0].userName}} <span>({{taskItem.startTs}})</span></div>
-							<div class="audit-user-name" v-else-if="taskItem.state == 2 && task.comment !== null"> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{taskItem.startTs}})</span></div>
+							<div class="audit-user-name" v-else-if="taskItem.state == 2 && task.comment == null"> {{task.auditByUsers[0].titleName}} -- {{task.auditByUsers[0].userName}} <span v-if="task.endTs !== null">({{task.endTs}}) </span></div>
+							<div class="audit-user-name" v-else-if="taskItem.state == 2 && task.comment !== null"> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}}) </span></div>
 							<div class="audit-user-name" v-else-if="taskItem.state == 3"> {{taskItem.auditTargetName}}</div>
 							
 							<div class="audit-user-name" v-else-if="taskItem.state == 6 && task.comment.result == -2"> {{task.auditByUsers[0].titleName}} -- {{task.auditByUsers[0].userName}} <span>({{task.endTs}})</span></div>

@@ -312,10 +312,12 @@ import {
   updateWorkflow,   
   getWorkflowList, 
   creadNewFlow,
-  getUserStatus
+  getUserStatus,
+  
   } from "@/api/workflow";
 import {getUserTitleList } from "@/api/title";
 import {getUserInfo} from '@/api/login';
+import {getAllUserInfoNoAuth, getDepartAll} from '@/api/login';
 
 import TableOnly from '@/components/TableOnly';
 import DialogPop from '@/components/DialogPop';
@@ -621,12 +623,9 @@ export default {
         console.log('this.fromApiflatNodeData 4 ------>> ', this.fromApiflatNodeData);
         // this.fromApiflatNodeData[0].name = this.infoForm.createdUser
         this.fromApiflatNodeData[0].name = this.$t('audit.workFlows.submitAudit')
+        this.fromApiflatNodeData[0].auditByUsers = []
+        this.fromApiflatNodeData[0].auditByUsers.push(this.$t('audit.sendAudit.submitterName'))
         
-        if(this.fromApiflatNodeData[0].auditByUsers.length > 0){
-          this.fromApiflatNodeData[0].auditByUsers = []
-          this.fromApiflatNodeData[0].auditByUsers.push(this.$t('audit.sendAudit.submitterName'))
-        }
-
         this.newFlatNodeDataView = this.fromApiflatNodeData
 
         // 傳node資料到 workflownode
@@ -686,7 +685,7 @@ export default {
 
     // get user
     async getUserInfo(){
-      await getUserInfo().then(res=>{
+      await getAllUserInfoNoAuth().then(res=>{
         this.userInfo = res.data
         this.userData = this.userInfo
         // console.log('this.userInfo ------>> ', this.userInfo);
@@ -697,7 +696,7 @@ export default {
     
     // get getDepart
     async getDepartmentList(){
-      await getUserStatus({ type: 0 }).then(res=>{
+      await getDepartAll({ type: 0 }).then(res=>{
         this.department = res.data
         // console.log('this.department 4 ------>> ', this.department);
         this.departmentAry = this.department.map( i => (
@@ -1144,14 +1143,25 @@ export default {
       toApiData.copyToUsers = this.ccToUSer
 
       console.log('toApiData :>> ', toApiData);
-
-      updateWorkflow(toApiData).then(res=>{
-        this.$router.push({name: 'workflowManage'})
-        console.log('res', res)
+      if(toApiData.orderedAuditNodeArray.length == 1) {
+        this.fullscreenLoading = false
+        this.isLoadingData = false
+        util.notify(this.$t('audit.workFlows.mustCreateOneNode'), 'error', 2000 );
+        return
+      }else{
+        updateWorkflow(toApiData).then(res=>{
+          this.$router.push({name: 'workflowManage'})
+          console.log('res', res)
         }).catch(err => {
           console.log('error' + err);
         });
+
+      }
+      
+      
+      
         this.fullscreenLoading = false
+        this.isLoadingData = false
     }
   }
 
