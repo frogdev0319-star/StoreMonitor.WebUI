@@ -151,6 +151,7 @@ export default {
       const self = this;
       self.page = pageObj.page;
       self.sizeNum = pageObj.size;
+      self.total = Math.ceil(self.allTableData.length/self.sizeNum);
       //self.params.filter = { page: self.page - 1, size: self.sizeNum };
       self.setPagingTableData();
     },

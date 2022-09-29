@@ -390,11 +390,11 @@ export default {
           "extra": [
               {
                 "optional": true,
-                "header": "this.$t('insSettingView.bindWorkflow')"
+                "header": this.$t('audit.auditStatus.sign')+"1"
               }
           ]
         },
-      n : 2
+      n : 1
     };
   },
   watch: {
@@ -418,16 +418,24 @@ export default {
       // console.log('this.workFlowToBind ~~~~>> ', this.workFlowToBind);
 
     },
-    onSiteSignature(){
-      this.signatureData.value = this.onSiteSignature
-      this.n = 2
-      if(this.signatureData.value == false) this.signatureData.extra = [
-        {
-          "optional": true,
-          "header": this.$t('insSettingView.bindWorkflow')
+    onSiteSignature:{
+      immediate: false, 
+      deep: true,
+      handler (val,old ) {
+        console.log("onSiteSignature:",val)
+        this.signatureData.value = this.onSiteSignature
+        this.n = 1
+        if(val) {
+          this.signatureData.extra = [
+            {
+              "optional": true,
+              "header": this.$t('audit.auditStatus.sign')+this.n
+            }
+          ];
+          this.n++;
         }
-      ]
-    }
+      }
+    },
   },
 
   async mounted() {
@@ -435,14 +443,7 @@ export default {
     await this.getRule();
     await this.workflowItems()
     console.log('this.signatureData :>> ', this.signatureData);
-    if(this.signatureData.value == true && this.signatureData.extra.length == 0)  {
-        this.signatureData.extra = [
-          {
-            "optional": true,
-            "header": this.$t('insSettingView.bindWorkflow')
-          }
-        ]
-      }
+    
   },
 
   methods: {
@@ -596,21 +597,34 @@ export default {
       });
     },
     getInspectRule(params) {
+      const self = this;
       return new Promise((resolve, reject) => {
         inpectRESTful.GetInspectRuleSettings(params).then(res => {
           resolve(res);
-          console.log('res.data ~~~~~~~::>> ', res.data);
           
-          var tempSign = res.data.filter(i => i.name == "onSiteSignature")
-          this.signatureData = tempSign[0]
-          console.log('this.signatureData :>> ', this.signatureData);
-
+          
+          var tempSign = res.data.filter(i => i.name == "onSiteSignature");
+          if(tempSign[0].value == true && !tempSign[0].hasOwnProperty('extra')){
+            tempSign[0]['extra'] = [];
+          }
+          self.signatureData = tempSign[0];
+          
+          if(self.signatureData.value == true && self.signatureData.extra.length == 0)  {
+            self.signatureData.extra.push(
+              {
+                "optional": true,
+                "header": self.$t('audit.auditStatus.sign')+self.n
+              }
+            )
+            self.n++;
+          }
 
           const tempArry = res.data.filter(list => list.name == "workflow")
           console.log('tempArry :>> ', tempArry);
-          this.workFlowInfoValue = tempArry[0].value
+          self.workFlowInfoValue = tempArry[0].value
 
         }).catch(err => {
+          console.log("getInspectRule err:",err);
           reject(err);
         });
       });
@@ -734,10 +748,9 @@ export default {
     },
 
     addSignature(index){
-    
       var addObj = {
           "optional": true,
-          "header": `簽名 ${this.n}`
+          "header": this.$t('audit.auditStatus.sign')+`${this.n}`
       }
       if(this.signatureData.extra.length < 4) this.signatureData.extra.push(addObj)
       return this.n++
@@ -746,7 +759,12 @@ export default {
     deleteSign(index){
       console.log('index :>> ', index);
       this.signatureData.extra.splice(index, 1)
-      
+      this.n--;
+      let tempN = this.n;
+      for(var i=this.signatureData.extra.length-1; tempN >1; i--){
+        tempN--; 
+        this.signatureData.extra[i].header = this.$t('audit.auditStatus.sign')+tempN;
+      }
     }
 
   }

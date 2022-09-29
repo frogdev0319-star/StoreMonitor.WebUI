@@ -1557,6 +1557,9 @@ export default {
 
 
   .users
+    .el-checkbox__input.is-indeterminate .el-checkbox__inner
+      background-color: #2c90d9 !important
+      border-color: #2c90d9 !important
     .el-checkbox__input.is-checked .el-checkbox__inner
       background: #2c90d9 !important
       border-color: #2c90d9 !important
