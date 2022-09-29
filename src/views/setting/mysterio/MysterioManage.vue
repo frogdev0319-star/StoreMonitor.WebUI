@@ -296,6 +296,7 @@ export default {
         },
         getMysterioList(getAll=false){
             const self = this;
+            self.inputSearchValue="";
             self.isLoadingData = true;
             const params={
               filter:{
@@ -326,8 +327,8 @@ export default {
                 if(getAll) {
                   this.selectedUserList =[];
                   this.allTableData = [];
-                  this.allTableData = mysterioData;
-                  this.selectedUserList = mysterioData;
+                  this.allTableData = mysterioData.slice();
+                  this.selectedUserList = mysterioData.slice();
                 }
                 else{
                   this.tableData = [];
@@ -382,14 +383,17 @@ export default {
           const self= this;
           mysteroRESTful.removeMysterioPerson({userId:this.delUserId}).then(res=>{
             if(res.errCode==0){
-              let delIdx = self.allTableData.findIndex(user=>user.userId==this.delUserId);
+              var tempAll = self.allTableData.slice();
+              let delIdx = tempAll.findIndex(user=>user.userId==this.delUserId);
+              console.log("delIdx:",delIdx);
               console.log("1.self.allTableData:",self.allTableData);
-              self.allTableData.splice(delIdx,1);
-              console.log("2.self.allTableData:",self.allTableData);
-              self.selectedUserList = self.allTableData.slice(0,self.allTableData.length);
+              tempAll.splice(delIdx,1);
+              console.log("2.tempAll:",tempAll);
+              self.allTableData = tempAll.slice();
+              self.selectedUserList = tempAll.slice();
               console.log("selectedUserList:",self.selectedUserList);
               //self.getMysterioList(true);
-              self.getMysterioList();
+              this.getMysterioList();
             }else{
               util.notify(self.$t('mysterio.delMysterioMemberFail'), 'error', 3000);
             }
@@ -440,6 +444,7 @@ export default {
         getAddUserList(){
           this.userList = [];
           var tempUserList = [];
+          this.userTableData = [];
           this.allUserList.map(user=>{
             var tempU = this.selectedUserList.find(temp=>temp.userId == user.userId);
             if(typeof tempU=='undefined'){
