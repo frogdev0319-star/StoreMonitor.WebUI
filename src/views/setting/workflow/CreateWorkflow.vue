@@ -25,9 +25,11 @@
                       :placeholder="workflowDetail.name"
                       v-model="workflowDetail.name"
                       style="width: 250px"
-                      maxlength="50"
+                      @input="(val) => itemInputChanged(val, 50)"
                       />
+                      <span class="text_limit_notice" v-if="showInputLimit"> 最多可輸入 50 個字元  </span>
                   </div>
+                  
                 </div>
 
                 <!-- 分類流程 -->
@@ -50,7 +52,7 @@
                 </div>
 
                 <!-- 簽核模式 -->
-                <div class="flex-row" style="margin-right: 30px">
+                <div class="flex-row" style="margin-right: 30px;">
                   <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.signoffMode')}}</div>
                       <el-radio-group class="storevue-radio" v-model="workflowDetail.cancelable" >
                         <div class="flex-row" style="margin-right: 30px">
@@ -100,7 +102,7 @@
 
               <!-- row -->
               <!-- 流程描述 -->
-              <div class="setting-config">
+              <div class="setting-config" style="margin-bottom: 20px;">
                 <div class="title-name">{{$t('audit.workFlows.workFlowDescription')}}</div>
                 <div class="title-status"> 
                   <el-input
@@ -110,9 +112,9 @@
                     class="storevue-textarea"
                     type="textarea"
                     resize="none"
-                    maxlength="600"
-                    show-word-limit
+                    @input="(val) => itemTextAreaChanged(val, 600)"
                   />
+                  <span class="text_limit_notice" v-if="showTextAreaLimit"> 最多可輸入 600 個字元  </span>
                 </div>
               </div>
             </template>
@@ -321,6 +323,8 @@ import TableOnly from '@/components/TableOnly';
 import DialogPop from '@/components/DialogPop';
 import InputLimit from '@/components/InputLimit';
 import util from "@/common/util";
+import filterString from '@/common/filterString.js';
+
 export default {
   name: 'WorkflowDetail',
   components: {
@@ -476,6 +480,9 @@ export default {
               1,
           ]
       },
+      showInputLimit: false,
+      showTextAreaLimit: false,
+      noInput: false
     };
   },
 
@@ -811,6 +818,31 @@ export default {
         this.isLoadingData = false;
         console.log('error' + err);
       });
+    },
+
+
+    itemInputChanged(val, n){
+      const content = filterString.all(val, n);
+      this.workflowDetail.name = content
+
+      const length = filterString.getContentLength(val);
+      if(length > n) {
+        this.showInputLimit = true
+      } else {
+        this.showInputLimit = false
+      }
+    },
+
+    itemTextAreaChanged(val, n){
+      const content = filterString.all(val, n);
+      this.workflowDetail.description = content
+
+      const length = filterString.getContentLength(val);
+      if(length > n) {
+        this.showTextAreaLimit = true
+      } else {
+        this.showTextAreaLimit = false
+      }
     },
 
 

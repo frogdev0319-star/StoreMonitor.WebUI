@@ -29,9 +29,9 @@
                     v-model="nodeData.name"
                     :placeholder="$t('audit.workFlows.inputNodeName')"
                     class="input-name"
-                    maxlength="20"
-                    show-word-limit
+                    @input="(val) => itemInputChanged(val, 20)"
                     />
+                    <span class="text_limit_notice" style="position: absolute;" v-if="showInputLimit"> 最多可輸入 20 個字元  </span>
                 </div>
 
                 <el-radio-group class="select_audit storevue-radio" v-model="nodeData.auditTargetType">
@@ -116,10 +116,11 @@
                           :validate-event ="false"
                           v-model="defineAgree"
                           class="input-name"
-                          maxlength="8"
-                          show-word-limit
+                          @input="(val) => itemDefineChanged_a(val, 8)"
                           />
+                          
                       </el-radio-group>
+                      <span class="text_limit_notice" style="position: initial;" v-if="showDefineLimit_a"> 最多可輸入 8 個字元  </span>
                     </div>
                     <!-- 定義拒絕 -->
                     <div class="approve_row">
@@ -132,10 +133,11 @@
                           :validate-event="false"
                           v-model="defineReject"
                           class="input-name"
-                          maxlength="8"
-                          show-word-limit
+                          @input="(val) => itemDefineChanged_b(val, 8)"
                           />
                       </el-radio-group>
+                      <span class="text_limit_notice" style="position: initial;" v-if="showDefineLimit_b"> 最多可輸入 8 個字元  </span>
+
                     </div>
 
                     <!-- 定義撤回 -->
@@ -149,11 +151,12 @@
                           :validate-event="false"
                           v-model="defineDrawback"
                           class="input-name"
-                          maxlength="8"
-                          show-word-limit/>
+                          @input="(val) => itemDefineChanged_c(val, 8)"
+                          />
                       </el-radio-group>
+                      <span class="text_limit_notice" style="position: initial;" v-if="showDefineLimit_c"> 最多可輸入 8 個字元  </span>
                     </div>
-                
+                    
                 </div>
               </div>
 
@@ -323,7 +326,7 @@ import {
   } from '@/api/login';
 import TableOnly from '@/components/TableOnly';
 import DialogPop from '@/components/DialogPop';
-
+import filterString from '@/common/filterString.js';
 import util from "@/common/util";
 export default {
   name: 'WorkflowDetail',
@@ -402,7 +405,11 @@ export default {
       defineReject: '',
       defineDrawback: '',
 
-      auditMembers: {}
+      auditMembers: {},
+      showInputLimit: false,
+      showDefineLimit_a: false,
+      showDefineLimit_b: false,
+      showDefineLimit_c: false
     };
   },
   watch:{ 
@@ -577,6 +584,52 @@ export default {
       console.log('this.departmentStatus :>> ', this.departmentStatus);
 
     },
+
+    itemInputChanged(val, n){
+      const content = filterString.all(val, n);
+      this.nodeData.name = content
+
+      const length = filterString.getContentLength(val);
+      if(length > n) {
+        this.showInputLimit = true
+      } else {
+        this.showInputLimit = false
+      }
+    },
+
+    itemDefineChanged_a(val, n){
+      const content = filterString.all(val, n);
+      this.defineAgree = content
+      const length = filterString.getContentLength(val);
+      if(length > n) {
+        this.showDefineLimit_a = true
+      } else {
+        this.showDefineLimit_a = false
+      }
+    },
+    itemDefineChanged_b(val, n){
+      const content = filterString.all(val, n);
+      this.defineReject = content
+      const length = filterString.getContentLength(val);
+      if(length > n) {
+        this.showDefineLimit_b = true
+      } else {
+        this.showDefineLimit_b = false
+      }
+    },
+    itemDefineChanged_c(val, n){
+      const content = filterString.all(val, n);
+      this.defineDrawback = content
+      const length = filterString.getContentLength(val);
+      if(length > n) {
+        this.showDefineLimit_c = true
+      } else {
+        this.showDefineLimit_c = false
+      }
+    },
+
+
+
 
     //======================================
     filterInputSearchUser(users){

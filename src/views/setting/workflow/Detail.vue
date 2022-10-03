@@ -27,9 +27,9 @@
                       class="ppip"
                       style="width: 250px"
                       :disabled="noInput"
-                      @input="(val) => itemDescriptionChanged(val, 10)"
+                      @input="(val) => itemInputChanged(val, 50)"
                       />
-                      <span class="text_limit_notice" > 最多可輸入 10 個字元 {{textCount}} </span>
+                      <span class="text_limit_notice" v-if="showInputLimit"> 最多可輸入 50 個字元  </span>
                   </div>
 
                 </div>
@@ -104,7 +104,7 @@
 
               <!-- row -->
               <!-- 流程描述 -->
-              <div class="setting-config">
+              <div class="setting-config" style="margin-bottom: 20px;">
                 <div class="title-name">{{$t('audit.workFlows.workFlowDescription')}}</div>
                 <div class="title-status"> 
                   <el-input
@@ -114,9 +114,9 @@
                     class="storevue-textarea"
                     type="textarea"
                     resize="none"
-                    maxlength="600"
-                    show-word-limit
+                    @input="(val) => itemTextAreaChanged(val, 600)"
                   />
+                  <span class="text_limit_notice" v-if="showTextAreaLimit"> 最多可輸入 600 個字元  </span>
                 </div>
               </div>
             </template>
@@ -484,8 +484,8 @@ export default {
               1,
           ]
       },
-      showTextLimit: false,
-      textCount: 0,
+      showInputLimit: false,
+      showTextAreaLimit: false,
       noInput: false
     };
   },
@@ -867,28 +867,30 @@ export default {
       });
     },
 
-    itemDescriptionChanged(val, n){
-      // console.log('val :>> ', val);
-      // console.log('n :>> ', n);
-      // console.log('val.length :>> ', val.length);
-      
-      // const content = filterString.all(val, 200);
-      // console.log('content :>> ', content);
-
-      console.log('workflowName :>> ', this.$refs.workflowName.value.length);
-
-      // this.$refs.workflowName.maxLength = 10
-
+    itemInputChanged(val, n){
+      const content = filterString.all(val, n);
+      this.workflowDetail.name = content
 
       const length = filterString.getContentLength(val);
-      if(length >= n) {
-        this.showTextLimit = true
+      if(length > n) {
+        this.showInputLimit = true
       } else {
-        this.showTextLimit = false
+        this.showInputLimit = false
       }
-      this.textCount = length
-
     },
+
+    itemTextAreaChanged(val, n){
+      const content = filterString.all(val, n);
+      this.workflowDetail.description = content
+
+      const length = filterString.getContentLength(val);
+      if(length > n) {
+        this.showTextAreaLimit = true
+      } else {
+        this.showTextAreaLimit = false
+      }
+    },
+
 
     //======================================
     filterInputSearchUser(users){
@@ -1616,7 +1618,7 @@ export default {
   
   .text_limit_notice
     position: absolute
-    text-align: left
+    text-align: right
     margin-left: 5px
     font-size: 10px
     margin-top: 2px

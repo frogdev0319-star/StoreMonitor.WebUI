@@ -176,9 +176,9 @@
                 v-model="item.header"
                 ref="workflowName"
                 style="width: 250px;  margin: 0 20px ;"
-                maxlength="20"
-                show-word-limit
+                @input="(val) => itemInputChanged({ val, item })"
                 />
+                
               <el-radio-group class="storevue-radio" v-model="item.optional" >
                 <el-radio :label="true">{{$t('insSettingView.mustSignature')}}</el-radio> 
                 <el-radio :label="false" v-if="index !== 0">{{$t('insSettingView.uncertainSignature')}}</el-radio> 
@@ -194,7 +194,11 @@
                   @click="deleteSign(index)"
               />
               </div>
+              
             </div>
+            <span class="text_limit_sign"  v-if="showInputLimit"> 最多可輸入 20 個字元  </span>
+
+
           </div>
           
         </div>
@@ -347,6 +351,7 @@ import util from '@/common/util';
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
 import ValidateInput from '@/components/ValidateInput';
+import filterString from '@/common/filterString.js';
 
 export default {
   name: 'SetRuleInspect',
@@ -394,7 +399,8 @@ export default {
               }
           ]
         },
-      n : 1
+      n : 1,
+      showInputLimit: false
     };
   },
   watch: {
@@ -772,7 +778,19 @@ export default {
         tempN--; 
         this.signatureData.extra[i].header = this.$t('audit.auditStatus.sign')+tempN;
       }
-    }
+    },
+
+    itemInputChanged({ val, item }){
+      const content = filterString.all(val, 20);
+      item.header = content
+
+      const length = filterString.getContentLength(val);
+      if(length > 20) {
+        this.showInputLimit = true
+      } else {
+        this.showInputLimit = false
+      }
+    },
 
   }
 };
@@ -841,7 +859,17 @@ $itemHeight:50px;
   }
 }
 
+.text_limit_sign{
+  position: relative;
+  text-align: left;
+  line-height: 20px;
+  margin-left: 5px;
+  font-size: 10px;
+  margin-top: 2px;
+  color: #ff2400;
+  display: block;
 
+}
 
 .el-setRule{
     width: 100%;

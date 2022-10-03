@@ -3544,11 +3544,11 @@ export default {
       this.feedbackInput = ''
     },
     itemDescriptionChanged({ val, item }) {
-      const content = filterString.all(val, 200);
+      const content = filterString.all(val, 10);
       item.inspectInput = content;
       const length = filterString.getContentLength(val);
       if (item.RuleCountTip) item.RuleCountTip = false;
-      if (length > 200) {
+      if (length > 10) {
         item.Ruletip = true;
       } else {
         item.Ruletip = false;
