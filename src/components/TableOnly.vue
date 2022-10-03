@@ -355,7 +355,7 @@ export default {
     },
     showBorder: {
       type: Boolean,
-      default: true
+      default: false
     },
     showSelectionColumn: {
       type: Boolean,
