@@ -723,7 +723,7 @@
                     }}</span>
                     <span v-if="item.Ruletip" class="rules">{{
                       $t("remotePatrol.comentRuletip")
-                    }}</span>
+                    }} </span>
                   </div>
                 </div>
               </div>

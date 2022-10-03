@@ -24,10 +24,14 @@
                       ref="workflowName"
                       :placeholder="workflowDetail.name"
                       v-model="workflowDetail.name"
+                      class="ppip"
                       style="width: 250px"
-                      maxlength="50"
+                      :disabled="noInput"
+                      @input="(val) => itemDescriptionChanged(val, 10)"
                       />
+                      <span class="text_limit_notice" > 最多可輸入 10 個字元 {{textCount}} </span>
                   </div>
+
                 </div>
 
                 <!-- 分類流程 -->
@@ -323,6 +327,8 @@ import TableOnly from '@/components/TableOnly';
 import DialogPop from '@/components/DialogPop';
 import InputLimit from '@/components/InputLimit';
 import util from "@/common/util";
+import filterString from '@/common/filterString.js';
+
 import { Breadcrumb } from 'element-ui';
 export default {
   name: 'WorkflowDetail',
@@ -478,6 +484,9 @@ export default {
               1,
           ]
       },
+      showTextLimit: false,
+      textCount: 0,
+      noInput: false
     };
   },
 
@@ -562,8 +571,6 @@ export default {
 
     // create
     getNodeData(){
-      
-
       const aaa = sessionStorage.getItem('workflowDetail')
       this.workflowDetail = JSON.parse(aaa)
 
@@ -860,6 +867,28 @@ export default {
       });
     },
 
+    itemDescriptionChanged(val, n){
+      // console.log('val :>> ', val);
+      // console.log('n :>> ', n);
+      // console.log('val.length :>> ', val.length);
+      
+      // const content = filterString.all(val, 200);
+      // console.log('content :>> ', content);
+
+      console.log('workflowName :>> ', this.$refs.workflowName.value.length);
+
+      // this.$refs.workflowName.maxLength = 10
+
+
+      const length = filterString.getContentLength(val);
+      if(length >= n) {
+        this.showTextLimit = true
+      } else {
+        this.showTextLimit = false
+      }
+      this.textCount = length
+
+    },
 
     //======================================
     filterInputSearchUser(users){
@@ -1584,4 +1613,13 @@ export default {
   .title-status
     .el-input__count-inner
       margin-top: 55px
+  
+  .text_limit_notice
+    position: absolute
+    text-align: left
+    margin-left: 5px
+    font-size: 10px
+    margin-top: 2px
+    color: #ff2400
+    display: block
 </style>
