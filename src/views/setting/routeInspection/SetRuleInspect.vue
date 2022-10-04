@@ -772,12 +772,12 @@ export default {
     deleteSign(index){
       console.log('index :>> ', index);
       this.signatureData.extra.splice(index, 1)
-      this.n--;
-      let tempN = this.n;
-      for(var i=this.signatureData.extra.length-1; tempN >1; i--){
-        tempN--; 
-        this.signatureData.extra[i].header = this.$t('audit.auditStatus.sign')+tempN;
-      }
+      // this.n--;
+      // let tempN = this.n;
+      // for(var i=this.signatureData.extra.length-1; tempN >1; i--){
+      //   tempN--; 
+      //   this.signatureData.extra[i].header = this.$t('audit.auditStatus.sign')+tempN;
+      // }
     },
 
     itemInputChanged({ val, item }){
