@@ -960,14 +960,14 @@ export default {
                   routeData = {
                       isSuccess: true,
                       user: data.notifiedTo,
-                      isBindWorkflow:!!PermissionHelper.enableSendAudit()
+                      isBindWorkflow:!!PermissionHelper.enableSendAudit() || !!PermissionHelper.enableMimicMode
                   };
                 }else{
                   util.notify(wfRes.errMsg, 'error', 3000);
                   routeData = {
                     isSuccess: false,
                     reLoadData: self.$route.params,
-                    isBindWorkflow:!!PermissionHelper.enableSendAudit()
+                    isBindWorkflow:!!PermissionHelper.enableSendAudit() || !!PermissionHelper.enableMimicMode
                   };
                 }
                 
