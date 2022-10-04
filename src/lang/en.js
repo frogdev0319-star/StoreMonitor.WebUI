@@ -40,6 +40,7 @@ export default{
         "networkError":"Network error, please check network connection status!",
         "noAuthority":"No authority!",
         "noInspectionAccessRights":"No Inspection Access Rights",
+        "noRight":"No Inspection Access Rights",
         "operPerm":"No operation permission",
         "otherSetting":"Other Settings",
         "overview":"Overview",

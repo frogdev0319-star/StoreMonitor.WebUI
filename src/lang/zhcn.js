@@ -40,6 +40,7 @@ export default{
       "networkError":"网络异常，请检查网络连接状况！",
       "noAuthority":"无操作权限！",
       "noInspectionAccessRights":"无巡检访问权限",
+      "noRight":"无巡检访问权限",
       "operPerm":"无操作权限",
       "otherSetting":"其他设置",
       "overview":"总览",

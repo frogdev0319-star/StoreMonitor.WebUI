@@ -40,6 +40,7 @@ export default{
       "networkError":"Lỗi mạng, vui lòng kiểm tra trạng thái kết nối mạng!",
       "noAuthority":"Không có ủy quyền!",
       "noInspectionAccessRights":"Không có quyền truy cập kiểm tra",
+      "noRight":"Không có quyền truy cập kiểm tra",
       "operPerm":"Không được phép hoạt động",
       "otherSetting":"Các cài đặt khác",
       "overview":"Tổng Quan",

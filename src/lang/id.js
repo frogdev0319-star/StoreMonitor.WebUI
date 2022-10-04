@@ -40,6 +40,7 @@ export default{
       "networkError":"Kesalahan jaringan, periksa status koneksi jaringan!",
       "noAuthority":"Tidak ada otorisasi!",
       "noInspectionAccessRights":"Tidak Ada Hak Akses Inspeksi",
+      "noRight":"Tidak Ada Hak Akses Inspeksi",
       "operPerm":"Tidak ada izin operasi",
       "otherSetting":"Pengaturan Lainnya",
       "overview":"Ikhtisar",

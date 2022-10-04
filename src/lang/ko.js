@@ -40,6 +40,7 @@ export default{
       "networkError":"네트워크 오류입니다. 네트워크 연결 상태를 확인하십시오!",
       "noAuthority":"권한이 없습니다!",
       "noInspectionAccessRights":"검사 액세스 권한이 없음",
+      "noRight":"검사 액세스 권한이 없음",
       "operPerm":"작업 권한이 없음",
       "otherSetting":"기타 설치",
       "overview":"개요",

@@ -40,6 +40,7 @@ export default{
       "networkError":"ネットワークエラー、ネットワーク接続状態を確認してください！",
       "noAuthority":"権限がありません！",
       "noInspectionAccessRights":"検査アクセス権なし",
+      "noRight":"検査アクセス権なし",
       "operPerm":"操作許可なし",
       "otherSetting":"その他の設定",
       "overview":"概要",

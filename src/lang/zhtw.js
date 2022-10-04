@@ -40,6 +40,7 @@ export default{
       "networkError":"網路異常，請檢查網路連接狀況！",
       "noAuthority":"無操作權限！",
       "noInspectionAccessRights":"無巡檢訪問權限",
+      "noRight":"無巡檢訪問權限",
       "operPerm":"無操作權限",
       "otherSetting":"其他設置",
       "overview":"總覽",
