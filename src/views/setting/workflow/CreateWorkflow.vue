@@ -27,7 +27,7 @@
                       style="width: 250px"
                       @input="(val) => itemInputChanged(val, 50)"
                       />
-                      <span class="text_limit_notice" v-if="showInputLimit"> 最多可輸入 50 個字元  </span>
+                      <span class="text_limit_notice" v-if="showInputLimit"> {{$t('remotePatrol.eventNameRuletip')}}   </span>
                   </div>
                   
                 </div>
@@ -114,7 +114,7 @@
                     resize="none"
                     @input="(val) => itemTextAreaChanged(val, 600)"
                   />
-                  <span class="text_limit_notice" v-if="showTextAreaLimit"> 最多可輸入 600 個字元  </span>
+                  <span class="text_limit_notice" v-if="showTextAreaLimit"> {{$t('remotePatrol.comentRuletip_suggest')}} </span>
                 </div>
               </div>
             </template>

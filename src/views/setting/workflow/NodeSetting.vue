@@ -120,7 +120,7 @@
                           />
                           
                       </el-radio-group>
-                      <span class="text_limit_notice" style="position: initial;" v-if="showDefineLimit_a"> 最多可輸入 8 個字元  </span>
+                      <span class="text_limit_notice" style="position: initial;" v-if="showDefineLimit_a"> {{$t('insSettingView.btnAttrLength')}} </span>
                     </div>
                     <!-- 定義拒絕 -->
                     <div class="approve_row">
@@ -136,7 +136,7 @@
                           @input="(val) => itemDefineChanged_b(val, 8)"
                           />
                       </el-radio-group>
-                      <span class="text_limit_notice" style="position: initial;" v-if="showDefineLimit_b"> 最多可輸入 8 個字元  </span>
+                      <span class="text_limit_notice" style="position: initial;" v-if="showDefineLimit_b"> {{$t('insSettingView.btnAttrLength')}} </span>
 
                     </div>
 
@@ -154,7 +154,7 @@
                           @input="(val) => itemDefineChanged_c(val, 8)"
                           />
                       </el-radio-group>
-                      <span class="text_limit_notice" style="position: initial;" v-if="showDefineLimit_c"> 最多可輸入 8 個字元  </span>
+                      <span class="text_limit_notice" style="position: initial;" v-if="showDefineLimit_c"> {{$t('insSettingView.btnAttrLength')}} </span>
                     </div>
                     
                 </div>

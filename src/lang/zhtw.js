@@ -691,6 +691,9 @@ export default{
       "mustSignature":"必簽",
       "uncertainSignature":"非必簽",
       "inputData":"請輸入負責人",
+
+      "inputRuletip":"最多可輸入20個字元",
+
       "bindWorkflow":"選擇綁定流程",
       "select":"請選擇",
       "no":"無",

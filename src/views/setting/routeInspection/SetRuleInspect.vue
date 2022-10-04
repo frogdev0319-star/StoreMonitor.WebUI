@@ -196,7 +196,7 @@
               </div>
               
             </div>
-            <span class="text_limit_sign"  v-if="showInputLimit"> 最多可輸入 20 個字元  </span>
+            <span class="text_limit_sign"  v-if="showInputLimit"> {{$t('insSettingView.inputRuletip')}}  </span>
 
 
           </div>
