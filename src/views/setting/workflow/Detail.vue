@@ -5,7 +5,7 @@
       {{$t('audit.workFlows.workFlowConfiguration')}}
       <div class="spacer"></div>
       <div class="buttons">
-        <delay-button type="filled" @click="submitWorkFlow"> {{$t('audit.workFlows.save')}}</delay-button>
+        <delay-button type="filled" @click="submitWorkFlow">  {{$t('audit.workFlows.saveAndEnable')}}</delay-button>
       </div>
     </div>
     <!-- 基本信息 -->
@@ -88,10 +88,10 @@
                               <div class="tip">
                                 {{$t('audit.workFlows.canCancel')}}
                                 <ul>
-                                    <li> {{$t('audit.workFlows.tooltipListcant1')}}</li>
-                                    <li> {{$t('audit.workFlows.tooltipListcant2')}}</li>
-                                    <li> {{$t('audit.workFlows.tooltipListcant3')}}</li>
-                                    <li> {{$t('audit.workFlows.tooltipListcant4')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcan1')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcan2')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcan3')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcan4')}}</li>
                                 </ul>
                               </div>
                             </div>
@@ -1138,6 +1138,7 @@ export default {
 
       if(repeatResult == true){
         this.fullscreenLoading = false
+        this.isLoadingData = false
         util.notify(this.$t('audit.workFlows.cantRepeatWorkflowName'), 'error', 2000 );
         this.$refs.workflowName.focus()
         return

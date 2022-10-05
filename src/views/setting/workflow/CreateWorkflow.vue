@@ -5,7 +5,7 @@
       {{$t('audit.workFlows.workFlowConfiguration')}}
       <div class="spacer"></div>
       <div class="buttons">
-        <delay-button type="filled" @click="addNewFlow">  {{$t('audit.workFlows.saveAndEnable')}}</delay-button>
+        <delay-button type="filled" @click="addNewFlow"> {{$t('audit.workFlows.saveAndEnable')}}</delay-button>
       </div>
     </div>
     <!-- 基本信息 -->
@@ -86,10 +86,10 @@
                               <div class="tip">
                                 {{$t('audit.workFlows.canCancel')}}
                                 <ul>
-                                    <li> {{$t('audit.workFlows.tooltipListcant1')}}</li>
-                                    <li> {{$t('audit.workFlows.tooltipListcant2')}}</li>
-                                    <li> {{$t('audit.workFlows.tooltipListcant3')}}</li>
-                                    <li> {{$t('audit.workFlows.tooltipListcant4')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcan1')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcan2')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcan3')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcan4')}}</li>
                                 </ul>
                               </div>
                             </div>
@@ -314,10 +314,11 @@ import {
   updateWorkflow,   
   getWorkflowList, 
   creadNewFlow,
-  getUserStatus
+  getUserStatus,
+  
   } from "@/api/workflow";
 import {getUserTitleList } from "@/api/title";
-import {getUserInfo} from '@/api/login';
+import {getUserInfo, getAllUserInfoNoAuth, getDepartAll} from '@/api/login';
 
 import TableOnly from '@/components/TableOnly';
 import DialogPop from '@/components/DialogPop';
@@ -676,7 +677,7 @@ export default {
 
     // get user
     async getUserInfo(){
-      await getUserInfo().then(res=>{
+      await getAllUserInfoNoAuth().then(res=>{
         this.userInfo = res.data
         this.userData = this.userInfo
         // console.log('this.userInfo ------>> ', this.userInfo);
@@ -700,7 +701,7 @@ export default {
     },
     // get getDepart
     async getDepartmentList(){
-      await getUserStatus({ type: 0 }).then(res=>{
+      await getDepartAll({ type: 0 }).then(res=>{
         this.department = res.data
         // console.log('this.department 4 ------>> ', this.department);
         this.departmentAry = this.department.map( i => (
