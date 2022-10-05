@@ -370,7 +370,10 @@ const user = {
           const statisticsRoute = navbarRoute.getStatisticalRoute();
           if(statisticsRoute.children.length > 0 && !PermissionHelper.enableMimicMode) accessedRoutes.push(statisticsRoute);
 
+          console.log("PermissionHelper.enableMimicMode:",PermissionHelper.enableMimicMode);
+          console.log("PermissionHelper.enableWaitAudit():",PermissionHelper.enableWaitAudit());
           const auditRoute = navbarRoute.getAuditRoute();
+          console.log("auditRoute:",auditRoute);
           auditRoute.children.length >0 ? accessedRoutes.push(auditRoute):'';
 
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();
