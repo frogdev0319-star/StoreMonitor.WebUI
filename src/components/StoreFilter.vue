@@ -646,7 +646,7 @@ export default {
     onChangeStoreGroup(val) {
       //console.log("onChangeStoreGroup:",val);
       this.curStoreGroup = val;
-      if(val.length == 0){
+      if(val.length == 0 && this.curStoreType.length === 0){
         const filterStoreId = [];
         let filterStoreStr="";
         let temp=[];
@@ -690,7 +690,7 @@ export default {
 
     onChangeStoreType(val) {
       this.curStoreType = val;
-      if(val.length == 0){
+      if(val.length == 0 && this.curStoreGroup.length === 0){
         const filterStoreId = [];
         let filterStoreStr="";
         let temp=[];
@@ -813,6 +813,7 @@ export default {
         }
         this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
         this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
+        this.curSelectedStore = (this.storeDataList.some( st => st.storeId == this.curSelectedStore))?this.curSelectedStore:"";
       } else {
         this.formatGroupAndType();
         const groupIdArray = this.storeGroupList.filter(groupItem => this.curStoreGroup.find(groupId => groupId === groupItem.value));
@@ -877,6 +878,7 @@ export default {
         }
         console.log("2.curStore:",this.curStore);
         this.storeStr = (filterStoreId.length==0)?allfilterStoreStr.substr(0, filterStoreStr.length - 1) :filterStoreStr.substr(0, filterStoreStr.length - 1);
+        this.curSelectedStore = (this.storeDataList.some( st => st.storeId == this.curSelectedStore))?this.curSelectedStore:"";
       }
         
 
