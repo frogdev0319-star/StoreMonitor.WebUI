@@ -644,6 +644,7 @@ export default{
       "enterListNameRuletip":"最多可輸入250個字元",
       "enterName":"輸入巡檢類別名稱",
       "enterNameRuletip":"最多可輸入50個字元",
+      "inputRuletip":"最多可輸入20個字元",
       "enterScore":"請輸入分值",
       "enterSelfListName":"請輸入自訂巡檢表名稱！",
       "evaluationType":"參與評分",
@@ -691,9 +692,6 @@ export default{
       "mustSignature":"必簽",
       "uncertainSignature":"非必簽",
       "inputData":"請輸入負責人",
-
-      "inputRuletip":"最多可輸入20個字元",
-
       "bindWorkflow":"選擇綁定流程",
       "select":"請選擇",
       "no":"無",

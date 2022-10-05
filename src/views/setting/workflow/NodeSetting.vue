@@ -1132,6 +1132,15 @@ export default {
   .title-status
     .el-input__count-inner
       margin-top: 55px
+      
+  .text_limit_notice
+    position: absolute
+    text-align: right
+    margin-left: 5px
+    font-size: 10px
+    margin-top: 2px
+    color: #ff2400
+    display: block
 </style>
 
 
