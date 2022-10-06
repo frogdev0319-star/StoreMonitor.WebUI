@@ -530,6 +530,7 @@ export default{
       "ReturnEvent":"Kejadian Ditolak",
       "Returned":"Dikembalikan",
       "addDetails":"Tambah Rincian Penanganan",
+      "addAttchement":"Tambahkan lampiran",
       "adding":"Tambah",
       "all":"Semua",
       "allEvents":"Semua Kejadian",

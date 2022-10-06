@@ -530,6 +530,7 @@ export default{
       "ReturnEvent":"เหตุการณ์ที่ปฏิเสธ",
       "Returned":"ส่งคืนแล้ว",
       "addDetails":"เพิ่มรายละเอียดการจัดการ",
+      "addAttchement":"เพิ่มไฟล์แนบ",
       "adding":"เพิ่ม",
       "all":"ทั้งหมด",
       "allEvents":"เหตุการณ์ทั้งหมด",

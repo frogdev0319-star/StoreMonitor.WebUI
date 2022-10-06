@@ -530,6 +530,7 @@ export default{
       "ReturnEvent":"退回事件",
       "Returned":"已退回",
       "addDetails":"添加處理資訊",
+      "addAttchement":"添加附件",
       "adding":"追加",
       "all":"全部",
       "allEvents":"全部事件",

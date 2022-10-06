@@ -530,6 +530,7 @@ export default{
         "ReturnEvent":"Rejected Events",
         "Returned":"Returned",
         "addDetails":"Add Handling Details",
+        "addAttchement":"Add Attachment",
         "adding":"Add",
         "all":"All",
         "allEvents":"All Events",

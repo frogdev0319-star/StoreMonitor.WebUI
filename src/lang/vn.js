@@ -530,6 +530,7 @@ export default{
       "ReturnEvent":"Các sự kiện đã hủy",
       "Returned":"Đã hoàn lại",
       "addDetails":"Thêm các chi tiết xử lý",
+      "addAttchement":"Thêm tập tin đính kèm",
       "adding":"Thêm",
       "all":"Tất cả",
       "allEvents":"Tất cả sự kiện",

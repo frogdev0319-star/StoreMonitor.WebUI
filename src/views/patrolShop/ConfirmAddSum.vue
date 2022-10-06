@@ -845,7 +845,7 @@ export default {
             }).catch((err) => {
               upload++;
             });
-            if (upload !== 0) {imgFileList
+            if (upload !== 0) {
               self.uploadProgress = false;
               util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
               return false;

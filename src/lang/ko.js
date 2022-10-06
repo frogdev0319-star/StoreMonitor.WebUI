@@ -530,6 +530,7 @@ export default{
       "ReturnEvent":"거절한 이벤트",
       "Returned":"거절",
       "addDetails":"처리 세부 추가",
+      "addAttchement":"첨부 파일 추가",
       "adding":"추가",
       "all":"전부",
       "allEvents":"모든 이벤트",

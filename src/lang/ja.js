@@ -530,6 +530,7 @@ export default{
       "ReturnEvent":"拒否されたイベント",
       "Returned":"拒否する",
       "addDetails":"処理の詳細を追加します",
+      "addAttchement":"添付ファイルの追加",
       "adding":"追加",
       "all":"オール",
       "allEvents":"すべてのイベント",
