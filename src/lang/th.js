@@ -1413,7 +1413,10 @@ export default{
         "tooltipListcan3":"สามารถแก้ไขรายการที่ไม่ผ่าน รายการที่ผ่าน และรายการที่ละเว้นเมื่อแก้ไขรายงานการตรวจสอบใหม่",
         "tooltipListcan4":"สามารถดูรายงานการตรวจสอบเฉพาะหลังจากการลงนามผ่านแล้วเท่านั้น",
         "auditFlow":"กระบวนการลงนาม",
-        "nodeOrder":"หมายเลขซีเรียลโหนด"
+        "nodeOrder":"หมายเลขซีเรียลโหนด",
+
+        "cantEmptyDays" : "The number of days to stay cannot be empty. ",
+        "cantTooMuchDays" : "The length of stay cannot exceed 365 days. "
     },
     "inceptionRpt":{
         "sendAudit":"ส่งการลงนาม",

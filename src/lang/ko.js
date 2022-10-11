@@ -1414,7 +1414,10 @@ export default{
         "tooltipListcan3":"검사 보고서 재편집 시 부적격 항목, 적격 항목, 무시 항목 편집 가능",
         "tooltipListcan4":"검사 보고서는 최종 서명이 완료된 후에만 볼 수 있습니다",
         "auditFlow":"최종 서명 프로세스",
-        "nodeOrder":"노드 일련 번호"
+        "nodeOrder":"노드 일련 번호",
+
+        "cantEmptyDays" : "The number of days to stay cannot be empty. ",
+        "cantTooMuchDays" : "The length of stay cannot exceed 365 days. "
     },
     "inceptionRpt":{
         "sendAudit":"최종 서명 제출",
