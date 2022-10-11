@@ -62,11 +62,16 @@
                 class="storevue-textarea"
                 type="textarea"
                 resize="none"
-                maxlength="600"
-                show-word-limit
+                @input="(val) => itemInputChanged(val, 600)"
+
               />
+              <span class="text_limit_notice" v-if="showInputLimit"> {{$t('remotePatrol.comentRuletip_suggest')}}  </span>
             </div>
           </div>
+
+
+
+
 
           <!-- 加入檔案 & 簽名 -->
           <div class="audit-add-files">
@@ -198,7 +203,7 @@ import DelayButton from '@/components/DelayButton';
 import util from '@/common/util';
 import { getUserInfo } from '@/api/login';
 import DialogPop from '@/components/DialogPop';
-
+import filterString from '@/common/filterString.js';
 import AuditUnit from '@/components/AuditUnit';
 
 
@@ -266,7 +271,8 @@ export default {
       showDoalogTaskDrawback : false,
       showDoalogTaskCancel: false,
 
-      isSystemRejectDialog : false
+      isSystemRejectDialog : false,
+      showInputLimit: false
     }
   },
   mounted() {},
@@ -458,7 +464,17 @@ export default {
       });
     },
 
-    
+    itemInputChanged(val, n){
+      const content = filterString.all(val, n);
+      this.commentsToApi.comment.description = content
+
+      const length = filterString.getContentLength(val);
+      if(length > n) {
+        this.showInputLimit = true
+      } else {
+        this.showInputLimit = false
+      }
+    },
 
     goToReportdetails(){
       var reportId = this.auditDetail.inspectReportId
@@ -978,9 +994,6 @@ export default {
           text-overflow: ellipsis
           font-size: 12px
 
-
-
-      
   #signature
     width: 500px
     height: 500px
@@ -990,7 +1003,15 @@ export default {
     // background-origin: border-box
     // background-clip: content-box, border-box
 
-    
+  .text_limit_notice
+    position: absolute
+    width: 90%
+    text-align: right
+    margin-left: 5px
+    font-size: 10px
+    margin-top: 5px
+    color: #ff2400
+    display: block
 
 
 </style>
