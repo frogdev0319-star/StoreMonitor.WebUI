@@ -1414,7 +1414,10 @@ export default{
         "tooltipListcan3":"巡检报告重新编辑时可以编辑不合格项、合格项及忽略项",
         "tooltipListcan4":"签核通过后才能检视巡检报告",
         "auditFlow":"签核流程",
-        "nodeOrder":"节点序号"
+        "nodeOrder":"节点序号",
+
+        "cantEmptyDays" : "停留天数不可为空 ",
+        "cantTooMuchDays" : "停留天数不可超过365天! "
     },
     "inceptionRpt":{
         "sendAudit":"送出签核",

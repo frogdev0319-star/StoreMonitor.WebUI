@@ -1415,7 +1415,10 @@ export default{
         "tooltipListcan3":"Unqualified items, qualified items and ignored items can be edited when re-editing the inspection report",
         "tooltipListcan4":"Inspection report can only be viewed after sign-off has passed",
         "auditFlow":"Sign-off process",
-        "nodeOrder":"Node serial number"
+        "nodeOrder":"Node serial number",
+
+        "cantEmptyDays" : "The number of days to stay cannot be empty. ",
+        "cantTooMuchDays" : "The length of stay cannot exceed 365 days. "
       },
       "inceptionRpt":{
           "sendAudit":"Submit sign-off",

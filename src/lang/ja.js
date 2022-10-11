@@ -1414,7 +1414,10 @@ export default{
         "tooltipListcan3":"検査レポートの再編集時に、不適格な項目、適格な項目、無視された項目を編集できます",
         "tooltipListcan4":"検査レポートは、承認が合格した後にのみ表示できます",
         "auditFlow":"承認プロセス",
-        "nodeOrder":"ノードの通し番号"
+        "nodeOrder":"ノードの通し番号",
+        
+        "cantEmptyDays" : "The number of days to stay cannot be empty. ",
+        "cantTooMuchDays" : "The length of stay cannot exceed 365 days. "
     },
     "inceptionRpt":{
         "sendAudit":"承認の送信",

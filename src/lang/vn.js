@@ -1414,7 +1414,10 @@ export default{
         "tooltipListcan3":"Có thể sửa các hạng mục chưa đạt yêu cầu, các hạng mục đạt yêu cầu và các hạng mục bị bỏ qua trong khi sửa lại báo cáo kiểm tra",
         "tooltipListcan4":"Chỉ có thể xem báo cáo kiểm tra sau khi đăng xuất thành công",
         "auditFlow":"Quy trình đăng xuất",
-        "nodeOrder":"Số xê-ri node"
+        "nodeOrder":"Số xê-ri node",
+
+        "cantEmptyDays" : "The number of days to stay cannot be empty. ",
+        "cantTooMuchDays" : "The length of stay cannot exceed 365 days. "
     },
     "inceptionRpt":{
         "sendAudit":"Gửi đăng xuất",

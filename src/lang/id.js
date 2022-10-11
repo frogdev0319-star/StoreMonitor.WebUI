@@ -1414,7 +1414,11 @@ export default{
         "tooltipListcan3":"Item yang tidak memenuhi syarat, item yang memenuhi syarat dan item yang diabaikan dapat diedit saat mengedit ulang laporan pemeriksaan",
         "tooltipListcan4":"Laporan pemeriksaan hanya dapat dilihat setelah penutup lolos",
         "auditFlow":"Proses penutup",
-        "nodeOrder":"Nomor seri node"
+        "nodeOrder":"Nomor seri node",
+
+        "cantEmptyDays" : "The number of days to stay cannot be empty. ",
+        "cantTooMuchDays" : "The length of stay cannot exceed 365 days. "
+
     },
     "inceptionRpt":{
         "sendAudit":"Kumpulkan penutup",
