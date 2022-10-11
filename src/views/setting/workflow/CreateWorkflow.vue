@@ -637,6 +637,9 @@ export default {
       const orinode = JSON.parse(reNewNode)
       // console.log('orinode 1 >> ', orinode);
 
+      this.ccToUSer = this.workflowDetail.copyToUsers
+
+
       if( newNode !== null ){
         orinode.push(newNode.orderedAuditNodeArray[0])
         sessionStorage.setItem('reNewNode', JSON.stringify(orinode))
@@ -656,6 +659,9 @@ export default {
 
       const data = sessionStorage.getItem('newWorkFlow')
       const newNode = JSON.parse(data)
+
+      // 取得副本通知人員
+      this.ccToUSer = this.workflowDetail.copyToUsers
       
       const reNewNode = sessionStorage.getItem('reNewNode')
       const orinode = JSON.parse(reNewNode)
@@ -733,6 +739,7 @@ export default {
           })
           }
       })
+      this.workflowDetail.copyToUsers = this.ccToUSer
       sessionStorage.setItem('workflowDetail', JSON.stringify(this.workflowDetail))
       sessionStorage.setItem('reNewNode', JSON.stringify(this.newFlatNodeDataView))
       var time = new Date()
@@ -1063,6 +1070,9 @@ export default {
     settingWorkFlow(row){
       console.log('go edit  :>> ', row);
       console.log('this.userInfo ------>> ', this.userInfo);
+      this.workflowDetail.copyToUsers = this.ccToUSer
+      sessionStorage.setItem('workflowDetail', JSON.stringify(this.workflowDetail))
+
 
       if(row.auditByUsers.length !== 0){
         var currentUser = this.userInfo.filter(u => u.userName == row.auditByUsers[0])
@@ -1148,7 +1158,6 @@ export default {
       console.log('this.newFlatNodeDataView :>> ', this.newFlatNodeDataView);
       console.log('this.workflowDetail :>> ', this.workflowDetail);
 
-      
       var repeatResult = this.allTableData.some(i=>i.name == this.workflowDetail.name)
       console.log('repeatResult~~~~ :>> ', repeatResult);
 
@@ -1167,7 +1176,6 @@ export default {
       this.newFlatNodeDataView.forEach(d =>{
         delete d.id 
         if(d.auditByUsers.length !== 0 ){
-
           var currentUser = this.userInfo.filter(u => u.userName == d.auditByUsers[0])
           console.log('currentUser :>> ', currentUser);
           d.auditByUsers = []
@@ -1205,6 +1213,7 @@ export default {
 
       if(toApiData.nextAuditNode.nextAuditNode == null) {
         this.newFlatNodeDataView.pop()
+        this.newFlatNodeDataView[0].auditByUsers.push('送出人')
         util.notify(this.$t('audit.workFlows.mustCreateOneNode'), 'error', 2000 );
         return
       } else {

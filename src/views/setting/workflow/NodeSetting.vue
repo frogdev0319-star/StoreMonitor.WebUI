@@ -187,7 +187,7 @@
               <div class="setting-config basic-config">
                 <div class="title-status">
                   <el-checkbox
-                    v-model="nodeData.notify"
+                    v-model="changeNotify"
                     class="storevue-checkbox-outlined"
                     :label="$t('audit.workFlows.alertAtOverTime')"/>
                 </div>
@@ -198,10 +198,15 @@
                 <div class="title-status">
                   {{$t('audit.workFlows.stayOver')}}
                   <el-input
+                    ref="stayOver"
                     placeholder=""
+                    type="number"
+                    max="50"
                     v-model="nodeData.unHandleNotifyDay"
                     :disabled="!nodeData.notify"
-                    class="input-name_short"/>
+                    class="input-name_short"
+                    @input="(val) => numberRange(val)"
+                    />
                   {{$t('audit.workFlows.day')}}
                 </div>
               </div>
@@ -409,10 +414,27 @@ export default {
       showInputLimit: false,
       showDefineLimit_a: false,
       showDefineLimit_b: false,
-      showDefineLimit_c: false
+      showDefineLimit_c: false,
+
+      changeNotify: false
     };
+    
   },
   watch:{ 
+
+    changeNotify(val){
+      
+      if(val == true){
+        this.nodeData.notify = true
+        if(this.nodeData.unHandleNotifyDay == null) this.nodeData.unHandleNotifyDay = 1
+
+      } else {
+        this.nodeData.notify = false
+        this.nodeData.unHandleNotifyDay = null
+      }
+    },
+
+    
     btnDefaultAgree(){
       if(this.btnDefaultAgree == 1){
         this.nodeData.customButton[0].text = this.defineAgree
@@ -429,6 +451,7 @@ export default {
   mounted() {},
   async created() {
     await this.init()
+    
   },
   computed: {
     searchUserData: {
@@ -583,6 +606,12 @@ export default {
       // this.departmentStatus = this.department[0].defineId
       console.log('this.departmentStatus :>> ', this.departmentStatus);
 
+      if(this.nodeData.notify) {
+        this.changeNotify = true
+      }else{
+        this.changeNotify = false
+      }
+
     },
 
     itemInputChanged(val, n){
@@ -723,16 +752,22 @@ export default {
 
     //======================================
 
-
-
+    numberRange(val){
+      
+      val = parseInt(Math.abs(val))
+      if(val == 0) val = ''
+      this.nodeData.unHandleNotifyDay = val
+    },
     saveNode(){
       // this.fullscreenLoading = true
 
+    
       //  節點名稱不可為空
       if(this.nodeData.name == ''){
         util.notify(this.$t('audit.workFlows.cantEmptyNodeName'), 'error', 2000 );
         return 
       }
+      
 
       // handle btn naming
       if(this.btnDefaultAgree == 1){
@@ -741,7 +776,6 @@ export default {
         this.nodeData.customButton[0].text = ''
         this.nodeData.customButton[0].text = this.$t('audit.workFlows.agree')
       }
-
       if(this.btnDefaultReject == 1){
         this.nodeData.customButton[1].text = this.defineReject
       }else{
@@ -756,8 +790,7 @@ export default {
         this.nodeData.customButton[2].text = this.$t('audit.workFlows.withdraw')
       }
 
-      
-
+    
       //自定簽核按鈕不可為空
       console.log('this.nodeData 3', this.nodeData)
       if(this.defineAgree == '' && this.btnDefaultAgree == 1 ){
@@ -773,15 +806,25 @@ export default {
         return
       }
 
-
-      console.log('this.departmentStatus :>> ', this.departmentStatus);
-      console.log('this.auditUsers :>> ', this.auditUsers);
-      console.log('this.nodeData auditTargetType :::::::::~~~~~~>> ', this.nodeData.auditTargetType);
+      // console.log('this.departmentStatus :>> ', this.departmentStatus);
+      // console.log('this.auditUsers :>> ', this.auditUsers);
+      // console.log('this.nodeData auditTargetType :::::::::~~~~~~>> ', this.nodeData.auditTargetType);
 
       // 簽核人員不可為空
       if((this.nodeData.auditTargetType == 0 && this.auditUsers == '') || (this.nodeData.auditTargetType == 1 && this.departmentStatus == '')){
         util.notify(this.$t('audit.workFlows.cantEmpty'), 'error', 1200 );
         this.fullscreenLoading = false
+        return
+      }
+      
+      //  停留時間不可為空
+      if(this.nodeData.notify && this.nodeData.unHandleNotifyDay == ""){
+        util.notify(this.$t('audit.workFlows.cantEmptyDays'), 'error', 2000 );
+        this.$refs.stayOver.focus()
+        return 
+      } else if(this.nodeData.unHandleNotifyDay > 365){
+        util.notify(this.$t('audit.workFlows.cantTooMuchDays'), 'error', 2000 );
+        this.$refs.stayOver.focus()
         return
       }
 
@@ -837,6 +880,8 @@ export default {
           }
         }
       })
+      
+
       
       
       console.log('to API', this.apiData)
@@ -915,16 +960,7 @@ export default {
         sessionStorage.setItem('pageAction', JSON.stringify("edit"))
         this.$router.push({name: 'workflowDetail'})
 
-        
-
-
-
-
-
-
-
-
-
+      
 
         // var checkRepeatArry = this.apiData.orderedAuditNodeArray.map(i => i = i.name)
         // console.log('checkRepeatArry', checkRepeatArry)
@@ -1107,6 +1143,13 @@ export default {
   .title-status
     .el-input__count-inner
       margin-top: 55px
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button 
+      -webkit-appearance: none
+      margin: 0
+
+
+
   .popup_width
     .el-dialog
       width: 70% !important
