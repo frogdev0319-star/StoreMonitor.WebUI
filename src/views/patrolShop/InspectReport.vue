@@ -454,6 +454,32 @@
             </div>
           </div>
         </el-col>
+        <el-col>
+          <div v-if="pageItem.class === 'signature-map'">
+            <div
+              :style="isexportPDF ? 'height:60px;line-height:60px' : ''"
+              class="item-header"
+              @click="hideOrShowDetail(pageItem, pageIndex)">
+              <div class="icon-header">
+                <i
+                  :style="isexportPDF ? 'font-size:22px;' : ''"
+                  :class="pageItem.ifExpand ? 'icon-zhedie1': 'icon-zhankai1'"
+                  class="iconfont icontemp"/>
+                <span class="title-lable"><span class="pdf_font_20">
+                  {{ $t(`remotePatrol.${pageItem.name}`) }}</span>
+                </span>
+              </div>
+            </div>
+            <div v-if="pageItem.ifExpand" class="item-content">
+              <div class="pdf_font_20">
+                <div class="content-title"><span class="pdf_font_20">{{ $t('remotePatrol.mapDistance1')+`${report.storeName}`+$t('remotePatrol.mapDistance2')+`${pageItem.distance}`+$t('remotePatrol.mapDistance3') }}</span></div>
+                <hr class="hr-horizontal" />
+                
+              </div>
+              <img :src= "pageItem.data" style="width:calc(984/1440*100vw); margin-top:9px;"/>
+            </div>
+          </div>
+        </el-col>
       </el-row>
       <el-row>
         <el-col v-if="!hasChart" :style="isexportPDF ? 'height:450px;' : 'height:0px;'" class="pie-content">
@@ -1026,6 +1052,10 @@ export default {
       if (this.isInsiteInspect && this.signaturesList.length > 0) {
         const signatureObj = { name: 'signature', class: 'signature-detail', ifExpand: false, data: this.signaturesList };
         pageData.push(signatureObj);
+      }
+      if (this.isInsiteInspect) {
+        const mapObj = { name: 'signatureInfo', class: 'signature-map', ifExpand: false, distance: 100, data:require('../../../static/google.png') };
+        pageData.push(mapObj);
       }
       this.pageData = pageData;
     },
@@ -2528,6 +2558,9 @@ export default {
         }
       }
       .signature-detail{
+        @extend .row-detail;
+      }
+      .signature-map{
         @extend .row-detail;
       }
     }

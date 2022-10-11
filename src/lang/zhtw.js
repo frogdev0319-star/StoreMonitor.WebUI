@@ -521,7 +521,11 @@ export default{
       "resubmiteRpt":"確認送出報告",
       "systemReject":"系統撤回",
       "systemRejectMsg":"無可簽核人員，請重新確認",
-      "cannotSwitchMimicMode":"正在編輯報告，不能切換模式"
+      "cannotSwitchMimicMode":"正在編輯報告，不能切換模式",
+      "signatureInfo":"簽到資訊",
+      "mapDistance1":"與",
+      "mapDistance2":"距離約",
+      "mapDistance3":"公尺",
   },
   "eventView":{
       "ClosedEvent":"已結案事件",
