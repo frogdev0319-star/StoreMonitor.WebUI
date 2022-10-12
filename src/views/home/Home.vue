@@ -273,7 +273,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.0.4.3
+                v3.0.4.6
                  &copy; {{ getFullYear }} Advantech Intelligent City
                 Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
@@ -1023,7 +1023,7 @@ export default {
       //console.log("*Change Routes mimicModeChanged:",mimicModeChanged);
       const self = this;
       const result = await self.$store.dispatch("GetUserAuthorities");
-      
+      console.log("changeRoutes resule:",result);
       if (result.errCode === 0) {
         await self.$store.dispatch("generateRoutes");
         self.getUserName(result.data);

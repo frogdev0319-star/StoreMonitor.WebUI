@@ -260,9 +260,14 @@ $sv_red: #c60957;
   }
 }
 .storevue-checkbox-filled {
-  .is-checked, .is-focus {
+  .is-checked {
     .el-checkbox__inner {
       background-color: #2c90d9;
+      border-color: #2c90d9;
+    }
+  }
+  .is-focus {
+    .el-checkbox__inner {
       border-color: #2c90d9;
     }
   }

@@ -63,7 +63,7 @@
             @confirmHandler="confirmAddPersonDialog">
             <div style="width:860px;height:516px;margin-left:20px;">
               <table-only
-                ref="elTP"
+                ref="myteryUserList"
                 class="table-white table-person"
                 table-themes="white"
                 :column-data="userColumnData"
@@ -146,7 +146,7 @@ export default {
             'isExpand': false
           },
           {
-            'prop': 'updateTs',
+            'prop': 'updateTsStr',
             'label': this.$t('mysterio.lastUpdateTime'),
             'sortable': 'custom',
             'width': 130,
@@ -223,13 +223,15 @@ export default {
       },
       // for search
       inputSearchValue(val){
+        self.curPage = 1;
         if(val.trim()==""){
           this.getMysterioList();
         }else{
           this.searchData = this.allTableData.filter(item => (
               item.userName.indexOf(val) > -1 || item.email.indexOf(val) > -1
           ));
-          this.tableData = this.searchData;
+          //this.tableData = this.searchData;
+          this.setTableBySearch();
         }
         
       }
@@ -244,7 +246,7 @@ export default {
     },
     methods: {
         async init(){
-          
+          this.inputSearchValue="";
           await this.getUserInfolist();
           this.getMysterioList(true);
           this.getMysterioList();
@@ -277,6 +279,7 @@ export default {
             var tempUserList = [];
             data.map(user => {
               const userJson = {};
+              userJson.id = user.userId;
               userJson.userName = user.userName;
               userJson.userId = user.userId;
               userJson.email = user.email;
@@ -293,6 +296,7 @@ export default {
         },
         getMysterioList(getAll=false){
             const self = this;
+            self.inputSearchValue="";
             self.isLoadingData = true;
             const params={
               filter:{
@@ -313,16 +317,18 @@ export default {
                   //console.log("mapUser:",mapUser);
                   let obj = {...item};
                   var position = this.positionsList.find(pos=>{return pos.contents.includes(item.userId)})
+                  obj['id']=item.userId;
                   obj['position'] = (position)? position.label:"";
-                  obj['updateTs']=util.getDateStr(item.updateTime),
+                  obj['updateTs']=item.updateTime,
+                  obj['updateTsStr']=util.getDateStr(item.updateTime),
                   obj['storeAuth']=item.permissionStores,
                   mysterioData.push(obj);
                 });
                 if(getAll) {
                   this.selectedUserList =[];
                   this.allTableData = [];
-                  this.allTableData = mysterioData;
-                  this.selectedUserList = mysterioData;
+                  this.allTableData = mysterioData.slice();
+                  this.selectedUserList = mysterioData.slice();
                 }
                 else{
                   this.tableData = [];
@@ -377,11 +383,17 @@ export default {
           const self= this;
           mysteroRESTful.removeMysterioPerson({userId:this.delUserId}).then(res=>{
             if(res.errCode==0){
-              let delIdx = self.allTableData.findIndex(user=>user.userId==this.delUserId);
-              self.allTableData.splice(delIdx,1);
-              self.selectedUserList = self.allTableData.slice(0,self.allTableData.length-1);
+              var tempAll = self.allTableData.slice();
+              let delIdx = tempAll.findIndex(user=>user.userId==this.delUserId);
+              console.log("delIdx:",delIdx);
+              console.log("1.self.allTableData:",self.allTableData);
+              tempAll.splice(delIdx,1);
+              console.log("2.tempAll:",tempAll);
+              self.allTableData = tempAll.slice();
+              self.selectedUserList = tempAll.slice();
+              console.log("selectedUserList:",self.selectedUserList);
               //self.getMysterioList(true);
-              self.getMysterioList();
+              this.getMysterioList();
             }else{
               util.notify(self.$t('mysterio.delMysterioMemberFail'), 'error', 3000);
             }
@@ -391,29 +403,48 @@ export default {
         handleSortChange(order, defaultSort) {
           this.defaultSort = { ...defaultSort };
           //this.order = this.params.order = order;
-          this.getMysterioList();
+          if(this.inputSearchValue.trim()=="") this.getMysterioList();
+          else {
+            this.setTableBySearch();
+          }
         },
         currentChange(val) {
             const self = this;
             self.curPage = val.page;
             //self.params.filter = { page: val.page - 1, size: self.sizeNum };
-            self.getMysterioList();
+            if(self.inputSearchValue.trim()=="") self.getMysterioList();
+            else self.setTableBySearch()
         },
 
         sizeChange(val) {
             const self = this;
             self.curSizeNum = val.size;
             self.curPage = 1;
-            self.getMysterioList();
+            if(self.inputSearchValue.trim()=="") self.getMysterioList();
+            else self.setTableBySearch()
+        },
+        setTableBySearch() {
+          this.total = Math.ceil(this.searchData.length/this.curSizeNum);
+          if(this.defaultSort.prop=="updateTsStr"){
+            if(this.defaultSort.order=='ascending'){
+              util.sortArrayByKeyAsc(this.searchData,"updateTs")
+            }else{
+              util.sortArrayByKeyDesc(this.searchData,"updateTs")
+            }
+          }
+          this.tableData = [];
+          this.tableData = [...this.searchData.slice( (this.curPage - 1)* this.curSizeNum, this.curPage* this.curSizeNum)];
         },
         //Dialog content
         addNewMysterioPerson(){
+            this.inputSearchValue="";
             this.getAddUserList();
             this.showAddPersionDialog=true;
         },
         getAddUserList(){
           this.userList = [];
           var tempUserList = [];
+          this.userTableData = [];
           this.allUserList.map(user=>{
             var tempU = this.selectedUserList.find(temp=>temp.userId == user.userId);
             if(typeof tempU=='undefined'){
@@ -495,6 +526,7 @@ export default {
     align-items: flex-start;
 }
 .table-person{
+  
   /deep/ .el-table__header-wrapper .el-table-column--selection{
     padding-left: 0px !important;
     font-size: 14px !important;
@@ -512,6 +544,11 @@ export default {
   }
     /deep/ .el-table__header-wrapper .el-checkbox{
         display:block;
+        .el-checkbox__input.is-indeterminate .el-checkbox__inner{
+          background-color: #2c90d9;
+          border-color: #2c90d9;
+          color:#FFF;
+        }
         .el-checkbox__input.is-checked .el-checkbox__inner {
             color: #1375bc;
             font-weight: 400;

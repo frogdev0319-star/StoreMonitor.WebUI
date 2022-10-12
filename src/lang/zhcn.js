@@ -40,6 +40,7 @@ export default{
       "networkError":"网络异常，请检查网络连接状况！",
       "noAuthority":"无操作权限！",
       "noInspectionAccessRights":"无巡检访问权限",
+      "noRight":"无巡检访问权限",
       "operPerm":"无操作权限",
       "otherSetting":"其他设置",
       "overview":"总览",
@@ -643,6 +644,8 @@ export default{
       "enterListNameRuletip":"最多可输入250个字符",
       "enterName":"输入巡检类别名称",
       "enterNameRuletip":"最多可输入30个字符",
+      "inputRuletip":"最多可输入20个字符",
+
       "enterScore":"请输入分值",
       "enterSelfListName":"请输入自定义巡检表名称！",
       "evaluationType":"参与评分",
@@ -1410,7 +1413,9 @@ export default{
         "tooltipListcan3":"巡检报告重新编辑时可以编辑不合格项、合格项及忽略项",
         "tooltipListcan4":"签核通过后才能检视巡检报告",
         "auditFlow":"签核流程",
-        "nodeOrder":"节点序号"
+        "nodeOrder":"节点序号",
+        "cantEmptyDays" : "停留天数不可为空!",
+        "cantTooMuchDays" : "停留天数不可超过365天!"
     },
     "inceptionRpt":{
         "sendAudit":"送出签核",

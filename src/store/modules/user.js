@@ -348,6 +348,7 @@ const user = {
     generateRoutes({ commit }) {
       return new Promise(resolve => {
         const accessedRoutes = [];
+        console.log("user.state.authorities:",user.state.authorities);
         if (user.state.authorities.length > 0) {
           PermissionHelper.setData(user.state.authorities);
 
@@ -369,11 +370,19 @@ const user = {
           const statisticsRoute = navbarRoute.getStatisticalRoute();
           if(statisticsRoute.children.length > 0 && !PermissionHelper.enableMimicMode) accessedRoutes.push(statisticsRoute);
 
+          console.log("PermissionHelper.enableMimicMode:",PermissionHelper.enableMimicMode);
+          console.log("PermissionHelper.enableWaitAudit():",PermissionHelper.enableWaitAudit());
           const auditRoute = navbarRoute.getAuditRoute();
+          console.log("auditRoute:",auditRoute);
           auditRoute.children.length >0 ? accessedRoutes.push(auditRoute):'';
 
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();
           systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';
+          if(accessedRoutes.length == 0){
+            const errorRoute = navbarRoute.getErrorRoute();
+            accessedRoutes.push(errorRoute);
+            errorRoute.redirect = errorRoute.children[0].path;
+          }
         } else {
           const errorRoute = navbarRoute.getErrorRoute();
           accessedRoutes.push(errorRoute);

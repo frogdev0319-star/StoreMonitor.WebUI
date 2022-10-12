@@ -40,6 +40,7 @@ export default{
       "networkError":"網路異常，請檢查網路連接狀況！",
       "noAuthority":"無操作權限！",
       "noInspectionAccessRights":"無巡檢訪問權限",
+      "noRight":"無巡檢訪問權限",
       "operPerm":"無操作權限",
       "otherSetting":"其他設置",
       "overview":"總覽",
@@ -643,6 +644,7 @@ export default{
       "enterListNameRuletip":"最多可輸入250個字元",
       "enterName":"輸入巡檢類別名稱",
       "enterNameRuletip":"最多可輸入30個字元",
+      "inputRuletip":"最多可輸入20個字元",
       "enterScore":"請輸入分值",
       "enterSelfListName":"請輸入自訂巡檢表名稱！",
       "evaluationType":"參與評分",
@@ -1411,7 +1413,10 @@ export default{
         "tooltipListcan3":"巡檢報告重新編輯時可以編輯不合格項、合格項及忽略項",
         "tooltipListcan4":"簽核通過後才能檢視巡檢報告",
         "auditFlow":"簽核流程",
-        "nodeOrder":"節點序號"
+        "nodeOrder":"節點序號",
+        "cantEmptyDays" : "停留天數不可為空! ",
+        "cantTooMuchDays" : "停留天數不可超過365天! "
+
     },
     "inceptionRpt":{
         "sendAudit":"送出簽核",

@@ -176,9 +176,9 @@
                 v-model="item.header"
                 ref="workflowName"
                 style="width: 250px;  margin: 0 20px ;"
-                maxlength="20"
-                show-word-limit
+                @input="(val) => itemInputChanged({ val, item })"
                 />
+                
               <el-radio-group class="storevue-radio" v-model="item.optional" >
                 <el-radio :label="true">{{$t('insSettingView.mustSignature')}}</el-radio> 
                 <el-radio :label="false" v-if="index !== 0">{{$t('insSettingView.uncertainSignature')}}</el-radio> 
@@ -194,7 +194,11 @@
                   @click="deleteSign(index)"
               />
               </div>
+              
             </div>
+            <span class="text_limit_sign"  v-if="showInputLimit"> {{$t('insSettingView.inputRuletip')}}  </span>
+
+
           </div>
           
         </div>
@@ -347,6 +351,7 @@ import util from '@/common/util';
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
 import ValidateInput from '@/components/ValidateInput';
+import filterString from '@/common/filterString.js';
 
 export default {
   name: 'SetRuleInspect',
@@ -390,11 +395,12 @@ export default {
           "extra": [
               {
                 "optional": true,
-                "header": "this.$t('insSettingView.bindWorkflow')"
+                "header": this.$t('audit.auditStatus.sign')+"1"
               }
           ]
         },
-      n : 2
+      n : 1,
+      showInputLimit: false
     };
   },
   watch: {
@@ -418,16 +424,31 @@ export default {
       // console.log('this.workFlowToBind ~~~~>> ', this.workFlowToBind);
 
     },
-    onSiteSignature(){
-      this.signatureData.value = this.onSiteSignature
-      this.n = 2
-      if(this.signatureData.value == false) this.signatureData.extra = [
-        {
-          "optional": true,
-          "header": this.$t('insSettingView.bindWorkflow')
+    onSiteSignature:{
+      immediate: false, 
+      deep: true,
+      handler (val,old ) {
+        const self = this;
+        console.log("onSiteSignature:",val)
+        self.signatureData.value = self.onSiteSignature;
+        console.log("this.signatureData:",self.signatureData)
+        self.n = 1
+        if(val){
+          var tempSign = {
+            "name": "onSiteSignature",
+            "value": true,
+            "extra": [
+                {
+                  "optional": true,
+                  "header": self.$t('audit.auditStatus.sign')+"1"
+                }
+            ]
+          }
+          self.signatureData = tempSign;
+          self.n++;
         }
-      ]
-    }
+      }
+    },
   },
 
   async mounted() {
@@ -435,14 +456,7 @@ export default {
     await this.getRule();
     await this.workflowItems()
     console.log('this.signatureData :>> ', this.signatureData);
-    if(this.signatureData.value == true && this.signatureData.extra.length == 0)  {
-        this.signatureData.extra = [
-          {
-            "optional": true,
-            "header": this.$t('insSettingView.bindWorkflow')
-          }
-        ]
-      }
+    
   },
 
   methods: {
@@ -596,21 +610,34 @@ export default {
       });
     },
     getInspectRule(params) {
+      const self = this;
       return new Promise((resolve, reject) => {
         inpectRESTful.GetInspectRuleSettings(params).then(res => {
           resolve(res);
-          console.log('res.data ~~~~~~~::>> ', res.data);
           
-          var tempSign = res.data.filter(i => i.name == "onSiteSignature")
-          this.signatureData = tempSign[0]
-          console.log('this.signatureData :>> ', this.signatureData);
-
+          
+          var tempSign = res.data.filter(i => i.name == "onSiteSignature");
+          if(tempSign[0].value == true && !tempSign[0].hasOwnProperty('extra')){
+            tempSign[0]['extra'] = [];
+          }
+          self.signatureData = tempSign[0];
+          
+          if(self.signatureData.value == true && self.signatureData.extra.length == 0)  {
+            self.signatureData.extra.push(
+              {
+                "optional": true,
+                "header": self.$t('audit.auditStatus.sign')+self.n
+              }
+            )
+            self.n++;
+          }
 
           const tempArry = res.data.filter(list => list.name == "workflow")
           console.log('tempArry :>> ', tempArry);
-          this.workFlowInfoValue = tempArry[0].value
+          self.workFlowInfoValue = tempArry[0].value
 
         }).catch(err => {
+          console.log("getInspectRule err:",err);
           reject(err);
         });
       });
@@ -734,10 +761,9 @@ export default {
     },
 
     addSignature(index){
-    
       var addObj = {
           "optional": true,
-          "header": `簽名 ${this.n}`
+          "header": this.$t('audit.auditStatus.sign')+`${this.n}`
       }
       if(this.signatureData.extra.length < 4) this.signatureData.extra.push(addObj)
       return this.n++
@@ -746,8 +772,25 @@ export default {
     deleteSign(index){
       console.log('index :>> ', index);
       this.signatureData.extra.splice(index, 1)
-      
-    }
+      // this.n--;
+      // let tempN = this.n;
+      // for(var i=this.signatureData.extra.length-1; tempN >1; i--){
+      //   tempN--; 
+      //   this.signatureData.extra[i].header = this.$t('audit.auditStatus.sign')+tempN;
+      // }
+    },
+
+    itemInputChanged({ val, item }){
+      const content = filterString.all(val, 20);
+      item.header = content
+
+      const length = filterString.getContentLength(val);
+      if(length > 20) {
+        this.showInputLimit = true
+      } else {
+        this.showInputLimit = false
+      }
+    },
 
   }
 };
@@ -816,7 +859,17 @@ $itemHeight:50px;
   }
 }
 
+.text_limit_sign{
+  position: relative;
+  text-align: left;
+  line-height: 20px;
+  margin-left: 5px;
+  font-size: 10px;
+  margin-top: 2px;
+  color: #ff2400;
+  display: block;
 
+}
 
 .el-setRule{
     width: 100%;

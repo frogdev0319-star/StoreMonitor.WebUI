@@ -5,7 +5,7 @@
       {{$t('audit.workFlows.workFlowConfiguration')}}
       <div class="spacer"></div>
       <div class="buttons">
-        <delay-button type="filled" @click="submit">  {{$t('audit.workFlows.saveAndEnable')}}</delay-button>
+        <delay-button type="filled" @click="submitWorkFlow">  {{$t('audit.workFlows.saveAndEnable')}}</delay-button>
       </div>
     </div>
     <!-- 基本信息 -->
@@ -22,13 +22,16 @@
                   <div class="title-status"> 
                     <el-input
                       ref="workflowName"
-                      :placeholder="nodeDataToApi.name"
-                      v-model="nodeDataToApi.name"
-                      style="width: 250px;"
-                      :maxlength="50"
-                      show-word-limit
+                      :placeholder="workflowDetail.name"
+                      v-model="workflowDetail.name"
+                      class="ppip"
+                      style="width: 250px"
+                      :disabled="noInput"
+                      @input="(val) => itemInputChanged(val, 50)"
                       />
+                      <span class="text_limit_notice" v-if="showInputLimit"> {{$t('remotePatrol.eventNameRuletip')}}  </span>
                   </div>
+
                 </div>
 
                 <!-- 分類流程 -->
@@ -53,7 +56,7 @@
                 <!-- 簽核模式 -->
                 <div class="flex-row" style="margin-right: 30px">
                   <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.signoffMode')}}</div>
-                      <el-radio-group class="storevue-radio" v-model="nodeDataToApi.cancelable" >
+                      <el-radio-group class="storevue-radio" v-model="workflowDetail.cancelable" >
                         <div class="flex-row" style="margin-right: 30px">
                           <el-radio :label="false">{{$t('audit.workFlows.canNotCancel')}}</el-radio>  
                             <el-tooltip
@@ -101,19 +104,19 @@
 
               <!-- row -->
               <!-- 流程描述 -->
-              <div class="setting-config">
+              <div class="setting-config" style="margin-bottom: 20px;">
                 <div class="title-name">{{$t('audit.workFlows.workFlowDescription')}}</div>
                 <div class="title-status"> 
                   <el-input
-                    v-model="nodeDataToApi.description"
+                    v-model="workflowDetail.description"
                     :autosize="{ minRows: 3, maxRows: 5 }"
                     :placeholder="$t('audit.workFlows.workFlowDescription')"
                     class="storevue-textarea"
                     type="textarea"
                     resize="none"
-                    maxlength="600"
-                    show-word-limit
+                    @input="(val) => itemTextAreaChanged(val, 600)"
                   />
+                  <span class="text_limit_notice" v-if="showTextAreaLimit">  {{$t('remotePatrol.comentRuletip_suggest')}}  </span>
                 </div>
               </div>
             </template>
@@ -140,7 +143,7 @@
                     ref="elTP"
                     class="table-white"
                     :column-data="columnData"
-                    :table-data="flatNodeDataView"
+                    :table-data="newFlatNodeDataView"
                     :tableworkflowOperation ="columnOperationData"
                     :highlight-current-row= "false"
                     :is-loading-data="isLoadingData"
@@ -153,14 +156,12 @@
                     :indexType="indexType"
                     @handleMove="handleEmitMove"
                     @handleOperation="handleEmitOperation"
-                    @handleAuditMethod = "handleOrderedAuditNodeArray"
-                    @handleSignature = "handleOrderedAuditNodeArray"
                   />
                 </div>
             </template>
           </setting-table>
 
-          <!-- row -->
+          <!-- row 新增副本通知人員 -->
           <div class="setting-config basic-config">
             <div class="title-name" style="width: fit-content">{{$t('audit.workFlows.addCC')}}</div>
             <div class="title-status" >
@@ -180,7 +181,7 @@
                 </el-select>
             </div>
             <div class="search_member" @click="handelePopupUserList"><i class="iconfont el-icon-view iconbangzhu"/> {{$t('audit.workFlows.findUser')}}</div>  
-                  
+
           </div>
         </div>
       </div>
@@ -202,6 +203,7 @@
         <div class="dialog-content">{{$t('audit.workFlows.comfirmDeleteNode')}}</div>
       </div>
     </dialog-pop>
+
 
     <!-- search user popup -->
     <dialog-pop
@@ -233,7 +235,7 @@
                 </div>
                 <!-- 部門 -->
                 <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
-                  <div class="title-name"> {{$t('audit.workFlows.depart')}}</div>
+                  <div class="title-name">  {{$t('audit.workFlows.depart')}}</div>
                   <div class="title-status"> 
                     <el-select
                       v-model="curTemplateDepartment"
@@ -310,30 +312,56 @@
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
 import {
-  getWorkflowList, 
   getNodeList, 
-  updateWorkflow, 
+  updateWorkflow,   
+  getWorkflowList, 
+  creadNewFlow,
   getUserStatus,
+  enableWorkflow,
+  
   } from "@/api/workflow";
-import {
-  getUserInfo,
-  getAllUserInfoNoAuth
-  } from '@/api/login';
+import {getUserTitleList } from "@/api/title";
+import {getUserInfo} from '@/api/login';
+import {getAllUserInfoNoAuth, getDepartAll} from '@/api/login';
 
 import TableOnly from '@/components/TableOnly';
 import DialogPop from '@/components/DialogPop';
-
+import InputLimit from '@/components/InputLimit';
 import util from "@/common/util";
+import filterString from '@/common/filterString.js';
+
+import { Breadcrumb } from 'element-ui';
 export default {
   name: 'WorkflowDetail',
   components: {
     TableOnly,
     DelayButton,
     SettingTable,
-    DialogPop
+    DialogPop,
+    InputLimit
   },
   data() {
     return {
+      ccToUSer: [],
+    
+      showSingleDeleteContent: false,
+      dataFromRoute: {},
+      workflowDetail: {},
+      templateList: ['巡檢表單'],
+      curTemplateIndex:'',
+      basicList: [],
+      loading: false,
+      isLoadingData: true,
+      workflowDescription: '',
+      infoForm: {},
+      nodeList:{},
+
+      fromApiflatNodeData:[],
+
+      nodeDataToApi:[],
+      userInfo:[],
+
+      // ======
       w_width: "1000",
       tags: [],
       userColumnData: [
@@ -363,35 +391,19 @@ export default {
         },
       ],
       userData:[],
-      // searchUserData:[],
       inputSearchUser: '',
-    
-      ccToUSer: [],
-      showSingleDeleteContent: false,
+      showSelectionColumn: true,
+  
       showingSearchUser: false,
-
-      dataFromRoute: {},
-      workflowDetail: {},
-      templateList: ['巡檢表單'],
-      curTemplateIndex:'',
-      basicList: [],
-      loading: false,
-      isLoadingData: false,
-      workflowDescription: '',
-      infoForm: {},
-      nodeList:{},
-      flatNodeData:[],
-      flatNodeDataView:[],
-      nodeDataToApi:[],
-      userInfo:[],
+      inputSearchUser: '',
       titleList:[],
-      department : [],
-
       titleListAry:[],
       departmentAry:[],
       curTemplateDepartment: '',
       curTemplateTitleList: '',
+    // ======
 
+      titleList:[],
       fullscreenLoading: false,
       columnOperationData: {
         label: this.$t('deviceView.operation'),
@@ -407,6 +419,7 @@ export default {
             text: this.$t('audit.workFlows.moveDown'),
             methods: 'moveDown'
           },
+
         ],
         operation: [
           {
@@ -456,11 +469,11 @@ export default {
       deleteSrc: require('../../../../static/img/table-delete.png'),
       rowId:'',
       signMode: 1,
+      department : '',
 
-      temp:[],
-      showSelectionColumn: true,
-      multipleSelection: [],
-      auditMember: {},
+      newFlatNodeDataView:[],
+      pageAction: "init",
+      currentUser:'',
       allTableData: [],
       apiBody: {
           "page": 0,
@@ -472,157 +485,131 @@ export default {
               1,
           ]
       },
+      showInputLimit: false,
+      showTextAreaLimit: false,
+      noInput: false
     };
-  }, 
-
-
-  watch:{
-    'nodeDataToApi.name'(value){
-      var nnn = value.replace(/[^\x00-\xff]/g,"xx").length
-      console.log('nnn :>> ', nnn);
-    },
-    
-    ccToUSer(){
-      this.nodeDataToApi.copyToUsers = this.ccToUSer
-    },
   },
+
+  watch:{},
+  async created() {
+    await this.init()
+  },
+  mounted() {
+    this.searchUserData = this.userData
+  },
+
   computed: {
+  
     searchUserData: {
       get(){
         return this.filterInputSearchUser(this.filterCurTemplateDepartment(this.filterCurTemplateTitleList(this.userData)))
       },
-      set(){
-        // console.log('val!?!?!~~~~~>>>', val)
-        // console.log('searchUserData!?!?!~~~~~>>>', this.searchUserData)
+      set(val){
+        console.log('val', val)
 			}
     }
   },
-  mounted() {
-    this.searchUserData = this.userData
 
-  },
-
-  async created() {
-    await this.init()
-  },
   methods: {
-    filterInputSearchUser(users){
-        return users.filter( item => item.userName.indexOf(this.inputSearchUser) > -1 || item.email.indexOf(this.inputSearchUser) > -1)
-    },
-    filterCurTemplateDepartment(users){
-        if(this.curTemplateDepartment.length == 0 || this.curTemplateDepartment == this.departmentAry[0]){
-          return users
-        }else{
-          return users.filter(item => item.sector.includes(this.curTemplateDepartment))
-        }
-    },
-    filterCurTemplateTitleList(users){
-      if(this.curTemplateTitleList.length == 0 || this.curTemplateTitleList == this.titleListAry[0]){
-        return users
-      }else{
-        return users.filter(item => item.title == this.curTemplateTitleList )
-      }
-    },    
-
-
-    handleOrderedAuditNodeArray(obj){
-      console.log('object :>> ', obj);
-      this.nodeDataToApi.orderedAuditNodeArray.forEach(row =>{
-        if(row.id == obj.id){
-          row.auditMethod = obj.auditMethod;
-          row.signature = obj.signature;
-        }
-      })
-      console.log('this.nodeDataToApi new :>> ', this.nodeDataToApi);
-    },
-
     async init(){
-      
-      await this.getWorkflowInfo() 
-      await this.getNodeList(this.infoForm.processDefinitionKey) 
-
       await this.getTitle() 
       await this.getUserInfo() 
       await this.getDepartmentList() 
+    
+      const result = await this.$store.dispatch("GetUserAuthorities");
+      this.currentUser = result.data.userId
 
+      var status = sessionStorage.getItem('pageAction');
+      const pageAction = JSON.parse(status)
+
+      console.log('pageAction', pageAction)
+      switch(pageAction){
+        case 'firstEdit':{
+          console.log('go firstEdit !!');
+          this.firstEdit()
+          break;      
+        }
+        case 'create':{
+          console.log('go create !!');
+          this.getNodeData()
+          break;      
+        }
+        case 'edit':{
+          console.log('go edit !!');
+          await this.handleEdit()
+          break;      
+        }
+        case 'set':{
+          // for Breadcrumb link
+          console.log('go set !!');
+          await this.handleEdit()
+          break;      
+        }
+        default: {
+          break;
+        }
+      }
+      await this.getPickedMember()
       await this.handleData() 
-      await this.dataToApi() 
 
+      
+      this.isLoadingData = false
+    },
+
+
+    async firstEdit(){
+      // get id 
+      await this.getWorkflowInfo()
+      await this.getNodeList(this.infoForm.processDefinitionKey) 
+      await this.handleData() 
       await this.getWorkflowList(this.apiBody)
-      await this.getPickedMember() 
-
+      
+      
+      this.isLoadingData = false
     },
 
     needNote(){
       util.notify(this.$t('audit.workFlows.thisModeWithoutEvent'), 'warning', 2000 );
     },
-    async getWorkflowList(param){
-      this.isLoadingData = true
-      await getWorkflowList(param).then(res=>{
-        this.allTableData = res.data.content
 
-        const n = this.allTableData.findIndex( i => i.name == this.nodeDataToApi.name)
-        this.allTableData.splice(n, 1)
-        // console.log('n === ', n);
-        // console.log('this.allTableData ======>> ',  this.allTableData );
-        this.isLoadingData = false
-      }).catch(err => {
-        this.isLoadingData = false;
-        console.log('error' + err);
-      });
+    // create
+    getNodeData(){
+      const tempData = sessionStorage.getItem('workflowDetail')
+      this.workflowDetail = JSON.parse(tempData)
+      this.ccToUSer = this.workflowDetail.copyToUsers
+
+      const data = sessionStorage.getItem('newWorkFlow')
+      const newNode = JSON.parse(data)
+      // console.log('newNode :>> ', newNode);
+
+      const reNewNode = sessionStorage.getItem('reNewNode')
+      const orinode = JSON.parse(reNewNode)
+      // console.log('orinode 1 >> ', orinode);
+
+      if( newNode !== null ){
+        orinode.push(newNode.orderedAuditNodeArray[0])
+        sessionStorage.setItem('reNewNode', JSON.stringify(orinode))
+
+        this.newFlatNodeDataView = orinode
+        console.log('orinode 2 >> ', orinode);
+        
+      }else{
+        sessionStorage.setItem('reNewNode', JSON.stringify(orinode))
+        this.newFlatNodeDataView = orinode
+      }
+      sessionStorage.removeItem('newWorkFlow')
     },
 
 
     getWorkflowInfo(){
       const data = sessionStorage.getItem('workflowDetail')
       this.infoForm = JSON.parse(data)
-      // this.infoForm.type = "巡檢表單"
+
+      // this.workflowDetail = this.infoForm 
+
       console.log('this.infoForm 1 ------>> ', this.infoForm);
-    },
-    
-    // get user
-    async getUserInfo(){
-      await getAllUserInfoNoAuth().then(res=>{
-        this.userInfo = res.data
-        this.userData = this.userInfo
-        console.log('this.userInfo 2 ------>> ', this.userInfo);
-      }).catch(err => {
-        console.log('error' + err);
-      });
-    },
-
-    // get title 職務
-    async getTitle(){
-      await getUserStatus({ type: 1 }).then(res=>{
-        this.titleList =  res.data
-        console.log('this.titleList 3 ------>> ', this.titleList);
-        this.titleListAry = this.titleList.map( i => (
-          i = i.defineName
-        ))
-        this.titleListAry.unshift(this.$t('overview.allPosition'))
-        console.log('this.titleListAry  7:>> ', this.titleListAry);
-        this.isLoadingData = false
-      }).catch(err => {
-        this.isLoadingData = false;
-        console.log('error' + err);
-      });
-    },
-
-    // get getDepart 部門
-    async getDepartmentList(){
-      await getUserStatus({ type: 0 }).then(res=>{
-        this.department = [...res.data]
-        console.log('this.department 7 ------>> ', this.department);
-      
-        this.departmentAry = this.department.map( i => (
-          i = i.defineName
-        ))
-        this.departmentAry.unshift(this.$t('overview.allDepartment'))
-        console.log('this.departmentAry  7:>> ', this.departmentAry);
-
-      }).catch(err => {
-        console.log('error' + err);
-      });
+      console.log('this.workflowDetail 1 ------>> ', this.workflowDetail);
     },
 
 
@@ -630,99 +617,211 @@ export default {
       this.isLoadingData = true
       await getNodeList(id).then(res=>{
 
-        this.nodeList =  res.data
+        // clone
+        this.nodeList = JSON.parse(JSON.stringify(res.data))
+
+        this.workflowDetail = res.data
+        delete this.workflowDetail.nextAuditNode
+        sessionStorage.setItem('workflowDetail', JSON.stringify(this.workflowDetail))
+
+
         this.ccToUSer = this.nodeList.copyToUsers
         console.log('this.nodeList 4 ------>> ', this.nodeList);
-
-        // flat data
+        console.log('res.data 4 ------>> ', res.data);
+        console.log('this.workflowDetail 4 ------>> ', this.workflowDetail);
+        
+        // flat data  
         this.flattenData(this.nodeList)
-        this.flatNodeData.forEach(d=>{
+        this.fromApiflatNodeData.forEach(d=>{
           delete d.nextAuditNode
         })
-        console.log('this.flatNodeData 4 ------>> ', this.flatNodeData);
-        // this.flatNodeData[0].name = this.infoForm.createdUser
-        this.flatNodeData[0].name = this.$t('audit.workFlows.submitAudit')
 
-        if(this.flatNodeData[0].auditByUsers.length > 0){
-          this.flatNodeData[0].auditByUsers = []
-          this.flatNodeData[0].auditByUsers.push(this.nodeList.createdUser)
-        }
-        this.isLoadingData = false
+        console.log('this.fromApiflatNodeData 4 ------>> ', this.fromApiflatNodeData);
+        this.fromApiflatNodeData[0].name = this.$t('audit.workFlows.submitAudit')
+        this.fromApiflatNodeData[0].auditByUsers = []
+        this.fromApiflatNodeData[0].auditByUsers.push(this.$t('audit.sendAudit.submitterName'))
+        
+        this.newFlatNodeDataView = this.fromApiflatNodeData
+
+        // 傳node資料到 workflownode
+        sessionStorage.setItem('reNewNode', JSON.stringify(this.newFlatNodeDataView))
+        
+
+
+        // this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;
         console.log('error' + err);
       });
     },
+
     // flatten Data by Recursive
     flattenData(data, key = 'nextAuditNode') {
       if(data[key] !== null) {
           const d = data[key];
-          this.flatNodeData.push(d);
+          this.fromApiflatNodeData.push(d);
           this.flattenData(data[key]);
       } else {
-        return this.flatNodeData;
+        return this.fromApiflatNodeData;
       }
     },
-
-    // maping data for page view
-    handleData(){
-      // deep copy
-      this.flatNodeDataView = JSON.parse(JSON.stringify(this.flatNodeData))
+    
+    handleEdit(){
+      console.log('this is Edit')
+    
+      const tempData = sessionStorage.getItem('workflowDetail')
+      this.workflowDetail = JSON.parse(tempData)
+      console.log('object  :::::::::>> ',  this.workflowDetail);
       
-      // switch user id to name 
-      this.flatNodeDataView.forEach(item =>{
-        var newArr = []
-        item.auditByUsers.forEach(id =>{
-          this.userInfo.forEach(uu =>{
-            if(id == uu.userId){
-              newArr.push(uu.userName)  
-            } 
-          })
-        })
-        item.auditByUsers = [...newArr ]
-      })
+      // 取得副本通知人員
+      this.ccToUSer = this.workflowDetail.copyToUsers
+      
+      const data = sessionStorage.getItem('newWorkFlow')
+      const newNode = JSON.parse(data)
+      console.log('newNode :::::::::>> ', newNode);
+      
+      const reNewNode = sessionStorage.getItem('reNewNode')
+      const orinode = JSON.parse(reNewNode)
+      console.log('orinode :::::::::>> ', orinode);
 
-      // this.department
-      this.flatNodeDataView.forEach(item =>{
-        var newArr2 = []
-        item.auditByGroups.forEach(id =>{
-          this.department.forEach(d =>{
-            if(id == d.defineId){
-              newArr2.push(d.defineName)  
-            } 
-          })
-        })
-        item.auditByGroups = [...newArr2 ]
-      })
 
-      this.flatNodeDataView[0].auditByUsers = []
-      this.flatNodeDataView[0].auditByUsers.push(this.$t('audit.sendAudit.submitterName'))
-      console.log('this.flatNodeDataView 5 ------>> ', this.flatNodeDataView);
+      if( newNode !== null){
+        var num = orinode.findIndex(n => newNode.orderedAuditNodeArray[0].id == n.id)
+        console.log('num :>> ', num);
+        orinode.splice(num , 1 , newNode.orderedAuditNodeArray[0])
+
+        sessionStorage.setItem('reNewNode', JSON.stringify(orinode))
+        this.newFlatNodeDataView = orinode
+      } else {
+        this.newFlatNodeDataView = orinode
+      }
+
+      console.log(' this.newFlatNodeDataView  handleEdit /////',  this.newFlatNodeDataView);
+      sessionStorage.removeItem('newWorkFlow')
+    },
+
+
+    // get user
+    async getUserInfo(){
+      await getAllUserInfoNoAuth().then(res=>{
+        this.userInfo = res.data
+        this.userData = this.userInfo
+        // console.log('this.userInfo ------>> ', this.userInfo);
+      }).catch(err => {
+        console.log('error' + err);
+      });
     },
     
-    // data for api submit
-    dataToApi(){
-      // deep copy
-      var orderedAuditNodeArray = JSON.parse(JSON.stringify(this.flatNodeData))
+    // get getDepart
+    async getDepartmentList(){
+      await getDepartAll({ type: 0 }).then(res=>{
+        this.department = res.data
+        // console.log('this.department 4 ------>> ', this.department);
+        this.departmentAry = this.department.map( i => (
+          i = i.defineName
+        ))
+        this.departmentAry.unshift(this.$t('overview.allDepartment'))
 
-      this.nodeDataToApi = this.nodeList
-      delete this.nodeDataToApi.nextAuditNode
-      this.nodeDataToApi.orderedAuditNodeArray = orderedAuditNodeArray
-      
-      sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
+      }).catch(err => {
+        console.log('error' + err);
+      });
     },
 
+    // get title
+    async getTitle(){
+      await getUserStatus({ type: 1 }).then(res=>{
+        this.titleList =  res.data
+        this.titleListAry = this.titleList.map( i => (
+          i = i.defineName
+        ))
+        this.titleListAry.unshift(this.$t('overview.allPosition'))
+      }).catch(err => {
+        console.log('error' + err);
+      });
+    },
+    
+    addNode() {
+      // name or group convert id
+      this.newFlatNodeDataView.forEach(d =>{
+        if(d.auditTargetType == 0){
+            this.userInfo.forEach(n =>{
+              if(d.auditByUsers.length !== 0 && d.auditByUsers[0] == n.userName){
+                d.auditByUsers = []
+                d.auditByUsers.push(n.userId)
+              }
+            })
+        }else if(d.auditTargetType == 1){
+          this.department.forEach(g =>{
+            if(d.auditByGroups.length !== 0 && d.auditByGroups[0] == g.defineName){
+              d.auditByGroups = []
+              d.auditByGroups.push(g.defineId)
+            }
+          })
+          }
+      })
+      this.workflowDetail.copyToUsers = this.ccToUSer
+      sessionStorage.setItem('workflowDetail', JSON.stringify(this.workflowDetail))
+      sessionStorage.setItem('reNewNode', JSON.stringify(this.newFlatNodeDataView))
+      var time = new Date()
+      var t = {
+          year: time.getFullYear(),
+          month: ((time.getMonth() + 1) < 10) ? '0' + (time.getMonth() + 1).toString() : (time.getMonth() + 1).toString(),
+          date: (time.getDate() < 10) ? '0' + time.getDate().toString() : time.getDate().toString(),
+          hour: (time.getHours() < 10) ? '0' + time.getHours().toString() : time.getHours().toString(),
+          minute: (time.getMinutes() < 10) ? '0' + time.getMinutes().toString() : time.getMinutes().toString(),
+          second: (time.getSeconds() < 10) ? '0' + time.getSeconds().toString() : time.getSeconds().toString()
+        }
+      const createTime = t.year + t.month + t.date + "-" + t.hour  + t.minute + t.second
+      const newNode = {
+              "id": createTime,
+              "name": this.$t('audit.workFlows.addNode'),
+              "auditMethod": 0,
+              "signature": false,
+              "customButton": [
+                  {
+                      "type": 0,
+                      "text":  this.$t('audit.workFlows.agree'),
+                      "enable": true
+                  },
+                  {
+                      "type": 1,
+                      "text": this.$t('audit.workFlows.reject'),
+                      "enable": true
+                  }
+              ],
+              "auditByUsers": [],
+              "auditByGroups": [],
+              "isEditing": false,
+              "auditTargetType": 1,
+              "notify": false,
+              "unHandleNotifyDay": null,
+
+            }
+      sessionStorage.setItem('workflowNode', JSON.stringify(newNode))
+      sessionStorage.setItem('pageAction', JSON.stringify("create"))
+      sessionStorage.setItem('routeTo', JSON.stringify("workflowDetail"))
+      
+      sessionStorage.removeItem('newWorkFlow')
+      this.$router.push({ name: 'nodeSetting' })
+    },
 
     getPickedMember(){
-      console.log('this.flatNodeDataView 8>> ', this.flatNodeDataView);
+      const reNewNode = sessionStorage.getItem('reNewNode')
+      const orinode = JSON.parse(reNewNode)
+      // console.log('orinode 1 >> ', orinode);
 
-      var handleFlatNodeDataView = [...this.flatNodeData]
+      if(reNewNode == null) return
+
+      var handleFlatNodeDataView = [...orinode]
       handleFlatNodeDataView.shift()
 
       var auditMembers = {        
         "auditByUsers": [],
         "auditByGroups": []
       }
+      
+      console.log('handleFlatNodeDataView ===--->> ', handleFlatNodeDataView);
+
       handleFlatNodeDataView.forEach(i=>{
         if(i.auditByUsers.length !== 0){
           auditMembers.auditByUsers.push(i.auditByUsers[0])
@@ -740,110 +839,94 @@ export default {
       sessionStorage.setItem('auditMembers', JSON.stringify(auditMembers))
     },
 
+    // maping data for page view
+    handleData(){
+      // switch user id to name 
+      var tempNewFlatNodeDataView = [...this.newFlatNodeDataView]
+      console.log('this.newFlatNodeDataView  handele ------>> ', this.newFlatNodeDataView);
 
-    addNode() {
-
-      const newNode = {
-            "name": this.$t('audit.workFlows.addNode'),
-            "auditMethod": 0,
-            "signature": false,
-            "customButton": [
-                {
-                    "type": 0,
-                    "text":  this.$t('audit.workFlows.agree'),
-                    "enable": true
-                },
-                {
-                    "type": 1,
-                    "text": this.$t('audit.workFlows.reject'),
-                    "enable": true
-                }
-            ],
-            "auditByUsers": [],
-            "auditByGroups": [],
-            "isEditing": false,
-            "auditTargetType": 1
-        }
-      sessionStorage.setItem('workflowNode', JSON.stringify(newNode))
-      sessionStorage.setItem('pageAction', JSON.stringify("set"))
-      sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
-  
-      this.$router.push({ name: 'nodeSetting' })
-      // call api for update
-      updateWorkflow(this.nodeDataToApi).then(res=>{
-        console.log('res :>> ', res);
-      }).catch(err => {
-        console.log('error' + err);
-      });
-    },
-
-    handleEmitMove(method){
-      // console.log('List method ', method);
-      Array.prototype.move = function (from, to) {
-        this.splice(to, 0, this.splice(from, 1)[0]);
-      };
-      switch(method.method){
-        case 'moveUp':{
-          this.flatNodeDataView.move(method.index, method.index - 1)
-          this.moveAction(method.index, method.index - 1)
-
-          break;
-        }
-        case 'moveDown':{
-          this.flatNodeDataView.move(method.index, method.index + 1)
-          this.moveAction(method.index, method.index + 1)
-          break;      
-        }
-        default: {
-          break;
-        }
-      }
-    },
-
-    handleEmitOperation({ method, row }) {
-      console.log('List row =====>> ', row);
-      switch(method){
-        case 'set':{
-          this.settingWorkFlow(row)
-          break;      
-        }
-        case 'delete':{
-          this.rowId = row.id
-          this.showSingleDeleteContent = true
-          break;      
-        }
-        default: {
-          break;
-        }
-      }
-    },
-  
-    moveAction(from , to){
-      console.log(from , to);
-      this.fullscreenLoading = true
-      var moving = this.nodeDataToApi.orderedAuditNodeArray.splice(from, 1)[0]
-      this.nodeDataToApi.orderedAuditNodeArray.splice(to, 0 , moving)
-      
-      // sync sessionStorage
-      sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
-
-      // call api for update
-      updateWorkflow(this.nodeDataToApi).then(res=>{
-        console.log('res :>> ', res);
-        this.fullscreenLoading = false
-        this.$message({
-          type: 'success',
-          message: this.$t('audit.workFlows.orderModified')
+      this.newFlatNodeDataView.forEach(item =>{
+        var newArr = []
+        if(item.auditByUsers[0] == this.$t('audit.sendAudit.submitterName')) newArr.push( this.$t('audit.sendAudit.submitterName'))
+        
+        this.userInfo.forEach( u =>{
+          if( item.auditByUsers[0] == u.userId || item.auditByUsers[0] == u.userName){
+            newArr.push(u.userName)
+          } 
         })
+        item.auditByUsers = newArr
+      })
+
+      this.newFlatNodeDataView.forEach(item =>{
+        var newArr2 = []
+        this.department.forEach( u =>{
+          if( item.auditByGroups[0] == u.defineId || item.auditByGroups[0] == u.defineName){
+            newArr2.push(u.defineName)
+          } 
+        })
+        item.auditByGroups = newArr2
+      })
+    },
+
+    
+    async getWorkflowList(param){
+      await getWorkflowList(param).then(res=>{
+        this.allTableData = res.data.content
+        var needToDelIndex = this.allTableData.findIndex(i => i.name == this.workflowDetail.name)
+        this.allTableData.splice(needToDelIndex , 1)
+
+        console.log('this.allTableData ======>> ',  this.allTableData );
+        console.log('this.workflowDetail.name ======>> ',  this.workflowDetail.name );
+        console.log('needToDelIndex :>> ', needToDelIndex);
+
       }).catch(err => {
-        this.fullscreenLoading = false
         console.log('error' + err);
       });
     },
 
-    hideDeleteContentDialog(key) {
-      this[key] = false;
+    itemInputChanged(val, n){
+      const content = filterString.all(val, n);
+      this.workflowDetail.name = content
+
+      const length = filterString.getContentLength(val);
+      if(length > n) {
+        this.showInputLimit = true
+      } else {
+        this.showInputLimit = false
+      }
     },
+
+    itemTextAreaChanged(val, n){
+      const content = filterString.all(val, n);
+      this.workflowDetail.description = content
+
+      const length = filterString.getContentLength(val);
+      if(length > n) {
+        this.showTextAreaLimit = true
+      } else {
+        this.showTextAreaLimit = false
+      }
+    },
+
+
+    //======================================
+    filterInputSearchUser(users){
+        return users.filter( item => item.userName.indexOf(this.inputSearchUser) > -1 || item.email.indexOf(this.inputSearchUser) > -1)
+    },
+    filterCurTemplateDepartment(users){
+        if(this.curTemplateDepartment.length == 0 || this.curTemplateDepartment == this.departmentAry[0]){
+          return users
+        }else{
+          return users.filter(item => item.sector.includes(this.curTemplateDepartment))
+        }
+    },
+    filterCurTemplateTitleList(users){
+      if(this.curTemplateTitleList.length == 0 || this.curTemplateTitleList == this.titleListAry[0]){
+        return users
+      }else{
+        return users.filter(item => item.title == this.curTemplateTitleList )
+      }
+    },  
 
     confirmSearchUsersDialog(){
         console.log('this.ccToUSer ~~~~~~~>', this.ccToUSer)
@@ -861,74 +944,9 @@ export default {
       
       // 清除所有勾選
       this.$refs.usersList.clear()
-      this.ccToUSer = []
     },
 
-    confirmDeleteSingle(id){
-      console.log('Let me delete value', id);
-      this.deleteRow(id)
-      this.showSingleDeleteContent = false
-    },
-
-    settingWorkFlow(row){
-      // 刪除  "isEditing": false
-      var oriData = this.flatNodeData.filter(f => row.id === f.id)
-      delete row.isEditing
-      sessionStorage.setItem('workflowNode', JSON.stringify(oriData[0]))
-      sessionStorage.setItem('pageAction', JSON.stringify("set"))
-      sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
-
-      this.$router.push({name: 'nodeSetting'})
-      // call api for update
-      updateWorkflow(this.nodeDataToApi).then(res=>{
-        console.log('res :>> ', res);
-      }).catch(err => {
-        console.log('error' + err);
-      });
-
-    },
-
-    deleteRow(deleteId){
-      this.fullscreenLoading = true
-      
-      var deleteData = this.flatNodeDataView.filter( e =>(
-        e.id !== deleteId
-      ))
-      this.flatNodeDataView = deleteData
-
-      var deleteNode = this.nodeDataToApi.orderedAuditNodeArray.filter( e =>(
-        e.id !== deleteId
-      ))
-
-      // 處理簽核人員下拉選單顯示(清除已選狀況)
-      var tempDeleteNode = [...deleteNode]
-      tempDeleteNode.shift()
-      
-      var auditMembers  = {}
-      auditMembers.auditByUsers = tempDeleteNode.map(u => u = u.auditByUsers[0])
-      auditMembers.auditByGroups = tempDeleteNode.map(g => g = g.auditByGroups[0])
-      sessionStorage.setItem('auditMembers', JSON.stringify(auditMembers))
-
-      this.nodeDataToApi.orderedAuditNodeArray = deleteNode
-      sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
-
-
-      // call api for update
-      updateWorkflow(this.nodeDataToApi).then(res=>{
-        console.log('res :>> ', res);
-        this.fullscreenLoading = false;
-        this.$message({
-          type: 'success',
-          message: this.$t('audit.workFlows.deleteScuccess')
-        })
-
-      }).catch(err => {
-        this.fullscreenLoading = false;
-        console.log('error' + err);
-      });
-    },
-
-    //popup 表格選取欄位
+     //popup 表格選取欄位
     handleSelectionChange(val){
       this.multipleSelection = val.val
       console.log(' this.multipleSelection',  this.multipleSelection)
@@ -943,33 +961,32 @@ export default {
 
     // 刪除 tag
     handleClose(tag){
+      console.log('tag--->', tag)
       this.tags.splice(this.tags.indexOf(tag), 1);
       this.$refs.usersList.toggleChecked(tag)
     },
 
+
     //處理 popup user selected
     handelePopupUserList(){
       this.showingSearchUser = true
-      console.log('this.searchUserData !!!', this.searchUserData)
-
 
       // [查詢人員]資料
       this.userData.forEach(user =>{
-          this.titleList.forEach( title =>{
-            if(title.contents.length !== 0 && title.contents.includes(user.userId)) user.title = title.defineName 
-          })
-          
-          // user 會有多個部門
-          user.sector = []
-          this.department.forEach( dep =>{
-            if(dep.contents.length !==  0 && dep.contents.includes(user.userId)) {
-              user.sector.push(dep.defineName)
-            }
-          })
-          user.sector = user.sector.join(", ")
+        this.titleList.forEach( title =>{
+          if(title.contents.length !== 0 && title.contents.includes(user.userId)) user.title = title.defineName 
         })
+        // user 會有多個部門
+        user.sector = []
+        this.department.forEach( dep =>{
+          if(dep.contents.length !==  0 && dep.contents.includes(user.userId)) {
+            user.sector.push(dep.defineName)
+          }
+        })
+        user.sector = user.sector.join(", ")
+      })
       
-      // 等待 dialog 生成
+       // 等待 dialog 生成
       if(this.ccToUSer.length > 0){
         var data = this.ccToUSer
         setTimeout(() => {
@@ -978,48 +995,259 @@ export default {
       }
     },
 
+    //======================================
+   
+    
+
+    handleEmitMove(method){
+      // console.log('List method ', method);
+      Array.prototype.move = function (from, to) {
+        this.splice(to, 0, this.splice(from, 1)[0]);
+      };
+      switch(method.method){
+        case 'moveUp':{
+          this.newFlatNodeDataView.move(method.index, method.index - 1)
+          sessionStorage.setItem('reNewNode', JSON.stringify(this.newFlatNodeDataView))
+          break;
+        }
+        case 'moveDown':{
+          this.newFlatNodeDataView.move(method.index, method.index + 1)
+          sessionStorage.setItem('reNewNode', JSON.stringify(this.newFlatNodeDataView))
+
+          break;      
+        }
+        default: {
+          break;
+        }
+      }
+    },
+
+    // 判定動作
+    handleEmitOperation({ method, row }) {
+      console.log('List row =====>> ', row);
+      switch(method){
+        case 'set':{
+          this.settingWorkFlow(row)
+          break;      
+        }
+        case 'delete':{
+          this.rowId = row.id
+          console.log('this.rowId :>> ', this.rowId);
+          this.showSingleDeleteContent = true
+          break;      
+        }
+        default: {
+          break;
+        }
+      }
+    },
+
+    hideDeleteContentDialog(key) {
+      this[key] = false;
+    },
+    confirmDeleteSingle(id){
+      console.log('Let me delete value', id);
+      this.deleteRow(id)
+      this.showSingleDeleteContent = false
+    },
+
+    // edit node
+    settingWorkFlow(row){
+      console.log('go edit  :>> ', row);
+      console.log('this.userInfo ------>> ', this.userInfo);
+
+      this.workflowDetail.copyToUsers = this.ccToUSer
+      sessionStorage.setItem('workflowDetail', JSON.stringify(this.workflowDetail))
+
+
+      if(row.auditByUsers.length !== 0){
+        var currentUser = this.userInfo.filter(u => u.userName == row.auditByUsers[0])
+        row.auditByUsers = []
+        row.auditByUsers.push(currentUser[0].userId)
+      } else if(row.auditByGroups.length !== 0){
+        var currentGroup = this.department.filter(u => u.defineName == row.auditByGroups[0])
+        row.auditByGroups = []
+        row.auditByGroups.push(currentGroup[0].defineId)
+      }
+      console.log('row :>> ', row);
+      sessionStorage.setItem('workflowNode', JSON.stringify(row))
+      sessionStorage.setItem('pageAction', JSON.stringify("set"))
+      this.$router.push({name: 'nodeSetting'})
+    },
+
+
+    // 刪除 node
+    deleteRow(id){
+      this.fullscreenLoading = true
+      var rowPosition = this.newFlatNodeDataView.findIndex( e =>(
+        e.id == id
+      ))
+
+      this.newFlatNodeDataView.splice(rowPosition , 1)
+
+      // var aaa = [...this.newFlatNodeDataView]
+      // aaa.forEach( item =>{
+      //   if(item.auditByUsers.length !== 0){
+      //     this.userInfo.forEach( u => {
+      //       if(item.auditByUsers[0] == u.userName) {
+      //         item.auditByUsers = []
+      //         item.auditByUsers.push(u.userId)
+      //       }
+      //     })
+      //   }
+      //   if(item.auditByGroups.length !== 0){
+      //     this.department.forEach( g => {
+      //     if(item.auditByGroups[0] == g.defineName) {
+      //       item.auditByGroups = []
+      //       item.auditByGroups.push(g.defineId)
+      //     }
+      //   })
+      //   }
+      // })
+
+      console.log('this.newFlatNodeDataView :~~~~~:::::::>> ', this.newFlatNodeDataView);
+      
+      sessionStorage.removeItem('newWorkFlow')
+      sessionStorage.setItem('reNewNode', JSON.stringify(this.newFlatNodeDataView))
+
+
+      // 處理簽核人員下拉選單顯示(清除已選狀況)
+      var tempDeleteNode = [...this.newFlatNodeDataView]
+      tempDeleteNode.shift()
+
+      var auditMembers  = {}
+      auditMembers.auditByUsers = []
+      auditMembers.auditByGroups = []
+
+      console.log('tempDeleteNode :>> ', tempDeleteNode);
+
+      var handleUsers = tempDeleteNode.map(u => u = u.auditByUsers[0])
+      handleUsers.forEach( i =>{
+        this.userInfo.forEach(u=>{
+          if( i == u.userName) auditMembers.auditByUsers.push(u.userId)
+        })
+      })
+      var handleGroup = tempDeleteNode.map(g => g = g.auditByGroups[0])
+      handleGroup.forEach( i =>{
+        this.department.forEach(u=>{
+          if( i == u.defineName) auditMembers.auditByGroups.push(u.defineId)
+        })
+      })
+      
+      sessionStorage.setItem('auditMembers', JSON.stringify(auditMembers))
+      this.fullscreenLoading = false
+    },
+
     //保存並發布
-    submit() {
-      var repeatResult = this.allTableData.some(i=>
-        i.name == this.nodeDataToApi.name
-      )
-      if(this.nodeDataToApi.name == ''){
+    submitWorkFlow() {
+      console.log('this.newFlatNodeDataView :>> ', this.newFlatNodeDataView);
+      console.log('this.workflowDetail :>> ', this.workflowDetail);
+
+      this.fullscreenLoading = true
+      this.isLoadingData = true
+
+      if(this.workflowDetail.name == "") {
+        this.fullscreenLoading = false
         util.notify(this.$t('audit.workFlows.cantEmptyWorkflowName'), 'error', 2000 );
         this.$refs.workflowName.focus()
         return
-      } else if(this.nodeDataToApi.orderedAuditNodeArray.length == 1){
-        util.notify(this.$t('audit.workFlows.mustCreateOneNode'), 'error', 2000 );
-        return
-      } else if(repeatResult == true){
+      }
+  
+
+      var repeatResult = this.allTableData.some(i => i.name == this.workflowDetail.name)
+      console.log('repeatResult~~~~ :>> ', repeatResult);
+
+      if(repeatResult == true){
+        this.fullscreenLoading = false
+        this.isLoadingData = false
         util.notify(this.$t('audit.workFlows.cantRepeatWorkflowName'), 'error', 2000 );
         this.$refs.workflowName.focus()
         return
-      } else {
-        console.log('gogogo :>> ');
-        // call api for update
-        updateWorkflow(this.nodeDataToApi).then(res=>{
-          console.log('res :>> ', res);
-          this.$router.push({name: 'workflowManage'})
-          this.isLoadingData = false
-        }).catch(err => {
-          this.isLoadingData = false;
-          console.log('error' , err);
-        });
       }
-    }
+      
+
+      // 刪除非 api 產生的 id
+      this.newFlatNodeDataView.forEach(i =>{
+        if(typeof(i.id) === 'string' ) delete i.id
+      })
+      console.log('this.newFlatNodeDataView !!!!!!', this.newFlatNodeDataView)
+
+      this.newFlatNodeDataView.forEach(d =>{
+        if(d.auditByUsers.length !== 0 ){
+
+          var currentUser = this.userInfo.filter(u => u.userName == d.auditByUsers[0])
+          d.auditByUsers = []
+          if(currentUser.length > 0) d.auditByUsers.push(currentUser[0].userId)
+
+        } else {
+          var currentGroup = this.department.filter(u => u.defineName == d.auditByGroups[0])
+          console.log('currentGroup :>> ', currentGroup);
+
+          d.auditByGroups = []
+          if(currentGroup.length > 0) d.auditByGroups.push(currentGroup[0].defineId)
+        }
+      })
+      
+      const orderedAuditNodeArray = [...this.newFlatNodeDataView]
+      console.log('orderedAuditNodeArray :>> ', orderedAuditNodeArray);
+
+      var toApiData = {...this.workflowDetail, orderedAuditNodeArray}
+      toApiData.copyToUsers = this.ccToUSer
+
+      console.log('toApiData :>> ', toApiData);
+      if(toApiData.orderedAuditNodeArray.length == 1) {
+        this.newFlatNodeDataView[0].auditByUsers.push(this.$t('audit.sendAudit.submitterName'))
+        this.fullscreenLoading = false
+        this.isLoadingData = false
+        util.notify(this.$t('audit.workFlows.mustCreateOneNode'), 'error', 2000 );
+        return
+      }else{
+        var id = {
+          "processDefinitionKeys": []
+        }
+        id.processDefinitionKeys.push(toApiData.processDefinitionKey)
+
+        updateWorkflow(toApiData).then(res=>{
+          console.log('res 111111', res)
+          if(toApiData.state == 0){
+            this.switchEnableWorkflow(id)
+          }else{
+            console.log('res okokokokok', res)
+            this.$router.push({name: 'workflowManage'})
+          }
+          }).catch(err => {
+            console.log('error' + err);
+          });
+
+      }
+      this.fullscreenLoading = false
+      this.isLoadingData = false
+    },
+
+    // 流程啟用
+    switchEnableWorkflow(id){
+      enableWorkflow(id).then( res =>{
+        console.log('res 22222222', res)
+        this.$router.push({name: 'workflowManage'})
+      }).catch(err => {
+          console.log('error' + err);
+       })
+    },
+    
   }
 
 };
 </script>
 
 <style lang="sass" scoped>
+  
   .is-multiple 
     .el-select-dropdown__item 
-        padding-left: 10px !important;
-        border-left: solid 1px #FFF;
+        padding-left: 10px !important
+        border-left: solid 1px #FFF
     .el-select-dropdown__item.selected 
-        padding-left: 10px !important;
-        border-left: solid 1px rgba(44, 144, 217, 0.34);
+        padding-left: 10px !important
+        border-left: solid 1px rgba(44, 144, 217, 0.34)
 
   .flex-row
     display: flex
@@ -1036,7 +1264,6 @@ export default {
       li 
         margin-left: 18px
         line-height: 1.5
-
 
   .workflow-header
     width: 100%
@@ -1061,7 +1288,7 @@ export default {
     .el-input
       .el-input__inner
           height: 36px
-          
+          padding-right: 50px
           
   .icon-gengduo
     width: 24px
@@ -1082,7 +1309,7 @@ export default {
   .add-node-btn
     position: absolute
     right: 1%
-    top: 3px
+    top: 5px
   
   .search_member
     height: 36px
@@ -1098,7 +1325,7 @@ export default {
     i 
       margin-right: 5px
       color: #006ab7
-
+  
   .dialog-content
     width: 100%
     .showing_search_user
@@ -1155,6 +1382,8 @@ export default {
         height: 335px
         overflow: auto
         border-radius: 5px
+
+
 
 </style>
 
@@ -1215,7 +1444,6 @@ export default {
     height: 36px;
     line-height: 36px;
     font-size: 12px;
-    
   }
 
   .span-font{
@@ -1302,7 +1530,10 @@ export default {
     text-align: left;
   }
 
- 
+  .title-operation{
+    /* width: 20%; */
+  }
+
   .sortable-ghost{
     color: #424151 !important;
     background: rgba(243, 19, 101, 0.1) !important;
@@ -1373,6 +1604,8 @@ export default {
 </style>
 
 <style lang="sass">
+
+
   .audit-user-row
     display: flex
     flex-wrap: wrap
@@ -1381,31 +1614,33 @@ export default {
     align-items: flex-start
     .audit-user
       margin-right: 10px
-      
+  
   .tablelist
     .el-table__row
       &:first-child
         .el-table_1_column_6
           .cell
             display: none !important
-
+            
+  .title-status
+    .el-input__count-inner
+      margin-top: 55px
   .popup_width
     .el-dialog
       width: 70% !important
       background: #f7f9fa
       .el-table th
-        
         &:first-child
           .cell
             width: 50px
             margin-left: -28px
             
-            
 
 
-
-      
   .users
+    .el-checkbox__input.is-indeterminate .el-checkbox__inner
+      background-color: #2c90d9 !important
+      border-color: #2c90d9 !important
     .el-checkbox__input.is-checked .el-checkbox__inner
       background: #2c90d9 !important
       border-color: #2c90d9 !important
@@ -1420,5 +1655,13 @@ export default {
   .title-status
     .el-input__count-inner
       margin-top: 55px
-
+  
+  .text_limit_notice
+    position: absolute
+    text-align: right
+    margin-left: 5px
+    font-size: 10px
+    margin-top: 2px
+    color: #ff2400
+    display: block
 </style>

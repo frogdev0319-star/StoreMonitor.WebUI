@@ -412,7 +412,9 @@ export default{
         },
         onStoreChange(storeObj) {
             this.storeFilterObj = storeObj;
-            if(this.curStoreIds){
+            //console.log("onStoreChange > this.curStoreIds:",this.curStoreIds);
+            //console.log("onStoreChange > storeObj:",storeObj);
+            if(this.curStoreIds  || (typeof this.curStoreIds=='undefined' && this.isMimicMode)){
                 this.searchParams = this.storeFilterObj;
                 this.curStoreIds = storeObj.filterStoreIds.filter(item=>item!='-1');
                 this.ifSearchData && this.getAllTask();
@@ -570,6 +572,7 @@ export default{
                     
                     for(const task of data){
                         var taskObj = {...task};
+                        taskObj['id'] =  task.inspectReportId;
                         taskObj['processStartTs'] =  util.getDateStr(task.processStartTs);
                         taskObj['processLastUpdateTs'] =  util.getDateStr(task.processLastUpdateTs);
                         taskObj['auditStatusName'] = util.getAuditStatusName(task.auditState);

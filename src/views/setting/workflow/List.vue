@@ -212,18 +212,18 @@ export default {
           'forDescription': true
         },
         {
-          'prop': 'createdTs',
+          'prop': 'createdTsStr',
           'label': this.$t('audit.workFlows.workFlowsCreatedTs'),
           'width': 130,
           'maxWidth': 130,
-          'sortable': true
+          'sortable': 'custom',
         },
         {
-          'prop': 'updateTs',
+          'prop': 'updateTsStr',
           'label': this.$t('audit.workFlows.workFlowsUpdateTs'),
           'width': 100,
           'maxWidth': 100,
-          'sortable': true
+          'sortable': 'custom',
         },
         {
           'prop': 'updatedUser',
@@ -241,6 +241,7 @@ export default {
       ],
       total: 5,
       currentPage: 1,
+      curSizeNum:10,
       sizeNum: 50,
       apiBody: {
           "page": 0,
@@ -271,19 +272,22 @@ export default {
 
     // for search
     inputSearchValue(val){
-      if(val){
-        this.searchData =this.allWorkflowList.filter(item => (
+      this.currentPage = 1;
+      if(val.trim()!=""){
+        this.allTableData =this.allWorkflowList.filter(item => (
           item.name.indexOf(val) > -1 
         ))
+        this.setTableBySearch();
       } else {
-        this.searchData = this.allTableData
+        //this.searchData = this.allTableData
+        this.getWorkflowList(this.apiBody);
       }
     }
   },
   methods: {
     async init(){      
       await this.getUserInfo()
-
+      this.inputSearchValue="";
       const data = sessionStorage.getItem('pageInfo')
       const pageInfo = JSON.parse(data)
       if(pageInfo == undefined){
@@ -330,8 +334,10 @@ export default {
           this.userInfo.forEach(user => {
             if(d.createdUser === user.userId){
               d.createdUser = user.userName
-              d.createdTs = this.getdate(d.createdTs)
-              d.updateTs = this.getdate(d.updateTs)
+              d.createdTs = d.createdTs
+              d.createdTsStr = this.getdate(d.createdTs)
+              d.updateTs = d.updateTs
+              d.updateTsStr = this.getdate(d.updateTs)
               d.type =  this.$t('audit.workFlows.inspectionForm')
               d.index = res.data.content.indexOf(d) + 1
               d.state = d.state.toString()
@@ -374,8 +380,10 @@ export default {
           this.userInfo.forEach(user => {
             if(d.createdUser === user.userId){
               d.createdUser = user.userName
-              d.createdTs = this.getdate(d.createdTs)
-              d.updateTs = this.getdate(d.updateTs)
+              d.createdTs = d.createdTs
+              d.createdTsStr = this.getdate(d.createdTs)
+              d.updateTs = d.updateTs
+              d.updateTsStr = this.getdate(d.updateTs)
               d.type = this.$t('audit.workFlows.inspectionForm')
               d.index = res.data.content.indexOf(d) + 1
               d.state = d.state.toString()
@@ -415,15 +423,27 @@ export default {
 
     sortChange(order, defaultSort){
 
-        // console.log('order ~~~~~>> ', order);
+        console.log('order ~~~~~>> ', order);
         // console.log('defaultSort ~~~~~>> ', defaultSort);
         this.isLoadingData = true
         this.apiBody.direction = order.direction.toUpperCase()
         this.apiBody.property = order.property
 
         console.log('this.apiBody sss ~~~~~>> ', this.apiBody);
-
-        this.getWorkflowList(this.apiBody);
+        if(this.inputSearchValue.trim()=="") this.getWorkflowList(this.apiBody);
+        else {
+          /*if( order.property=='createdTs'|| order.property=="updateTs"){
+            if(order.direction=='asc'){
+               console.log('1.order ~~~~~>> ', order);
+              util.sortArrayByKeyAsc(this.allTableData,order.property)
+            }else{
+               console.log('2.order ~~~~~>> ', order);
+              util.sortArrayByKeyDesc(this.allTableData,order.property)
+            }
+          }*/
+          this.setTableBySearch();
+        }
+        
     },
 
 
@@ -437,20 +457,31 @@ export default {
       console.log('pageInfo ppp ~~~~~>> ', pageInfo);
 
       this.currentPage = pageInfo.page
-      this.inputSearchValue = ''
+      this.curSizeNum = pageInfo.size;
+      //this.inputSearchValue = ''
       this.apiBody.page =  pageInfo.page - 1
       this.apiBody.size =  pageInfo.size
 
       console.log('this.apiBody ~~~~~>> ', this.apiBody);
 
       // this.init()
-      this.getWorkflowList(this.apiBody);
+      if(this.inputSearchValue.trim()=="") this.getWorkflowList(this.apiBody);
+      else this.setTableBySearch()
+      
+    },
+    setTableBySearch() {
+      this.total = Math.ceil(this.allTableData.length/this.apiBody.size);
+      if( this.apiBody.property=='createdTs'|| this.apiBody.property=="updateTs"){
+        if( this.apiBody.direction=='ASC'){
+          util.sortArrayByKeyAsc(this.allTableData,this.apiBody.property)
+        }else{
+          util.sortArrayByKeyDesc(this.allTableData,this.apiBody.property)
+        }
+      }
+      this.searchData = [];
+      this.searchData = [...this.allTableData.slice( (this.currentPage - 1)* this.curSizeNum, this.currentPage* this.curSizeNum)];
     },
 
-
-
-
-    
     handleEmitOperation({ method, row }) {
       switch(method){
         case 'copy':{
@@ -488,8 +519,13 @@ export default {
       //   util.notify(this.$t('audit.workFlows.cantDisabledEdit'), 'error', 2000 );
       //   return
       // } else {
-        this.$router.push({name: 'workflowDetail'})
+        var createNewNodeNeed = {"orderedAuditNodeArray":[]}
+        sessionStorage.setItem('nodeDataToApi', JSON.stringify(createNewNodeNeed))
+
         sessionStorage.setItem('workflowDetail', JSON.stringify(row))
+        sessionStorage.setItem('pageAction', JSON.stringify("firstEdit"))
+        this.$router.push({name: 'workflowDetail'})
+
       // }
     },
 
@@ -670,7 +706,7 @@ export default {
         white-space: nowrap
         width: 200px
       .showDescription
-        position: absolute
+        position: fixed
         width: 500px
         height: fit-content
         font-size: 13px
@@ -679,13 +715,8 @@ export default {
         background: rgba(0,0,0,.75)
         color: #fff
         border-radius: 3px
-        bottom: -10px
-        left: 95%
         z-index: 1000
         display: none
-    &:nth-child(-n+5)
-      .showDescription
-        top: -10px
 
     
 

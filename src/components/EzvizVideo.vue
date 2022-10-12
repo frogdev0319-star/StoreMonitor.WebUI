@@ -593,13 +593,15 @@ export default {
           value: 1
         }
       ],
-      notUpdateMsg: false
+      notUpdateMsg: false,
+      enableMimicMode:false
     };
   },
 
   watch: {
     channelInfo: {
       handler(newChannel, oldChannel) {
+        console.log("oldChannel:",oldChannel)
         if (Object.keys(oldChannel).length > 0 && newChannel.ivsId !== oldChannel.ivsId) {
           try {
             this.getEzvizAccessToken(newChannel.ivsId);
@@ -628,6 +630,12 @@ export default {
         self.showError = false;
         self.stopVideo();
       }
+    },
+
+    mimicMode(){
+      const self = this;
+      self.enableMimicMode = this.$store.getters.mimicMode;
+      console.log("enableMimicMode:",this.enableMimicMode);
     },
 
     stopVideoTime(val) {
@@ -823,7 +831,7 @@ export default {
 
     async changeHistoryTime(newValue) {
       const self = this;
-      if (this.videoAuthority === false) {
+      if (this.videoAuthority === false && !self.$store.getters.mimicMode) {
         this.showError = true;
         this.errorMsg = this.$t('remotePatrol.videoLicense');
         return;
@@ -880,7 +888,7 @@ export default {
 
     getEzvizAccessToken(ivsId) {
       const self = this;
-      if (this.videoAuthority === false) {
+      if (this.videoAuthority === false && !self.$store.getters.mimicMode) {
         return;
       }
       this.notUpdateMsg = false;
@@ -890,7 +898,9 @@ export default {
         if (self.currentIvsId === ivsId) {
           resolve(self.accessToken);
         } else {
+          console.log("getEzvizAccessToken >> params:",params);
           getEzvizAccessToken(params).then(result => {
+            console.log("getEzvizAccessToken >> result:",result);
             if (result.errCode === 0) {
               self.currentIvsId = ivsId;
               self.accessToken = result.data.accessToken;
@@ -920,7 +930,7 @@ export default {
       if (self.channelInfo == null) {
         return;
       }
-      if (self.videoAuthority === false) {
+      if (self.videoAuthority === false && !self.$store.getters.mimicMode) {
         this.showError = true;
         this.errorMsg = this.$t('remotePatrol.videoLicense');
         return;
@@ -1409,7 +1419,7 @@ export default {
         this.decoder.stop()
         return;
       }
-      if (this.videoAuthority === false) {
+      if (this.videoAuthority === false && !self.$store.getters.mimicMode) {
         this.showError = true;
         this.errorMsg = this.$t('remotePatrol.videoLicense');
         return;

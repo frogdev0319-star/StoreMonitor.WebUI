@@ -219,6 +219,15 @@ export default {
         console.log('this.auditStates ----->> ', this.auditStates);
         console.log('this.taskInfo ori ----->> ', this.taskInfo);
 
+        // 部門簽核完成時間排序
+        this.taskInfo.forEach(item =>{
+          if(item.tasks.length > 1 && item.state == 1){
+            item.tasks.sort((a,b)=>{
+              return a.endTs > b.endTs ? 1 : -1
+            })
+          }
+        })
+
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;

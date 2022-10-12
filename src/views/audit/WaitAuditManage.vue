@@ -488,6 +488,7 @@ export default{
                     
                     for(const task of data){
                         var taskObj = {...task};
+                        taskObj['id'] =  task.inspectReportId;
                         taskObj.processStartTs =  util.getDateStr(task.processStartTs);
                         taskObj.processLastUpdateTs =  util.getDateStr(task.processLastUpdateTs);
                         taskObj['auditStatusName'] = util.getAuditStatusName(task.auditState);

@@ -845,7 +845,7 @@ export default {
             }).catch((err) => {
               upload++;
             });
-            if (upload !== 0) {imgFileList
+            if (upload !== 0) {
               self.uploadProgress = false;
               util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
               return false;
@@ -960,14 +960,14 @@ export default {
                   routeData = {
                       isSuccess: true,
                       user: data.notifiedTo,
-                      isBindWorkflow:!!PermissionHelper.enableSendAudit()
+                      isBindWorkflow:!!PermissionHelper.enableSendAudit() || !!PermissionHelper.enableMimicMode
                   };
                 }else{
                   util.notify(wfRes.errMsg, 'error', 3000);
                   routeData = {
                     isSuccess: false,
                     reLoadData: self.$route.params,
-                    isBindWorkflow:!!PermissionHelper.enableSendAudit()
+                    isBindWorkflow:!!PermissionHelper.enableSendAudit() || !!PermissionHelper.enableMimicMode
                   };
                 }
                 
@@ -2032,6 +2032,7 @@ export default {
         }
         .attach-area{
           display:flex;
+          flex-wrap: wrap;
           align-content:flex-start;
           align-self: flex-start;
           .attach-add{

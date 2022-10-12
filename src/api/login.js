@@ -71,3 +71,13 @@ export const getDepart = params => {
   });
 };
 
+export const getDepartAll = params => {
+  return request({
+    url: `${version}/user/define/list/all`,
+    method: 'get',
+    params
+  });
+};
+
+
+

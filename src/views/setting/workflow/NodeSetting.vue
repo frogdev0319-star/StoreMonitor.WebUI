@@ -29,9 +29,9 @@
                     v-model="nodeData.name"
                     :placeholder="$t('audit.workFlows.inputNodeName')"
                     class="input-name"
-                    maxlength="20"
-                    show-word-limit
+                    @input="(val) => itemInputChanged(val, 20)"
                     />
+                    <span class="text_limit_notice" style="position: absolute;" v-if="showInputLimit"> 最多可輸入 20 個字元  </span>
                 </div>
 
                 <el-radio-group class="select_audit storevue-radio" v-model="nodeData.auditTargetType">
@@ -116,10 +116,11 @@
                           :validate-event ="false"
                           v-model="defineAgree"
                           class="input-name"
-                          maxlength="8"
-                          show-word-limit
+                          @input="(val) => itemDefineChanged_a(val, 8)"
                           />
+                          
                       </el-radio-group>
+                      <span class="text_limit_notice" style="position: initial;" v-if="showDefineLimit_a"> {{$t('insSettingView.btnAttrLength')}} </span>
                     </div>
                     <!-- 定義拒絕 -->
                     <div class="approve_row">
@@ -132,10 +133,11 @@
                           :validate-event="false"
                           v-model="defineReject"
                           class="input-name"
-                          maxlength="8"
-                          show-word-limit
+                          @input="(val) => itemDefineChanged_b(val, 8)"
                           />
                       </el-radio-group>
+                      <span class="text_limit_notice" style="position: initial;" v-if="showDefineLimit_b"> {{$t('insSettingView.btnAttrLength')}} </span>
+
                     </div>
 
                     <!-- 定義撤回 -->
@@ -149,11 +151,12 @@
                           :validate-event="false"
                           v-model="defineDrawback"
                           class="input-name"
-                          maxlength="8"
-                          show-word-limit/>
+                          @input="(val) => itemDefineChanged_c(val, 8)"
+                          />
                       </el-radio-group>
+                      <span class="text_limit_notice" style="position: initial;" v-if="showDefineLimit_c"> {{$t('insSettingView.btnAttrLength')}} </span>
                     </div>
-                
+                    
                 </div>
               </div>
 
@@ -184,7 +187,7 @@
               <div class="setting-config basic-config">
                 <div class="title-status">
                   <el-checkbox
-                    v-model="nodeData.notify"
+                    v-model="changeNotify"
                     class="storevue-checkbox-outlined"
                     :label="$t('audit.workFlows.alertAtOverTime')"/>
                 </div>
@@ -195,10 +198,15 @@
                 <div class="title-status">
                   {{$t('audit.workFlows.stayOver')}}
                   <el-input
+                    ref="stayOver"
                     placeholder=""
+                    type="number"
+                    max="50"
                     v-model="nodeData.unHandleNotifyDay"
                     :disabled="!nodeData.notify"
-                    class="input-name_short"/>
+                    class="input-name_short"
+                    @input="(val) => numberRange(val)"
+                    />
                   {{$t('audit.workFlows.day')}}
                 </div>
               </div>
@@ -316,14 +324,14 @@
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
 import {updateWorkflow} from "@/api/workflow";
-import {getDepart } from '@/api/login';
+import {getDepart, getDepartAll} from '@/api/login';
 import {
   getUserInfo,
   getAllUserInfoNoAuth
   } from '@/api/login';
 import TableOnly from '@/components/TableOnly';
 import DialogPop from '@/components/DialogPop';
-
+import filterString from '@/common/filterString.js';
 import util from "@/common/util";
 export default {
   name: 'WorkflowDetail',
@@ -402,10 +410,30 @@ export default {
       defineReject: '',
       defineDrawback: '',
 
-      auditMembers: {}
+      auditMembers: {},
+      showInputLimit: false,
+      showDefineLimit_a: false,
+      showDefineLimit_b: false,
+      showDefineLimit_c: false,
+
+      changeNotify: false
     };
+    
   },
   watch:{ 
+
+    changeNotify(val){
+      if(val == true){
+        this.nodeData.notify = true
+        if(this.nodeData.unHandleNotifyDay == null) this.nodeData.unHandleNotifyDay = 1
+
+      } else {
+        this.nodeData.notify = false
+        this.nodeData.unHandleNotifyDay = null
+      }
+    },
+
+    
     btnDefaultAgree(){
       if(this.btnDefaultAgree == 1){
         this.nodeData.customButton[0].text = this.defineAgree
@@ -422,6 +450,7 @@ export default {
   mounted() {},
   async created() {
     await this.init()
+    
   },
   computed: {
     searchUserData: {
@@ -479,7 +508,7 @@ export default {
   
     // get getDepart
     async getDepartmentList(){
-      await getDepart({ type: 0 }).then(res=>{
+      await getDepartAll({ type: 0 }).then(res=>{
 
         var AllDepartment = res.data
 
@@ -502,7 +531,7 @@ export default {
         }
         
         this.departmentAry = res.data.map( i => i = i.defineName)
-        this.departmentAry.unshift(this.$t('audit.workFlows.allDepart'))
+        this.departmentAry.unshift(this.$t('overview.allDepartment'))
       }).catch(err => {
         console.log('error' + err);
       });
@@ -531,6 +560,7 @@ export default {
       const data = sessionStorage.getItem('workflowDetail')
       this.infoForm = JSON.parse(data)
       this.infoForm.type = this.$t('audit.workFlows.inspectionForm')
+      console.log(' this.infoForm :>> ',  this.infoForm);
     },
     
     async getNodeInfo(){
@@ -575,7 +605,59 @@ export default {
       // this.departmentStatus = this.department[0].defineId
       console.log('this.departmentStatus :>> ', this.departmentStatus);
 
+      if(this.nodeData.notify) {
+        this.changeNotify = true
+      }else{
+        this.changeNotify = false
+      }
+
     },
+
+    itemInputChanged(val, n){
+      const content = filterString.all(val, n);
+      this.nodeData.name = content
+
+      const length = filterString.getContentLength(val);
+      if(length > n) {
+        this.showInputLimit = true
+      } else {
+        this.showInputLimit = false
+      }
+    },
+
+    itemDefineChanged_a(val, n){
+      const content = filterString.all(val, n);
+      this.defineAgree = content
+      const length = filterString.getContentLength(val);
+      if(length > n) {
+        this.showDefineLimit_a = true
+      } else {
+        this.showDefineLimit_a = false
+      }
+    },
+    itemDefineChanged_b(val, n){
+      const content = filterString.all(val, n);
+      this.defineReject = content
+      const length = filterString.getContentLength(val);
+      if(length > n) {
+        this.showDefineLimit_b = true
+      } else {
+        this.showDefineLimit_b = false
+      }
+    },
+    itemDefineChanged_c(val, n){
+      const content = filterString.all(val, n);
+      this.defineDrawback = content
+      const length = filterString.getContentLength(val);
+      if(length > n) {
+        this.showDefineLimit_c = true
+      } else {
+        this.showDefineLimit_c = false
+      }
+    },
+
+
+
 
     //======================================
     filterInputSearchUser(users){
@@ -669,8 +751,12 @@ export default {
 
     //======================================
 
-
-
+    numberRange(val){
+      console.log('val :>> ', val);
+      val = parseInt(Math.abs(val))
+      if(val == 0) val = ''
+      this.nodeData.unHandleNotifyDay = val
+    },
     saveNode(){
       // this.fullscreenLoading = true
 
@@ -679,6 +765,7 @@ export default {
         util.notify(this.$t('audit.workFlows.cantEmptyNodeName'), 'error', 2000 );
         return 
       }
+      
 
       // handle btn naming
       if(this.btnDefaultAgree == 1){
@@ -687,7 +774,6 @@ export default {
         this.nodeData.customButton[0].text = ''
         this.nodeData.customButton[0].text = this.$t('audit.workFlows.agree')
       }
-
       if(this.btnDefaultReject == 1){
         this.nodeData.customButton[1].text = this.defineReject
       }else{
@@ -702,8 +788,7 @@ export default {
         this.nodeData.customButton[2].text = this.$t('audit.workFlows.withdraw')
       }
 
-      
-
+    
       //自定簽核按鈕不可為空
       console.log('this.nodeData 3', this.nodeData)
       if(this.defineAgree == '' && this.btnDefaultAgree == 1 ){
@@ -719,15 +804,25 @@ export default {
         return
       }
 
-
-      console.log('this.departmentStatus :>> ', this.departmentStatus);
-      console.log('this.auditUsers :>> ', this.auditUsers);
-      console.log('this.nodeData auditTargetType :::::::::~~~~~~>> ', this.nodeData.auditTargetType);
+      // console.log('this.departmentStatus :>> ', this.departmentStatus);
+      // console.log('this.auditUsers :>> ', this.auditUsers);
+      // console.log('this.nodeData auditTargetType :::::::::~~~~~~>> ', this.nodeData.auditTargetType);
 
       // 簽核人員不可為空
       if((this.nodeData.auditTargetType == 0 && this.auditUsers == '') || (this.nodeData.auditTargetType == 1 && this.departmentStatus == '')){
         util.notify(this.$t('audit.workFlows.cantEmpty'), 'error', 1200 );
         this.fullscreenLoading = false
+        return
+      }
+      
+      //  停留時間不可為空
+      if(this.nodeData.notify && this.nodeData.unHandleNotifyDay == ""){
+        util.notify(this.$t('audit.workFlows.cantEmptyDays'), 'error', 2000 );
+        this.$refs.stayOver.focus()
+        return 
+      } else if(this.nodeData.unHandleNotifyDay > 365){
+        util.notify(this.$t('audit.workFlows.cantTooMuchDays'), 'error', 2000 );
+        this.$refs.stayOver.focus()
         return
       }
 
@@ -784,9 +879,11 @@ export default {
         }
       })
       
+
+      
       
       console.log('to API', this.apiData)
-      if(pageAction == "create" || pageAction == "edit" ){
+      if(pageAction == "create" || pageAction == "edit"){
         console.log('pageAction ---->', pageAction)
       
         //  節點名稱不可為重複
@@ -797,18 +894,16 @@ export default {
         console.log('checkNameResult', checkNameResult)
         console.log('this.apiData :::::::>>>', this.apiData)
 
-        // create
+        // create alert
         if(checkNameResult.length > 0 && pageAction == "create") {
           util.notify(this.$t('audit.workFlows.cantRepeatNodeName'), 'error', 2000 );
           return
         }
 
-        // edit
-        if(checkNameResult.length > 0 && pageAction == "edit") {
-
+        // edit alert
+        if(checkNameResult.length > 0 && pageAction == "edit" ) {
           console.log(' this.nodeData',  this.nodeData)
           console.log('reNewNode', reNewNode)
-
           var tempAry = reNewNode.filter( i => i.id !== this.nodeData.id)
           console.log('tempAry', tempAry)
 
@@ -822,31 +917,67 @@ export default {
           }
         }
         sessionStorage.setItem('newWorkFlow', JSON.stringify(this.apiData))
-        console.log('newWorkFlow 2', this.apiData)
-        this.$router.push({name: 'createWorkflow'})
 
+        const getTo = sessionStorage.getItem('routeTo')
+        const routeTo = JSON.parse(getTo)
 
-      } else if(pageAction == "set"){
-        console.log('pageAction', pageAction)
-        console.log('this.apiData', this.apiData)
-        console.log('this.nodeData', this.nodeData)
-        var checkRepeatArry = this.apiData.orderedAuditNodeArray.map(i => i = i.name)
-        console.log('checkRepeatArry', checkRepeatArry)
-        
-        const repeat = checkRepeatArry.some( (item, index, arr) => arr.indexOf(item) !== index)
-        console.log('repeat', repeat)
-        if(repeat){
-          util.notify(this.$t('audit.workFlows.cantRepeatNodeName'), 'error', 2000 );
-        }else{
-          // call api
-          updateWorkflow(this.apiData).then(res=>{
-            console.log('res :>> ', res);
-            this.$router.push({name: 'workflowDetail'})
-            this.isLoadingData = false
-          }).catch(err => {
-            console.log('error' , err);
-          });
+        if(routeTo == "createWorkflow"){
+          this.$router.push({name: 'createWorkflow'})
+        }else if(routeTo == "workflowDetail"){
+          this.$router.push({name: 'workflowDetail'})
         }
+        
+      }else if(pageAction == "set"){
+         //  節點名稱不可為重複
+        var status = sessionStorage.getItem('reNewNode');
+        const reNewNode = JSON.parse(status)
+
+        var checkNameResult = reNewNode.filter(i => i.name == this.nodeData.name )
+        console.log('checkNameResult', checkNameResult)
+        console.log('this.apiData :::::::>>>', this.apiData)
+
+        // edit
+        if(checkNameResult.length > 0 && pageAction == "set" ) {
+          console.log(' this.nodeData',  this.nodeData)
+          console.log('reNewNode', reNewNode)
+          var tempAry = reNewNode.filter( i => i.id !== this.nodeData.id)
+          console.log('tempAry', tempAry)
+
+          var tt = tempAry.some(i =>
+            i.name == this.nodeData.name
+          ) 
+          console.log('tt', tt)
+          if(tt){
+            util.notify(this.$t('audit.workFlows.cantRepeatNodeName'), 'error', 2000 );
+            return
+          }
+        }
+        
+        sessionStorage.setItem('newWorkFlow', JSON.stringify(this.apiData))
+        console.log('newWorkFlow 2', this.apiData)
+        sessionStorage.setItem('pageAction', JSON.stringify("edit"))
+        this.$router.push({name: 'workflowDetail'})
+
+      
+
+        // var checkRepeatArry = this.apiData.orderedAuditNodeArray.map(i => i = i.name)
+        // console.log('checkRepeatArry', checkRepeatArry)
+        
+        // const repeat = checkRepeatArry.some( (item, index, arr) => arr.indexOf(item) !== index)
+        // console.log('repeat', repeat)
+        // if(repeat){
+        //   util.notify(this.$t('audit.workFlows.cantRepeatNodeName'), 'error', 2000 );
+        // }else{
+        //   // call api
+        //   updateWorkflow(this.apiData).then(res=>{
+        //     console.log('res :>> ', res);
+        //     this.$router.push({name: 'workflowDetail'})
+        //     this.isLoadingData = false
+        //   }).catch(err => {
+        //     console.log('error' , err);
+        //   });
+        // }
+
       }
 
     },
@@ -1010,6 +1141,13 @@ export default {
   .title-status
     .el-input__count-inner
       margin-top: 55px
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button 
+      -webkit-appearance: none
+      margin: 0
+
+
+
   .popup_width
     .el-dialog
       width: 70% !important
@@ -1035,6 +1173,15 @@ export default {
   .title-status
     .el-input__count-inner
       margin-top: 55px
+      
+  .text_limit_notice
+    position: absolute
+    text-align: right
+    margin-left: 5px
+    font-size: 10px
+    margin-top: 2px
+    color: #ff2400
+    display: block
 </style>
 
 
