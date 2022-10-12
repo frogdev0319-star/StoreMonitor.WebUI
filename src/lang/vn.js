@@ -686,7 +686,7 @@ export default{
       "itemsOfCate":"Các mục kiểm tra của ",
       "loadingbindstore":"đang tải",
       "moreThan":"nhiều hơn",
-      "needSignatrue":"Phải có chữ ký tại chỗ",
+      "needSignature":"Phải có chữ ký tại chỗ",
       "defineTitle":"Hiển thị tên cho chữ ký tùy biến",
       "addSignature":"Thêm chữ ký",
       "principal":"Người phụ trách",

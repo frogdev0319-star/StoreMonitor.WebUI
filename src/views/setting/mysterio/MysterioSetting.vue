@@ -18,6 +18,11 @@
                     </delay-button>
                 </div>
             </div>
+            <div class="mysterio-nickName">
+                <div class="store-item">
+                    <div class="item-label"><span style="color:'#C60957'">*</span>{{$t('mysterio.nickName')}}</div>
+                </div>
+            </div>
             <div class="mysterio-body">
                 <div class="store-item">
                     <div class="item-label"><span style="color:'#C60957'">*</span>{{$t('remotePatrol.stores')}}</div>
@@ -425,6 +430,27 @@ export default {
     justify-content: space-between;
     border-bottom: 1px solid #e3e9f4;
   }
+}
+.mysterio-nickName{
+    width:auto;
+    margin-top: 32px;
+    margin-bottom: 27px;
+    margin-right: 32px;
+    .store-item{
+        flex:1;
+        height: 74px;
+        align-content: center;
+        align-self: center;
+        display: flex;
+        flex-direction: column;
+        align-items:flex-start;
+        margin-left: 32px;
+        
+        span{
+                color:#C60957;
+                font-size: 12px;
+            }
+    }
 }
 .mysterio-body{
     width:auto;

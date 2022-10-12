@@ -686,7 +686,7 @@ export default{
       "itemsOfCate":"항목 확인 ",
       "loadingbindstore":"로드하는 중...",
       "moreThan":"다음 이상",
-      "needSignatrue":"현장 서명 필요",
+      "needSignature":"현장 서명 필요",
       "defineTitle":"사용자 지정 서명의 표시 이름",
       "addSignature":"서명 추가",
       "principal":"담당자",
