@@ -52,6 +52,12 @@ const _Environments = {
     GLOBAL_WEBSITE: 'https://inspection.wise-iservice.com/storemonitor/api/',
     VERSION: version,
     clientId: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a'
+  },
+  iservicePreview:{
+    CHINA_WEBSITE: 'https://preview-inspection.wise-iservice/api',
+    GLOBAL_WEBSITE: 'https://preview-inspection.wise-iservice/api/',
+    VERSION: version,
+    clientId: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a'
   }
 };
 
@@ -79,8 +85,12 @@ else if(data.SITE == 'iservice'){
   environJSON = _Environments.iservice;
   isGlobalWebsite = true;
 }
+else if(data.SITE == 'iservice-preview'){
+  environJSON = _Environments.iservicePreview;
+  isGlobalWebsite = true;
+}
 else{
-  environJSON = _Environments.iservice;
+  environJSON = _Environments.iservicePreview;
   isGlobalWebsite = true;
 }
 
