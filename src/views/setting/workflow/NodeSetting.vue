@@ -423,7 +423,6 @@ export default {
   watch:{ 
 
     changeNotify(val){
-      
       if(val == true){
         this.nodeData.notify = true
         if(this.nodeData.unHandleNotifyDay == null) this.nodeData.unHandleNotifyDay = 1
@@ -753,7 +752,7 @@ export default {
     //======================================
 
     numberRange(val){
-      
+      console.log('val :>> ', val);
       val = parseInt(Math.abs(val))
       if(val == 0) val = ''
       this.nodeData.unHandleNotifyDay = val
@@ -761,7 +760,6 @@ export default {
     saveNode(){
       // this.fullscreenLoading = true
 
-    
       //  節點名稱不可為空
       if(this.nodeData.name == ''){
         util.notify(this.$t('audit.workFlows.cantEmptyNodeName'), 'error', 2000 );

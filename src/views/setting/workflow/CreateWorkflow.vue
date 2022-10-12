@@ -772,7 +772,9 @@ export default {
               "auditByUsers": [],
               "auditByGroups": [],
               "isEditing": false,
-              "auditTargetType": 1
+              "auditTargetType": 1,
+              "notify": false,
+              "unHandleNotifyDay": null,
             }
       sessionStorage.setItem('workflowNode', JSON.stringify(newNode))
       sessionStorage.setItem('pageAction', JSON.stringify("create"))
@@ -1177,7 +1179,6 @@ export default {
         delete d.id 
         if(d.auditByUsers.length !== 0 ){
           var currentUser = this.userInfo.filter(u => u.userName == d.auditByUsers[0])
-          console.log('currentUser :>> ', currentUser);
           d.auditByUsers = []
           if(currentUser.length > 0) d.auditByUsers.push(currentUser[0].userId)
 

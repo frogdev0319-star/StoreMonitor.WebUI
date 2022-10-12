@@ -792,7 +792,10 @@ export default {
               "auditByUsers": [],
               "auditByGroups": [],
               "isEditing": false,
-              "auditTargetType": 1
+              "auditTargetType": 1,
+              "notify": false,
+              "unHandleNotifyDay": null,
+
             }
       sessionStorage.setItem('workflowNode', JSON.stringify(newNode))
       sessionStorage.setItem('pageAction', JSON.stringify("create"))
