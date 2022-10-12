@@ -686,7 +686,7 @@ export default{
       "itemsOfCate":"検査項",
       "loadingbindstore":"読み込み中…",
       "moreThan":"より大きい",
-      "needSignatrue":"オンサイト署名が必要",
+      "needSignature":"オンサイト署名が必要",
       "defineTitle":"カスタム署名用の名前を表示して",
       "addSignature":"署名を追加して",
       "principal":"担当者",

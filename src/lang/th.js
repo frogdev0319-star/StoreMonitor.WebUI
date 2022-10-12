@@ -685,7 +685,7 @@ export default{
       "itemsOfCate":"รายการของการตรวจสอบของ ",
       "loadingbindstore":"กำลังโหลด",
       "moreThan":"มากกว่า",
-      "needSignatrue":"ต้องมีลายเซ็นจากสถานที่",
+      "needSignature":"ต้องมีลายเซ็นจากสถานที่",
       "defineTitle":"แสดงชื่อสำหรับลายเซ็นแบบกำหนดเอง",
       "addSignature":"เพิ่มลายเซ็น",
       "principal":"ผู้รับผิดชอบ",
