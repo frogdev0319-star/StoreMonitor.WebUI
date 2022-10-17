@@ -1462,7 +1462,11 @@ export default{
       "pleaseChooseStore":"스토어를 선택하십시오",
       "pleaseChooseTag":"검사 선택",
       "comfirmDelMysterio":"이 미스터리 쇼퍼 멤버 삭제 확인",
-      "saveMysterioSettingFail":"권한 그룹을 저장하지 못했습니다"
+      "saveMysterioSettingFail":"권한 그룹을 저장하지 못했습니다",
+      "nickName":"Nick Name",
+      "nickNameTip":"The nick name of sub-category supports up to 10 characters",
+      "pleaseInputNickName":"Please enter the nick name of the mystery",
+      "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name."
   }
 
 }

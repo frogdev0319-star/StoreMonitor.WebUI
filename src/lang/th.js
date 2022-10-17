@@ -1461,7 +1461,11 @@ export default{
       "pleaseChooseStore":"โปรดเลือกร้านค้า",
       "pleaseChooseTag":"เลือกการตรวจสอบ",
       "comfirmDelMysterio":"ยืนยันการลบสมาชิกนักช็อปปริศนานี้",
-      "saveMysterioSettingFail":"ไม่สามารถบันทึกกลุ่มสิทธิ์"
+      "saveMysterioSettingFail":"ไม่สามารถบันทึกกลุ่มสิทธิ์",
+      "nickName":"Nick Name",
+      "nickNameTip":"The nick name of sub-category supports up to 10 characters",
+      "pleaseInputNickName":"Please enter the nick name of the mystery",
+      "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name."
   }
 
 }

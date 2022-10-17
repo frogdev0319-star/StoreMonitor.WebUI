@@ -1463,7 +1463,11 @@ export default{
       "pleaseChooseStore":"Silakan pilih toko",
       "pleaseChooseTag":"Pilih Inspeksi",
       "comfirmDelMysterio":"Konfirmasi penghapusan anggota pembeli misterius ini",
-      "saveMysterioSettingFail":"Gagal menyimpan kelompok izin"
+      "saveMysterioSettingFail":"Gagal menyimpan kelompok izin",
+      "nickName":"Nick Name",
+      "nickNameTip":"The nick name of sub-category supports up to 10 characters",
+      "pleaseInputNickName":"Please enter the nick name of the mystery",
+      "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name."
   }
 
 }

@@ -130,6 +130,14 @@ export default {
             'isExpand': false
           },
           {
+            'prop': 'nickname',
+            'label': this.$t('mysterio.nickName'),
+            'sortable': false,
+            'width': 130,
+            'maxWidth': 130,
+            'isExpand': false
+          },
+          {
             'prop': 'position',
             'label': this.$t('mysterio.position'),
             'sortable': false,
@@ -228,7 +236,7 @@ export default {
           this.getMysterioList();
         }else{
           this.searchData = this.allTableData.filter(item => (
-              item.userName.indexOf(val) > -1 || item.email.indexOf(val) > -1
+              item.userName.indexOf(val) > -1 || item.email.indexOf(val) > -1 || item.nickname.indexOf(val) > -1
           ));
           //this.tableData = this.searchData;
           this.setTableBySearch();
@@ -370,7 +378,7 @@ export default {
             }
         },
         goSettingPage(row){
-          this.$router.push({name: 'MysterioSetting',params: {userId:row.userId}});
+          this.$router.push({name: 'MysterioSetting',params: {userId:row.userId, nickName:row.nickname}});
         },
         deleteMysterioMember(row){
           this.delUserId = row.userId;
