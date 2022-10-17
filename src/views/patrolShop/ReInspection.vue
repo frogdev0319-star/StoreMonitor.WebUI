@@ -141,7 +141,7 @@
                   resize="none"
                   @input="eventDesChanged"
                   @blur="notShowInputRuleTips('eventDes')"/>
-                <span v-if="eventDesRuletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
+                
                 <button
                   class="inspect-btn"
                   @click="submitFeedbackItemResource()"
@@ -149,6 +149,7 @@
                   {{$t('remotePatrol.confirm')}}
                 </button>
               </div>
+              <span v-if="eventDesRuletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
             </div>
           </div>
         </dialog-pop>
@@ -244,7 +245,7 @@
                   resize="none"
                   @input="eventDesChanged"
                   @blur="notShowInputRuleTips('eventDes')"/>
-                <span v-if="eventDesRuletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
+                
                 <button
                   class="inspect-btn"
                   @click="submitFeedbackItemResource()"
@@ -252,6 +253,7 @@
                   {{$t('remotePatrol.confirm')}}
                 </button>
               </div>
+              <span v-if="eventDesRuletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
             </div>
           </div>
         </dialog-pop>
@@ -3595,7 +3597,15 @@ export default {
     },
     eventDesChanged(val) {
       const self = this;
-      self.eventDes = val;
+      const content = filterString.all(val, 200);
+      self.eventDes = content;
+      self.feedbackInput = content;
+      const length = filterString.getContentLength(val);
+      if (length > 200) {
+        this.eventDesRuletip = true;
+      } else {
+        this.eventDesRuletip = false;
+      }
     },
     notShowInputRuleTips(e, item) {
       if (e == 'item') {

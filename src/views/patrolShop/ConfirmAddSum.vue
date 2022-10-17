@@ -2338,6 +2338,7 @@ export default {
               }
               .cdm-pic{
                 overflow: hidden;
+                word-break: break-word;
                 .source-details{
                   display: inline-block;
                   .img-content{
