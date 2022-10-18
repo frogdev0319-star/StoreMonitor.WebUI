@@ -1302,7 +1302,9 @@ export default{
         "addSign":"menambahkan tanda tangan",
         "addAttachment":"Tambahkan lampiran",
         "pleaseSign":"Tanda tangan",
-        "needSign":"Penutup ini memerlukan lampiran file tanda tangan"
+        "needSign":"Penutup ini memerlukan lampiran file tanda tangan",
+        "selectComment":"Please choose to sign-off on comments!",
+        "rejectReason":"Please fill in the reason for rejection!",
     },
     "sendAudit":{
         "all":"Semua",

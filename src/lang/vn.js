@@ -1302,7 +1302,9 @@ export default{
         "addSign":"Thêm vào ký tên",
         "addAttachment":"Thêm tập tin đính kèm",
         "pleaseSign":"Hãy ký tên",
-        "needSign":"Phiên đăng xuất này cần phải đính kèm tập tin chữ ký"
+        "needSign":"Phiên đăng xuất này cần phải đính kèm tập tin chữ ký",
+        "selectComment":"Please choose to sign-off on comments!",
+        "rejectReason":"Please fill in the reason for rejection!",
     },
     "sendAudit":{
         "all":"Tất cả",

@@ -1300,7 +1300,9 @@ export default{
         "addSign":"加入簽名",
         "addAttachment":"加入附件",
         "pleaseSign":"請簽名",
-        "needSign":"此簽核需要附加簽名檔案"
+        "needSign":"此簽核需要附加簽名檔案",
+        "selectComment":"請選擇簽核意見！",
+        "rejectReason":"請填寫駁回原因！",
     },
     "sendAudit":{
         "all":"全部",

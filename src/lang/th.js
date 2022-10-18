@@ -1301,7 +1301,9 @@ export default{
         "addSign":"เพิ่มลายเซ็น",
         "addAttachment":"เพิ่มไฟล์แนบ",
         "pleaseSign":"โปรดลงนาม",
-        "needSign":"การลงนามนี้ต้องแนบไฟล์ลายเซ็น"
+        "needSign":"การลงนามนี้ต้องแนบไฟล์ลายเซ็น",
+        "selectComment":"Please choose to sign-off on comments!",
+        "rejectReason":"Please fill in the reason for rejection!",
     },
     "sendAudit":{
         "all":"ทั้งหมด",

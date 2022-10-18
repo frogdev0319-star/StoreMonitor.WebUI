@@ -1302,7 +1302,9 @@ export default{
         "addSign":"서명 추가",
         "addAttachment":"첨부 파일 추가",
         "pleaseSign":"서명하십시오",
-        "needSign":"이 최종 서명에는 서명 파일을 첨부해야 합니다"
+        "needSign":"이 최종 서명에는 서명 파일을 첨부해야 합니다",
+        "selectComment":"Please choose to sign-off on comments!",
+        "rejectReason":"Please fill in the reason for rejection!",
     },
     "sendAudit":{
         "all":"전부",
