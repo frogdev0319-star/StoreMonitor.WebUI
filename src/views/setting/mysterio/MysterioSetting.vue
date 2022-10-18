@@ -335,8 +335,12 @@ export default {
                 if(res.errCode==0){
                     this.$router.push({name: 'MysterioManage'});
                 }else if(res.errCode==500){//代稱重複
-                    this.warnningTitle = this.$t('mysterio.duplicateNickName');
-                    this.showItemExitedDialog = true;
+                    if(res.errMsg =="this nickname is exist!"){
+                        this.warnningTitle = this.$t('mysterio.duplicateNickName');
+                        this.showItemExitedDialog = true;
+                    }else{
+                        util.notify(self.$t('mysterio.saveMysterioSettingFail')+":"+res.errMsg, 'error', 3000);
+                    }
                 }else{
                     util.notify(self.$t('mysterio.saveMysterioSettingFail'), 'error', 3000);
                 }
