@@ -29,6 +29,7 @@
           <AuditUnit 
             :taskInfo = "taskInfo"
             :auditStates = auditStates
+            :isMysteryMode = isMysteryMode
             />
 
 				</div>
@@ -270,7 +271,8 @@ export default {
       showDoalogTaskCancel: false,
 
       isSystemRejectDialog : false,
-      showInputLimit: false
+      showInputLimit: false,
+      isMysteryMode: false
     }
   },
   mounted() {},
@@ -328,7 +330,7 @@ export default {
         })
         this.auditStates = res.data.auditStates
         this.taskInfo = res.data.taskList
-        
+        this.isMysteryMode = res.data.isMysteryMode
 
         // 部門簽核完成時間排序
         this.taskInfo.forEach(item =>{

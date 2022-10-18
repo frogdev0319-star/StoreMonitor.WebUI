@@ -27,6 +27,7 @@
             <AuditUnit 
               :taskInfo = "taskInfo"
               :auditStates = auditStates
+              :isMysteryMode = isMysteryMode
               />
 
           </div>
@@ -118,7 +119,8 @@ export default {
 
       onEditing: false,
       showDoalogTaskDrawback : false,
-      showDoalogTaskCancel : false
+      showDoalogTaskCancel : false,
+      isMysteryMode: false
     }
   },
   
@@ -215,6 +217,7 @@ export default {
         })
         this.auditStates = res.data.auditStates
         this.taskInfo = res.data.taskList
+        this.isMysteryMode = res.data.isMysteryMode
 
         console.log('this.auditStates ----->> ', this.auditStates);
         console.log('this.taskInfo ori ----->> ', this.taskInfo);

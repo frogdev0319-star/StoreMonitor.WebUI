@@ -8,14 +8,17 @@
 			
 			<!-- audit task wrapper -->
 			<div class="audit-task-wrapper" :class="{ on_audit : taskItem.state == 2 }" >
-				<div class="audit-workflow-name">{{taskItem.nodeName}}</div>
+				<div class="audit-workflow-name">{{taskItem.nodeName}} </div>
 				<div class="audit-flow-content"  v-for=" task in taskItem.tasks" :key="task.taskId">
 					<!-- name -->
 					<div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
 						<div class="audit-name">
 							
-							<div class="audit-user-name" v-if="taskItem.state == 1 && task.comment.result == 0">{{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
-							<div class="audit-user-name" v-else-if="taskItem.parentId == -1"> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
+							<div class="audit-user-name" v-if="taskItem.state == 1 && task.comment.result == 0">{{task.assignee.titleName}} -- {{task.assignee.userName}} <span> ({{task.endTs}})</span></div>
+							<!-- 補上神秘客判斷 -->
+							<div class="audit-user-name" v-else-if="taskItem.parentId == -1"> <span v-if="!isMysteryMode">{{task.assignee.titleName}} -- </span> {{task.assignee.userName}} <span> ({{task.endTs}})</span></div>
+
+
 							<div class="audit-user-name" v-else-if="taskItem.state == 1 && task.comment.result == 1"> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
 							<div class="audit-user-name" v-else-if="taskItem.state == 1 && task.comment.result == -999"> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
 							<div class="audit-user-name" v-else-if="taskItem.state == 5 && task.comment.result == -1"> {{task.auditByUsers[0].titleName}} -- {{task.auditByUsers[0].userName}} <span>({{task.endTs}})</span></div>
@@ -102,6 +105,10 @@ export default {
 		auditStates:{
 			type: Number,
 			default: 0
+		},
+		isMysteryMode:{
+			type: Boolean,
+			default: false
 		}
 	},
 	data() {
