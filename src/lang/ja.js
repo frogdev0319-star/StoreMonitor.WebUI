@@ -1464,7 +1464,11 @@ export default{
       "pleaseChooseStore":"ストアを選択してください",
       "pleaseChooseTag":"検査を選択する",
       "comfirmDelMysterio":"このミステリーショッパーメンバーの削除を確認します",
-      "saveMysterioSettingFail":"アクセス許可グループの保存に失敗しました"
+      "saveMysterioSettingFail":"アクセス許可グループの保存に失敗しました",
+      "nickName":"Nick Name",
+      "nickNameTip":"The nick name of sub-category supports up to 10 characters",
+      "pleaseInputNickName":"Please enter the nick name of the mystery",
+      "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name."
   }
 
 }

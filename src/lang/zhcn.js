@@ -1463,7 +1463,11 @@ export default{
       "pleaseChooseStore":"请选择门店",
       "pleaseChooseTag":"请选择巡检表",
       "comfirmDelMysterio":"确定删除此神秘客成员",
-      "saveMysterioSettingFail":"储存权限群组失败"
+      "saveMysterioSettingFail":"储存权限群组失败",
+      "nickName":"代称",
+      "nickNameTip":"神秘客代称长度不可超过10个字元！",
+      "pleaseInputNickName":"请输入神秘客代称",
+      "duplicateNickName":"已有相同的神秘客代称，请重新输入"
   }
 
 }

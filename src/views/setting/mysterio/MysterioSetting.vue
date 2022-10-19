@@ -18,6 +18,21 @@
                     </delay-button>
                 </div>
             </div>
+            <div class="mysterio-nickName">
+                <div class="store-item">
+                    <div class="item-label"><span style="color:'#C60957'">*</span>{{$t('mysterio.nickName')}}</div>
+                    <div class="nickName-input"> 
+                        <el-input
+                        ref="nickName"
+                        v-model="nickName"
+                        style="width: 250px"
+                        :disabled="noInput"
+                        @input="(val) => itemInputChanged(val, 10)"
+                        />
+                        <span class="text_limit_notice" v-if="showInputLimit"> {{$t('mysterio.nickNameTip')}}  </span>
+                    </div>
+                </div>
+            </div>
             <div class="mysterio-body">
                 <div class="store-item">
                     <div class="item-label"><span style="color:'#C60957'">*</span>{{$t('remotePatrol.stores')}}</div>
@@ -112,6 +127,7 @@ import TblPaginationOnly from '@/components/TblPaginationOnly';
 import util from '@/common/util';
 import DelayButton from '@/components/DelayButton';
 import DialogPop from '@/components/DialogPop';
+import filterString from '@/common/filterString.js';
 
 export default {
     name: 'MysterioSetting',
@@ -169,6 +185,8 @@ export default {
         },
         showItemExitedDialog:false,
         warnningTitle:"",
+        nickName:"",
+        showInputLimit:false
       };
     },
 
@@ -190,6 +208,7 @@ export default {
     methods: {
         getRouteData(){
             this.userId = this.$route.params.userId;
+            this.nickName = this.$route.params.nickName;
             console.log("userId:",this.userId);
         },
         init(){
@@ -270,11 +289,12 @@ export default {
             mysteroRESTful.getMysterySetting({userId:this.userId}).then(res=>{
                 var tempAuthLit = [];
                 if(res.errCode==0){
-                    res.data.map(setting=>{
+                    res.data.settings.map(setting=>{
                         var obj = self.doMapStoreAndTag(setting.storeId,setting.inspectTagId);
                         obj['id']=setting.id;
                         tempAuthLit.push(obj);
                     });
+                    self.nickName = res.data.nickname;
                 }
                 self.allTableData = tempAuthLit;
                 self.total = Math.ceil( self.allTableData.length/self.curSizeNum);
@@ -296,6 +316,11 @@ export default {
             this.allTableData = util.sort_by_key(this.allTableData,key,this.defaultSort.order );
         },
         saveAuth(){
+            if(this.nickName.trim()==""){
+                this.warnningTitle = this.$t('mysterio.pleaseInputNickName');
+                this.showItemExitedDialog = true;
+                return;
+            }
             const self = this;
             var settingList=[];
             self.allTableData.map(auth =>{
@@ -306,9 +331,16 @@ export default {
                 };
                 settingList.push(obj);
             });
-            mysteroRESTful.batchAddMysterySetting({userId:self.userId,settingList}).then(res=>{
+            mysteroRESTful.batchAddMysterySetting({userId:self.userId,settingList,nickname:self.nickName}).then(res=>{
                 if(res.errCode==0){
                     this.$router.push({name: 'MysterioManage'});
+                }else if(res.errCode==500){//代稱重複
+                    if(res.errMsg =="this nickname is exist!"){
+                        this.warnningTitle = this.$t('mysterio.duplicateNickName');
+                        this.showItemExitedDialog = true;
+                    }else{
+                        util.notify(self.$t('mysterio.saveMysterioSettingFail')+":"+res.errMsg, 'error', 3000);
+                    }
                 }else{
                     util.notify(self.$t('mysterio.saveMysterioSettingFail'), 'error', 3000);
                 }
@@ -404,7 +436,18 @@ export default {
         },
         onShowItemExitedDialogClose(){
             this.showItemExitedDialog = false;
-        }
+        },
+        itemInputChanged(val, n){
+            const content = filterString.all(val, n);
+            this.nickName = content
+
+            const length = filterString.getContentLength(val);
+            if(length > n) {
+                this.showInputLimit = true
+            } else {
+                this.showInputLimit = false
+            }
+        },
     }
 }
 </script>
@@ -425,6 +468,40 @@ export default {
     justify-content: space-between;
     border-bottom: 1px solid #e3e9f4;
   }
+}
+.mysterio-nickName{
+    width:auto;
+    margin-top: 32px;
+    margin-bottom: 27px;
+    margin-right: 32px;
+    width:50%;
+    .store-item{
+        flex:1;
+        height: 74px;
+        align-content: flex-start;
+        align-self:flex-start;
+        display: flex;
+        flex-direction: column;
+        align-items:flex-start;
+        margin-left: 32px;
+        
+        span{
+                color:#C60957;
+                font-size: 12px;
+            }
+        .nickName-input{
+            margin-top: 6px;
+            .text_limit_notice{
+                position: absolute;
+                text-align: right;
+                margin-left: 5px;
+                font-size: 10px;
+                margin-top: 2px;
+                color: #ff2400;
+                display: block;
+            }
+        }
+    }
 }
 .mysterio-body{
     width:auto;
