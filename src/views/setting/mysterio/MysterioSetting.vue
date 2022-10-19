@@ -18,22 +18,20 @@
                     </delay-button>
                 </div>
             </div>
-            <div class="mysterio-nickName">
-                <div class="store-item">
+            <div class="mysterio-body">
+                <div style="height:148px;flex:1;">
+                <div class="store-item" style="height:85px;">
                     <div class="item-label"><span style="color:'#C60957'">*</span>{{$t('mysterio.nickName')}}</div>
                     <div class="nickName-input"> 
                         <el-input
                         ref="nickName"
                         v-model="nickName"
-                        style="width: 250px"
                         :disabled="noInput"
-                        @input="(val) => itemInputChanged(val, 10)"
+                        @input="(val) => itemInputChanged(val, 50)"
                         />
                         <span class="text_limit_notice" v-if="showInputLimit"> {{$t('mysterio.nickNameTip')}}  </span>
                     </div>
                 </div>
-            </div>
-            <div class="mysterio-body">
                 <div class="store-item">
                     <div class="item-label"><span style="color:'#C60957'">*</span>{{$t('remotePatrol.stores')}}</div>
                     <div class="item-selection">
@@ -49,32 +47,39 @@
                         </el-select>
                     </div>
                 </div>
-                <div class="store-item">
-                    <div class="item-label"><span style="color:'#C60957'">*</span>{{$t('overview.patrolLists')}}</div>
-                    <div class="item-selection">
-                        <el-select
-                            v-model="selInspectVaule"
-                            @change="onChangeSelectedInspect"
-                            size="mini">
-                            <el-option-group
-                                v-for="group in storeDataList[selStoreIndex].inspectList"
-                                :key="group.label"
-                                :label="group.label">
-                                <el-option v-for="(sitem) in group.options"
-                                    :key="sitem.inspId"
-                                    :label="sitem.label"
-                                    :value="{value:sitem.inspId,label:sitem.label}"
-                                />
-                            </el-option-group>
-                        </el-select>
+                </div>
+                <div style="height:148px;flex:1;">
+                    <div style="height:85px;"></div>
+                    <div class="store-item">
+                        <div class="item-label"><span style="color:'#C60957'">*</span>{{$t('overview.patrolLists')}}</div>
+                        <div class="item-selection">
+                            <el-select
+                                v-model="selInspectVaule"
+                                @change="onChangeSelectedInspect"
+                                size="mini">
+                                <el-option-group
+                                    v-for="group in storeDataList[selStoreIndex].inspectList"
+                                    :key="group.label"
+                                    :label="group.label">
+                                    <el-option v-for="(sitem) in group.options"
+                                        :key="sitem.inspId"
+                                        :label="sitem.label"
+                                        :value="{value:sitem.inspId,label:sitem.label}"
+                                    />
+                                </el-option-group>
+                            </el-select>
+                        </div>
                     </div>
                 </div>
-                <delay-button @click="addAuth" style="margin-left:32px;height:36px; margin-top:35px ;">
-                    <div class="button-area">
-                        <i class="iconfont el-icon-plus"/>
-                        <span>{{$t('mysterio.addAuth')}}</span>
-                    </div>
-                </delay-button>
+                <div style="height:148px;">
+                    <div style="height:85px;"></div>
+                    <delay-button @click="addAuth" style="margin-left:32px;height:36px; margin-top:calc(36/1920*100vw) ;">
+                        <div class="button-area">
+                            <i class="iconfont el-icon-plus"/>
+                            <span>{{$t('mysterio.addAuth')}}</span>
+                        </div>
+                    </delay-button>
+                </div>
             </div>
             <div class="addList">
                 <div style="border-left:4px solid #2c90d9;text-align: left;margin-bottom:17px ;"><span style="margin-left:12px;">{{$t('mysterio.authList')}}</span></div>
@@ -474,23 +479,31 @@ export default {
     margin-top: 32px;
     margin-bottom: 27px;
     margin-right: 32px;
-    width:50%;
-    .store-item{
+    display: flex;
+    flex-direction: column;
+    .item-label{
         flex:1;
-        height: 74px;
-        align-content: flex-start;
-        align-self:flex-start;
-        display: flex;
-        flex-direction: column;
-        align-items:flex-start;
+        align-self: flex-start;
         margin-left: 32px;
-        
         span{
                 color:#C60957;
                 font-size: 12px;
             }
+    }
+    .store-item{
+        flex:1;
+        height: 74px;
+        align-content: flex-start;
+        display: flex;
+        flex-direction: row;
+        align-items:flex-start;
+        margin-top: 10px;
+        margin-left: 32px;
+        margin-right: 27px;
+        justify-content: space-between;
         .nickName-input{
-            margin-top: 6px;
+            display: flex;
+            flex:1;
             .text_limit_notice{
                 position: absolute;
                 text-align: right;
@@ -520,11 +533,22 @@ export default {
         flex-direction: column;
         align-items:flex-start;
         margin-left: 32px;
-        
         span{
                 color:#C60957;
                 font-size: 12px;
             }
+        .nickName-input{
+            width:100%;
+            .text_limit_notice{
+                position: absolute;
+                text-align: right;
+                margin-left: 5px;
+                font-size: 10px;
+                margin-top: 2px;
+                color: #ff2400;
+                display: block;
+            }
+        }
         .item-selection{
             margin-top: 6px;
             display: flex;
