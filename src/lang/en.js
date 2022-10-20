@@ -1467,7 +1467,8 @@ export default{
         "nickName":"Nick Name",
         "nickNameTip":"The nick name of sub-category supports up to 50 characters",
         "pleaseInputNickName":"Please enter the nick name of the mystery",
-        "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name."
+        "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name.",
+        "mystery":"Mystery Shopper"
     }
   
   }

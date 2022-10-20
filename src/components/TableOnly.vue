@@ -418,7 +418,7 @@ export default {
     currentProperties: function() {
       console.log(this.expandComponent);
       if (this.expandComponent=== 'TabInceptionDetail') {
-        return { submitter: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs,isexportPDF:this.isexportPDF }
+        return { submitter: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs,isexportPDF:this.isexportPDF,isMystery:this.expandCompProperties.isMystery }
       }else if(this.expandComponent=== 'IncepItemTop5'){
         //console.log("this.expandCompProperties:",this.expandCompProperties);
         return { storeId: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs,isexportPDF:this.isexportPDF }
