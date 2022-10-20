@@ -1467,7 +1467,7 @@ export default{
         "comfirmDelMysterio":"Confirm the deletion of this mystery shopper member",
         "saveMysterioSettingFail":"Failed to save permission group",
         "nickName":"Nick Name",
-        "nickNameTip":"The nick name of sub-category supports up to 10 characters",
+        "nickNameTip":"The nick name of sub-category supports up to 50 characters",
         "pleaseInputNickName":"Please enter the nick name of the mystery",
         "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name."
     }

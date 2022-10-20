@@ -1465,7 +1465,7 @@ export default{
       "comfirmDelMysterio":"Xác nhận xóa thành viên người mua sắm bí mật này",
       "saveMysterioSettingFail":"Không thể lưu nhóm quyền truy cập",
       "nickName":"Nick Name",
-      "nickNameTip":"The nick name of sub-category supports up to 10 characters",
+      "nickNameTip":"The nick name of sub-category supports up to 50 characters",
       "pleaseInputNickName":"Please enter the nick name of the mystery",
       "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name."
   }
