@@ -1033,14 +1033,27 @@ export default {
          params.storeIds = self.params.storeIds;
 
          //let id = this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName);
-         params.submitters = [];
+         params.submitters = this.part3.compareIds;
          if(this.part3.indexRegion!=-1){
           let id = this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName);
           params.submitters=[id]
          }
          params.groupIds   = [];
          params.groupMode = 0;
-       }
+       }else if (this.part3.compareType == 'position') {
+            params.storeIds = self.params.storeIds;
+            let users = [];
+            this.part3.originArray.forEach(function (item) {
+                if (self.part3.compareIds.indexOf(item.value) >= 0)
+                    users = users.concat(item.contents);
+            })
+            if(this.part3.indexRegion==-1)
+                  params.submitters = users;
+            else
+                  params.submitters = [self.part3.content[self.part3.indexRegion].innerId]
+            params.groupIds   = [];
+            params.groupMode = 0;
+        }
        params.inspectTagId = self.params.inspectId;
             params.filter={
               page:0,
@@ -2174,9 +2187,20 @@ export default {
             console.log("To Get Data")
             params.storeIds = this.part3.indexRegion==-1?self.params.storeIds:this.part3.content[this.part3.indexRegion].list;
             params.groupIds = this.part3.indexRegion==-1?[]:this.part3.content[this.part3.indexRegion].list;
-            if(this.part3.compareType=='users' || this.part3.compareType=='position'){
+            if(this.part3.compareType=='users' ){
               params.storeIds = self.params.storeIds;
-              params.submitters=this.part3.indexRegion==-1?[]:[ this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName)]
+              params.submitters=this.part3.indexRegion==-1?this.part3.compareIds:[ this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName)]
+            }else if (this.part3.compareType == 'position') {
+                params.storeIds = self.params.storeIds;
+                let users = [];
+                this.part3.originArray.forEach(function (item) {
+                    if (self.part3.compareIds.indexOf(item.value) >= 0)
+                        users = users.concat(item.contents);
+                })
+                if(this.part3.indexRegion==-1)
+                      params.submitters = users;
+                else
+                      params.submitters = [ this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName)]
             }
             params.inspectTagId = self.params.inspectId;
             if(this.inspectItem){

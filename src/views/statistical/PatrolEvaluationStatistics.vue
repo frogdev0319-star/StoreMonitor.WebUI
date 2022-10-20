@@ -1592,9 +1592,23 @@ export default {
             //this.part2.compareType == 'stores'
            // console.log(this.part1.content[this.part1.indexRegion])
             params.storeIds =this.part1.indexRegion==-1?this.params.storeIds:this.part1.compareType == 'stores' ? [this.part1.content[this.part1.indexRegion].innerId] : this.part1.content[this.part1.indexRegion].list;
-            if (this.part1.compareType == 'position' || this.part1.compareType == 'users') {
+            if (this.part1.compareType == 'users') {
                 params.storeIds = self.params.storeIds;
-                params.submitters = self.part1.indexRegion==-1?[]:[self.part1.content[self.part1.indexRegion].innerId];
+                params.submitters = self.part1.indexRegion==-1?this.part1.compareIds:[self.part1.content[self.part1.indexRegion].innerId];
+                params.groupIds = [];
+                params.groupMode = 0;
+            }else if (this.part1.compareType == 'position') {
+                //console.log("position content:",self.part1.content);
+                params.storeIds = self.params.storeIds;
+                let users = [];
+                this.part1.originArray.forEach(function (item) {
+                    if (self.part1.compareIds.indexOf(item.value) >= 0)
+                        users = users.concat(item.contents);
+                })
+                if(this.part1.indexRegion==-1)
+                      params.submitters = users;
+                else
+                      params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
                 params.groupIds = [];
                 params.groupMode = 0;
             }
@@ -1650,9 +1664,23 @@ export default {
             }
             console.log(this.part2.content[this.part2.indexRegion])
             params.storeIds =this.part2.indexRegion==-1?this.params.storeIds: this.part2.compareType == 'stores' ? [this.part2.content[this.part2.indexRegion].innerId] : this.part2.content[this.part2.indexRegion].list;
-            if (this.part2.compareType == 'position' || this.part2.compareType == 'users') {
+            if (this.part2.compareType == 'users') {
                 params.storeIds = self.params.storeIds;
-                params.submitters =self.part2.indexRegion==-1?[]: [self.part1.content[self.part2.indexRegion].innerId];
+                params.submitters =self.part2.indexRegion==-1?this.part2.compareIds: [self.part2.content[self.part2.indexRegion].innerId];
+                params.groupIds = [];
+                params.groupMode = 0;
+            }else if (this.part2.compareType == 'position') {
+                //console.log("position content:",self.part2.content);
+                params.storeIds = self.params.storeIds;
+                let users = [];
+                this.part2.originArray.forEach(function (item) {
+                    if (self.part2.compareIds.indexOf(item.value) >= 0)
+                        users = users.concat(item.contents);
+                })
+                if(this.part2.indexRegion==-1)
+                      params.submitters = users;
+                else
+                      params.submitters = [self.part2.content[self.part2.indexRegion].innerId]
                 params.groupIds = [];
                 params.groupMode = 0;
             }
@@ -1706,9 +1734,23 @@ export default {
             }
             // console.log(this.part3.content[this.part3.indexRegion])
             params.storeIds = this.part3.indexRegion==-1?this.params.storeIds:this.part3.compareType == 'stores' ? [this.part3.content[this.part3.indexRegion].innerId] : this.part3.content[this.part3.indexRegion].list;
-            if (this.part3.compareType == 'position' || this.part3.compareType == 'users') {
+            if (this.part3.compareType == 'users') {
                 params.storeIds = self.params.storeIds;
-                params.submitters = self.part3.indexRegion==-1?[]:[self.part3.content[self.part3.indexRegion].innerId];
+                params.submitters = self.part3.indexRegion==-1?this.part3.compareIds:[self.part3.content[self.part3.indexRegion].innerId];
+                params.groupIds = [];
+                params.groupMode = 0;
+            }else if (this.part3.compareType == 'position') {
+                //console.log("position content:",self.part3.content);
+                params.storeIds = self.params.storeIds;
+                let users = [];
+                this.part3.originArray.forEach(function (item) {
+                    if (self.part3.compareIds.indexOf(item.value) >= 0)
+                        users = users.concat(item.contents);
+                })
+                if(this.part3.indexRegion==-1)
+                      params.submitters = users;
+                else
+                      params.submitters = [self.part3.content[self.part3.indexRegion].innerId]
                 params.groupIds = [];
                 params.groupMode = 0;
             }
@@ -2461,12 +2503,26 @@ export default {
                     params.endTs = self.params.endTs;
                     params.groupMode = 0;
                     params.storeIds = this.part1.indexRegion==-1? this.params.storeIds:this.part1.content[this.part1.indexRegion].list;
-                    if (this.part1.compareType == 'users' || this.part1.compareType == 'position') {
+                    if (this.part1.compareType == 'users' ) {//|| this.part1.compareType == 'position'
+                        //console.log("********self.part1.content:",self.part1.content);
                         params.storeIds = self.params.storeIds;
                         if(this.part1.indexRegion==-1)
-                              params.submitters = []
+                              params.submitters = this.part1.compareIds;
                         else
                               params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
+                    }else if (this.part1.compareType == 'position') {
+                        //console.log("position content:",self.part1.content);
+                        params.storeIds = self.params.storeIds;
+                        let users = [];
+                        this.part1.originArray.forEach(function (item) {
+                            if (self.part1.compareIds.indexOf(item.value) >= 0)
+                                users = users.concat(item.contents);
+                        })
+                        if(this.part1.indexRegion==-1)
+                              params.submitters = users;
+                        else
+                              params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
+                        
                     }
                     params.inspectTagId = self.params.inspectId;
                     params.order = {
@@ -2707,9 +2763,21 @@ export default {
                     params.endTs = self.params.endTs;
                     params.groupMode = 0;
                     params.storeIds =this.part2.indexRegion==-1?this.params.storeIds: this.part2.content[this.part2.indexRegion].list;
-                    if (this.part2.compareType == 'users' || this.part2.compareType == 'position') {
+                    if (this.part2.compareType == 'users') {
                         params.storeIds = self.params.storeIds;
-                        params.submitters = this.part2.indexRegion==-1?[]:[self.part2.content[self.part2.indexRegion].innerId]
+                        params.submitters = this.part2.indexRegion==-1?this.part2.compareIds:[self.part2.content[self.part2.indexRegion].innerId]
+                    }else if (this.part2.compareType == 'position') {
+                        //console.log("position content:",self.part2.content);
+                        params.storeIds = self.params.storeIds;
+                        let users = [];
+                        this.part2.originArray.forEach(function (item) {
+                            if (self.part2.compareIds.indexOf(item.value) >= 0)
+                                users = users.concat(item.contents);
+                        })
+                        if(this.part2.indexRegion==-1)
+                            params.submitters = users;
+                        else
+                            params.submitters = [self.part2.content[self.part2.indexRegion].innerId]
                     }
                     params.inspectTagId = self.params.inspectId;
                     params.order = {
@@ -2917,9 +2985,21 @@ export default {
                     params.endTs = self.params.endTs;
                     params.groupMode = 0;
                     params.storeIds = this.part3.indexRegion==-1? this.params.storeIds:this.part3.content[this.part3.indexRegion].list;
-                    if (this.part3.compareType == 'users' || this.part3.compareType == 'position') {
+                    if (this.part3.compareType == 'users') {
                         params.storeIds = self.params.storeIds;
-                        params.submitters =this.part3.indexRegion==-1?[]: [self.part3.content[self.part3.indexRegion].innerId]
+                        params.submitters =this.part3.indexRegion==-1?this.part3.compareIds: [self.part3.content[self.part3.indexRegion].innerId]
+                    }else if (this.part3.compareType == 'position') {
+                        //console.log("position content:",self.part3.content);
+                        params.storeIds = self.params.storeIds;
+                        let users = [];
+                        this.part3.originArray.forEach(function (item) {
+                            if (self.part3.compareIds.indexOf(item.value) >= 0)
+                                users = users.concat(item.contents);
+                        })
+                        if(this.part3.indexRegion==-1)
+                            params.submitters = users;
+                        else
+                            params.submitters = [self.part3.content[self.part3.indexRegion].innerId]
                     }
                     params.inspectTagId = self.params.inspectId;
                     params.order = {
