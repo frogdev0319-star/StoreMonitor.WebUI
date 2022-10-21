@@ -74,6 +74,8 @@
                 </el-col>
             </el-row>
         </div>
+
+        <!-- 考評結果分佈 --> 
         <div class="statistics-content" id="imgTest_avg2" style="height:900px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
             <div class="head">
                 <div class="region-titles">
@@ -153,8 +155,8 @@
             <el-col style="position:absolute;height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc( 100% - 80px )">
                 <div v-if="part1.storeMode==1" style="overflow-y:hidden;overflow-x:auto;height:430px;width:100%" :style="{width:ispdf?'900px':null}">
                     <!--<div v-if="ispdf" style="height:100%;">
-                  <v-chart ref="storeChart" :id="part1-region-line-chart" autoresize :options="part1.barStoreOption"
-                  :style="{width:part1.barStoreOption?part1.barStoreOption.width:'100%',height:'100%'}"/>
+                    <v-chart ref="storeChart" :id="part1-region-line-chart" autoresize :options="part1.barStoreOption"
+                    :style="{width:part1.barStoreOption?part1.barStoreOption.width:'100%',height:'100%'}"/>
                 </div>-->
                     <div style="height:100%;">
                         <v-chart ref="storeChart" :id="part1-region-line-chart" :options="part1.barStoreOption" autoresize :style="{width:part1.barStoreOption?part1.barStoreOption.width:'100%',height:'100%'}" />
@@ -1675,13 +1677,13 @@ export default {
                         users = users.concat(item.contents);
                 })
                 if(this.part1.indexRegion==-1)
-                      params.submitters = users;
+                    params.submitters = users;
                 else
-                      params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
+                    params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
                 params.groupIds = [];
                 params.groupMode = 0;
             }
-            // console.log(params)
+            
             params.inspectTagId = self.params.inspectId;
             params.filter = {
                 page: 0,
@@ -1882,7 +1884,7 @@ export default {
         },
 
         getInspectStatsOverviewWithGroup(params) {
-            console.log("getInspectStatsOverviewWithGroup")
+            console.log("getInspectStatsOverviewWithGroup", params)
             if (params.filter.size == 0) {
                 return;
             }
@@ -2006,7 +2008,13 @@ export default {
             originArray,
             selStoreIdArr
         }) { //劃分類型選擇
-            console.log("Part1 Emit Type Change=" + compareType)
+            console.log("Part1 Emit Type Change compareType===> ", compareType)
+            console.log("Part1 Emit Type Change compareArr===> ", compareArr)
+            console.log("Part1 Emit Type Change selectedLabels===> ", selectedLabels)
+            console.log("Part1 Emit Type Change originArray===> ", originArray)
+            console.log("Part1 Emit Type Change selStoreIdArr===> ", selStoreIdArr)
+
+
             this.part1.compareType = compareType;
             this.part1.compareIds = compareArr;
             this.part1.comapareLabels = selectedLabels;
@@ -2386,7 +2394,14 @@ export default {
                 params.submitters = this.part1.compareIds;
                 params.groupIds = this.part1.compareIds;
                 params.groupMode = 5;
-            } else if (this.part1.compareType == 'position') {
+                params.searchMysteryMode = 0
+            } else if (this.part1.compareType == 'mysterio') {
+                params.submitters = this.part1.compareIds;
+                params.groupIds = this.part1.compareIds;
+                params.groupMode = 5;
+                params.searchMysteryMode = 1
+
+            }else if (this.part1.compareType == 'position') {
                 let users = [];
                 console.log("Part1 User")
                 console.log(this.part1.originArray)
@@ -2405,7 +2420,7 @@ export default {
                 size: params.groupIds.length
             };
 
-            console.log(params)
+            console.log('getPart1RegionBar ----->>>>', params)
             if (params.storeIds.length === 0) {
                 ;
                 return false;
@@ -2548,6 +2563,7 @@ export default {
 
             await this.getPart1StoreBar();
         },
+
         async getPart1StoreBar() {
             const self = this;
             const option = this.getInspectLineOption();
@@ -2565,7 +2581,6 @@ export default {
                     else{
                         content = [this.part1.content[this.part1.indexRegion]];
                     }
-
                 } else {
                     const params = {};
                     params.beginTs = self.params.beginTs;
@@ -2576,9 +2591,9 @@ export default {
                         //console.log("********self.part1.content:",self.part1.content);
                         params.storeIds = self.params.storeIds;
                         if(this.part1.indexRegion==-1)
-                              params.submitters = this.part1.compareIds;
+                            params.submitters = this.part1.compareIds;
                         else
-                              params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
+                            params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
                     }else if (this.part1.compareType == 'position') {
                         //console.log("position content:",self.part1.content);
                         params.storeIds = self.params.storeIds;
@@ -2588,9 +2603,9 @@ export default {
                                 users = users.concat(item.contents);
                         })
                         if(this.part1.indexRegion==-1)
-                              params.submitters = users;
+                            params.submitters = users;
                         else
-                              params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
+                            params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
                         
                     }
                     params.inspectTagId = self.params.inspectId;

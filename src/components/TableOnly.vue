@@ -389,8 +389,8 @@ export default {
       require:false
     },
     expandCompProperties:{
-      type: Object,
-      default: () => {}
+      type: String,
+      default: ""
     }
   },
   data() {
