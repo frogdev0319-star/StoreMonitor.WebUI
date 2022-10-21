@@ -145,6 +145,10 @@ export default {
             type: Boolean,
             default: false
         },
+        isMystery:{
+            type: Boolean,
+            default: false
+        }
     },
     data(){
         return{
@@ -464,7 +468,8 @@ export default {
         params.activeName = '4';
         params.searchParams.filter ={ page: 0, size: 10 };
         params.beginTs=this.beginTs;
-        params.endTs=this.endTs
+        params.endTs=this.endTs;
+        params.searchMysteryMode=this.isMystery?1:0;
         params.searchFrom='PatrolPersonStat';
       }else{
           params ={

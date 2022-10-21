@@ -1469,9 +1469,9 @@ export default{
       "nickNameTip":"神秘客代稱長度不可超過50個字元！",
       "pleaseInputNickName":"請輸入神秘客代稱",
       "duplicateNickName":"已有相同的神秘客代稱，請重新輸入",
-      
       "mysterio":"神秘客",
-      "allMysterio":"全部神秘客"
+      "allMysterio":"全部神秘客",
+      "mystery":"神秘客"
   }
 
 }
