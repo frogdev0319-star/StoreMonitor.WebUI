@@ -1302,7 +1302,9 @@ export default{
         "addSign":"署名を追加する",
         "addAttachment":"添付ファイルの追加",
         "pleaseSign":"署名してください",
-        "needSign":"この承認には、署名ファイルを添付する必要があります"
+        "needSign":"この承認には、署名ファイルを添付する必要があります",
+        "selectComment":"Please choose to sign-off on comments!",
+        "rejectReason":"Please fill in the reason for rejection!",
     },
     "sendAudit":{
         "all":"オール",

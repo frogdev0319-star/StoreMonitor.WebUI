@@ -1302,7 +1302,9 @@ export default{
         "addSign":"加入签名",
         "addAttachment":"加入附件",
         "pleaseSign":"请签名",
-        "needSign":"此签核需要附加签名档案"
+        "needSign":"此签核需要附加签名档案",
+        "selectComment":"请选择签核意见！",
+        "rejectReason":"请填写驳回原因！",
     },
     "sendAudit":{
         "all":"全部",

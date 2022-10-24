@@ -29,6 +29,7 @@
           <AuditUnit 
             :taskInfo = "taskInfo"
             :auditStates = auditStates
+            :isMysteryMode = isMysteryMode
             />
 
 				</div>
@@ -54,8 +55,9 @@
               <div class="el-radio-details" :class="{agree : agree == true}" @click="agreeNode">{{customButton[0].text}}</div>
               <div class="el-radio-details" :class="{reject : agree == false}" @click="rejectNode">{{customButton[1].text}}</div>
             </div>
-            <div class="comment-input">
+            <div class="comment-input"  >
               <el-input
+                ref="audit_comment"
                 v-model="commentsToApi.comment.description"
                 :autosize="{ minRows: 3, maxRows: 5 }"
                 :placeholder="$t('remotePatrol.enterDesc')"
@@ -68,9 +70,6 @@
               <span class="text_limit_notice" v-if="showInputLimit"> {{$t('remotePatrol.comentRuletip_suggest')}}  </span>
             </div>
           </div>
-
-
-
 
 
           <!-- 加入檔案 & 簽名 -->
@@ -272,7 +271,8 @@ export default {
       showDoalogTaskCancel: false,
 
       isSystemRejectDialog : false,
-      showInputLimit: false
+      showInputLimit: false,
+      isMysteryMode: false
     }
   },
   mounted() {},
@@ -330,7 +330,7 @@ export default {
         })
         this.auditStates = res.data.auditStates
         this.taskInfo = res.data.taskList
-        
+        this.isMysteryMode = res.data.isMysteryMode
 
         // 部門簽核完成時間排序
         this.taskInfo.forEach(item =>{
@@ -399,6 +399,7 @@ export default {
     rejectNode(){
       this.agree = false
       this.commentsToApi.result = 1
+      this.$refs.audit_comment.focus()
       console.log('this.commentsToApi :>> ', this.commentsToApi);
     },
 
@@ -527,7 +528,7 @@ export default {
     async taskSummit(){
       this.isLoadingData = true
       if(this.agree == null){
-        util.notify('請選擇簽核意見', 'error', 2000);
+        util.notify(this.$t('audit.auditStatus.selectComment'), 'error', 2000);
         this.isLoadingData = false
         return
       }
@@ -593,6 +594,14 @@ export default {
         this.isLoadingData = false;
         return
       }
+
+      // 必填寫駁回原因
+      if( this.commentsToApi.result == 1 && this.commentsToApi.comment.description == "") {
+        util.notify(this.$t('audit.auditStatus.rejectReason'), 'error', 2000);
+        this.isLoadingData = false;
+        return
+      }
+
       console.log('this.commentsToApi ready to Api -------->> ', this.commentsToApi);
       taskSummit(this.commentsToApi).then(res=>{
         console.log('res :>> ', res);
@@ -611,6 +620,10 @@ export default {
 
       });
     },
+
+
+
+
 
     isSystemRejectDialogConfirm(){
         this.isLoadingData = false;
@@ -893,6 +906,9 @@ export default {
             font-size: 14px
         .comment-input
           margin-bottom: 30px
+          border: 1px solid #fff
+          border-radius: 6px
+         
       .audit-add-files
         margin-left: 10px
         p 
@@ -925,6 +941,10 @@ export default {
             margin-right: 10px
             width: 200px
             border-radius: 4px
+
+  .need_comment
+    border: 1px solid #dedede !important
+    border-radius: 6px !important
 
   .agree
     background-color: rgb(0, 106, 183)

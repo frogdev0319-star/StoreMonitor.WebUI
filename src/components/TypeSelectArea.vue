@@ -75,8 +75,8 @@ export default {
           default:0
         },
         inspectId:{
-          type:String,
-          default:''
+          type:Number,
+          default:0
         },
         regionArray1:{
           type:Array,
@@ -98,7 +98,7 @@ export default {
         },
         curStoreType:{
           type:Array,
-           default() {
+          default() {
             return []
           }
         },
@@ -119,9 +119,13 @@ export default {
             DatePickIconSrc: require('../../static/img/statistics/ic_edit.svg'),
             CalenderIconSrc: require('../../static/img/statistics/ic_calender.svg'),
             //compareType:'stores',
-            compareTypeItems:[{value:'area1',label:this.$t('statistics.area1')},{value:'area2',label:this.$t('statistics.area2')},
-            {value:'storeGroup',label:this.$t('statistics.storeGroup')},{value:'storeType',label:this.$t('statistics.storeType')},
-            {value:'stores',label:this.$t('statistics.stores')}],
+            compareTypeItems:[
+              {value:'area1',label:this.$t('statistics.area1')},
+              {value:'area2',label:this.$t('statistics.area2')},
+              {value:'storeGroup',label:this.$t('statistics.storeGroup')},
+              {value:'storeType',label:this.$t('statistics.storeType')},
+              {value:'stores',label:this.$t('statistics.stores')}
+            ],
             date:Date.now(),
             dateFormat:'yyyy/MM/DD',
             //curCountry: -1, 
@@ -147,6 +151,7 @@ export default {
             origianlUserList:[],
             userIds: [],
             userList: [],
+            mysterioList: [],
             origianlUserList: [],
             positionIds: [],
             positionsList: [],
@@ -160,9 +165,10 @@ export default {
     console.log("On Created")
     await this.getStoreListAndGroupAndType();
     if(this.allowPerson){
-     this.compareTypeItems.push({value:'position',label:this.$t('overview.position')})
-     this.compareTypeItems.push({value:'users',label:this.$t('overview.user')})
-     this.getSearchCondition();
+      this.compareTypeItems.push({value:'position',label:this.$t('overview.position')})
+      this.compareTypeItems.push({value:'users',label:this.$t('overview.user')})
+      this.compareTypeItems.push({value:'mysterio',label:this.$t('mysterio.mysterio')})
+      this.getSearchCondition();
     }
 
   },
@@ -174,14 +180,14 @@ export default {
         self.ifGetParamsFromCash = false;
         self.getStoreListAndGroupAndType();
         if(self.allowPerson){
-            this.getSearchCondition();
-         }
+          this.getSearchCondition();
+        }
       }
     },
     inspectId:{
-              immediate: false, 
-        deep: true,
-       handler (val,old ) {
+      immediate: false, 
+      deep: true,
+      handler (val,old ) {
           console.log("Inspect ID Changed")
           let selectedLabels = [];
           let storeIds = [];
@@ -208,7 +214,7 @@ export default {
             
             }
           });
-           if(this.compareType== 'area1'){
+          if(this.compareType== 'area1'){
             this.curSelectId=[];
             this.changeCompareType(this.compareType);
           }
@@ -307,8 +313,8 @@ export default {
     }
   },
   computed: {
-     ...mapGetters({ accountChanged: 'accountChanged' }),
-     cachedParamsInfo() {
+    ...mapGetters({ accountChanged: 'accountChanged' }),
+    cachedParamsInfo() {
      // console.log(this.cachedParams)
       return this.cachedParams
     }
@@ -494,11 +500,13 @@ export default {
         });
       });
     },
-     async getSearchCondition() {
+    async getSearchCondition() {
       const userPosition = getDepartmentList({ type: 1 }); //取得職務
       const userPromise = getUserInfo();
+      console.log('userPromise ------>>>> ', userPromise);
       try {
         const result = await Promise.all([userPosition, userPromise]);
+        console.log('result ------>>>> ', result);
         this.getUserList(result[1].data);
         this.getUserPositionList(result[0].data);
       } catch (e) {
@@ -538,17 +546,33 @@ export default {
     },
 
     getUserList(data) {
-     // console.log(data)
+      console.log("????---->",  data)
       this.userList = [];
+      this.mysterioList = [];
       this.origianlUserList = [];
+
       data.map(user => {
-        const userJson = {};
-        userJson.label = user.userName;
-        userJson.value = user.userId;
-        userJson.title = user.title;
-        this.origianlUserList.push(userJson);
-        this.userList.push(userJson);
+        if(!user.mystery){
+          // user
+          const userJson = {};
+          userJson.label = user.userName;
+          userJson.value = user.userId;
+          userJson.title = user.title;
+          this.origianlUserList.push(userJson);
+          this.userList.push(userJson);
+        } else{
+          // 神秘客
+          const mysterioJson = {};
+          mysterioJson.label = user.userName;
+          mysterioJson.value = user.userId;
+          this.origianlUserList.push(mysterioJson);
+          this.mysterioList.push(mysterioJson);
+        }
+        
       });
+      console.log("this.userList ---->",  this.userList)
+      console.log("this.mysterioList ---->",  this.mysterioList)
+
       this.userIds = this.ifCachedParams ? this.userIds : this.userList.map(user => user.value);
     },
     getStoreDefineList(type) {
@@ -578,9 +602,9 @@ export default {
           self.curTypeArrary.forEach(function(item){
             item.contents =[];
             self.storeList.forEach(function(store){
-               if(self.curStores.indexOf(store.storeId)>=0 && store.province == item.label){
-                 item.contents.push(store.storeId);
-               }
+              if(self.curStores.indexOf(store.storeId)>=0 && store.province == item.label){
+                item.contents.push(store.storeId);
+              }
             });
           })
           break;
@@ -591,9 +615,9 @@ export default {
           self.curTypeArrary.forEach(function(item){
             item.contents =[];
             self.storeList.forEach(function(store){
-               if(self.curStores.indexOf(store.storeId)>=0 && store.city == item.label){
-                 item.contents.push(store.storeId);
-               }
+              if(self.curStores.indexOf(store.storeId)>=0 && store.city == item.label){
+                item.contents.push(store.storeId);
+              }
             });
           })
           break;
@@ -616,13 +640,19 @@ export default {
           }
           break;
         case 'users':
-          self.dropdownPlaceholder =  self.$t('overview.user');
-          self.selAllString=self.$t('overview.allUser');
+          self.dropdownPlaceholder =  "self.$t('overview.user')";
+          self.selAllString = self.$t('overview.allUser');
           self.curTypeArrary = self.userList;
           break;
+
+        case 'mysterio':
+          self.dropdownPlaceholder =  self.$t('mysterio.mysterio');
+          self.selAllString = self.$t('mysterio.allMysterio');
+          self.curTypeArrary = self.mysterioList;
+          break;
         case 'position':
-          self.dropdownPlaceholder =  self.$t('overview.position');
-          self.selAllString=self.$t('overview.allPosition');
+          self.dropdownPlaceholder =  self.$t('mysterio.mysterio');
+          self.selAllString= self.$t('overview.allPosition');
           self.curTypeArrary = self.positionsList ;
           break;
         case 'stores':
@@ -683,15 +713,19 @@ export default {
           }
         //}
           console.log("curSelectId:",self.curSelectId);
-          self.onChangeCompareType({selectedArray:self.curSelectId,storeIds:storeIds,selectedLabels});
+          self.onChangeCompareType({
+            selectedArray: self.curSelectId,
+            storeIds: storeIds,
+            selectedLabels
+          });
             //self.$emit("emitTypeChanged",{compareType:self.compareType,compareArr:storeIds,selectedLabels});    
       //}
         
     },
     onChangeCompareType({selectedArray,storeIds,selectedLabels}) {
-      //console.log("onChangeCompareType > selectedArray:",selectedArray);
-      //console.log("onChangeCompareType > selectedLabels:",selectedLabels);
-      //console.log("1.onChangeCompareType > storeIds:",storeIds);
+      console.log("onChangeCompareType ---->>>> selectedArray:", selectedArray);
+      console.log("onChangeCompareType  ---->>>> storeIds:", storeIds);
+      console.log("onChangeCompareType  ---->>>> selectedLabels:", selectedLabels);
       this.curSelectId = selectedArray;
       let originArray = [];
       this.curTypeArrary.forEach(function(item){
@@ -720,6 +754,10 @@ export default {
       //console.log("2.onChangeCompareType > originArray:",originArray);
       this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:compareArr,selectedLabels,originArray,selStoreIdArr:storeId});
     },
+
+
+
+
     doGetStoreIdsByProvince(provinceArrary){
       //console.log("provinceArrary:",provinceArrary);
       const self = this;
