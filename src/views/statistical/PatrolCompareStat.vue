@@ -923,7 +923,7 @@ export default {
             color:'#556679',
             fontSize:12,
           },
-          name:'(分)',
+          name:'(%)',
            nameTextStyle:{
              fontSize:12,
              color:'#556679',

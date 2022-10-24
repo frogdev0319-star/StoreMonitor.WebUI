@@ -496,7 +496,7 @@ export default {
       this.params.endTs = end;
       this.params.submitters = this.userIds;*/
       this.allInsRecordData = [];
-      let param = {beginTs:start,endTs:end,submitters:(this.userIds.length==0)?[' ']:this.userIds};
+      let param = {beginTs:start,endTs:end,submitters:(this.userIds.length==0)?[' ']:this.userIds,isMysteryMode:this.isMystery};
       let searchParams = {...param};
       searchParams['positionIds'] = this.positionIds; 
       const searchConditon = {

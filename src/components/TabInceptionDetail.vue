@@ -329,7 +329,7 @@ export default {
       getReportList() {
         const self = this;
         self.submitterName = "";
-        let params = {beginTs:this.beginTs,endTs:this.endTs,clause:{"submitter":this.submitter}};
+        let params = {beginTs:this.beginTs,endTs:this.endTs,clause:{"submitter":this.submitter},searchMysteryMode:this.isMystery?1:0};
         //console.log("params:",params);
         return new Promise((resolve) => {
             getInspectReportList(params).then(res => {
@@ -503,7 +503,7 @@ export default {
       },
       getNotInspectedStores(){
           const self = this;
-          let params = {beginTs:this.beginTs,endTs:this.endTs,submitters:[this.submitter]};
+          let params = {beginTs:this.beginTs,endTs:this.endTs,submitters:[this.submitter],isMysteryMode:this.isMystery};
           console.log("params:",params);
           return new Promise((resolve) => {
             getNotInspectStoresByPerson(params).then(res => {
@@ -530,7 +530,7 @@ export default {
       getEventCompletedRate(){
         const self = this;
         let params = {beginTs:this.beginTs,endTs:this.endTs,clause: {assigner:this.submitter},
-                        order: {direction: "asc",property: "storeId"}};
+                        order: {direction: "asc",property: "storeId"},searchMysteryMode:this.isMystery?1:0};
         return new Promise((resolve) => {
             GetEventAndCommentList(params).then(res => {
                 const errCode = res.errCode;
