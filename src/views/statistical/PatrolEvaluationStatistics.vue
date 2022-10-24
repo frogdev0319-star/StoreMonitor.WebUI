@@ -2923,6 +2923,11 @@ export default {
                             params.submitters = users;
                         else
                             params.submitters = [self.part2.content[self.part2.indexRegion].innerId]
+                    }else if(this.part2.compareType == 'area1'){
+                        params.storeIds = this.part2.selStoreIdArr;
+                    }
+                    else if(this.part2.compareType == 'area2'){
+                        params.storeIds = this.part2.selStoreIdArr;
                     }
                     params.inspectTagId = self.params.inspectId;
                     params.order = {
@@ -3157,6 +3162,11 @@ export default {
                             params.submitters = users;
                         else
                             params.submitters = [self.part3.content[self.part3.indexRegion].innerId]
+                    }else if(this.part3.compareType == 'area1'){
+                        params.storeIds = this.part3.selStoreIdArr;
+                    }
+                    else if(this.part3.compareType == 'area2'){
+                        params.storeIds = this.part3.selStoreIdArr;
                     }
                     params.inspectTagId = self.params.inspectId;
                     params.order = {
