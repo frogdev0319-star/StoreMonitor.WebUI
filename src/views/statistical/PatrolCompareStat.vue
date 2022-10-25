@@ -468,7 +468,7 @@ export default {
         this.filterDateRange = dateRange;
         this.filterDateRange2 = dateRange;
         this.avgChartOption = this.getAverageBarchartOption();
-        this.assChartOption = this.getAverageBarchartOption();
+        this.assChartOption = this.getAverageBarchartOption(true);
         this.doGetAverageScore(dateRange); //預設本周
         this.doGetAssessmentScore(dateRange);
         this.getInspectTagStandardScore();
@@ -714,7 +714,7 @@ export default {
     async doGetAssessmentScore(DateRangeFilter){ //同比時間區間選擇
       let region = this.areaMode.filter((r)=>{ return r.key==this.compareType2});
       this.Ass12Num = [];
-      this.AssChartOption = this.getAverageBarchartOption();
+      this.AssChartOption = this.getAverageBarchartOption(true);
       //console.log("this.comapareLabels2:",this.comapareLabels2);
       
       
@@ -854,7 +854,7 @@ export default {
         });
       });
     },
-    getAverageBarchartOption(){
+    getAverageBarchartOption(isAss = false){
       const self = this;
       const chartOption = {
         grid:{
@@ -923,7 +923,7 @@ export default {
             color:'#556679',
             fontSize:12,
           },
-          name:'(%)',
+          name:isAss?'(%)':'(分)',
            nameTextStyle:{
              fontSize:12,
              color:'#556679',

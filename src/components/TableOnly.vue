@@ -434,6 +434,10 @@ export default {
   watch:{
     isLoadingData(val){
       this.isLoading = val;
+    },
+    tableData(val){
+      console.log("tableData changed");
+      this.closeAllExpand();
     }
   },
   created() {},
@@ -518,7 +522,10 @@ export default {
           //this.expandChange(row);
         }
     },
-
+    closeAllExpand(){
+      this.expands="";
+      this.expandRowKeys=[];
+    },
     handleRowClick(row) {
       /*console.log("row click:",row);
       if(this.allowRowExpand){
