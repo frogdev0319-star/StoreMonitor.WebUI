@@ -137,8 +137,8 @@
             </el-row>
             <div class="subtitle-head">
                 <span class="title">
-                    {{ $t('statistics.titles.storeEvalDetail') }}
-                </span>
+                    {{ $t('statistics.titles.storeEvalDetail') }} 
+                </span> 
                 <div class="operation-btns" :class="getLangStyleValue(operationBtnClass)">
                     <div class="switch-btn">
                         <el-button class="mode-btn" :class="{'active-mode-btn' :part1.storeMode==0}" @click="onSwitchPart1Mode(0)">{{ $t('statistics.event.tableMode')}}</el-button>
@@ -195,11 +195,13 @@
                 </div>
             </el-col>
         </div>
+
+        <!-- 考評得分分佈 -->
         <div class="statistics-content" id="imgTest_avg3" style="height:1010px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
             <div class="head">
                 <div class="region-titles">
                     <span class="title">
-                        {{ $t('statistics.titles.scoreDistribution') }}
+                        {{ $t('statistics.titles.scoreDistribution') }} 
                     </span>
                 </div>
                 <TypeSelectArea
@@ -313,7 +315,11 @@
                 </div>
             </el-col>
         </div>
-        <div v-if="part3.standardScore!=-9999" id="imgTest_avg4" class="statistics-content" style="height:1000px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
+        
+
+        <!-- 考評達標率 -->
+        <!-- v-if="part3.standardScore!=-9999" -->
+        <div id="imgTest_avg4" class="statistics-content" style="height:1000px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
             <div class="head">
                 <div class="region-titles">
                     <span class="title">
@@ -1668,6 +1674,15 @@ export default {
                 params.submitters = self.part1.indexRegion==-1?this.part1.compareIds:[self.part1.content[self.part1.indexRegion].innerId];
                 params.groupIds = [];
                 params.groupMode = 0;
+                params.searchMysteryMode = 0
+
+            } else if(this.part1.compareType == 'mysterio'){
+                params.storeIds = self.params.storeIds;
+                params.submitters = self.part1.indexRegion==-1?this.part1.compareIds:[self.part1.content[self.part1.indexRegion].innerId];
+                params.groupIds = [];
+                params.groupMode = 0;
+                params.searchMysteryMode = 1
+                
             }else if (this.part1.compareType == 'position') {
                 //console.log("position content:",self.part1.content);
                 params.storeIds = self.params.storeIds;
@@ -1740,6 +1755,13 @@ export default {
                 params.submitters =self.part2.indexRegion==-1?this.part2.compareIds: [self.part2.content[self.part2.indexRegion].innerId];
                 params.groupIds = [];
                 params.groupMode = 0;
+                params.searchMysteryMode = 0
+            }else if(this.part2.compareType == 'mysterio'){
+                params.storeIds = self.params.storeIds;
+                params.submitters =self.part2.indexRegion==-1?this.part2.compareIds: [self.part2.content[self.part2.indexRegion].innerId];
+                params.groupIds = [];
+                params.groupMode = 0;
+                params.searchMysteryMode = 1
             }else if (this.part2.compareType == 'position') {
                 //console.log("position content:",self.part2.content);
                 params.storeIds = self.params.storeIds;
@@ -1749,9 +1771,9 @@ export default {
                         users = users.concat(item.contents);
                 })
                 if(this.part2.indexRegion==-1)
-                      params.submitters = users;
+                    params.submitters = users;
                 else
-                      params.submitters = [self.part2.content[self.part2.indexRegion].innerId]
+                    params.submitters = [self.part2.content[self.part2.indexRegion].innerId]
                 params.groupIds = [];
                 params.groupMode = 0;
             }
@@ -1810,6 +1832,13 @@ export default {
                 params.submitters = self.part3.indexRegion==-1?this.part3.compareIds:[self.part3.content[self.part3.indexRegion].innerId];
                 params.groupIds = [];
                 params.groupMode = 0;
+                params.searchMysteryMode = 0
+            }else if(this.part3.compareType == 'mysterio'){
+                params.storeIds = self.params.storeIds;
+                params.submitters = self.part3.indexRegion==-1?this.part3.compareIds:[self.part3.content[self.part3.indexRegion].innerId];
+                params.groupIds = [];
+                params.groupMode = 0;
+                params.searchMysteryMode = 1
             }else if (this.part3.compareType == 'position') {
                 //console.log("position content:",self.part3.content);
                 params.storeIds = self.params.storeIds;
@@ -1819,9 +1848,9 @@ export default {
                         users = users.concat(item.contents);
                 })
                 if(this.part3.indexRegion==-1)
-                      params.submitters = users;
+                    params.submitters = users;
                 else
-                      params.submitters = [self.part3.content[self.part3.indexRegion].innerId]
+                    params.submitters = [self.part3.content[self.part3.indexRegion].innerId]
                 params.groupIds = [];
                 params.groupMode = 0;
             }
@@ -2487,7 +2516,7 @@ export default {
             const self = this;
             const option = this.getInspectLineOption();
             const regionData = [];
-            const regionLabel = [];
+            var regionLabel = [];
 
             if (this.part1.content) {
                 this.part1.content.map((item, index) => {
@@ -2541,10 +2570,12 @@ export default {
                             }
                         })
                     }
-
+                    // regionLabel = this.part1.comapareLabels
                     regionLabel.push(this.maxLabel(item.groupName))
                 });
             }
+            
+            console.log('regionLabel ----->>>> ', regionLabel);
 
             option.series[0].name = "";
             option.series[0].data = regionData;
@@ -2590,6 +2621,7 @@ export default {
                     if (this.part1.compareType == 'users' ) {//|| this.part1.compareType == 'position'
                         //console.log("********self.part1.content:",self.part1.content);
                         params.storeIds = self.params.storeIds;
+                        params.searchMysteryMode = 0
                         if(this.part1.indexRegion==-1)
                             params.submitters = this.part1.compareIds;
                         else
@@ -2597,6 +2629,7 @@ export default {
                     }else if (this.part1.compareType == 'position') {
                         //console.log("position content:",self.part1.content);
                         params.storeIds = self.params.storeIds;
+                        params.searchMysteryMode = 0
                         let users = [];
                         this.part1.originArray.forEach(function (item) {
                             if (self.part1.compareIds.indexOf(item.value) >= 0)
@@ -2607,7 +2640,21 @@ export default {
                         else
                             params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
                         
+                    }else if(this.part1.compareType == 'mysterio'){
+                        params.storeIds = self.params.storeIds;
+                        params.searchMysteryMode = 1
+                        if(this.part1.indexRegion==-1)
+                            params.submitters = this.part1.compareIds;
+                        else
+                            params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
+                    } 
+                    else if(this.part1.compareType == 'area1'){
+                        params.storeIds = this.part1.selStoreIdArr;
                     }
+                    else if(this.part1.compareType == 'area2'){
+                        params.storeIds = this.part1.selStoreIdArr;
+                    }
+
                     params.inspectTagId = self.params.inspectId;
                     params.order = {
                         direction: (this.part1.storeMode == 1) ? this.part1.storeOrder : this.part1.table.order,
@@ -2618,7 +2665,8 @@ export default {
                         size: (this.part1.storeMode == 1) ? params.storeIds.length : this.part1.table.sizeNum
                     }
 
-                    console.log(params)
+                    
+                    console.log("getPart1StoreBar  ----->>>>" , params)
                     if (params.storeIds.length == 0) return;
                     const storeResult = await this.getInspectStatsOverviewWithGroup(params);
                     if (storeResult.errCode === 0) {
@@ -2725,7 +2773,13 @@ export default {
                 params.submitters = this.part2.compareIds;
                 params.groupIds = this.part2.compareIds;
                 params.groupMode = 5;
-            } else if (this.part2.compareType == 'position') {
+                params.searchMysteryMode = 0
+            } else if(this.part2.compareType == 'mysterio'){
+                params.submitters = this.part2.compareIds;
+                params.groupIds = this.part2.compareIds;
+                params.groupMode = 5;
+                params.searchMysteryMode = 1
+            }else if (this.part2.compareType == 'position') {
                 let users = [];
                 this.part2.originArray.forEach(function (item) {
                     if (self.part2.compareIds.indexOf(item.value) >= 0)
@@ -2850,9 +2904,16 @@ export default {
                     if (this.part2.compareType == 'users') {
                         params.storeIds = self.params.storeIds;
                         params.submitters = this.part2.indexRegion==-1?this.part2.compareIds:[self.part2.content[self.part2.indexRegion].innerId]
+                        params.searchMysteryMode = 0
+                    }else if(this.part2.compareType == 'mysterio'){
+                        params.storeIds = self.params.storeIds;
+                        params.submitters = this.part2.indexRegion==-1?this.part2.compareIds:[self.part2.content[self.part2.indexRegion].innerId]
+                        params.searchMysteryMode = 1
+
                     }else if (this.part2.compareType == 'position') {
                         //console.log("position content:",self.part2.content);
                         params.storeIds = self.params.storeIds;
+                        params.searchMysteryMode = 0
                         let users = [];
                         this.part2.originArray.forEach(function (item) {
                             if (self.part2.compareIds.indexOf(item.value) >= 0)
@@ -2862,6 +2923,11 @@ export default {
                             params.submitters = users;
                         else
                             params.submitters = [self.part2.content[self.part2.indexRegion].innerId]
+                    }else if(this.part2.compareType == 'area1'){
+                        params.storeIds = this.part2.selStoreIdArr;
+                    }
+                    else if(this.part2.compareType == 'area2'){
+                        params.storeIds = this.part2.selStoreIdArr;
                     }
                     params.inspectTagId = self.params.inspectId;
                     params.order = {
@@ -2958,6 +3024,12 @@ export default {
                 params.submitters = this.part3.compareIds;
                 params.groupIds = this.part3.compareIds;
                 params.groupMode = 5;
+                params.searchMysteryMode = 0
+            } else if(this.part3.compareType == 'mysterio'){
+                params.submitters = this.part3.compareIds;
+                params.groupIds = this.part3.compareIds;
+                params.groupMode = 5;
+                params.searchMysteryMode = 1
             } else if (this.part3.compareType == 'position') {
                 let users = [];
                 this.part3.originArray.forEach(function (item) {
@@ -3071,10 +3143,16 @@ export default {
                     params.storeIds = this.part3.indexRegion==-1? this.params.storeIds:this.part3.content[this.part3.indexRegion].list;
                     if (this.part3.compareType == 'users') {
                         params.storeIds = self.params.storeIds;
+                        params.searchMysteryMode = 0
+                        params.submitters =this.part3.indexRegion==-1?this.part3.compareIds: [self.part3.content[self.part3.indexRegion].innerId]
+                    }else if(this.part3.compareType == 'mysterio'){
+                        params.storeIds = self.params.storeIds;
+                        params.searchMysteryMode = 1
                         params.submitters =this.part3.indexRegion==-1?this.part3.compareIds: [self.part3.content[self.part3.indexRegion].innerId]
                     }else if (this.part3.compareType == 'position') {
                         //console.log("position content:",self.part3.content);
                         params.storeIds = self.params.storeIds;
+                        params.searchMysteryMode = 0
                         let users = [];
                         this.part3.originArray.forEach(function (item) {
                             if (self.part3.compareIds.indexOf(item.value) >= 0)
@@ -3084,6 +3162,11 @@ export default {
                             params.submitters = users;
                         else
                             params.submitters = [self.part3.content[self.part3.indexRegion].innerId]
+                    }else if(this.part3.compareType == 'area1'){
+                        params.storeIds = this.part3.selStoreIdArr;
+                    }
+                    else if(this.part3.compareType == 'area2'){
+                        params.storeIds = this.part3.selStoreIdArr;
                     }
                     params.inspectTagId = self.params.inspectId;
                     params.order = {
