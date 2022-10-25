@@ -1604,7 +1604,7 @@ export default {
         getUserInfo().then(res => {
           self.userDataList = res.data;
           res.data.forEach(item => {
-            if (item.userId === userId) {
+            if (item.userId === userId && item.mystery==false) {
               const accountId = item.accountId.toLowerCase();
               self.accountId = accountId;
               localStorage.setItem('oss_bucket', accountId);

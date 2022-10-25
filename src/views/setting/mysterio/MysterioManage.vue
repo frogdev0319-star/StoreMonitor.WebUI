@@ -286,15 +286,17 @@ export default {
             this.allUserList = [];
             var tempUserList = [];
             data.map(user => {
-              const userJson = {};
-              userJson.id = user.userId;
-              userJson.userName = user.userName;
-              userJson.userId = user.userId;
-              userJson.email = user.email;
-              var position =  this.positionsList.find(pos=>{return pos.contents.includes(user.userId)});
-              //console.log("position:",position);
-              userJson.position = (position)?position.label:'';
-              tempUserList.push(userJson);
+              if(user.mystery == false){
+                const userJson = {};
+                userJson.id = user.userId;
+                userJson.userName = user.userName;
+                userJson.userId = user.userId;
+                userJson.email = user.email;
+                var position =  this.positionsList.find(pos=>{return pos.contents.includes(user.userId)});
+                //console.log("position:",position);
+                userJson.position = (position)?position.label:'';
+                tempUserList.push(userJson);
+              }
             });
             this.allUserList = tempUserList;
         },
