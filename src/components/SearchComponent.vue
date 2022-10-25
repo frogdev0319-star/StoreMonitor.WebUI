@@ -78,8 +78,8 @@ export default {
       default: false
     },
     isInspectItem: {
-      type: Boolean,
-      default: false
+      type: String,
+      default: ''
     },
     path: {
       type: String,

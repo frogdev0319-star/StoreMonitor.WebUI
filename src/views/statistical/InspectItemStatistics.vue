@@ -27,82 +27,84 @@
           @exportPdf = "exportPdf"
           @setDefaultSortAndPage="setDefaultSortAndPage"/>
       </el-col>
-     <div class="statistics-content"   id="imgTest_avg1"   style="height:1110px;margin-top:200px;box-shadow:none;"  :style="{width:ispdf?'1024px':null}">
-                <div class="head">
-                        <div class="region-titles">
-                            <span class="title">
-                                 {{ $t('statistics.titles.inspectItemScores') }}
-                            </span>
-                        </div>
-                            <TypeSelectArea
-                              path="inspectItemStatistics"
-                              ref="typeSelectArea"
-                              :allow-all=true
-                              :allow-person=true
-                              :region-array1="params.curProvince"
-                              :region-array2="params.curCity"
-                              :cur-store-group="params.curStoreGroup"
-                              :cur-store-type="params.curStoreType"
-                              :cur-stores="params.storeIds"
-                              :cached-params="params"
-                              :cur-country="curCountry"
-                              @emitTypeChanged="emitTypeChangedPart3"
-                          ></TypeSelectArea>
-                </div>
-              <div style="padding:20px">
-                <InspectItemSelect
-                    :inspect-item-list="inspectItemList"
-                    @emitItemChanged="emitItemChanged"
-                 />
-              </div>
-              <div class="subtitle-head">
-                  <span class="title" style="width:80%" >
-                    {{inspectSubTitle}}
+
+    <!-- 巡檢項目得分 -->
+    <div class="statistics-content"   id="imgTest_avg1"   style="height:1110px;margin-top:200px;box-shadow:none;"  :style="{width:ispdf?'1024px':null}">
+            <div class="head">
+              <div class="region-titles">
+                  <span class="title">
+                        {{ $t('statistics.titles.inspectItemScores') }}
                   </span>
               </div>
+                  <TypeSelectArea
+                    path="inspectItemStatistics"
+                    ref="typeSelectArea"
+                    :allow-all=true
+                    :allow-person=true
+                    :region-array1="params.curProvince"
+                    :region-array2="params.curCity"
+                    :cur-store-group="params.curStoreGroup"
+                    :cur-store-type="params.curStoreType"
+                    :cur-stores="params.storeIds"
+                    :cached-params="params"
+                    :cur-country="curCountry"
+                    @emitTypeChanged="emitTypeChangedPart3"
+                ></TypeSelectArea>
+            </div>
+          <div style="padding:20px">
+            <InspectItemSelect
+                :inspect-item-list="inspectItemList"
+                @emitItemChanged="emitItemChanged"
+              />
+          </div>
+          <div class="subtitle-head">
+              <span class="title" style="width:80%" >
+                {{inspectSubTitle}}
+              </span>
+          </div>
           <el-row :span="24" class="region-overview" style="margin-left:40px;width:400px">
-                    <el-col :span="10" class="division">
-                      <el-col class="text-area">
-                        <el-row class="top">
-                           <span class="mainTitle">{{totalAvgScore!=-9999?totalAvgScore:'N/A'}}</span>
-                           <span class="unit">{{$t('statistics.score')}}</span>
-                        </el-row >
-                        <el-row class="subtitlehead">
-                            <span>{{ $t('statistics.titleAvgScore') }}</span>
-                        </el-row>
-                      </el-col>
-                     </el-col>
+              <el-col :span="10" class="division">
+                <el-col class="text-area">
+                  <el-row class="top">
+                      <span class="mainTitle">{{totalAvgScore!=-9999?totalAvgScore:'N/A'}}</span>
+                      <span class="unit">{{$t('statistics.score')}}</span>
+                  </el-row >
+                  <el-row class="subtitlehead">
+                      <span>{{ $t('statistics.titleAvgScore') }}</span>
+                  </el-row>
+                </el-col>
+                </el-col>
           </el-row>
-                     <el-row  :span="24" class="partition" style="height:320px;;padding-right:40px;width:calc(100% - 40px)">
+          <el-row  :span="24" class="partition" style="height:320px;;padding-right:40px;width:calc(100% - 40px)">
             <el-col  style="overflow-x:auto;overflow-y:hidden;height:320px;width :100%">
-               <v-chart @click='clickPart3Bar' ref="storeChart" :options="part3.barRegionOption"  autoresize
+              <v-chart @click='clickPart3Bar' ref="storeChart" :options="part3.barRegionOption"  autoresize
                             :style="{width:part3.barRegionOption?part3.barRegionOption.width :'100%',height:'100%'}" />
-            <div style="position:absolute;right:0px;top:0px" @click='changePart3RegionOrder'>
+              <div style="position:absolute;right:0px;top:0px" @click='changePart3RegionOrder'>
                       <div class="button-area" >
                           <span style="color:#acaeb1">{{ part3.regionOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
                           <img :src='part3.regionOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
                       </div>
               </div>
-           </el-col>
-        </el-row >
+            </el-col>
+          </el-row >
         <div class="subtitle-head">
           <span class="title" style="width:80%"  >
             {{ inspectDetailSubTitle }}
           </span>
-           <div class="operation-btns" :class="getLangStyleValue(operationBtnClass)">
-                  <div class="switch-btn">
-                    <el-button
-                    class="mode-btn"
-                    :class="{'active-mode-btn' :part3.storeMode==0}"
-                    @click="onSwitchPart3Mode(0)"
-                    >{{ $t('statistics.event.tableMode')}}</el-button>
-                    <el-button
-                      class="mode-btn"
-                      :class="{'active-mode-btn' :part3.storeMode==1}"
-                      @click="onSwitchPart3Mode(1)"
-                    >{{ $t('statistics.event.imageMode')}}</el-button>
-                  </div>
-               <delay-button
+          <div class="operation-btns" :class="getLangStyleValue(operationBtnClass)">
+              <div class="switch-btn">
+                <el-button
+                class="mode-btn"
+                :class="{'active-mode-btn' :part3.storeMode==0}"
+                @click="onSwitchPart3Mode(0)"
+                >{{ $t('statistics.event.tableMode')}}</el-button>
+                <el-button
+                  class="mode-btn"
+                  :class="{'active-mode-btn' :part3.storeMode==1}"
+                  @click="onSwitchPart3Mode(1)"
+                >{{ $t('statistics.event.imageMode')}}</el-button>
+              </div>
+              <delay-button
                       :class="getLangStyleValue(operationBtnClass)"
                       style="margin-left:32px;background-color:#FFF;color:#006ab7;border:none;"
                       type="default"
@@ -116,17 +118,17 @@
                   </delay-button>
             </div>
         </div>
-       <el-col  style="height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 90px);position:absolute" :style="{width:ispdf?'900px':'calc(100% - 90px)'}">
+        <el-col  style="height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 90px);position:absolute" :style="{width:ispdf?'900px':'calc(100% - 90px)'}">
                   <div  v-if="part3.storeMode==1"  style="height:100%;overflow-y:hidden;overflow-x:auto">
                       <v-chart
-                                ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption"   autoresize
-                                :style="{width:part3.barStoreOption?part3.barStoreOption.width :'100%',height:'100%'}" />
+                          ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption"   autoresize
+                          :style="{width:part3.barStoreOption?part3.barStoreOption.width :'100%',height:'100%'}" />
                   </div>
                   <div v-else style="margin-top:20.5px;height:100%;overflow-y:hidden;"  :style="{width:ispdf?'1024px':null}">
                     <div style="margin-top:20.5px;">
                     <table-only
                       ref="elTP"
-                     :column-data="part3StoreInfoTableCol"
+                      :column-data="part3StoreInfoTableCol"
                       :table-data="part3.storeTableData"
                       :total="part3.table.total"
                       :highlight-current-row= "true"
@@ -142,7 +144,6 @@
                       :expandCompProperties = "componentsProps"
                       @handleChange="handlePageAndSizeChangePart3"
                       @sortChange="handleSortChangePart3"
-                      @onCellClick = "onEvenListNumClick"
                     />
                   </div>
                   <div style="width:100%; margin-top:12px;height:31px;">
@@ -156,14 +157,14 @@
                   />
                 </div>
                 </div>
-                 <div  v-if="part2.storeMode==1"
-                      style="position:absolute;right:40px;top:30px;height:40px" @click='changePart3StoreOrder'>
-                    <div class="button-area" >
-                      <span style="color:#acaeb1">{{ part3.storeOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
-                      <img :src='part3.storeOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
-                    </div>
+                <div  v-if="part2.storeMode==1"
+                    style="position:absolute;right:40px;top:30px;height:40px" @click='changePart3StoreOrder'>
+                  <div class="button-area" >
+                    <span style="color:#acaeb1">{{ part3.storeOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
+                    <img :src='part3.storeOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
                   </div>
-           </el-col>
+                </div>
+          </el-col>
       </div>
     </el-row>
     <div v-if="ispdf" id="pdf-area" ref="printPDF" class="statistics-container">
@@ -229,6 +230,7 @@ export default {
   mixins: [resize],
   data() {
     return {
+      componentsProps: "",
       path:"inspectItemStatistics",
       pdfSrc_avg1:"",
       inspectSubTitle: this.$t('statistics.itemAverageScore'),
@@ -817,6 +819,9 @@ export default {
       //console.log('******',util.getLangStyleValue(langArray));
       return util.getLangStyleValue(langArray);
     },
+    exportPdf(){
+      console.log('exportPdf ~~~~~~~>> ');
+    },
     maxLabel(val) {
         var returnValue = '';
         var byteValLen = 0;
@@ -841,10 +846,10 @@ export default {
         this.getPart3StoreBar();
     },
     handleSortChangePart3(e){
-       console.log(e)
-       this.part3.table.order = e.direction;
-        this.part3.table.property = e.property;
-        this.getPart3StoreBar();
+      console.log(e)
+      this.part3.table.order = e.direction;
+      this.part3.table.property = e.property;
+      this.getPart3StoreBar();
     },
     onSwitchPart1Mode(mode){
       this.part1.storeMode = mode;
@@ -1012,61 +1017,60 @@ export default {
     },
 
     async exportStore2Excel() {
- const self = this;
+      const self = this;
       const that = this;
       let content =[];
-       const params = {};
-       params.beginTs = self.params.beginTs;
-       params.endTs = self.params.endTs;
-       params.groupMode = 0;
-       params.order={
-              direction:"desc",
-              property: "averageScore",
-            }
+      const params = {};
+      params.beginTs = self.params.beginTs;
+      params.endTs = self.params.endTs;
+      params.groupMode = 0;
+      params.order={
+            direction:"desc",
+            property: "averageScore",
+          }
        //console.log(this.part3.content[this.part3.indexRegion])
-       if(this.part3.compareType == 'stores'){
-         content = this.part3.indexRegion==-1?this.part3.content: [this.part3.content[this.part3.indexRegion]];
-       }
-       else{
+        if(this.part3.compareType == 'stores'){
+          content = this.part3.indexRegion==-1?this.part3.content: [this.part3.content[this.part3.indexRegion]];
+        }
+        else{
         params.storeIds = this.part3.indexRegion==-1 ?this.params.storeIds:this.part3.content[this.part3.indexRegion].list;
-       if(this.part3.compareType == 'position'||this.part3.compareType == 'users'){
-         params.storeIds = self.params.storeIds;
-
-         //let id = this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName);
-         params.submitters = this.part3.compareIds;
-         if(this.part3.indexRegion!=-1){
+        if(this.part3.compareType == 'position'||this.part3.compareType == 'users'){
+          params.storeIds = self.params.storeIds;
+          params.searchMysteryMode = 0
+          //let id = this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName);
+          params.submitters = [];
+          if(this.part3.indexRegion!=-1){
           let id = this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName);
           params.submitters=[id]
-         }
-         params.groupIds   = [];
-         params.groupMode = 0;
-       }else if (this.part3.compareType == 'position') {
-            params.storeIds = self.params.storeIds;
-            let users = [];
-            this.part3.originArray.forEach(function (item) {
-                if (self.part3.compareIds.indexOf(item.value) >= 0)
-                    users = users.concat(item.contents);
-            })
-            if(this.part3.indexRegion==-1)
-                  params.submitters = users;
-            else
-                  params.submitters = [self.part3.content[self.part3.indexRegion].innerId]
-            params.groupIds   = [];
-            params.groupMode = 0;
+          }
+          params.groupIds   = [];
+          params.groupMode = 0;
+        } 
+        else if(this.part3.compareType == 'mysterio'){
+          params.storeIds = self.params.storeIds;
+          params.searchMysteryMode = 1
+          //let id = this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName);
+          params.submitters = [];
+          if(this.part3.indexRegion!=-1){
+          let id = this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName);
+          params.submitters=[id]
+          }
+          params.groupIds   = [];
+          params.groupMode = 0;
+
         }
-       params.inspectTagId = self.params.inspectId;
+        params.inspectTagId = self.params.inspectId;
             params.filter={
               page:0,
               size:params.storeIds.length
             }
-             if (params.storeIds.length === 0) {
+            if (params.storeIds.length === 0) {
               util.notify(self.$t('overview.emptyStoreList'), 'warning', 3000);
               return false;
             }
             if(this.inspectItem){
               params.itemIds = this.inspectItem.item.ids
             }
-            console.log(params)
             const storeResult = await this.getInspectStatsItemOverGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
@@ -1075,17 +1079,17 @@ export default {
               }
             }
 
-       }
-       console.log("Export")
-       console.log(content)
+      }
+      console.log("Export")
+      console.log(content)
       content.forEach((item,i)=>{
           item.rank= i+1;
-                 if(item.storeRegion)item.storeGroup = item.storeRegion.toString();
-                    if(item.storeBranchType)item.storeType = item.storeBranchType.toString();
-                    if(item.submitters)item.storeSubmitters = item.submitters.toString();
-                    if(item.code=='')item.code='- -'
-                    if(item.storeGroup=='')item.storeGroup='- -'
-                    if(item.storeType=='')item.storeType='- -'
+            if(item.storeRegion)item.storeGroup = item.storeRegion.toString();
+              if(item.storeBranchType)item.storeType = item.storeBranchType.toString();
+              if(item.submitters)item.storeSubmitters = item.submitters.toString();
+              if(item.code=='')item.code='- -'
+              if(item.storeGroup=='')item.storeGroup='- -'
+              if(item.storeType=='')item.storeType='- -'
 
       });
       require.ensure([], async() => {
@@ -1595,39 +1599,48 @@ export default {
       params.storeIds = self.params.storeIds;
       params.inspectTagId = self.params.inspectId;
       if(self.part1.compareType=='stores'){
-         params.storeIds  = self.part1.compareIds;
-         params.groupMode = 0;
+        params.storeIds  = self.part1.compareIds;
+        params.groupMode = 0;
       }
       else if(self.part1.compareType=='area1'){
-         params.groupIds  = self.part1.compareIds;
-         params.groupMode = 1;
+        params.groupIds  = self.part1.compareIds;
+        params.groupMode = 1;
       }
       else if(self.part1.compareType=='area2'){
-         params.groupIds  = self.part1.compareIds;
-         params.groupMode = 2;
+        params.groupIds  = self.part1.compareIds;
+        params.groupMode = 2;
       }
       else if(self.part1.compareType=='storeType'){
-         params.groupIds  = self.part1.compareIds;
-         params.groupMode = 3;
+        params.groupIds  = self.part1.compareIds;
+        params.groupMode = 3;
+        
       }
       else if(self.part1.compareType=='storeGroup'){
-         params.groupIds  = self.part1.compareIds;
-         params.groupMode = 4;
+        params.groupIds  = self.part1.compareIds;
+        params.groupMode = 4;
       }
-     else if(self.part1.compareType=='users'){
-         params.submitters  = self.part1.compareIds;
-         params.groupIds  = self.part1.compareIds;
-         params.groupMode = 5;
+      else if(self.part1.compareType =='users'){
+        params.submitters  = self.part1.compareIds;
+        params.groupIds  = self.part1.compareIds;
+        params.groupMode = 5;
+        params.searchMysteryMode = 0
+      }
+      else if (this.part1.compareType == 'mysterio') {
+        params.submitters = self.part1.compareIds;
+        params.groupIds = self.part1.compareIds;
+        params.groupMode = 5;
+        params.searchMysteryMode = 1
       }
       else if(self.part1.compareType=='position'){
         let users = [];
-         self.part1.originArray.forEach(function(item){
-           if(self.part1.compareIds.indexOf(item.value)>=0)
+        self.part1.originArray.forEach(function(item){
+          if(self.part1.compareIds.indexOf(item.value)>=0)
             users =  users.concat(item.contents);
-         })
-         params.submitters  = users;
-         params.groupIds  = users;
-         params.groupMode = 5;
+        })
+        params.submitters  = users;
+        params.groupIds  = users;
+        params.groupMode = 5;
+        params.searchMysteryMode = 0
       }
       if (self.totalRegion > 0) {
         params.filter = { page: 0, size: 20 };
@@ -1761,6 +1774,7 @@ export default {
             params.groupMode = 0;
             params.storeIds = this.part1.content[this.part1.indexRegion].list;
             params.inspectTagId = self.params.inspectId;
+            console.log("params ::::>>>>", params)
             const storeResult = await this.getInspectStatsItemOverGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
@@ -1821,30 +1835,31 @@ export default {
       params.storeIds = self.params.storeIds;
       params.inspectTagId = self.params.inspectId;
       params.order={
-         direction: "desc",
-         property:"averageScore"
+        direction: "desc",
+        property:"averageScore"
       }
       if(this.part2.compareType=='stores'){
-         params.storeIds  = this.part2.compareIds;
-         params.groupIds= this.part2.compareIds;
-         params.groupMode = 0;
+        params.storeIds  = this.part2.compareIds;
+        params.groupIds= this.part2.compareIds;
+        params.groupMode = 0;
       }
       else if(this.part2.compareType=='area1'){
-         params.groupIds  = this.part2.compareIds;
-         params.groupMode = 1;
+        params.groupIds  = this.part2.compareIds;
+        params.groupMode = 1;
       }
       else if(this.part2.compareType=='area2'){
-         params.groupIds  = this.part2.compareIds;
-         params.groupMode = 2;
+        params.groupIds  = this.part2.compareIds;
+        params.groupMode = 2;
       }
       else if(this.part2.compareType=='storeType'){
-         params.groupIds  = this.part2.compareIds;
-         params.groupMode = 3;
+        params.groupIds  = this.part2.compareIds;
+        params.groupMode = 3;
       }
       else if(this.part2.compareType=='storeGroup'){
-         params.groupIds  = this.part2.compareIds;
-         params.groupMode = 4;
-      }
+        params.groupIds  = this.part2.compareIds;
+        params.groupMode = 4;
+      } 
+
       let totalReport = 0;
       let totalStandard = 0;
       params.filter = { page: 0, size: 20 };
@@ -1967,7 +1982,7 @@ export default {
           regionData.push({value,itemStyle: {
             color: '#7bd8eb',
           }})
-           regionLabel.push(this.maxLabel(item.groupName))
+          regionLabel.push(this.maxLabel(item.groupName))
         });
       }
       this.part2.storeTableData = content;
@@ -1985,7 +2000,7 @@ export default {
       option.yAxis[0].name  =  this.$t('statistics.score'),
       this.part2.barStoreOption = option;
     },
-     async getPart3RegionBar() {
+    async getPart3RegionBar() {
 
       const self = this;
       const params = {};
@@ -2001,48 +2016,56 @@ export default {
       params.storeIds = self.params.storeIds;
       params.inspectTagId = self.params.inspectId;
       params.order={
-         direction: this.part3.regionOrder,
-         property:"averageScore"
+        direction: this.part3.regionOrder,
+        property:"averageScore"
       }
       if(this.part3.compareType=='stores'){
-         params.groupIds  = this.part3.compareIds;
-         params.storeIds  = this.part3.compareIds;
-         params.groupMode = 0;
+        params.groupIds  = this.part3.compareIds;
+        params.storeIds  = this.part3.compareIds;
+        params.groupMode = 0;
       }
       else if(this.part3.compareType=='area1'){
-         params.storeIds =  this.part3.selStoreIdArr;
-         params.groupIds  = this.part3.compareIds;
-         params.groupMode = 1;
+        params.storeIds =  this.part3.selStoreIdArr;
+        params.groupIds  = this.part3.compareIds;
+        params.groupMode = 1;
       }
       else if(this.part3.compareType=='area2'){
-         params.storeIds =  this.part3.selStoreIdArr;
-         params.groupIds  = this.part3.compareIds;
-         params.groupMode = 2;
+        params.storeIds =  this.part3.selStoreIdArr;
+        params.groupIds  = this.part3.compareIds;
+        params.groupMode = 2;
       }
       else if(this.part3.compareType=='storeType'){
-         params.groupIds  = this.part3.compareIds;
-         params.groupMode = 3;
+        params.groupIds  = this.part3.compareIds;
+        params.groupMode = 3;
       }
       else if(this.part3.compareType=='storeGroup'){
-         params.groupIds  = this.part3.compareIds;
-         params.groupMode = 4;
+        params.groupIds  = this.part3.compareIds;
+        params.groupMode = 4;
       }
-       else if(this.part3.compareType=='users'){
-         params.submitters  = this.part3.compareIds;
-         params.groupIds  = this.part3.compareIds;
-         params.groupMode = 5;
+      else if(this.part3.compareType=='users'){
+        params.submitters  = this.part3.compareIds;
+        params.groupIds  = this.part3.compareIds;
+        params.groupMode = 5;
+        params.searchMysteryMode = 0
+      }
+      else if (this.part3.compareType == 'mysterio') {
+        params.submitters = self.part3.compareIds;
+        params.groupIds = self.part3.compareIds;
+        params.groupMode = 5;
+        params.searchMysteryMode = 1
       }
       else if(this.part3.compareType=='position'){
-         let users = [];
-         var selPosition = this.part3.compareIds;
-         this.part3.originArray.forEach(function(item){
-           if(selPosition.includes(item.value)){
-              users =  users.concat(item.contents);
-           }
-         })
-         params.submitters  = users;
-         params.groupIds  = users;
-         params.groupMode = 5;
+        let users = [];
+        var selPosition = this.part3.compareIds;
+        this.part3.originArray.forEach(function(item){
+          if(selPosition.includes(item.value)){
+            users =  users.concat(item.contents);
+          }
+        })
+        params.submitters  = users;
+        params.groupIds  = users;
+        params.groupMode = 5;
+        params.searchMysteryMode = 0
       }
 
       if(this.inspectItem){
@@ -2055,7 +2078,7 @@ export default {
       if(params.groupIds.length==0  ){
         //console.log("No group");
         this.part3.content =[];
-         this.drawPart3RegionBar();
+        this.drawPart3RegionBar();
         return;
       }
         params.filter = { page: 0, size: params.groupIds.length };
@@ -2184,23 +2207,18 @@ export default {
             params.beginTs = self.params.beginTs;
             params.endTs = self.params.endTs;
             params.groupMode = 0;
+            params.searchMysteryMode = 1
             console.log("To Get Data")
             params.storeIds = this.part3.indexRegion==-1?self.params.storeIds:this.part3.content[this.part3.indexRegion].list;
             params.groupIds = this.part3.indexRegion==-1?[]:this.part3.content[this.part3.indexRegion].list;
-            if(this.part3.compareType=='users' ){
+            if(this.part3.compareType=='users' || this.part3.compareType=='position'){
               params.storeIds = self.params.storeIds;
-              params.submitters=this.part3.indexRegion==-1?this.part3.compareIds:[ this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName)]
-            }else if (this.part3.compareType == 'position') {
-                params.storeIds = self.params.storeIds;
-                let users = [];
-                this.part3.originArray.forEach(function (item) {
-                    if (self.part3.compareIds.indexOf(item.value) >= 0)
-                        users = users.concat(item.contents);
-                })
-                if(this.part3.indexRegion==-1)
-                      params.submitters = users;
-                else
-                      params.submitters = [ this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName)]
+              params.submitters=this.part3.indexRegion==-1?[]:[ this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName)]
+              params.searchMysteryMode = 0
+            } else if(this.part3.compareType=='mysterio'){
+              params.storeIds = self.params.storeIds;
+              params.submitters=this.part3.indexRegion==-1?[]:[ this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName)]
+              params.searchMysteryMode = 1
             }
             params.inspectTagId = self.params.inspectId;
             if(this.inspectItem){

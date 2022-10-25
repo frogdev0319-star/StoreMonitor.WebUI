@@ -319,7 +319,7 @@
 
         <!-- 考評達標率 -->
         <!-- v-if="part3.standardScore!=-9999" -->
-        <div id="imgTest_avg4" class="statistics-content" style="height:1000px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
+        <div id="imgTest_avg4" v-if="part3.standardScore!=-9999" class="statistics-content" style="height:1000px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
             <div class="head">
                 <div class="region-titles">
                     <span class="title">
@@ -526,6 +526,9 @@ export default {
             timeMode: 1,
             regionsList: [],
             params: {},
+
+            defineMysteryMode: -1,
+
             daysRangeList: [],
             toolTipClass: 'page-login-toolTipClass',
             tooltipClass: 'tooltip-class',
@@ -1323,14 +1326,16 @@ export default {
             return returnValue;
         },
         routeToInpectReportWithParam(e, type) {
-          if(!PermissionHelper.enableInspectReport()){
-            message({
-                message: this.$i18n.t('route.noReportAuthority'),
-                type: 'error',
-                duration: 5 * 1000
-              });
-            return;
-          }
+            if(!PermissionHelper.enableInspectReport()){
+                message({
+                    message: this.$i18n.t('route.noReportAuthority'),
+                    type: 'error',
+                    duration: 5 * 1000
+                });
+                return;
+            }
+            console.log('e :::::::::>> ', e);
+            console.log('type :::::::::>> ', type);
             // const searchParams = SearchConditionUtil.getSearchCondition('inspectReport');
             let searchParams = JSON.parse(JSON.stringify(this.params))
             searchParams.jump = true;
@@ -1355,12 +1360,15 @@ export default {
                 page: 0,
                 size: 12
             };
-
+            // ***
+            searchParams.searchMysteryMode = this.defineMysteryMode
+            // ***
             console.log(searchParams)
             const searchParamsObj = {
                 path: 'inspectReport',
                 params: searchParams
             };
+            console.log("searchParamsObj bbb" , searchParamsObj)
             SearchConditionUtil.saveSearchCondition(searchParamsObj);
             //this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
             this.$router.push({
@@ -1472,12 +1480,12 @@ export default {
                 page: 0,
                 size: 10
             };
-
+            
             const searchParamsObj = {
                 path: 'inspectReport',
                 params: searchParams
             };
-            console.log(searchParamsObj)
+            console.log("searchParamsObj aaa" , searchParamsObj)
             SearchConditionUtil.saveSearchCondition(searchParamsObj);
             //this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
             this.$router.push({
@@ -2405,31 +2413,36 @@ export default {
                 params.storeIds = this.part1.compareIds;
                 params.groupIds = this.part1.compareIds;
                 params.groupMode = 0;
+                this.defineMysteryMode = -1
             } else if (this.part1.compareType == 'area1') {
                 params.groupIds = this.part1.compareIds;
                 params.storeIds = this.part1.selStoreIdArr;
                 params.groupMode = 1;
+                this.defineMysteryMode = -1
             } else if (this.part1.compareType == 'area2') {
                 params.groupIds = this.part1.compareIds;
                 params.storeIds = this.part1.selStoreIdArr;
                 params.groupMode = 2;
+                this.defineMysteryMode = -1
             } else if (this.part1.compareType == 'storeType') {
                 params.groupIds = this.part1.compareIds;
                 params.groupMode = 3;
             } else if (this.part1.compareType == 'storeGroup') {
                 params.groupIds = this.part1.compareIds;
                 params.groupMode = 4;
+                this.defineMysteryMode = -1
             } else if (this.part1.compareType == 'users') {
                 params.submitters = this.part1.compareIds;
                 params.groupIds = this.part1.compareIds;
                 params.groupMode = 5;
                 params.searchMysteryMode = 0
+                this.defineMysteryMode = 0
             } else if (this.part1.compareType == 'mysterio') {
                 params.submitters = this.part1.compareIds;
                 params.groupIds = this.part1.compareIds;
                 params.groupMode = 5;
                 params.searchMysteryMode = 1
-
+                this.defineMysteryMode = 1
             }else if (this.part1.compareType == 'position') {
                 let users = [];
                 console.log("Part1 User")
@@ -2442,6 +2455,8 @@ export default {
                 params.submitters = users;
                 params.groupIds = users;
                 params.groupMode = 5;
+                params.searchMysteryMode = 0
+                this.defineMysteryMode = 0
             }
 
             params.filter = {
@@ -2622,6 +2637,7 @@ export default {
                         //console.log("********self.part1.content:",self.part1.content);
                         params.storeIds = self.params.storeIds;
                         params.searchMysteryMode = 0
+                        this.defineMysteryMode = 0
                         if(this.part1.indexRegion==-1)
                             params.submitters = this.part1.compareIds;
                         else
@@ -2630,6 +2646,7 @@ export default {
                         //console.log("position content:",self.part1.content);
                         params.storeIds = self.params.storeIds;
                         params.searchMysteryMode = 0
+                        this.defineMysteryMode = 0
                         let users = [];
                         this.part1.originArray.forEach(function (item) {
                             if (self.part1.compareIds.indexOf(item.value) >= 0)
@@ -2643,6 +2660,7 @@ export default {
                     }else if(this.part1.compareType == 'mysterio'){
                         params.storeIds = self.params.storeIds;
                         params.searchMysteryMode = 1
+                        this.defineMysteryMode = 1
                         if(this.part1.indexRegion==-1)
                             params.submitters = this.part1.compareIds;
                         else
@@ -2653,6 +2671,10 @@ export default {
                     }
                     else if(this.part1.compareType == 'area2'){
                         params.storeIds = this.part1.selStoreIdArr;
+                    }
+                    else if(this.part1.compareType == 'stores'){
+                        params.storeIds = this.part1.compareIds;
+                        params.groupIds = this.part1.compareIds;
                     }
 
                     params.inspectTagId = self.params.inspectId;
@@ -2755,30 +2777,37 @@ export default {
                 params.storeIds = this.part2.compareIds;
                 params.groupIds = this.part2.compareIds;
                 params.groupMode = 0;
+                this.defineMysteryMode = -1
             } else if (this.part2.compareType == 'area1') {
                 params.storeIds = this.part2.selStoreIdArr;
                 params.groupIds = this.part2.compareIds;
                 params.groupMode = 1;
+                this.defineMysteryMode = -1
             } else if (this.part2.compareType == 'area2') {
                 params.storeIds = this.part2.selStoreIdArr;
                 params.groupIds = this.part2.compareIds;
                 params.groupMode = 2;
+                this.defineMysteryMode = -1
             } else if (this.part2.compareType == 'storeType') {
                 params.groupIds = this.part2.compareIds;
                 params.groupMode = 3;
+                this.defineMysteryMode = -1
             } else if (this.part2.compareType == 'storeGroup') {
                 params.groupIds = this.part2.compareIds;
                 params.groupMode = 4;
+                this.defineMysteryMode = -1
             } else if (this.part2.compareType == 'users') {
                 params.submitters = this.part2.compareIds;
                 params.groupIds = this.part2.compareIds;
                 params.groupMode = 5;
                 params.searchMysteryMode = 0
+                this.defineMysteryMode = 0
             } else if(this.part2.compareType == 'mysterio'){
                 params.submitters = this.part2.compareIds;
                 params.groupIds = this.part2.compareIds;
                 params.groupMode = 5;
                 params.searchMysteryMode = 1
+                this.defineMysteryMode = 1
             }else if (this.part2.compareType == 'position') {
                 let users = [];
                 this.part2.originArray.forEach(function (item) {
@@ -2788,6 +2817,8 @@ export default {
                 params.submitters = users;
                 params.groupIds = users;
                 params.groupMode = 5;
+                params.searchMysteryMode = 0
+                this.defineMysteryMode = 0
             }
 
             let totalReport = 0;
@@ -2929,6 +2960,10 @@ export default {
                     else if(this.part2.compareType == 'area2'){
                         params.storeIds = this.part2.selStoreIdArr;
                     }
+                    else if(this.part2.compareType == 'stores'){
+                        params.storeIds = this.part2.compareIds;
+                        params.groupIds = this.part2.compareIds;
+                    }
                     params.inspectTagId = self.params.inspectId;
                     params.order = {
                         direction: (this.part2.storeMode == 1) ? this.part2.storeOrder : this.part2.table.order,
@@ -3006,30 +3041,37 @@ export default {
                 params.storeIds = this.part3.compareIds;
                 params.groupIds = this.part3.compareIds;
                 params.groupMode = 0;
+                this.defineMysteryMode = -1
             } else if (this.part3.compareType == 'area1') {
                 params.storeIds = this.part3.selStoreIdArr;
                 params.groupIds = this.part3.compareIds;
                 params.groupMode = 1;
+                this.defineMysteryMode = -1
             } else if (this.part3.compareType == 'area2') {
                 params.storeIds = this.part3.selStoreIdArr;
                 params.groupIds = this.part3.compareIds;
                 params.groupMode = 2;
+                this.defineMysteryMode = -1
             } else if (this.part3.compareType == 'storeType') {
                 params.groupIds = this.part3.compareIds;
                 params.groupMode = 3;
+                this.defineMysteryMode = -1
             } else if (this.part3.compareType == 'storeGroup') {
                 params.groupIds = this.part3.compareIds;
                 params.groupMode = 4;
+                this.defineMysteryMode = -1
             } else if (this.part3.compareType == 'users') {
                 params.submitters = this.part3.compareIds;
                 params.groupIds = this.part3.compareIds;
                 params.groupMode = 5;
                 params.searchMysteryMode = 0
+                this.defineMysteryMode = 0
             } else if(this.part3.compareType == 'mysterio'){
                 params.submitters = this.part3.compareIds;
                 params.groupIds = this.part3.compareIds;
                 params.groupMode = 5;
                 params.searchMysteryMode = 1
+                this.defineMysteryMode = 1
             } else if (this.part3.compareType == 'position') {
                 let users = [];
                 this.part3.originArray.forEach(function (item) {
@@ -3039,6 +3081,8 @@ export default {
                 params.submitters = users;
                 params.groupIds = users;
                 params.groupMode = 5;
+                params.searchMysteryMode = 0
+                this.defineMysteryMode = 0
             }
 
             let totalReport = 0;
@@ -3167,6 +3211,9 @@ export default {
                     }
                     else if(this.part3.compareType == 'area2'){
                         params.storeIds = this.part3.selStoreIdArr;
+                    }else if(this.part3.compareType == 'stores'){
+                        params.storeIds = this.part3.compareIds;
+                        params.groupIds = this.part3.compareIds;
                     }
                     params.inspectTagId = self.params.inspectId;
                     params.order = {
