@@ -594,6 +594,7 @@ export default {
       self.curSelectId = [];
       self.curTypeArrary = [];
       let storeIds = [];
+      
       switch (val){
         case 'area1':
           self.dropdownPlaceholder = self.$t('remotePatrol.regionI');
@@ -627,7 +628,7 @@ export default {
           self.selAllString=self.$t('storeView.all');
           self.curTypeArrary = self.curStoreGroupList;
           for(let i=0; i<self.curTypeArrary ;i++){
-            storeIds = storeIds.concat(self.curTypeArrary[i].storeIds);
+              storeIds = storeIds.concat(self.curTypeArrary[i].storeIds);
           }
           //console.log("self.curTypeArrary:",self.curTypeArrary);
           break;
@@ -723,6 +724,7 @@ export default {
         
     },
     onChangeCompareType({selectedArray,storeIds,selectedLabels}) {
+      console.log("curStoreList:",this.curStoreList);
       console.log("onChangeCompareType ---->>>> selectedArray:", selectedArray);
       console.log("onChangeCompareType  ---->>>> storeIds:", storeIds);
       console.log("onChangeCompareType  ---->>>> selectedLabels:", selectedLabels);
@@ -749,6 +751,8 @@ export default {
       }else if(this.compareType=='area2'){
         storeId=this.doGetStoreIdsByCity(selectedArray);
         //console.log("storeId:",storeId);
+      }else if(this.compareType=='storeGroup' || this.compareType=='storeType' ){
+        storeId = this.doGetStoreIdsByGroup(storeIds);
       }
       //console.log("2.onChangeCompareType > compareArr:",compareArr);
       //console.log("2.onChangeCompareType > originArray:",originArray);
@@ -769,7 +773,7 @@ export default {
         if (item.country === this.curCountry || this.curCountry==-1) {
           let storeObj = {};
           if(provinceArrary.includes(item.province)){
-            if(!tempStoreIds.includes(item.storeId))tempStoreIds.push(item.storeId);
+            if(!tempStoreIds.includes(item.storeId) && self.curStoreList.findIndex(curItem =>curItem.storeId == item.storeId)!=-1)tempStoreIds.push(item.storeId);
           }
         }
       });
@@ -786,9 +790,18 @@ export default {
         if (item.country === this.curCountry || this.curCountry==-1) {
           let storeObj = {};
           if(cityArrary.includes(item.city)){
-            if(!tempStoreIds.includes(item.storeId))tempStoreIds.push(item.storeId);
+            if(!tempStoreIds.includes(item.storeId)  && self.curStoreList.findIndex(curItem =>curItem.storeId == item.storeId)!=-1 )tempStoreIds.push(item.storeId);
           }
         }
+      });
+      return tempStoreIds;
+    },
+    doGetStoreIdsByGroup(storeIds){
+      const self = this;
+      const tempStoreIds = [];
+      storeIds.forEach(id => {
+        if(self.curStoreList.findIndex(curItem =>curItem.storeId == id)!=-1) 
+          tempStoreIds.push(id);
       });
       return tempStoreIds;
     }
