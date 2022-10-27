@@ -1613,15 +1613,15 @@ export default {
 
             this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
             this.part1.pieOption = {};
-            this.part1.storeTableData = null;
+            this.part1.storeTableData = [];
             this.part1.barRegionOption = {};
             this.part1.barStoreOption = {};
             this.part2.pieOption = {};
-            this.part2.storeTableData = null;
+            this.part2.storeTableData = [];
             this.part2.barRegionOption = {};
             this.part2.barStoreOption = {};
             this.part3.pieOption = {};
-            this.part3.storeTableData = null;
+            this.part3.storeTableData = [];
             this.part3.barRegionOption = {};
             this.part3.barStoreOption = {};
             this.overviewCount = {
@@ -2632,7 +2632,9 @@ export default {
                     params.beginTs = self.params.beginTs;
                     params.endTs = self.params.endTs;
                     params.groupMode = 0;
-                    params.storeIds = this.part1.indexRegion==-1? this.params.storeIds:this.part1.content[this.part1.indexRegion].list;
+                    console.log("*self.params.storeIds:",self.params.storeIds);
+                    console.log("*this.part1.selStoreIdArr:",this.part1.selStoreIdArr)
+                    params.storeIds = this.part1.indexRegion==-1? this.part1.selStoreIdArr:this.part1.content[this.part1.indexRegion].list;
                     if (this.part1.compareType == 'users' ) {//|| this.part1.compareType == 'position'
                         //console.log("********self.part1.content:",self.part1.content);
                         params.storeIds = self.params.storeIds;
@@ -2666,16 +2668,26 @@ export default {
                         else
                             params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
                     } 
-                    else if(this.part1.compareType == 'area1'){
-                        params.storeIds = this.part1.selStoreIdArr;
+                    else if(this.part1.compareType == 'storeGroup' && this.part1.indexRegion!=-1){
+                        var storId = [];
+                        this.part1.content[this.part1.indexRegion].list.forEach(function (item) {
+                            if (self.params.storeIds.indexOf(item) >= 0)
+                                storId.push(item);
+                        })
+                        params.storeIds = storId;
                     }
-                    else if(this.part1.compareType == 'area2'){
-                        params.storeIds = this.part1.selStoreIdArr;
+                    else if(this.part1.compareType == 'storeType' && this.part1.indexRegion!=-1){
+                        var storId = [];
+                        this.part1.content[this.part1.indexRegion].list.forEach(function (item) {
+                            if (self.params.storeIds.indexOf(item) >= 0)
+                                storId.push(item);
+                        })
+                        params.storeIds = storId;
                     }
-                    else if(this.part1.compareType == 'stores'){
+                    /*else if(this.part1.compareType == 'stores'){
                         params.storeIds = this.part1.compareIds;
                         params.groupIds = this.part1.compareIds;
-                    }
+                    }*/
 
                     params.inspectTagId = self.params.inspectId;
                     params.order = {
@@ -2931,7 +2943,7 @@ export default {
                     params.beginTs = self.params.beginTs;
                     params.endTs = self.params.endTs;
                     params.groupMode = 0;
-                    params.storeIds =this.part2.indexRegion==-1?this.params.storeIds: this.part2.content[this.part2.indexRegion].list;
+                    params.storeIds =this.part2.indexRegion==-1?this.part2.selStoreIdArr: this.part2.content[this.part2.indexRegion].list;
                     if (this.part2.compareType == 'users') {
                         params.storeIds = self.params.storeIds;
                         params.submitters = this.part2.indexRegion==-1?this.part2.compareIds:[self.part2.content[self.part2.indexRegion].innerId]
@@ -2954,15 +2966,21 @@ export default {
                             params.submitters = users;
                         else
                             params.submitters = [self.part2.content[self.part2.indexRegion].innerId]
-                    }else if(this.part2.compareType == 'area1'){
-                        params.storeIds = this.part2.selStoreIdArr;
+                    }else if(this.part2.compareType == 'storeGroup' && this.part2.indexRegion!=-1){
+                        var storId = [];
+                        this.part2.content[this.part2.indexRegion].list.forEach(function (item) {
+                            if (self.params.storeIds.indexOf(item) >= 0)
+                                storId.push(item);
+                        })
+                        params.storeIds = storId;
                     }
-                    else if(this.part2.compareType == 'area2'){
-                        params.storeIds = this.part2.selStoreIdArr;
-                    }
-                    else if(this.part2.compareType == 'stores'){
-                        params.storeIds = this.part2.compareIds;
-                        params.groupIds = this.part2.compareIds;
+                    else if(this.part2.compareType == 'storeType' && this.part2.indexRegion!=-1){
+                        var storId = [];
+                        this.part2.content[this.part2.indexRegion].list.forEach(function (item) {
+                            if (self.params.storeIds.indexOf(item) >= 0)
+                                storId.push(item);
+                        })
+                        params.storeIds = storId;
                     }
                     params.inspectTagId = self.params.inspectId;
                     params.order = {
@@ -3184,7 +3202,7 @@ export default {
                     params.beginTs = self.params.beginTs;
                     params.endTs = self.params.endTs;
                     params.groupMode = 0;
-                    params.storeIds = this.part3.indexRegion==-1? this.params.storeIds:this.part3.content[this.part3.indexRegion].list;
+                    params.storeIds = this.part3.indexRegion==-1? this.part3.selStoreIdArr:this.part3.content[this.part3.indexRegion].list;
                     if (this.part3.compareType == 'users') {
                         params.storeIds = self.params.storeIds;
                         params.searchMysteryMode = 0
@@ -3206,14 +3224,21 @@ export default {
                             params.submitters = users;
                         else
                             params.submitters = [self.part3.content[self.part3.indexRegion].innerId]
-                    }else if(this.part3.compareType == 'area1'){
-                        params.storeIds = this.part3.selStoreIdArr;
+                    }else if(this.part3.compareType == 'storeGroup' && this.part3.indexRegion!=-1){
+                        var storId = [];
+                        this.part3.content[this.part3.indexRegion].list.forEach(function (item) {
+                            if (self.params.storeIds.indexOf(item) >= 0)
+                                storId.push(item);
+                        })
+                        params.storeIds = storId;
                     }
-                    else if(this.part3.compareType == 'area2'){
-                        params.storeIds = this.part3.selStoreIdArr;
-                    }else if(this.part3.compareType == 'stores'){
-                        params.storeIds = this.part3.compareIds;
-                        params.groupIds = this.part3.compareIds;
+                    else if(this.part3.compareType == 'storeType' && this.part3.indexRegion!=-1){
+                        var storId = [];
+                        this.part3.content[this.part3.indexRegion].list.forEach(function (item) {
+                            if (self.params.storeIds.indexOf(item) >= 0)
+                                storId.push(item);
+                        })
+                        params.storeIds = storId;
                     }
                     params.inspectTagId = self.params.inspectId;
                     params.order = {

@@ -300,10 +300,10 @@ export default {
             }
           });
           this.curStoreList = curStoreList;
-          if(this.compareType== 'stores'){
+          //if(this.compareType== 'stores'){
             this.curSelectId=[];
             this.changeCompareType(this.compareType);
-          }
+          //}
 
         }
     },
