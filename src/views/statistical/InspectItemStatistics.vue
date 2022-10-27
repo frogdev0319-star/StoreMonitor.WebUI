@@ -2001,7 +2001,7 @@ export default {
       this.part2.barStoreOption = option;
     },
     async getPart3RegionBar() {
-
+      
       const self = this;
       const params = {};
       this.totalAvgScore =-9999;
@@ -2019,6 +2019,9 @@ export default {
         direction: this.part3.regionOrder,
         property:"averageScore"
       }
+
+
+
       if(this.part3.compareType=='stores'){
         params.groupIds  = this.part3.compareIds;
         params.storeIds  = this.part3.compareIds;
@@ -2049,8 +2052,8 @@ export default {
         params.searchMysteryMode = 0
       }
       else if (this.part3.compareType == 'mysterio') {
-        params.submitters = self.part3.compareIds;
-        params.groupIds = self.part3.compareIds;
+        params.submitters = this.part3.compareIds;
+        params.groupIds = this.part3.compareIds;
         params.groupMode = 5;
         params.searchMysteryMode = 1
       }
@@ -2207,7 +2210,7 @@ export default {
             params.beginTs = self.params.beginTs;
             params.endTs = self.params.endTs;
             params.groupMode = 0;
-            params.searchMysteryMode = 1
+            params.searchMysteryMode = -1
             console.log("To Get Data")
             params.storeIds = this.part3.indexRegion==-1?self.params.storeIds:this.part3.content[this.part3.indexRegion].list;
             params.groupIds = this.part3.indexRegion==-1?[]:this.part3.content[this.part3.indexRegion].list;
