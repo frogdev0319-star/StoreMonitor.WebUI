@@ -1452,8 +1452,8 @@ $filterWidth: (100%-706);
             overflow:hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
-             font-size: calc(15/1440*100vw);
-             margin-right: calc(10/1440*100vw);
+            font-size: calc(15/1440*100vw);
+            margin-right: calc(10/1440*100vw);
           }
           div {
             text-align: left;
@@ -1539,6 +1539,10 @@ $filterWidth: (100%-706);
         }
         .margin-bottom-5 {
           margin-bottom: calc(5/1440*100vw);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          
         }
         .item-score{
           color: $tab;
