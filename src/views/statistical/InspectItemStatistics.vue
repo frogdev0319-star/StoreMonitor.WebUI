@@ -1052,7 +1052,7 @@ export default {
           //let id = this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName);
           params.submitters = [];
           if(this.part3.indexRegion!=-1){
-          let id = this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName);
+          let id = this.$refs.typeSelectArea.getUserIdFromMystery(self.part3.content[self.part3.indexRegion].groupName);
           params.submitters=[id]
           }
           params.groupIds   = [];
@@ -1772,7 +1772,7 @@ export default {
             params.beginTs = self.params.beginTs;
             params.endTs = self.params.endTs;
             params.groupMode = 0;
-            params.storeIds = this.part1.content[this.part1.indexRegion].list;
+            params.storeIds = this.part1.indexRegion==-1? this.part1.selStoreIdArr:this.part1.content[this.part1.indexRegion].list;
             params.inspectTagId = self.params.inspectId;
             console.log("params ::::>>>>", params)
             const storeResult = await this.getInspectStatsItemOverGroup(params);
@@ -2212,7 +2212,7 @@ export default {
             params.groupMode = 0;
             params.searchMysteryMode = -1
             console.log("To Get Data")
-            params.storeIds = this.part3.indexRegion==-1?self.params.storeIds:this.part3.content[this.part3.indexRegion].list;
+            params.storeIds = this.part3.indexRegion==-1? this.part3.selStoreIdArr:this.part3.content[this.part3.indexRegion].list;
             params.groupIds = this.part3.indexRegion==-1?[]:this.part3.content[this.part3.indexRegion].list;
             if(this.part3.compareType=='users' || this.part3.compareType=='position'){
               params.storeIds = self.params.storeIds;
@@ -2220,9 +2220,24 @@ export default {
               params.searchMysteryMode = 0
             } else if(this.part3.compareType=='mysterio'){
               params.storeIds = self.params.storeIds;
-              params.submitters=this.part3.indexRegion==-1?[]:[ this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName)]
+              params.submitters=this.part3.indexRegion==-1?[]:[ this.$refs.typeSelectArea.getUserIdFromMystery(self.part3.content[self.part3.indexRegion].groupName)]
               params.searchMysteryMode = 1
-            }
+            }else if(this.part3.compareType == 'storeGroup' && this.part3.indexRegion!=-1){
+                        var storId = [];
+                        this.part3.content[this.part3.indexRegion].list.forEach(function (item) {
+                            if (self.params.storeIds.indexOf(item) >= 0)
+                                storId.push(item);
+                        })
+                        params.storeIds = storId;
+                    }
+                    else if(this.part3.compareType == 'storeType' && this.part3.indexRegion!=-1){
+                        var storId = [];
+                        this.part3.content[this.part3.indexRegion].list.forEach(function (item) {
+                            if (self.params.storeIds.indexOf(item) >= 0)
+                                storId.push(item);
+                        })
+                        params.storeIds = storId;
+                    }
             params.inspectTagId = self.params.inspectId;
             if(this.inspectItem){
               params.itemIds = this.inspectItem.item.ids
