@@ -256,6 +256,7 @@ export default {
   }
   .el-select-dropdown__item{
     /*color: #7d8cad;*/
+    padding-right: 10px;
   }
   .el-select-dropdown.is-multiple .el-select-dropdown__item.selected::after{
     font-family: "iconfont" !important;
@@ -357,5 +358,6 @@ export default {
   .el-select-dropdown.is-multiple .el-select-dropdown__item.selected span{
     color: #7d8cad;
     font-weight: normal;
+    padding-right: 25px;
   }
 </style>

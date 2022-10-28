@@ -84,7 +84,6 @@ export default {
     },
 
     options(val){
-      //console.log("options > val:",val);
       this.selectedArray = [...this.selected];
       this.initData();
     },
@@ -109,6 +108,11 @@ export default {
         if (item.disabled) {
           self.disabledLength++;
         }
+        /*console.log("item.label.length:",item.label.length);
+        if(item.label.length>=40){
+          item.label = item.label.substr(0,45)+"...";
+          console.log("item.label:",item.label);
+        }*/
       });
       if (!this.selectedArray.includes('-1') && this.selectedArray.length === this.options.length - this.disabledLength) {
         this.input = this.all;
@@ -281,7 +285,7 @@ export default {
     margin-right: calc(15/1920*100vw);
   }
   .el-select-dropdown__item{
-    padding: 0 20px 0 50px !important;
+    padding: 0 10px 0 20px !important;
     /*color: #7d8cad;*/
   }
   .el-select-dropdown.is-multiple .el-select-dropdown__item.selected::after{
@@ -401,6 +405,7 @@ export default {
   .el-select-dropdown.is-multiple .el-select-dropdown__item.selected span{
     color: #7d8cad;
     font-weight: normal;
+    padding-right: 25px;
   }
   .el-select-dropdown.is-multiple .el-select-dropdown__item.selected.hover {
     background-color: #FEE4E7;
