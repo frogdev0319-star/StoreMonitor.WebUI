@@ -2212,8 +2212,9 @@ export default {
             params.groupMode = 0;
             params.searchMysteryMode = -1
             console.log("To Get Data")
-            params.storeIds = this.part3.indexRegion==-1?self.params.storeIds:this.part3.content[this.part3.indexRegion].list;
+            params.storeIds = this.part3.indexRegion==-1?this.part3.selStoreIdArr:this.part3.content[this.part3.indexRegion].list;
             params.groupIds = this.part3.indexRegion==-1?[]:this.part3.content[this.part3.indexRegion].list;
+            
             if(this.part3.compareType=='users' || this.part3.compareType=='position'){
               params.storeIds = self.params.storeIds;
               params.submitters=this.part3.indexRegion==-1?[]:[ this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName)]

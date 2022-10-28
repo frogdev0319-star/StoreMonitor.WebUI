@@ -127,7 +127,7 @@ export default {
   mounted() {},
   async created() {
     await this.init()
-    // await this.getNodeList(this.auditDetail.processDefinitionKey) 
+    await this.getNodeList(this.auditDetail.processDefinitionKey) 
 
     const resulit = await this.$store.dispatch("GetUserAuthorities");
     this.currentUserInfo = resulit.data.userId
@@ -247,7 +247,7 @@ export default {
         this.flatNodeData.forEach(d=>{
           delete d.nextAuditNode
         })
-        // console.log('this.taskInfo 2 ------>> ', this.taskInfo);
+        console.log('this.taskInfo 3 ------>> ', this.taskInfo);
         console.log('this.flatNodeData 3 ------>> ', this.flatNodeData);
 
         const currentNode = this.taskInfo.filter( i => i.state == 2)
