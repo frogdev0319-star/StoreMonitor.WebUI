@@ -523,6 +523,16 @@ export default {
       }
       return null;
     },
+    getUserIdFromMystery(name){
+      console.log("getUserIdFromMystery="+name)
+      if(this.mysterioList){
+        console.log("this.mysterioList:",this.mysterioList)
+        let d =  this.mysterioList.find(item=>item.label==name);
+        console.log(d)
+        if(d)return d.value;
+      }
+      return null;
+    },
     getUserPositionList(data) {
       console.log(data)
       this.positionsList = [];
