@@ -802,7 +802,7 @@ export default {
         order:p.order,
         inspectTagId: p.inspectTagId != '-1' ? p.inspectTagId : null, 
         // searchMysteryMode : PermissionHelper.enableMimicMode ? 1 : -1
-        searchMysteryMode : p.searchMysteryMode
+        searchMysteryMode : PermissionHelper.enableMimicMode ? 1 :p.searchMysteryMode
       }
 
       console.log('params ~~~~~>> ', params);
