@@ -357,6 +357,21 @@
                        :label="catergy.label" :value="catergy.value"></el-option>
           </el-select>
         </div>
+        <div v-if="showGroupScoreSetting">
+          <div class="dialog-form-item-name">
+            <span>{{ $t('insSettingView.advanceSetting') }}</span>
+          </div>
+          <div style="line-height:28px;">
+            <el-radio-group class="attribute-group" v-model="itemAdvanceSetting">
+                <el-radio label="1">{{ $t('insSettingView.advanceSettingOn') }}</el-radio>
+                <el-radio label="0">{{ $t('insSettingView.advanceSettingOff') }}</el-radio>
+            </el-radio-group>
+          </div>
+          <el-input v-model.number="itemGroupScore"
+              :placeholder="$t('insSettingView.enterScore')"
+              :disabled = "itemAdvanceSetting=='0'"
+              @input="itemGroupScoreChange"/>
+        </div>
       </div>
     </dialog-pop>
   </div>
@@ -561,6 +576,9 @@ export default {
       tempSelectLabelWidth:[{key:'en',value:'123px'},{key:'zh',value:'123px'},{key:'zhtw',value:'123px'},
         {key:'ja-JP',value:'125px'},{key:'ko-KR',value:'123px'},{key:'vi-VN',value:'123px'},
         {key:'id-ID',value:'123px'},{key:'th-TH',value:'123px'}],
+      showGroupScoreSetting:false,
+      itemAdvanceSetting:'0',
+      itemGroupScore:0,
     };
   },
   computed: {
@@ -867,6 +885,7 @@ export default {
       this.parentId = -1;
       this.isEditCategory = false;
       this.notAllowedChangeParentId = false;
+      this.showGroupScoreSetting = false;
       this.getParentCatergoryList();
     },
 
@@ -913,13 +932,16 @@ export default {
           id: this.activeId,
           name: this.groupNameInput,
           tag: this.tabName,
-          parentId: this.parentId
+          parentId: this.parentId,
+          isAdvanced:this.itemAdvanceSetting=="1",
+          groupScore:this.itemAdvanceSetting=="1"?this.itemGroupScore:0
         }]
       };
       let resUpdateGroup = await this.updateGroup(params);
       this.showAddGroup = false;
       if (resUpdateGroup.errCode === 0) {
         util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
+        this.itemGroupScore = 0;
         this.refreshData(this.groupIndex);
       } else {
         util.notify(this.$t('deviceView.editFail'), 'warning', 3000);
@@ -987,6 +1009,14 @@ export default {
     },
 
     editCategory(index, item) {
+      if(!item.children){
+        this.showGroupScoreSetting = true;
+        this.itemGroupScore = item.groupScore;
+        this.itemAdvanceSetting = item.isAdvanced?"1":"0";
+      }else{
+        this.showGroupScoreSetting = false;
+      }
+      console.log(">>>>>editCategory:",item);
       item.isEdit = true;
       item.showEdit = false;
       this.notAllowedChangeParentId = !((item.parentId === -1 && !item.children) || item.parentId !== -1);
@@ -1766,6 +1796,10 @@ export default {
 
     getInputCatergyName(val) {
       this.groupNameInput = val;
+    },
+
+    itemGroupScoreChange(val){
+      this.itemGroupScore = this.getUtilScore(val,1);
     },
 
     getSubCategorySequence(children) {

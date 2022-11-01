@@ -83,7 +83,7 @@
                   <el-checkbox v-model="child.checked" class="storevue-checkbox-outlined" @change="checkSubcatergy(child, item)"/>
                   <span class="table-title">{{ child.groupName }}</span>
                 </div>
-                <div style="width:16%;font-size: 14px;font-weight: bold;color: #424151; text-align:center;">{{ item.groupScore }}</div>
+                <div style="width:16%;font-size: 14px;font-weight: bold;color: #424151; text-align:center;">{{ child.groupScore }}</div>
               </div>
               <div v-if="child.itemData.length !== 0" class="table-class" :key="`item-`+childIndex">
                 <draggable-table
@@ -315,7 +315,7 @@ export default {
       const self = this;
       self.typeNum = self.routeData.length;
       let allcount = 0;
-      console.log(">>>>>self.routeData",self.routeData);
+      //console.log(">>>>>self.routeData",self.routeData);
       self.routeData.forEach(item => {
         allcount += item.itemData.length;
       });

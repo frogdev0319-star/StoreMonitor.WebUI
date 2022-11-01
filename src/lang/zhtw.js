@@ -788,7 +788,10 @@ export default{
       "isRequired":"必填",
       "notRequired":"非必填",
       "selectStoreTag":"快速選擇",
-      "groupScore":"類別分值"
+      "groupScore":"類別分值",
+      "advanceSetting":"進階設定",
+      "advanceSettingOn":"開啟",
+      "advanceSettingOff":"關閉",
   },
   "deviceView":{
       "EzvizAccount":"串流服務帳號",

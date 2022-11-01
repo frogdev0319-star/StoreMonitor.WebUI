@@ -687,7 +687,7 @@ export default {
           _obj.type = _item.type;
           _obj.checked = false;
           _obj.parentId = _item.parentId;
-          _obj.groupScore = 50;
+          _obj.groupScore = _item.groupScore;
           const tempChild = [];
           _item.items.forEach(itemChild => {
             const objChild = {};
