@@ -55,10 +55,12 @@
           </div>
           <div class="catergy-title">
             <el-checkbox v-model="item.checked" class="storevue-checkbox-outlined" @change="checkItemsOfCatergy(item)"/>
-            <div style="display: inline-flex;flex-direction: column;font-size: 14px;font-weight: bold;color: #424151; padding-left: calc(38/1920*100vw);">
+            <div style="display: inline-flex;flex-direction: column;font-size: 14px;font-weight: bold;color: #424151; padding-left: calc(38/1920*100vw);"
+            :style="isScoreItemActive?{'width':'45%'}:{'width':'71%'}" >
               <div v-if="sheetIndex != 2 && item.weight != -1">{{ `${item.weight}%` }}</div>
               <div>{{ item.groupName }}（{{ item.itemCount }}）</div>
             </div>
+            <div v-if="!item.children" style="width:16%;font-size: 14px;font-weight: bold;color: #424151; text-align:center;">{{ item.groupScore }}</div>
           </div>
           <template v-if="!item.children">
             <div v-if="item.itemData.length !== 0" class="table-class">
@@ -77,8 +79,11 @@
           <template v-else>
             <template v-for="(child,childIndex) in item.children">
               <div class="catergy-title subcatergy" :key="childIndex">
-                <el-checkbox v-model="child.checked" class="storevue-checkbox-outlined" @change="checkSubcatergy(child, item)"/>
-                <span class="table-title">{{ child.groupName }}</span>
+                <div :style="isScoreItemActive?{'width':'46%'}:{'width':'72%'}">
+                  <el-checkbox v-model="child.checked" class="storevue-checkbox-outlined" @change="checkSubcatergy(child, item)"/>
+                  <span class="table-title">{{ child.groupName }}</span>
+                </div>
+                <div style="width:16%;font-size: 14px;font-weight: bold;color: #424151; text-align:center;">{{ item.groupScore }}</div>
               </div>
               <div v-if="child.itemData.length !== 0" class="table-class" :key="`item-`+childIndex">
                 <draggable-table
@@ -213,6 +218,12 @@ export default {
           },
         },
         {
+          name: this.$t('insSettingView.groupScore'),
+          headerStyle:{
+            width: '16%',
+          },
+        },
+        {
           name: this.$t('insSettingView.score'),
           headerStyle:{
             width: '16%'
@@ -238,6 +249,12 @@ export default {
           headerStyle:{
             width: '25%',
             textAlign: 'left'
+          },
+        },
+        {
+          name: this.$t('insSettingView.groupScore'),
+          headerStyle:{
+            width: '16%',
           },
         },
         {
@@ -298,6 +315,7 @@ export default {
       const self = this;
       self.typeNum = self.routeData.length;
       let allcount = 0;
+      console.log(">>>>>self.routeData",self.routeData);
       self.routeData.forEach(item => {
         allcount += item.itemData.length;
       });
@@ -841,6 +859,8 @@ export default {
         font-size: 0;
         width:80%;
         text-align: left;
+        display: flex;
+        flex-direction: row;
         margin: 15px 0 15px calc(27/1920*100vw);
         .all-checkBox{
           margin-right: 0;

@@ -787,7 +787,8 @@ export default{
       "bindWorkFLow":"巡檢表綁定流程",
       "isRequired":"必填",
       "notRequired":"非必填",
-      "selectStoreTag":"快速選擇"
+      "selectStoreTag":"快速選擇",
+      "groupScore":"類別分值"
   },
   "deviceView":{
       "EzvizAccount":"串流服務帳號",
