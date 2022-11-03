@@ -801,8 +801,7 @@ export default {
         filter:p.filter,
         order:p.order,
         inspectTagId: p.inspectTagId != '-1' ? p.inspectTagId : null, 
-        // searchMysteryMode : PermissionHelper.enableMimicMode ? 1 : -1
-        searchMysteryMode : PermissionHelper.enableMimicMode ? 1 :p.searchMysteryMode
+        searchMysteryMode : PermissionHelper.enableMimicMode ? 1 : p.searchMysteryMode
       }
 
       console.log('params ~~~~~>> ', params);
@@ -995,6 +994,7 @@ export default {
       if (self.curAppraise != null && self.curAppraise !== -1) {
         clause.status = self.curAppraise;
       }
+      
       self.params.clause = clause;
       self.params.inspectTagId = self.inspectId === '-1' ? '' : self.inspectId;
       typeof (self.params.inspectTagId) === 'string' && delete self.params.inspectTagId;
@@ -1008,6 +1008,17 @@ export default {
       } else {
         self.params.like = {};
       }
+
+      if(this.params.jump){ //跳轉
+          console.log("Jump to ")
+          this.params.jump = false;
+          this.dateValue = [new Date().setTime(this.params.beginTs), new Date().setTime(this.params.endTs)];
+          this.params.searchMysteryMode = this.params.searchMysteryMode;
+          //this.saveSearchParams();
+          //this.searchData();
+        }else{
+          this.params.searchMysteryMode = PermissionHelper.enableMimicMode ? 1 : -1;
+        }
       console.log("SearchParams")
       console.log(self.params)
       self.params.filter = { page: 0, size: self.sizeNum };
@@ -1168,14 +1179,17 @@ export default {
         if(!searchParams.curCity){
           searchParams.curCity =[];
         }
-    
-        if(searchParams.jump){
+        
+        if(searchParams.jump){ //跳轉
           console.log("Jump to ")
-          this.params.jump = false;
+          //this.params.jump = false;
           this.dateValue = [new Date().setTime(this.params.beginTs), new Date().setTime(this.params.endTs)];
-          this.saveSearchParams();
+          this.params.searchMysteryMode = searchParams.searchMysteryMode;
+          //this.saveSearchParams();
           this.searchData();
-        }
+        }/*else{
+          this.params.searchMysteryMode = PermissionHelper.enableMimicMode ? 1 : -1;
+        }*/
         
       } else {
         this.params.filter = { page: 0, size: this.sizeNum };
