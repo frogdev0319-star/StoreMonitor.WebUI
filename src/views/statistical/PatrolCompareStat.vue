@@ -923,7 +923,7 @@ export default {
             color:'#556679',
             fontSize:12,
           },
-          name:isAss?'(%)':'(分)',
+          name:isAss?'(次)':'(分)',
            nameTextStyle:{
              fontSize:12,
              color:'#556679',
