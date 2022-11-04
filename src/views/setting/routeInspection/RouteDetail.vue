@@ -60,7 +60,7 @@
               <div v-if="sheetIndex != 2 && item.weight != -1">{{ `${item.weight}%` }}</div>
               <div>{{ item.groupName }}（{{ item.itemCount }}）</div>
             </div>
-            <div v-if="!item.children" style="width:16%;font-size: 14px;font-weight: bold;color: #424151; text-align:center;">{{ item.groupScore }}</div>
+            <div v-if="!item.children" style="width:16%;font-size: 14px;font-weight: bold;color: #424151; text-align:center;">{{ item.groupScore==-99999?'': item.groupScore}}</div>
           </div>
           <template v-if="!item.children">
             <div v-if="item.itemData.length !== 0" class="table-class">
@@ -83,7 +83,7 @@
                   <el-checkbox v-model="child.checked" class="storevue-checkbox-outlined" @change="checkSubcatergy(child, item)"/>
                   <span class="table-title">{{ child.groupName }}</span>
                 </div>
-                <div style="width:16%;font-size: 14px;font-weight: bold;color: #424151; text-align:center;">{{ child.groupScore }}</div>
+                <div style="width:16%;font-size: 14px;font-weight: bold;color: #424151; text-align:center;">{{ child.groupScore==-99999?'':child.groupScore }}</div>
               </div>
               <div v-if="child.itemData.length !== 0" class="table-class" :key="`item-`+childIndex">
                 <draggable-table

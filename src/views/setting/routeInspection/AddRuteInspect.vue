@@ -371,6 +371,7 @@
               :placeholder="$t('insSettingView.enterScore')"
               :disabled = "itemAdvanceSetting=='0'"
               @input="itemGroupScoreChange"/>
+          <span v-if="GroupScoreTip" class="rules">{{ $t('insSettingView.setGroupScoreRange') }}</span>
         </div>
       </div>
     </dialog-pop>
@@ -579,6 +580,7 @@ export default {
       showGroupScoreSetting:false,
       itemAdvanceSetting:'0',
       itemGroupScore:0,
+      GroupScoreTip:false,
     };
   },
   computed: {
@@ -891,7 +893,8 @@ export default {
 
     getParentCatergoryList() {
       this.parentCatergoryList = [];
-      let parentCatergoryList = this.groupList.filter(item => item.children || (!item.children && item.items.length === 0));
+      console.log(">>>>this.groupList:",this.groupList);
+      let parentCatergoryList = this.groupList.filter(item => (item.children || (!item.children && item.items.length === 0 )) && !item.isAdvanced);
       parentCatergoryList = this.isEditCategory ? parentCatergoryList.filter(item => this.activeId !== item.id) : parentCatergoryList;
       parentCatergoryList.forEach(item => {
         const catergoryObj = {};
@@ -913,6 +916,10 @@ export default {
       const self = this;
       if (self.groupNameInput.trim().length === 0) {
         util.notify(self.$t('insSettingView.titleEmpty'), 'warning', 3000);
+        return false;
+      }
+      if(this.GroupScoreTip){
+        util.notify(self.$t('insSettingView.setGroupScoreRange'), 'warning', 3000);
         return false;
       }
       let mode = 0;
@@ -1011,7 +1018,7 @@ export default {
     editCategory(index, item) {
       if(!item.children){
         this.showGroupScoreSetting = true;
-        this.itemGroupScore = item.groupScore;
+        this.itemGroupScore = (item.groupScore==-99999)?0:item.groupScore;
         this.itemAdvanceSetting = item.isAdvanced?"1":"0";
       }else{
         this.showGroupScoreSetting = false;
@@ -1239,6 +1246,7 @@ export default {
       self.ItemTotalScoreTip1 = false;
       self.ScoreOptionsTips0 = false;
       self.ScoreOptionsTips1 = false;
+      self.GroupScoreTip = false;
       this.itemType = 0;
     },
 
@@ -1527,6 +1535,8 @@ export default {
         obj.children = item.children;
         obj.sequence = item.sequence;
         obj.weight = item.weight;
+        obj.isAdvanced = item.isAdvanced;
+        obj.groupScore = item.groupScore;
         temp.push(obj);
         groupIds.push(item.id);
       });
@@ -1800,6 +1810,11 @@ export default {
 
     itemGroupScoreChange(val){
       this.itemGroupScore = this.getUtilScore(val,1);
+      if(parseFloat(this.itemGroupScore)<-9999 || parseFloat(this.itemGroupScore)>9999){
+          this.GroupScoreTip=true;
+        }else{
+          this.GroupScoreTip=false;
+        }
     },
 
     getSubCategorySequence(children) {

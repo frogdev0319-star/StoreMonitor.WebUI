@@ -792,6 +792,7 @@ export default{
       "advanceSetting":"進階設定",
       "advanceSettingOn":"開啟",
       "advanceSettingOff":"關閉",
+      "setGroupScoreRange":"類別分值上限 輸入範圍 -9999 ~ 9999"
   },
   "deviceView":{
       "EzvizAccount":"串流服務帳號",
