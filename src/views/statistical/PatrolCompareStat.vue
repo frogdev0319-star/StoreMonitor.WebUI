@@ -905,7 +905,7 @@ export default {
           },
           max:function (value) {
             if(!value || value.max==0 ||  value.max<=100) return 100;
-            else return value.max+10;
+            else return value.max;
           },
           axisLine:{
             show:false,
