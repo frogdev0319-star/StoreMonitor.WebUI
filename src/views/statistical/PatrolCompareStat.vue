@@ -904,8 +904,8 @@ export default {
             else return 0;
           },
           max:function (value) {
-            if(!value || value.max==0 ) return 100;
-            else return value.max*1.2;
+            if(!value || value.max==0 ||  value.max<=100) return 100;
+            else return value.max+10;
           },
           axisLine:{
             show:false,
