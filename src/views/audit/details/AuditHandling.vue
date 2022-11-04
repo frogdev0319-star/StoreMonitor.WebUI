@@ -548,6 +548,13 @@ export default {
         }
       });
 
+      // 必填寫駁回原因
+      if( this.commentsToApi.result == 1 && this.commentsToApi.comment.description == "") {
+        util.notify(this.$t('audit.auditStatus.rejectReason'), 'error', 2000);
+        this.isLoadingData = false;
+        return
+      }
+
       //上傳簽核簽名檔
       if(self.signatureFileList.length > 0){
         for(let idx=0; idx < self.signatureFileList.length; idx++){
@@ -591,13 +598,6 @@ export default {
       if(this.isSignature == true && this.commentsToApi.comment.signature.length == 0) {
         util.notify(this.$t('audit.auditStatus.needSign'), 'error', 1500);
         this.commentsToApi.comment.attachment = []
-        this.isLoadingData = false;
-        return
-      }
-
-      // 必填寫駁回原因
-      if( this.commentsToApi.result == 1 && this.commentsToApi.comment.description == "") {
-        util.notify(this.$t('audit.auditStatus.rejectReason'), 'error', 2000);
         this.isLoadingData = false;
         return
       }
