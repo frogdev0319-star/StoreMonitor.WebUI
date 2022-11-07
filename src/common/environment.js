@@ -81,6 +81,10 @@ else if(data.SITE == 'NewPortals'){
   environJSON = _Environments.NewPortals;
   isGlobalWebsite = true;
 }
+else if(data.SITE == 'Dev'){
+  environJSON = _Environments.Dev;
+  isGlobalWebsite = true;
+}
 else if(data.SITE == 'iservice'){
   environJSON = _Environments.iservice;
   isGlobalWebsite = true;
