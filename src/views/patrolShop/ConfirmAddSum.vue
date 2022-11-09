@@ -1392,7 +1392,7 @@ export default {
             if (p_item.type === 0) {
               
               if(item.isAdvanced){
-                if(inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1'){
+                //if(inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1'){
                   //console.log("PassFileTS:",PassFileTS);
                   if(item.groupScore<0){
                     PassFileTotalScoreSystem += (PassFileTS<item.groupScore?item.groupScore:PassFileTS);
@@ -1409,7 +1409,7 @@ export default {
                     PassFileTotalScore += (totalScore0>item.groupScore?item.groupScore:totalScore0);
                     PassFileTotalScoreX += (PassFile_totalScoreX>item.groupScore?item.groupScore:PassFile_totalScoreX);
                   }
-                }
+                //}
               }else{
                 PassFileTotalScoreSystem += PassFileTS
                 PassFileXS += PassFileX
