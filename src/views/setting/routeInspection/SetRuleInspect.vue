@@ -123,7 +123,169 @@
         </div>
       </setting-table>
     </el-col>
-    <el-col :span="24" class="el-rute-content">
+    
+
+    <!-- 巡檢總評選項顯示 -->
+    <el-col v-if="mode === 1" :span="24" class="el-rute-content">
+      <setting-table table-name="巡檢總評選項顯示">
+        <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
+        
+          <div class="overall_options" v-if="onSiteSignature">
+
+            <div class="overall_row">
+              <el-radio-group class="storevue-radio radio_item" v-model="defineStatus_0">
+                <el-radio :label="0" style="margin-right: 60px">立即督導</el-radio> 
+                <el-radio :label="1" >自定義</el-radio> 
+              </el-radio-group>
+              <el-input
+                placeholder="請輸入自定義名稱" 
+                ref=""
+                v-model="needDefineName.status_0"
+                :disabled="defineStatus_0 == 0"
+                style="width: 250px;  margin: 0 20px ;"
+                @input="(val) => itemInputChanged(val, 20)"
+                />
+            </div>
+            <div class="overall_row">
+              <el-radio-group class="storevue-radio radio_item" v-model="defineStatus_1">
+                <el-radio :label="0" style="margin-right: 60px">待改善</el-radio> 
+                <el-radio :label="1" >自定義</el-radio> 
+              </el-radio-group>
+              <el-input
+                placeholder="請輸入自定義名稱" 
+                ref=""
+                v-model="needDefineName.status_1"
+                :disabled="defineStatus_1 == 0"
+                style="width: 250px;  margin: 0 20px ;"
+                />
+            </div>
+            
+            <div class="overall_row">
+              <el-radio-group class="storevue-radio radio_item" v-model="defineStatus_2">
+                <el-radio :label="0" style="margin-right: 60px">良好</el-radio> 
+                <el-radio :label="1" >自定義</el-radio> 
+              </el-radio-group>
+
+              <el-input
+                placeholder="請輸入自定義名稱" 
+                ref=""
+                v-model="needDefineName.status_2"
+                :disabled="defineStatus_2 == 0"
+                style="width: 250px;  margin: 0 20px ;"
+                />
+            </div>
+            <span class="text_limit_sign"  v-if="showInputLimit"> {{$t('insSettingView.inputRuletip')}}  </span>
+          </div>
+        </div>
+      </setting-table>
+    </el-col>
+
+
+
+    <!-- 巡檢建議值 -->
+    <el-col v-if="mode === 1" :span="24" class="el-rute-content">
+      <setting-table :table-name="$t('insSettingView.isCheckSuggest')">
+        <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
+          <el-checkbox class="storevue-checkbox-outlined" v-model="switchAutoSelectReview">
+            <span>
+              開啟依條件自動選取巡檢總評
+            </span>
+          </el-checkbox>
+
+          <div v-if="switchAutoSelectReview" style="width: 100%;">
+          <!-- radio 1 -->
+          <el-radio-group class="storevue-radio suggestvalue" v-model="isAutoSelectReview">
+            <div class="suggestvalue_section" style="margin-bottom: 3px">
+
+              <el-radio :label="true" style="margin-bottom: 10px">依分數條件自動選取</el-radio> 
+
+                <div class="for_flex">
+                  <div class="suggestvalue_naming">
+                      <div class="item_name">
+                        <div v-if="needDefineName.status_0 !== ''">{{needDefineName.status_0}}</div>
+                        <div style="color: #c0c0c0" v-if="needDefineName.status_0 == ''">無自定義名稱</div>
+                      </div>
+                      <div class="item_name">
+                        <div v-if="needDefineName.status_1 !== ''">{{needDefineName.status_1}}</div>
+                        <div style="color: #c0c0c0" v-if="needDefineName.status_1 == ''">無自定義名稱</div>
+                      </div>
+                      
+                      <div class="item_name">
+                        <div v-if="needDefineName.status_2 !== ''">{{needDefineName.status_2}}</div>
+                        <div style="color: #c0c0c0" v-if="needDefineName.status_2 == ''">無自定義名稱</div>
+                      </div>
+                  </div>
+
+                  <div class="suggestvalue_score">
+                    <!-- low score -->
+                    <div class="item_score">
+                      <div class="score">0 分</div>   
+                      <span style="margin: 0 15px"> ~ </span>  
+                      <div class="score"> {{scoreMiddleLow - 1}} 分</div>
+                    </div>
+
+                    <!-- middle score -->
+                    <div class="item_score">
+                      <div class="score">
+                        <el-input
+                          placeholder="" 
+                          style="width: 90px;"
+                          v-model="scoreMiddleLow"
+                          type="number"
+                          :disabled = "!isAutoSelectReview"
+                          @blur="inputChangeStandardScore"
+                          />
+                          分
+                        </div>  
+                      <span style="margin: 0 15px"> ~ </span>  
+                      <div class="score"> 
+                        <el-input
+                          placeholder="" 
+                          style="width: 90px;"
+                          v-model="scoreMiddleHeight"
+                          type="number"
+                          :disabled = "!isAutoSelectReview"
+                          @blur="inputChangeStandardScore"/>
+                          分 
+                      </div>
+                    </div>
+                    
+                    <!-- hight score -->
+                    <div class="item_score">
+                      <div class="score">{{ scoreMiddleHeight + 1}} 分</div>   
+                      <span style="margin: 0 15px"> ~ </span>  
+                      <div class="score"> 100 分</div>
+                    </div>
+                  </div>
+                </div>
+
+            </div>
+
+            <!-- radio 2 -->
+            <div class="suggestvalue_section">
+              <el-radio :label="false" v-model="dangerousOnFailedItem">{{ $t('insSettingView.tab1FailedDangeous') }}</el-radio> 
+
+              <!-- <div slot="tableDetail">
+                <p class="" style="line-height: 0px">
+                  <el-checkbox class="storevue-checkbox-outlined" v-model="dangerousOnFailedItem">
+                    <span>
+                      {{ $t('insSettingView.tab1FailedDangeous') }}
+                    </span>
+                  </el-checkbox>
+                </p>
+              </div> -->
+            </div>
+            
+          </el-radio-group>
+          </div>
+
+        </div>
+      </setting-table>
+    </el-col>
+
+
+    <!-- 巡檢建議值 -->
+    <!-- <el-col :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.isCheckSuggest')">
         <div slot="tableDetail">
           <p class="rule-item">
@@ -135,7 +297,12 @@
           </p>
         </div>
       </setting-table>
-    </el-col>
+    </el-col> -->
+    
+
+
+
+    <!-- 巡檢附件上傳 -->
     <el-col v-if="mode === 1" :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.isCheckAnnex')">
         <div slot="tableDetail">
@@ -149,6 +316,9 @@
         </div>
       </setting-table>
     </el-col>
+    
+
+    <!-- 巡檢簽名 -->
     <el-col v-if="mode === 1" :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.inspectionSignature')">
         <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
@@ -194,17 +364,14 @@
                   @click="deleteSign(index)"
               />
               </div>
-              
             </div>
             <span class="text_limit_sign"  v-if="showInputLimit"> {{$t('insSettingView.inputRuletip')}}  </span>
-
-
           </div>
-          
         </div>
       </setting-table>
     </el-col>
 
+    <!-- 自定義評估選項 -->
     <el-col :span="24" class="el-rute-content" style="margin-bottom:20px;">
       <setting-table :table-name="$t('insSettingView.btnAttributeValues')">
         <div slot="tableDetail" class="setting-config" >
@@ -400,7 +567,28 @@ export default {
           ]
         },
       n : 1,
-      showInputLimit: false
+      showInputLimit: false,
+
+      switchAutoSelectReview: true,
+      isAutoSelectReview: true,
+      defineStatus_2: 0, //良好
+      defineStatus_1: 0, //待改善
+      defineStatus_0: 0, //立即督導
+
+      defaultDefineName:{
+        status_2:'良好',
+        status_1:'待改善',
+        status_0:'立即督導',
+      },
+      needDefineName:{
+        status_2:'',
+        status_1:'',
+        status_0:'',
+      },
+      
+      scoreMiddleLow: 50,
+      scoreMiddleHeight: 80
+
     };
   },
   watch: {
@@ -449,6 +637,17 @@ export default {
         }
       }
     },
+
+    defineStatus_2(value){
+      if(value == 0) this.needDefineName.status_2 = this.defaultDefineName.status_2
+    },
+    defineStatus_1(value){
+      if(value == 0) this.needDefineName.status_1 = this.defaultDefineName.status_1
+    },
+    defineStatus_0(value){
+      if(value == 0) this.needDefineName.status_0 = this.defaultDefineName.status_0
+    },
+
   },
 
   async mounted() {
@@ -456,6 +655,11 @@ export default {
     await this.getRule();
     await this.workflowItems()
     console.log('this.signatureData :>> ', this.signatureData);
+
+    this.needDefineName.status_2 = this.defaultDefineName.status_2
+    this.needDefineName.status_1 = this.defaultDefineName.status_1
+    this.needDefineName.status_0 = this.defaultDefineName.status_0
+
     
   },
 
@@ -859,6 +1063,24 @@ $itemHeight:50px;
   }
 }
 
+.overall_options{
+  width: 100%;
+  padding: 10px 0;
+  }
+  .overall_row{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    .radio_item{
+      .el-radio{
+        width: 60px !important;
+      }
+    }  
+  }
+
+
+
 .text_limit_sign{
   position: relative;
   text-align: left;
@@ -989,4 +1211,62 @@ $itemHeight:50px;
       }
     }
 }
+</style>
+
+<style lang="sass" scoped>
+  .suggestvalue
+    width: 100%
+    display: flex
+    flex-direction: column
+    justify-content: flex-start
+    align-items: flex-start
+    .suggestvalue_section
+      width: 100%
+      background: #f7f9fa
+      margin-bottom: 20px
+      padding: 20px 20px
+      font-size: 15px
+    
+      .for_flex
+        margin-top: 10px
+        display: flex
+        flex-direction: row
+        justify-content: flex-start
+        align-items: flex-start
+        .suggestvalue_naming
+          margin-left: 30px
+          margin-right: 20px
+          .item_name
+            min-width: 70px
+            height: 45px
+            display: flex
+            flex-direction: row
+            justify-content: flex-start
+            align-items: center
+          
+        .suggestvalue_score
+          .item_score
+            height: 45px
+            display: flex
+            flex-direction: row
+            justify-content: flex-start
+            align-items: center
+            .score
+              width: 110px
+              display: flex
+              flex-direction: row
+              justify-content: flex-end
+              align-items: center
+              .el-input--medium
+                margin-right: 5px
+              
+
+</style>
+
+<style lang="sass">
+.suggestvalue_score
+  .item_score 
+    .score
+      .el-input--medium .el-input__inner
+        text-align: right
 </style>
