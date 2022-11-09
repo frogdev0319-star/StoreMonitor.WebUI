@@ -904,8 +904,8 @@ export default {
             else return 0;
           },
           max:function (value) {
-            if(!value || value.max==0 ) return 100;
-            else return value.max*1.2;
+            if(!value || value.max==0 ||  value.max<=100) return 100;
+            else return value.max;
           },
           axisLine:{
             show:false,
@@ -923,7 +923,7 @@ export default {
             color:'#556679',
             fontSize:12,
           },
-          name:isAss?'(%)':'(分)',
+          name:isAss?'(次)':'(分)',
            nameTextStyle:{
              fontSize:12,
              color:'#556679',

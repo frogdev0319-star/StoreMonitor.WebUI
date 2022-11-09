@@ -374,13 +374,15 @@ const user = {
           console.log("PermissionHelper.enableWaitAudit():",PermissionHelper.enableWaitAudit());
           const auditRoute = navbarRoute.getAuditRoute();
           console.log("auditRoute:",auditRoute);
-          auditRoute.children.length >0 ? accessedRoutes.push(auditRoute):'';
+          (auditRoute.children.length >0 && accessedRoutes.findIndex(item=>item.name==auditRoute.name)==-1) ? accessedRoutes.push(auditRoute):'';
 
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();
           systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';
+          console.log("accessedRoutes.length:",accessedRoutes.length);
           if(accessedRoutes.length == 0){
             const errorRoute = navbarRoute.getErrorRoute();
-            accessedRoutes.push(errorRoute);
+            if(accessedRoutes.findIndex(item=>item.name==errorRoute.name)==-1) accessedRoutes.push(errorRoute);
+            console.log("errorRoute.children[0].path:",errorRoute.children[0].path);
             errorRoute.redirect = errorRoute.children[0].path;
           }
         } else {
