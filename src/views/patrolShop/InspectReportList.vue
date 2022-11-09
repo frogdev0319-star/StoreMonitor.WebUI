@@ -791,11 +791,20 @@ export default {
         });
       });
     },
-   getReportList(p) {
+    getReportList(p) {
       console.log("1.Get Report List")
       console.log(p)
-      var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,
-      inspectTagId:p.inspectTagId!='-1'?p.inspectTagId:null,isMysteryMode:PermissionHelper.enableMimicMode}
+      var params = {
+        beginTs:p.beginTs,endTs:p.endTs,
+        clause:p.clause,
+        like:p.like,
+        filter:p.filter,
+        order:p.order,
+        inspectTagId: p.inspectTagId != '-1' ? p.inspectTagId : null, 
+        searchMysteryMode : PermissionHelper.enableMimicMode ? 1 : p.searchMysteryMode
+      }
+
+      console.log('params ~~~~~>> ', params);
       const self = this;
       params.endTs = params.endTs - params.endTs % 1000 + 999;
       if (params.clause.storeId.length === 0) {
@@ -985,6 +994,7 @@ export default {
       if (self.curAppraise != null && self.curAppraise !== -1) {
         clause.status = self.curAppraise;
       }
+      
       self.params.clause = clause;
       self.params.inspectTagId = self.inspectId === '-1' ? '' : self.inspectId;
       typeof (self.params.inspectTagId) === 'string' && delete self.params.inspectTagId;
@@ -998,6 +1008,17 @@ export default {
       } else {
         self.params.like = {};
       }
+
+      if(this.params.jump){ //跳轉
+          console.log("Jump to ")
+          this.params.jump = false;
+          this.dateValue = [new Date().setTime(this.params.beginTs), new Date().setTime(this.params.endTs)];
+          this.params.searchMysteryMode = this.params.searchMysteryMode;
+          //this.saveSearchParams();
+          //this.searchData();
+        }else{
+          this.params.searchMysteryMode = PermissionHelper.enableMimicMode ? 1 : -1;
+        }
       console.log("SearchParams")
       console.log(self.params)
       self.params.filter = { page: 0, size: self.sizeNum };
@@ -1075,7 +1096,7 @@ export default {
 
     async getInspectList() {
       const self = this;
-      const inspectArr = PermissionHelper.enableMimicMode? await self.getTagMytery() : await self.getTagAll();
+      const inspectArr = PermissionHelper.enableMimicMode ? await self.getTagMytery() : await self.getTagAll();
       const newArr = [];
       const inspectList = [];
       inspectArr.forEach(_item => {
@@ -1158,14 +1179,17 @@ export default {
         if(!searchParams.curCity){
           searchParams.curCity =[];
         }
-    
-        if(searchParams.jump){
+        
+        if(searchParams.jump){ //跳轉
           console.log("Jump to ")
-          this.params.jump = false;
+          //this.params.jump = false;
           this.dateValue = [new Date().setTime(this.params.beginTs), new Date().setTime(this.params.endTs)];
-          this.saveSearchParams();
+          this.params.searchMysteryMode = searchParams.searchMysteryMode;
+          //this.saveSearchParams();
           this.searchData();
-        }
+        }/*else{
+          this.params.searchMysteryMode = PermissionHelper.enableMimicMode ? 1 : -1;
+        }*/
         
       } else {
         this.params.filter = { page: 0, size: this.sizeNum };
@@ -1442,8 +1466,8 @@ $filterWidth: (100%-706);
             overflow:hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
-             font-size: calc(15/1440*100vw);
-             margin-right: calc(10/1440*100vw);
+            font-size: calc(15/1440*100vw);
+            margin-right: calc(10/1440*100vw);
           }
           div {
             text-align: left;
@@ -1529,6 +1553,10 @@ $filterWidth: (100%-706);
         }
         .margin-bottom-5 {
           margin-bottom: calc(5/1440*100vw);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          
         }
         .item-score{
           color: $tab;

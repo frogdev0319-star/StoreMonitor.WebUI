@@ -69,9 +69,12 @@ router.beforeEach(async(to, from, next) => {
     getBrandList(brandList.data);
     await store.dispatch('GetUserAuthorities');
     const accessRoutes = await store.dispatch('generateRoutes');
-    console.log("accessRoutes:",accessRoutes)
     router.addRoutes(accessRoutes);
-    next({ ...to, replace: true });
+    if( accessRoutes.findIndex(item => item.path==to.path)==-1 ){
+      next({ ...accessRoutes[0], replace: true });
+    }else{
+      next({ ...to, replace: true });
+    }
   } else {
     next();
   }

@@ -389,8 +389,8 @@ export default {
       require:false
     },
     expandCompProperties:{
-      type: Object,
-      default: () => {}
+      type: String,
+      default: ""
     }
   },
   data() {
@@ -416,12 +416,12 @@ export default {
       return this.$refs.tablePagination.selection;
     },
     currentProperties: function() {
-      console.log(this.expandComponent);
+      console.log("this.expandComponent --->", this.expandComponent);
       if (this.expandComponent=== 'TabInceptionDetail') {
-        return { submitter: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs,isexportPDF:this.isexportPDF }
+        return { submitter: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs,isexportPDF:this.isexportPDF,isMystery:this.expandCompProperties.isMystery }
       }else if(this.expandComponent=== 'IncepItemTop5'){
-        //console.log("this.expandCompProperties:",this.expandCompProperties);
-        return { storeId: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs,isexportPDF:this.isexportPDF }
+        console.log("this.expandCompProperties:",this.expandCompProperties);
+        return { storeId: this.expands, beginTs:this.expandCompProperties.beginTs, endTs:this.expandCompProperties.endTs, isexportPDF:this.isexportPDF }
       }else if(this.expandComponent=== 'EventCommentList'){
         //console.log("this.expands:",this.expands);
         return { storeId: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs,itemId:this.expandCompProperties.itemId,isexportPDF:this.isexportPDF }
@@ -434,11 +434,17 @@ export default {
   watch:{
     isLoadingData(val){
       this.isLoading = val;
+    },
+    tableData(val){
+      console.log("tableData changed");
+      this.closeAllExpand();
     }
   },
   created() {},
   mounted() {
     //console.log(this.columnData)
+    console.log("this.expandCompProperties ????--->", this.expandCompProperties)
+    
   },
   methods: {
     changeAuditMethod(row){
@@ -516,7 +522,10 @@ export default {
           //this.expandChange(row);
         }
     },
-
+    closeAllExpand(){
+      this.expands="";
+      this.expandRowKeys=[];
+    },
     handleRowClick(row) {
       /*console.log("row click:",row);
       if(this.allowRowExpand){

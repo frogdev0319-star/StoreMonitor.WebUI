@@ -552,9 +552,11 @@ export default {
       if(this.searchParams['searchFrom']=='PatrolPersonStat'){
         delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
         this.searchParams['searchFrom'] = '';
+        this.searchParams['searchMysteryMode'] = -1;
       }else if(this.searchParams['searchFrom']=='EventStatistics'){
         delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
         this.searchParams['searchFrom'] = '';
+        this.searchParams['searchMysteryMode'] = -1;
     }
       this.getEventListAndCount();
     },
@@ -777,13 +779,15 @@ export default {
         if (val === 0) {
           start = this.$moment(this.dateValue[0]).valueOf();
           end = this.$moment(this.dateValue[1]).valueOf();
+          //console.log("1.**end:",this.$moment(endTime,'YYYY/MM/DD'));
         } else {
           start = this.$moment(this.dateValue[0]).valueOf();
           const endTime = this.dateValue[1];
-          end = this.$moment(endTime);
+          end = this.$moment(endTime).valueOf();
+          //console.log("2.**end:",end);
         }
       }
-      end = end - end % 1000 + 999;
+      //end = end - end % 1000 + 99999;
       var params = {
           beginTs: start,
           endTs: end,
@@ -794,7 +798,8 @@ export default {
             page: page,
             size: this.tableDataList[tabIndex].sizeNum
           },
-          like: like
+          like: like,
+          searchMysteryMode : this.searchParams.searchMysteryMode
       }
       console.log("1.this.params:",params);
       if(storeId && storeId!='-1' && storeId!=""){
@@ -879,8 +884,10 @@ export default {
       const self = this;
       let start = this.$moment(self.dateValue[0]).valueOf();
       let endTime = this.$moment(self.dateValue[1]).valueOf();
+      //console.log("**endTime.constructor:",endTime.constructor);
       let end = endTime.constructor === Date ? new Date(endTime).getTime() : endTime;
-      end = end - end % 1000 + 999;
+      //console.log("**endTime:",endTime);
+      //end = end - end % 1000 + 99999;
       if(self.searchParams['searchFrom']=='PatrolPersonStat'|| this.searchParams['searchFrom']=="EventStatistics"){
          //storeId = this.searchParams.clause.storeId;
          start = self.searchParams.beginTs;
@@ -924,7 +931,8 @@ export default {
         clause: {
           storeId: storeId
         },
-        like: like
+        like: like,
+        searchMysteryMode:self.searchParams.searchMysteryMode
       };
       if(storeId!='-1'){
         params['clause']['storeId'] = storeId
@@ -1125,6 +1133,7 @@ export default {
       params.sizeNum = this.params.filter.size;
       params.page = this.params.filter.page;
       params.order = this.order;
+      params.searchMysteryMode = -1;
       const searchConditon = {
         path: 'eventManage',
         params: params
@@ -1149,7 +1158,8 @@ export default {
             this.storeFilterObj.curCity = ["-1"];
             this.params.beginTs = searchParams.beginTs;
             this.params.endTs = searchParams.endTs;
-            this.dateValue = [util.getDates(searchParams.beginTs),util.getDates(searchParams.endTs)];
+            this.dateValue = [util.getDates(searchParams.beginTs),searchParams.endTs];
+            this.params.searchMysteryMode = searchParams.searchMysteryMode;
             //console.log("1.EventMange > getSearchParams > dateValue:",this.dateValue);
             //util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
           }else if(searchParams['searchFrom']=="EventStatistics"){
@@ -1158,7 +1168,8 @@ export default {
             this.storeFilterObj.filterStoreIds = searchParams.curStore;
             this.storeFilterObj.curStore=searchParams.curStore;
             this.storeFilterObj.storeIds=searchParams.curStore;
-            this.dateValue = [util.getDates(searchParams.beginTs),util.getDates(searchParams.endTs)];
+            this.dateValue = [util.getDates(searchParams.beginTs),searchParams.endTs];
+            this.params.searchMysteryMode = -1;
             //console.log("1..EventMange > getSearchParams > dateValue:",this.dateValue);
           }else{
             this.storeFilterObj.filterStoreIds = (searchParams.curStore)?searchParams.curStore:[];
@@ -1166,6 +1177,7 @@ export default {
             //console.log("2.EventMange > getSearchParams > dateValue:",this.dateValue);
             this.params.beginTs = this.dateValue[0].valueOf();
             this.params.endTs = this.dateValue[1].valueOf();
+            this.params.searchMysteryMode = -1;
           }
           this.inputSearchValue = searchParams.inputSearchValue;
           this.curState = searchParams.curState;
@@ -1184,6 +1196,7 @@ export default {
           this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
           this.params.beginTs = this.dateValue[0].valueOf();
           this.params.endTs = this.dateValue[1].valueOf();
+          this.params.searchMysteryMode = -1;
         }
       
     },

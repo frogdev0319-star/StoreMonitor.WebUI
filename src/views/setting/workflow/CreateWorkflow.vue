@@ -322,7 +322,6 @@ import {getUserInfo, getAllUserInfoNoAuth, getDepartAll} from '@/api/login';
 
 import TableOnly from '@/components/TableOnly';
 import DialogPop from '@/components/DialogPop';
-import InputLimit from '@/components/InputLimit';
 import util from "@/common/util";
 import filterString from '@/common/filterString.js';
 
@@ -333,7 +332,6 @@ export default {
     DelayButton,
     SettingTable,
     DialogPop,
-    InputLimit
   },
   data() {
     return {

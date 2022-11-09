@@ -68,7 +68,8 @@ export default {
     StoreFilter,
     DelayButton,
     MultiSelect,
-    RegionMultiSelect
+    RegionMultiSelect,
+    
   },
 
   props: {
@@ -77,8 +78,8 @@ export default {
       default: false
     },
     isInspectItem: {
-      type: Boolean,
-      default: false
+      type: String,
+      default: ''
     },
     path: {
       type: String,
@@ -122,7 +123,8 @@ export default {
       inspectCatch: '',
       storeFilterObj: {},
       searchParams: {},
-      ifSaveParams: false
+      ifSaveParams: false,
+      
     };
   },
 

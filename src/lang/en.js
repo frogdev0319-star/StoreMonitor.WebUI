@@ -1311,7 +1311,9 @@ export default{
           "addSign":"Add signature",
           "addAttachment":"Add attachment",
           "pleaseSign":"Please sign",
-          "needSign":"This sign-off requires attaching a signature file"
+          "needSign":"This sign-off requires attaching a signature file",
+          "selectComment":"Please choose to sign-off on comments!",
+          "rejectReason":"Please fill in the reason for rejection!",
       },
       "sendAudit":{
           "all":"All",
@@ -1472,6 +1474,11 @@ export default{
         "pleaseChooseStore":"Please select store",
         "pleaseChooseTag":"Select Inspect",
         "comfirmDelMysterio":"Confirm the deletion of this mystery shopper member",
-        "saveMysterioSettingFail":"Failed to save permission group"
+        "saveMysterioSettingFail":"Failed to save permission group",
+        "nickName":"Nick Name",
+        "nickNameTip":"The nick name of sub-category supports up to 50 characters",
+        "pleaseInputNickName":"Please enter the nick name of the mystery",
+        "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name.",
+        "mystery":"Mystery Shopper"
 	}
 }

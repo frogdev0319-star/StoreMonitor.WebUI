@@ -12,7 +12,16 @@
     </div>
     <el-row class="statistics-container">
         <el-col :span="24">
-            <search-component ref="inspectEvalutionSearch" :is-patrol="false" isInspectItem="true" :default-sort="defaultSort" path="inspectEvalutionStatistics" @emitSearch="emitSearch" @exportPdf="exportPdf" @setDefaultSortAndPage="setDefaultSortAndPage" />
+            <search-component 
+                ref="inspectEvalutionSearch" 
+                :is-patrol="false" 
+                :isInspectItem="true" 
+                :default-sort="defaultSort" 
+                path="inspectEvalutionStatistics" 
+                @emitSearch="emitSearch" 
+                @exportPdf="exportPdf"
+                @setDefaultSortAndPage="setDefaultSortAndPage" 
+            />
         </el-col>
         <div class="statistics-content" id="imgTest_avg1" style="height:194px;margin-top:200px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
             <div class="head">
@@ -65,6 +74,8 @@
                 </el-col>
             </el-row>
         </div>
+
+        <!-- 考評結果分佈 --> 
         <div class="statistics-content" id="imgTest_avg2" style="height:900px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
             <div class="head">
                 <div class="region-titles">
@@ -126,8 +137,8 @@
             </el-row>
             <div class="subtitle-head">
                 <span class="title">
-                    {{ $t('statistics.titles.storeEvalDetail') }}
-                </span>
+                    {{ $t('statistics.titles.storeEvalDetail') }} 
+                </span> 
                 <div class="operation-btns" :class="getLangStyleValue(operationBtnClass)">
                     <div class="switch-btn">
                         <el-button class="mode-btn" :class="{'active-mode-btn' :part1.storeMode==0}" @click="onSwitchPart1Mode(0)">{{ $t('statistics.event.tableMode')}}</el-button>
@@ -144,8 +155,8 @@
             <el-col style="position:absolute;height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc( 100% - 80px )">
                 <div v-if="part1.storeMode==1" style="overflow-y:hidden;overflow-x:auto;height:430px;width:100%" :style="{width:ispdf?'900px':null}">
                     <!--<div v-if="ispdf" style="height:100%;">
-                  <v-chart ref="storeChart" :id="part1-region-line-chart" autoresize :options="part1.barStoreOption"
-                  :style="{width:part1.barStoreOption?part1.barStoreOption.width:'100%',height:'100%'}"/>
+                    <v-chart ref="storeChart" :id="part1-region-line-chart" autoresize :options="part1.barStoreOption"
+                    :style="{width:part1.barStoreOption?part1.barStoreOption.width:'100%',height:'100%'}"/>
                 </div>-->
                     <div style="height:100%;">
                         <v-chart ref="storeChart" :id="part1-region-line-chart" :options="part1.barStoreOption" autoresize :style="{width:part1.barStoreOption?part1.barStoreOption.width:'100%',height:'100%'}" />
@@ -153,7 +164,24 @@
                 </div>
                 <div v-else style="margin-top:20.5px;height:100%;" :style="{width:ispdf?'1024px':null}">
                     <div style="margin-top:20.5px;">
-                        <table-only ref="elTP" :column-data="part1StoreInfoTableCol" :table-data="part1.storeTableData" :total="part1.table.total" :highlight-current-row="true" :pagesize="sizeNum" :current-page="page" :is-event="false" :default-sort="defaultSort" :allowRowExpand="true" :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" :tableHeight="300" layout="prev,pager,next,sizes" expand-component="IncepItemTop5" :expandCompProperties="componentsProps" @handleChange="handlePageAndSizeChangePart1" @sortChange="handleSortChangePart1" @onCellClick="onEvenListNumClickPart1" />
+                        <table-only ref="elTP" 
+                            :column-data="part1StoreInfoTableCol" 
+                            :table-data="part1.storeTableData" 
+                            :total="part1.table.total" 
+                            :highlight-current-row="true" 
+                            :pagesize="sizeNum" 
+                            :current-page="page" 
+                            :is-event="false" 
+                            :default-sort="defaultSort" 
+                            :allowRowExpand="true" 
+                            :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                            :tableHeight="300" layout="prev,pager,next,sizes" 
+                            expand-component="IncepItemTop5" 
+                            :expandCompProperties="componentsProps"
+                            @handleChange="handlePageAndSizeChangePart1" 
+                            @sortChange="handleSortChangePart1" 
+                            @onCellClick="onEvenListNumClickPart1" 
+                            />
                     </div>
                     <div style="width:100%; margin-top:12px;height:31px;">
                         <tbl-pagination-only :total="part1.table.total" :pagesize="part1.table.sizeNum" :current-page="part1.table.page" layout="prev,pager, next,sizes,slot" @sizeChange="handlePageAndSizeChangePart1" @currentChange="handlePageAndSizeChangePart1" />
@@ -167,11 +195,13 @@
                 </div>
             </el-col>
         </div>
+
+        <!-- 考評得分分佈 -->
         <div class="statistics-content" id="imgTest_avg3" style="height:1010px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
             <div class="head">
                 <div class="region-titles">
                     <span class="title">
-                        {{ $t('statistics.titles.scoreDistribution') }}
+                        {{ $t('statistics.titles.scoreDistribution') }} 
                     </span>
                 </div>
                 <TypeSelectArea
@@ -252,7 +282,26 @@
 
                 <div v-else style="main-rgtop:20.5px;height:100%;" :style="{width:ispdf?'1024px':null}">
                     <div style="margin-top:20.5px;padding-right:10px;">
-                        <table-only ref="elTP" :column-data="part2StoreInfoTableCol" :table-data="part2.storeTableData" :total="part2.table.total" :highlight-current-row="true" :pagesize="sizeNum" :current-page="page" :is-event="false" :default-sort="defaultSort" :allowRowExpand="true" :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" :tableHeight="300" :isexportPDF="ispdf" layout="prev,pager,next,sizes" expand-component="IncepItemTop5" :expandCompProperties="componentsProps" @handleChange="handlePageAndSizeChangePart2" @sortChange="handleSortChangePart2" @onCellClick="onEvenListNumClickPart2" />
+                        <table-only ref="elTP" 
+                            :column-data="part2StoreInfoTableCol" 
+                            :table-data="part2.storeTableData" 
+                            :total="part2.table.total" 
+                            :highlight-current-row="true" 
+                            :pagesize="sizeNum" 
+                            :current-page="page" 
+                            :is-event="false" 
+                            :default-sort="defaultSort" 
+                            :allowRowExpand="true" 
+                            :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                            :tableHeight="300" 
+                            :isexportPDF="ispdf" 
+                            layout="prev,pager,next,sizes" 
+                            expand-component="IncepItemTop5" 
+                            :expandCompProperties="componentsProps" 
+                            @handleChange="handlePageAndSizeChangePart2" 
+                            @sortChange="handleSortChangePart2" 
+                            @onCellClick="onEvenListNumClickPart2" 
+                            />
                     </div>
                     <div style="width:100%; margin-top:12px;height:31px;" :style="{width:ispdf?'1024px':null}">
                         <tbl-pagination-only :total="part2.table.total" :pagesize="part2.table.sizeNum" :current-page="part2.table.page" layout="prev,pager, next,sizes,slot" @sizeChange="handlePageAndSizeChangePart2" @currentChange="handlePageAndSizeChangePart2" />
@@ -266,7 +315,11 @@
                 </div>
             </el-col>
         </div>
-        <div v-if="part3.standardScore!=-9999" id="imgTest_avg4" class="statistics-content" style="height:1000px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
+        
+
+        <!-- 考評達標率 -->
+        <!-- v-if="part3.standardScore!=-9999" -->
+        <div id="imgTest_avg4" v-if="part3.standardScore!=-9999" class="statistics-content" style="height:1000px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
             <div class="head">
                 <div class="region-titles">
                     <span class="title">
@@ -343,7 +396,25 @@
                 </div>
                 <div v-else style="margin-top:20.5px;height:100%;overflow-x:auto;" :style="{width:ispdf?'1024px':null}">
                     <div style="margin-top:20.5px;padding-right:10px;">
-                        <table-only ref="elTP" :column-data="part3StoreInfoTableCol" :table-data="part3.storeTableData" :total="part3.table.total" :highlight-current-row="true" :pagesize="sizeNum" :current-page="page" :is-event="false" :default-sort="defaultSort" :allowRowExpand="true" :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" :tableHeight="300" :isexportPDF="ispdf" layout="prev,pager,next,sizes" expand-component="IncepItemTop5" :expandCompProperties="componentsProps" @handleChange="handlePageAndSizeChange3" @sortChange="handleSortChangePart3" @onCellClick="onEvenListNumClickPart3" />
+                        <table-only ref="elTP" 
+                            :column-data="part3StoreInfoTableCol" 
+                            :table-data="part3.storeTableData" 
+                            :total="part3.table.total" 
+                            :highlight-current-row="true" 
+                            :pagesize="sizeNum" 
+                            :current-page="page" 
+                            :is-event="false" 
+                            :default-sort="defaultSort" 
+                            :allowRowExpand="true" 
+                            :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                            :tableHeight="300" 
+                            :isexportPDF="ispdf" 
+                            layout="prev,pager,next,sizes" 
+                            expand-component="IncepItemTop5" 
+                            :expandCompProperties="componentsProps" 
+                            @handleChange="handlePageAndSizeChange3" 
+                            @sortChange="handleSortChangePart3" 
+                            @onCellClick="onEvenListNumClickPart3" />
                     </div>
                     <div style="width:100%; margin-top:12px;height:31px;">
                         <tbl-pagination-only :total="part3.table.total" :pagesize="part3.table.sizeNum" :current-page="part3.table.page" layout="prev,pager, next,sizes,slot" @sizeChange="handlePageAndSizeChange3" @currentChange="handlePageAndSizeChangePart3" />
@@ -358,6 +429,12 @@
             </el-col>
         </div>
     </el-row>
+
+
+
+
+
+    
     <div id="pdf-area" v-if="ispdf" ref="printPDF" class="statistics-container">
         <div style="width:1024px;">
             <div class="statistics-content-pdf" style="height: 194px;marginTop:20px;box-shadow:none;">
@@ -449,6 +526,9 @@ export default {
             timeMode: 1,
             regionsList: [],
             params: {},
+
+            defineMysteryMode: -1,
+
             daysRangeList: [],
             toolTipClass: 'page-login-toolTipClass',
             tooltipClass: 'tooltip-class',
@@ -1246,14 +1326,16 @@ export default {
             return returnValue;
         },
         routeToInpectReportWithParam(e, type) {
-          if(!PermissionHelper.enableInspectReport()){
-            message({
-                message: this.$i18n.t('route.noReportAuthority'),
-                type: 'error',
-                duration: 5 * 1000
-              });
-            return;
-          }
+            if(!PermissionHelper.enableInspectReport()){
+                message({
+                    message: this.$i18n.t('route.noReportAuthority'),
+                    type: 'error',
+                    duration: 5 * 1000
+                });
+                return;
+            }
+            console.log('e :::::::::>> ', e);
+            console.log('type :::::::::>> ', type);
             // const searchParams = SearchConditionUtil.getSearchCondition('inspectReport');
             let searchParams = JSON.parse(JSON.stringify(this.params))
             searchParams.jump = true;
@@ -1278,12 +1360,15 @@ export default {
                 page: 0,
                 size: 12
             };
-
+            // ***
+            searchParams.searchMysteryMode = this.defineMysteryMode
+            // ***
             console.log(searchParams)
             const searchParamsObj = {
                 path: 'inspectReport',
                 params: searchParams
             };
+            console.log("searchParamsObj bbb" , searchParamsObj)
             SearchConditionUtil.saveSearchCondition(searchParamsObj);
             //this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
             this.$router.push({
@@ -1395,12 +1480,12 @@ export default {
                 page: 0,
                 size: 10
             };
-
+            
             const searchParamsObj = {
                 path: 'inspectReport',
                 params: searchParams
             };
-            console.log(searchParamsObj)
+            console.log("searchParamsObj aaa" , searchParamsObj)
             SearchConditionUtil.saveSearchCondition(searchParamsObj);
             //this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
             this.$router.push({
@@ -1528,15 +1613,15 @@ export default {
 
             this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
             this.part1.pieOption = {};
-            this.part1.storeTableData = null;
+            this.part1.storeTableData = [];
             this.part1.barRegionOption = {};
             this.part1.barStoreOption = {};
             this.part2.pieOption = {};
-            this.part2.storeTableData = null;
+            this.part2.storeTableData = [];
             this.part2.barRegionOption = {};
             this.part2.barStoreOption = {};
             this.part3.pieOption = {};
-            this.part3.storeTableData = null;
+            this.part3.storeTableData = [];
             this.part3.barRegionOption = {};
             this.part3.barStoreOption = {};
             this.overviewCount = {
@@ -1592,13 +1677,36 @@ export default {
             //this.part2.compareType == 'stores'
            // console.log(this.part1.content[this.part1.indexRegion])
             params.storeIds =this.part1.indexRegion==-1?this.params.storeIds:this.part1.compareType == 'stores' ? [this.part1.content[this.part1.indexRegion].innerId] : this.part1.content[this.part1.indexRegion].list;
-            if (this.part1.compareType == 'position' || this.part1.compareType == 'users') {
+            if (this.part1.compareType == 'users') {
                 params.storeIds = self.params.storeIds;
-                params.submitters = self.part1.indexRegion==-1?[]:[self.part1.content[self.part1.indexRegion].innerId];
+                params.submitters = self.part1.indexRegion==-1?this.part1.compareIds:[self.part1.content[self.part1.indexRegion].innerId];
+                params.groupIds = [];
+                params.groupMode = 0;
+                params.searchMysteryMode = 0
+
+            } else if(this.part1.compareType == 'mysterio'){
+                params.storeIds = self.params.storeIds;
+                params.submitters = self.part1.indexRegion==-1?this.part1.compareIds:[self.part1.content[self.part1.indexRegion].innerId];
+                params.groupIds = [];
+                params.groupMode = 0;
+                params.searchMysteryMode = 1
+                
+            }else if (this.part1.compareType == 'position') {
+                //console.log("position content:",self.part1.content);
+                params.storeIds = self.params.storeIds;
+                let users = [];
+                this.part1.originArray.forEach(function (item) {
+                    if (self.part1.compareIds.indexOf(item.value) >= 0)
+                        users = users.concat(item.contents);
+                })
+                if(this.part1.indexRegion==-1)
+                    params.submitters = users;
+                else
+                    params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
                 params.groupIds = [];
                 params.groupMode = 0;
             }
-            // console.log(params)
+            
             params.inspectTagId = self.params.inspectId;
             params.filter = {
                 page: 0,
@@ -1650,9 +1758,30 @@ export default {
             }
             console.log(this.part2.content[this.part2.indexRegion])
             params.storeIds =this.part2.indexRegion==-1?this.params.storeIds: this.part2.compareType == 'stores' ? [this.part2.content[this.part2.indexRegion].innerId] : this.part2.content[this.part2.indexRegion].list;
-            if (this.part2.compareType == 'position' || this.part2.compareType == 'users') {
+            if (this.part2.compareType == 'users') {
                 params.storeIds = self.params.storeIds;
-                params.submitters =self.part2.indexRegion==-1?[]: [self.part1.content[self.part2.indexRegion].innerId];
+                params.submitters =self.part2.indexRegion==-1?this.part2.compareIds: [self.part2.content[self.part2.indexRegion].innerId];
+                params.groupIds = [];
+                params.groupMode = 0;
+                params.searchMysteryMode = 0
+            }else if(this.part2.compareType == 'mysterio'){
+                params.storeIds = self.params.storeIds;
+                params.submitters =self.part2.indexRegion==-1?this.part2.compareIds: [self.part2.content[self.part2.indexRegion].innerId];
+                params.groupIds = [];
+                params.groupMode = 0;
+                params.searchMysteryMode = 1
+            }else if (this.part2.compareType == 'position') {
+                //console.log("position content:",self.part2.content);
+                params.storeIds = self.params.storeIds;
+                let users = [];
+                this.part2.originArray.forEach(function (item) {
+                    if (self.part2.compareIds.indexOf(item.value) >= 0)
+                        users = users.concat(item.contents);
+                })
+                if(this.part2.indexRegion==-1)
+                    params.submitters = users;
+                else
+                    params.submitters = [self.part2.content[self.part2.indexRegion].innerId]
                 params.groupIds = [];
                 params.groupMode = 0;
             }
@@ -1706,9 +1835,30 @@ export default {
             }
             // console.log(this.part3.content[this.part3.indexRegion])
             params.storeIds = this.part3.indexRegion==-1?this.params.storeIds:this.part3.compareType == 'stores' ? [this.part3.content[this.part3.indexRegion].innerId] : this.part3.content[this.part3.indexRegion].list;
-            if (this.part3.compareType == 'position' || this.part3.compareType == 'users') {
+            if (this.part3.compareType == 'users') {
                 params.storeIds = self.params.storeIds;
-                params.submitters = self.part3.indexRegion==-1?[]:[self.part3.content[self.part3.indexRegion].innerId];
+                params.submitters = self.part3.indexRegion==-1?this.part3.compareIds:[self.part3.content[self.part3.indexRegion].innerId];
+                params.groupIds = [];
+                params.groupMode = 0;
+                params.searchMysteryMode = 0
+            }else if(this.part3.compareType == 'mysterio'){
+                params.storeIds = self.params.storeIds;
+                params.submitters = self.part3.indexRegion==-1?this.part3.compareIds:[self.part3.content[self.part3.indexRegion].innerId];
+                params.groupIds = [];
+                params.groupMode = 0;
+                params.searchMysteryMode = 1
+            }else if (this.part3.compareType == 'position') {
+                //console.log("position content:",self.part3.content);
+                params.storeIds = self.params.storeIds;
+                let users = [];
+                this.part3.originArray.forEach(function (item) {
+                    if (self.part3.compareIds.indexOf(item.value) >= 0)
+                        users = users.concat(item.contents);
+                })
+                if(this.part3.indexRegion==-1)
+                    params.submitters = users;
+                else
+                    params.submitters = [self.part3.content[self.part3.indexRegion].innerId]
                 params.groupIds = [];
                 params.groupMode = 0;
             }
@@ -1771,7 +1921,7 @@ export default {
         },
 
         getInspectStatsOverviewWithGroup(params) {
-            console.log("getInspectStatsOverviewWithGroup")
+            console.log("getInspectStatsOverviewWithGroup", params)
             if (params.filter.size == 0) {
                 return;
             }
@@ -1895,7 +2045,13 @@ export default {
             originArray,
             selStoreIdArr
         }) { //劃分類型選擇
-            console.log("Part1 Emit Type Change=" + compareType)
+            console.log("Part1 Emit Type Change compareType===> ", compareType)
+            console.log("Part1 Emit Type Change compareArr===> ", compareArr)
+            console.log("Part1 Emit Type Change selectedLabels===> ", selectedLabels)
+            console.log("Part1 Emit Type Change originArray===> ", originArray)
+            console.log("Part1 Emit Type Change selStoreIdArr===> ", selStoreIdArr)
+
+
             this.part1.compareType = compareType;
             this.part1.compareIds = compareArr;
             this.part1.comapareLabels = selectedLabels;
@@ -2257,25 +2413,37 @@ export default {
                 params.storeIds = this.part1.compareIds;
                 params.groupIds = this.part1.compareIds;
                 params.groupMode = 0;
+                this.defineMysteryMode = -1
             } else if (this.part1.compareType == 'area1') {
                 params.groupIds = this.part1.compareIds;
                 params.storeIds = this.part1.selStoreIdArr;
                 params.groupMode = 1;
+                this.defineMysteryMode = -1
             } else if (this.part1.compareType == 'area2') {
                 params.groupIds = this.part1.compareIds;
                 params.storeIds = this.part1.selStoreIdArr;
                 params.groupMode = 2;
+                this.defineMysteryMode = -1
             } else if (this.part1.compareType == 'storeType') {
                 params.groupIds = this.part1.compareIds;
                 params.groupMode = 3;
             } else if (this.part1.compareType == 'storeGroup') {
                 params.groupIds = this.part1.compareIds;
                 params.groupMode = 4;
+                this.defineMysteryMode = -1
             } else if (this.part1.compareType == 'users') {
                 params.submitters = this.part1.compareIds;
                 params.groupIds = this.part1.compareIds;
                 params.groupMode = 5;
-            } else if (this.part1.compareType == 'position') {
+                params.searchMysteryMode = 0
+                this.defineMysteryMode = 0
+            } else if (this.part1.compareType == 'mysterio') {
+                params.submitters = this.part1.compareIds;
+                params.groupIds = this.part1.compareIds;
+                params.groupMode = 5;
+                params.searchMysteryMode = 1
+                this.defineMysteryMode = 1
+            }else if (this.part1.compareType == 'position') {
                 let users = [];
                 console.log("Part1 User")
                 console.log(this.part1.originArray)
@@ -2287,6 +2455,8 @@ export default {
                 params.submitters = users;
                 params.groupIds = users;
                 params.groupMode = 5;
+                params.searchMysteryMode = 0
+                this.defineMysteryMode = 0
             }
 
             params.filter = {
@@ -2294,7 +2464,7 @@ export default {
                 size: params.groupIds.length
             };
 
-            console.log(params)
+            console.log('getPart1RegionBar ----->>>>', params)
             if (params.storeIds.length === 0) {
                 ;
                 return false;
@@ -2361,7 +2531,7 @@ export default {
             const self = this;
             const option = this.getInspectLineOption();
             const regionData = [];
-            const regionLabel = [];
+            var regionLabel = [];
 
             if (this.part1.content) {
                 this.part1.content.map((item, index) => {
@@ -2415,10 +2585,12 @@ export default {
                             }
                         })
                     }
-
+                    // regionLabel = this.part1.comapareLabels
                     regionLabel.push(this.maxLabel(item.groupName))
                 });
             }
+            
+            console.log('regionLabel ----->>>> ', regionLabel);
 
             option.series[0].name = "";
             option.series[0].data = regionData;
@@ -2437,6 +2609,7 @@ export default {
 
             await this.getPart1StoreBar();
         },
+
         async getPart1StoreBar() {
             const self = this;
             const option = this.getInspectLineOption();
@@ -2454,20 +2627,68 @@ export default {
                     else{
                         content = [this.part1.content[this.part1.indexRegion]];
                     }
-
                 } else {
                     const params = {};
                     params.beginTs = self.params.beginTs;
                     params.endTs = self.params.endTs;
                     params.groupMode = 0;
-                    params.storeIds = this.part1.indexRegion==-1? this.params.storeIds:this.part1.content[this.part1.indexRegion].list;
-                    if (this.part1.compareType == 'users' || this.part1.compareType == 'position') {
+                    console.log("*self.params.storeIds:",self.params.storeIds);
+                    console.log("*this.part1.selStoreIdArr:",this.part1.selStoreIdArr)
+                    params.storeIds = this.part1.indexRegion==-1? this.part1.selStoreIdArr:this.part1.content[this.part1.indexRegion].list;
+                    if (this.part1.compareType == 'users' ) {//|| this.part1.compareType == 'position'
+                        //console.log("********self.part1.content:",self.part1.content);
                         params.storeIds = self.params.storeIds;
+                        params.searchMysteryMode = 0
+                        this.defineMysteryMode = 0
                         if(this.part1.indexRegion==-1)
-                              params.submitters = []
+                            params.submitters = this.part1.compareIds;
                         else
-                              params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
+                            params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
+                    }else if (this.part1.compareType == 'position') {
+                        //console.log("position content:",self.part1.content);
+                        params.storeIds = self.params.storeIds;
+                        params.searchMysteryMode = 0
+                        this.defineMysteryMode = 0
+                        let users = [];
+                        this.part1.originArray.forEach(function (item) {
+                            if (self.part1.compareIds.indexOf(item.value) >= 0)
+                                users = users.concat(item.contents);
+                        })
+                        if(this.part1.indexRegion==-1)
+                            params.submitters = users;
+                        else
+                            params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
+                        
+                    }else if(this.part1.compareType == 'mysterio'){
+                        params.storeIds = self.params.storeIds;
+                        params.searchMysteryMode = 1
+                        this.defineMysteryMode = 1
+                        if(this.part1.indexRegion==-1)
+                            params.submitters = this.part1.compareIds;
+                        else
+                            params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
+                    } 
+                    else if(this.part1.compareType == 'storeGroup' && this.part1.indexRegion!=-1){
+                        var storId = [];
+                        this.part1.content[this.part1.indexRegion].list.forEach(function (item) {
+                            if (self.params.storeIds.indexOf(item) >= 0)
+                                storId.push(item);
+                        })
+                        params.storeIds = storId;
                     }
+                    else if(this.part1.compareType == 'storeType' && this.part1.indexRegion!=-1){
+                        var storId = [];
+                        this.part1.content[this.part1.indexRegion].list.forEach(function (item) {
+                            if (self.params.storeIds.indexOf(item) >= 0)
+                                storId.push(item);
+                        })
+                        params.storeIds = storId;
+                    }
+                    /*else if(this.part1.compareType == 'stores'){
+                        params.storeIds = this.part1.compareIds;
+                        params.groupIds = this.part1.compareIds;
+                    }*/
+
                     params.inspectTagId = self.params.inspectId;
                     params.order = {
                         direction: (this.part1.storeMode == 1) ? this.part1.storeOrder : this.part1.table.order,
@@ -2478,7 +2699,8 @@ export default {
                         size: (this.part1.storeMode == 1) ? params.storeIds.length : this.part1.table.sizeNum
                     }
 
-                    console.log(params)
+                    
+                    console.log("getPart1StoreBar  ----->>>>" , params)
                     if (params.storeIds.length == 0) return;
                     const storeResult = await this.getInspectStatsOverviewWithGroup(params);
                     if (storeResult.errCode === 0) {
@@ -2567,25 +2789,38 @@ export default {
                 params.storeIds = this.part2.compareIds;
                 params.groupIds = this.part2.compareIds;
                 params.groupMode = 0;
+                this.defineMysteryMode = -1
             } else if (this.part2.compareType == 'area1') {
                 params.storeIds = this.part2.selStoreIdArr;
                 params.groupIds = this.part2.compareIds;
                 params.groupMode = 1;
+                this.defineMysteryMode = -1
             } else if (this.part2.compareType == 'area2') {
                 params.storeIds = this.part2.selStoreIdArr;
                 params.groupIds = this.part2.compareIds;
                 params.groupMode = 2;
+                this.defineMysteryMode = -1
             } else if (this.part2.compareType == 'storeType') {
                 params.groupIds = this.part2.compareIds;
                 params.groupMode = 3;
+                this.defineMysteryMode = -1
             } else if (this.part2.compareType == 'storeGroup') {
                 params.groupIds = this.part2.compareIds;
                 params.groupMode = 4;
+                this.defineMysteryMode = -1
             } else if (this.part2.compareType == 'users') {
                 params.submitters = this.part2.compareIds;
                 params.groupIds = this.part2.compareIds;
                 params.groupMode = 5;
-            } else if (this.part2.compareType == 'position') {
+                params.searchMysteryMode = 0
+                this.defineMysteryMode = 0
+            } else if(this.part2.compareType == 'mysterio'){
+                params.submitters = this.part2.compareIds;
+                params.groupIds = this.part2.compareIds;
+                params.groupMode = 5;
+                params.searchMysteryMode = 1
+                this.defineMysteryMode = 1
+            }else if (this.part2.compareType == 'position') {
                 let users = [];
                 this.part2.originArray.forEach(function (item) {
                     if (self.part2.compareIds.indexOf(item.value) >= 0)
@@ -2594,6 +2829,8 @@ export default {
                 params.submitters = users;
                 params.groupIds = users;
                 params.groupMode = 5;
+                params.searchMysteryMode = 0
+                this.defineMysteryMode = 0
             }
 
             let totalReport = 0;
@@ -2706,10 +2943,44 @@ export default {
                     params.beginTs = self.params.beginTs;
                     params.endTs = self.params.endTs;
                     params.groupMode = 0;
-                    params.storeIds =this.part2.indexRegion==-1?this.params.storeIds: this.part2.content[this.part2.indexRegion].list;
-                    if (this.part2.compareType == 'users' || this.part2.compareType == 'position') {
+                    params.storeIds =this.part2.indexRegion==-1?this.part2.selStoreIdArr: this.part2.content[this.part2.indexRegion].list;
+                    if (this.part2.compareType == 'users') {
                         params.storeIds = self.params.storeIds;
-                        params.submitters = this.part2.indexRegion==-1?[]:[self.part2.content[self.part2.indexRegion].innerId]
+                        params.submitters = this.part2.indexRegion==-1?this.part2.compareIds:[self.part2.content[self.part2.indexRegion].innerId]
+                        params.searchMysteryMode = 0
+                    }else if(this.part2.compareType == 'mysterio'){
+                        params.storeIds = self.params.storeIds;
+                        params.submitters = this.part2.indexRegion==-1?this.part2.compareIds:[self.part2.content[self.part2.indexRegion].innerId]
+                        params.searchMysteryMode = 1
+
+                    }else if (this.part2.compareType == 'position') {
+                        //console.log("position content:",self.part2.content);
+                        params.storeIds = self.params.storeIds;
+                        params.searchMysteryMode = 0
+                        let users = [];
+                        this.part2.originArray.forEach(function (item) {
+                            if (self.part2.compareIds.indexOf(item.value) >= 0)
+                                users = users.concat(item.contents);
+                        })
+                        if(this.part2.indexRegion==-1)
+                            params.submitters = users;
+                        else
+                            params.submitters = [self.part2.content[self.part2.indexRegion].innerId]
+                    }else if(this.part2.compareType == 'storeGroup' && this.part2.indexRegion!=-1){
+                        var storId = [];
+                        this.part2.content[this.part2.indexRegion].list.forEach(function (item) {
+                            if (self.params.storeIds.indexOf(item) >= 0)
+                                storId.push(item);
+                        })
+                        params.storeIds = storId;
+                    }
+                    else if(this.part2.compareType == 'storeType' && this.part2.indexRegion!=-1){
+                        var storId = [];
+                        this.part2.content[this.part2.indexRegion].list.forEach(function (item) {
+                            if (self.params.storeIds.indexOf(item) >= 0)
+                                storId.push(item);
+                        })
+                        params.storeIds = storId;
                     }
                     params.inspectTagId = self.params.inspectId;
                     params.order = {
@@ -2788,24 +3059,37 @@ export default {
                 params.storeIds = this.part3.compareIds;
                 params.groupIds = this.part3.compareIds;
                 params.groupMode = 0;
+                this.defineMysteryMode = -1
             } else if (this.part3.compareType == 'area1') {
                 params.storeIds = this.part3.selStoreIdArr;
                 params.groupIds = this.part3.compareIds;
                 params.groupMode = 1;
+                this.defineMysteryMode = -1
             } else if (this.part3.compareType == 'area2') {
                 params.storeIds = this.part3.selStoreIdArr;
                 params.groupIds = this.part3.compareIds;
                 params.groupMode = 2;
+                this.defineMysteryMode = -1
             } else if (this.part3.compareType == 'storeType') {
                 params.groupIds = this.part3.compareIds;
                 params.groupMode = 3;
+                this.defineMysteryMode = -1
             } else if (this.part3.compareType == 'storeGroup') {
                 params.groupIds = this.part3.compareIds;
                 params.groupMode = 4;
+                this.defineMysteryMode = -1
             } else if (this.part3.compareType == 'users') {
                 params.submitters = this.part3.compareIds;
                 params.groupIds = this.part3.compareIds;
                 params.groupMode = 5;
+                params.searchMysteryMode = 0
+                this.defineMysteryMode = 0
+            } else if(this.part3.compareType == 'mysterio'){
+                params.submitters = this.part3.compareIds;
+                params.groupIds = this.part3.compareIds;
+                params.groupMode = 5;
+                params.searchMysteryMode = 1
+                this.defineMysteryMode = 1
             } else if (this.part3.compareType == 'position') {
                 let users = [];
                 this.part3.originArray.forEach(function (item) {
@@ -2815,6 +3099,8 @@ export default {
                 params.submitters = users;
                 params.groupIds = users;
                 params.groupMode = 5;
+                params.searchMysteryMode = 0
+                this.defineMysteryMode = 0
             }
 
             let totalReport = 0;
@@ -2916,10 +3202,43 @@ export default {
                     params.beginTs = self.params.beginTs;
                     params.endTs = self.params.endTs;
                     params.groupMode = 0;
-                    params.storeIds = this.part3.indexRegion==-1? this.params.storeIds:this.part3.content[this.part3.indexRegion].list;
-                    if (this.part3.compareType == 'users' || this.part3.compareType == 'position') {
+                    params.storeIds = this.part3.indexRegion==-1? this.part3.selStoreIdArr:this.part3.content[this.part3.indexRegion].list;
+                    if (this.part3.compareType == 'users') {
                         params.storeIds = self.params.storeIds;
-                        params.submitters =this.part3.indexRegion==-1?[]: [self.part3.content[self.part3.indexRegion].innerId]
+                        params.searchMysteryMode = 0
+                        params.submitters =this.part3.indexRegion==-1?this.part3.compareIds: [self.part3.content[self.part3.indexRegion].innerId]
+                    }else if(this.part3.compareType == 'mysterio'){
+                        params.storeIds = self.params.storeIds;
+                        params.searchMysteryMode = 1
+                        params.submitters =this.part3.indexRegion==-1?this.part3.compareIds: [self.part3.content[self.part3.indexRegion].innerId]
+                    }else if (this.part3.compareType == 'position') {
+                        //console.log("position content:",self.part3.content);
+                        params.storeIds = self.params.storeIds;
+                        params.searchMysteryMode = 0
+                        let users = [];
+                        this.part3.originArray.forEach(function (item) {
+                            if (self.part3.compareIds.indexOf(item.value) >= 0)
+                                users = users.concat(item.contents);
+                        })
+                        if(this.part3.indexRegion==-1)
+                            params.submitters = users;
+                        else
+                            params.submitters = [self.part3.content[self.part3.indexRegion].innerId]
+                    }else if(this.part3.compareType == 'storeGroup' && this.part3.indexRegion!=-1){
+                        var storId = [];
+                        this.part3.content[this.part3.indexRegion].list.forEach(function (item) {
+                            if (self.params.storeIds.indexOf(item) >= 0)
+                                storId.push(item);
+                        })
+                        params.storeIds = storId;
+                    }
+                    else if(this.part3.compareType == 'storeType' && this.part3.indexRegion!=-1){
+                        var storId = [];
+                        this.part3.content[this.part3.indexRegion].list.forEach(function (item) {
+                            if (self.params.storeIds.indexOf(item) >= 0)
+                                storId.push(item);
+                        })
+                        params.storeIds = storId;
                     }
                     params.inspectTagId = self.params.inspectId;
                     params.order = {
@@ -3283,6 +3602,9 @@ export default {
             this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
         },
 
+        exportPdf(){
+            console.log('exportPdf ~~~~~~~>> ');
+        },
         setDefaultSortAndPage(paramsObj) {
             this.defaultSort = paramsObj.defaultSort;
             this.order = this.params.order = paramsObj.order;

@@ -1302,7 +1302,9 @@ export default{
         "addSign":"menambahkan tanda tangan",
         "addAttachment":"Tambahkan lampiran",
         "pleaseSign":"Tanda tangan",
-        "needSign":"Penutup ini memerlukan lampiran file tanda tangan"
+        "needSign":"Penutup ini memerlukan lampiran file tanda tangan",
+        "selectComment":"Please choose to sign-off on comments!",
+        "rejectReason":"Please fill in the reason for rejection!",
     },
     "sendAudit":{
         "all":"Semua",
@@ -1463,7 +1465,12 @@ export default{
       "pleaseChooseStore":"Silakan pilih toko",
       "pleaseChooseTag":"Pilih Inspeksi",
       "comfirmDelMysterio":"Konfirmasi penghapusan anggota pembeli misterius ini",
-      "saveMysterioSettingFail":"Gagal menyimpan kelompok izin"
+      "saveMysterioSettingFail":"Gagal menyimpan kelompok izin",
+      "nickName":"Nick Name",
+      "nickNameTip":"The nick name of sub-category supports up to 50 characters",
+      "pleaseInputNickName":"Please enter the nick name of the mystery",
+      "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name.",
+      "mystery":"Mystery Shopper"
   }
 
 }

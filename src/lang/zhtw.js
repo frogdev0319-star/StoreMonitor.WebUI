@@ -1299,7 +1299,9 @@ export default{
         "addSign":"加入簽名",
         "addAttachment":"加入附件",
         "pleaseSign":"請簽名",
-        "needSign":"此簽核需要附加簽名檔案"
+        "needSign":"此簽核需要附加簽名檔案",
+        "selectComment":"請選擇簽核意見！",
+        "rejectReason":"請填寫駁回原因！",
     },
     "sendAudit":{
         "all":"全部",
@@ -1461,7 +1463,14 @@ export default{
       "pleaseChooseStore":"請選擇門店",
       "pleaseChooseTag":"請選擇巡檢表",
       "comfirmDelMysterio":"確定刪除此神秘客成員",
-      "saveMysterioSettingFail":"儲存權限群組失敗"	  
+      "saveMysterioSettingFail":"儲存權限群組失敗",
+      "nickName":"代稱",
+      "nickNameTip":"神秘客代稱長度不可超過50個字元！",
+      "pleaseInputNickName":"請輸入神秘客代稱",
+      "duplicateNickName":"已有相同的神秘客代稱，請重新輸入",
+      "mysterio":"神秘客",
+      "allMysterio":"全部神秘客",
+      "mystery":"神秘客"
   }
 
 }

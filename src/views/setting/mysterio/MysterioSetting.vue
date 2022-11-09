@@ -19,6 +19,19 @@
                 </div>
             </div>
             <div class="mysterio-body">
+                <div style="height:148px;flex:1;">
+                <div class="store-item" style="height:85px;">
+                    <div class="item-label"><span style="color:'#C60957'">*</span>{{$t('mysterio.nickName')}}</div>
+                    <div class="nickName-input"> 
+                        <el-input
+                        ref="nickName"
+                        v-model="nickName"
+                        :disabled="noInput"
+                        @input="(val) => itemInputChanged(val, 50)"
+                        />
+                        <span class="text_limit_notice" v-if="showInputLimit"> {{$t('mysterio.nickNameTip')}}  </span>
+                    </div>
+                </div>
                 <div class="store-item">
                     <div class="item-label"><span style="color:'#C60957'">*</span>{{$t('remotePatrol.stores')}}</div>
                     <div class="item-selection">
@@ -34,32 +47,39 @@
                         </el-select>
                     </div>
                 </div>
-                <div class="store-item">
-                    <div class="item-label"><span style="color:'#C60957'">*</span>{{$t('overview.patrolLists')}}</div>
-                    <div class="item-selection">
-                        <el-select
-                            v-model="selInspectVaule"
-                            @change="onChangeSelectedInspect"
-                            size="mini">
-                            <el-option-group
-                                v-for="group in storeDataList[selStoreIndex].inspectList"
-                                :key="group.label"
-                                :label="group.label">
-                                <el-option v-for="(sitem) in group.options"
-                                    :key="sitem.inspId"
-                                    :label="sitem.label"
-                                    :value="{value:sitem.inspId,label:sitem.label}"
-                                />
-                            </el-option-group>
-                        </el-select>
+                </div>
+                <div style="height:148px;flex:1;">
+                    <div style="height:85px;"></div>
+                    <div class="store-item">
+                        <div class="item-label"><span style="color:'#C60957'">*</span>{{$t('overview.patrolLists')}}</div>
+                        <div class="item-selection">
+                            <el-select
+                                v-model="selInspectVaule"
+                                @change="onChangeSelectedInspect"
+                                size="mini">
+                                <el-option-group
+                                    v-for="group in storeDataList[selStoreIndex].inspectList"
+                                    :key="group.label"
+                                    :label="group.label">
+                                    <el-option v-for="(sitem) in group.options"
+                                        :key="sitem.inspId"
+                                        :label="sitem.label"
+                                        :value="{value:sitem.inspId,label:sitem.label}"
+                                    />
+                                </el-option-group>
+                            </el-select>
+                        </div>
                     </div>
                 </div>
-                <delay-button @click="addAuth" style="margin-left:32px;height:36px; margin-top:35px ;">
-                    <div class="button-area">
-                        <i class="iconfont el-icon-plus"/>
-                        <span>{{$t('mysterio.addAuth')}}</span>
-                    </div>
-                </delay-button>
+                <div style="height:148px;">
+                    <div style="height:85px;"></div>
+                    <delay-button @click="addAuth" style="margin-left:32px;height:36px; margin-top:calc(36/1920*100vw) ;">
+                        <div class="button-area">
+                            <i class="iconfont el-icon-plus"/>
+                            <span>{{$t('mysterio.addAuth')}}</span>
+                        </div>
+                    </delay-button>
+                </div>
             </div>
             <div class="addList">
                 <div style="border-left:4px solid #2c90d9;text-align: left;margin-bottom:17px ;"><span style="margin-left:12px;">{{$t('mysterio.authList')}}</span></div>
@@ -112,6 +132,7 @@ import TblPaginationOnly from '@/components/TblPaginationOnly';
 import util from '@/common/util';
 import DelayButton from '@/components/DelayButton';
 import DialogPop from '@/components/DialogPop';
+import filterString from '@/common/filterString.js';
 
 export default {
     name: 'MysterioSetting',
@@ -169,6 +190,8 @@ export default {
         },
         showItemExitedDialog:false,
         warnningTitle:"",
+        nickName:"",
+        showInputLimit:false
       };
     },
 
@@ -190,6 +213,7 @@ export default {
     methods: {
         getRouteData(){
             this.userId = this.$route.params.userId;
+            this.nickName = this.$route.params.nickName;
             console.log("userId:",this.userId);
         },
         init(){
@@ -270,11 +294,12 @@ export default {
             mysteroRESTful.getMysterySetting({userId:this.userId}).then(res=>{
                 var tempAuthLit = [];
                 if(res.errCode==0){
-                    res.data.map(setting=>{
+                    res.data.settings.map(setting=>{
                         var obj = self.doMapStoreAndTag(setting.storeId,setting.inspectTagId);
                         obj['id']=setting.id;
                         tempAuthLit.push(obj);
                     });
+                    self.nickName = res.data.nickname;
                 }
                 self.allTableData = tempAuthLit;
                 self.total = Math.ceil( self.allTableData.length/self.curSizeNum);
@@ -296,6 +321,11 @@ export default {
             this.allTableData = util.sort_by_key(this.allTableData,key,this.defaultSort.order );
         },
         saveAuth(){
+            if(this.nickName.trim()==""){
+                this.warnningTitle = this.$t('mysterio.pleaseInputNickName');
+                this.showItemExitedDialog = true;
+                return;
+            }
             const self = this;
             var settingList=[];
             self.allTableData.map(auth =>{
@@ -306,9 +336,16 @@ export default {
                 };
                 settingList.push(obj);
             });
-            mysteroRESTful.batchAddMysterySetting({userId:self.userId,settingList}).then(res=>{
+            mysteroRESTful.batchAddMysterySetting({userId:self.userId,settingList,nickname:self.nickName}).then(res=>{
                 if(res.errCode==0){
                     this.$router.push({name: 'MysterioManage'});
+                }else if(res.errCode==500){//代稱重複
+                    if(res.errMsg =="this nickname is exist!"){
+                        this.warnningTitle = this.$t('mysterio.duplicateNickName');
+                        this.showItemExitedDialog = true;
+                    }else{
+                        util.notify(self.$t('mysterio.saveMysterioSettingFail')+":"+res.errMsg, 'error', 3000);
+                    }
                 }else{
                     util.notify(self.$t('mysterio.saveMysterioSettingFail'), 'error', 3000);
                 }
@@ -404,7 +441,18 @@ export default {
         },
         onShowItemExitedDialogClose(){
             this.showItemExitedDialog = false;
-        }
+        },
+        itemInputChanged(val, n){
+            const content = filterString.all(val, n);
+            this.nickName = content
+
+            const length = filterString.getContentLength(val);
+            if(length > n) {
+                this.showInputLimit = true
+            } else {
+                this.showInputLimit = false
+            }
+        },
     }
 }
 </script>
@@ -426,6 +474,48 @@ export default {
     border-bottom: 1px solid #e3e9f4;
   }
 }
+.mysterio-nickName{
+    width:auto;
+    margin-top: 32px;
+    margin-bottom: 27px;
+    margin-right: 32px;
+    display: flex;
+    flex-direction: column;
+    .item-label{
+        flex:1;
+        align-self: flex-start;
+        margin-left: 32px;
+        span{
+                color:#C60957;
+                font-size: 12px;
+            }
+    }
+    .store-item{
+        flex:1;
+        height: 74px;
+        align-content: flex-start;
+        display: flex;
+        flex-direction: row;
+        align-items:flex-start;
+        margin-top: 10px;
+        margin-left: 32px;
+        margin-right: 27px;
+        justify-content: space-between;
+        .nickName-input{
+            display: flex;
+            flex:1;
+            .text_limit_notice{
+                position: absolute;
+                text-align: right;
+                margin-left: 5px;
+                font-size: 10px;
+                margin-top: 2px;
+                color: #ff2400;
+                display: block;
+            }
+        }
+    }
+}
 .mysterio-body{
     width:auto;
     margin-top: 32px;
@@ -443,11 +533,22 @@ export default {
         flex-direction: column;
         align-items:flex-start;
         margin-left: 32px;
-        
         span{
                 color:#C60957;
                 font-size: 12px;
             }
+        .nickName-input{
+            width:100%;
+            .text_limit_notice{
+                position: absolute;
+                text-align: right;
+                margin-left: 5px;
+                font-size: 10px;
+                margin-top: 2px;
+                color: #ff2400;
+                display: block;
+            }
+        }
         .item-selection{
             margin-top: 6px;
             display: flex;

@@ -221,7 +221,6 @@
             resize="none"
             @input="eventDesChanged"
             @blur="notShowInputRuleTips('eventDes')"/>
-            <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
             <button
               class="inspect-btn"
               @click="submitItemResource()"
@@ -229,6 +228,7 @@
               {{$t('remotePatrol.confirm')}}
             </button>
           </div>
+          <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
           <span v-if="RuleCountTip" class="rules">{{
               $t("remotePatrol.commentCountRuleTip")
             }}</span>
@@ -727,7 +727,7 @@ export default {
 
     eventNameChanged(val) {
       const self = this;
-      const content = filterString.standard(val, 50);
+      const content = filterString.all(val, 50);
       self.eventName = content;
       self.showEventNameInfo = false;
       const length = filterString.getContentLength(val);
