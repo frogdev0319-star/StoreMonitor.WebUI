@@ -132,7 +132,13 @@
             </div>
           </div>
           <hr class="hr-horizontal"/>
-          <table v-for="(s_item,s_index) in summary" :key="s_index" class="table table-bordered">
+          <div class="limit-group-score-tip" >
+            <div class="limit-img" >
+              <img :src="require('../../../static/img/group_score.svg')" width="20" height="20" />
+            </div>
+            <div class="limit-text">{{$t('remotePatrol.tipLimitGroupScore')}}</div>
+          </div>
+          <table v-for="(s_item,s_index) in summary" :key="s_index" class="table table-bordered" style="margin-top:10px;">
             <thead>
               <tr>
                 <th v-for="(t_item ,t_index) in s_item.data[0].tHeader" :key="t_index" :style="t_item.width" scope="col">
@@ -150,6 +156,7 @@
                         <div class="sheet_title">{{ inspectItem.label }}</div>
                       </div>
                       <div class="flex" style="align-items: center">
+                        <span>{{$t('')}}</span>
                         <span class="count-blag">{{inspectItem.count}}</span>
                       </div>
                     </div>
@@ -163,7 +170,15 @@
                   <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfQualified }}</span></td>
                   <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfUnqualified }}</span></td>
                   <td v-if="inspectItem.type === 1"><span>{{ getDoubleNum(item.itemScore) }}</span></td>
-                  <td><span>{{ item.itemgetScore == '--' ? '--' : getDoubleNum(item.itemgetScore) }}</span></td>
+                  <td>
+                    <div style="display:flex;flex-direction:row;justify-content:space-between;">
+                      <div style="flex:2;">{{ item.itemgetScore == '--' ? '--' : getDoubleNum(item.itemgetScore) }}</div>
+                      <div style="display:flex;flex:1;flex-direction:row;align-content:center;">
+                        <img v-if="item.groupScore != '-99999'" style="margin-right:4px;" :src="require('../../../static/img/group_score.svg')" width="15" height="15" />
+                        <div style="color:#9EACB6;font-size:10px;font-weight:normal;">{{ item.groupScore != '-99999'? item.groupScore:''}}</div>
+                      </div>
+                    </div>
+                  </td>
                 </tr>
               </tbody>
             </template>
@@ -1238,9 +1253,12 @@ export default {
         let inspectPic = 0;
         let totalScore0 = 0, CurAddScoreB = 0, CurOtherTotalScore = 0, PassFileX = 0, PassFileTS = 0, ScoreTS = 0, OtherTS = 0, PassFileN = 0;
         let PassFile_totalScoreX = 0, Score_totalScoreX = 0;
-        inspect.forEach(p_item => {
+        inspect.forEach(p_item => { //大類別
           // console.log(p_item)
-          p_item.inspectList.forEach(item => {
+          p_item.inspectList.forEach(item => {//子類別, groupScore在這層
+            PassFileTS=0;PassFileN = 0;PassFileX = 0;totalScore0=0;PassFile_totalScoreX=0;
+            CurAddScoreB = 0;ScoreTS = 0;Score_totalScoreX = 0;ScoreX = 0;ScoreN = 0;
+            OtherTS = 0;
             let QualifiedArr = [], UnqualifiedArr = [], IgnoredArr = [];
             let totalScore = 0, totalGetscore = 0, notAddIgnoretotalScore = 0;
             let tab1GetScoreNoContainedIngored = 0;
@@ -1251,7 +1269,7 @@ export default {
             item.unqualifiedItems = [];
             item.numOfCommentItem = 0;
             item.numOfTotalItems = 0;
-            item.items.forEach(s_item => {
+            item.items.forEach(s_item => {//子項 
               item.numOfTotalItems++;
               if (s_item.itemType === 1) {
                 item.numOfCommentItem++;
@@ -1332,7 +1350,7 @@ export default {
                 s_item.showTotalScore = true;
               }
               inspectPic += s_item.sourceList.length;
-            });
+            });//end for //子項加總完
             item['numOfQualified'] = QualifiedArr.length;
             item['numOfUnqualified'] = UnqualifiedArr.length;
             item['numIgnore'] = IgnoredArr.length;
@@ -1372,29 +1390,100 @@ export default {
               }
             }
             if (p_item.type === 0) {
-              PassFileTotalScoreSystem = PassFileTS
-              PassFileXS = PassFileX
-              PassFileXN = (PassFileN + PassFileX)
-              PassFileTotalScore = totalScore0
-              PassFileTotalScoreX = PassFile_totalScoreX
+              
+              if(item.isAdvanced){
+                if(inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1'){
+                  //console.log("PassFileTS:",PassFileTS);
+                  if(item.groupScore<0){
+                    PassFileTotalScoreSystem += (PassFileTS<item.groupScore?item.groupScore:PassFileTS);
+                    console.log("PassFileTotalScoreSystem:",PassFileTotalScoreSystem);
+                    PassFileXS += (PassFileX<item.groupScore?item.groupScore:PassFileX);
+                    PassFileXN += ((PassFileN + PassFileX)<item.groupScore?item.groupScore:(PassFileN + PassFileX));
+                    PassFileTotalScore += (totalScore0<item.groupScore?item.groupScore:totalScore0);
+                    PassFileTotalScoreX += (PassFile_totalScoreX<item.groupScore?item.groupScore:PassFile_totalScoreX);
+                  }else{
+                    PassFileTotalScoreSystem += (PassFileTS>item.groupScore?item.groupScore:PassFileTS);
+                    console.log("PassFileTotalScoreSystem:",PassFileTotalScoreSystem);
+                    PassFileXS += (PassFileX>item.groupScore?item.groupScore:PassFileX);
+                    PassFileXN += ((PassFileN + PassFileX)>item.groupScore?item.groupScore:(PassFileN + PassFileX));
+                    PassFileTotalScore += (totalScore0>item.groupScore?item.groupScore:totalScore0);
+                    PassFileTotalScoreX += (PassFile_totalScoreX>item.groupScore?item.groupScore:PassFile_totalScoreX);
+                  }
+                }
+              }else{
+                PassFileTotalScoreSystem += PassFileTS
+                PassFileXS += PassFileX
+                PassFileXN += (PassFileN + PassFileX)
+                PassFileTotalScore += totalScore0
+                PassFileTotalScoreX += PassFile_totalScoreX
+              }
             }
             if (p_item.type === 1) {
-              CurAddScoreB += totalScore;
-              allScoreB = CurAddScoreB
-              ScoreTotalScoreSystem = ScoreTS
-              ScoreXN = (ScoreX + ScoreN)
-              ScoreTotalScoreX = Score_totalScoreX
+              if(item.isAdvanced){
+                if(inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1'){
+                  //console.log("PassFileTtotalScoreS:",totalScore);
+                  if(totalScore<0 && item.groupScore<0)
+                    CurAddScoreB += (totalScore<item.groupScore)?item.groupScore:totalScore;
+                  else
+                    CurAddScoreB += (totalScore>item.groupScore)?item.groupScore:totalScore;
+                  allScoreB = CurAddScoreB;
+                  console.log("type 1 allScoreB:",allScoreB);
+
+                  if(ScoreTS<0 && item.groupScore<0)
+                    ScoreTotalScoreSystem += (ScoreTS<item.groupScore)?item.groupScore:ScoreTS;
+                  else
+                    ScoreTotalScoreSystem += (ScoreTS>item.groupScore)?item.groupScore:ScoreTS;
+                  console.log("type 1 ScoreTotalScoreSystem:",ScoreTotalScoreSystem);
+
+                  if((ScoreX + ScoreN)<0 && item.groupScore<0)
+                    ScoreXN += (ScoreX + Score<item.groupScore)?item.groupScore:(ScoreX + ScoreN);
+                  else
+                    ScoreXN += (ScoreX + ScoreN>item.groupScore)?item.groupScore:(ScoreX + ScoreN);
+                  console.log("type 1 ScoreXN:",ScoreXN);
+
+                  if(Score_totalScoreX < 0 &&　item.groupScore<0)
+                    ScoreTotalScoreX += (Score_totalScoreX<item.groupScore)?item.groupScore:Score_totalScoreX;
+                  else
+                    ScoreTotalScoreX += (Score_totalScoreX>item.groupScore)?item.groupScore:Score_totalScoreX;
+                  console.log("type 1 ScoreTotalScoreX:",ScoreTotalScoreX);
+                }
+              }else{
+                  CurAddScoreB += totalScore;
+                  allScoreB = CurAddScoreB
+                  console.log("*type 1 ScoreTS:",ScoreTS);
+                  ScoreTotalScoreSystem += ScoreTS
+                  console.log("*type 1 ScoreTotalScoreSystem:",ScoreTotalScoreSystem);
+                  ScoreXN += (ScoreX + ScoreN)
+                  ScoreTotalScoreX += Score_totalScoreX
+              }
               item['itemgetScore'] =
-                util.isDouble(inspectSettings.qualifiedForIgnoredWithType2
-                  ? (tab2NotIgnoredItemsGetScore + tab2IgnoredItemsGetScore) : tab2NotIgnoredItemsGetScore,2);
-              item['itemgetScore'] = util.isDouble(item['itemgetScore'],2);
+                  util.isDouble(inspectSettings.qualifiedForIgnoredWithType2
+                    ? (tab2NotIgnoredItemsGetScore + tab2IgnoredItemsGetScore) : tab2NotIgnoredItemsGetScore,2);
+                item['itemgetScore'] = util.isDouble(item['itemgetScore'],2);
             }
             if (p_item.type === 2) {
-              CurOtherTotalScore += totalGetscore;
-              otherGetscoreTotal = CurOtherTotalScore
-              OtherTotalScoreSystem = OtherTS
+              if(item.isAdvanced){
+                if(inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1'){
+                  if(totalGetscore<0 && item.groupScore<0)
+                    CurOtherTotalScore += (totalGetscore<item.groupScore)?item.groupScore:totalGetscore;
+                  else
+                    CurOtherTotalScore += (totalGetscore>item.groupScore)?item.groupScore:totalGetscore;
+                  otherGetscoreTotal = CurOtherTotalScore
+                  console.log("type 2 otherGetscoreTotal:",otherGetscoreTotal);
+
+                  if(OtherTS<0 && item.groupScore<0)
+                    OtherTotalScoreSystem += (OtherTS<item.groupScore)?item.groupScore:OtherTS;
+                  else
+                    OtherTotalScoreSystem += (OtherTS>item.groupScore)?item.groupScore:OtherTS;
+                  console.log("type 2 OtherTotalScoreSystem:",OtherTotalScoreSystem);
+                }
+              }else{
+                CurOtherTotalScore += totalGetscore;
+                otherGetscoreTotal = CurOtherTotalScore
+                OtherTotalScoreSystem += OtherTS
+              }
             }
-          });
+          });//end for 一個類別
           if (p_item.type === 0) {
             p_item['tHeader'] = self.theaderPassFail;
             if (p_item.inspectList.some(x => x.numOfUnqualified !== 0) && dealType.some(x => x === 0) && inspectSettings.dangerousOnFailedItem) {
@@ -1412,13 +1501,13 @@ export default {
         let s_count = 0;
         if (inspect.length === 1 && inspect[0].type === 0) {
           // console.log(1)
-          if (inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1') {
+          if (inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1') {//加分 or 扣分制
             if (inspectSettings.qualifiedForIgnoredWithType1) {
               s_count = PassFileXN;
             } else {
               s_count = PassFileTotalScoreSystem;
             }
-          } else {
+          } else {//比例制
             if (inspectSettings.qualifiedForIgnoredWithType1) {
               s_count = PassFileTotalScore === 0 ? 0 : PassFileXN / PassFileTotalScore * 100;
             } else {
@@ -2157,6 +2246,29 @@ export default {
               color: $tab;
               font-size: calc(12/1920*100vw);
             }
+          }
+        }
+        .limit-group-score-tip{
+          display: flex;
+          flex-direction: row;
+          align-content: center;
+          font-weight: bold;
+          font-size: calc(16/1920*100vw);
+          color: #484848;
+          height: 30px;
+          justify-content: right;
+          .limit-img{
+            align-self: center;
+            height: 20px;
+            align-items: center;
+            flex-direction: column;
+            display: flex;
+            justify-content: center;
+          }
+          .limit-text{
+            margin-left: 5px;
+            align-self: center;
+            height:20px;
           }
         }
         .table-bordered{

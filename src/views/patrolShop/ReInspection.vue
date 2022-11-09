@@ -1915,6 +1915,8 @@ export default {
             obj.isHover = false;
             obj.parentId = item.parentId;
             obj.lastUnqualifiedNumber = item.lastUnqualifiedNumber;
+            obj.groupScore = item.groupScore;
+            obj.isAdvanced = item.isAdvanced;
             if (index == 0) {
               obj.isClick = true;
             } else {
@@ -1928,6 +1930,8 @@ export default {
               itemObj.weight = item.weight;
               itemObj.groupId = item.groupId;
               itemObj.groupName = item.groupName;
+              itemObj.groupScore = item.groupScore;
+              itemObj.isAdvanced = item.isAdvanced;
               itemObj.subject = _item.subject;
               itemObj.description = _item.description;
               itemObj.itemScore = _item.itemScore;
