@@ -1257,7 +1257,7 @@ export default {
           // console.log(p_item)
           p_item.inspectList.forEach(item => {//子類別, groupScore在這層
             PassFileTS=0;PassFileN = 0;PassFileX = 0;totalScore0=0;PassFile_totalScoreX=0;
-            CurAddScoreB = 0;ScoreTS = 0;Score_totalScoreX = 0;ScoreX = 0;ScoreN = 0;
+            ScoreTS = 0;Score_totalScoreX = 0;ScoreX = 0;ScoreN = 0;
             OtherTS = 0;
             let QualifiedArr = [], UnqualifiedArr = [], IgnoredArr = [];
             let totalScore = 0, totalGetscore = 0, notAddIgnoretotalScore = 0;
@@ -1394,7 +1394,7 @@ export default {
               if(item.isAdvanced){
                 //if(inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1'){
                   //console.log("PassFileTS:",PassFileTS);
-                  if(item.groupScore<0){
+                  if(item.groupScore<=0){
                     PassFileTotalScoreSystem += (PassFileTS<item.groupScore?item.groupScore:PassFileTS);
                     console.log("PassFileTotalScoreSystem:",PassFileTotalScoreSystem);
                     PassFileXS += (PassFileX<item.groupScore?item.groupScore:PassFileX);
@@ -1420,39 +1420,41 @@ export default {
             }
             if (p_item.type === 1) {
               if(item.isAdvanced){
-                if(inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1'){
+                //if(inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1'){
                   //console.log("PassFileTtotalScoreS:",totalScore);
-                  if(totalScore<0 && item.groupScore<0)
+                  if(item.groupScore<=0)
                     CurAddScoreB += (totalScore<item.groupScore)?item.groupScore:totalScore;
                   else
                     CurAddScoreB += (totalScore>item.groupScore)?item.groupScore:totalScore;
+                  
                   allScoreB = CurAddScoreB;
                   console.log("type 1 allScoreB:",allScoreB);
 
-                  if(ScoreTS<0 && item.groupScore<0)
+                  if(item.groupScore<=0)
                     ScoreTotalScoreSystem += (ScoreTS<item.groupScore)?item.groupScore:ScoreTS;
                   else
                     ScoreTotalScoreSystem += (ScoreTS>item.groupScore)?item.groupScore:ScoreTS;
                   console.log("type 1 ScoreTotalScoreSystem:",ScoreTotalScoreSystem);
 
-                  if((ScoreX + ScoreN)<0 && item.groupScore<0)
-                    ScoreXN += (ScoreX + Score<item.groupScore)?item.groupScore:(ScoreX + ScoreN);
+                  if(item.groupScore<=0)
+                    ScoreXN += ((ScoreX + ScoreN)<item.groupScore)?item.groupScore:(ScoreX + ScoreN);
                   else
-                    ScoreXN += (ScoreX + ScoreN>item.groupScore)?item.groupScore:(ScoreX + ScoreN);
+                    ScoreXN += ((ScoreX + ScoreN)>item.groupScore)?item.groupScore:(ScoreX + ScoreN);
                   console.log("type 1 ScoreXN:",ScoreXN);
 
-                  if(Score_totalScoreX < 0 &&　item.groupScore<0)
+                  if(　item.groupScore<=0)
                     ScoreTotalScoreX += (Score_totalScoreX<item.groupScore)?item.groupScore:Score_totalScoreX;
                   else
                     ScoreTotalScoreX += (Score_totalScoreX>item.groupScore)?item.groupScore:Score_totalScoreX;
                   console.log("type 1 ScoreTotalScoreX:",ScoreTotalScoreX);
-                }
+                //}
               }else{
                   CurAddScoreB += totalScore;
-                  allScoreB = CurAddScoreB
-                  console.log("*type 1 ScoreTS:",ScoreTS);
+                  allScoreB = CurAddScoreB;
+                  console.log("type 1 allScoreB:",allScoreB);
+                  console.log("type 1 ScoreTS:",ScoreTS);
                   ScoreTotalScoreSystem += ScoreTS
-                  console.log("*type 1 ScoreTotalScoreSystem:",ScoreTotalScoreSystem);
+                  console.log("type 1 ScoreTotalScoreSystem:",ScoreTotalScoreSystem);
                   ScoreXN += (ScoreX + ScoreN)
                   ScoreTotalScoreX += Score_totalScoreX
               }
@@ -1463,20 +1465,19 @@ export default {
             }
             if (p_item.type === 2) {
               if(item.isAdvanced){
-                if(inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1'){
-                  if(totalGetscore<0 && item.groupScore<0)
+                  if(item.groupScore<=0)
                     CurOtherTotalScore += (totalGetscore<item.groupScore)?item.groupScore:totalGetscore;
                   else
                     CurOtherTotalScore += (totalGetscore>item.groupScore)?item.groupScore:totalGetscore;
                   otherGetscoreTotal = CurOtherTotalScore
                   console.log("type 2 otherGetscoreTotal:",otherGetscoreTotal);
 
-                  if(OtherTS<0 && item.groupScore<0)
+                  if(item.groupScore<=0)
                     OtherTotalScoreSystem += (OtherTS<item.groupScore)?item.groupScore:OtherTS;
                   else
                     OtherTotalScoreSystem += (OtherTS>item.groupScore)?item.groupScore:OtherTS;
                   console.log("type 2 OtherTotalScoreSystem:",OtherTotalScoreSystem);
-                }
+                
               }else{
                 CurOtherTotalScore += totalGetscore;
                 otherGetscoreTotal = CurOtherTotalScore
@@ -1529,19 +1530,32 @@ export default {
             } else {
               let total_a = 0, total_b = 0, total_c = 0;
               if (inspectSettings.qualifiedForIgnoredWithType1 && !inspectSettings.qualifiedForIgnoredWithType2) {
+                console.log('*PassFileXN:',PassFileXN);
+                console.log('*ScoreTotalScoreSystem:',ScoreTotalScoreSystem);
                 total_a = PassFileXN + ScoreTotalScoreSystem;
+                console.log('*PassFileTotalScore:',PassFileTotalScore);
+                console.log('*ScoreTotalScoreX:',ScoreTotalScoreX);
                 total_b = PassFileTotalScore + ScoreTotalScoreX;
               } else if (!inspectSettings.qualifiedForIgnoredWithType1 && inspectSettings.qualifiedForIgnoredWithType2) {
                 total_a = PassFileXS + ScoreXN;
                 total_b = PassFileTotalScoreX + allScoreB;
               } else if (inspectSettings.qualifiedForIgnoredWithType1 && inspectSettings.qualifiedForIgnoredWithType2) {
+                console.log('*PassFileXN:',PassFileXN);
+                console.log('*ScoreXN:',ScoreXN);
                 total_a = PassFileXN + ScoreXN;
+                console.log('*PassFileTotalScore:',PassFileTotalScore);
+                console.log('*allScoreB:',allScoreB);
                 total_b = PassFileTotalScore + allScoreB;
               } else {
+                console.log('*PassFileXS:',PassFileXS);
+                console.log('*ScoreTotalScoreSystem:',ScoreTotalScoreSystem);
                 total_a = PassFileXS + ScoreTotalScoreSystem;
                 total_b = PassFileTotalScoreX + ScoreTotalScoreX;
+                console.log('*PassFileTotalScoreX:',PassFileTotalScoreX);
+                console.log('*ScoreTotalScoreX:',ScoreTotalScoreX);
               }
               total_c = total_a === 0 || total_b === 0 ? 0 : (total_a / total_b * 100);
+              console.log('total_c:',total_c);
               s_count = total_c + otherGetscoreTotal;
               // console.log(s_count)
             }
