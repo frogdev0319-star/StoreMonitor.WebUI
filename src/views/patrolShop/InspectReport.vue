@@ -290,6 +290,12 @@
           </div>
         </el-col>
         <el-col v-if="pageItem.class === 'row-table'">
+          <div class="limit-group-score-tip" >
+            <div class="limit-img" >
+              <img :src="require('../../../static/img/group_score.svg')" width="20" height="20" />
+            </div>
+            <div class="limit-text">{{$t('remotePatrol.tipLimitGroupScore')}}</div>
+          </div>
           <table v-for="(tableItem, tableIndex) in pageItem.data" :key="tableIndex" class="table table-bordered">
             <thead :class="hasChart ? 'pdf_font_20': 'pdf_font_16'">
               <tr v-if="tableItem[0].type === 0">
@@ -335,7 +341,19 @@
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfQualifiedItems }}</span></td>
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfUnqualifiedItems }}</span></td>
                   <td v-if="subcategory.type === 1"><span>{{ getDoubleNum(categoryItem.weight == -1 ? subcategory.totalScore : subcategory.totalScore * categoryItem.weight / 100) }}</span></td>
-                  <td><span>{{ getDoubleNum(subcategory.actualScore) == Infinity ? '--' : getDoubleNum((categoryItem.weight == -1 || categoryItem.type==2 ) ? subcategory.actualScore : subcategory.actualScore * categoryItem.weight / 100) }}</span></td>
+                  <td>
+                    <div style="display:flex;flex-direction:row;justify-content:space-between;">
+                      <div style="flex:2;">{{ getDoubleNum(subcategory.actualScore) == Infinity ? '--' : getDoubleNum((categoryItem.weight == -1 || categoryItem.type==2 ) ? subcategory.actualScore : subcategory.actualScore * categoryItem.weight / 100) }}</div>
+                      <div v-if="subcategory.children" style="display:flex;flex:1;flex-direction:row;align-content:center;">
+                        <img v-if="categoryItem.isAdvanced" style="margin-right:4px;" :src="require('../../../static/img/group_score.svg')" width="15" height="15" />
+                        <div style="color:#9EACB6;font-size:10px;font-weight:normal;">{{ categoryItem.isAdvanced? categoryItem.groupScore:''}}</div>
+                      </div>
+                      <div v-else-if="!subcategory.children" style="display:flex;flex:1;flex-direction:row;align-content:center;">
+                        <img v-if="subcategory.isAdvanced" style="margin-right:4px;" :src="require('../../../static/img/group_score.svg')" width="15" height="15" />
+                        <div style="color:#9EACB6;font-size:10px;font-weight:normal;">{{ subcategory.isAdvanced? subcategory.groupScore:''}}</div>
+                      </div>
+                    </div>
+                  </td>
                 </tr>
               </tbody>
             </template>
@@ -2243,7 +2261,6 @@ export default {
         .table-bordered{
           border-collapse: collapse;
           width: 100%;
-          margin-top: 20px;
           th{
               color: $tab;
               text-align: left;
@@ -2774,6 +2791,29 @@ export default {
       height:24px;
     }
   }
+  .limit-group-score-tip{
+          display: flex;
+          flex-direction: row;
+          align-content: center;
+          font-weight: bold;
+          font-size: calc(16/1920*100vw);
+          color: #484848;
+          height: 30px;
+          justify-content: right;
+          .limit-img{
+            align-self: center;
+            height: 20px;
+            align-items: center;
+            flex-direction: column;
+            display: flex;
+            justify-content: center;
+          }
+          .limit-text{
+            margin-left: 5px;
+            align-self: center;
+            height:20px;
+          }
+        }
 </style>
 <style>
   .echarts {

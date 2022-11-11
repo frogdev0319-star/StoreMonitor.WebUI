@@ -1294,20 +1294,20 @@ export default {
                   item.unqualifiedItems.push(s_item);
                 }
                 if (s_item.itemgetScore !== '--') {
-                  totalGetscore += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore * (s_item.type==2 ? 1 :(p_item.weight / 100));
+                  totalGetscore += s_item.itemgetScore;
                 }
               }
               s_item.itemgetScore === '--' ? s_item.itemgetScore = 0 : null;
               if (p_item.type === 0) {
-                PassFileTS += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore * p_item.weight / 100;
-                totalScore0 += p_item.weight == -1 ? s_item.itemScore : s_item.itemScore * p_item.weight / 100;
+                PassFileTS += s_item.itemgetScore ;
+                totalScore0 += s_item.itemScore;
                 if (!s_item.isIgnore && !s_item.manualIgnore) {
-                  PassFileX += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore * p_item.weight / 100;
-                  PassFile_totalScoreX += p_item.weight == -1 ? s_item.itemScore : s_item.itemScore * p_item.weight / 100;
-                  tab1GetScoreNoContainedIngored += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore * p_item.weight / 100;
+                  PassFileX += s_item.itemgetScore;
+                  PassFile_totalScoreX += s_item.itemScore;
+                  tab1GetScoreNoContainedIngored += s_item.itemgetScore;
                 } else {
-                  PassFileN += p_item.weight == -1 ? s_item.itemScore : s_item.itemScore * p_item.weight / 100;
-                  tab1GetScoreContainedIgnored += p_item.weight == -1 ? s_item.itemScore : s_item.itemScore * p_item.weight / 100;
+                  PassFileN += s_item.itemScore;
+                  tab1GetScoreContainedIgnored += s_item.itemScore;
                 }
                 if (inspect.length > 1) {
                   if (!inspectSettings.includedInTotalScoreWithType1) {
@@ -1329,16 +1329,16 @@ export default {
                   }
                 }
               } else if (p_item.type === 1) {
-                totalScore += p_item.weight == -1 ? s_item.itemScore : s_item.itemScore * p_item.weight / 100;
-                ScoreTS += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore * p_item.weight / 100;
+                totalScore += s_item.itemScore;
+                ScoreTS +=s_item.itemgetScore;
                 if (!s_item.isIgnore && !s_item.manualIgnore) {
-                  ScoreX += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore * p_item.weight / 100;
-                  Score_totalScoreX += p_item.weight == -1 ? s_item.itemScore : s_item.itemScore * p_item.weight / 100;
+                  ScoreX += s_item.itemgetScore;
+                  Score_totalScoreX += s_item.itemScore;
                   notAddIgnoretotalScore += p_item.weight == -1 ? s_item.itemScore : s_item.itemScore * p_item.weight / 100;
-                  tab2NotIgnoredItemsGetScore += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore * p_item.weight / 100;
+                  tab2NotIgnoredItemsGetScore += s_item.itemgetScore;
                 } else {
-                  ScoreN += p_item.weight == -1 ? s_item.itemScore : s_item.itemScore * p_item.weight / 100;
-                  tab2IgnoredItemsGetScore += p_item.weight == -1 ? s_item.itemScore : s_item.itemScore * p_item.weight / 100;
+                  ScoreN = s_item.itemScore;
+                  tab2IgnoredItemsGetScore += s_item.itemScore;
                 }
                 if (s_item.isIgnore || s_item.manualIgnore) {
                   s_item.showTotalScore = inspectSettings.qualifiedForIgnoredWithType2;
@@ -1346,7 +1346,7 @@ export default {
                   s_item.showTotalScore = true;
                 }
               } else if (p_item.type === 2 && !s_item.isIgnore) {
-                OtherTS += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore;// * p_item.weight / 100;
+                OtherTS += s_item.itemgetScore;// * p_item.weight / 100;
                 s_item.showTotalScore = true;
               }
               inspectPic += s_item.sourceList.length;
@@ -1363,11 +1363,156 @@ export default {
             } else {
               item['itemScore'] = notAddIgnoretotalScore;
             }
-            if (p_item.type === 0 && !inspectSettings.includedInTotalScoreWithType1 && !isOnlyTab1) {
+            
+            if (p_item.type === 0) {
+              let ts = PassFileTS;
+              let xs = PassFileX;
+              let xn = (PassFileN + PassFileX);
+              let ts0 = totalScore0;
+              let tsX = PassFile_totalScoreX;
+              if(item.isAdvanced){
+                  if(item.groupScore<=0){
+                    ts = (ts<item.groupScore?item.groupScore:ts);
+                    xs = (xs<item.groupScore?item.groupScore:xs);
+                    xn = (xn<item.groupScore?item.groupScore:xn);
+                    ts0 = (ts0<item.groupScore?item.groupScore:ts0);
+                    tsX = (tsX<item.groupScore?item.groupScore:tsX);
+                    
+                  }else{
+                    ts = (ts>item.groupScore?item.groupScore:ts);
+                    xs = (xs>item.groupScore?item.groupScore:xs);
+                    xn = (xn>item.groupScore?item.groupScore:xn);
+                    ts0 = (ts0>item.groupScore?item.groupScore:ts0);
+                    tsX = (tsX>item.groupScore?item.groupScore:tsX);
+                    
+                  }
+                  /*console.log("ts:",ts);
+                  PassFileTotalScoreSystem = ts*(p_item.weight == -1 ? 1 : (p_item.weight/100));
+                  PassFileXS +=  xs*(p_item.weight == -1 ? 1 : (p_item.weight/100));
+                  PassFileXN += xn*(p_item.weight == -1 ? 1 : (p_item.weight/100));
+                  PassFileTotalScore += ts0*(p_item.weight == -1 ? 1 : (p_item.weight/100));
+                  PassFileTotalScoreX += tsX*(p_item.weight == -1 ? 1 : (p_item.weight/100));*/
+              }
+                PassFileTotalScoreSystem += ts*(p_item.weight == -1 ? 1 : (p_item.weight/100));
+                PassFileXS += xs*(p_item.weight == -1 ? 1 : (p_item.weight/100));
+                PassFileXN += xn*(p_item.weight == -1 ? 1 : (p_item.weight/100));
+                PassFileTotalScore += ts0*(p_item.weight == -1 ? 1 : (p_item.weight/100));
+                PassFileTotalScoreX += tsX*(p_item.weight == -1 ? 1 : (p_item.weight/100));
+            
+              console.log("ts:",ts);
+              console.log("PassFileTotalScoreSystem:",PassFileTotalScoreSystem);
+            }
+            if (p_item.type === 1) {
+              let type1ts = totalScore;
+              let type1Score = ScoreTS;
+              let type1XN = (ScoreX + ScoreN);
+              let type1tsX = Score_totalScoreX;
+              if(item.isAdvanced){
+                //if(inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1'){
+                  //console.log("PassFileTtotalScoreS:",totalScore);
+                  if(item.groupScore<=0)
+                  {
+                    type1ts = (type1ts <item.groupScore)?item.groupScore:type1ts ;
+                    type1Score = (type1Score<item.groupScore)?item.groupScore:type1Score;
+                    type1XN = (type1XN<item.groupScore)?item.groupScore:type1XN;
+                    type1tsX = (type1tsX<item.groupScore)?item.groupScore:type1tsX;
+                  }else{
+                    type1ts = (type1ts >item.groupScore)?item.groupScore:type1ts ;
+                    type1Score = (type1Score>item.groupScore)?item.groupScore:type1Score;
+                    type1XN = (type1XN>item.groupScore)?item.groupScore:type1XN;
+                    type1tsX = (type1tsX>item.groupScore)?item.groupScore:type1tsX;
+                  }
+                //}
+              }
+                  CurAddScoreB += type1ts * (p_item.weight == -1 ? 1 : (p_item.weight/100));
+                  allScoreB = CurAddScoreB;
+                  ScoreTotalScoreSystem += type1Score* (p_item.weight == -1 ? 1 : (p_item.weight/100));
+                  ScoreXN += type1XN* (p_item.weight == -1 ? 1 : (p_item.weight/100));
+                  ScoreTotalScoreX += type1tsX* (p_item.weight == -1 ? 1 : (p_item.weight/100));
+              
+              
+              console.log("type 1 allScoreB:",allScoreB);
+              console.log("type 1 ScoreTotalScoreSystem:",ScoreTotalScoreSystem);
+              console.log("type 1 ScoreXN:",ScoreXN);
+              console.log("type 1 ScoreTotalScoreX:",ScoreTotalScoreX);
+              
+            }
+            if (p_item.type === 2) {
+              if(item.isAdvanced){
+                  if(item.groupScore<=0){
+                    CurOtherTotalScore += (totalGetscore<item.groupScore)?item.groupScore:totalGetscore;
+                    OtherTotalScoreSystem += (OtherTS<item.groupScore)?item.groupScore:OtherTS;
+                  }else{
+                    CurOtherTotalScore += (totalGetscore>item.groupScore)?item.groupScore:totalGetscore;
+                    OtherTotalScoreSystem += (OtherTS>item.groupScore)?item.groupScore:OtherTS;
+                  }
+                
+              }else{
+                CurOtherTotalScore += totalGetscore;
+                OtherTotalScoreSystem += OtherTS
+              }
+              otherGetscoreTotal = CurOtherTotalScore
+              console.log("type 2 otherGetscoreTotal:",otherGetscoreTotal);
+              console.log("type 2 OtherTotalScoreSystem:",OtherTotalScoreSystem);
+            }
+            //顯示後放
+            /*if (p_item.type === 0 && !inspectSettings.includedInTotalScoreWithType1 && !isOnlyTab1) {
               item['itemgetScore'] = '--';
             } else {
               item['itemgetScore'] = util.isDouble(totalGetscore,2);
+            }*/
+            //判斷顯示值 是否碰到上限
+            console.log('item.isAdvanced:',item.isAdvanced);
+            if(item.isAdvanced){
+              if(item.groupScore<=0){
+                if (inspectSettings.qualifiedForIgnoredWithType1  && p_item.type == 0) {
+                  let tab1ConIgLimit = ((tab1GetScoreContainedIgnored+tab1GetScoreNoContainedIngored)<item.groupScore?item.groupScore:(tab1GetScoreContainedIgnored+tab1GetScoreNoContainedIngored));//包含忽略
+                  tab1GetScoreContainedIgnored = tab1ConIgLimit* (p_item.weight == -1 ? 1 : (p_item.weight/100));;
+                }else{
+                  let tab1ConNoIgLimit = (tab1GetScoreNoContainedIngored<item.groupScore?item.groupScore:tab1GetScoreNoContainedIngored);//不含忽略
+                  tab1GetScoreNoContainedIngored = tab1ConNoIgLimit* (p_item.weight == -1 ? 1 : (p_item.weight/100));
+                }
+
+                if(inspectSettings.qualifiedForIgnoredWithType2 && p_item.type == 1){
+                  let tab2ConIgLimit = ((tab2IgnoredItemsGetScore+tab2NotIgnoredItemsGetScore)<item.groupScore?item.groupScore:(tab2IgnoredItemsGetScore+tab2NotIgnoredItemsGetScore));//包含忽略
+                  tab2IgnoredItemsGetScore = tab2ConIgLimit*(p_item.weight == -1 ? 1 : (p_item.weight/100));
+                }else{
+                  let tab2ConNoIgLimit = (tab2NotIgnoredItemsGetScore<item.groupScore?item.groupScore:tab2NotIgnoredItemsGetScore);//不含忽略
+                  tab2NotIgnoredItemsGetScore = tab2ConNoIgLimit*(p_item.weight == -1 ? 1 : (p_item.weight/100));
+                }
+
+                totalGetscore = (totalGetscore<item.groupScore)?item.groupScore:totalGetscore;
+              }else{
+                if (inspectSettings.qualifiedForIgnoredWithType1  && p_item.type == 0) {
+                  let tab1ConIgLimit = ((tab1GetScoreContainedIgnored+tab1GetScoreNoContainedIngored)>item.groupScore?item.groupScore:(tab1GetScoreContainedIgnored+tab1GetScoreNoContainedIngored));//包含忽略
+                  tab1GetScoreContainedIgnored = tab1ConIgLimit* (p_item.weight == -1 ? 1 : (p_item.weight/100));;
+                }else{
+                  let tab1ConNoIgLimit = (tab1GetScoreNoContainedIngored>item.groupScore?item.groupScore:tab1GetScoreNoContainedIngored);//不含忽略
+                  tab1GetScoreNoContainedIngored = tab1ConNoIgLimit* (p_item.weight == -1 ? 1 : (p_item.weight/100));
+                }
+
+                if(inspectSettings.qualifiedForIgnoredWithType2 && p_item.type == 1){
+                  let tab2ConIgLimit = ((tab2IgnoredItemsGetScore+tab2NotIgnoredItemsGetScore)>item.groupScore?item.groupScore:(tab2IgnoredItemsGetScore+tab2NotIgnoredItemsGetScore));//包含忽略
+                  tab2IgnoredItemsGetScore = tab2ConIgLimit*(p_item.weight == -1 ? 1 : (p_item.weight/100));
+                }else{
+                  let tab2ConNoIgLimit = (tab2NotIgnoredItemsGetScore>item.groupScore?item.groupScore:tab2NotIgnoredItemsGetScore);//不含忽略
+                  tab2NotIgnoredItemsGetScore = tab2ConNoIgLimit*(p_item.weight == -1 ? 1 : (p_item.weight/100));
+                }
+
+                totalGetscore = (totalGetscore>item.groupScore)?item.groupScore:totalGetscore;
+              }
+            }else{
+              
+                tab1GetScoreContainedIgnored = tab1GetScoreContainedIgnored*(p_item.weight == -1 ? 1 : (p_item.weight/100));
+                
+                console.log('(p_item.weight/100):',(p_item.weight/100));
+                tab1GetScoreNoContainedIngored = tab1GetScoreNoContainedIngored*(p_item.weight == -1 ? 1 : (p_item.weight/100));
+
+                tab2IgnoredItemsGetScore = tab2IgnoredItemsGetScore*(p_item.weight == -1 ? 1 : (p_item.weight/100));
+                tab2NotIgnoredItemsGetScore = tab2NotIgnoredItemsGetScore*(p_item.weight == -1 ? 1 : (p_item.weight/100));
             }
+            console.log('tab1GetScoreContainedIgnored:',tab1GetScoreContainedIgnored);
+            console.log('tab1GetScoreNoContainedIngored:',tab1GetScoreNoContainedIngored);
             if (inspect.length === 1 && inspect[0].type === 0) {
               if (inspectSettings.qualifiedForIgnoredWithType1) {
                 item['itemgetScore'] = util.isDouble(tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored,2);
@@ -1377,111 +1522,25 @@ export default {
                 item['itemgetScore'] = util.isDouble(tab1GetScoreNoContainedIngored,2);
               }
             } else {
-              if (inspectSettings.includedInTotalScoreWithType1) {
-                if (inspectSettings.qualifiedForIgnoredWithType1 && (p_item.type === 0 || p_item.type === 1)) {
-                  item['itemgetScore'] = util.isDouble(tab1GetScoreContainedIgnored +tab1GetScoreNoContainedIngored,2);
+              if (p_item.type == 0) {
+                if (inspectSettings.qualifiedForIgnoredWithType1) {
+                  item['itemgetScore'] = util.isDouble(tab1GetScoreContainedIgnored,2);
                 } else {
-                  if (p_item.type === 1) item['itemgetScore'] = util.isDouble(tab1GetScoreNoContainedIngored,2);
+                  item['itemgetScore'] = util.isDouble(tab1GetScoreNoContainedIngored,2);
                 }
+              }
+              else if(p_item.type == 1){
+                if(inspectSettings.qualifiedForIgnoredWithType2){
+                  item['itemgetScore'] = util.isDouble(tab2IgnoredItemsGetScore,2);
+                }else{
+                  item['itemgetScore'] = util.isDouble(tab2NotIgnoredItemsGetScore,2);
+                }
+              }else if(p_item.type == 2){
+                item['itemgetScore'] = util.isDouble(totalGetscore,2);
               }
               if (inspectSettings.qualifiedForIgnoredWithType1) {
                 item['numOfQualified'] = item['numOfQualified'];
                 item['numIgnore'] = 0;
-              }
-            }
-            if (p_item.type === 0) {
-              
-              if(item.isAdvanced){
-                //if(inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1'){
-                  //console.log("PassFileTS:",PassFileTS);
-                  if(item.groupScore<=0){
-                    PassFileTotalScoreSystem += (PassFileTS<item.groupScore?item.groupScore:PassFileTS);
-                    console.log("PassFileTotalScoreSystem:",PassFileTotalScoreSystem);
-                    PassFileXS += (PassFileX<item.groupScore?item.groupScore:PassFileX);
-                    PassFileXN += ((PassFileN + PassFileX)<item.groupScore?item.groupScore:(PassFileN + PassFileX));
-                    PassFileTotalScore += (totalScore0<item.groupScore?item.groupScore:totalScore0);
-                    PassFileTotalScoreX += (PassFile_totalScoreX<item.groupScore?item.groupScore:PassFile_totalScoreX);
-                  }else{
-                    PassFileTotalScoreSystem += (PassFileTS>item.groupScore?item.groupScore:PassFileTS);
-                    console.log("PassFileTotalScoreSystem:",PassFileTotalScoreSystem);
-                    PassFileXS += (PassFileX>item.groupScore?item.groupScore:PassFileX);
-                    PassFileXN += ((PassFileN + PassFileX)>item.groupScore?item.groupScore:(PassFileN + PassFileX));
-                    PassFileTotalScore += (totalScore0>item.groupScore?item.groupScore:totalScore0);
-                    PassFileTotalScoreX += (PassFile_totalScoreX>item.groupScore?item.groupScore:PassFile_totalScoreX);
-                  }
-                //}
-              }else{
-                PassFileTotalScoreSystem += PassFileTS
-                PassFileXS += PassFileX
-                PassFileXN += (PassFileN + PassFileX)
-                PassFileTotalScore += totalScore0
-                PassFileTotalScoreX += PassFile_totalScoreX
-              }
-            }
-            if (p_item.type === 1) {
-              if(item.isAdvanced){
-                //if(inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1'){
-                  //console.log("PassFileTtotalScoreS:",totalScore);
-                  if(item.groupScore<=0)
-                    CurAddScoreB += (totalScore<item.groupScore)?item.groupScore:totalScore;
-                  else
-                    CurAddScoreB += (totalScore>item.groupScore)?item.groupScore:totalScore;
-                  
-                  allScoreB = CurAddScoreB;
-                  console.log("type 1 allScoreB:",allScoreB);
-
-                  if(item.groupScore<=0)
-                    ScoreTotalScoreSystem += (ScoreTS<item.groupScore)?item.groupScore:ScoreTS;
-                  else
-                    ScoreTotalScoreSystem += (ScoreTS>item.groupScore)?item.groupScore:ScoreTS;
-                  console.log("type 1 ScoreTotalScoreSystem:",ScoreTotalScoreSystem);
-
-                  if(item.groupScore<=0)
-                    ScoreXN += ((ScoreX + ScoreN)<item.groupScore)?item.groupScore:(ScoreX + ScoreN);
-                  else
-                    ScoreXN += ((ScoreX + ScoreN)>item.groupScore)?item.groupScore:(ScoreX + ScoreN);
-                  console.log("type 1 ScoreXN:",ScoreXN);
-
-                  if(　item.groupScore<=0)
-                    ScoreTotalScoreX += (Score_totalScoreX<item.groupScore)?item.groupScore:Score_totalScoreX;
-                  else
-                    ScoreTotalScoreX += (Score_totalScoreX>item.groupScore)?item.groupScore:Score_totalScoreX;
-                  console.log("type 1 ScoreTotalScoreX:",ScoreTotalScoreX);
-                //}
-              }else{
-                  CurAddScoreB += totalScore;
-                  allScoreB = CurAddScoreB;
-                  console.log("type 1 allScoreB:",allScoreB);
-                  console.log("type 1 ScoreTS:",ScoreTS);
-                  ScoreTotalScoreSystem += ScoreTS
-                  console.log("type 1 ScoreTotalScoreSystem:",ScoreTotalScoreSystem);
-                  ScoreXN += (ScoreX + ScoreN)
-                  ScoreTotalScoreX += Score_totalScoreX
-              }
-              item['itemgetScore'] =
-                  util.isDouble(inspectSettings.qualifiedForIgnoredWithType2
-                    ? (tab2NotIgnoredItemsGetScore + tab2IgnoredItemsGetScore) : tab2NotIgnoredItemsGetScore,2);
-                item['itemgetScore'] = util.isDouble(item['itemgetScore'],2);
-            }
-            if (p_item.type === 2) {
-              if(item.isAdvanced){
-                  if(item.groupScore<=0)
-                    CurOtherTotalScore += (totalGetscore<item.groupScore)?item.groupScore:totalGetscore;
-                  else
-                    CurOtherTotalScore += (totalGetscore>item.groupScore)?item.groupScore:totalGetscore;
-                  otherGetscoreTotal = CurOtherTotalScore
-                  console.log("type 2 otherGetscoreTotal:",otherGetscoreTotal);
-
-                  if(item.groupScore<=0)
-                    OtherTotalScoreSystem += (OtherTS<item.groupScore)?item.groupScore:OtherTS;
-                  else
-                    OtherTotalScoreSystem += (OtherTS>item.groupScore)?item.groupScore:OtherTS;
-                  console.log("type 2 OtherTotalScoreSystem:",OtherTotalScoreSystem);
-                
-              }else{
-                CurOtherTotalScore += totalGetscore;
-                otherGetscoreTotal = CurOtherTotalScore
-                OtherTotalScoreSystem += OtherTS
               }
             }
           });//end for 一個類別
@@ -1586,14 +1645,12 @@ export default {
         if (inspectSettings.hundredMarkType === '1') {
           s_count = s_count + inspectSettings.baseScore;
         }
-        self.scorecount = s_count > inspectSettings.maxScore 
-          ? inspectSettings.maxScore
-          : 
-          (
-            s_count < inspectSettings.minScore 
-            ? inspectSettings.minScore 
-            : parseFloat(s_count.toFixed(1))
-          );
+        self.scorecount = parseFloat(s_count.toFixed(1));
+        if(inspectSettings.maxScore && s_count > inspectSettings.maxScore)
+          self.scorecount = inspectSettings.maxScore;
+        if(inspectSettings.minScore && s_count < inspectSettings.minScore )
+          self.scorecount = inspectSettings.minScore;
+        
         self.summary = this.groupbyKey(inspect, 'type');
         eventList.forEach((item, index) => {
           const objFeedBack = {};
