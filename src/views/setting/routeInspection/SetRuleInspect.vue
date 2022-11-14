@@ -288,7 +288,7 @@
         <div slot="tableDetail" class="setting-config rule-item">
           <div>
             <div>
-              <el-checkbox class="storevue-checkbox-outlined" v-model="enableDelay">
+              <el-checkbox class="storevue-checkbox-outlined" v-model="enableDelay" @change="enableDelayChanged">
                 <span>
                   {{ $t('insSettingView.sendMsgRemind') }}
                 </span>
@@ -301,6 +301,8 @@
                 v-model="delayDay"
                 type="number"
                 :disabled="!enableDelay"
+                :min="1"
+                @change="onMsgRemindChanged"
               />
               <span>{{ $t('overview.day') }}</span>
             </div>
@@ -713,7 +715,13 @@ export default {
       }
       this.standardScore = score;
     },
-    
+    onMsgRemindChanged(e){
+      if(e<=0){
+        this.delayDay=1;
+      }else{
+        this.delayDay = e;
+      }
+    },
 
     async workflowItems(){
       await workflowItems().then(res=>{
