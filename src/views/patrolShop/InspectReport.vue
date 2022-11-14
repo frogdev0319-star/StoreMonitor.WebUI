@@ -1104,9 +1104,23 @@ export default {
       summaryTree.forEach(item => {
         if (!item.children) {
           item.children = [];
+          if(item.isAdvanced){
+            if(item.groupScore<=0){
+              item.actualScore = (item.actualScore<item.groupScore)?item.groupScore:item.actualScore;
+            }else{
+              item.actualScore = (item.actualScore>item.groupScore)?item.groupScore:item.actualScore;
+            }
+          }
           item.children.push(item);
         } else {
           item.children.forEach(child => {
+            if(child.isAdvanced){
+              if(child.groupScore<=0){
+                child.actualScore = (child.actualScore<item.groupScore)?child.groupScore:child.actualScore;
+              }else{
+                child.actualScore = (child.actualScore>item.groupScore)?child.groupScore:child.actualScore;
+              }
+            }
             item.numOfCommentItems += child.numOfCommentItems;
             item.numOfTotalItems += child.numOfTotalItems;
           });
@@ -1176,7 +1190,7 @@ export default {
     getCategorySummary(summary) {
       util.sortArrayByKeyAsc(summary, 'type');
       const summaryTree = util.handleInspctionCatergyTree(summary, 'groupId');
-      //console.log("1.summaryTree:",summaryTree);
+      console.log("1.summaryTree:",summaryTree);
       summaryTree.forEach(summaryItem => {
         if (summaryItem.children) {
           summaryItem.numOfIgnored = this.addChildrenDataToParent(summaryItem.children, 'numOfIgnored');
