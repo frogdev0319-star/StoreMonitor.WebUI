@@ -1278,7 +1278,8 @@ export default {
             ],
             part1BarcharWidth: '100%',
             part2BarcharWidth: '100%',
-            part3BarcharWidth: '100%'
+            part3BarcharWidth: '100%',
+            curSubmitter:'-1',
         };
     },
 
@@ -1361,7 +1362,9 @@ export default {
                 size: 12
             };
             // ***
-            searchParams.searchMysteryMode = this.defineMysteryMode
+            if(this.curSubmitter!='-1')
+                searchParams.submitters = this.curSubmitter;
+            searchParams.searchMysteryMode = this.defineMysteryMode;
             // ***
             console.log(searchParams)
             const searchParamsObj = {
@@ -1480,6 +1483,9 @@ export default {
                 page: 0,
                 size: 10
             };
+            if(this.curSubmitter!='-1')
+                searchParams.submitters = this.curSubmitter;
+            searchParams.searchMysteryMode = this.defineMysteryMode;
             
             const searchParamsObj = {
                 path: 'inspectReport',
@@ -2617,6 +2623,7 @@ export default {
             const regionLabel = [];
 
             let content = [];
+            this.curSubmitter = '-1';
             //console.log("getPart1StoreBar > this.part1.indexRegion:", this.part1.indexRegion);
             //console.log("getPart1StoreBar > this.part1.content:", this.part1.content);
             if (this.part1.content && (this.part1.content[this.part1.indexRegion] || this.part1.indexRegion==-1)) {
@@ -2643,7 +2650,8 @@ export default {
                         if(this.part1.indexRegion==-1)
                             params.submitters = this.part1.compareIds;
                         else
-                            params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
+                            params.submitters = [self.part1.content[self.part1.indexRegion].innerId];
+                        this.curSubmitter =params.submitters; 
                     }else if (this.part1.compareType == 'position') {
                         //console.log("position content:",self.part1.content);
                         params.storeIds = self.params.storeIds;
@@ -2658,6 +2666,7 @@ export default {
                             params.submitters = users;
                         else
                             params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
+                        this.curSubmitter =params.submitters; 
                         
                     }else if(this.part1.compareType == 'mysterio'){
                         params.storeIds = self.params.storeIds;
@@ -2666,7 +2675,8 @@ export default {
                         if(this.part1.indexRegion==-1)
                             params.submitters = this.part1.compareIds;
                         else
-                            params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
+                            params.submitters = [self.part1.content[self.part1.indexRegion].innerId];
+                        this.curSubmitter =params.submitters; 
                     } 
                     else if(this.part1.compareType == 'storeGroup' && this.part1.indexRegion!=-1){
                         var storId = [];

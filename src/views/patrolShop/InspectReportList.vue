@@ -578,6 +578,7 @@ export default {
 
   methods: {
     initData() {
+      console.log("in initData");
       const self = this;
       self.isLoading = true;
       this.searchInput = '';
@@ -816,7 +817,12 @@ export default {
       if(PermissionHelper.enableMimicMode){
         
         params['submitter'] = this.$store.getters.userId; 
+      }else if(params.searchMysteryMode!=-1 && p.submitters && p.submitters!='-1' && p.submitters.length>0){
+        var obj = {...p.clause};
+        obj['submitter'] = p.submitters;
+        params['clause'] = obj;
       }
+      
       return new Promise((resolve) => {
         //console.log("params:",params);
         getInspectReportList(params).then(async(res) => {
@@ -1009,18 +1015,22 @@ export default {
         self.params.like = {};
       }
 
-      if(this.params.jump){ //跳轉
-          console.log("Jump to ")
-          this.params.jump = false;
-          this.dateValue = [new Date().setTime(this.params.beginTs), new Date().setTime(this.params.endTs)];
-          this.params.searchMysteryMode = this.params.searchMysteryMode;
+      if(self.params.jump){ //跳轉
+          console.log("1.ump to ")
+          self.params.jump = false;
+          self.dateValue = [new Date().setTime(this.params.beginTs), new Date().setTime(this.params.endTs)];
+          self.params.searchMysteryMode = this.params.searchMysteryMode;
+          self.params.submitter = this.params.submitters;
           //this.saveSearchParams();
           //this.searchData();
+          console.log("searchData>>>>SearchParams:",self.params)
+          this.ifSearchData = false;
         }else{
-          this.params.searchMysteryMode = PermissionHelper.enableMimicMode ? 1 : -1;
+          console.log("searchData>>>>no jump:",self.params)
+          self.params.searchMysteryMode = PermissionHelper.enableMimicMode ? 1 : -1;
         }
-      console.log("SearchParams")
-      console.log(self.params)
+      
+      console.log("###",self.params)
       self.params.filter = { page: 0, size: self.sizeNum };
       self.saveSearchParams();
       self.getReportList(self.params);
@@ -1152,7 +1162,7 @@ export default {
     getSearchParams() {
       // console.log("Get SEarch Parameter");
       let searchParams = JSON.parse(JSON.stringify(SearchConditionUtil.getSearchCondition('inspectReport')));
-      
+      console.log("getSearchParams>>>>searchParams:",searchParams);
       this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
    
    
@@ -1184,12 +1194,15 @@ export default {
           console.log("Jump to ")
           //this.params.jump = false;
           this.dateValue = [new Date().setTime(this.params.beginTs), new Date().setTime(this.params.endTs)];
+          console.log("searchParams.searchMysteryMode:",searchParams.searchMysteryMode);
           this.params.searchMysteryMode = searchParams.searchMysteryMode;
+          this.params.submitter = this.params.submitters;
           //this.saveSearchParams();
+          console.log("getSearchParams>>>this.params:",this.params);
           this.searchData();
-        }/*else{
+        }else{
           this.params.searchMysteryMode = PermissionHelper.enableMimicMode ? 1 : -1;
-        }*/
+        }
         
       } else {
         this.params.filter = { page: 0, size: this.sizeNum };
