@@ -1809,7 +1809,7 @@ export default {
     },
 
     itemGroupScoreChange(val){
-      this.itemGroupScore = this.getUtilScore(val,1);
+      this.itemGroupScore = this.getUtilScore(val,this.activeSheetName=='0'?0:1);
       if(parseFloat(this.itemGroupScore)<-9999 || parseFloat(this.itemGroupScore)>9999){
           this.GroupScoreTip=true;
         }else{

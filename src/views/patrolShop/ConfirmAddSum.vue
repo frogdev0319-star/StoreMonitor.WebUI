@@ -1249,6 +1249,7 @@ export default {
           }
           allTypeArr.add(p_item.type);
         });
+        console.log(">>>isOnlyTab1:",isOnlyTab1);
         let Tab0Status = false;
         let inspectPic = 0;
         let totalScore0 = 0, CurAddScoreB = 0, CurOtherTotalScore = 0, PassFileX = 0, PassFileTS = 0, ScoreTS = 0, OtherTS = 0, PassFileN = 0;
@@ -1412,17 +1413,24 @@ export default {
                   //console.log("PassFileTtotalScoreS:",totalScore);
                   if(item.groupScore<=0)
                   {
-                    type1ts = (type1ts <item.groupScore)?item.groupScore:type1ts ;
+                    //type1ts = (type1ts <item.groupScore)?item.groupScore:type1ts ;
                     type1Score = (type1Score<item.groupScore)?item.groupScore:type1Score;
                     type1XN = (type1XN<item.groupScore)?item.groupScore:type1XN;
-                    type1tsX = (type1tsX<item.groupScore)?item.groupScore:type1tsX;
+                    //type1tsX = (type1tsX<item.groupScore)?item.groupScore:type1tsX;
                   }else{
-                    type1ts = (type1ts >item.groupScore)?item.groupScore:type1ts ;
+                    //type1ts = (type1ts >item.groupScore)?item.groupScore:type1ts ;
                     type1Score = (type1Score>item.groupScore)?item.groupScore:type1Score;
                     type1XN = (type1XN>item.groupScore)?item.groupScore:type1XN;
-                    type1tsX = (type1tsX>item.groupScore)?item.groupScore:type1tsX;
+                    //type1tsX = (type1tsX>item.groupScore)?item.groupScore:type1tsX;
                   }
-                //}
+                  //比例制，分母取上限分值，不分正負
+                  if(inspectSettings.hundredMarkType!='0' && item.groupScore<=0){ 
+                    type1ts = (type1ts <item.groupScore)?item.groupScore:type1ts ;
+                    type1tsX = (type1tsX<item.groupScore)?item.groupScore:type1tsX;
+                  }else{
+                    type1ts = (Math.abs(type1ts) >Math.abs(item.groupScore))?item.groupScore:type1ts ;
+                    type1tsX = (Math.abs(type1tsX)>Math.abs(item.groupScore))?item.groupScore:type1tsX;
+                  }
               }
                   CurAddScoreB += type1ts * (p_item.weight == -1 ? 1 : (p_item.weight/100));
                   allScoreB = CurAddScoreB;
@@ -1456,11 +1464,7 @@ export default {
               console.log("type 2 OtherTotalScoreSystem:",OtherTotalScoreSystem);
             }
             //顯示後放
-            /*if (p_item.type === 0 && !inspectSettings.includedInTotalScoreWithType1 && !isOnlyTab1) {
-              item['itemgetScore'] = '--';
-            } else {
-              item['itemgetScore'] = util.isDouble(totalGetscore,2);
-            }*/
+            
             //判斷顯示值 是否碰到上限
             console.log('item.isAdvanced:',item.isAdvanced);
             if(item.isAdvanced){
@@ -1484,7 +1488,9 @@ export default {
                 totalGetscore = (totalGetscore<item.groupScore)?item.groupScore:totalGetscore;
               }else{
                 if (inspectSettings.qualifiedForIgnoredWithType1  && p_item.type == 0) {
+                  console.log("包含忽略+tab1>>>groupScore:",item.groupScore);
                   let tab1ConIgLimit = ((tab1GetScoreContainedIgnored+tab1GetScoreNoContainedIngored)>item.groupScore?item.groupScore:(tab1GetScoreContainedIgnored+tab1GetScoreNoContainedIngored));//包含忽略
+                  console.log("包含忽略+tab1:",tab1ConIgLimit);
                   tab1GetScoreContainedIgnored = tab1ConIgLimit* (p_item.weight == -1 ? 1 : (p_item.weight/100));;
                 }else{
                   let tab1ConNoIgLimit = (tab1GetScoreNoContainedIngored>item.groupScore?item.groupScore:tab1GetScoreNoContainedIngored);//不含忽略
@@ -1502,17 +1508,31 @@ export default {
                 totalGetscore = (totalGetscore>item.groupScore)?item.groupScore:totalGetscore;
               }
             }else{
-              
-                tab1GetScoreContainedIgnored = tab1GetScoreContainedIgnored*(p_item.weight == -1 ? 1 : (p_item.weight/100));
+                if (inspectSettings.qualifiedForIgnoredWithType1  && p_item.type == 0) {
+                  tab1GetScoreContainedIgnored = (tab1GetScoreContainedIgnored+tab1GetScoreNoContainedIngored)*(p_item.weight == -1 ? 1 : (p_item.weight/100));
+                }else{
+                  tab1GetScoreNoContainedIngored = tab1GetScoreNoContainedIngored*(p_item.weight == -1 ? 1 : (p_item.weight/100));
+                }
                 
-                console.log('(p_item.weight/100):',(p_item.weight/100));
+                if(inspectSettings.qualifiedForIgnoredWithType2 && p_item.type == 1){
+                  tab2IgnoredItemsGetScore = (tab2IgnoredItemsGetScore+tab2NotIgnoredItemsGetScore)*(p_item.weight == -1 ? 1 : (p_item.weight/100));
+                }else{
+                  tab2NotIgnoredItemsGetScore = tab2NotIgnoredItemsGetScore*(p_item.weight == -1 ? 1 : (p_item.weight/100));
+                }
+                
+                /*console.log('(p_item.weight/100):',(p_item.weight/100));
                 tab1GetScoreNoContainedIngored = tab1GetScoreNoContainedIngored*(p_item.weight == -1 ? 1 : (p_item.weight/100));
 
                 tab2IgnoredItemsGetScore = tab2IgnoredItemsGetScore*(p_item.weight == -1 ? 1 : (p_item.weight/100));
-                tab2NotIgnoredItemsGetScore = tab2NotIgnoredItemsGetScore*(p_item.weight == -1 ? 1 : (p_item.weight/100));
+                tab2NotIgnoredItemsGetScore = tab2NotIgnoredItemsGetScore*(p_item.weight == -1 ? 1 : (p_item.weight/100));*/
             }
             console.log('tab1GetScoreContainedIgnored:',tab1GetScoreContainedIgnored);
             console.log('tab1GetScoreNoContainedIngored:',tab1GetScoreNoContainedIngored);
+            /*if (p_item.type === 0 && !inspectSettings.includedInTotalScoreWithType1 && !isOnlyTab1) {
+              item['itemgetScore'] = '--';
+            } else {
+              item['itemgetScore'] = util.isDouble(totalGetscore,2);
+            }*/
             if (inspect.length === 1 && inspect[0].type === 0) {
               if (inspectSettings.qualifiedForIgnoredWithType1) {
                 item['itemgetScore'] = util.isDouble(tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored,2);
@@ -1523,7 +1543,12 @@ export default {
               }
             } else {
               if (p_item.type == 0) {
-                if (inspectSettings.qualifiedForIgnoredWithType1) {
+                console.log(">>>>includedInTotalScoreWithType1:",inspectSettings.includedInTotalScoreWithType1);
+                console.log(">>>>isOnlyTab1:",isOnlyTab1);
+                if (!inspectSettings.includedInTotalScoreWithType1 && !isOnlyTab1) {
+                  item['itemgetScore'] = '--';
+                }
+                else if (inspectSettings.qualifiedForIgnoredWithType1) {
                   item['itemgetScore'] = util.isDouble(tab1GetScoreContainedIgnored,2);
                 } else {
                   item['itemgetScore'] = util.isDouble(tab1GetScoreNoContainedIngored,2);
@@ -1543,6 +1568,7 @@ export default {
                 item['numIgnore'] = 0;
               }
             }
+            
           });//end for 一個類別
           if (p_item.type === 0) {
             p_item['tHeader'] = self.theaderPassFail;

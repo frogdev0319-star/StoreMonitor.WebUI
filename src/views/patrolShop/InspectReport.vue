@@ -1115,10 +1115,14 @@ export default {
         } else {
           item.children.forEach(child => {
             if(child.isAdvanced){
+              //console.log("sub item:",child.groupName);
               if(child.groupScore<=0){
-                child.actualScore = (child.actualScore<item.groupScore)?child.groupScore:child.actualScore;
+                //console.log("1.groupScore:",child.groupScore);
+                child.actualScore = (child.actualScore<child.groupScore)?child.groupScore:child.actualScore;
+                //console.log("1.actualScore:",child.actualScore);
               }else{
-                child.actualScore = (child.actualScore>item.groupScore)?child.groupScore:child.actualScore;
+                child.actualScore = (child.actualScore>child.groupScore)?child.groupScore:child.actualScore;
+                //console.log("2.actualScore:",child.actualScore);
               }
             }
             item.numOfCommentItems += child.numOfCommentItems;
