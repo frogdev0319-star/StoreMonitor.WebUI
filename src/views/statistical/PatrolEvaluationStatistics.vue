@@ -1362,8 +1362,11 @@ export default {
                 size: 12
             };
             // ***
+            //console.log(">>>>>router1...this.curSubmitter:",this.curSubmitter);
             if(this.curSubmitter!='-1')
                 searchParams.submitters = this.curSubmitter;
+            else
+                searchParams.submitters = e.row.submitters;
             searchParams.searchMysteryMode = this.defineMysteryMode;
             // ***
             console.log(searchParams)
@@ -1379,7 +1382,7 @@ export default {
             });
         },
         onEvenListNumClickPart1(e) {
-            console.log(e.prop)
+            console.log(e)
             let type = -1;
             if (e.prop == 'numOfQualified') {
                 type = 2;
@@ -1483,6 +1486,7 @@ export default {
                 page: 0,
                 size: 10
             };
+            console.log(">>>>>router2...this.curSubmitter:",this.curSubmitter);
             if(this.curSubmitter!='-1')
                 searchParams.submitters = this.curSubmitter;
             searchParams.searchMysteryMode = this.defineMysteryMode;
@@ -2652,6 +2656,7 @@ export default {
                         else
                             params.submitters = [self.part1.content[self.part1.indexRegion].innerId];
                         this.curSubmitter =params.submitters; 
+                    
                     }else if (this.part1.compareType == 'position') {
                         //console.log("position content:",self.part1.content);
                         params.storeIds = self.params.storeIds;
@@ -2665,7 +2670,7 @@ export default {
                         if(this.part1.indexRegion==-1)
                             params.submitters = users;
                         else
-                            params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
+                            params.submitters = [self.part1.content[self.part1.indexRegion].innerId];
                         this.curSubmitter =params.submitters; 
                         
                     }else if(this.part1.compareType == 'mysterio'){
@@ -2939,6 +2944,7 @@ export default {
             const regionData = [];
             const regionLabel = [];
             let content = [];
+            this.curSubmitter = '-1';
             if (this.part2.content ) {
                 console.log("getPart2StoreBar"+this.part2.compareType)
                 if (this.part2.compareType == 'stores' && this.part2.indexRegion!=-1) {
@@ -2958,11 +2964,14 @@ export default {
                         params.storeIds = self.params.storeIds;
                         params.submitters = this.part2.indexRegion==-1?this.part2.compareIds:[self.part2.content[self.part2.indexRegion].innerId]
                         params.searchMysteryMode = 0
+                        this.curSubmitter =params.submitters; 
+                        console.log(">>>>>2U...this.curSubmitter:",this.curSubmitter);
                     }else if(this.part2.compareType == 'mysterio'){
                         params.storeIds = self.params.storeIds;
                         params.submitters = this.part2.indexRegion==-1?this.part2.compareIds:[self.part2.content[self.part2.indexRegion].innerId]
                         params.searchMysteryMode = 1
-
+                        this.curSubmitter =params.submitters; 
+                        console.log(">>>>>2M...this.curSubmitter:",this.curSubmitter);
                     }else if (this.part2.compareType == 'position') {
                         //console.log("position content:",self.part2.content);
                         params.storeIds = self.params.storeIds;
@@ -2975,7 +2984,9 @@ export default {
                         if(this.part2.indexRegion==-1)
                             params.submitters = users;
                         else
-                            params.submitters = [self.part2.content[self.part2.indexRegion].innerId]
+                            params.submitters = [self.part2.content[self.part2.indexRegion].innerId];
+                        this.curSubmitter =params.submitters; 
+                        console.log(">>>>>2P...this.curSubmitter:",this.curSubmitter);
                     }else if(this.part2.compareType == 'storeGroup' && this.part2.indexRegion!=-1){
                         var storId = [];
                         this.part2.content[this.part2.indexRegion].list.forEach(function (item) {
@@ -3204,6 +3215,7 @@ export default {
             const regionData = [];
             const regionLabel = [];
             let content = [];
+            this.curSubmitter = '-1';
             if (this.part3.content ) {
                 if (this.part3.compareType == 'stores' && this.part3.indexRegion!=-1) {
                     content = [this.part3.content[this.part3.indexRegion]];
@@ -3217,10 +3229,12 @@ export default {
                         params.storeIds = self.params.storeIds;
                         params.searchMysteryMode = 0
                         params.submitters =this.part3.indexRegion==-1?this.part3.compareIds: [self.part3.content[self.part3.indexRegion].innerId]
+                        this.curSubmitter =params.submitters; 
                     }else if(this.part3.compareType == 'mysterio'){
                         params.storeIds = self.params.storeIds;
                         params.searchMysteryMode = 1
                         params.submitters =this.part3.indexRegion==-1?this.part3.compareIds: [self.part3.content[self.part3.indexRegion].innerId]
+                        this.curSubmitter =params.submitters; 
                     }else if (this.part3.compareType == 'position') {
                         //console.log("position content:",self.part3.content);
                         params.storeIds = self.params.storeIds;
@@ -3233,7 +3247,8 @@ export default {
                         if(this.part3.indexRegion==-1)
                             params.submitters = users;
                         else
-                            params.submitters = [self.part3.content[self.part3.indexRegion].innerId]
+                            params.submitters = [self.part3.content[self.part3.indexRegion].innerId];
+                        this.curSubmitter =params.submitters; 
                     }else if(this.part3.compareType == 'storeGroup' && this.part3.indexRegion!=-1){
                         var storId = [];
                         this.part3.content[this.part3.indexRegion].list.forEach(function (item) {
