@@ -290,7 +290,7 @@
         <div slot="tableDetail" class="setting-config rule-item">
           <div>
             <div>
-              <el-checkbox class="storevue-checkbox-outlined" v-model="enableDelay" @change="enableDelayChanged">
+              <el-checkbox class="storevue-checkbox-outlined" v-model="enableDelay">
                 <span>
                   {{ $t('insSettingView.sendMsgRemind') }}
                 </span>
@@ -365,7 +365,7 @@ export default {
   components: { ValidateInput, SettingTable, DelayButton },
   data() {
     return {
-      delayDay: 0,
+      delayDay: 1,
       enableDelay: false,
       hundredMarkType: '0',
       minScore: 0,
@@ -429,7 +429,9 @@ export default {
       this.bindWorkFlowData.type = 0
       this.bindWorkFlowData.inspectTagId = this.inspectId
       // console.log('this.workFlowToBind ~~~~>> ', this.workFlowToBind);
-
+    },
+    enableDelay(val){
+      if(val == true && this.delayDay == undefined)  this.delayDay = 1
     },
     onSiteSignature:{
       immediate: false, 
@@ -469,7 +471,12 @@ export default {
   methods: {
     async submitRule() {
       const self = this;
-      if(this.delayDay > 365){
+      if(this.enableDelay && this.delayDay == undefined){
+        util.notify(this.$t('audit.workFlows.cantEmptyDays'), 'error', 2000 );
+        this.$refs.delay_day.focus()
+        return 
+      } 
+      else if(this.delayDay > 365){
         util.notify(this.$t('audit.workFlows.cantTooMuchDays'), 'error', 2000 );
         this.$refs.delay_day.focus()
         return
