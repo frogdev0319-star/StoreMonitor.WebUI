@@ -283,6 +283,8 @@
         </div>
       </setting-table>
     </el-col>
+
+    <!-- 事件超時未處理提醒 -->
     <el-col :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.eventTimeoutReminder')">
         <div slot="tableDetail" class="setting-config rule-item">
@@ -297,6 +299,7 @@
             <div class="flex-center">
               <span style="white-space:nowrap;">{{ $t('insSettingView.moreThan') }}</span>
               <el-input
+                ref="delay_day"
                 style="margin: 0 20px"
                 v-model="delayDay"
                 type="number"
@@ -310,6 +313,8 @@
         </div>
       </setting-table>
     </el-col>
+
+
     <el-col v-if="mode === 1" :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.inspectionCheckin')">
         <div slot="tableDetail" class="setting-config rule-item">
@@ -464,6 +469,11 @@ export default {
   methods: {
     async submitRule() {
       const self = this;
+      if(this.delayDay > 365){
+        util.notify(this.$t('audit.workFlows.cantTooMuchDays'), 'error', 2000 );
+        this.$refs.delay_day.focus()
+        return
+      }
 
        // handle bind workflow
       if( !!this.workFlowToBind ){
@@ -514,11 +524,13 @@ export default {
             }
           ]
         };
+      
+
 
       if(this.onSiteSignature) params.ruleItems.push(this.signatureData)
         console.log('params', params)
         const res = await self.updateInspectRule(params);
-
+      
 
       if (res.errCode === 0) {
           util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
@@ -528,6 +540,8 @@ export default {
           return false;
         }
       }
+
+      
 
     },
     async getRule() {
