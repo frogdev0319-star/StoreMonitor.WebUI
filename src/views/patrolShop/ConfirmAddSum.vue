@@ -19,8 +19,10 @@
         </div>
       </div>
 
+      <!-- 本次巡檢總評 -->
       <div class="submit-content">
         <div class="submit-radio margin-bottom-md">
+          
           <span v-for="(item,index) in resultList" :key="index">
             <span
               v-if="item.isShow"
@@ -28,6 +30,8 @@
               class="el-radio-details"
               @click="clickSum(item,index)">{{ item.name }}</span>
           </span>
+
+
         </div>
         <span class="sug-label">{{ $t('remotePatrol.inspectionAdvice') }}</span>
         <el-input
@@ -42,9 +46,11 @@
         <span v-if="adviceInfoRuletip" class="rules">{{ $t('remotePatrol.comentRuletip_suggest') }}</span>
       </div>
     </el-col>
+
+    <!-- 送出簽核 -->
     <el-col v-if="isBindWorkflow" :span="24" class="sum-submit paper">
       <div class="submit-header flex-center margin-bottom-md">
-        <span>{{ $t('audit.inceptionRpt.sendAudit') }}</span>
+        <span>{{ $t('audit.inceptionRpt.sendAudit') }} </span>
       </div>
       <div class="audit-content">
         <span class="sug-label" >{{ $t('audit.inceptionRpt.addAttach') }}</span>
@@ -455,6 +461,8 @@
   </el-row>
 </template>
 <script>
+
+import { inpectRESTful } from '@/api/index';
 import { getStorageInfo } from '@/api/event';
 import { submitInspectItem1 } from '@/api/inspect';
 import {SubmitWorkflow,getWorkflowInfo,modifyReportWorkflow,taskSummit,getReportWorkflowTask,ReSubmitWorkflow} from '@/api/workflow';
@@ -496,7 +504,7 @@ export default {
           'label': 0,
           'name': this.$t('remotePatrol.dangerous'),
           'isActive': false,
-          'isShow': true
+          'isShow': false
         }
       ],
       startIcon: require('../../../static/img/play_icon.png'),
@@ -541,7 +549,10 @@ export default {
       reportStatus:-1,
       auditCancelable:false,
       showConfirmSubmitMsg:false,
-      showSystemReject:false
+      showSystemReject:false,
+
+      inspectStatus:"",
+      autoMappingByTotalScore: ""
     };
   },
   computed: {
@@ -595,6 +606,12 @@ export default {
     self.getRouteData();
     self.getUpLoadBucketInfo();
     self.getOssInfo();
+
+    self.getInspectStatus();
+    self.getInspectRule();
+   
+
+    
   },
   methods: {
     getDoubleNum (num) {
@@ -685,9 +702,12 @@ export default {
         });
       }
     },
+
+    
     clickSum(item, index) {
       const self = this;
       item.isActive = true;
+      console.log('self.resultList :>> ', self.resultList);
       self.resultList.forEach((_item, _index) => {
         if (index !== _index) {
           _item.isActive = false;
@@ -695,6 +715,8 @@ export default {
       });
       self.curSumIndex = item.label;
     },
+
+
     onConfirmSubmitMsgOk(){
       this.showConfirmSubmitMsg = false;
       this.submit(true);
@@ -1180,6 +1202,8 @@ export default {
       };
       this.$router.push({ name: 'submitEvent', params: { data: routeData}});
     },
+
+
     async getRouteData() {
       const self = this;
       const PatrolComment = self.$store.getters.PatrolComment;
@@ -1797,6 +1821,80 @@ export default {
       groups.forEach(g=> auditGroups +=g.defineName+',');
       //console.log(' auditGroups:', auditGroups);
       return auditGroups.slice(0,auditGroups.length-1);
+    },
+
+
+
+
+    getInspectRule() {
+      const self = this;
+      var getId = sessionStorage.getItem('inspectId');
+      const id = JSON.parse(getId)
+
+      const params = {inspectId: id}
+      return new Promise((resolve, reject) => {
+        inpectRESTful.GetInspectRuleSettings(params).then(res => {
+          resolve(res);
+          // console.log('res ~~~~~>>>> ', res.data);
+
+          this.autoMappingByTotalScore = res.data.find(i => {
+            return i.name == "setting_autoMappingByTotalScore"
+          })
+          console.log('this.autoMappingByTotalScore ~~~~~>>>> ', this.autoMappingByTotalScore);
+          console.log('this.scorecount ~~~~~>>>> ', this.scorecount);
+          console.log('this.resultList ~~~~~>>>> ', this.resultList);
+          // this.scorecount = 10
+
+          for (let i = 0; i < 3; i++) {
+            this.resultList[i].name = this.inspectStatus["status_"+ i]
+          }
+
+          if(this.autoMappingByTotalScore.value){
+              this.resultList.forEach(item => {
+                item.isShow = false
+              })
+      
+              if(this.scorecount >= 80){
+                var n = this.resultList.findIndex(i=>i.label === 0)
+                console.log('n 2 :>> ', n);
+                this.resultList[n].isActive = true
+                this.resultList[n].isShow = true
+              } 
+              else if(  this.scorecount <= 79 && this.scorecount >= 50){
+                var n = this.resultList.findIndex(i=>i.label === 1)
+                console.log('n 1:>> ', n);
+                this.resultList[n].isActive = true
+                this.resultList[n].isShow = true
+              } 
+              else if( this.scorecount <= 49 && this.scorecount >= 0){
+                var n = this.resultList.findIndex(i=>i.label === 2)
+                console.log('n 0:>> ', n);
+                this.resultList[n].isActive = true
+                this.resultList[n].isShow = true
+              }
+          }
+
+
+        }).catch(err => {
+          console.log("getInspectRule err:",err);
+          reject(err);
+        });
+      });
+    },
+
+    getInspectStatus(){
+      return new Promise((resolve, reject) => {
+        inpectRESTful.getInspectStatus().then(res => {
+          resolve(res);
+          this.inspectStatus = res.data.settingContent.general_setting_inspect_status_name
+          delete this.inspectStatus.update_time
+          delete this.inspectStatus.update_user_id
+          console.log('this.inspectStatus :>> ', this.inspectStatus);
+
+        }).catch(err => {
+          reject(err);
+        });
+      });
     },
   }
 };

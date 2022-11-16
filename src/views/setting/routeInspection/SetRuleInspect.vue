@@ -79,15 +79,18 @@
                 {{ $t('remotePatrol.scorecount') }}
               </span>
               <span v-if="MinScoreMsg" class="score_msg">
-                *{{ $t('insSettingView.minScoreEmpty') }}
+                * {{ $t('insSettingView.minScoreEmpty') }}
               </span>
             </template>
+
+            <!-- 考評總分範圍設置 -->
             <template>
               <span class="rangeScore">
                 {{ $t('insSettingView.totalScorRange') }}：
               </span>
               <el-input
                 :placeholder="$t('insSettingView.setMinScore')"
+                ref="min_score"
                 v-model="minScore"
                 class="input"
                 @blur="inputChangeMin"/>
@@ -96,6 +99,7 @@
               </span>
               <el-input
                 :placeholder="$t('insSettingView.setMaxScore')"
+                ref="max_score"
                 v-model="maxScore"
                 class="input"
                 @blur="inputChangeMax"/>
@@ -103,7 +107,8 @@
                 {{ $t('remotePatrol.scorecount') }}
               </span>
               <span v-if="ScoreMsg" class="score_msg">
-                *{{ $t('insSettingView.rangeScoreTips') }}
+                * 考評總分最高值需高於最低值! 
+                <!-- *{{ $t('insSettingView.rangeScoreTips') }} -->
               </span>
               
             </template>
@@ -126,55 +131,27 @@
     
 
     <!-- 巡檢總評選項顯示 -->
-    <el-col v-if="mode === 1" :span="24" class="el-rute-content">
-      <setting-table table-name="巡檢總評選項顯示">
+    <el-col :span="24" class="el-rute-content storeLevel">
+      <setting-table table-name="巡檢總評選項顯示 (此設定是依門店)">
         <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
-        
           <div class="overall_options" v-if="onSiteSignature">
 
-            <div class="overall_row">
-              <el-radio-group class="storevue-radio radio_item" v-model="defineStatus_0">
-                <el-radio :label="0" style="margin-right: 60px">立即督導</el-radio> 
+            <div class="overall_row" v-for="(item, index) in defaultDefineName" :key="index">
+              <el-radio-group class="storevue-radio radio_item" v-model="item.defineStatus">
+                <el-radio :label="0" style="margin-right: 60px">{{item.name}}</el-radio> 
                 <el-radio :label="1" >自定義</el-radio> 
               </el-radio-group>
               <el-input
                 placeholder="請輸入自定義名稱" 
                 ref=""
-                v-model="needDefineName.status_0"
-                :disabled="defineStatus_0 == 0"
-                style="width: 250px;  margin: 0 20px ;"
-                @input="(val) => itemInputChanged(val, 20)"
-                />
-            </div>
-            <div class="overall_row">
-              <el-radio-group class="storevue-radio radio_item" v-model="defineStatus_1">
-                <el-radio :label="0" style="margin-right: 60px">待改善</el-radio> 
-                <el-radio :label="1" >自定義</el-radio> 
-              </el-radio-group>
-              <el-input
-                placeholder="請輸入自定義名稱" 
-                ref=""
-                v-model="needDefineName.status_1"
-                :disabled="defineStatus_1 == 0"
-                style="width: 250px;  margin: 0 20px ;"
+                v-model="item.newName"
+                :disabled="item.defineStatus == 0"
+                style="width: 200px;  margin: 0 20px ;"
+                @input="(val) => itemInputChanged_overall({ val, item })"
                 />
             </div>
             
-            <div class="overall_row">
-              <el-radio-group class="storevue-radio radio_item" v-model="defineStatus_2">
-                <el-radio :label="0" style="margin-right: 60px">良好</el-radio> 
-                <el-radio :label="1" >自定義</el-radio> 
-              </el-radio-group>
-
-              <el-input
-                placeholder="請輸入自定義名稱" 
-                ref=""
-                v-model="needDefineName.status_2"
-                :disabled="defineStatus_2 == 0"
-                style="width: 250px;  margin: 0 20px ;"
-                />
-            </div>
-            <span class="text_limit_sign"  v-if="showInputLimit"> {{$t('insSettingView.inputRuletip')}}  </span>
+            <span class="text_limit_sign" v-if="showInputLimit_overallItem"> {{$t('insSettingView.inputRuletip')}}  </span>
           </div>
         </div>
       </setting-table>
@@ -183,7 +160,7 @@
 
 
     <!-- 巡檢建議值 -->
-    <el-col v-if="mode === 1" :span="24" class="el-rute-content">
+    <el-col :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.isCheckSuggest')">
         <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
           <el-checkbox class="storevue-checkbox-outlined" v-model="switchAutoSelectReview">
@@ -202,26 +179,26 @@
                 <div class="for_flex">
                   <div class="suggestvalue_naming">
                       <div class="item_name">
-                        <div v-if="needDefineName.status_0 !== ''">{{needDefineName.status_0}}</div>
-                        <div style="color: #c0c0c0" v-if="needDefineName.status_0 == ''">無自定義名稱</div>
+                        <div v-if="defaultDefineName[0].newName !== ''">{{defaultDefineName[0].newName}}</div>
+                        <div style="color: #c0c0c0" v-if="defaultDefineName[0].newName == ''">無自定義名稱</div>
                       </div>
                       <div class="item_name">
-                        <div v-if="needDefineName.status_1 !== ''">{{needDefineName.status_1}}</div>
-                        <div style="color: #c0c0c0" v-if="needDefineName.status_1 == ''">無自定義名稱</div>
+                        <div v-if="defaultDefineName[1].newName !== ''">{{defaultDefineName[1].newName}}</div>
+                        <div style="color: #c0c0c0" v-if="defaultDefineName[1].newName == ''">無自定義名稱</div>
                       </div>
                       
                       <div class="item_name">
-                        <div v-if="needDefineName.status_2 !== ''">{{needDefineName.status_2}}</div>
-                        <div style="color: #c0c0c0" v-if="needDefineName.status_2 == ''">無自定義名稱</div>
+                        <div v-if="defaultDefineName[2].newName !== ''">{{defaultDefineName[2].newName}}</div>
+                        <div style="color: #c0c0c0" v-if="defaultDefineName[2].newName == ''">無自定義名稱</div>
                       </div>
                   </div>
 
                   <div class="suggestvalue_score">
                     <!-- low score -->
                     <div class="item_score">
-                      <div class="score">0 分</div>   
+                      <div class="score">{{minScore}} 分</div>   
                       <span style="margin: 0 15px"> ~ </span>  
-                      <div class="score"> {{scoreMiddleLow - 1}} 分</div>
+                      <div class="score"> {{showScoreMin}} 分</div>
                     </div>
 
                     <!-- middle score -->
@@ -233,7 +210,8 @@
                           v-model="scoreMiddleLow"
                           type="number"
                           :disabled = "!isAutoSelectReview"
-                          @blur="inputChangeStandardScore"
+                          @blur="inputScoreMiddleMin"
+                          
                           />
                           分
                         </div>  
@@ -245,17 +223,22 @@
                           v-model="scoreMiddleHeight"
                           type="number"
                           :disabled = "!isAutoSelectReview"
-                          @blur="inputChangeStandardScore"/>
+                          @blur="inputScoreMiddleMax"/>
                           分 
                       </div>
+                      <span v-if="ScoreMsg" class="score_msg" style="margin-left: 20px">
+                          * 考評範圍最高值需高於最低值! 
+                      </span>
                     </div>
                     
                     <!-- hight score -->
                     <div class="item_score">
-                      <div class="score">{{ scoreMiddleHeight + 1}} 分</div>   
+                      <div class="score">{{showScoreMax}} 分</div>   
                       <span style="margin: 0 15px"> ~ </span>  
-                      <div class="score"> 100 分</div>
+                      <div class="score"> {{maxScore}} 分</div>
                     </div>
+
+                    
                   </div>
                 </div>
 
@@ -264,16 +247,6 @@
             <!-- radio 2 -->
             <div class="suggestvalue_section">
               <el-radio :label="false" v-model="dangerousOnFailedItem">{{ $t('insSettingView.tab1FailedDangeous') }}</el-radio> 
-
-              <!-- <div slot="tableDetail">
-                <p class="" style="line-height: 0px">
-                  <el-checkbox class="storevue-checkbox-outlined" v-model="dangerousOnFailedItem">
-                    <span>
-                      {{ $t('insSettingView.tab1FailedDangeous') }}
-                    </span>
-                  </el-checkbox>
-                </p>
-              </div> -->
             </div>
             
           </el-radio-group>
@@ -365,7 +338,7 @@
               />
               </div>
             </div>
-            <span class="text_limit_sign"  v-if="showInputLimit"> {{$t('insSettingView.inputRuletip')}}  </span>
+            <span class="text_limit_sign" v-if="showInputLimit"> {{$t('insSettingView.inputRuletip')}}  </span>
           </div>
         </div>
       </setting-table>
@@ -533,7 +506,10 @@ export default {
       includedInTotalScoreWithType1: false,
       qualifiedForIgnoredWithType1: false,
       qualifiedForIgnoredWithType2: false,
+
+      setting_isAutoMappingActivate: true,
       dangerousOnFailedItem: false,
+
       onSitePhotoOnly: false,
       lang: this.$i18n.locale,
       ScoreMsg: false,
@@ -568,6 +544,7 @@ export default {
         },
       n : 1,
       showInputLimit: false,
+      showInputLimit_overallItem: false,
 
       switchAutoSelectReview: true,
       isAutoSelectReview: true,
@@ -575,11 +552,28 @@ export default {
       defineStatus_1: 0, //待改善
       defineStatus_0: 0, //立即督導
 
-      defaultDefineName:{
-        status_2:'良好',
-        status_1:'待改善',
-        status_0:'立即督導',
-      },
+      defaultDefineName:[
+        {
+          name: '立即督導' ,
+          newName: '立即督導',
+          defineStatus: 0,
+          status_0: ""
+        },
+        {
+          name:'待改善',
+          newName: '待改善',
+          defineStatus: 0,
+          status_1: ""
+        },
+        
+        {
+          name: '良好',
+          newName: '良好',
+          defineStatus: 0,
+          status_2: ""
+        },
+      ],
+
       needDefineName:{
         status_2:'',
         status_1:'',
@@ -587,7 +581,11 @@ export default {
       },
       
       scoreMiddleLow: 50,
-      scoreMiddleHeight: 80
+      scoreMiddleHeight: 80,
+
+      inspectStatus:""
+
+      
 
     };
   },
@@ -637,28 +635,79 @@ export default {
         }
       }
     },
+    isAutoSelectReview(val){
+      console.log('val :>> ', val);
+      if(val) {
+        this.setting_isAutoMappingActivate = true
+        this.dangerousOnFailedItem = false
 
-    defineStatus_2(value){
-      if(value == 0) this.needDefineName.status_2 = this.defaultDefineName.status_2
+      } else {
+        this.setting_isAutoMappingActivate = false
+        this.dangerousOnFailedItem = true
+
+      }
     },
-    defineStatus_1(value){
-      if(value == 0) this.needDefineName.status_1 = this.defaultDefineName.status_1
+    defaultDefineName:{
+      immediate: false, 
+      deep: true,
+      handler (val, old ) {
+        // if(val[0].defineStatus == 0) val[0].newName = val[0].name
+        for(let i of val ){
+          if(i.defineStatus == 0) i.newName = i.name
+        }
+      }
+    }
+  },
+  computed:{
+    showScoreMin(){
+      return parseFloat(this.scoreMiddleLow)  - 1
     },
-    defineStatus_0(value){
-      if(value == 0) this.needDefineName.status_0 = this.defaultDefineName.status_0
-    },
+    showScoreMax(){
+      
+      return parseFloat(this.scoreMiddleHeight) + 1
+    }
 
   },
+
 
   async mounted() {
     
     await this.getRule();
     await this.workflowItems()
-    console.log('this.signatureData :>> ', this.signatureData);
+    await this.getInspectStatus()
 
-    this.needDefineName.status_2 = this.defaultDefineName.status_2
-    this.needDefineName.status_1 = this.defaultDefineName.status_1
-    this.needDefineName.status_0 = this.defaultDefineName.status_0
+
+    for (let i = 0; i < 3; i++) {
+      if(this.defaultDefineName[i].name !== this.inspectStatus["status_" + i]) {
+          this.defaultDefineName[i].defineStatus = 1
+          this.defaultDefineName[i].newName = this.inspectStatus["status_"+ i]
+        } else {
+          this.defaultDefineName[i].defineStatus = 0
+          this.defaultDefineName[i].newName = this.defaultDefineName[i].name
+        }
+      
+    }
+
+    // if(this.defaultDefineName[0].name !== this.inspectStatus.status_0) {
+    //   this.defaultDefineName[0].defineStatus = 1
+    //   this.defaultDefineName[0].newName = this.inspectStatus.status_0
+    // }
+    // if(this.defaultDefineName[1].name !== this.inspectStatus.status_1) {
+    //   this.defaultDefineName[1].defineStatus = 1
+    //   this.defaultDefineName[1].newName = this.inspectStatus.status_1
+    // }
+    // if(this.defaultDefineName[2].name !== this.inspectStatus.status_2) {
+    //   this.defaultDefineName[2].defineStatus = 2
+    //   this.defaultDefineName[2].newName = this.inspectStatus.status_2
+    // }
+  
+    // this.defaultDefineName.forEach( i =>{
+    
+
+    // })
+
+    console.log('this.inspectStatus  mounted:>> ', this.inspectStatus);
+    console.log('this.defaultDefineName  mounted:>> ', this.defaultDefineName);
 
     
   },
@@ -695,7 +744,31 @@ export default {
             { name: 'maxScore', value: parseFloat(self.maxScore) },
             { name: 'baseScore', value: parseFloat(self.baseScore) },
             { name: 'standardScore', value: parseFloat(self.standardScore) },
+            
+
+            { name: 'setting_isAutoMappingActivate', 
+              category: "generalRule",
+              value: self.setting_isAutoMappingActivate 
+            },
+            {
+              name: "setting_autoMappingByTotalScore", // 依分數條件自動選取
+              category: "generalRule",
+              value: self.switchAutoSelectReview ,
+              extra: [
+                  {
+                      key: "mappingScore_bottom", // 下標值
+                      value: self.scoreMiddleLow
+                  },
+                  {
+                      key: "mappingScore_top", // 上標值
+                      value: self.scoreMiddleHeight
+                  }
+                ]
+            },
+
             { name: 'dangerousOnFailedItem', value: self.dangerousOnFailedItem },
+
+
             { name: 'onSitePhotoOnly', value: self.onSitePhotoOnly },
             { name: 'onSiteSignature', value: self.onSiteSignature },
             { name: 'checkin', value: self.checkin },
@@ -717,21 +790,39 @@ export default {
           ]
         };
 
+      
+      console.log('this.minScore :>> ', this.minScore);
+      console.log('this.maxScore :>> ', this.maxScore);
+
+  
       if(this.onSiteSignature) params.ruleItems.push(this.signatureData)
         console.log('params', params)
-        const res = await self.updateInspectRule(params);
+        
+      if(this.minScore === undefined || this.minScore === '') {
+        util.notify("最低考評總分範圍不可為空", 'error', 2000 );
+        this.$refs.min_score.focus()
+        return
+      }
+      if(this.maxScore === undefined || this.maxScore === null || this.maxScore === '') {
+        util.notify("最高考評總分範圍不可為空", 'error', 2000 );
+        this.$refs.max_score.focus()
+        return
+      }
 
-
-      if (res.errCode === 0) {
+      const statusNameRes = await self.updateInspectStatus();
+      const res = await self.updateInspectRule(params);
+      if (res.errCode === 0 && statusNameRes.errCode == 0) {
           util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           return false;
         } else {
           util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
           return false;
         }
-      }
 
+      }
     },
+
+
     async getRule() {
       const self = this;
       const ruleData = JSON.parse(sessionStorage.getItem('ruleData'));
@@ -846,15 +937,52 @@ export default {
         });
       });
     },
+
+
+
+    getInspectStatus(){
+      return new Promise((resolve, reject) => {
+        inpectRESTful.getInspectStatus().then(res => {
+          resolve(res);
+          this.inspectStatus = res.data.settingContent.general_setting_inspect_status_name
+          delete this.inspectStatus.update_time
+          delete this.inspectStatus.update_user_id
+          console.log('this.inspectStatus :>> ', this.inspectStatus);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
+    updateInspectStatus(){
+      var status = {
+          "status_0": this.defaultDefineName[0].newName,
+          "status_1": this.defaultDefineName[1].newName,
+          "status_2": this.defaultDefineName[2].newName,
+      }
+      console.log('status ~~~~~~~~>> ', status);
+      return new Promise((resolve, reject) => {
+        inpectRESTful.updateInspectStatus(status).then(res => {
+          resolve(res);
+          
+        }).catch(err => {
+          reject(err);
+        });
+      });
+
+    },
+
+
     inputChangeMax(e) {
       let maxScore = this.getUtilScore(e.target.value);
+
       if (this.hundredMarkType === '1') {
         maxScore = parseFloat(maxScore) > parseFloat(this.baseScore) ? parseFloat(this.baseScore) : maxScore;
       }
       this.maxScore = maxScore;
       this.standardScore = parseFloat(this.standardScore) > parseFloat(this.maxScore)
         ? parseFloat(this.maxScore) : this.standardScore;
-      this.ScoreMsg = parseFloat(this.minScore) > parseFloat(this.maxScore);
+      this.ScoreMsg = parseFloat(this.minScore) >= parseFloat(this.maxScore);
     },
 
     inputChangeMin(e) {
@@ -863,6 +991,25 @@ export default {
       self.ScoreMsg = parseFloat(self.minScore) > parseFloat(self.maxScore);
       self.MinScoreMsg = (self.hundredMarkType=='1' && self.baseScore.toString()=="");
     },
+
+
+    inputScoreMiddleMax(e){
+      const self = this;
+      self.scoreMiddleHeight = self.getUtilScore(e.target.value);
+      console.log('self.scoreMiddleHeight :>> ', self.scoreMiddleHeight);
+      
+
+
+
+    },
+
+    inputScoreMiddleMin(e){
+      const self = this;
+      self.scoreMiddleLow = self.getUtilScore(e.target.value);
+
+    },
+
+
 
     getUtilScore(val) {
       val = val.replace(/[^-?\d\.]/g, '');
@@ -995,6 +1142,22 @@ export default {
         this.showInputLimit = false
       }
     },
+
+
+    itemInputChanged_overall({ val, item }){
+      const content = filterString.all(val, 20);
+      item.newName = content
+      const length = filterString.getContentLength(val);
+      if(length > 20) {
+        this.showInputLimit_overallItem = true
+      } else {
+        this.showInputLimit_overallItem = false
+      }
+    },
+
+ 
+
+
 
   }
 };
@@ -1259,7 +1422,9 @@ $itemHeight:50px;
               align-items: center
               .el-input--medium
                 margin-right: 5px
+
               
+  
 
 </style>
 
@@ -1269,4 +1434,15 @@ $itemHeight:50px;
     .score
       .el-input--medium .el-input__inner
         text-align: right
+.score
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button 
+    -webkit-appearance: none
+    margin: 0
+
+.storeLevel
+  .setting-table-container
+    .setting-header
+      background: #e4f3fd
+
 </style>

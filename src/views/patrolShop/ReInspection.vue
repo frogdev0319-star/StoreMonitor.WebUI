@@ -500,7 +500,7 @@
       :class="{'margin-left-md': !isFullScreenMode, 'padding': isFullScreenMode}" v-if="!showSpread" class="rside paper spacer" >
         <div v-if="!isFullScreenMode" class="patrol-select title" :class="{'padding': !isFullScreenMode}">
           <div class="patrol-content text-left flex-center" :class="{'margin-bottom-md': isFullScreenMode}">
-            {{ $t('remotePatrol.selectInspect') }}
+            {{ $t('remotePatrol.selectInspect') }} 
             <el-select 
               style="margin-left: 20px;"
               class="storevue-select-grey" 
@@ -1803,6 +1803,10 @@ export default {
     
     changeInspect(val) {
       const self = this;
+      console.log('val :::::::::>> ', val);
+      sessionStorage.setItem('inspectId', JSON.stringify(val))
+
+
       // console.log(self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 0, self.$store.getters.PatrolHistory != null)
       if (self.$store.getters.editCount > 0) {
         self.changeInspectObj.dialogCosed = true;
@@ -1814,6 +1818,7 @@ export default {
         self.changeInspectList(val);
       }
     },
+
     changeInspectList(val) {
       const self = this;
       if (!self.showGuide && self.$refs.vendorVideo) {
