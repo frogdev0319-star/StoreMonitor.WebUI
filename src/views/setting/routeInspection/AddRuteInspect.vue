@@ -629,10 +629,10 @@ export default {
 
     RouteNameLength(val) {
       const self = this;
-      const content = filterString.all(val, 30);
+      const content = filterString.all(val, 50);
       const length = filterString.getContentLength(val);
       self.editRouteName = content;
-      if (length > 30) {
+      if (length > 50) {
         self.showLengthNameWarning = true;
       } else {
         self.showLengthNameWarning = false;

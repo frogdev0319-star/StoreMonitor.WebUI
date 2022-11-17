@@ -1947,6 +1947,7 @@ export default {
       const self = this;
       const content = filterString.all(val, 200);
       self.eventDesEdit.val = content;
+      self.inspectInput = content;
       const length = filterString.getContentLength(val);
       if (length > 200) {
         this.eventDesRuletip = true;

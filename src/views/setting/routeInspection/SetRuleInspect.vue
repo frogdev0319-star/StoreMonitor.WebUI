@@ -283,6 +283,8 @@
         </div>
       </setting-table>
     </el-col>
+
+    <!-- 事件超時未處理提醒 -->
     <el-col :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.eventTimeoutReminder')">
         <div slot="tableDetail" class="setting-config rule-item">
@@ -297,10 +299,13 @@
             <div class="flex-center">
               <span style="white-space:nowrap;">{{ $t('insSettingView.moreThan') }}</span>
               <el-input
+                ref="delay_day"
                 style="margin: 0 20px"
                 v-model="delayDay"
                 type="number"
                 :disabled="!enableDelay"
+                :min="1"
+                @change="onMsgRemindChanged"
               />
               <span>{{ $t('overview.day') }}</span>
             </div>
@@ -308,6 +313,8 @@
         </div>
       </setting-table>
     </el-col>
+
+
     <el-col v-if="mode === 1" :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.inspectionCheckin')">
         <div slot="tableDetail" class="setting-config rule-item">
@@ -358,7 +365,7 @@ export default {
   components: { ValidateInput, SettingTable, DelayButton },
   data() {
     return {
-      delayDay: 0,
+      delayDay: 1,
       enableDelay: false,
       hundredMarkType: '0',
       minScore: 0,
@@ -422,7 +429,9 @@ export default {
       this.bindWorkFlowData.type = 0
       this.bindWorkFlowData.inspectTagId = this.inspectId
       // console.log('this.workFlowToBind ~~~~>> ', this.workFlowToBind);
-
+    },
+    enableDelay(val){
+      if(val == true && this.delayDay == undefined)  this.delayDay = 1
     },
     onSiteSignature:{
       immediate: false, 
@@ -462,6 +471,16 @@ export default {
   methods: {
     async submitRule() {
       const self = this;
+      if(this.enableDelay && this.delayDay == undefined){
+        util.notify(this.$t('audit.workFlows.cantEmptyDays'), 'error', 2000 );
+        this.$refs.delay_day.focus()
+        return 
+      } 
+      else if(this.delayDay > 365){
+        util.notify(this.$t('audit.workFlows.cantTooMuchDays'), 'error', 2000 );
+        this.$refs.delay_day.focus()
+        return
+      }
 
        // handle bind workflow
       if( !!this.workFlowToBind ){
@@ -512,11 +531,13 @@ export default {
             }
           ]
         };
+      
+
 
       if(this.onSiteSignature) params.ruleItems.push(this.signatureData)
         console.log('params', params)
         const res = await self.updateInspectRule(params);
-
+      
 
       if (res.errCode === 0) {
           util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
@@ -526,6 +547,8 @@ export default {
           return false;
         }
       }
+
+      
 
     },
     async getRule() {
@@ -713,7 +736,13 @@ export default {
       }
       this.standardScore = score;
     },
-    
+    onMsgRemindChanged(e){
+      if(e<=0){
+        this.delayDay=1;
+      }else{
+        this.delayDay = e;
+      }
+    },
 
     async workflowItems(){
       await workflowItems().then(res=>{
