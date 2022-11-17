@@ -58,6 +58,8 @@
         <div class="weather-content">
           <img v-if="weatherImg" class="weather-info-content" :src="weatherImg">
         </div>
+
+
         <div 
           style="margin-left: calc(20/1440*100vw)"
           class="status-tag"
@@ -68,11 +70,16 @@
           }[report.status]"
         >
           {{{
-            0: $t('overview.danger'),
-            1: $t('overview.improve'),
-            2: $t('overview.echartGood')
+            // 0: $t('overview.danger'),
+            // 1: $t('overview.improve'),
+            // 2: $t('overview.echartGood')
+            0: inspectStatus.status_0,
+            1: inspectStatus.status_1,
+            2: inspectStatus.status_2
           }[report.status]}}
         </div>
+
+        
         <div v-if="standard!=-1" style="margin-left: calc(20/1440*100vw)" class="status-tag"
           :style="standard == 1 ? {'color':'#59ab22','background-color':'#e8f6de'}: {'color':'#f57848','background-color':'#ffefeb'}"
         >{{standard == 1 ? $t('remotePatrol.goalAchieved') : $t('remotePatrol.farBehind')}}</div>
@@ -502,7 +509,11 @@
 </template>
 <script>
 import ECharts from 'vue-echarts';
-import { getInspectReportInfo,downLoadInspectReportEntireDetail } from '@/api/inspect';
+import { 
+  getInspectReportInfo,
+  downLoadInspectReportEntireDetail,
+  getInspectStatus
+} from '@/api/inspect';
 import { CancelWorkflow,taskDrawback,GetTaskInfo } from '@/api/workflow';
 import util from '@/common/util';
 import videojs from '../../../static/video.js';
@@ -612,6 +623,8 @@ export default {
       showEditBtn:true,
       showCancelBtn:false,
       auditState:1,
+
+      inspectStatus: ''
     };
   },
 
@@ -647,6 +660,7 @@ export default {
     this.getStoredTemplateId();
     this.getRouterData();
     this.getReportTemplateAndInfo();
+    this.getInspectStatus()
   },
 
   mounted() {
@@ -815,12 +829,26 @@ export default {
         self.report = obj;
       }
     },
-
+    
+    getInspectStatus() {
+      return new Promise((resolve, reject) => {
+        getInspectStatus().then(res => {
+          resolve(res);
+          this.inspectStatus = res.data.settingContent.general_setting_inspect_status_name
+          delete this.inspectStatus.update_time
+          delete this.inspectStatus.update_user_id
+          console.log('this.inspectStatus~~~~~ :>> ', this.inspectStatus);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+    
     getIconSrc(status) {
       const statusAndLangAndIconMap = [
         {
           status: 0,
-          statusStr: this.$t('overview.danger'),
+          statusStr: this.inspectStatus.status_0, // Poor
           children: [{
             'zh': require('../../../static/img/dangerous_cn.png'),
             'zhtw': require('../../../static/img/dangerous_tw.png'),
@@ -831,7 +859,7 @@ export default {
         },
         {
           status: 1,
-          statusStr: this.$t('overview.improve'),
+          statusStr: this.inspectStatus.status_1, // Fair
           children: [{
             'zh': require('../../../static/img/improved_cn.png'),
             'zhtw': require('../../../static/img/improved_cn.png'),
@@ -842,7 +870,7 @@ export default {
         },
         {
           status: 2,
-          statusStr: this.$t('overview.echartGood'),
+          statusStr: this.inspectStatus.status_2, // Good
           children: [{
             'zh': require('../../../static/img/good_cn.png'),
             'zhtw': require('../../../static/img/good_cn.png'),

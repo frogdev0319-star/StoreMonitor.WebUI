@@ -479,7 +479,8 @@ import {
     getInspectStatsOverviewWithGroup
 } from '@/api/inspectOverview';
 import {
-    GetInspectTagList
+    GetInspectTagList,
+    getInspectStatus
 } from '@/api/inspect';
 import SearchComponent from '@/components/SearchComponent';
 import resize from '@/components/mixins/echartResize';
@@ -1278,7 +1279,9 @@ export default {
             ],
             part1BarcharWidth: '100%',
             part2BarcharWidth: '100%',
-            part3BarcharWidth: '100%'
+            part3BarcharWidth: '100%',
+
+            inspectStatus:''
         };
     },
 
@@ -1297,7 +1300,10 @@ export default {
     },
 
     async created() {
+        await this.getInspectStatus()
         await this.initData();
+        await this.renameTableLabel();
+        
     },
 
     beforeDestroy() {
@@ -1306,6 +1312,59 @@ export default {
     },
 
     methods: {
+        getInspectStatus(){
+            return new Promise((resolve, reject) => {
+                getInspectStatus().then(res => {
+                resolve(res);
+                this.inspectStatus = res.data.settingContent.general_setting_inspect_status_name
+                delete this.inspectStatus.update_time
+                delete this.inspectStatus.update_user_id
+                console.log('this.inspectStatus :>> ', this.inspectStatus);
+                }).catch(err => {
+                reject(err);
+                });
+            });
+        },
+
+        renameTableLabel(){
+            // part1StoreInfoTableCol
+            this.part1StoreInfoTableCol[8].label = this.inspectStatus.status_2
+            this.part1StoreInfoTableCol[9].label = this.inspectStatus.status_1
+            this.part1StoreInfoTableCol[10].label = this.inspectStatus.status_0
+
+            // regionInfoData
+            this.regionInfoData[3].label = this.inspectStatus.status_2
+            this.regionInfoData[4].label = this.inspectStatus.status_1
+            this.regionInfoData[5].label = this.inspectStatus.status_0
+            console.log('this.regionInfoData ~~~~~>> ', this.regionInfoData);
+
+            // storeInfoData
+            this.storeInfoData[6].label = this.inspectStatus.status_2
+            this.storeInfoData[7].label = this.inspectStatus.status_1
+            this.storeInfoData[8].label = this.inspectStatus.status_0
+            console.log('this.storeInfoData ~~~~~>> ', this.storeInfoData);
+
+            // exportDataHeader
+            this.exportDataHeader[6].label = this.inspectStatus.status_2
+            this.exportDataHeader[7].label = this.inspectStatus.status_1
+            this.exportDataHeader[8].label = this.inspectStatus.status_0
+
+            // exportRegionHeader
+            this.exportRegionHeader[3].label = this.inspectStatus.status_2
+            this.exportRegionHeader[4].label = this.inspectStatus.status_1
+            this.exportRegionHeader[5].label = this.inspectStatus.status_0
+
+            // exportPart1DataHeader
+            this.exportPart1DataHeader[8].label = this.inspectStatus.status_2
+            this.exportPart1DataHeader[9].label = this.inspectStatus.status_1
+            this.exportPart1DataHeader[10].label = this.inspectStatus.status_0
+
+
+
+        },
+
+
+
         getLangStyleValue(langArray) {
             return util.getLangStyleValue(langArray);
         },
@@ -1393,12 +1452,12 @@ export default {
         onEvenListNumClickPart2(e) {
             if (e.prop == 'compareTrend') {
                 if(!PermissionHelper.enableAppraisalCompareStatistics()){
-                  message({
-                      message: this.$i18n.t('route.noPatrolCompareStatAuthority'),
-                      type: 'error',
-                      duration: 5 * 1000
+                    message({
+                        message: this.$i18n.t('route.noPatrolCompareStatAuthority'),
+                        type: 'error',
+                        duration: 5 * 1000
                     });
-                  return;
+                    return;
                 }
                 let params = JSON.parse(JSON.stringify(this.params));
                 params.storeIds = [e.row.innerId]
@@ -1428,12 +1487,12 @@ export default {
         onEvenListNumClickPart3(e) {
             if (e.prop == 'compareTrend') {
                 if(!PermissionHelper.enableAppraisalCompareStatistics()){
-                  message({
-                      message: this.$i18n.t('route.noPatrolCompareStatAuthority'),
-                      type: 'error',
+                    message({
+                        message: this.$i18n.t('route.noPatrolCompareStatAuthority'),
+                        type: 'error',
                       duration: 5 * 1000
                     });
-                  return;
+                    return;
                 }
                 let params = JSON.parse(JSON.stringify(this.params))
                 params.storeIds = [e.row.innerId]
@@ -1457,9 +1516,9 @@ export default {
                 message: this.$i18n.t('route.noReportAuthority'),
                 type: 'error',
                 duration: 5 * 1000
-              });
+            });
             return;
-          }
+            }
             let searchParams = JSON.parse(JSON.stringify(this.params))
             searchParams.jump = true;
 
@@ -2400,6 +2459,11 @@ export default {
             let totalImproved = 0;
             let totalQualified = 0;
             let totalReport = 0;
+
+            self.resultLegend[0].type = this.inspectStatus.status_0
+            self.resultLegend[1].type = this.inspectStatus.status_1
+            self.resultLegend[2].type = this.inspectStatus.status_2
+
             const jsonArray = self.resultLegend.slice(0, 3);
             let seriesData = [];
             const params = {};
@@ -2489,15 +2553,15 @@ export default {
                 }
                 seriesData = [{
                         value: totalDargerous,
-                        name: self.$t('overview.danger')
+                        name: self.inspectStatus.status_0
                     },
                     {
                         value: totalImproved,
-                        name: self.$t('overview.improve')
+                        name: self.inspectStatus.status_1
                     },
                     {
                         value: totalQualified,
-                        name: self.$t('overview.echartGood')
+                        name: self.inspectStatus.status_2
                     }
                 ];
                 const totalArray = [totalDargerous, totalImproved, totalQualified];
