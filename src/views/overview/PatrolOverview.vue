@@ -25,6 +25,7 @@
             </div>
           </div>
         </el-col>
+        
         <el-col :span="14" class="store-list">
           <div class="title">{{ $t('overview.patrolStatus') }}</div>
           <div class="region-result">
@@ -216,6 +217,9 @@ import {
   getInspectStatsOverviewWithRegion,
   getInspectStatsOverRegion
 } from '@/api/inspectOverview';
+import {
+    getInspectStatus
+} from '@/api/inspect';
 import { mapGetters } from 'vuex';
 import resize from '@/components/mixins/echartResize';
 import SearchConditionUtil from '@/common/SearchConditionUtil.js';
@@ -314,7 +318,9 @@ export default {
       descending: require('../../../static/img/descending.png'),
       ascending: require('../../../static/img/ascending.png'),
       currentIndex: 0,
-      fontFamily: 'NotoSansCJKtc,Roboto, Microsoft YaHei'
+      fontFamily: 'NotoSansCJKtc,Roboto, Microsoft YaHei',
+
+      inspectStatus: ''
     };
   },
 
@@ -336,9 +342,10 @@ export default {
     }
   },
 
-  created() {
-    this.getSearchParams();
-    this.getPatrolOverviewData();
+  async created() {
+    await this.getInspectStatus();
+    await this.getSearchParams();
+    await this.getPatrolOverviewData();
   },
 
   beforeDestroy() {
@@ -349,6 +356,32 @@ export default {
   },
 
   methods: {
+    getInspectStatus(){
+      return new Promise((resolve, reject) => {
+          getInspectStatus().then(res => {
+          resolve(res);
+          this.inspectStatus = res.data.settingContent.general_setting_inspect_status_name
+          delete this.inspectStatus.update_time
+          delete this.inspectStatus.update_user_id
+          console.log('this.inspectStatus ~~~~>> ', this.inspectStatus);
+
+          this.renameTableLabel()
+
+          }).catch(err => {
+          reject(err);
+          });
+      });
+    },
+
+    renameTableLabel(){
+
+      this.resultList[2] = this.inspectStatus.status_2
+      this.resultList[1] = this.inspectStatus.status_1
+      this.resultList[0] = this.inspectStatus.status_0
+      console.log('this.resultList~~~~~>', this.resultList)
+
+    },
+
     changBestAndWorst() {
       const self = this;
       self.isWorstArea = !self.isWorstArea;
@@ -732,8 +765,8 @@ export default {
       if (self.isWorstArea) {
         firstColor = '#f11e66';
         secondColor = '#f59249';
-        firstName = self.$t('overview.danger');
-        secondName = self.$t('overview.improve');
+        firstName = self.inspectStatus.status_0;
+        secondName = self.inspectStatus.status_1;
         try {
           result.sort(self.compareDanger);
           maxValue = self.findMaxDanger(result);
@@ -744,7 +777,7 @@ export default {
         firstColor = '#57e78f';
         secondColor = '#8fd92e';
         firstName = self.$t('overview.excellent');
-        secondName = self.$t('overview.echartGood');
+        secondName = self.inspectStatus.status_2;
         try {
           result.sort(self.compareExcellent);
           maxValue = self.findMaxExcellent(result);
@@ -1588,14 +1621,15 @@ export default {
             }
           ],
           series: [
-            { name: this.$t('overview.danger'), type: 'bar', barWidth: 35, barGap: '10' },
-            { name: this.$t('overview.improve'), type: 'bar', barWidth: 35, barGap: '10' },
-            { name: this.$t('overview.echartGood'), type: 'bar', barWidth: 35, barGap: '10' }
+            { name: this.inspectStatus.status_0, type: 'bar', barWidth: 35, barGap: '10' },
+            { name: this.inspectStatus.status_1, type: 'bar', barWidth: 35, barGap: '10' },
+            { name: this.inspectStatus.status_2, type: 'bar', barWidth: 35, barGap: '10' }
           ]
         },
 
         options: []
       };
+      console.log('regionOption~~~~~>', regionOption)
       return regionOption;
     },
 
