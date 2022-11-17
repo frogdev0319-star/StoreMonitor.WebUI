@@ -40,7 +40,7 @@
             <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" />
               <el-select
                 class="el-province"
-               style="margin-left:0px;border:none;border-radius:0px;"
+                style="margin-left:0px;border:none;border-radius:0px;"
               v-model="inspectId"
               :placeholder="$t('insSettingView.selectPost')"
               size="mini">
@@ -59,8 +59,8 @@
       <div class="report-header">
         <div class="flex-center" style="padding-top: 0;">
           <date-time-selector
-           class="time-selector"
-           @change="dateChange" 
+            class="time-selector"
+            @change="dateChange" 
           :dateTimeValue = dateValue /> 
           <div class="flex-center fullWidth" style="margin-left: 20px">
             <div class="search-content flex-center" style="margin-right: 20px">
@@ -80,6 +80,7 @@
         </div>
         <!-- <selected-stores :store-str="storeStr"/> -->
       </div>
+
       <div class="report-content loading spacer paper">
         <div
           v-loading="isLoading"
@@ -150,8 +151,11 @@
               </delay-button>-->
             </div>
           </div>
+
+          <!-- 報告列表 -->
           <div v-if="ShowCard" class="showCardHeight flex">
               <div v-for="(item,index) in reportList"  :key="index" class="report-card">
+                <!-- card -->
                 <div class="cards shadow-light" @click="clickReport(item,index)">
                   <div class="flex-center margin-bottom-5">
                     <div class="card-title">{{ item.storeName }}</div>
@@ -165,7 +169,7 @@
                         1: {'color':'#f57848','background-color':'#ffefeb'},
                         2: {'color':'#59ab22','background-color':'#e8f6de'}
                       }[item.statusCode]"
-                    >{{item.status}}</div>
+                    >{{item.status}} </div>
                     <div v-if="item.standard!=-1" style="margin-left: calc(10/1920*100vw)" :class="(lang.indexOf('zh') == -1)?'status-tag-en':'status-tag' "
                       :style="item.standard==1 ? {'color':'#59ab22','background-color':'#e8f6de'}: {'color':'#f57848','background-color':'#ffefeb'}"
                     >{{item.standard==1 ? $t('remotePatrol.goalAchieved') : $t('remotePatrol.farBehind')}}</div>
@@ -300,7 +304,14 @@
   </div>
 </template>
 <script>
-import { getInspectReportList, GetInspectTagList,downLoadInspectReportEntireDetail,getAllReportIds,GetMysteryInspectTagList } from '@/api/inspect';
+import { 
+      getInspectReportList, 
+      GetInspectTagList,
+      downLoadInspectReportEntireDetail,
+      getAllReportIds,
+      GetMysteryInspectTagList ,
+      getInspectStatus
+    } from '@/api/inspect';
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
 import StoreFilter from '@/components/StoreFilter';
@@ -528,6 +539,8 @@ export default {
       isScore:true,
       showExportAllWarn:false,
       showExportAllNotice:false,
+
+      inspectStatus:''
     };
   },
 
@@ -593,6 +606,8 @@ export default {
       self.curReportType = -1;
       self.getSearchParams();
       self.getInspectList();
+      self.getInspectStatus();
+      
     },
 
     async export2Excel() {
@@ -717,7 +732,8 @@ export default {
       }
       return obj;
     },
-   getReportList_(p) {
+
+    getReportList_(p) {
       console.log("2.Get Report List")
       console.log(p)
       var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,
@@ -793,7 +809,6 @@ export default {
     },
     getReportList(p) {
       console.log("1.Get Report List")
-      console.log(p)
       var params = {
         beginTs:p.beginTs,endTs:p.endTs,
         clause:p.clause,
@@ -824,7 +839,7 @@ export default {
           let data = [];
           if (errCode === 0) {
             data = res.data.content;
-          }
+          } 
           const temp = [];
           self.isLoading = true;
           for(const item of data){
@@ -864,11 +879,15 @@ export default {
             });
             const statusAndIconObj = self.getIconSrc(item.status);
             reportObj.status = statusAndIconObj.status;
+
+
             reportObj.iconSrc = statusAndIconObj.iconSrc;
             temp.push(reportObj);
           }
           //);
           self.reportList = temp;
+          console.log('self.reportList ~~~~~>> ', self.reportList);
+
           self.total = Math.ceil(res.data.totalElements/self.sizeNum);
           self.isLoading = false;
           if (temp.length === 0) {
@@ -898,7 +917,7 @@ export default {
       const statusAndLangAndIconMap = [
         {
           status: 0,
-          statusStr: this.$t('overview.danger'), // Poor
+          statusStr: this.inspectStatus.status_0, // Poor
           children: [{
             'zh': require('../../../static/img/dangerous_cn.png'),
             'zhtw': require('../../../static/img/dangerous_tw.png'),
@@ -909,7 +928,7 @@ export default {
         },
         {
           status: 1,
-          statusStr: this.$t('overview.improve'), // Fair
+          statusStr: this.inspectStatus.status_1, // Fair
           children: [{
             'zh': require('../../../static/img/improved_cn.png'),
             'zhtw': require('../../../static/img/improved_cn.png'),
@@ -920,7 +939,7 @@ export default {
         },
         {
           status: 2,
-          statusStr: this.$t('overview.echartGood'), // Good
+          statusStr: this.inspectStatus.status_2, // Good
           children: [{
             'zh': require('../../../static/img/good_cn.png'),
             'zhtw': require('../../../static/img/good_cn.png'),
@@ -1092,6 +1111,20 @@ export default {
         });
       });
     },
+    
+    getInspectStatus() {
+      return new Promise((resolve, reject) => {
+        getInspectStatus().then(res => {
+          resolve(res);
+          this.inspectStatus = res.data.settingContent.general_setting_inspect_status_name
+          delete this.inspectStatus.update_time
+          delete this.inspectStatus.update_user_id
+          console.log('this.inspectStatus~~~~~ :>> ', this.inspectStatus);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
 
 
     async getInspectList() {
@@ -1154,17 +1187,16 @@ export default {
       let searchParams = JSON.parse(JSON.stringify(SearchConditionUtil.getSearchCondition('inspectReport')));
       
       this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
-   
-   
+
       if (Object.keys(searchParams).length > 0) {
-         
+        
         this.storeFilterObj = searchParams;
         this.params = searchParams;
         console.log("Get Old Params")
         console.log(searchParams)
         this.order = searchParams.order;
         this.filter = searchParams.filter;
-       
+      
         this.checkSortType(this.curSortType,true);
         console.log("searchParams.clause.status:",searchParams.clause.status);
         this.curAppraise = (typeof searchParams.clause.status=='undefined') ? -1:searchParams.clause.status;
