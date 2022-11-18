@@ -340,10 +340,10 @@
                   </td>
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfQualifiedItems }}</span></td>
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfUnqualifiedItems }}</span></td>
-                  <td v-if="subcategory.type === 1"><span>{{ getDoubleNum(categoryItem.weight == -1 ? subcategory.totalScore : subcategory.totalScore * categoryItem.weight / 100) }}</span></td>
+                  <td v-if="subcategory.type === 1"><span>{{ getDoubleNum(subcategory.weight == -1 ? subcategory.totalScore : subcategory.totalScore * subcategory.weight / 100) }}</span></td>
                   <td>
                     <div style="display:flex;flex-direction:row;justify-content:space-between;">
-                      <div style="flex:2;">{{ getDoubleNum(subcategory.actualScore) == Infinity ? '--' : getDoubleNum((categoryItem.weight == -1 || categoryItem.type==2 ) ? subcategory.actualScore : subcategory.actualScore * categoryItem.weight / 100) }}</div>
+                      <div style="flex:2;">{{ getDoubleNum(subcategory.actualScore) == Infinity ? '--' : getDoubleNum((subcategory.weight == -1 || subcategory.type==2 ) ? subcategory.actualScore : subcategory.actualScore * subcategory.weight / 100) }}</div>
                       <div v-if="subcategory.children" style="display:flex;flex:1;flex-direction:row;align-content:center;">
                         <img v-if="categoryItem.isAdvanced" style="margin-right:4px;" :src="require('../../../static/img/group_score.svg')" width="15" height="15" />
                         <div style="color:#9EACB6;font-size:10px;font-weight:normal;">{{ categoryItem.isAdvanced? categoryItem.groupScore:''}}</div>
@@ -1113,7 +1113,9 @@ export default {
           }
           item.children.push(item);
         } else {
+          let weight = item.weight;
           item.children.forEach(child => {
+            weight = child.weight;
             if(child.isAdvanced){
               //console.log("sub item:",child.groupName);
               if(child.groupScore<=0){
@@ -1125,6 +1127,7 @@ export default {
                 //console.log("2.actualScore:",child.actualScore);
               }
             }
+            item.weight = weight;
             item.numOfCommentItems += child.numOfCommentItems;
             item.numOfTotalItems += child.numOfTotalItems;
           });
@@ -1205,6 +1208,10 @@ export default {
           summaryItem.actualScore = this.addChildrenDataToParent(summaryItem.children, 'actualScore');
           summaryItem.numOfTotalItems = this.addChildrenDataToParent(summaryItem.children, 'numOfTotalItems');
           summaryItem.numOfCommentItems = this.addChildrenDataToParent(summaryItem.children, 'numOfCommentItems');
+          
+          if(summaryItem.children[0].weight != summaryItem.weight){
+            summaryItem.weight = summaryItem.children[0].weight;
+          }
         }
       });
       //console.log("2.summaryTree:",summaryTree);
@@ -1224,6 +1231,7 @@ export default {
       }
       return sum;
     },
+
 
     getTab1AndTab3BtnName(inspectSettings) {
       const itemOptionsForType1 = inspectSettings.filter(settingItem => settingItem.name === 'itemOptionsForType1');
