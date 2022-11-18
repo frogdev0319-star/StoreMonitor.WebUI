@@ -142,8 +142,8 @@
                 <el-radio :label="1" >自定義</el-radio> 
               </el-radio-group>
               <el-input
+                :ref=item.refName
                 placeholder="請輸入自定義名稱" 
-                ref=""
                 v-model="item.newName"
                 :disabled="item.defineStatus == 0"
                 style="width: 200px;  margin: 0 20px ;"
@@ -557,20 +557,20 @@ export default {
           name: '立即督導' ,
           newName: '立即督導',
           defineStatus: 0,
-          status_0: ""
+          refName: 'bad'
         },
         {
           name:'待改善',
           newName: '待改善',
           defineStatus: 0,
-          status_1: ""
+          refName: 'fair'
         },
         
         {
           name: '良好',
           newName: '良好',
           defineStatus: 0,
-          status_2: ""
+          refName: 'good'
         },
       ],
 
@@ -583,10 +583,8 @@ export default {
       scoreMiddleLow: 50,
       scoreMiddleHeight: 80,
 
-      inspectStatus:""
-
+      inspectStatus:"",
       
-
     };
   },
   watch: {
@@ -685,27 +683,9 @@ export default {
           this.defaultDefineName[i].defineStatus = 0
           this.defaultDefineName[i].newName = this.defaultDefineName[i].name
         }
-      
     }
 
-    // if(this.defaultDefineName[0].name !== this.inspectStatus.status_0) {
-    //   this.defaultDefineName[0].defineStatus = 1
-    //   this.defaultDefineName[0].newName = this.inspectStatus.status_0
-    // }
-    // if(this.defaultDefineName[1].name !== this.inspectStatus.status_1) {
-    //   this.defaultDefineName[1].defineStatus = 1
-    //   this.defaultDefineName[1].newName = this.inspectStatus.status_1
-    // }
-    // if(this.defaultDefineName[2].name !== this.inspectStatus.status_2) {
-    //   this.defaultDefineName[2].defineStatus = 2
-    //   this.defaultDefineName[2].newName = this.inspectStatus.status_2
-    // }
   
-    // this.defaultDefineName.forEach( i =>{
-    
-
-    // })
-
     console.log('this.inspectStatus  mounted:>> ', this.inspectStatus);
     console.log('this.defaultDefineName  mounted:>> ', this.defaultDefineName);
 
@@ -725,6 +705,24 @@ export default {
           await this.bindWorkflow(this.bindWorkFlowData)
         }
       }
+
+      for (let i = 0; i < 3; i++) {
+        if(this.defaultDefineName[i].defineStatus == 1 && this.defaultDefineName[i].newName == "") {
+          this.$refs.stayOver.focus()
+          util.notify('自定義名稱不可為空', 'error', 2000)
+          
+          return 
+          } 
+      }
+      // this.defaultDefineName.forEach(l =>{
+      //   if(l.defineStatus === 1 && l.newName == ""){
+      //     util.notify('自定義名稱不可為空', 'error', 2000);
+      //     console.log('l.newName :>> ', l.newName);
+      //     return 
+      //   }
+      //   return
+      // })
+
       
       if ((this.passFailBtnAttr === 'userDefined' && !this.validateUserDefinedPassFailBtnValue()) ||
           (this.otherBtnAttr === 'userDefined' && !this.validateUserDefinedOtherBtnValue())) {
