@@ -1376,17 +1376,19 @@ export default {
                     ts = (ts<item.groupScore?item.groupScore:ts);
                     xs = (xs<item.groupScore?item.groupScore:xs);
                     xn = (xn<item.groupScore?item.groupScore:xn);
-                    ts0 = (ts0<item.groupScore?item.groupScore:ts0);
-                    tsX = (tsX<item.groupScore?item.groupScore:tsX);
+                    //ts0 = (ts0<item.groupScore?item.groupScore:ts0);
+                    //tsX = (tsX<item.groupScore?item.groupScore:tsX);
                     
                   }else{
                     ts = (ts>item.groupScore?item.groupScore:ts);
                     xs = (xs>item.groupScore?item.groupScore:xs);
                     xn = (xn>item.groupScore?item.groupScore:xn);
-                    ts0 = (ts0>item.groupScore?item.groupScore:ts0);
-                    tsX = (tsX>item.groupScore?item.groupScore:tsX);
+                    //ts0 = (ts0>item.groupScore?item.groupScore:ts0);
+                    //tsX = (tsX>item.groupScore?item.groupScore:tsX);
                     
                   }
+                  ts0 = item.groupScore;
+                  tsX = item.groupScore;
                   /*console.log("ts:",ts);
                   PassFileTotalScoreSystem = ts*(p_item.weight == -1 ? 1 : (p_item.weight/100));
                   PassFileXS +=  xs*(p_item.weight == -1 ? 1 : (p_item.weight/100));

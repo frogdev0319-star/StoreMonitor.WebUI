@@ -1106,9 +1106,9 @@ export default {
           item.children = [];
           if(item.isAdvanced){
             if(item.groupScore<=0){
-              item.actualScore = (item.actualScore<item.groupScore)?item.groupScore:item.actualScore;
+              item.actualScore = (this.getDoubleNum(item.actualScore) != Infinity && item.actualScore<item.groupScore)?item.groupScore:item.actualScore;
             }else{
-              item.actualScore = (item.actualScore>item.groupScore)?item.groupScore:item.actualScore;
+              item.actualScore = (this.getDoubleNum(item.actualScore) != Infinity && item.actualScore>item.groupScore)?item.groupScore:item.actualScore;
             }
           }
           item.children.push(item);
@@ -1118,10 +1118,10 @@ export default {
               //console.log("sub item:",child.groupName);
               if(child.groupScore<=0){
                 //console.log("1.groupScore:",child.groupScore);
-                child.actualScore = (child.actualScore<child.groupScore)?child.groupScore:child.actualScore;
+                child.actualScore = (this.getDoubleNum(child.actualScore) != Infinity && child.actualScore<child.groupScore)?child.groupScore:child.actualScore;
                 //console.log("1.actualScore:",child.actualScore);
               }else{
-                child.actualScore = (child.actualScore>child.groupScore)?child.groupScore:child.actualScore;
+                child.actualScore = (this.getDoubleNum(child.actualScore) != Infinity && child.actualScore>child.groupScore)?child.groupScore:child.actualScore;
                 //console.log("2.actualScore:",child.actualScore);
               }
             }
