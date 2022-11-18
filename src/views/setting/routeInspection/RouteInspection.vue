@@ -687,6 +687,7 @@ export default {
           _obj.type = _item.type;
           _obj.checked = false;
           _obj.parentId = _item.parentId;
+          _obj.groupScore = _item.groupScore;
           const tempChild = [];
           _item.items.forEach(itemChild => {
             const objChild = {};
@@ -2015,12 +2016,14 @@ export default {
         }
         if (item.subCatergyName != undefined && item.subCatergyName.length > 0) {
           if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 50) {
+            console.log("@@"+item.subCatergyName+filterString.getContentLength(item.subCatergyName.toString().trim()));
             passFailFlagObj.flags.flagSubGroupLengthPassFail = true;
           }
         }
         if (item.itemName == undefined || item.itemName.length == 0) {
           passFailFlagObj.flags.flagItemNamePassFail = true;
         } else if (filterString.getContentLength(item.itemName.toString().trim()) > ITEMSLENGTH) {
+          console.log(item.itemName.toString().trim()+filterString.getContentLength(item.itemName.toString().trim()))
           passFailFlagObj.flags.flagItemLengthPassFail = true;
         }
         if (item.score != undefined) {
@@ -2086,6 +2089,7 @@ export default {
         if (item.itemName == undefined || item.itemName.length === 0) {
           scoreFlagObj.flags.flagItemNameScore = true;
         } else if (filterString.getContentLength(item.itemName.toString().trim()) > ITEMSLENGTH) {
+          console.log(item.itemName.toString().trim()+filterString.getContentLength(item.itemName.toString().trim()))
           scoreFlagObj.flags.flagItemLengthScore = true;
         }
         let maxScore = 0;

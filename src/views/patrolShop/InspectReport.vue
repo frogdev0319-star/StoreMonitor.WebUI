@@ -297,6 +297,12 @@
           </div>
         </el-col>
         <el-col v-if="pageItem.class === 'row-table'">
+          <div class="limit-group-score-tip" >
+            <div class="limit-img" >
+              <img :src="require('../../../static/img/group_score.svg')" width="20" height="20" />
+            </div>
+            <div class="limit-text">{{$t('remotePatrol.tipLimitGroupScore')}}</div>
+          </div>
           <table v-for="(tableItem, tableIndex) in pageItem.data" :key="tableIndex" class="table table-bordered">
             <thead :class="hasChart ? 'pdf_font_20': 'pdf_font_16'">
               <tr v-if="tableItem[0].type === 0">
@@ -341,8 +347,20 @@
                   </td>
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfQualifiedItems }}</span></td>
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfUnqualifiedItems }}</span></td>
-                  <td v-if="subcategory.type === 1"><span>{{ getDoubleNum(categoryItem.weight == -1 ? subcategory.totalScore : subcategory.totalScore * categoryItem.weight / 100) }}</span></td>
-                  <td><span>{{ getDoubleNum(subcategory.actualScore) == Infinity ? '--' : getDoubleNum((categoryItem.weight == -1 || categoryItem.type==2 ) ? subcategory.actualScore : subcategory.actualScore * categoryItem.weight / 100) }}</span></td>
+                  <td v-if="subcategory.type === 1"><span>{{ getDoubleNum(subcategory.weight == -1 ? subcategory.totalScore : subcategory.totalScore * subcategory.weight / 100) }}</span></td>
+                  <td>
+                    <div style="display:flex;flex-direction:row;justify-content:space-between;">
+                      <div style="flex:2;">{{ getDoubleNum(subcategory.actualScore) == Infinity ? '--' : getDoubleNum((subcategory.weight == -1 || subcategory.type==2 ) ? subcategory.actualScore : subcategory.actualScore * subcategory.weight / 100) }}</div>
+                      <div v-if="subcategory.children" style="display:flex;flex:1;flex-direction:row;align-content:center;">
+                        <img v-if="categoryItem.isAdvanced" style="margin-right:4px;" :src="require('../../../static/img/group_score.svg')" width="15" height="15" />
+                        <div style="color:#9EACB6;font-size:10px;font-weight:normal;">{{ categoryItem.isAdvanced? categoryItem.groupScore:''}}</div>
+                      </div>
+                      <div v-else-if="!subcategory.children" style="display:flex;flex:1;flex-direction:row;align-content:center;">
+                        <img v-if="subcategory.isAdvanced" style="margin-right:4px;" :src="require('../../../static/img/group_score.svg')" width="15" height="15" />
+                        <div style="color:#9EACB6;font-size:10px;font-weight:normal;">{{ subcategory.isAdvanced? subcategory.groupScore:''}}</div>
+                      </div>
+                    </div>
+                  </td>
                 </tr>
               </tbody>
             </template>
@@ -1114,9 +1132,30 @@ export default {
       summaryTree.forEach(item => {
         if (!item.children) {
           item.children = [];
+          if(item.isAdvanced){
+            if(item.groupScore<=0){
+              item.actualScore = (this.getDoubleNum(item.actualScore) != Infinity && item.actualScore<item.groupScore)?item.groupScore:item.actualScore;
+            }else{
+              item.actualScore = (this.getDoubleNum(item.actualScore) != Infinity && item.actualScore>item.groupScore)?item.groupScore:item.actualScore;
+            }
+          }
           item.children.push(item);
         } else {
+          let weight = item.weight;
           item.children.forEach(child => {
+            weight = child.weight;
+            if(child.isAdvanced){
+              //console.log("sub item:",child.groupName);
+              if(child.groupScore<=0){
+                //console.log("1.groupScore:",child.groupScore);
+                child.actualScore = (this.getDoubleNum(child.actualScore) != Infinity && child.actualScore<child.groupScore)?child.groupScore:child.actualScore;
+                //console.log("1.actualScore:",child.actualScore);
+              }else{
+                child.actualScore = (this.getDoubleNum(child.actualScore) != Infinity && child.actualScore>child.groupScore)?child.groupScore:child.actualScore;
+                //console.log("2.actualScore:",child.actualScore);
+              }
+            }
+            item.weight = weight;
             item.numOfCommentItems += child.numOfCommentItems;
             item.numOfTotalItems += child.numOfTotalItems;
           });
@@ -1186,7 +1225,7 @@ export default {
     getCategorySummary(summary) {
       util.sortArrayByKeyAsc(summary, 'type');
       const summaryTree = util.handleInspctionCatergyTree(summary, 'groupId');
-      //console.log("1.summaryTree:",summaryTree);
+      console.log("1.summaryTree:",summaryTree);
       summaryTree.forEach(summaryItem => {
         if (summaryItem.children) {
           summaryItem.numOfIgnored = this.addChildrenDataToParent(summaryItem.children, 'numOfIgnored');
@@ -1197,6 +1236,10 @@ export default {
           summaryItem.actualScore = this.addChildrenDataToParent(summaryItem.children, 'actualScore');
           summaryItem.numOfTotalItems = this.addChildrenDataToParent(summaryItem.children, 'numOfTotalItems');
           summaryItem.numOfCommentItems = this.addChildrenDataToParent(summaryItem.children, 'numOfCommentItems');
+          
+          if(summaryItem.children[0].weight != summaryItem.weight){
+            summaryItem.weight = summaryItem.children[0].weight;
+          }
         }
       });
       //console.log("2.summaryTree:",summaryTree);
@@ -1216,6 +1259,7 @@ export default {
       }
       return sum;
     },
+
 
     getTab1AndTab3BtnName(inspectSettings) {
       const itemOptionsForType1 = inspectSettings.filter(settingItem => settingItem.name === 'itemOptionsForType1');
@@ -2271,7 +2315,6 @@ export default {
         .table-bordered{
           border-collapse: collapse;
           width: 100%;
-          margin-top: 20px;
           th{
               color: $tab;
               text-align: left;
@@ -2802,6 +2845,29 @@ export default {
       height:24px;
     }
   }
+  .limit-group-score-tip{
+          display: flex;
+          flex-direction: row;
+          align-content: center;
+          font-weight: bold;
+          font-size: calc(16/1920*100vw);
+          color: #484848;
+          height: 30px;
+          justify-content: right;
+          .limit-img{
+            align-self: center;
+            height: 20px;
+            align-items: center;
+            flex-direction: column;
+            display: flex;
+            justify-content: center;
+          }
+          .limit-text{
+            margin-left: 5px;
+            align-self: center;
+            height:20px;
+          }
+        }
 </style>
 <style>
   .echarts {

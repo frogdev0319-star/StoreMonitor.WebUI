@@ -357,6 +357,22 @@
                        :label="catergy.label" :value="catergy.value"></el-option>
           </el-select>
         </div>
+        <div v-if="showGroupScoreSetting">
+          <div class="dialog-form-item-name">
+            <span>{{ $t('insSettingView.advanceSetting') }}</span>
+          </div>
+          <div style="line-height:28px;">
+            <el-radio-group class="attribute-group" v-model="itemAdvanceSetting">
+                <el-radio label="1">{{ $t('insSettingView.advanceSettingOn') }}</el-radio>
+                <el-radio label="0">{{ $t('insSettingView.advanceSettingOff') }}</el-radio>
+            </el-radio-group>
+          </div>
+          <el-input v-model.number="itemGroupScore"
+              :placeholder="$t('insSettingView.enterScore')"
+              :disabled = "itemAdvanceSetting=='0'"
+              @input="itemGroupScoreChange"/>
+          <span v-if="GroupScoreTip" class="rules">{{ $t('insSettingView.setGroupScoreRange') }}</span>
+        </div>
       </div>
     </dialog-pop>
   </div>
@@ -561,6 +577,10 @@ export default {
       tempSelectLabelWidth:[{key:'en',value:'123px'},{key:'zh',value:'123px'},{key:'zhtw',value:'123px'},
         {key:'ja-JP',value:'125px'},{key:'ko-KR',value:'123px'},{key:'vi-VN',value:'123px'},
         {key:'id-ID',value:'123px'},{key:'th-TH',value:'123px'}],
+      showGroupScoreSetting:false,
+      itemAdvanceSetting:'0',
+      itemGroupScore:0,
+      GroupScoreTip:false,
     };
   },
   computed: {
@@ -867,12 +887,14 @@ export default {
       this.parentId = -1;
       this.isEditCategory = false;
       this.notAllowedChangeParentId = false;
+      this.showGroupScoreSetting = false;
       this.getParentCatergoryList();
     },
 
     getParentCatergoryList() {
       this.parentCatergoryList = [];
-      let parentCatergoryList = this.groupList.filter(item => item.children || (!item.children && item.items.length === 0));
+      console.log(">>>>this.groupList:",this.groupList);
+      let parentCatergoryList = this.groupList.filter(item => (item.children || (!item.children && item.items.length === 0 )) && !item.isAdvanced);
       parentCatergoryList = this.isEditCategory ? parentCatergoryList.filter(item => this.activeId !== item.id) : parentCatergoryList;
       parentCatergoryList.forEach(item => {
         const catergoryObj = {};
@@ -896,6 +918,10 @@ export default {
         util.notify(self.$t('insSettingView.titleEmpty'), 'warning', 3000);
         return false;
       }
+      if(this.GroupScoreTip){
+        util.notify(self.$t('insSettingView.setGroupScoreRange'), 'warning', 3000);
+        return false;
+      }
       let mode = 0;
       const tabIndex = sessionStorage.getItem('TabIndex');
       mode = tabIndex === '0' ? 1 : (tabIndex === '1' ? 0 : 1);
@@ -913,13 +939,16 @@ export default {
           id: this.activeId,
           name: this.groupNameInput,
           tag: this.tabName,
-          parentId: this.parentId
+          parentId: this.parentId,
+          isAdvanced:this.itemAdvanceSetting=="1",
+          groupScore:this.itemAdvanceSetting=="1"?this.itemGroupScore:0
         }]
       };
       let resUpdateGroup = await this.updateGroup(params);
       this.showAddGroup = false;
       if (resUpdateGroup.errCode === 0) {
         util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
+        this.itemGroupScore = 0;
         this.refreshData(this.groupIndex);
       } else {
         util.notify(this.$t('deviceView.editFail'), 'warning', 3000);
@@ -987,6 +1016,14 @@ export default {
     },
 
     editCategory(index, item) {
+      if(!item.children){
+        this.showGroupScoreSetting = true;
+        this.itemGroupScore = (item.groupScore==-99999)?0:item.groupScore;
+        this.itemAdvanceSetting = item.isAdvanced?"1":"0";
+      }else{
+        this.showGroupScoreSetting = false;
+      }
+      console.log(">>>>>editCategory:",item);
       item.isEdit = true;
       item.showEdit = false;
       this.notAllowedChangeParentId = !((item.parentId === -1 && !item.children) || item.parentId !== -1);
@@ -1209,6 +1246,7 @@ export default {
       self.ItemTotalScoreTip1 = false;
       self.ScoreOptionsTips0 = false;
       self.ScoreOptionsTips1 = false;
+      self.GroupScoreTip = false;
       this.itemType = 0;
     },
 
@@ -1497,6 +1535,8 @@ export default {
         obj.children = item.children;
         obj.sequence = item.sequence;
         obj.weight = item.weight;
+        obj.isAdvanced = item.isAdvanced;
+        obj.groupScore = item.groupScore;
         temp.push(obj);
         groupIds.push(item.id);
       });
@@ -1766,6 +1806,15 @@ export default {
 
     getInputCatergyName(val) {
       this.groupNameInput = val;
+    },
+
+    itemGroupScoreChange(val){
+      this.itemGroupScore = this.getUtilScore(val,this.activeSheetName=='0'?0:1);
+      if(parseFloat(this.itemGroupScore)<-9999 || parseFloat(this.itemGroupScore)>9999){
+          this.GroupScoreTip=true;
+        }else{
+          this.GroupScoreTip=false;
+        }
     },
 
     getSubCategorySequence(children) {

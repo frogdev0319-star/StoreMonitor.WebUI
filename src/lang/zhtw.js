@@ -521,7 +521,8 @@ export default{
       "resubmiteRpt":"確認送出報告",
       "systemReject":"系統撤回",
       "systemRejectMsg":"無可簽核人員，請重新確認",
-      "cannotSwitchMimicMode":"正在編輯報告，不能切換模式"
+      "cannotSwitchMimicMode":"正在編輯報告，不能切換模式",
+      "tipLimitGroupScore":"得分超過類別上限時以上限計算總分",
   },
   "eventView":{
       "ClosedEvent":"已結案事件",
@@ -787,7 +788,13 @@ export default{
       "bindWorkFLow":"巡檢表綁定流程",
       "isRequired":"必填",
       "notRequired":"非必填",
-      "selectStoreTag":"快速選擇"
+      "selectStoreTag":"快速選擇",
+      "groupScore":"類別分值",
+      "advanceSetting":"進階設定",
+      "advanceSettingOn":"開啟",
+      "advanceSettingOff":"關閉",
+      "setGroupScoreRange":"類別分值上限 輸入範圍 -9999 ~ 9999",
+    
   },
   "deviceView":{
       "EzvizAccount":"串流服務帳號",
