@@ -1425,7 +1425,7 @@ export default{
         "auditFlow":"簽核流程",
         "nodeOrder":"節點序號",
         "cantEmptyDays" : "停留天數不可為空! ",
-        "cantTooMuchDays" : "停留天數不可超過365天! "
+        "cantTooMuchDays" : "天數不可超過365天! "
 
     },
     "inceptionRpt":{
