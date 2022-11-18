@@ -742,6 +742,7 @@ export default {
       const self = this;
       const content = filterString.all(val, 200);
       self.eventDes = content;
+      self.inspectInput = content;
       const length = filterString.getContentLength(val);
       if (length > 200) {
         self.eventDesRuletip = true;
@@ -820,7 +821,7 @@ export default {
     },
 
     startVideo() {
-      if (this.videoAuthority === false && !self.$store.getters.mimicMode) {
+      if (this.videoAuthority === false && !this.$store.getters.mimicMode) {
         this.showError = true;
         this.errorText = this.$t('remotePatrol.videoLicense');
         return;
