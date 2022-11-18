@@ -587,8 +587,8 @@ export default {
         status_0:'',
       },
       
-      scoreMiddleLow: 50,
-      scoreMiddleHeight: 80,
+      scoreMiddleLow: 0,
+      scoreMiddleHeight: 0,
 
       inspectStatus:"",
       
@@ -663,26 +663,42 @@ export default {
           if(i.defineStatus == 0) i.newName = i.name
         }
       }
-    }
+    },
+
+    minScore(val){
+      console.log('val :>> ', val);
+      this.scoreMiddleLow = (this.maxScore - val) * .5
+
+      // var aaa = (this.maxScore - val) * .2
+      // var bbb = (this.maxScore - val) * .8
+
+      // this.scoreMiddleLow = val + aaa
+      // this.scoreMiddleHeight = val - aaa
+
+
+    },
+    // maxScore(val){
+    //   console.log('val :>> ', val);
+      
+    // }
+
+
   },
   computed:{
     showScoreMin(){
       return parseFloat(this.scoreMiddleLow)  - 1
     },
     showScoreMax(){
-      
       return parseFloat(this.scoreMiddleHeight) + 1
     }
 
   },
-
 
   async mounted() {
     
     await this.getRule();
     await this.workflowItems()
     await this.getInspectStatus()
-
 
     for (let i = 0; i < 3; i++) {
       if(this.defaultDefineName[i].name !== this.inspectStatus["status_" + i]) {
@@ -693,12 +709,10 @@ export default {
           this.defaultDefineName[i].newName = this.defaultDefineName[i].name
         }
     }
-
-  
     console.log('this.inspectStatus  mounted:>> ', this.inspectStatus);
     console.log('this.defaultDefineName  mounted:>> ', this.defaultDefineName);
 
-    
+    // this.scoreMiddleLow = (this.maxScore - this.mainScore) * .5
   },
 
   methods: {
@@ -1003,22 +1017,18 @@ export default {
       self.MinScoreMsg = (self.hundredMarkType=='1' && self.baseScore.toString()=="");
     },
 
+    inputScoreMiddleMin(e){
+      const self = this;
+      self.scoreMiddleLow = self.getUtilScore(e.target.value);
+    },
 
     inputScoreMiddleMax(e){
       const self = this;
       self.scoreMiddleHeight = self.getUtilScore(e.target.value);
-      console.log('self.scoreMiddleHeight :>> ', self.scoreMiddleHeight);
-      
-
-
-
+  
     },
 
-    inputScoreMiddleMin(e){
-      const self = this;
-      self.scoreMiddleLow = self.getUtilScore(e.target.value);
-
-    },
+  
 
 
 
