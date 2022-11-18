@@ -666,22 +666,11 @@ export default {
     },
 
     minScore(val){
-      console.log('val :>> ', val);
-      this.scoreMiddleLow = (this.maxScore - val) * .5
-
-      // var aaa = (this.maxScore - val) * .2
-      // var bbb = (this.maxScore - val) * .8
-
-      // this.scoreMiddleLow = val + aaa
-      // this.scoreMiddleHeight = val - aaa
-
-
+      this.countNum()
     },
-    // maxScore(val){
-    //   console.log('val :>> ', val);
-      
-    // }
-
+    maxScore(val){
+      this.countNum()
+    }
 
   },
   computed:{
@@ -700,6 +689,8 @@ export default {
     await this.workflowItems()
     await this.getInspectStatus()
 
+    // await this.countNum()
+  
     for (let i = 0; i < 3; i++) {
       if(this.defaultDefineName[i].name !== this.inspectStatus["status_" + i]) {
           this.defaultDefineName[i].defineStatus = 1
@@ -711,11 +702,15 @@ export default {
     }
     console.log('this.inspectStatus  mounted:>> ', this.inspectStatus);
     console.log('this.defaultDefineName  mounted:>> ', this.defaultDefineName);
-
-    // this.scoreMiddleLow = (this.maxScore - this.mainScore) * .5
   },
 
   methods: {
+    countNum(){
+      this.scoreMiddleLow = ((this.maxScore - this.minScore) * .5) + this.minScore
+      this.scoreMiddleHeight = ((this.maxScore - this.minScore) * .8) + this.minScore
+    },
+
+
     async submitRule() {
       const self = this;
       if(this.enableDelay && this.delayDay == undefined){
@@ -812,14 +807,9 @@ export default {
             }
           ]
         };
+    
       
 
-
-      
-      console.log('this.minScore :>> ', this.minScore);
-      console.log('this.maxScore :>> ', this.maxScore);
-
-  
       if(this.onSiteSignature) params.ruleItems.push(this.signatureData)
         console.log('params', params)
         
@@ -885,6 +875,18 @@ export default {
               case 'dangerousOnFailedItem':
                 self.dangerousOnFailedItem = item.value;
                 break;
+
+              case 'setting_isAutoMappingActivate':
+                self.setting_isAutoMappingActivate = item.value;
+                break;
+
+              case 'setting_autoMappingByTotalScore':
+                self.setting_autoMappingByTotalScore = item.value;
+                self.scoreMiddleLow = item.extra[0].value
+                self.scoreMiddleHeight = item.extra[1].value
+                break;
+
+
               case 'onSitePhotoOnly':
                 self.onSitePhotoOnly = item.value;
                 break;
@@ -1020,11 +1022,30 @@ export default {
     inputScoreMiddleMin(e){
       const self = this;
       self.scoreMiddleLow = self.getUtilScore(e.target.value);
+
+      if(self.scoreMiddleLow == '' || self.scoreMiddleLow == null){
+        this.countNum()
+      }
+      else if(self.scoreMiddleLow <= this.minScore + 1) {
+        self.scoreMiddleLow = this.minScore + 2
+      } 
+      else if(self.scoreMiddleLow > self.scoreMiddleHeight){
+        self.scoreMiddleLow = self.scoreMiddleHeight - 1
+      }
     },
 
     inputScoreMiddleMax(e){
       const self = this;
       self.scoreMiddleHeight = self.getUtilScore(e.target.value);
+      if(self.scoreMiddleHeight == '' || self.scoreMiddleHeight == null){
+        this.countNum()
+      }
+      else if(self.scoreMiddleHeight >=this.maxScore) {
+        self.scoreMiddleHeight = this.maxScore - 2
+      }
+      else if(self.scoreMiddleLow > self.scoreMiddleHeight){
+        self.scoreMiddleHeight = self.scoreMiddleLow + 1
+      }
   
     },
 

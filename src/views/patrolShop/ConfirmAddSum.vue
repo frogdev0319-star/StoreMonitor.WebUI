@@ -22,7 +22,6 @@
       <!-- 本次巡檢總評 -->
       <div class="submit-content">
         <div class="submit-radio margin-bottom-md">
-          
           <span v-for="(item,index) in resultList" :key="index">
             <span
               v-if="item.isShow"
@@ -567,6 +566,7 @@ export default {
       showSystemReject:false,
 
       inspectStatus:"",
+      getInspectRuleSettings: "",
       autoMappingByTotalScore: ""
     };
   },
@@ -2023,7 +2023,9 @@ export default {
       return new Promise((resolve, reject) => {
         inpectRESTful.GetInspectRuleSettings(params).then(res => {
           resolve(res);
-          // console.log('res ~~~~~>>>> ', res.data);
+
+          this.getInspectRuleSettings = res.data
+          console.log('this.getInspectRuleSettings ~~~~~>>>> ', this.getInspectRuleSettings);
 
           this.autoMappingByTotalScore = res.data.find(i => {
             return i.name == "setting_autoMappingByTotalScore"
@@ -2033,35 +2035,48 @@ export default {
           console.log('this.resultList ~~~~~>>>> ', this.resultList);
           // this.scorecount = 10
 
-          for (let i = 0; i < 3; i++) {
-            this.resultList[i].name = this.inspectStatus["status_"+ i]
-          }
+          const scoreMiddleLow = this.autoMappingByTotalScore.extra.find(i => i.key === "mappingScore_bottom").value
+          const scoreMiddleHeight = this.autoMappingByTotalScore.extra.find(i => i.key === "mappingScore_top").value
+          console.log('scoreMiddleLow ~~~~~~>> ', scoreMiddleLow);
+          console.log('scoreMiddleHeight ~~~~~~>> ', scoreMiddleHeight);
+
+
+
+          // for (let i = 0; i < 3; i++) {
+          //   this.resultList[i].name = this.inspectStatus["status_"+ i]
+          // }
+          
+          this.resultList[0].name =this.inspectStatus.status_2
+          this.resultList[1].name =this.inspectStatus.status_1
+          this.resultList[2].name =this.inspectStatus.status_0
+
 
           if(this.autoMappingByTotalScore.value){
+              // 全部 false
               this.resultList.forEach(item => {
                 item.isShow = false
               })
-      
-              if(this.scorecount >= 80){
-                var n = this.resultList.findIndex(i=>i.label === 0)
+              
+              if(this.scorecount >= scoreMiddleHeight){
+                var n = this.resultList.findIndex(i=>i.label === 2)
                 console.log('n 2 :>> ', n);
                 this.resultList[n].isActive = true
                 this.resultList[n].isShow = true
               } 
-              else if(  this.scorecount <= 79 && this.scorecount >= 50){
+              else if(  this.scorecount <= scoreMiddleHeight - 1 && this.scorecount >= scoreMiddleLow){
                 var n = this.resultList.findIndex(i=>i.label === 1)
                 console.log('n 1:>> ', n);
                 this.resultList[n].isActive = true
                 this.resultList[n].isShow = true
               } 
-              else if( this.scorecount <= 49 && this.scorecount >= 0){
-                var n = this.resultList.findIndex(i=>i.label === 2)
+              else if( this.scorecount <= scoreMiddleLow - 1){
+                var n = this.resultList.findIndex(i=>i.label === 0)
                 console.log('n 0:>> ', n);
                 this.resultList[n].isActive = true
                 this.resultList[n].isShow = true
               }
           }
-
+          console.log('this.resultList 2 ~~~~~>>>> ', this.resultList);
 
         }).catch(err => {
           console.log("getInspectRule err:",err);
