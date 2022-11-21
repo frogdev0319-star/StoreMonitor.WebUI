@@ -163,13 +163,13 @@
     <el-col :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.isCheckSuggest')">
         <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
-          <el-checkbox class="storevue-checkbox-outlined" v-model="switchAutoSelectReview">
+          <el-checkbox class="storevue-checkbox-outlined" v-model="setting_isAutoMappingActivate">
             <span>
               開啟依條件自動選取巡檢總評
             </span>
           </el-checkbox>
 
-          <div v-if="switchAutoSelectReview" style="width: 100%;">
+          <div v-if="setting_isAutoMappingActivate" style="width: 100%;">
           <!-- radio 1 -->
           <el-radio-group class="storevue-radio suggestvalue" v-model="isAutoSelectReview">
             <div class="suggestvalue_section" style="margin-bottom: 3px">
@@ -515,7 +515,10 @@ export default {
       qualifiedForIgnoredWithType2: false,
 
       setting_isAutoMappingActivate: true,
+      
+
       dangerousOnFailedItem: false,
+      setting_autoMappingByTotalScore: true,
 
       onSitePhotoOnly: false,
       lang: this.$i18n.locale,
@@ -553,7 +556,7 @@ export default {
       showInputLimit: false,
       showInputLimit_overallItem: false,
 
-      switchAutoSelectReview: true,
+      // switchAutoSelectReview: true,
       isAutoSelectReview: true,
       defineStatus_2: 0, //良好
       defineStatus_1: 0, //待改善
@@ -645,11 +648,11 @@ export default {
     isAutoSelectReview(val){
       console.log('val :>> ', val);
       if(val) {
-        this.setting_isAutoMappingActivate = true
+        this.setting_autoMappingByTotalScore = true
         this.dangerousOnFailedItem = false
 
       } else {
-        this.setting_isAutoMappingActivate = false
+        this.setting_autoMappingByTotalScore = false
         this.dangerousOnFailedItem = true
 
       }
@@ -702,6 +705,9 @@ export default {
     }
     console.log('this.inspectStatus  mounted:>> ', this.inspectStatus);
     console.log('this.defaultDefineName  mounted:>> ', this.defaultDefineName);
+
+    
+
   },
 
   methods: {
@@ -742,8 +748,6 @@ export default {
           } 
       }
   
-
-      
       if ((this.passFailBtnAttr === 'userDefined' && !this.validateUserDefinedPassFailBtnValue()) ||
           (this.otherBtnAttr === 'userDefined' && !this.validateUserDefinedOtherBtnValue())) {
         util.notify(this.$t('insSettingView.enterBtnAttr'), 'warning', 3000);
@@ -768,10 +772,11 @@ export default {
               category: "generalRule",
               value: self.setting_isAutoMappingActivate 
             },
+            
             {
               name: "setting_autoMappingByTotalScore", // 依分數條件自動選取
               category: "generalRule",
-              value: self.switchAutoSelectReview ,
+              value: self.setting_autoMappingByTotalScore ,
               extra: [
                   {
                       key: "mappingScore_bottom", // 下標值
@@ -876,14 +881,16 @@ export default {
                 self.dangerousOnFailedItem = item.value;
                 break;
 
+
               case 'setting_isAutoMappingActivate':
                 self.setting_isAutoMappingActivate = item.value;
                 break;
-
+                
               case 'setting_autoMappingByTotalScore':
-                self.setting_autoMappingByTotalScore = item.value;
+                self.setting_autoMappingByTotalScore = item.value
                 self.scoreMiddleLow = item.extra[0].value
                 self.scoreMiddleHeight = item.extra[1].value
+                
                 break;
 
 
@@ -920,6 +927,8 @@ export default {
       } catch (err) {
         console.log('SetInspectRule-getRule: ' + err);
       }
+
+      self.isAutoSelectReview = self.setting_autoMappingByTotalScore
     },
     updateInspectRule(params) {
       return new Promise((resolve, reject) => {
