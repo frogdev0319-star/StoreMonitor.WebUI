@@ -63,11 +63,13 @@
                     <el-select
                       v-model="patrolActive"
                       class="device-select"
+                      
                       size="mini"
                       @change="handleClickPatrol"
                       placeholder="">
                       <el-option
                         v-for="(_item, _index) in item.data"
+                        style="width:fit-content;padding-right:50px;"
                         :key="_index"
                         :label="_item.name"
                         :value="String(_index)"
