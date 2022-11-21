@@ -23,7 +23,7 @@
         @click="submitBindTitle">
         {{ $t('remotePatrol.submit') }}
       </el-button>
-      <span v-if="showLengthNameWarning" class="warningtips">{{ $t('insSettingView.enterNameRuletip') }}</span>
+    <div v-if="showLengthNameWarning" class="warningtips">{{ $t('insSettingView.enterNameRuletip') }}</div>  
     </div>
     <hr class="hr-horizontal">
     <div class="flex padding">
@@ -2032,14 +2032,13 @@ export default {
                 color: #ddd;
                 cursor: pointer;
             }
-            .warningtips{
-                font-size:12px;
-                color:red;
-                margin:5px 0 0 0;
-                position: absolute;
-                top:22px;
-                left:calc(30/1920*100vw);
-            }
+            
+        }
+        .warningtips{
+            font-size:12px;
+            color:red;
+            position: absolute;
+            top:53px;
         }
         .iconcontent{
             @include point(margin-left,20);
