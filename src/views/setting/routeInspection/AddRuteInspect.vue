@@ -367,11 +367,14 @@
                 <el-radio label="0">{{ $t('insSettingView.advanceSettingOff') }}</el-radio>
             </el-radio-group>
           </div>
-          <el-input v-model.number="itemGroupScore"
-              :placeholder="$t('insSettingView.enterScore')"
-              :disabled = "itemAdvanceSetting=='0'"
-              @input="itemGroupScoreChange"/>
-          <span v-if="GroupScoreTip" class="rules">{{ $t('insSettingView.setGroupScoreRange') }}</span>
+          <div style="margin-left:20px;">
+            <div style="line-height:28px;" :style="itemAdvanceSetting=='1'?{'color':'#606266'}:{'color':'#c0c4cc'}">{{$t('insSettingView.groupScoreLimit')}}</div>
+            <el-input v-model.number="itemGroupScore"
+                :placeholder="$t('insSettingView.enterScore')"
+                :disabled = "itemAdvanceSetting=='0'"
+                @input="itemGroupScoreChange"/>
+            <span v-if="GroupScoreTip" class="rules">{{ $t('insSettingView.setGroupScoreRange') }}</span>
+          </div>
         </div>
       </div>
     </dialog-pop>
