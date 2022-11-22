@@ -35,7 +35,7 @@
               <v-chart
                 ref="storeEventRef"
                 :options="storeEventsOptions"
-                :auto-resize="true"
+                autoresize
                 class="result-content"/>
             </div>
           </div>
@@ -51,7 +51,7 @@
               <div class="pct-panel">
                   <v-chart
                       ref="eventSourceRef"
-                      :auto-resize="true"
+                      autoresize
                       :options="eventSourceOptions"
                       class="chart-content"
                   />
@@ -92,7 +92,7 @@
                 <div class="pct-panel">
                     <v-chart
                         ref="eventSourceRef"
-                        :auto-resize="true"
+                        autoresize
                         :options="eventStatusOptions"
                         class="chart-content"
                     />
@@ -136,7 +136,7 @@
                 <v-chart
                   ref="storeStatusRef"
                   :options="storeStatusOptions"
-                  :auto-resize="true"
+                  autoresize
                   class="result-content"/>
               </div>
             </div>

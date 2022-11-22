@@ -33,7 +33,7 @@
                 <v-chart
                   ref="storeChart"
                   :options="storeOptions"
-                  :auto-resize="true"
+                  autoresize
                   class="result-content"
                   @timelinechanged="timelineHandler"/>
                 <i v-if="showPreviousGroup" class="el-icon-arrow-left icon-arrow" @click="previousGroup"/>
@@ -101,7 +101,7 @@
               <div class="pct-panel">
                   <v-chart
                       ref="temsPie"
-                      :auto-resize="true"
+                      autoresize
                       :options="itemsOptions"
                       class="chart-content"
                   />
@@ -160,7 +160,7 @@
               <el-col :span="8" class="item-radar">
                 <div v-if="itemsTopFive.length > 0" class="rader-panel">
                   <div class="radar-title">{{ curItemName }}</div>
-                  <v-chart ref="itemsRadar" :options="itemsRadarOption" :auto-resize="true" class="radar-content"/>
+                  <v-chart ref="itemsRadar" :options="itemsRadarOption" autoresize class="radar-content"/>
                 </div>
                 <div v-else class="radar-empty">
                   {{ $t('overview.noData') }}
@@ -192,7 +192,7 @@
             <div class="cycle-panel">
               <div class="panel-info">*{{ $t('overview.dataZoomInfo') }}</div>
               <div class="panel-bubble">
-                <v-chart ref="cycleChart" :options="cycleOption" :auto-resize="true" class="radar-content"/>
+                <v-chart ref="cycleChart" :options="cycleOption" autoresize class="radar-content"/>
               </div>
               <div class="cycle-axis">{{ $t('overview.cycle') }}</div>
               <div class="pass-rate-axis">{{ $t('overview.passRate') }}</div>
