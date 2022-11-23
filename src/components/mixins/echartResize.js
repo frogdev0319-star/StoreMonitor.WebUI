@@ -33,11 +33,9 @@ export default {
   methods: {
     sidebarResizeHandler(e) {
       this.adjustChart();
-      
     },
 
     initListener() {
-      console.log('resize ~~~~~~~~>> GO');
       window.addEventListener('resize', this.adjustChart, false);
       this.sidebarElm = document.getElementsByClassName('aside-menu')[0];
       this.sidebarElm && this.sidebarElm.addEventListener('transitionend', this.sidebarResizeHandler, false);

@@ -490,7 +490,7 @@ export default {
 </style>
 <style scoped>
   .el-select-dropdown__item{
-    padding: 0 20px 0 20px !important;
+    padding: 0 40px 0 20px !important;
     /*color: #7d8cad;*/
   }
 

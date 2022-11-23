@@ -1454,8 +1454,8 @@ export default {
                     type1ts = (type1ts <item.groupScore)?item.groupScore:type1ts ;
                     type1tsX = (type1tsX<item.groupScore)?item.groupScore:type1tsX;
                   }else{
-                    type1ts = (Math.abs(type1ts) >Math.abs(item.groupScore))?item.groupScore:type1ts ;
-                    type1tsX = (Math.abs(type1tsX)>Math.abs(item.groupScore))?item.groupScore:type1tsX;
+                    type1ts = item.groupScore;//(Math.abs(type1ts) >Math.abs(item.groupScore))?item.groupScore:type1ts ;
+                    type1tsX = item.groupScore;//(Math.abs(type1tsX)>Math.abs(item.groupScore))?item.groupScore:type1tsX;
                   }
               }
                   CurAddScoreB += type1ts * (p_item.weight == -1 ? 1 : (p_item.weight/100));

@@ -23,7 +23,7 @@
         @click="submitBindTitle">
         {{ $t('remotePatrol.submit') }}
       </el-button>
-      <span v-if="showLengthNameWarning" class="warningtips">{{ $t('insSettingView.enterNameRuletip') }}</span>
+    <div v-if="showLengthNameWarning" class="warningtips">{{ $t('insSettingView.enterNameRuletip') }}</div>  
     </div>
     <hr class="hr-horizontal">
     <div class="flex padding">
@@ -367,11 +367,14 @@
                 <el-radio label="0">{{ $t('insSettingView.advanceSettingOff') }}</el-radio>
             </el-radio-group>
           </div>
-          <el-input v-model.number="itemGroupScore"
-              :placeholder="$t('insSettingView.enterScore')"
-              :disabled = "itemAdvanceSetting=='0'"
-              @input="itemGroupScoreChange"/>
-          <span v-if="GroupScoreTip" class="rules">{{ $t('insSettingView.setGroupScoreRange') }}</span>
+          <div style="margin-left:20px;">
+            <div style="line-height:28px;" :style="itemAdvanceSetting=='1'?{'color':'#606266'}:{'color':'#c0c4cc'}">{{$t('insSettingView.groupScoreLimit')}}</div>
+            <el-input v-model.number="itemGroupScore"
+                :placeholder="$t('insSettingView.enterScore')"
+                :disabled = "itemAdvanceSetting=='0'"
+                @input="itemGroupScoreChange"/>
+            <span v-if="GroupScoreTip" class="rules">{{ activeSheetName=='0'?$t('insSettingView.setGroupScoreRange0'):$t('insSettingView.setGroupScoreRange') }}</span>
+          </div>
         </div>
       </div>
     </dialog-pop>
@@ -2032,14 +2035,13 @@ export default {
                 color: #ddd;
                 cursor: pointer;
             }
-            .warningtips{
-                font-size:12px;
-                color:red;
-                margin:5px 0 0 0;
-                position: absolute;
-                top:22px;
-                left:calc(30/1920*100vw);
-            }
+            
+        }
+        .warningtips{
+            font-size:12px;
+            color:red;
+            position: absolute;
+            top:53px;
         }
         .iconcontent{
             @include point(margin-left,20);

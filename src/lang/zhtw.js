@@ -793,8 +793,9 @@ export default{
       "advanceSetting":"進階設定",
       "advanceSettingOn":"開啟",
       "advanceSettingOff":"關閉",
+      "setGroupScoreRange0":"類別分值上限 輸入範圍 0 ~ 9999",
       "setGroupScoreRange":"類別分值上限 輸入範圍 -9999 ~ 9999",
-    
+      "groupScoreLimit":"類別分值上限"
   },
   "deviceView":{
       "EzvizAccount":"串流服務帳號",
@@ -1478,7 +1479,6 @@ export default{
       "duplicateNickName":"已有相同的神秘客代稱，請重新輸入",
       "mysterio":"神秘客",
       "allMysterio":"全部神秘客",
-      "mystery":"神秘客"
   }
 
 }
