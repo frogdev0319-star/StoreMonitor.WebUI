@@ -793,6 +793,7 @@ export default{
       "advanceSetting":"進階設定",
       "advanceSettingOn":"開啟",
       "advanceSettingOff":"關閉",
+      "setGroupScoreRange0":"類別分值上限 輸入範圍 0 ~ 9999",
       "setGroupScoreRange":"類別分值上限 輸入範圍 -9999 ~ 9999",
       "groupScoreLimit":"類別分值上限"
   },

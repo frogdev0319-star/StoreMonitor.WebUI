@@ -373,7 +373,7 @@
                 :placeholder="$t('insSettingView.enterScore')"
                 :disabled = "itemAdvanceSetting=='0'"
                 @input="itemGroupScoreChange"/>
-            <span v-if="GroupScoreTip" class="rules">{{ $t('insSettingView.setGroupScoreRange') }}</span>
+            <span v-if="GroupScoreTip" class="rules">{{ activeSheetName=='0'?$t('insSettingView.setGroupScoreRange0'):$t('insSettingView.setGroupScoreRange') }}</span>
           </div>
         </div>
       </div>
