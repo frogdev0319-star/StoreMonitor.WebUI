@@ -32,11 +32,11 @@
               </el-select>
             </div>
             <div class="charts-content">
-              <v-chart
+              <!-- <v-chart
                 ref="storeEventRef"
                 :options="storeEventsOptions"
                 :auto-resize="true"
-                class="result-content"/>
+                class="result-content"/> -->
             </div>
           </div>
 

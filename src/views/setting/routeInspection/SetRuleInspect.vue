@@ -134,7 +134,7 @@
     <el-col :span="24" class="el-rute-content storeLevel">
       <setting-table table-name="巡檢總評選項顯示 (此設定是依門店)">
         <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
-          <div class="overall_options" v-if="onSiteSignature">
+          <div class="overall_options">
 
             <div class="overall_row" v-for="(item, index) in defaultDefineName" :key="index">
               <el-radio-group class="storevue-radio radio_item" v-model="item.defineStatus">
@@ -151,7 +151,7 @@
                 />
             </div>
             
-            <span class="text_limit_sign" v-if="showInputLimit_overallItem"> {{$t('insSettingView.inputRuletip')}}  </span>
+            <span class="text_limit_sign" v-if="showInputLimit_overallItem"> {{$t('insSettingView.inputRuletip')}} </span>
           </div>
         </div>
       </setting-table>
@@ -246,7 +246,9 @@
 
             <!-- radio 2 -->
             <div class="suggestvalue_section">
-              <el-radio :label="false" v-model="dangerousOnFailedItem">{{ $t('insSettingView.tab1FailedDangeous') }}</el-radio> 
+              <el-radio :label="false" v-model="dangerousOnFailedItem">
+                Tab1（Pass&Fail）中存在不合格項時，巡檢結果為： {{defaultDefineName[0].newName}}
+              </el-radio> 
             </div>
             
           </el-radio-group>

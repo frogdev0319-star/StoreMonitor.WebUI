@@ -8,6 +8,8 @@
       >
         <template v-slot:others>
           <div class="last-row" >
+
+            <!-- 總評類型 -->
             <span style="margin-right: 16px; font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.resultType') }}</span>
             <el-select
               v-model="curAppraise"
@@ -21,6 +23,8 @@
                 :label="item.label"
                 :value="item.status"/>
             </el-select>
+
+            <!-- 報表類型 -->
             <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.reportType') }}</span>
             <div class="flex-center report-type-area">
             <el-select
@@ -37,6 +41,7 @@
                 :label="item.label"
                 :value="item.mode"/>
             </el-select>
+            
             <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" />
               <el-select
                 class="el-province"
@@ -1130,6 +1135,13 @@ export default {
           delete this.inspectStatus.update_time
           delete this.inspectStatus.update_user_id
           console.log('this.inspectStatus~~~~~ :>> ', this.inspectStatus);
+          
+          this.appraiseList.forEach(item =>{
+            if(item.status === 0) {item.label = this.inspectStatus.status_0}
+            else if(item.status === 1) {item.label = this.inspectStatus.status_1}
+            else if(item.status === 2) {item.label = this.inspectStatus.status_2}
+          })
+
         }).catch(err => {
           reject(err);
         });

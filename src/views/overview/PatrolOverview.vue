@@ -26,8 +26,9 @@
           </div>
         </el-col>
         
+        <!-- 各區域門店巡檢情況 -->
         <el-col :span="14" class="store-list">
-          <div class="title">{{ $t('overview.patrolStatus') }}</div>
+          <div class="title">{{ $t('overview.patrolStatus') }} </div>
           <div class="region-result">
             <div class="region-content">
               <div class="region-result-panel">
@@ -43,8 +44,8 @@
               </div>
             </div>
           </div>
-
         </el-col>
+
         <el-col :span="6" class="focus-list">
           <div class="title flex-center">
             <span v-if="isWorstArea" class="area-title">{{ $t('overview.worstRegion') }}</span>
@@ -329,17 +330,20 @@ export default {
   },
 
   watch: {
-    accountChanged(val) {
+    async accountChanged(val) {
       const self = this;
       if (val !== 0) {
         self.timeMode = 1;
         self.isEnSpan = false;
         self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
         self.currentIndex = 0;
-        self.getSearchParams();
-        self.getPatrolOverviewData();
+
+        await self.getInspectStatus();
+        await self.getSearchParams();
+        await self.getPatrolOverviewData();
       }
-    }
+    },
+    
   },
 
   async created() {
@@ -374,12 +378,9 @@ export default {
     },
 
     renameTableLabel(){
-
       this.resultList[2] = this.inspectStatus.status_2
       this.resultList[1] = this.inspectStatus.status_1
       this.resultList[0] = this.inspectStatus.status_0
-      console.log('this.resultList~~~~~>', this.resultList)
-
     },
 
     changBestAndWorst() {
@@ -1194,11 +1195,24 @@ export default {
             fontSize: 12
           },
           data: [
-            { name: this.$t('overview.dangerousMore'), icon: 'rect' },
-            { name: this.$t('overview.DangerousLess'), icon: 'rect' },
-            { name: this.$t('overview.excellentLess'), icon: 'rect' },
-            { name: this.$t('overview.excellentMore'), icon: 'rect' }]
+            {
+              name: this.inspectStatus.status_0 + " ≥ 60%", 
+              icon: 'rect' },
+            {
+              name: this.inspectStatus.status_0 + "＜60%", 
+              icon: 'rect' 
+            },
+            { 
+              name: this.$t('overview.excellentLess'), 
+              icon: 'rect' 
+            },
+            { 
+              name: this.$t('overview.excellentMore'), 
+              icon: 'rect' 
+            }]
         },
+
+        
         textStyle: {
           fontFamily: this.fontFamily
         },
@@ -1328,7 +1342,7 @@ export default {
 
         series: [
           {
-            name: this.$t('overview.dangerousMore'),
+            name: this.inspectStatus.status_0 + "≥60%",
             type: 'scatter',
             itemStyle: itemDangerStyle,
             symbolSize: function() {
@@ -1357,7 +1371,7 @@ export default {
             data: []
           },
           {
-            name: this.$t('overview.DangerousLess'),
+            name: this.inspectStatus.status_0 + "＜60%",
             type: 'scatter',
             itemStyle: itemDangerStyle,
             symbolSize: 15,
