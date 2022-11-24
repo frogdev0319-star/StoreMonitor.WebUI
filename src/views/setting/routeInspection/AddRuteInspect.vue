@@ -1412,11 +1412,12 @@ export default {
                 const res = resApply;
               });
             }
-            setTimeout(function() {
-              if (self.tabName == '远程巡检') {
+            /*setTimeout(function() {
+              if (self.routeName == '远程巡检') {
+                console.log("in tabName = ",self.tabName);
                 PubSub.publish('change-color', { showTag: true });
               }
-            }, 1000);
+            }, 1000);*/
           } else {
             util.notify(self.$t('insSettingView.addFail'), 'warning', 3000);
             return false;
