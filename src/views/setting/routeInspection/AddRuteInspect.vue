@@ -432,7 +432,7 @@ export default {
       ScoreOptionsTips1:false,
       firstLoad: true,
       groupTitle: this.$t('insSettingView.category'),
-      tabName: '',
+      //tabName: '',
       ModelPost: [],
       ModelAddPost: [],
       groupList: [],
@@ -676,6 +676,7 @@ export default {
         if (res.errCode === 0) {
           self.showEditTab = false;
           self.routeName = self.editRouteName;
+          //self.tabName = self.editRouteName;
           self.showLengthNameWarning = false;
           util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           return false;
@@ -826,7 +827,7 @@ export default {
       }
     },
 
-    async confirmEditGroup(index, item) {
+    /*async confirmEditGroup(index, item) {
       const self = this;
       const temp = [];
       if (item.name == null || item.name.length === 0) {
@@ -852,7 +853,7 @@ export default {
         util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
         return false;
       }
-    },
+    },*/
 
     updateGroup(params) {
       return new Promise((resolve, reject) => {
@@ -941,7 +942,7 @@ export default {
         'groups': [{
           id: this.activeId,
           name: this.groupNameInput,
-          tag: this.tabName,
+          tag: this.routeName,//this.tabName,
           parentId: this.parentId,
           isAdvanced:this.itemAdvanceSetting=="1",
           groupScore:this.itemAdvanceSetting=="1"?this.itemGroupScore:0
@@ -964,7 +965,7 @@ export default {
       const obj = {
         name: this.groupNameInput,
         mode: mode,
-        tag: this.tabName,
+        tag: this.routeName,//this.tabName,
         type: Number(this.activeSheetName),
         parentId: this.parentId
       };
@@ -1518,7 +1519,7 @@ export default {
 
     async refreshData(index) {
       const self = this;
-      const curTag = self.tabName;
+      const curTag = self.routeName;//self.tabName;
       const itemsList = await self.getInspectItemList();
       const data = util.getRouteByTag(curTag, itemsList);
       const filterData = util.handleInspctionCatergyTree(data);
@@ -1685,7 +1686,8 @@ export default {
     },
 
     initData() {
-      this.tabName = sessionStorage.getItem('GroupName');
+      //this.tabName = sessionStorage.getItem('GroupName');
+      //console.log("tabName:",this.tabName);
       const itemSettingData = JSON.parse(sessionStorage.getItem('itemSettingData'));
       this.routeName = itemSettingData.routeName;
       this.routeData = itemSettingData.routeData;
