@@ -567,7 +567,8 @@ export default {
 
       inspectStatus:"",
       getInspectRuleSettings: "",
-      autoMappingByTotalScore: ""
+      autoMappingByTotalScore: "",
+      isAutoMappingActivate: "",
     };
   },
   computed: {
@@ -2030,6 +2031,12 @@ export default {
           this.autoMappingByTotalScore = res.data.find(i => {
             return i.name == "setting_autoMappingByTotalScore"
           })
+
+          this.isAutoMappingActivate = res.data.find(i => {
+            return i.name == "setting_isAutoMappingActivate"
+          })
+            
+
           console.log('this.autoMappingByTotalScore ~~~~~>>>> ', this.autoMappingByTotalScore);
           console.log('this.scorecount ~~~~~>>>> ', this.scorecount);
           console.log('this.resultList ~~~~~>>>> ', this.resultList);
@@ -2051,25 +2058,25 @@ export default {
           this.resultList[2].name =this.inspectStatus.status_0
 
 
-          if(this.autoMappingByTotalScore.value){
+          if(this.isAutoMappingActivate.value){
               // 全部 false
               this.resultList.forEach(item => {
                 item.isShow = false
               })
               
-              if(this.scorecount >= scoreMiddleHeight){
+              if(this.scorecount >= scoreMiddleHeight + 0.1){
                 var n = this.resultList.findIndex(i=>i.label === 2)
                 console.log('n 2 :>> ', n);
                 this.resultList[n].isActive = true
                 this.resultList[n].isShow = true
               } 
-              else if(  this.scorecount <= scoreMiddleHeight - 1 && this.scorecount >= scoreMiddleLow){
+              else if(  this.scorecount <= scoreMiddleHeight && this.scorecount >= scoreMiddleLow){
                 var n = this.resultList.findIndex(i=>i.label === 1)
                 console.log('n 1:>> ', n);
                 this.resultList[n].isActive = true
                 this.resultList[n].isShow = true
               } 
-              else if( this.scorecount <= scoreMiddleLow - 1){
+              else if( this.scorecount <= scoreMiddleLow - 0.1){
                 var n = this.resultList.findIndex(i=>i.label === 0)
                 console.log('n 0:>> ', n);
                 this.resultList[n].isActive = true

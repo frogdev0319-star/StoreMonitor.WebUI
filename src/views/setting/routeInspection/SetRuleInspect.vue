@@ -132,7 +132,7 @@
 
     <!-- 巡檢總評選項顯示 -->
     <el-col :span="24" class="el-rute-content storeLevel">
-      <setting-table table-name="巡檢總評選項顯示 (此設定是依門店)">
+      <setting-table table-name="巡檢總評選項顯示 (此設定將影響品牌之巡檢總評相關顯示)">
         <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
           <div class="overall_options">
 
@@ -247,8 +247,7 @@
             <!-- radio 2 -->
             <div class="suggestvalue_section">
               <el-radio :label="false" v-model="dangerousOnFailedItem">
-                Tab1（Pass&Fail）中存在不合格項時，巡檢結果為： {{defaultDefineName[0].newName}}
-              </el-radio> 
+                Tab1（Pass&Fail）中存在不合格項時，巡檢結果為： {{defaultDefineName[0].newName}}</el-radio> 
             </div>
             
           </el-radio-group>
@@ -680,12 +679,13 @@ export default {
   },
   computed:{
     showScoreMin(){
-      return parseFloat(this.scoreMiddleLow)  - 1
+      var tempScore =  (parseFloat(this.scoreMiddleLow) - 0.1)
+      return Number.isInteger(tempScore) ? tempScore.toFixed(0) : tempScore.toFixed(1)
     },
     showScoreMax(){
-      return parseFloat(this.scoreMiddleHeight) + 1
+      var tempScore =  (parseFloat(this.scoreMiddleHeight) + 0.1)
+      return Number.isInteger(tempScore) ? tempScore.toFixed(0) : tempScore.toFixed(1)
     }
-
   },
 
   async mounted() {
@@ -714,8 +714,12 @@ export default {
 
   methods: {
     countNum(){
-      this.scoreMiddleLow = ((this.maxScore - this.minScore) * .5) + this.minScore
-      this.scoreMiddleHeight = ((this.maxScore - this.minScore) * .8) + this.minScore
+
+      var middleLow = (((this.maxScore - this.minScore) * .5) + this.minScore)
+      this.scoreMiddleLow = Number.isInteger(middleLow) ? middleLow.toFixed(0) : middleLow.toFixed(1)
+
+      var middleHeight = (((this.maxScore - this.minScore) * .8) + this.minScore)
+      this.scoreMiddleHeight = Number.isInteger(middleHeight) ? middleHeight.toFixed(0) : middleHeight.toFixed(1)
     },
 
 
@@ -1013,6 +1017,7 @@ export default {
 
     inputChangeMax(e) {
       let maxScore = this.getUtilScore(e.target.value);
+      if(maxScore < 1) maxScore = 1
 
       if (this.hundredMarkType === '1') {
         maxScore = parseFloat(maxScore) > parseFloat(this.baseScore) ? parseFloat(this.baseScore) : maxScore;
@@ -1043,6 +1048,7 @@ export default {
       else if(self.scoreMiddleLow > self.scoreMiddleHeight){
         self.scoreMiddleLow = self.scoreMiddleHeight - 1
       }
+
     },
 
     inputScoreMiddleMax(e){
@@ -1059,9 +1065,6 @@ export default {
       }
   
     },
-
-  
-
 
 
     getUtilScore(val) {
