@@ -163,7 +163,7 @@
     <el-col :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.isCheckSuggest')">
         <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
-          <el-checkbox class="storevue-checkbox-outlined" v-model="setting_isAutoMappingActivate">
+          <el-checkbox class="storevue-checkbox-outlined" v-model="setting_isAutoMappingActivate" @change="switchIsAutoMappingActivate">
             <span>
               開啟依條件自動選取巡檢總評
             </span>
@@ -171,7 +171,7 @@
 
           <div v-if="setting_isAutoMappingActivate" style="width: 100%;">
           <!-- radio 1 -->
-          <el-radio-group class="storevue-radio suggestvalue" v-model="isAutoSelectReview">
+          <el-radio-group class="storevue-radio suggestvalue" v-model="setting_autoMappingByTotalScore">
             <div class="suggestvalue_section" style="margin-bottom: 3px">
 
               <el-radio :label="true" style="margin-bottom: 10px">依分數條件自動選取</el-radio> 
@@ -209,7 +209,7 @@
                           style="width: 90px;"
                           v-model="scoreMiddleLow"
                           type="number"
-                          :disabled = "!isAutoSelectReview"
+                          :disabled = "!setting_autoMappingByTotalScore"
                           @blur="inputScoreMiddleMin"
                           
                           />
@@ -222,7 +222,7 @@
                           style="width: 90px;"
                           v-model="scoreMiddleHeight"
                           type="number"
-                          :disabled = "!isAutoSelectReview"
+                          :disabled = "!setting_autoMappingByTotalScore"
                           @blur="inputScoreMiddleMax"/>
                           分 
                       </div>
@@ -515,11 +515,11 @@ export default {
       qualifiedForIgnoredWithType1: false,
       qualifiedForIgnoredWithType2: false,
 
-      setting_isAutoMappingActivate: true,
-      
 
-      dangerousOnFailedItem: false,
+      setting_isAutoMappingActivate: false,
       setting_autoMappingByTotalScore: true,
+      dangerousOnFailedItem: false,
+
 
       onSitePhotoOnly: false,
       lang: this.$i18n.locale,
@@ -556,13 +556,6 @@ export default {
       n : 1,
       showInputLimit: false,
       showInputLimit_overallItem: false,
-
-      // switchAutoSelectReview: true,
-      isAutoSelectReview: true,
-      defineStatus_2: 0, //良好
-      defineStatus_1: 0, //待改善
-      defineStatus_0: 0, //立即督導
-
       defaultDefineName:[
         {
           name: '立即督導' ,
@@ -584,18 +577,9 @@ export default {
           refName: 'good'
         },
       ],
-
-      needDefineName:{
-        status_2:'',
-        status_1:'',
-        status_0:'',
-      },
-      
       scoreMiddleLow: 0,
       scoreMiddleHeight: 0,
-
       inspectStatus:"",
-      
     };
   },
   watch: {
@@ -618,9 +602,13 @@ export default {
       this.bindWorkFlowData.inspectTagId = this.inspectId
       // console.log('this.workFlowToBind ~~~~>> ', this.workFlowToBind);
     },
+
+    
     enableDelay(val){
       if(val == true && this.delayDay == undefined)  this.delayDay = 1
     },
+
+
     onSiteSignature:{
       immediate: false, 
       deep: true,
@@ -646,18 +634,11 @@ export default {
         }
       }
     },
-    isAutoSelectReview(val){
-      console.log('val :>> ', val);
-      if(val) {
-        this.setting_autoMappingByTotalScore = true
-        this.dangerousOnFailedItem = false
 
-      } else {
-        this.setting_autoMappingByTotalScore = false
-        this.dangerousOnFailedItem = true
-
-      }
+    setting_autoMappingByTotalScore(val){
+      if(this.setting_isAutoMappingActivate) this.dangerousOnFailedItem = !val     
     },
+
     defaultDefineName:{
       immediate: false, 
       deep: true,
@@ -695,7 +676,6 @@ export default {
     await this.getInspectStatus()
 
     // await this.countNum()
-  
     for (let i = 0; i < 3; i++) {
       if(this.defaultDefineName[i].name !== this.inspectStatus["status_" + i]) {
           this.defaultDefineName[i].defineStatus = 1
@@ -705,16 +685,29 @@ export default {
           this.defaultDefineName[i].newName = this.defaultDefineName[i].name
         }
     }
-    console.log('this.inspectStatus  mounted:>> ', this.inspectStatus);
-    console.log('this.defaultDefineName  mounted:>> ', this.defaultDefineName);
-
-    
+    // console.log('this.inspectStatus  mounted:>> ', this.inspectStatus);
+    // console.log('this.defaultDefineName  mounted:>> ', this.defaultDefineName);
+    // console.log('this.setting_autoMappingByTotalScore  mounted >>>>>>>----->> ', this.setting_autoMappingByTotalScore);
 
   },
 
   methods: {
-    countNum(){
 
+    switchIsAutoMappingActivate(val){
+      console.log('val =======>> ', val);
+      if(!val){
+        this.setting_autoMappingByTotalScore = false
+        this.dangerousOnFailedItem = false
+      } else {
+        this.setting_autoMappingByTotalScore = true
+        this.dangerousOnFailedItem = false
+      }
+      console.log('this.setting_autoMappingByTotalScore :>> ', this.setting_autoMappingByTotalScore);
+      console.log('this.dangerousOnFailedItem :>> ', this.dangerousOnFailedItem);
+    },
+
+
+    countNum(){
       var middleLow = (((this.maxScore - this.minScore) * .5) + this.minScore)
       this.scoreMiddleLow = Number.isInteger(middleLow) ? middleLow.toFixed(0) : middleLow.toFixed(1)
 
@@ -795,8 +788,7 @@ export default {
                 ]
             },
 
-            { name: 'dangerousOnFailedItem', value: self.dangerousOnFailedItem },
-
+            { name: 'dangerousOnFailedItem', value: this.dangerousOnFailedItem },
 
             { name: 'onSitePhotoOnly', value: self.onSitePhotoOnly },
             { name: 'onSiteSignature', value: self.onSiteSignature },
@@ -819,8 +811,6 @@ export default {
           ]
         };
     
-      
-
       if(this.onSiteSignature) params.ruleItems.push(this.signatureData)
         console.log('params', params)
         
@@ -844,7 +834,6 @@ export default {
           util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
           return false;
         }
-
       }
     },
 
@@ -886,17 +875,13 @@ export default {
               case 'dangerousOnFailedItem':
                 self.dangerousOnFailedItem = item.value;
                 break;
-
-
               case 'setting_isAutoMappingActivate':
                 self.setting_isAutoMappingActivate = item.value;
                 break;
-                
               case 'setting_autoMappingByTotalScore':
                 self.setting_autoMappingByTotalScore = item.value
                 self.scoreMiddleLow = item.extra[0].value
                 self.scoreMiddleHeight = item.extra[1].value
-                
                 break;
 
 
@@ -933,8 +918,6 @@ export default {
       } catch (err) {
         console.log('SetInspectRule-getRule: ' + err);
       }
-
-      self.isAutoSelectReview = self.setting_autoMappingByTotalScore
     },
     updateInspectRule(params) {
       return new Promise((resolve, reject) => {

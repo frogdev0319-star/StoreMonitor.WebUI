@@ -29,8 +29,6 @@
               class="el-radio-details"
               @click="clickSum(item,index)">{{ item.name }}</span>
           </span>
-
-
         </div>
         <span class="sug-label">{{ $t('remotePatrol.inspectionAdvice') }}</span>
         <el-input
@@ -120,6 +118,8 @@
         </div>
       </div>
     </el-col>
+
+    <!-- 巡檢預覽 -->
     <el-col v-if="!allRemarkItemsFlag" :span="24" class="sum-data">
       <span style="font-size: 18px; font-weight: bold">{{ $t('remotePatrol.preview') }}</span>
       <div class="paper" style="margin-top: 15px; padding: 0 15px">
@@ -157,12 +157,12 @@
                   <td :rowspan="inspectItem.inspectList.length+1" style="vertical-align:middle;">
                     <div class="flex">
                       <div class="spacer">
-                        <div v-if="inspectItem.weight != -1 && inspectItem.type != 2">{{ inspectItem.weight + '%' }}</div>
+                        <div v-if="inspectItem.weight != -1 && inspectItem.type != 2">{{ inspectItem.weight + '%' }} </div>
                         <div class="sheet_title">{{ inspectItem.label }}</div>
                       </div>
                       <div class="flex" style="align-items: center">
                         <span>{{$t('')}}</span>
-                        <span class="count-blag">{{inspectItem.count}}</span>
+                        <span class="count-blag">{{inspectItem.count}} </span>
                       </div>
                     </div>
                   </td>
@@ -359,7 +359,7 @@
                                 :height="imgHeight+'px'"
                                 :class="{'source-details': sourceitem.mediaType!=3}">
                                 <template v-if="sourceitem.mediaType==3">
-                                 {{`${sourceitem.src}`}}
+                                  {{`${sourceitem.src}`}}
                                 </template>
                                 <div v-if="sourceitem.mediaType === 2" :style="isexportPDF ? 'margin-right:20px;margin-bottom:20px' : ''" class="img-content">
                                   <el-image
@@ -518,7 +518,7 @@ export default {
           'label': 0,
           'name': this.$t('remotePatrol.dangerous'),
           'isActive': false,
-          'isShow': false
+          'isShow': true
         }
       ],
       startIcon: require('../../../static/img/play_icon.png'),
@@ -569,6 +569,11 @@ export default {
       getInspectRuleSettings: "",
       autoMappingByTotalScore: "",
       isAutoMappingActivate: "",
+      dangerousOnFailedItem:"",
+
+      unqualifiedStatus:  false,
+      scoreMiddleLow: 0,
+      scoreMiddleHeight: 0,
     };
   },
   computed: {
@@ -618,14 +623,12 @@ export default {
   },
   mounted() {
     const self = this;
-    
+    self.getInspectStatus();
+    self.getInspectRule();
+
     self.getRouteData();
     self.getUpLoadBucketInfo();
     self.getOssInfo();
-
-    self.getInspectStatus();
-    self.getInspectRule();
-   
 
     
   },
@@ -1570,8 +1573,8 @@ export default {
               }
             } else {
               if (p_item.type == 0) {
-                console.log(">>>>includedInTotalScoreWithType1:",inspectSettings.includedInTotalScoreWithType1);
-                console.log(">>>>isOnlyTab1:",isOnlyTab1);
+                // console.log(">>>>includedInTotalScoreWithType1:",inspectSettings.includedInTotalScoreWithType1);
+                // console.log(">>>>isOnlyTab1:",isOnlyTab1);
                 if (!inspectSettings.includedInTotalScoreWithType1 && !isOnlyTab1) {
                   item['itemgetScore'] = '--';
                 }
@@ -1599,10 +1602,14 @@ export default {
           });//end for 一個類別
           if (p_item.type === 0) {
             p_item['tHeader'] = self.theaderPassFail;
+            console.log('p_item.inspectList :>>>>>>>>>>>----->> ', p_item.inspectList);
             if (p_item.inspectList.some(x => x.numOfUnqualified !== 0) && dealType.some(x => x === 0) && inspectSettings.dangerousOnFailedItem) {
-              self.resultList[0].isShow = false;
-              self.resultList[1].isShow = false;
-              self.resultList[2].isActive = true;
+              // self.resultList[0].isShow = false;
+              // self.resultList[1].isShow = false;
+              // self.resultList[2].isActive = true;
+              // self.resultList[2].isShow = true;
+
+              this.unqualifiedStatus = true
               Tab0Status = true;
             }
           } else if (p_item.type === 1) {
@@ -2028,24 +2035,29 @@ export default {
           this.getInspectRuleSettings = res.data
           console.log('this.getInspectRuleSettings ~~~~~>>>> ', this.getInspectRuleSettings);
 
+          this.dangerousOnFailedItem = res.data.find(i => {
+            return i.name == "dangerousOnFailedItem"
+          })
           this.autoMappingByTotalScore = res.data.find(i => {
             return i.name == "setting_autoMappingByTotalScore"
           })
-
           this.isAutoMappingActivate = res.data.find(i => {
             return i.name == "setting_isAutoMappingActivate"
           })
-            
+          
 
+          console.log('this.dangerousOnFailedItem ~~~~~>>>> ', this.dangerousOnFailedItem);
           console.log('this.autoMappingByTotalScore ~~~~~>>>> ', this.autoMappingByTotalScore);
+          console.log('this.isAutoMappingActivate ~~~~~>>>> ', this.isAutoMappingActivate);
+
           console.log('this.scorecount ~~~~~>>>> ', this.scorecount);
           console.log('this.resultList ~~~~~>>>> ', this.resultList);
           // this.scorecount = 10
 
-          const scoreMiddleLow = this.autoMappingByTotalScore.extra.find(i => i.key === "mappingScore_bottom").value
-          const scoreMiddleHeight = this.autoMappingByTotalScore.extra.find(i => i.key === "mappingScore_top").value
-          console.log('scoreMiddleLow ~~~~~~>> ', scoreMiddleLow);
-          console.log('scoreMiddleHeight ~~~~~~>> ', scoreMiddleHeight);
+          this.scoreMiddleLow = this.autoMappingByTotalScore.extra.find(i => i.key === "mappingScore_bottom").value
+          this.scoreMiddleHeight = this.autoMappingByTotalScore.extra.find(i => i.key === "mappingScore_top").value
+          console.log('scoreMiddleLow ~~~~~~>> ', this.scoreMiddleLow);
+          console.log('scoreMiddleHeight ~~~~~~>> ', this.scoreMiddleHeight);
 
 
 
@@ -2056,34 +2068,8 @@ export default {
           this.resultList[0].name =this.inspectStatus.status_2
           this.resultList[1].name =this.inspectStatus.status_1
           this.resultList[2].name =this.inspectStatus.status_0
-
-
-          if(this.isAutoMappingActivate.value){
-              // 全部 false
-              this.resultList.forEach(item => {
-                item.isShow = false
-              })
-              
-              if(this.scorecount >= scoreMiddleHeight + 0.1){
-                var n = this.resultList.findIndex(i=>i.label === 2)
-                console.log('n 2 :>> ', n);
-                this.resultList[n].isActive = true
-                this.resultList[n].isShow = true
-              } 
-              else if(  this.scorecount <= scoreMiddleHeight && this.scorecount >= scoreMiddleLow){
-                var n = this.resultList.findIndex(i=>i.label === 1)
-                console.log('n 1:>> ', n);
-                this.resultList[n].isActive = true
-                this.resultList[n].isShow = true
-              } 
-              else if( this.scorecount <= scoreMiddleLow - 0.1){
-                var n = this.resultList.findIndex(i=>i.label === 0)
-                console.log('n 0:>> ', n);
-                this.resultList[n].isActive = true
-                this.resultList[n].isShow = true
-              }
-          }
-          console.log('this.resultList 2 ~~~~~>>>> ', this.resultList);
+          
+          if(this.isAutoMappingActivate.value) this.determineResultList()
 
         }).catch(err => {
           console.log("getInspectRule err:",err);
@@ -2106,6 +2092,49 @@ export default {
         });
       });
     },
+
+    
+    determineResultList(){
+      if(this.unqualifiedStatus){
+        console.log('go 1 ~~~~~~~~~~>> ');
+        this.resultList[0].isShow = false;
+        this.resultList[1].isShow = false;
+        this.resultList[2].isActive = true;
+        this.resultList[2].isShow = true;
+      }
+      else if(this.autoMappingByTotalScore.value){
+        console.log('go 2 ~~~~~~~~~~>> ');
+        this.resultList.forEach(item => {
+          item.isShow = false
+        })
+        if(this.scorecount >= this.scoreMiddleHeight + 0.1){
+          var n = this.resultList.findIndex(i=>i.label === 2)
+          console.log('n 2 :>> ', n);
+          this.resultList[n].isActive = true
+          this.resultList[n].isShow = true
+        } 
+        else if(  this.scorecount <= this.scoreMiddleHeight && this.scorecount >= this.scoreMiddleLow){
+          var n = this.resultList.findIndex(i=>i.label === 1)
+          console.log('n 1:>> ', n);
+          this.resultList[n].isActive = true
+          this.resultList[n].isShow = true
+        } 
+        else if( this.scorecount <= this.scoreMiddleLow - 0.1){
+          var n = this.resultList.findIndex(i=>i.label === 0)
+          console.log('n 0:>> ', n);
+          this.resultList[n].isActive = true
+          this.resultList[n].isShow = true
+        } else {
+          this.resultList[0].isShow = true;
+          this.resultList[0].isActive = false;
+          this.resultList[1].isShow = true;
+          this.resultList[1].isActive = false;
+          this.resultList[2].isShow = true;
+          this.resultList[2].isActive = false;
+          
+        }
+      }
+    }
   }
 };
 </script>
