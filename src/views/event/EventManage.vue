@@ -7,6 +7,40 @@
           path = "eventManage"
           @storeChange = "onStoreChange"
         >
+          <template v-slot:others>
+            <div class="last-row" >
+              <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.reportType') }}</span>
+              <div class="flex-center report-type-area">
+                <el-select
+                  v-model="curReportType"
+                  class="el-province"
+                  :placeholder="$t('remotePatrol.all')"
+                  size="mini"
+                  style="margin-right:0px;border:none;"
+                  @change="getInspectList"
+                >
+                  <el-option
+                    v-for="item in reportTypeList"
+                    :key="item.mode"
+                    :label="item.label"
+                    :value="item.mode"/>
+                </el-select>
+                <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" />
+                  <el-select
+                    class="el-province"
+                  style="margin-left:0px;border:none;border-radius:0px;"
+                  v-model="inspectId"
+                  :placeholder="$t('insSettingView.selectPost')"
+                  size="mini">
+                  <el-option
+                    v-for="item in inspectTableList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"/>
+                </el-select>
+              </div>
+            </div>
+          </template>
         </store-filter>
       </div>
       <div class="flex-center" style="justify-content: space-between; margin: 20px 0 20px 0px;font-size:calc(16/1920*100vw)">
@@ -216,6 +250,7 @@
 
 import util from '@/common/util.js';
 import { eventRESTful } from '@/api/index';
+import {  GetInspectTagList } from '@/api/inspect';
 import { getCookie } from '@/common/auth';
 import { isLoginIn } from '@/api/login';
 import { mapGetters } from 'vuex';
@@ -359,7 +394,16 @@ export default {
             ],
       tabContentId:[{key:'en',value:'#en-tabs-content'},{key:'zh',value:'#en-tabs-content'},{key:'zhtw',value:'#en-tabs-content'},
         {key:'ja-JP',value:'#en-tabs-content'},{key:'ko-KR',value:'#en-tabs-content'},{key:'vi-VN',value:'#en-tabs-content'},
-        {key:'id-ID',value:'#en-tabs-content'},{key:'th-TH',value:'#th-tabs-content'}]
+        {key:'id-ID',value:'#en-tabs-content'},{key:'th-TH',value:'#th-tabs-content'}],
+      curReportType: -1,
+      reportTypeList: [
+        { 'mode': -1, 'label': this.$t('remotePatrol.all') },
+        { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
+        { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') }
+      ],
+      inspectId: '',
+      inspectTableList: [],
+      inspectCatch:'-1',
     };
   },
 
@@ -419,12 +463,14 @@ export default {
     if (windowHeight > 800) {
       self.tableHeight = 770 + 'px';
     }
+    
   },
 
   activated() {
     const self = this;
     self.windowHeight = window.innerHeight;
     if (!self.$route.meta.isBack || self.isFirstLoad) {
+      self.getInspectList();
       self.initData();
     } else {
       console.log("Activate")
@@ -1125,6 +1171,8 @@ export default {
       params.sizeNum = this.params.filter.size;
       params.page = this.params.filter.page;
       params.order = this.order;
+      params.curReportType = this.curReportType;
+      params.inspectTagId = this.inspectId;
       const searchConditon = {
         path: 'eventManage',
         params: params
@@ -1178,12 +1226,16 @@ export default {
           this.params = searchParams.searchParams;
           this.searchParams = searchParams;
           this.ifGetParamsFromCash = true;
+          this.curReportType = searchParams.curReportType;
+          this.inspectCatch = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
         } else {
           this.searchParams = {};
           this.curState = [0];
           this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
           this.params.beginTs = this.dateValue[0].valueOf();
           this.params.endTs = this.dateValue[1].valueOf();
+          this.inspectCatch = '-1'
+          this.ifGetParamsFromCash = false;
         }
       
     },
@@ -1229,8 +1281,49 @@ export default {
       }).catch(err => {
         console.log('EventDetail-addComment:' + err);
       });
-    }
-
+    },
+    async getInspectList() {
+      const self = this;
+      const inspectArr = await self.getTagAll();
+      const newArr = [];
+      const inspectList = [];
+      inspectArr.forEach(_item => {
+        if (self.curReportType === -1) {
+          if (!newArr.includes(_item.id)) {
+            newArr.push(_item.id);
+            inspectList.push(_item);
+          }
+        } else if (self.curReportType === 0) {
+          if (!newArr.includes(_item.id) && _item.mode === 0) {
+            newArr.push(_item.id);
+            inspectList.push(_item);
+          }
+        } else if (self.curReportType === 1) {
+          if (!newArr.includes(_item.id) && _item.mode === 1) {
+            newArr.push(_item.id);
+            inspectList.push(_item);
+          }
+        }
+      });
+      self.inspectTableList = inspectList;
+      self.inspectTableList.length > 0 && self.inspectTableList.unshift({ id: '-1', name: self.$t('remotePatrol.all') });
+      if (inspectList.length !== 0) {
+        self.inspectId = self.ifGetParamsFromCash ? self.inspectCatch : self.inspectTableList[0].id;
+        self.ifGetParamsFromCash = false;
+      } else {
+        self.inspectId = '';
+      }
+    },
+    getTagAll() {
+      return new Promise((resolve, reject) => {
+        GetInspectTagList().then(res => {
+          const data = res.data;
+          resolve(data);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
   },
 
   beforeRouteEnter(to, from, next) {
@@ -1545,7 +1638,17 @@ $h1:#292e36;
     .el-table__fixed-body-wrapper .el-table__body {
   padding-bottom: 6px; // 6px为横向滚动条高度
 }
-
+.last-row{
+      display: flex;
+      flex-direction: row;
+      width:100%;
+      margin-left: 42px;
+      height: 36px;
+      align-items: flex-start;
+      align-items:center;
+      justify-content: flex-start;
+      padding-right: (180/1920*100vw);
+}
 </style>
 <style scoped>
     .el-select >>> .el-input__inner{
