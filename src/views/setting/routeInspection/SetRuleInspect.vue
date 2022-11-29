@@ -708,11 +708,16 @@ export default {
 
 
     countNum(){
-      var middleLow = (((this.maxScore - this.minScore) * .5) + this.minScore)
+      var minScore = parseInt(this.minScore)
+      var maxScore = parseInt(this.maxScore)
+
+      var middleLow = (((maxScore - minScore) * .5) + minScore)
       this.scoreMiddleLow = Number.isInteger(middleLow) ? middleLow.toFixed(0) : middleLow.toFixed(1)
 
-      var middleHeight = (((this.maxScore - this.minScore) * .8) + this.minScore)
+      var middleHeight = (((maxScore - minScore) * .8) + minScore)
       this.scoreMiddleHeight = Number.isInteger(middleHeight) ? middleHeight.toFixed(0) : middleHeight.toFixed(1)
+      this.scoreMiddleHeight = middleHeight
+
     },
 
 

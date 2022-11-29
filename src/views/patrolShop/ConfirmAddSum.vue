@@ -2019,9 +2019,6 @@ export default {
       return auditGroups.slice(0,auditGroups.length-1);
     },
 
-
-
-
     getInspectRule() {
       const self = this;
       var getId = sessionStorage.getItem('inspectId');
@@ -2052,18 +2049,9 @@ export default {
 
           console.log('this.scorecount ~~~~~>>>> ', this.scorecount);
           console.log('this.resultList ~~~~~>>>> ', this.resultList);
-          // this.scorecount = 10
 
           this.scoreMiddleLow = this.autoMappingByTotalScore.extra.find(i => i.key === "mappingScore_bottom").value
           this.scoreMiddleHeight = this.autoMappingByTotalScore.extra.find(i => i.key === "mappingScore_top").value
-          console.log('scoreMiddleLow ~~~~~~>> ', this.scoreMiddleLow);
-          console.log('scoreMiddleHeight ~~~~~~>> ', this.scoreMiddleHeight);
-
-
-
-          // for (let i = 0; i < 3; i++) {
-          //   this.resultList[i].name = this.inspectStatus["status_"+ i]
-          // }
           
           this.resultList[0].name =this.inspectStatus.status_2
           this.resultList[1].name =this.inspectStatus.status_1
@@ -2096,14 +2084,12 @@ export default {
     
     determineResultList(){
       if(this.unqualifiedStatus){
-        console.log('go 1 ~~~~~~~~~~>> ');
         this.resultList[0].isShow = false;
         this.resultList[1].isShow = false;
         this.resultList[2].isActive = true;
         this.resultList[2].isShow = true;
       }
       else if(this.autoMappingByTotalScore.value){
-        console.log('go 2 ~~~~~~~~~~>> ');
         this.resultList.forEach(item => {
           item.isShow = false
         })
