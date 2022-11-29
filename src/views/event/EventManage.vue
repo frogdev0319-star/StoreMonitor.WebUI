@@ -1649,6 +1649,13 @@ $h1:#292e36;
       justify-content: flex-start;
       padding-right: (180/1920*100vw);
 }
+.report-type-area{
+    width:calc(346/1440*100vw);
+    height: calc(36/1920*100vw);
+    background-color: #FFF;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+}
 </style>
 <style scoped>
     .el-select >>> .el-input__inner{
