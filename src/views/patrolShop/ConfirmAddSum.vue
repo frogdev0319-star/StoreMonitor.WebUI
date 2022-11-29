@@ -1366,7 +1366,7 @@ export default {
                   notAddIgnoretotalScore += p_item.weight == -1 ? s_item.itemScore : s_item.itemScore * p_item.weight / 100;
                   tab2NotIgnoredItemsGetScore += s_item.itemgetScore;
                 } else {
-                  ScoreN = s_item.itemScore;
+                  ScoreN += s_item.itemScore;
                   tab2IgnoredItemsGetScore += s_item.itemScore;
                 }
                 if (s_item.isIgnore || s_item.manualIgnore) {
@@ -1383,15 +1383,7 @@ export default {
             item['numOfQualified'] = QualifiedArr.length;
             item['numOfUnqualified'] = UnqualifiedArr.length;
             item['numIgnore'] = IgnoredArr.length;
-            if (inspectSettings.qualifiedForIgnoredWithType2) {
-              item['itemScore'] = totalScore;
-              if (p_item.type === 1) {
-                item['numOfQualified'] = item['numOfQualified'];
-                item['numIgnore'] = 0;
-              }
-            } else {
-              item['itemScore'] = notAddIgnoretotalScore;
-            }
+            
             
             if (p_item.type === 0) {
               let ts = PassFileTS;
@@ -1563,6 +1555,15 @@ export default {
             } else {
               item['itemgetScore'] = util.isDouble(totalGetscore,2);
             }*/
+            if (inspectSettings.qualifiedForIgnoredWithType2) {
+              item['itemScore'] = util.isDouble(totalScore*(p_item.weight == -1 ? 1 : (p_item.weight/100)),2);
+              if (p_item.type === 1) {
+                item['numOfQualified'] = item['numOfQualified'];
+                item['numIgnore'] = 0;
+              }
+            } else {
+              item['itemScore'] = util.isDouble(notAddIgnoretotalScore*(p_item.weight == -1 ? 1 : (p_item.weight/100)),2);
+            }
             if (inspect.length === 1 && inspect[0].type === 0) {
               if (inspectSettings.qualifiedForIgnoredWithType1) {
                 item['itemgetScore'] = util.isDouble(tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored,2);
