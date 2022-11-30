@@ -2096,7 +2096,7 @@ export default {
     },
     async getItemDetail(){
       const self = this;
-      if(this.selEventItem == -1){
+      if(this.selEventItem == -1 && self.allEventItemIds.length>0){
         let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,itemIds:self.allEventItemIds,storeIds:self.compareIds2};
         //console.log(params)
         let result = await this.getInspecItemStatsOverview(params);
