@@ -278,7 +278,8 @@ export default{
       "daysww":"号",
       "weeks":"周",
       "pageSize":"每頁顯示",
-      "pageSizeUnit":"筆"
+      "pageSizeUnit":"筆",
+      "rate":"率"
   },
   "remotePatrol":{
       "InspectionDetail":"导出报告",
@@ -797,7 +798,12 @@ export default{
       "advanceSettingOff":"关闭",
       "setGroupScoreRange0":"类别分值上限 输入范围 0 ~ 9999",
       "setGroupScoreRange":"类别分值上限 输入范围 -9999 ~ 9999",
-      "groupScoreLimit":"类别分值上限"
+      "groupScoreLimit":"类别分值上限",
+      "commentStatus":"巡检总评选项显示 (此设定将影响品牌之巡检总评相关显示)",
+      "autoSelectComment":"开启依条件自动选取巡检总评 ",
+      "selectByScore":"依分数条件自动选取 ",
+      "noUserDefinedName":"无自定义名称 ",
+      "needHeighterThan":"考评范围最高值需高于最低值! ",
   },
   "deviceView":{
       "EzvizAccount":"串流服务账号",

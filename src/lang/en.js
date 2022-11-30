@@ -278,7 +278,8 @@ export default{
         "daysww":"XX",
         "weeks":"week",
         "pageSize":"Display per page",
-        "pageSizeUnit":"entries"
+        "pageSizeUnit":"entries",
+        "rate":"率"
     },
     "remotePatrol":{
         "InspectionDetail":"Export report",
@@ -797,7 +798,12 @@ export default{
         "advanceSettingOff":"OFF",
         "setGroupScoreRange0":"類別分值上限 輸入範圍 0 ~ 9999",
         "setGroupScoreRange":"類別分值上限 輸入範圍 -9999 ~ 9999",
-        "groupScoreLimit":"類別分值上限"
+        "groupScoreLimit":"類別分值上限",
+        "commentStatus":"巡檢總評選項顯示 (此設定將影響品牌之巡檢總評相關顯示)",
+        "autoSelectComment":"開啟依條件自動選取巡檢總評 ",
+        "selectByScore":"依分數條件自動選取 ",
+        "noUserDefinedName":"無自定義名稱 ",
+        "needHeighterThan":"考評範圍最高值需高於最低值! ",
     },
     "deviceView":{
         "EzvizAccount":"Streaming Service Account",

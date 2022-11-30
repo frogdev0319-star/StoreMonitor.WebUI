@@ -23,7 +23,7 @@
                 @setDefaultSortAndPage="setDefaultSortAndPage" 
             />
         </el-col>
-        <div class="statistics-content" id="imgTest_avg1" style="height:194px;margin-top:200px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
+        <div class="statistics-content" id="imgTest_avg1" style="height:194px;margin-top:200px;box-shadow:none;" :style="{width:ispdf?'1280px':null}">
             <div class="head">
                 <el-col :span="17">
                     <div class="region-titles">
@@ -76,7 +76,7 @@
         </div>
 
         <!-- 考評結果分佈 --> 
-        <div class="statistics-content" id="imgTest_avg2" style="height:900px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
+        <div class="statistics-content" id="imgTest_avg2" style="height:900px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1280px':null}">
             <div class="head">
                 <div class="region-titles">
                     <span class="title">
@@ -162,7 +162,7 @@
                         <v-chart ref="storeChart" :id="part1-region-line-chart" :options="part1.barStoreOption" autoresize :style="{width:part1.barStoreOption?part1.barStoreOption.width:'100%',height:'100%'}" />
                     </div>
                 </div>
-                <div v-else style="margin-top:20.5px;height:100%;" :style="{width:ispdf?'1024px':null}">
+                <div v-else style="margin-top:20.5px;height:100%;" :style="{width:ispdf?'1280px':null}">
                     <div style="margin-top:20.5px;">
                         <table-only ref="elTP" 
                             :column-data="part1StoreInfoTableCol" 
@@ -197,7 +197,7 @@
         </div>
 
         <!-- 考評得分分佈 -->
-        <div class="statistics-content" id="imgTest_avg3" style="height:1010px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
+        <div class="statistics-content" id="imgTest_avg3" style="height:1010px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1280px':null}">
             <div class="head">
                 <div class="region-titles">
                     <span class="title">
@@ -280,7 +280,7 @@
                     </div>
                 </div>
 
-                <div v-else style="main-rgtop:20.5px;height:100%;" :style="{width:ispdf?'1024px':null}">
+                <div v-else style="main-rgtop:20.5px;height:100%;" :style="{width:ispdf?'1280px':null}">
                     <div style="margin-top:20.5px;padding-right:10px;">
                         <table-only ref="elTP" 
                             :column-data="part2StoreInfoTableCol" 
@@ -303,7 +303,7 @@
                             @onCellClick="onEvenListNumClickPart2" 
                             />
                     </div>
-                    <div style="width:100%; margin-top:12px;height:31px;" :style="{width:ispdf?'1024px':null}">
+                    <div style="width:100%; margin-top:12px;height:31px;" :style="{width:ispdf?'1280px':null}">
                         <tbl-pagination-only :total="part2.table.total" :pagesize="part2.table.sizeNum" :current-page="part2.table.page" layout="prev,pager, next,sizes,slot" @sizeChange="handlePageAndSizeChangePart2" @currentChange="handlePageAndSizeChangePart2" />
                     </div>
                 </div>
@@ -319,7 +319,7 @@
 
         <!-- 考評達標率 -->
         <!-- v-if="part3.standardScore!=-9999" -->
-        <div id="imgTest_avg4" v-if="part3.standardScore!=-9999" class="statistics-content" style="height:1000px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
+        <div id="imgTest_avg4" v-if="part3.standardScore!=-9999" class="statistics-content" style="height:1000px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1280px':null}">
             <div class="head">
                 <div class="region-titles">
                     <span class="title">
@@ -394,7 +394,7 @@
                 <div v-if="part3.storeMode==1" style="height:100%;overflow-y:hidden;overflow-x:auto">
                     <v-chart ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption" autoresize :style="{width:part3.barStoreOption?part3.barStoreOption.width :'100%',height:'100%'}" />
                 </div>
-                <div v-else style="margin-top:20.5px;height:100%;overflow-x:auto;" :style="{width:ispdf?'1024px':null}">
+                <div v-else style="margin-top:20.5px;height:100%;overflow-x:auto;" :style="{width:ispdf?'1280px':null}">
                     <div style="margin-top:20.5px;padding-right:10px;">
                         <table-only ref="elTP" 
                             :column-data="part3StoreInfoTableCol" 
@@ -436,7 +436,7 @@
 
     
     <div id="pdf-area" v-if="ispdf" ref="printPDF" class="statistics-container">
-        <div style="width:1024px;">
+        <div style="width:1280px;">
             <div class="statistics-content-pdf" style="height: 194px;marginTop:20px;box-shadow:none;">
                 <div id="img_avg1">
                     <img :src="pdfSrc_avg1" style="display: block;width:100%;height: auto;">
@@ -1359,8 +1359,6 @@ export default {
             this.exportPart1DataHeader[8].label = this.inspectStatus.status_2
             this.exportPart1DataHeader[9].label = this.inspectStatus.status_1
             this.exportPart1DataHeader[10].label = this.inspectStatus.status_0
-
-
 
         },
 
@@ -2563,7 +2561,7 @@ export default {
                 }
                 seriesData = [{
                         value: totalDargerous,
-                        name: self.inspectStatus.status_0
+                        name: "self.inspectStatus.status_0"
                     },
                     {
                         value: totalImproved,
@@ -3691,9 +3689,9 @@ export default {
             this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
         },
 
-        exportPdf(){
-            console.log('exportPdf ~~~~~~~>> ');
-        },
+        // exportPdf(){
+        //     console.log('exportPdf ~~~~~~~>> ');
+        // },
         setDefaultSortAndPage(paramsObj) {
             this.defaultSort = paramsObj.defaultSort;
             this.order = this.params.order = paramsObj.order;
@@ -3978,7 +3976,7 @@ export default {
                     .excellent_nums {
                         flex-grow: 1;
                         text-align: right;
-                        margin-left: calc(20 / 1920 * 10vw);
+                        // margin-left: calc(20 / 1920 * 10vw);
                         font-size: calc(15 / 1920 * 100vw);
                         line-height: calc(14 / 1920 * 100vw);
                     }

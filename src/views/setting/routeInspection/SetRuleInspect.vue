@@ -106,11 +106,6 @@
               <span class="input-text">
                 {{ $t('remotePatrol.scorecount') }}
               </span>
-              <span v-if="ScoreMsg" class="score_msg">
-                * 考評總分最高值需高於最低值! 
-                <!-- *{{ $t('insSettingView.rangeScoreTips') }} -->
-              </span>
-              
             </template>
             <template>
               <span class="rangeScore">
@@ -124,6 +119,10 @@
                 {{ $t('remotePatrol.scorecount') }}
               </span>
             </template>
+
+            <span v-if="ScoreMsg" class="score_msg">
+              *{{ $t('insSettingView.rangeScoreTips') }}
+            </span>
           </p>
         </div>
       </setting-table>
@@ -132,18 +131,18 @@
 
     <!-- 巡檢總評選項顯示 -->
     <el-col :span="24" class="el-rute-content storeLevel">
-      <setting-table table-name="巡檢總評選項顯示 (此設定將影響品牌之巡檢總評相關顯示)">
+      <setting-table :table-name="$t('insSettingView.commentStatus')">
         <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
           <div class="overall_options">
 
             <div class="overall_row" v-for="(item, index) in defaultDefineName" :key="index">
               <el-radio-group class="storevue-radio radio_item" v-model="item.defineStatus">
                 <el-radio :label="0" style="margin-right: 60px">{{item.name}}</el-radio> 
-                <el-radio :label="1" >自定義</el-radio> 
+                <el-radio :label="1" >{{ $t('insSettingView.userDefined')}} </el-radio> 
               </el-radio-group>
               <el-input
                 :ref=item.refName
-                placeholder="請輸入自定義名稱" 
+                :placeholder="$t('audit.workFlows.defineItem')" 
                 v-model="item.newName"
                 :disabled="item.defineStatus == 0"
                 style="width: 200px;  margin: 0 20px ;"
@@ -165,7 +164,7 @@
         <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
           <el-checkbox class="storevue-checkbox-outlined" v-model="setting_isAutoMappingActivate" @change="switchIsAutoMappingActivate">
             <span>
-              開啟依條件自動選取巡檢總評
+              {{$t('insSettingView.autoSelectComment')}} 
             </span>
           </el-checkbox>
 
@@ -174,31 +173,31 @@
           <el-radio-group class="storevue-radio suggestvalue" v-model="setting_autoMappingByTotalScore">
             <div class="suggestvalue_section" style="margin-bottom: 3px">
 
-              <el-radio :label="true" style="margin-bottom: 10px">依分數條件自動選取</el-radio> 
+              <el-radio :label="true" style="margin-bottom: 10px">{{$t('insSettingView.selectByScore')}} </el-radio> 
 
                 <div class="for_flex">
                   <div class="suggestvalue_naming">
                       <div class="item_name">
                         <div v-if="defaultDefineName[0].newName !== ''">{{defaultDefineName[0].newName}}</div>
-                        <div style="color: #c0c0c0" v-if="defaultDefineName[0].newName == ''">無自定義名稱</div>
+                        <div style="color: #c0c0c0" v-if="defaultDefineName[0].newName == ''">{{$t('insSettingView.noUserDefinedName')}}</div>
                       </div>
                       <div class="item_name">
                         <div v-if="defaultDefineName[1].newName !== ''">{{defaultDefineName[1].newName}}</div>
-                        <div style="color: #c0c0c0" v-if="defaultDefineName[1].newName == ''">無自定義名稱</div>
+                        <div style="color: #c0c0c0" v-if="defaultDefineName[1].newName == ''">{{$t('insSettingView.noUserDefinedName')}}</div>
                       </div>
                       
                       <div class="item_name">
                         <div v-if="defaultDefineName[2].newName !== ''">{{defaultDefineName[2].newName}}</div>
-                        <div style="color: #c0c0c0" v-if="defaultDefineName[2].newName == ''">無自定義名稱</div>
+                        <div style="color: #c0c0c0" v-if="defaultDefineName[2].newName == ''">{{$t('insSettingView.noUserDefinedName')}}</div>
                       </div>
                   </div>
 
                   <div class="suggestvalue_score">
                     <!-- low score -->
                     <div class="item_score">
-                      <div class="score">{{minScore}} 分</div>   
+                      <div class="score">{{minScore}} {{$t('statistics.score')}}</div>   
                       <span style="margin: 0 15px"> ~ </span>  
-                      <div class="score"> {{showScoreMin}} 分</div>
+                      <div class="score"> {{showScoreMin}} {{$t('statistics.score')}}</div>
                     </div>
 
                     <!-- middle score -->
@@ -213,7 +212,7 @@
                           @blur="inputScoreMiddleMin"
                           
                           />
-                          分
+                          {{$t('statistics.score')}}
                         </div>  
                       <span style="margin: 0 15px"> ~ </span>  
                       <div class="score"> 
@@ -224,18 +223,18 @@
                           type="number"
                           :disabled = "!setting_autoMappingByTotalScore"
                           @blur="inputScoreMiddleMax"/>
-                          分 
+                          {{$t('statistics.score')}} 
                       </div>
                       <span v-if="ScoreMsg" class="score_msg" style="margin-left: 20px">
-                          * 考評範圍最高值需高於最低值! 
+                          * {{$t('insSettingView.needHeighterThan')}}
                       </span>
                     </div>
                     
                     <!-- hight score -->
                     <div class="item_score">
-                      <div class="score">{{showScoreMax}} 分</div>   
+                      <div class="score">{{showScoreMax}}  {{$t('statistics.score')}}</div>   
                       <span style="margin: 0 15px"> ~ </span>  
-                      <div class="score"> {{maxScore}} 分</div>
+                      <div class="score"> {{maxScore}}  {{$t('statistics.score')}}</div>
                     </div>
 
                     
@@ -247,7 +246,7 @@
             <!-- radio 2 -->
             <div class="suggestvalue_section">
               <el-radio :label="false" v-model="dangerousOnFailedItem">
-                Tab1（Pass&Fail）中存在不合格項時，巡檢結果為： {{defaultDefineName[0].newName}}</el-radio> 
+                <span  style="font-weight: 400">{{$t('insSettingView.tab1FailedDangeous')}}</span> ： <span style="color: #1375bc; font-weight: 900">{{defaultDefineName[0].newName}}</span></el-radio> 
             </div>
             
           </el-radio-group>
@@ -256,25 +255,6 @@
         </div>
       </setting-table>
     </el-col>
-
-
-    <!-- 巡檢建議值 -->
-    <!-- <el-col :span="24" class="el-rute-content">
-      <setting-table :table-name="$t('insSettingView.isCheckSuggest')">
-        <div slot="tableDetail">
-          <p class="rule-item">
-            <el-checkbox class="storevue-checkbox-outlined" v-model="dangerousOnFailedItem">
-              <span>
-                {{ $t('insSettingView.tab1FailedDangeous') }}
-              </span>
-            </el-checkbox>
-          </p>
-        </div>
-      </setting-table>
-    </el-col> -->
-    
-
-
 
     <!-- 巡檢附件上傳 -->
     <el-col v-if="mode === 1" :span="24" class="el-rute-content">
@@ -486,9 +466,6 @@
         </div>
       </setting-table>
     </el-col>
-
-
-
   </el-row>
 </template>
 
@@ -1018,7 +995,10 @@ export default {
 
     inputChangeMin(e) {
       const self = this;
-      self.minScore = self.getUtilScore(e.target.value);
+      let minScore = self.getUtilScore(e.target.value);
+      if(minScore == "") minScore = 0
+
+      self.minScore = minScore
       self.ScoreMsg = parseFloat(self.minScore) > parseFloat(self.maxScore);
       self.MinScoreMsg = (self.hundredMarkType=='1' && self.baseScore.toString()=="");
     },

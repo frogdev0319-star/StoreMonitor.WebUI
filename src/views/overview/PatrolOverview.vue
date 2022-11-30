@@ -1150,7 +1150,7 @@ export default {
         { name: 'inspectCycle', index: 0, text: this.$t('overview.cycle') },
         { name: 'passRate', index: 1, text: this.$t('overview.passRate') },
         { name: 'excellentRate', index: 2, text: this.$t('overview.excellentRate') },
-        { name: 'dangerRate', index: 3, text: this.inspectStatus.status_0 + "率" },
+        { name: 'dangerRate', index: 3, text: this.inspectStatus.status_0 + this.$t('overview.rate') },
         { name: 'region', index: 5, text: this.$t('overview.region') }
       ];
 

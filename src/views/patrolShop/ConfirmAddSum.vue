@@ -2307,8 +2307,9 @@ export default {
             font-size: 12px;
             border-radius: 4px;
             cursor: pointer;
-            @include point(width,90);
-            @include point(padding,6);
+            // @include point(width,90);
+            // @include point(padding,10);
+            padding: 7px 20px;
             text-align: center;
             margin-right: calc(20/1920*100vw);
           }
