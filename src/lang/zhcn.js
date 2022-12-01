@@ -365,6 +365,10 @@ export default{
       "fluency":"流畅",
       "fullScreenMode":"宽萤幕模式",
       "generateTime":"报告产生时间：",
+      "signInTime":"签到时间",
+      "patrolTime":"巡检花费时间",
+      "signInDistance":"签到距离",
+      "aroundDistance":"约",
       "getAccessTokenError":"获取Access Token失败",
       "getBeseyeStreamError":"获取Beseye视频流信息失败！",
       "getscore":"本次得分",
@@ -521,7 +525,11 @@ export default{
       "resubmiteRpt":"确认送出报告",
       "systemReject":"系统撤回",
       "systemRejectMsg":"无可签核人员，请重新确认",
-      "cannotSwitchMimicMode":"正在编辑报告，不能切换模式"
+      "cannotSwitchMimicMode":"正在编辑报告，不能切换模式",
+      "signatureInfo":"签到资讯",
+      "mapDistance1":"与",
+      "mapDistance2":"距离约",
+      "mapDistance3":"公尺",
   },
   "eventView":{
       "ClosedEvent":"已结案事件",

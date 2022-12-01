@@ -52,8 +52,14 @@
         <div class="pdf_font_24">
             <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.submitter') }}</span>
             <span :class="isexportPDF ? 'pdf-info-value' : 'info-value'">{{ report.submitterName }}</span>
-            <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.generateTime') }}</span>
+            <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.generateTime')+'：' }}</span>
             <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
+            <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.signInTime')+'：' }}</span>
+            <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
+            <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.patrolTime')+'：' }}</span>
+            <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
+            <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.signInDistance')+'：' }}</span>
+            <span :class="isexportPDF ? 'pdf-info-value' : ''">{{$t('remotePatrol.aroundDistance')+'150m'}}</span>
         </div>
         <div class="weather-content">
           <img v-if="weatherImg" class="weather-info-content" :src="weatherImg">

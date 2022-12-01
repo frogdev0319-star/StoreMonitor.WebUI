@@ -395,13 +395,14 @@ export default {
       tabContentId:[{key:'en',value:'#en-tabs-content'},{key:'zh',value:'#en-tabs-content'},{key:'zhtw',value:'#en-tabs-content'},
         {key:'ja-JP',value:'#en-tabs-content'},{key:'ko-KR',value:'#en-tabs-content'},{key:'vi-VN',value:'#en-tabs-content'},
         {key:'id-ID',value:'#en-tabs-content'},{key:'th-TH',value:'#th-tabs-content'}],
-      curReportType: -1,
+      
       reportTypeList: [
         { 'mode': -1, 'label': this.$t('remotePatrol.all') },
         { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
         { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') }
       ],
-      inspectId: '',
+      curReportType: -1,
+      inspectId: '-1',
       inspectTableList: [],
       inspectCatch:'-1',
     };
@@ -1226,7 +1227,7 @@ export default {
           this.params = searchParams.searchParams;
           this.searchParams = searchParams;
           this.ifGetParamsFromCash = true;
-          this.curReportType = searchParams.curReportType;
+          this.curReportType = (typeof searchParams.curReportType =='undefined')? -1 : searchParams.curReportType;
           this.inspectCatch = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
         } else {
           this.searchParams = {};
@@ -1234,7 +1235,8 @@ export default {
           this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
           this.params.beginTs = this.dateValue[0].valueOf();
           this.params.endTs = this.dateValue[1].valueOf();
-          this.inspectCatch = '-1'
+          this.inspectCatch = '-1';
+          this.curReportType = -1;
           this.ifGetParamsFromCash = false;
         }
       
@@ -1311,7 +1313,7 @@ export default {
         self.inspectId = self.ifGetParamsFromCash ? self.inspectCatch : self.inspectTableList[0].id;
         self.ifGetParamsFromCash = false;
       } else {
-        self.inspectId = '';
+        self.inspectId = '-1';
       }
     },
     getTagAll() {
