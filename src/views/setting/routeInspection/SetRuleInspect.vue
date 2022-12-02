@@ -974,15 +974,23 @@ export default {
       const self = this;
       let minScore = self.getUtilScore(e.target.value);
       // if(minScore == "") minScore = 0
+
+      console.log("min", minScore === self.maxScore)
+      // console.log("max", self.maxScore )
+
+      if(minScore === self.maxScore) minScore = minScore - 1
       this.countNumMin()
       this.countNumMax()
-      // self.minScore = minScore
+      self.minScore = minScore
       self.ScoreMsg = parseFloat(self.minScore) > parseFloat(self.maxScore);
       self.MinScoreMsg = (self.hundredMarkType=='1' && self.baseScore.toString()=="");
     },
+    
     inputChangeMax(e) {
       let maxScore = this.getUtilScore(e.target.value);
       // if(maxScore < 1) maxScore = 1
+
+      if(this.minScore === maxScore) maxScore = maxScore + 1
       this.countNumMin()
       this.countNumMax()
 
