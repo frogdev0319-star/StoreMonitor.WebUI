@@ -1432,7 +1432,8 @@ export default{
         "auditFlow":"签核流程",
         "nodeOrder":"节点序号",
         "cantEmptyDays" : "停留天数不可为空!",
-        "cantTooMuchDays" : "停留天数不可超过365天!"
+        "cantTooMuchDays" : "停留天数不可超过365天!",
+        "cantEmptyInspectStatus" : "巡检总评选项自定义名称不可为空! ",
     },
     "inceptionRpt":{
         "sendAudit":"送出签核",

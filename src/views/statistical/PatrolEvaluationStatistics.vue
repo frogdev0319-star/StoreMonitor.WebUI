@@ -1295,7 +1295,9 @@ export default {
     watch: {
         async accountChanged(val) {
             if (val !== 0) {
+                await this.getInspectStatus();
                 await this.initData();
+                await this.renameTableLabel();
             }
         },
     },

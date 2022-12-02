@@ -1432,9 +1432,10 @@ export default{
         "tooltipListcan4":"Inspection report can only be viewed after sign-off has passed",
         "auditFlow":"Sign-off process",
         "nodeOrder":"Node serial number",
-
         "cantEmptyDays" : "The number of days to stay cannot be empty. ",
-        "cantTooMuchDays" : "The length of stay cannot exceed 365 days. "
+        "cantTooMuchDays" : "The length of stay cannot exceed 365 days. ",
+        "cantEmptyInspectStatus" : "巡檢總評選項自定義名稱不可為空! ",
+
       },
       "inceptionRpt":{
           "sendAudit":"Submit sign-off",

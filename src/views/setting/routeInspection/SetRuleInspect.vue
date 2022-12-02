@@ -535,21 +535,20 @@ export default {
       showInputLimit_overallItem: false,
       defaultDefineName:[
         {
-          name: '立即督導' ,
-          newName: '立即督導',
+          name:  this.$t('overview.danger') ,
+          newName:  this.$t('overview.danger'),
           defineStatus: 0,
           refName: 'bad'
         },
         {
-          name:'待改善',
-          newName: '待改善',
+          name: this.$t('overview.improve'),
+          newName: this.$t('overview.improve'),
           defineStatus: 0,
           refName: 'fair'
         },
-        
         {
-          name: '良好',
-          newName: '良好',
+          name: this.$t('overview.echartGood'),
+          newName: this.$t('overview.echartGood'),
           defineStatus: 0,
           refName: 'good'
         },
@@ -627,13 +626,6 @@ export default {
       }
     },
 
-    minScore(val){
-      this.countNum()
-    },
-    maxScore(val){
-      this.countNum()
-    }
-
   },
   computed:{
     showScoreMin(){
@@ -652,7 +644,6 @@ export default {
     await this.workflowItems()
     await this.getInspectStatus()
 
-    // await this.countNum()
     for (let i = 0; i < 3; i++) {
       if(this.defaultDefineName[i].name !== this.inspectStatus["status_" + i]) {
           this.defaultDefineName[i].defineStatus = 1
@@ -671,7 +662,6 @@ export default {
   methods: {
 
     switchIsAutoMappingActivate(val){
-      console.log('val =======>> ', val);
       if(!val){
         this.setting_autoMappingByTotalScore = false
         this.dangerousOnFailedItem = false
@@ -683,19 +673,20 @@ export default {
       console.log('this.dangerousOnFailedItem :>> ', this.dangerousOnFailedItem);
     },
 
-
-    countNum(){
+    countNumMin(){
       var minScore = parseInt(this.minScore)
       var maxScore = parseInt(this.maxScore)
 
       var middleLow = (((maxScore - minScore) * .5) + minScore)
       this.scoreMiddleLow = Number.isInteger(middleLow) ? middleLow.toFixed(0) : middleLow.toFixed(1)
-
+    },
+    countNumMax(){
+      var minScore = parseInt(this.minScore)
+      var maxScore = parseInt(this.maxScore)
       var middleHeight = (((maxScore - minScore) * .8) + minScore)
       this.scoreMiddleHeight = Number.isInteger(middleHeight) ? middleHeight.toFixed(0) : middleHeight.toFixed(1)
-      this.scoreMiddleHeight = middleHeight
-
     },
+    
 
 
     async submitRule() {
@@ -724,7 +715,7 @@ export default {
       for (let i = 0; i < 3; i++) {
         if(this.defaultDefineName[i].defineStatus == 1 && this.defaultDefineName[i].newName == "") {
           // this.$refs.stayOver.focus()
-          util.notify(this.defaultDefineName[i].name + ' 巡檢總評選項自定義名稱不可為空', 'error', 2000)
+          util.notify(this.defaultDefineName[i].name + ", "+ this.$t('audit.workFlows.cantEmptyInspectStatus'), 'error', 2000)
           return 
           } 
       }
@@ -760,12 +751,12 @@ export default {
               value: self.setting_autoMappingByTotalScore ,
               extra: [
                   {
-                      key: "mappingScore_bottom", // 下標值
-                      value: self.scoreMiddleLow
+                    key: "mappingScore_bottom", // 下標值
+                    value: self.scoreMiddleLow
                   },
                   {
-                      key: "mappingScore_top", // 上標值
-                      value: self.scoreMiddleHeight
+                    key: "mappingScore_top", // 上標值
+                    value: self.scoreMiddleHeight
                   }
                 ]
             },
@@ -979,10 +970,21 @@ export default {
 
     },
 
-
+    inputChangeMin(e) {
+      const self = this;
+      let minScore = self.getUtilScore(e.target.value);
+      // if(minScore == "") minScore = 0
+      this.countNumMin()
+      this.countNumMax()
+      // self.minScore = minScore
+      self.ScoreMsg = parseFloat(self.minScore) > parseFloat(self.maxScore);
+      self.MinScoreMsg = (self.hundredMarkType=='1' && self.baseScore.toString()=="");
+    },
     inputChangeMax(e) {
       let maxScore = this.getUtilScore(e.target.value);
-      if(maxScore < 1) maxScore = 1
+      // if(maxScore < 1) maxScore = 1
+      this.countNumMin()
+      this.countNumMax()
 
       if (this.hundredMarkType === '1') {
         maxScore = parseFloat(maxScore) > parseFloat(this.baseScore) ? parseFloat(this.baseScore) : maxScore;
@@ -993,42 +995,39 @@ export default {
       this.ScoreMsg = parseFloat(this.minScore) >= parseFloat(this.maxScore);
     },
 
-    inputChangeMin(e) {
-      const self = this;
-      let minScore = self.getUtilScore(e.target.value);
-      if(minScore == "") minScore = 0
+    
 
-      self.minScore = minScore
-      self.ScoreMsg = parseFloat(self.minScore) > parseFloat(self.maxScore);
-      self.MinScoreMsg = (self.hundredMarkType=='1' && self.baseScore.toString()=="");
-    },
+
 
     inputScoreMiddleMin(e){
       const self = this;
+      self.scoreMiddleHeight = parseInt(self.scoreMiddleHeight)
       self.scoreMiddleLow = self.getUtilScore(e.target.value);
-
       if(self.scoreMiddleLow == '' || self.scoreMiddleLow == null){
-        this.countNum()
+        this.countNumMin()
       }
       else if(self.scoreMiddleLow <= this.minScore + 1) {
         self.scoreMiddleLow = this.minScore + 2
       } 
-      else if(self.scoreMiddleLow > self.scoreMiddleHeight){
+      else if(self.scoreMiddleLow >= self.scoreMiddleHeight){
         self.scoreMiddleLow = self.scoreMiddleHeight - 1
       }
-
     },
 
     inputScoreMiddleMax(e){
       const self = this;
+      self.scoreMiddleLow = parseInt(self.scoreMiddleLow)
       self.scoreMiddleHeight = self.getUtilScore(e.target.value);
+
+      console.log('typeof scoreMiddleLow :>> ', typeof(self.scoreMiddleLow));
+      console.log('typeof scoreMiddleHeight :>> ', typeof(self.scoreMiddleHeight));
       if(self.scoreMiddleHeight == '' || self.scoreMiddleHeight == null){
-        this.countNum()
+        this.countNumMax()
       }
-      else if(self.scoreMiddleHeight >=this.maxScore) {
+      else if(self.scoreMiddleHeight >= this.maxScore) {
         self.scoreMiddleHeight = this.maxScore - 2
       }
-      else if(self.scoreMiddleLow > self.scoreMiddleHeight){
+      else if(self.scoreMiddleLow >= self.scoreMiddleHeight){
         self.scoreMiddleHeight = self.scoreMiddleLow + 1
       }
   

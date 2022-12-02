@@ -1503,6 +1503,7 @@ $filterWidth: (100%-706);
       align-items: flex-start;
       // height: calc(450/1440*100vw);
       // overflow: auto;
+        
     }
     .list-table{
       margin-bottom: 20px;
@@ -1532,14 +1533,16 @@ $filterWidth: (100%-706);
         margin-bottom: calc(20/1440*100vw);
         margin-right: 1%;
         transition: all .3s;
+        cursor: pointer;
         &:hover{
-          box-shadow: 0 3px 8px 0 rgba(0, 0, 0, .15)
+          box-shadow: 0 3px 8px 0 rgba(0, 0, 0, .2);
+          
         }
         .cards{
           width: 100%;
           height: calc(220/1440*100vw);
           padding: calc(15/1440*100vw);
-          cursor: pointer;
+          
           // margin-right: calc(20/1440*100vw);
           border: 1px solid #e3e9f4;
           font-size: calc(12/1440*100vw);
@@ -1649,6 +1652,7 @@ $filterWidth: (100%-706);
           
           
         .card_bottom{
+          text-align: left;
           .submitter{
             margin-bottom: calc(5/1440*100vw);
             overflow: hidden;
