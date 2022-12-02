@@ -687,7 +687,7 @@ export default{
       "itemsOfCate":"Các mục kiểm tra của ",
       "loadingbindstore":"đang tải",
       "moreThan":"nhiều hơn",
-      "needSignatrue":"Phải có chữ ký tại chỗ",
+      "needSignature":"Phải có chữ ký tại chỗ",
       "defineTitle":"Hiển thị tên cho chữ ký tùy biến",
       "addSignature":"Thêm chữ ký",
       "principal":"Người phụ trách",
@@ -1303,7 +1303,9 @@ export default{
         "addSign":"Thêm vào ký tên",
         "addAttachment":"Thêm tập tin đính kèm",
         "pleaseSign":"Hãy ký tên",
-        "needSign":"Phiên đăng xuất này cần phải đính kèm tập tin chữ ký"
+        "needSign":"Phiên đăng xuất này cần phải đính kèm tập tin chữ ký",
+        "selectComment":"Please choose to sign-off on comments!",
+        "rejectReason":"Please fill in the reason for rejection!",
     },
     "sendAudit":{
         "all":"Tất cả",
@@ -1415,7 +1417,9 @@ export default{
         "tooltipListcan3":"Có thể sửa các hạng mục chưa đạt yêu cầu, các hạng mục đạt yêu cầu và các hạng mục bị bỏ qua trong khi sửa lại báo cáo kiểm tra",
         "tooltipListcan4":"Chỉ có thể xem báo cáo kiểm tra sau khi đăng xuất thành công",
         "auditFlow":"Quy trình đăng xuất",
-        "nodeOrder":"Số xê-ri node"
+        "nodeOrder":"Số xê-ri node",
+        "cantEmptyDays" : "The number of days to stay cannot be empty. ",
+        "cantTooMuchDays" : "The length of stay cannot exceed 365 days. "
     },
     "inceptionRpt":{
         "sendAudit":"Gửi đăng xuất",
@@ -1460,7 +1464,12 @@ export default{
       "pleaseChooseStore":"Hãy chọn cửa hàng",
       "pleaseChooseTag":"Chọn Kiểm tra",
       "comfirmDelMysterio":"Xác nhận xóa thành viên người mua sắm bí mật này",
-      "saveMysterioSettingFail":"Không thể lưu nhóm quyền truy cập"
+      "saveMysterioSettingFail":"Không thể lưu nhóm quyền truy cập",
+      "nickName":"Nick Name",
+      "nickNameTip":"The nick name of sub-category supports up to 50 characters",
+      "pleaseInputNickName":"Please enter the nick name of the mystery",
+      "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name.",
+      "mystery":"Mystery Shopper"
   }
 
 }

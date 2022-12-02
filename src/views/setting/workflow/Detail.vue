@@ -5,7 +5,7 @@
       {{$t('audit.workFlows.workFlowConfiguration')}}
       <div class="spacer"></div>
       <div class="buttons">
-        <delay-button type="filled" @click="submitWorkFlow"> {{$t('audit.workFlows.save')}}</delay-button>
+        <delay-button type="filled" @click="submitWorkFlow">  {{$t('audit.workFlows.saveAndEnable')}}</delay-button>
       </div>
     </div>
     <!-- 基本信息 -->
@@ -88,10 +88,10 @@
                               <div class="tip">
                                 {{$t('audit.workFlows.canCancel')}}
                                 <ul>
-                                    <li> {{$t('audit.workFlows.tooltipListcant1')}}</li>
-                                    <li> {{$t('audit.workFlows.tooltipListcant2')}}</li>
-                                    <li> {{$t('audit.workFlows.tooltipListcant3')}}</li>
-                                    <li> {{$t('audit.workFlows.tooltipListcant4')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcan1')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcan2')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcan3')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcan4')}}</li>
                                 </ul>
                               </div>
                             </div>
@@ -317,6 +317,7 @@ import {
   getWorkflowList, 
   creadNewFlow,
   getUserStatus,
+  enableWorkflow,
   
   } from "@/api/workflow";
 import {getUserTitleList } from "@/api/title";
@@ -325,7 +326,6 @@ import {getAllUserInfoNoAuth, getDepartAll} from '@/api/login';
 
 import TableOnly from '@/components/TableOnly';
 import DialogPop from '@/components/DialogPop';
-import InputLimit from '@/components/InputLimit';
 import util from "@/common/util";
 import filterString from '@/common/filterString.js';
 
@@ -337,7 +337,6 @@ export default {
     DelayButton,
     SettingTable,
     DialogPop,
-    InputLimit
   },
   data() {
     return {
@@ -552,7 +551,7 @@ export default {
       await this.getPickedMember()
       await this.handleData() 
 
-      await this.getWorkflowList(this.apiBody)
+      
       this.isLoadingData = false
     },
 
@@ -562,6 +561,9 @@ export default {
       await this.getWorkflowInfo()
       await this.getNodeList(this.infoForm.processDefinitionKey) 
       await this.handleData() 
+      await this.getWorkflowList(this.apiBody)
+      
+      
       this.isLoadingData = false
     },
 
@@ -571,8 +573,9 @@ export default {
 
     // create
     getNodeData(){
-      const aaa = sessionStorage.getItem('workflowDetail')
-      this.workflowDetail = JSON.parse(aaa)
+      const tempData = sessionStorage.getItem('workflowDetail')
+      this.workflowDetail = JSON.parse(tempData)
+      this.ccToUSer = this.workflowDetail.copyToUsers
 
       const data = sessionStorage.getItem('newWorkFlow')
       const newNode = JSON.parse(data)
@@ -601,6 +604,9 @@ export default {
       const data = sessionStorage.getItem('workflowDetail')
       this.infoForm = JSON.parse(data)
 
+      // this.workflowDetail = this.infoForm 
+
+      console.log('this.infoForm 1 ------>> ', this.infoForm);
       console.log('this.workflowDetail 1 ------>> ', this.workflowDetail);
     },
 
@@ -620,6 +626,7 @@ export default {
         this.ccToUSer = this.nodeList.copyToUsers
         console.log('this.nodeList 4 ------>> ', this.nodeList);
         console.log('res.data 4 ------>> ', res.data);
+        console.log('this.workflowDetail 4 ------>> ', this.workflowDetail);
         
         // flat data  
         this.flattenData(this.nodeList)
@@ -628,7 +635,6 @@ export default {
         })
 
         console.log('this.fromApiflatNodeData 4 ------>> ', this.fromApiflatNodeData);
-        // this.fromApiflatNodeData[0].name = this.infoForm.createdUser
         this.fromApiflatNodeData[0].name = this.$t('audit.workFlows.submitAudit')
         this.fromApiflatNodeData[0].auditByUsers = []
         this.fromApiflatNodeData[0].auditByUsers.push(this.$t('audit.sendAudit.submitterName'))
@@ -664,6 +670,9 @@ export default {
       const tempData = sessionStorage.getItem('workflowDetail')
       this.workflowDetail = JSON.parse(tempData)
       console.log('object  :::::::::>> ',  this.workflowDetail);
+      
+      // 取得副本通知人員
+      this.ccToUSer = this.workflowDetail.copyToUsers
       
       const data = sessionStorage.getItem('newWorkFlow')
       const newNode = JSON.parse(data)
@@ -748,6 +757,7 @@ export default {
           })
           }
       })
+      this.workflowDetail.copyToUsers = this.ccToUSer
       sessionStorage.setItem('workflowDetail', JSON.stringify(this.workflowDetail))
       sessionStorage.setItem('reNewNode', JSON.stringify(this.newFlatNodeDataView))
       var time = new Date()
@@ -780,7 +790,10 @@ export default {
               "auditByUsers": [],
               "auditByGroups": [],
               "isEditing": false,
-              "auditTargetType": 1
+              "auditTargetType": 1,
+              "notify": false,
+              "unHandleNotifyDay": null,
+
             }
       sessionStorage.setItem('workflowNode', JSON.stringify(newNode))
       sessionStorage.setItem('pageAction', JSON.stringify("create"))
@@ -860,8 +873,10 @@ export default {
         var needToDelIndex = this.allTableData.findIndex(i => i.name == this.workflowDetail.name)
         this.allTableData.splice(needToDelIndex , 1)
 
+        console.log('this.allTableData ======>> ',  this.allTableData );
+        console.log('this.workflowDetail.name ======>> ',  this.workflowDetail.name );
         console.log('needToDelIndex :>> ', needToDelIndex);
-        // console.log('this.allTableData ======>> ',  this.allTableData );
+
       }).catch(err => {
         console.log('error' + err);
       });
@@ -1039,6 +1054,10 @@ export default {
       console.log('go edit  :>> ', row);
       console.log('this.userInfo ------>> ', this.userInfo);
 
+      this.workflowDetail.copyToUsers = this.ccToUSer
+      sessionStorage.setItem('workflowDetail', JSON.stringify(this.workflowDetail))
+
+
       if(row.auditByUsers.length !== 0){
         var currentUser = this.userInfo.filter(u => u.userName == row.auditByUsers[0])
         row.auditByUsers = []
@@ -1138,6 +1157,7 @@ export default {
 
       if(repeatResult == true){
         this.fullscreenLoading = false
+        this.isLoadingData = false
         util.notify(this.$t('audit.workFlows.cantRepeatWorkflowName'), 'error', 2000 );
         this.$refs.workflowName.focus()
         return
@@ -1154,7 +1174,6 @@ export default {
         if(d.auditByUsers.length !== 0 ){
 
           var currentUser = this.userInfo.filter(u => u.userName == d.auditByUsers[0])
-          console.log('currentUser :>> ', currentUser);
           d.auditByUsers = []
           if(currentUser.length > 0) d.auditByUsers.push(currentUser[0].userId)
 
@@ -1175,25 +1194,44 @@ export default {
 
       console.log('toApiData :>> ', toApiData);
       if(toApiData.orderedAuditNodeArray.length == 1) {
+        this.newFlatNodeDataView[0].auditByUsers.push(this.$t('audit.sendAudit.submitterName'))
         this.fullscreenLoading = false
         this.isLoadingData = false
         util.notify(this.$t('audit.workFlows.mustCreateOneNode'), 'error', 2000 );
         return
       }else{
+        var id = {
+          "processDefinitionKeys": []
+        }
+        id.processDefinitionKeys.push(toApiData.processDefinitionKey)
+
         updateWorkflow(toApiData).then(res=>{
-          this.$router.push({name: 'workflowManage'})
-          console.log('res', res)
-        }).catch(err => {
-          console.log('error' + err);
-        });
+          console.log('res 111111', res)
+          if(toApiData.state == 0){
+            this.switchEnableWorkflow(id)
+          }else{
+            console.log('res okokokokok', res)
+            this.$router.push({name: 'workflowManage'})
+          }
+          }).catch(err => {
+            console.log('error' + err);
+          });
 
       }
-      
-      
-      
-        this.fullscreenLoading = false
-        this.isLoadingData = false
-    }
+      this.fullscreenLoading = false
+      this.isLoadingData = false
+    },
+
+    // 流程啟用
+    switchEnableWorkflow(id){
+      enableWorkflow(id).then( res =>{
+        console.log('res 22222222', res)
+        this.$router.push({name: 'workflowManage'})
+      }).catch(err => {
+          console.log('error' + err);
+       })
+    },
+    
   }
 
 };

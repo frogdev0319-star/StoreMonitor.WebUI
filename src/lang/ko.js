@@ -687,7 +687,7 @@ export default{
       "itemsOfCate":"항목 확인 ",
       "loadingbindstore":"로드하는 중...",
       "moreThan":"다음 이상",
-      "needSignatrue":"현장 서명 필요",
+      "needSignature":"현장 서명 필요",
       "defineTitle":"사용자 지정 서명의 표시 이름",
       "addSignature":"서명 추가",
       "principal":"담당자",
@@ -1303,7 +1303,9 @@ export default{
         "addSign":"서명 추가",
         "addAttachment":"첨부 파일 추가",
         "pleaseSign":"서명하십시오",
-        "needSign":"이 최종 서명에는 서명 파일을 첨부해야 합니다"
+        "needSign":"이 최종 서명에는 서명 파일을 첨부해야 합니다",
+        "selectComment":"Please choose to sign-off on comments!",
+        "rejectReason":"Please fill in the reason for rejection!",
     },
     "sendAudit":{
         "all":"전부",
@@ -1415,7 +1417,10 @@ export default{
         "tooltipListcan3":"검사 보고서 재편집 시 부적격 항목, 적격 항목, 무시 항목 편집 가능",
         "tooltipListcan4":"검사 보고서는 최종 서명이 완료된 후에만 볼 수 있습니다",
         "auditFlow":"최종 서명 프로세스",
-        "nodeOrder":"노드 일련 번호"
+        "nodeOrder":"노드 일련 번호",
+
+        "cantEmptyDays" : "The number of days to stay cannot be empty. ",
+        "cantTooMuchDays" : "The length of stay cannot exceed 365 days. "
     },
     "inceptionRpt":{
         "sendAudit":"최종 서명 제출",
@@ -1460,7 +1465,12 @@ export default{
       "pleaseChooseStore":"스토어를 선택하십시오",
       "pleaseChooseTag":"검사 선택",
       "comfirmDelMysterio":"이 미스터리 쇼퍼 멤버 삭제 확인",
-      "saveMysterioSettingFail":"권한 그룹을 저장하지 못했습니다"
+      "saveMysterioSettingFail":"권한 그룹을 저장하지 못했습니다",
+      "nickName":"Nick Name",
+      "nickNameTip":"The nick name of sub-category supports up to 50 characters",
+      "pleaseInputNickName":"Please enter the nick name of the mystery",
+      "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name.",
+      "mystery":"Mystery Shopper"
   }
 
 }

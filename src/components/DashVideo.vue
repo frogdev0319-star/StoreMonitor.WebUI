@@ -519,7 +519,7 @@ export default {
   async created() {
     window.addEventListener('resize', this.resizeFun, false);
     window.addEventListener('visibilitychange', this.visibilityChange, false);
-    this.videoAuthority && this.getDashUrlInfo();
+    (this.videoAuthority || this.$store.getters.mimicMode) && this.getDashUrlInfo();
   },
 
   beforeDestroy() {
@@ -621,7 +621,7 @@ export default {
 
     async startVideo(IVSID, channelId, startTs) {
       try {
-        if (this.videoAuthority === false) {
+        if (this.videoAuthority === false && !self.$store.getters.mimicMode) {
           this.showError = true;
           this.errorText = this.$t('remotePatrol.videoLicense');
           return;

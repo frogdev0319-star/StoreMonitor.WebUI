@@ -1303,7 +1303,9 @@ export default{
         "addSign":"menambahkan tanda tangan",
         "addAttachment":"Tambahkan lampiran",
         "pleaseSign":"Tanda tangan",
-        "needSign":"Penutup ini memerlukan lampiran file tanda tangan"
+        "needSign":"Penutup ini memerlukan lampiran file tanda tangan",
+        "selectComment":"Please choose to sign-off on comments!",
+        "rejectReason":"Please fill in the reason for rejection!",
     },
     "sendAudit":{
         "all":"Semua",
@@ -1415,7 +1417,11 @@ export default{
         "tooltipListcan3":"Item yang tidak memenuhi syarat, item yang memenuhi syarat dan item yang diabaikan dapat diedit saat mengedit ulang laporan pemeriksaan",
         "tooltipListcan4":"Laporan pemeriksaan hanya dapat dilihat setelah penutup lolos",
         "auditFlow":"Proses penutup",
-        "nodeOrder":"Nomor seri node"
+        "nodeOrder":"Nomor seri node",
+
+        "cantEmptyDays" : "The number of days to stay cannot be empty. ",
+        "cantTooMuchDays" : "The length of stay cannot exceed 365 days. "
+
     },
     "inceptionRpt":{
         "sendAudit":"Kumpulkan penutup",
@@ -1460,7 +1466,12 @@ export default{
       "pleaseChooseStore":"Silakan pilih toko",
       "pleaseChooseTag":"Pilih Inspeksi",
       "comfirmDelMysterio":"Konfirmasi penghapusan anggota pembeli misterius ini",
-      "saveMysterioSettingFail":"Gagal menyimpan kelompok izin"
+      "saveMysterioSettingFail":"Gagal menyimpan kelompok izin",
+      "nickName":"Nick Name",
+      "nickNameTip":"The nick name of sub-category supports up to 50 characters",
+      "pleaseInputNickName":"Please enter the nick name of the mystery",
+      "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name.",
+      "mystery":"Mystery Shopper"
   }
 
 }

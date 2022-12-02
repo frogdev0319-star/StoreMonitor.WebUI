@@ -23,7 +23,15 @@
           <div class="search-bar">
             <date-time-selector class="time-selector" @change="dateChange"/>
             <div class="person-title">
-              <span :class="lang === 'en'? 'en-span-class' : ''">{{ $t('statistics.patrolPerson.insPerson') }}</span>
+              <el-radio-group v-model="isMystery" style="display:flex;flex-direction:column;height:calc(40/1920*100vw);justify-content: space-between;" @change="onFilterPersonChanged">
+                <div>
+                  <el-radio :label="false" :class="lang === 'en'? 'en-span-class' : ''">{{ $t('statistics.patrolPerson.insPerson') }}</el-radio>  
+                  <!--<span :class="lang === 'en'? 'en-span-class' : ''">{{ $t('statistics.patrolPerson.insPerson') }}<span>-->
+                </div>
+                <div>
+                  <el-radio :label="true" :class="lang === 'en'? 'en-span-class' : ''">{{ $t('mysterio.mystery') }}</el-radio>
+                </div>
+              </el-radio-group>
                <div class="date-range">
                 <region-multi-select
                   ref="multiState"
@@ -31,6 +39,8 @@
                   :options="positionsList"
                   :all="$t('statistics.patrolPerson.dutyAll')"
                   class="position"
+                  :class="positionDisabled?'disable':''"
+                  :disabled="positionDisabled"
                   @changeInput="handlePositionsChange"/>
                 <div style="width:0px;height:25px;border:1px solid rgba(172,174,177,0.3); " />
                 <region-multi-select
@@ -282,10 +292,12 @@ export default {
           'isExpand':true
         }
       ],
-      componentsProps:{beginTs:this.$moment().subtract(29, 'days').startOf('d').toDate(),endTs: this.$moment().endOf('d').toDate()},
+      componentsProps:{beginTs:this.$moment().subtract(29, 'days').startOf('d').toDate(),endTs: this.$moment().endOf('d').toDate(),isMystery:false},
       isexportPDF:false,
       ispdf:false,
       ifCachedParams:false,
+      isMystery:false,
+      positionDisabled:false,
     }
   },
 
@@ -340,20 +352,37 @@ export default {
       //this.daysRangeList = util.getDaysRangeList(start, end, this.timeMode);
     },
     async getSearchCondition() {
-      const userPosition = getDepartmentList({ type: 1 }); //取得職務
-      const userPromise = getUserInfo();
-      //const titlePromise = titleRESTful.getUserTitleList();
-      try {
-        const result = await Promise.all([userPosition, userPromise]);
-        this.getUserList(result[1].data);
-        //this.getTitleList(result[2].data);
-        this.getUserPositionList(result[0].data);
-        this.filterUserIds();
+      /*if(this.mystery){
+        const result = await getUserInfo({isMysteryMode:true});
+        this.getUserList(result.data);
         this.initData();
-        //this.searchCheckInList();
-      } catch (e) {
-        console.log(e);
+      }else{*/
+        const userPosition = getDepartmentList({ type: 1 }); //取得職務
+        const userPromise = getUserInfo({isMysteryMode:true});
+        //const titlePromise = titleRESTful.getUserTitleList();
+        try {
+          const result = await Promise.all([userPosition, userPromise]);
+          this.getUserList(result[1].data);
+          //this.getTitleList(result[2].data);
+          this.getUserPositionList(result[0].data);
+          this.filterUserIds();
+          this.initData();
+          //this.searchCheckInList();
+        } catch (e) {
+          console.log(e);
+        }
+      //}
+    },
+
+    onFilterPersonChanged(val){
+      console.log("****onFilterPersonChanged:",val);
+      
+      if(val){
+        this.positionDisabled = true;
+      }else {
+        this.positionDisabled = false;
       }
+      this.filterUserIds();
     },
 
     getUserPositionList(data) {
@@ -385,11 +414,12 @@ export default {
           userJson.label = user.userName;
           userJson.value = user.userId;
           userJson.title = user.title;
+          userJson.mystery = user.mystery;
           this.origianlUserList.push(userJson);
           this.userList.push(userJson);
         
       });
-      this.userIds = (this.ifCachedParams && this.userIds.length>0) ? this.userIds : this.userList.map(user => user.value);
+        this.userIds = (this.ifCachedParams && this.userIds.length>0) ? this.userIds : this.userList.map(user => user.value);
     },
 
     getTitleList(data) {
@@ -407,14 +437,22 @@ export default {
     },
 
     filterUserIds() {
-      const filterDepart = this.positionsList.filter(position => this.positionIds.includes(position.value));
-      //console.log("filterDepart:",filterDepart);
-      const departUserId = filterDepart.map(user => user.contents).flat();
-      //console.log("departUserId:",departUserId);
-      this.userList = this.origianlUserList.filter(item => {
-        return departUserId.includes(item.value);
-      });
-      this.userIds = this.userList.map(user => user.value);
+      if(this.isMystery){
+        this.userList = this.origianlUserList.filter(item => {
+          return item.mystery;
+        });
+        this.userIds = this.userList.map(user => user.value);
+      }else{
+        const filterDepart = this.positionsList.filter(position => this.positionIds.includes(position.value));
+        //console.log("filterDepart:",filterDepart);
+        const departUserId = filterDepart.map(user => user.contents).flat();
+        console.log("this.origianlUserList:",this.origianlUserList);
+        this.userList = this.origianlUserList.filter(item => {
+            return (!item.mystery) && departUserId.includes(item.value);
+        });
+        this.userIds = this.userList.map(user => user.value);
+      }
+      
     },
 
     handleUserChange(userIds) {
@@ -451,14 +489,14 @@ export default {
     async doSearchInsRecordList(){
       const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
       const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
-      this.componentsProps =  {beginTs:start,endTs:end};
+      this.componentsProps =  {beginTs:start,endTs:end,isMystery:this.isMystery};
       //const daysDiff = this.$moment(end).diff(start, 'days');
       //this.timeMode = daysDiff <= 30 ? 1 : 2;
       /*this.params.beginTs = start;
       this.params.endTs = end;
       this.params.submitters = this.userIds;*/
       this.allInsRecordData = [];
-      let param = {beginTs:start,endTs:end,submitters:(this.userIds.length==0)?[' ']:this.userIds};
+      let param = {beginTs:start,endTs:end,submitters:(this.userIds.length==0)?[' ']:this.userIds,isMysteryMode:this.isMystery};
       let searchParams = {...param};
       searchParams['positionIds'] = this.positionIds; 
       const searchConditon = {
@@ -585,6 +623,10 @@ export default {
           min-width: 85px;
       }
       /deep/
+      .el-select.el-select--medium .el-input.is-disabled .el-input__inner{
+        background:#f5f7fa  !important;
+      }
+      /deep/
       .el-input--medium .el-input__icon {
           line-height: calc(36/1920*100vw);
       }
@@ -647,18 +689,27 @@ export default {
             border:none;
             line-height: calc(36/1920*100vw);
             height: calc(36/1920*100vw);
+            background: transparent;
           }
         }
+        .disable{
+            /deep/
+            .el-input--medium .el-input__inner{
+              color:#f5f7fa;
+            }
+          }
         .person{
           display:inline;
           width: calc(223/1440*100vw);
+          
           /deep/
           .el-input--medium .el-input__inner{
             border:none;
             line-height: calc(36/1920*100vw);
             height: calc(36/1920*100vw);
-
+            
           }
+          
         }
     }
     

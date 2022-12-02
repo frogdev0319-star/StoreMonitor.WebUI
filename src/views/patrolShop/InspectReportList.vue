@@ -578,6 +578,7 @@ export default {
 
   methods: {
     initData() {
+      console.log("in initData");
       const self = this;
       self.isLoading = true;
       this.searchInput = '';
@@ -791,11 +792,20 @@ export default {
         });
       });
     },
-   getReportList(p) {
+    getReportList(p) {
       console.log("1.Get Report List")
       console.log(p)
-      var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,
-      inspectTagId:p.inspectTagId!='-1'?p.inspectTagId:null,isMysteryMode:PermissionHelper.enableMimicMode}
+      var params = {
+        beginTs:p.beginTs,endTs:p.endTs,
+        clause:p.clause,
+        like:p.like,
+        filter:p.filter,
+        order:p.order,
+        inspectTagId: p.inspectTagId != '-1' ? p.inspectTagId : null, 
+        searchMysteryMode : PermissionHelper.enableMimicMode ? 1 : p.searchMysteryMode
+      }
+
+      console.log('params ~~~~~>> ', params);
       const self = this;
       params.endTs = params.endTs - params.endTs % 1000 + 999;
       if (params.clause.storeId.length === 0) {
@@ -807,7 +817,12 @@ export default {
       if(PermissionHelper.enableMimicMode){
         
         params['submitter'] = this.$store.getters.userId; 
+      }else if(params.searchMysteryMode!=-1 && p.submitters && p.submitters!='-1' && p.submitters.length>0){
+        var obj = {...p.clause};
+        obj['submitter'] = p.submitters;
+        params['clause'] = obj;
       }
+      
       return new Promise((resolve) => {
         //console.log("params:",params);
         getInspectReportList(params).then(async(res) => {
@@ -985,6 +1000,7 @@ export default {
       if (self.curAppraise != null && self.curAppraise !== -1) {
         clause.status = self.curAppraise;
       }
+      
       self.params.clause = clause;
       self.params.inspectTagId = self.inspectId === '-1' ? '' : self.inspectId;
       typeof (self.params.inspectTagId) === 'string' && delete self.params.inspectTagId;
@@ -998,8 +1014,23 @@ export default {
       } else {
         self.params.like = {};
       }
-      console.log("SearchParams")
-      console.log(self.params)
+
+      if(self.params.jump){ //跳轉
+          console.log("1.ump to ")
+          self.params.jump = false;
+          self.dateValue = [new Date().setTime(this.params.beginTs), new Date().setTime(this.params.endTs)];
+          self.params.searchMysteryMode = this.params.searchMysteryMode;
+          self.params.submitter = this.params.submitters;
+          //this.saveSearchParams();
+          //this.searchData();
+          console.log("searchData>>>>SearchParams:",self.params)
+          this.ifSearchData = false;
+        }else{
+          console.log("searchData>>>>no jump:",self.params)
+          self.params.searchMysteryMode = PermissionHelper.enableMimicMode ? 1 : -1;
+        }
+      
+      console.log("###",self.params)
       self.params.filter = { page: 0, size: self.sizeNum };
       self.saveSearchParams();
       self.getReportList(self.params);
@@ -1075,7 +1106,7 @@ export default {
 
     async getInspectList() {
       const self = this;
-      const inspectArr = PermissionHelper.enableMimicMode? await self.getTagMytery() : await self.getTagAll();
+      const inspectArr = PermissionHelper.enableMimicMode ? await self.getTagMytery() : await self.getTagAll();
       const newArr = [];
       const inspectList = [];
       inspectArr.forEach(_item => {
@@ -1131,7 +1162,7 @@ export default {
     getSearchParams() {
       // console.log("Get SEarch Parameter");
       let searchParams = JSON.parse(JSON.stringify(SearchConditionUtil.getSearchCondition('inspectReport')));
-      
+      console.log("getSearchParams>>>>searchParams:",searchParams);
       this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
    
    
@@ -1158,13 +1189,19 @@ export default {
         if(!searchParams.curCity){
           searchParams.curCity =[];
         }
-    
-        if(searchParams.jump){
+        
+        if(searchParams.jump){ //跳轉
           console.log("Jump to ")
-          this.params.jump = false;
+          //this.params.jump = false;
           this.dateValue = [new Date().setTime(this.params.beginTs), new Date().setTime(this.params.endTs)];
-          this.saveSearchParams();
+          console.log("searchParams.searchMysteryMode:",searchParams.searchMysteryMode);
+          this.params.searchMysteryMode = searchParams.searchMysteryMode;
+          this.params.submitter = this.params.submitters;
+          //this.saveSearchParams();
+          console.log("getSearchParams>>>this.params:",this.params);
           this.searchData();
+        }else{
+          this.params.searchMysteryMode = PermissionHelper.enableMimicMode ? 1 : -1;
         }
         
       } else {
@@ -1442,8 +1479,8 @@ $filterWidth: (100%-706);
             overflow:hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
-             font-size: calc(15/1440*100vw);
-             margin-right: calc(10/1440*100vw);
+            font-size: calc(15/1440*100vw);
+            margin-right: calc(10/1440*100vw);
           }
           div {
             text-align: left;
@@ -1529,6 +1566,10 @@ $filterWidth: (100%-706);
         }
         .margin-bottom-5 {
           margin-bottom: calc(5/1440*100vw);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          
         }
         .item-score{
           color: $tab;

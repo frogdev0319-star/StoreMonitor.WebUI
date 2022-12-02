@@ -7,40 +7,6 @@
           path = "eventManage"
           @storeChange = "onStoreChange"
         >
-          <template v-slot:others>
-            <div class="last-row" >
-              <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.reportType') }}</span>
-              <div class="flex-center report-type-area">
-                <el-select
-                  v-model="curReportType"
-                  class="el-province"
-                  :placeholder="$t('remotePatrol.all')"
-                  size="mini"
-                  style="margin-right:0px;border:none;"
-                  @change="getInspectList"
-                >
-                  <el-option
-                    v-for="item in reportTypeList"
-                    :key="item.mode"
-                    :label="item.label"
-                    :value="item.mode"/>
-                </el-select>
-                <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" />
-                  <el-select
-                    class="el-province"
-                  style="margin-left:0px;border:none;border-radius:0px;"
-                  v-model="inspectId"
-                  :placeholder="$t('insSettingView.selectPost')"
-                  size="mini">
-                  <el-option
-                    v-for="item in inspectTableList"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"/>
-                </el-select>
-              </div>
-            </div>
-          </template>
         </store-filter>
       </div>
       <div class="flex-center" style="justify-content: space-between; margin: 20px 0 20px 0px;font-size:calc(16/1920*100vw)">
@@ -250,7 +216,6 @@
 
 import util from '@/common/util.js';
 import { eventRESTful } from '@/api/index';
-import {  GetInspectTagList } from '@/api/inspect';
 import { getCookie } from '@/common/auth';
 import { isLoginIn } from '@/api/login';
 import { mapGetters } from 'vuex';
@@ -394,17 +359,7 @@ export default {
             ],
       tabContentId:[{key:'en',value:'#en-tabs-content'},{key:'zh',value:'#en-tabs-content'},{key:'zhtw',value:'#en-tabs-content'},
         {key:'ja-JP',value:'#en-tabs-content'},{key:'ko-KR',value:'#en-tabs-content'},{key:'vi-VN',value:'#en-tabs-content'},
-        {key:'id-ID',value:'#en-tabs-content'},{key:'th-TH',value:'#th-tabs-content'}],
-      
-      reportTypeList: [
-        { 'mode': -1, 'label': this.$t('remotePatrol.all') },
-        { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
-        { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') }
-      ],
-      curReportType: -1,
-      inspectId: '-1',
-      inspectTableList: [],
-      inspectCatch:'-1',
+        {key:'id-ID',value:'#en-tabs-content'},{key:'th-TH',value:'#th-tabs-content'}]
     };
   },
 
@@ -464,14 +419,12 @@ export default {
     if (windowHeight > 800) {
       self.tableHeight = 770 + 'px';
     }
-    
   },
 
   activated() {
     const self = this;
     self.windowHeight = window.innerHeight;
     if (!self.$route.meta.isBack || self.isFirstLoad) {
-      self.getInspectList();
       self.initData();
     } else {
       console.log("Activate")
@@ -599,9 +552,11 @@ export default {
       if(this.searchParams['searchFrom']=='PatrolPersonStat'){
         delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
         this.searchParams['searchFrom'] = '';
+        this.searchParams['searchMysteryMode'] = -1;
       }else if(this.searchParams['searchFrom']=='EventStatistics'){
         delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
         this.searchParams['searchFrom'] = '';
+        this.searchParams['searchMysteryMode'] = -1;
     }
       this.getEventListAndCount();
     },
@@ -824,13 +779,15 @@ export default {
         if (val === 0) {
           start = this.$moment(this.dateValue[0]).valueOf();
           end = this.$moment(this.dateValue[1]).valueOf();
+          //console.log("1.**end:",this.$moment(endTime,'YYYY/MM/DD'));
         } else {
           start = this.$moment(this.dateValue[0]).valueOf();
           const endTime = this.dateValue[1];
-          end = this.$moment(endTime);
+          end = this.$moment(endTime).valueOf();
+          //console.log("2.**end:",end);
         }
       }
-      end = end - end % 1000 + 999;
+      //end = end - end % 1000 + 99999;
       var params = {
           beginTs: start,
           endTs: end,
@@ -841,7 +798,8 @@ export default {
             page: page,
             size: this.tableDataList[tabIndex].sizeNum
           },
-          like: like
+          like: like,
+          searchMysteryMode : this.searchParams.searchMysteryMode
       }
       console.log("1.this.params:",params);
       if(storeId && storeId!='-1' && storeId!=""){
@@ -926,8 +884,10 @@ export default {
       const self = this;
       let start = this.$moment(self.dateValue[0]).valueOf();
       let endTime = this.$moment(self.dateValue[1]).valueOf();
+      //console.log("**endTime.constructor:",endTime.constructor);
       let end = endTime.constructor === Date ? new Date(endTime).getTime() : endTime;
-      end = end - end % 1000 + 999;
+      //console.log("**endTime:",endTime);
+      //end = end - end % 1000 + 99999;
       if(self.searchParams['searchFrom']=='PatrolPersonStat'|| this.searchParams['searchFrom']=="EventStatistics"){
          //storeId = this.searchParams.clause.storeId;
          start = self.searchParams.beginTs;
@@ -971,7 +931,8 @@ export default {
         clause: {
           storeId: storeId
         },
-        like: like
+        like: like,
+        searchMysteryMode:self.searchParams.searchMysteryMode
       };
       if(storeId!='-1'){
         params['clause']['storeId'] = storeId
@@ -1172,6 +1133,7 @@ export default {
       params.sizeNum = this.params.filter.size;
       params.page = this.params.filter.page;
       params.order = this.order;
+      params.searchMysteryMode = -1;
       params.curReportType = this.curReportType;
       params.inspectTagId = this.inspectId;
       const searchConditon = {
@@ -1198,7 +1160,8 @@ export default {
             this.storeFilterObj.curCity = ["-1"];
             this.params.beginTs = searchParams.beginTs;
             this.params.endTs = searchParams.endTs;
-            this.dateValue = [util.getDates(searchParams.beginTs),util.getDates(searchParams.endTs)];
+            this.dateValue = [util.getDates(searchParams.beginTs),searchParams.endTs];
+            this.params.searchMysteryMode = searchParams.searchMysteryMode;
             //console.log("1.EventMange > getSearchParams > dateValue:",this.dateValue);
             //util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
           }else if(searchParams['searchFrom']=="EventStatistics"){
@@ -1207,7 +1170,8 @@ export default {
             this.storeFilterObj.filterStoreIds = searchParams.curStore;
             this.storeFilterObj.curStore=searchParams.curStore;
             this.storeFilterObj.storeIds=searchParams.curStore;
-            this.dateValue = [util.getDates(searchParams.beginTs),util.getDates(searchParams.endTs)];
+            this.dateValue = [util.getDates(searchParams.beginTs),searchParams.endTs];
+            this.params.searchMysteryMode = -1;
             //console.log("1..EventMange > getSearchParams > dateValue:",this.dateValue);
           }else{
             this.storeFilterObj.filterStoreIds = (searchParams.curStore)?searchParams.curStore:[];
@@ -1215,6 +1179,7 @@ export default {
             //console.log("2.EventMange > getSearchParams > dateValue:",this.dateValue);
             this.params.beginTs = this.dateValue[0].valueOf();
             this.params.endTs = this.dateValue[1].valueOf();
+            this.params.searchMysteryMode = -1;
           }
           this.inputSearchValue = searchParams.inputSearchValue;
           this.curState = searchParams.curState;
@@ -1235,6 +1200,7 @@ export default {
           this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
           this.params.beginTs = this.dateValue[0].valueOf();
           this.params.endTs = this.dateValue[1].valueOf();
+          this.params.searchMysteryMode = -1;
           this.inspectCatch = '-1';
           this.curReportType = -1;
           this.ifGetParamsFromCash = false;
@@ -1315,17 +1281,6 @@ export default {
       } else {
         self.inspectId = '-1';
       }
-    },
-    getTagAll() {
-      return new Promise((resolve, reject) => {
-        GetInspectTagList().then(res => {
-          const data = res.data;
-          resolve(data);
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
   },
 
   beforeRouteEnter(to, from, next) {
@@ -1349,7 +1304,8 @@ export default {
     }
   }
 
-};
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -1640,6 +1596,7 @@ $h1:#292e36;
     .el-table__fixed-body-wrapper .el-table__body {
   padding-bottom: 6px; // 6px为横向滚动条高度
 }
+
 .last-row{
       display: flex;
       flex-direction: row;

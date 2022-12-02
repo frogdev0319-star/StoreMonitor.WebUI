@@ -687,7 +687,7 @@ export default{
       "itemsOfCate":"検査項",
       "loadingbindstore":"読み込み中…",
       "moreThan":"より大きい",
-      "needSignatrue":"オンサイト署名が必要",
+      "needSignature":"オンサイト署名が必要",
       "defineTitle":"カスタム署名用の名前を表示して",
       "addSignature":"署名を追加して",
       "principal":"担当者",
@@ -1303,7 +1303,9 @@ export default{
         "addSign":"署名を追加する",
         "addAttachment":"添付ファイルの追加",
         "pleaseSign":"署名してください",
-        "needSign":"この承認には、署名ファイルを添付する必要があります"
+        "needSign":"この承認には、署名ファイルを添付する必要があります",
+        "selectComment":"Please choose to sign-off on comments!",
+        "rejectReason":"Please fill in the reason for rejection!",
     },
     "sendAudit":{
         "all":"オール",
@@ -1415,7 +1417,10 @@ export default{
         "tooltipListcan3":"検査レポートの再編集時に、不適格な項目、適格な項目、無視された項目を編集できます",
         "tooltipListcan4":"検査レポートは、承認が合格した後にのみ表示できます",
         "auditFlow":"承認プロセス",
-        "nodeOrder":"ノードの通し番号"
+        "nodeOrder":"ノードの通し番号",
+        
+        "cantEmptyDays" : "The number of days to stay cannot be empty. ",
+        "cantTooMuchDays" : "The length of stay cannot exceed 365 days. "
     },
     "inceptionRpt":{
         "sendAudit":"承認の送信",
@@ -1460,7 +1465,12 @@ export default{
       "pleaseChooseStore":"ストアを選択してください",
       "pleaseChooseTag":"検査を選択する",
       "comfirmDelMysterio":"このミステリーショッパーメンバーの削除を確認します",
-      "saveMysterioSettingFail":"アクセス許可グループの保存に失敗しました"
+      "saveMysterioSettingFail":"アクセス許可グループの保存に失敗しました",
+      "nickName":"Nick Name",
+      "nickNameTip":"The nick name of sub-category supports up to 50 characters",
+      "pleaseInputNickName":"Please enter the nick name of the mystery",
+      "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name.",
+      "mystery":"Mystery Shopper"
   }
 
 }

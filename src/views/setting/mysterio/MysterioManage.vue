@@ -130,6 +130,14 @@ export default {
             'isExpand': false
           },
           {
+            'prop': 'nickname',
+            'label': this.$t('mysterio.nickName'),
+            'sortable': false,
+            'width': 130,
+            'maxWidth': 130,
+            'isExpand': false
+          },
+          {
             'prop': 'position',
             'label': this.$t('mysterio.position'),
             'sortable': false,
@@ -228,7 +236,7 @@ export default {
           this.getMysterioList();
         }else{
           this.searchData = this.allTableData.filter(item => (
-              item.userName.indexOf(val) > -1 || item.email.indexOf(val) > -1
+              item.userName.indexOf(val) > -1 || item.email.indexOf(val) > -1 || item.nickname.indexOf(val) > -1
           ));
           //this.tableData = this.searchData;
           this.setTableBySearch();
@@ -278,15 +286,17 @@ export default {
             this.allUserList = [];
             var tempUserList = [];
             data.map(user => {
-              const userJson = {};
-              userJson.id = user.userId;
-              userJson.userName = user.userName;
-              userJson.userId = user.userId;
-              userJson.email = user.email;
-              var position =  this.positionsList.find(pos=>{return pos.contents.includes(user.userId)});
-              //console.log("position:",position);
-              userJson.position = (position)?position.label:'';
-              tempUserList.push(userJson);
+              if(user.mystery == false){
+                const userJson = {};
+                userJson.id = user.userId;
+                userJson.userName = user.userName;
+                userJson.userId = user.userId;
+                userJson.email = user.email;
+                var position =  this.positionsList.find(pos=>{return pos.contents.includes(user.userId)});
+                //console.log("position:",position);
+                userJson.position = (position)?position.label:'';
+                tempUserList.push(userJson);
+              }
             });
             this.allUserList = tempUserList;
         },
@@ -370,7 +380,7 @@ export default {
             }
         },
         goSettingPage(row){
-          this.$router.push({name: 'MysterioSetting',params: {userId:row.userId}});
+          this.$router.push({name: 'MysterioSetting',params: {userId:row.userId, nickName:row.nickname}});
         },
         deleteMysterioMember(row){
           this.delUserId = row.userId;

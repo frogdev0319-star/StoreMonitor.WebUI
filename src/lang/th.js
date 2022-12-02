@@ -686,7 +686,7 @@ export default{
       "itemsOfCate":"รายการของการตรวจสอบของ ",
       "loadingbindstore":"กำลังโหลด",
       "moreThan":"มากกว่า",
-      "needSignatrue":"ต้องมีลายเซ็นจากสถานที่",
+      "needSignature":"ต้องมีลายเซ็นจากสถานที่",
       "defineTitle":"แสดงชื่อสำหรับลายเซ็นแบบกำหนดเอง",
       "addSignature":"เพิ่มลายเซ็น",
       "principal":"ผู้รับผิดชอบ",
@@ -1302,7 +1302,9 @@ export default{
         "addSign":"เพิ่มลายเซ็น",
         "addAttachment":"เพิ่มไฟล์แนบ",
         "pleaseSign":"โปรดลงนาม",
-        "needSign":"การลงนามนี้ต้องแนบไฟล์ลายเซ็น"
+        "needSign":"การลงนามนี้ต้องแนบไฟล์ลายเซ็น",
+        "selectComment":"Please choose to sign-off on comments!",
+        "rejectReason":"Please fill in the reason for rejection!",
     },
     "sendAudit":{
         "all":"ทั้งหมด",
@@ -1414,7 +1416,10 @@ export default{
         "tooltipListcan3":"สามารถแก้ไขรายการที่ไม่ผ่าน รายการที่ผ่าน และรายการที่ละเว้นเมื่อแก้ไขรายงานการตรวจสอบใหม่",
         "tooltipListcan4":"สามารถดูรายงานการตรวจสอบเฉพาะหลังจากการลงนามผ่านแล้วเท่านั้น",
         "auditFlow":"กระบวนการลงนาม",
-        "nodeOrder":"หมายเลขซีเรียลโหนด"
+        "nodeOrder":"หมายเลขซีเรียลโหนด",
+
+        "cantEmptyDays" : "The number of days to stay cannot be empty. ",
+        "cantTooMuchDays" : "The length of stay cannot exceed 365 days. "
     },
     "inceptionRpt":{
         "sendAudit":"ส่งการลงนาม",
@@ -1459,7 +1464,12 @@ export default{
       "pleaseChooseStore":"โปรดเลือกร้านค้า",
       "pleaseChooseTag":"เลือกการตรวจสอบ",
       "comfirmDelMysterio":"ยืนยันการลบสมาชิกนักช็อปปริศนานี้",
-      "saveMysterioSettingFail":"ไม่สามารถบันทึกกลุ่มสิทธิ์"
+      "saveMysterioSettingFail":"ไม่สามารถบันทึกกลุ่มสิทธิ์",
+      "nickName":"Nick Name",
+      "nickNameTip":"The nick name of sub-category supports up to 50 characters",
+      "pleaseInputNickName":"Please enter the nick name of the mystery",
+      "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name.",
+      "mystery":"Mystery Shopper"
   }
 
 }

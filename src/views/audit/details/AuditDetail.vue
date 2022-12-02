@@ -27,6 +27,7 @@
             <AuditUnit 
               :taskInfo = "taskInfo"
               :auditStates = auditStates
+              :isMysteryMode = isMysteryMode
               />
 
           </div>
@@ -118,14 +119,15 @@ export default {
 
       onEditing: false,
       showDoalogTaskDrawback : false,
-      showDoalogTaskCancel : false
+      showDoalogTaskCancel : false,
+      isMysteryMode: false
     }
   },
   
   mounted() {},
   async created() {
     await this.init()
-    // await this.getNodeList(this.auditDetail.processDefinitionKey) 
+    await this.getNodeList(this.auditDetail.processDefinitionKey) 
 
     const resulit = await this.$store.dispatch("GetUserAuthorities");
     this.currentUserInfo = resulit.data.userId
@@ -215,6 +217,7 @@ export default {
         })
         this.auditStates = res.data.auditStates
         this.taskInfo = res.data.taskList
+        this.isMysteryMode = res.data.isMysteryMode
 
         console.log('this.auditStates ----->> ', this.auditStates);
         console.log('this.taskInfo ori ----->> ', this.taskInfo);
@@ -244,7 +247,7 @@ export default {
         this.flatNodeData.forEach(d=>{
           delete d.nextAuditNode
         })
-        // console.log('this.taskInfo 2 ------>> ', this.taskInfo);
+        console.log('this.taskInfo 3 ------>> ', this.taskInfo);
         console.log('this.flatNodeData 3 ------>> ', this.flatNodeData);
 
         const currentNode = this.taskInfo.filter( i => i.state == 2)

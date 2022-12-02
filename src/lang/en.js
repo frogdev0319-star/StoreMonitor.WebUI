@@ -1284,26 +1284,28 @@ export default{
     },
     "audit":{
       "auditStatus":{
-          "noteYet":"Not started yet",
-          "processing":"Processing",
-          "agree":"Agree",
-          "reject":"Rejected",
-          "approved":"Sign-off passed",
-          "cancel":"Cancel",
-          "rollback":"Withdraw",
-          "systemRollback":"System withdrawal",
-          "ifDraback":"Withdraw sign-off? ",
-          "ifCancel":"Cancel sign-off? ",
-          "confirmDraback":"Confirm withdrawal of this report sign-off? ",
-          "confirmCancel":"Confirm cancellation of this report sign-off?",
-          "auditComment":"Fill in sign-off comment",
-          "comment":"Fill in sign-off comment",
-          "taskSummit":"Submit",
-          "sign":"Signature",
-          "addSign":"Add signature",
-          "addAttachment":"Add attachment",
-          "pleaseSign":"Please sign",
-          "needSign":"This sign-off requires attaching a signature file"
+        "noteYet":"Not started yet",
+        "processing":"Processing",
+        "agree":"Agree",
+        "reject":"Rejected",
+        "approved":"Sign-off passed",
+        "cancel":"Cancel",
+        "rollback":"Withdraw",
+        "systemRollback":"System withdrawal",
+        "ifDraback":"Withdraw sign-off? ",
+        "ifCancel":"Cancel sign-off? ",
+        "confirmDraback":"Confirm withdrawal of this report sign-off? ",
+        "confirmCancel":"Confirm cancellation of this report sign-off?",
+        "auditComment":"Fill in sign-off comment",
+        "comment":"Fill in sign-off comment",
+        "taskSummit":"Submit",
+        "sign":"Signature",
+        "addSign":"Add signature",
+        "addAttachment":"Add attachment",
+        "pleaseSign":"Please sign",
+        "needSign":"This sign-off requires attaching a signature file",
+        "selectComment":"Please choose to sign-off on comments!",
+        "rejectReason":"Please fill in the reason for rejection!",
       },
       "sendAudit":{
           "all":"All",
@@ -1416,7 +1418,10 @@ export default{
         "tooltipListcan3":"Unqualified items, qualified items and ignored items can be edited when re-editing the inspection report",
         "tooltipListcan4":"Inspection report can only be viewed after sign-off has passed",
         "auditFlow":"Sign-off process",
-        "nodeOrder":"Node serial number"
+        "nodeOrder":"Node serial number",
+
+        "cantEmptyDays" : "The number of days to stay cannot be empty. ",
+        "cantTooMuchDays" : "The length of stay cannot exceed 365 days. "
       },
       "inceptionRpt":{
           "sendAudit":"Submit sign-off",
@@ -1461,7 +1466,12 @@ export default{
         "pleaseChooseStore":"Please select store",
         "pleaseChooseTag":"Select Inspect",
         "comfirmDelMysterio":"Confirm the deletion of this mystery shopper member",
-        "saveMysterioSettingFail":"Failed to save permission group"
+        "saveMysterioSettingFail":"Failed to save permission group",
+        "nickName":"Nick Name",
+        "nickNameTip":"The nick name of sub-category supports up to 50 characters",
+        "pleaseInputNickName":"Please enter the nick name of the mystery",
+        "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name.",
+        "mystery":"Mystery Shopper"
     }
   
   }

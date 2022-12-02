@@ -1141,6 +1141,7 @@ export default {
         {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
       ],
       WindowWidth:util.getWindowWidth(),
+      compareGroupAndTypeId:[]
     };
   },
 
@@ -1253,7 +1254,8 @@ export default {
         }
       });
 
-      this.compareIds = tempId
+      this.compareIds = tempId;
+      this.compareGroupAndTypeId = compareArr;
       //console.log("1.emitTypeChanged > this.compareIds:",this.compareIds);
 
       this.comapareLabels = selectedLabels;
@@ -1394,15 +1396,17 @@ export default {
       let region = this.areaMode.filter((r)=>{ return r.key==this.compareType});
       self.params.groupMode = region[0].value;
       let searchCondition = {}
-      //if(region[0].value<3){ //store, area1, area2
+      if(region[0].value<3){ //store, area1, area2
         searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,storeIds:self.compareIds.filter(storeId => storeId !== '-1'),
           order:{"direction":this.barchartOrder,"property":"numOfTotal"}
         };
         //console.log("*getEventTableData>searchCondition:",searchCondition);
-      /*}else{ //groupType, storeGroup
-        self.params.groupIds=this.compareIds
-        searchCondition  = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,groupIds:this.compareIds};
-      }*/
+      }else{ //groupType, storeGroup
+        self.params.groupIds=this.compareGroupAndTypeId;
+        searchCondition  = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,groupIds:this.compareGroupAndTypeId,
+        order:{"direction":this.barchartOrder,"property":"numOfTotal"}
+        };
+      }
      if(this.compareIds.length>0){
         const eventResult = await self.getEventTableDataInfo(searchCondition);
         //console.log("*getEventTableData>eventResult:",eventResult);
@@ -1660,8 +1664,8 @@ export default {
         //};
       //console.log("*getEventTableData>searchCondition:",searchCondition);
       /*}else{ //groupType, storeGroup
-        self.params.groupIds=this.compareIds
-        searchCondition  = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,groupIds:this.compareIds};
+        self.params.groupIds=this.compareGroupAndTypeId;
+        searchCondition  = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,groupIds:this.compareGroupAndTypeId};
       }*/
       const searchParamsObj = {
         path: 'eventStatistics',
@@ -1728,15 +1732,16 @@ export default {
     },
     doFilterEventListBySelBar(){
       let name = this.barActiveName;
+      console.log("filter name:",name);
       let filterData = name==''? this.allEventTableData:this.allEventTableData.filter(item=>{
         if(this.compareType=="area1"){
           return (item.province == name);
         }else if(this.compareType=="area2"){
           return (item.city == name);
         }else if(this.compareType=="storeGroup"){
-          return (item.storeGroup == name);
+          return (item.storeRegion.includes(name));
         }else if(this.compareType=="storeType"){
-          return (item.storeGroup == name);
+          return (item.storeBranchType.includes(name));
         }else if(this.compareType=="stores"){
           return (item.groupName == name);
         }

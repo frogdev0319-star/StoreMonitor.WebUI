@@ -723,7 +723,7 @@
 
       async startVideo(IVSID, channelId, startTs) {
         try {
-          if (this.videoAuthority === false) {
+          if (this.videoAuthority === false && !self.$store.getters.mimicMode) {
             this.showError = true;
             this.errorText = this.$t('remotePatrol.videoLicense');
             return;

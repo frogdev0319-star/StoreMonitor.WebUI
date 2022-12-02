@@ -221,7 +221,6 @@
             resize="none"
             @input="eventDesChanged"
             @blur="notShowInputRuleTips('eventDes')"/>
-            <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
             <button
               class="inspect-btn"
               @click="submitItemResource()"
@@ -229,6 +228,7 @@
               {{$t('remotePatrol.confirm')}}
             </button>
           </div>
+          <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
           <span v-if="RuleCountTip" class="rules">{{
               $t("remotePatrol.commentCountRuleTip")
             }}</span>
@@ -727,7 +727,7 @@ export default {
 
     eventNameChanged(val) {
       const self = this;
-      const content = filterString.standard(val, 50);
+      const content = filterString.all(val, 50);
       self.eventName = content;
       self.showEventNameInfo = false;
       const length = filterString.getContentLength(val);
@@ -742,6 +742,7 @@ export default {
       const self = this;
       const content = filterString.all(val, 200);
       self.eventDes = content;
+      self.inspectInput = content;
       const length = filterString.getContentLength(val);
       if (length > 200) {
         self.eventDesRuletip = true;
@@ -820,7 +821,7 @@ export default {
     },
 
     startVideo() {
-      if (this.videoAuthority === false) {
+      if (this.videoAuthority === false && !this.$store.getters.mimicMode) {
         this.showError = true;
         this.errorText = this.$t('remotePatrol.videoLicense');
         return;
