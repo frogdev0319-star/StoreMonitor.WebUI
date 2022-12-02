@@ -2140,7 +2140,7 @@ export default {
         self.eventItemTable.column_data.forEach(item=>{
           tHeader.push(item.label);
         });
-        const filterVal = ['groupName', 'itemName', 'numOfUnqualified', 'percentage', 'numOfStores'];
+        const filterVal = ['groupName', 'itemName', 'numOfUnqualified', 'percentage', 'numOfStore'];
         const curData = self.eventItemTable.itemAllData;
         const data = self.formatJson(filterVal, curData);
         const fileName = this.selEventItemName+'_Inspection item event' + '_' + util.getCurDateStr();
