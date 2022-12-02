@@ -70,7 +70,17 @@ router.beforeEach(async(to, from, next) => {
     await store.dispatch('GetUserAuthorities');
     const accessRoutes = await store.dispatch('generateRoutes');
     router.addRoutes(accessRoutes);
-    if( accessRoutes.findIndex(item => item.path==to.path)==-1 ){
+    //console.log("accessRoutes:",accessRoutes)
+    //console.log("to.path:",to.path);
+    //console.log(">>>>accessRoutes.findIndex(item => item.path==to.path)",accessRoutes.findIndex(item => item.path==to.path));
+    let findpath = false;
+    for(let i=0; i<accessRoutes.length; i++){
+      if( accessRoutes[i].children.findIndex(item => item.path==to.path)==-1 ){
+        findpath = true;
+        break;
+      }
+    }
+    if( !findpath ){
       next({ ...accessRoutes[0], replace: true });
     }else{
       next({ ...to, replace: true });
