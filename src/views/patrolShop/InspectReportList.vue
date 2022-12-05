@@ -8,6 +8,8 @@
       >
         <template v-slot:others>
           <div class="last-row" >
+
+            <!-- 總評類型 -->
             <span style="margin-right: 16px; font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.resultType') }}</span>
             <el-select
               v-model="curAppraise"
@@ -21,6 +23,8 @@
                 :label="item.label"
                 :value="item.status"/>
             </el-select>
+
+            <!-- 報表類型 -->
             <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.reportType') }}</span>
             <div class="flex-center report-type-area">
             <el-select
@@ -37,10 +41,11 @@
                 :label="item.label"
                 :value="item.mode"/>
             </el-select>
+            
             <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" />
               <el-select
                 class="el-province"
-               style="margin-left:0px;border:none;border-radius:0px;"
+                style="margin-left:0px;border:none;border-radius:0px;"
               v-model="inspectId"
               :placeholder="$t('insSettingView.selectPost')"
               size="mini">
@@ -59,8 +64,8 @@
       <div class="report-header">
         <div class="flex-center" style="padding-top: 0;">
           <date-time-selector
-           class="time-selector"
-           @change="dateChange" 
+            class="time-selector"
+            @change="dateChange" 
           :dateTimeValue = dateValue /> 
           <div class="flex-center fullWidth" style="margin-left: 20px">
             <div class="search-content flex-center" style="margin-right: 20px">
@@ -80,6 +85,7 @@
         </div>
         <!-- <selected-stores :store-str="storeStr"/> -->
       </div>
+
       <div class="report-content loading spacer paper">
         <div
           v-loading="isLoading"
@@ -150,35 +156,46 @@
               </delay-button>-->
             </div>
           </div>
-          <div v-if="ShowCard" class="showCardHeight flex">
+
+          <!-- 報告列表 -->
+          <div v-if="ShowCard" class="showCardHeight">
               <div v-for="(item,index) in reportList"  :key="index" class="report-card">
+                <!-- card -->
                 <div class="cards shadow-light" @click="clickReport(item,index)">
-                  <div class="flex-center margin-bottom-5">
-                    <div class="card-title">{{ item.storeName }}</div>
-                    <img :src="item.mode===1?onsiteIcon:remoteIcon" :height="20" alt="" >
-                  </div>
-                  <div class="margin-bottom-5">{{ item.tagName }}</div>
-                  <div style="margin-bottom: 12px" class="flex">
-                    <div :class="lang.indexOf('zh') == -1?'status-tag-en':'status-tag' "
-                      :style="{
-                        0: {'color':'#e22472','background-color':'#ffecf4'},
-                        1: {'color':'#f57848','background-color':'#ffefeb'},
-                        2: {'color':'#59ab22','background-color':'#e8f6de'}
-                      }[item.statusCode]"
-                    >{{item.status}}</div>
-                    <div v-if="item.standard!=-1" style="margin-left: calc(10/1920*100vw)" :class="(lang.indexOf('zh') == -1)?'status-tag-en':'status-tag' "
-                      :style="item.standard==1 ? {'color':'#59ab22','background-color':'#e8f6de'}: {'color':'#f57848','background-color':'#ffefeb'}"
-                    >{{item.standard==1 ? $t('remotePatrol.goalAchieved') : $t('remotePatrol.farBehind')}}</div>
-                  </div>
-                  <!-- //0: danger,1: improve,2: pass -->
-                  <div class="flex-center">
-                    <div class="score">{{ item.totalScore }}</div>
-                    <div v-if="lang.indexOf('zh') !== -1" class="score-unit">
-                      {{ $t('insSettingView.scores') }}
+                  <!-- card main -->
+                  <div class="card_main">
+                    <div class="flex-center margin-bottom-5">
+                      <div class="card-title">{{ item.storeName }}</div>
+                      <img :src="item.mode===1?onsiteIcon:remoteIcon" :height="20" alt="" >
+                    </div>
+                    <div class="margin-bottom-5">{{ item.tagName }}</div>
+                    <div class="status-tag_row">
+                      <div style="margin-right: 3%;"  :class="lang.indexOf('zh') == -1?'status-tag-en':'status-tag' "
+                        :style="{
+                          0: {'color':'#e22472','background-color':'#ffecf4'},
+                          1: {'color':'#f57848','background-color':'#ffefeb'},
+                          2: {'color':'#59ab22','background-color':'#e8f6de'}
+                        }[item.statusCode]"
+                      >{{item.status}} </div>
+                      <div v-if="item.standard!=-1" :class="(lang.indexOf('zh') == -1)?'status-tag-en':'status-tag' "
+                        :style="item.standard==1 ? {'color':'#59ab22','background-color':'#e8f6de'}: {'color':'#f57848','background-color':'#ffefeb'}"
+                      >{{item.standard==1 ? $t('remotePatrol.goalAchieved') : $t('remotePatrol.farBehind')}}</div>
+                    </div>
+                    <!-- //0: danger,1: improve,2: pass -->
+                    <div class="flex-center">
+                      <div class="score">{{ item.totalScore }}</div>
+                      <div v-if="lang.indexOf('zh') !== -1" class="score-unit">
+                        {{ $t('insSettingView.scores') }}
+                      </div>
                     </div>
                   </div>
-                  <div class="margin-bottom-5">{{ $t('remotePatrol.submitter') }} {{ item.submitterName }}</div>
-                  <div>{{ item.datestr }}</div>
+
+                  <!-- card bottom -->
+                  <div class="card_bottom">
+                    <div class="submitter">{{ $t('remotePatrol.submitter') }} {{ item.submitterName }}</div>
+                    <div>{{ item.datestr }}</div>
+                  </div>
+                  
                 </div>
               </div>
           </div>
@@ -300,7 +317,14 @@
   </div>
 </template>
 <script>
-import { getInspectReportList, GetInspectTagList,downLoadInspectReportEntireDetail,getAllReportIds,GetMysteryInspectTagList } from '@/api/inspect';
+import { 
+      getInspectReportList, 
+      GetInspectTagList,
+      downLoadInspectReportEntireDetail,
+      getAllReportIds,
+      GetMysteryInspectTagList ,
+      getInspectStatus
+    } from '@/api/inspect';
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
 import StoreFilter from '@/components/StoreFilter';
@@ -528,6 +552,8 @@ export default {
       isScore:true,
       showExportAllWarn:false,
       showExportAllNotice:false,
+
+      inspectStatus:''
     };
   },
 
@@ -594,6 +620,8 @@ export default {
       self.curReportType = -1;
       self.getSearchParams();
       self.getInspectList();
+      self.getInspectStatus();
+      
     },
 
     async export2Excel() {
@@ -718,7 +746,8 @@ export default {
       }
       return obj;
     },
-   getReportList_(p) {
+
+    getReportList_(p) {
       console.log("2.Get Report List")
       console.log(p)
       var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,
@@ -794,7 +823,6 @@ export default {
     },
     getReportList(p) {
       console.log("1.Get Report List")
-      console.log(p)
       var params = {
         beginTs:p.beginTs,endTs:p.endTs,
         clause:p.clause,
@@ -830,7 +858,7 @@ export default {
           let data = [];
           if (errCode === 0) {
             data = res.data.content;
-          }
+          } 
           const temp = [];
           self.isLoading = true;
           for(const item of data){
@@ -870,11 +898,15 @@ export default {
             });
             const statusAndIconObj = self.getIconSrc(item.status);
             reportObj.status = statusAndIconObj.status;
+
+
             reportObj.iconSrc = statusAndIconObj.iconSrc;
             temp.push(reportObj);
           }
           //);
           self.reportList = temp;
+          console.log('self.reportList ~~~~~>> ', self.reportList);
+
           self.total = Math.ceil(res.data.totalElements/self.sizeNum);
           self.isLoading = false;
           if (temp.length === 0) {
@@ -904,7 +936,7 @@ export default {
       const statusAndLangAndIconMap = [
         {
           status: 0,
-          statusStr: this.$t('overview.danger'), // Poor
+          statusStr: this.inspectStatus.status_0, // Poor
           children: [{
             'zh': require('../../../static/img/dangerous_cn.png'),
             'zhtw': require('../../../static/img/dangerous_tw.png'),
@@ -915,7 +947,7 @@ export default {
         },
         {
           status: 1,
-          statusStr: this.$t('overview.improve'), // Fair
+          statusStr: this.inspectStatus.status_1, // Fair
           children: [{
             'zh': require('../../../static/img/improved_cn.png'),
             'zhtw': require('../../../static/img/improved_cn.png'),
@@ -926,7 +958,7 @@ export default {
         },
         {
           status: 2,
-          statusStr: this.$t('overview.echartGood'), // Good
+          statusStr: this.inspectStatus.status_2, // Good
           children: [{
             'zh': require('../../../static/img/good_cn.png'),
             'zhtw': require('../../../static/img/good_cn.png'),
@@ -1102,6 +1134,27 @@ export default {
         });
       });
     },
+    
+    getInspectStatus() {
+      return new Promise((resolve, reject) => {
+        getInspectStatus().then(res => {
+          resolve(res);
+          this.inspectStatus = res.data.settingContent.general_setting_inspect_status_name
+          delete this.inspectStatus.update_time
+          delete this.inspectStatus.update_user_id
+          console.log('this.inspectStatus~~~~~ :>> ', this.inspectStatus);
+          
+          this.appraiseList.forEach(item =>{
+            if(item.status === 0) {item.label = this.inspectStatus.status_0}
+            else if(item.status === 1) {item.label = this.inspectStatus.status_1}
+            else if(item.status === 2) {item.label = this.inspectStatus.status_2}
+          })
+
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
 
 
     async getInspectList() {
@@ -1164,17 +1217,16 @@ export default {
       let searchParams = JSON.parse(JSON.stringify(SearchConditionUtil.getSearchCondition('inspectReport')));
       console.log("getSearchParams>>>>searchParams:",searchParams);
       this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
-   
-   
+
       if (Object.keys(searchParams).length > 0) {
-         
+        
         this.storeFilterObj = searchParams;
         this.params = searchParams;
         console.log("Get Old Params")
         console.log(searchParams)
         this.order = searchParams.order;
         this.filter = searchParams.filter;
-       
+      
         this.checkSortType(this.curSortType,true);
         console.log("searchParams.clause.status:",searchParams.clause.status);
         this.curAppraise = (typeof searchParams.clause.status=='undefined') ? -1:searchParams.clause.status;
@@ -1444,9 +1496,14 @@ $filterWidth: (100%-706);
     }
     
     .showCardHeight{
+      display: flex;
       flex-wrap: wrap;
-      height: calc(450/1440*100vw);
-      overflow: auto;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: flex-start;
+      // height: calc(450/1440*100vw);
+      // overflow: auto;
+        
     }
     .list-table{
       margin-bottom: 20px;
@@ -1472,42 +1529,58 @@ $filterWidth: (100%-706);
     }
     
     .report-card{
+        width: 19%;
         margin-bottom: calc(20/1440*100vw);
+        margin-right: 1%;
+        transition: all .3s;
+        cursor: pointer;
+        &:hover{
+          box-shadow: 0 3px 8px 0 rgba(0, 0, 0, .2);
+          
+        }
         .cards{
-          .card-title {
-            width: calc(150/1440*100vw);
-            overflow:hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            font-size: calc(15/1440*100vw);
-            margin-right: calc(10/1440*100vw);
-          }
-          div {
-            text-align: left;
-          }
-            padding: calc(15/1440*100vw);
-            cursor: pointer;
-            margin-right: calc(20/1440*100vw);
-            border: 1px solid #e3e9f4;
-            font-size: calc(12/1440*100vw);
-            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
-            width: calc(200/1440*100vw);
-            height: calc(210/1440*100vw);
-            position: relative;
-            color: #69727c;
-            min-height: calc(160/1440*100vw);
-            .item-img{
-              position: absolute;
-              right: 1px;
-              top: 1px;
-            }
-          .item-flex{
-            display: flex;
-            flex-direction: column;
-            padding-top: calc(40/1440*100vw);
-            justify-content: space-around;
-          }
-            .item-header{
+          width: 100%;
+          height: calc(220/1440*100vw);
+          padding: calc(15/1440*100vw);
+          
+          // margin-right: calc(20/1440*100vw);
+          border: 1px solid #e3e9f4;
+          font-size: calc(12/1440*100vw);
+          box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
+          position: relative;
+          color: #69727c;
+          min-height: calc(160/1440*100vw);
+
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          justify-content: space-between;
+          .card_main{
+            width: 100%;
+            .card-title {
+                width: calc(150/1440*100vw);
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                font-size: calc(15/1440*100vw);
+                margin-right: calc(10/1440*100vw);
+              }
+              div {
+                text-align: left;
+              }
+                
+              .item-img{
+                position: absolute;
+                right: 1px;
+                top: 1px;
+              }
+              .item-flex{
+                display: flex;
+                flex-direction: column;
+                padding-top: calc(40/1440*100vw);
+                justify-content: space-around;
+              }
+              .item-header{
                 width: 100%;
                 //margin-top: calc(40/1920*100vw);
                 overflow: hidden;
@@ -1531,44 +1604,70 @@ $filterWidth: (100%-706);
                         color: $black;
                         overflow: hidden;
                         text-overflow: ellipsis
-                }
+                  }
                 .inspect{
-                    font-size: calc(12/1920*100vw);
-                    color: $tab;
+                  font-size: calc(12/1920*100vw);
+                  color: $tab;
                 }
+              }
             }
-        }
-        .item-icon{
+            .item-icon{
+              text-align: left;
+              padding-left: calc(20/1920*100vw);
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              padding-right: calc(20/1920*100vw);
+            }
+            .inspectIcon{
+              font-size: calc(60/1920*100vw);
+              color: $border;
+            }
+            .score {
+              font-size: calc(32/1440*100vw); 
+              margin-right: calc(5/1440*100vw);
+              // margin-bottom: calc(30/1440*100vw);
+            }
+            .status-tag_row{
+              display: flex;
+              flex-wrap: wrap;
+              flex-direction: row;
+              align-items: flex-start;
+              justify-content: flex-start;
+              margin-bottom: 1%;
+              .status-tag {
+                border-radius: 4px; 
+                padding: calc(5/1440*100vw) calc(7/1440*100vw);
+                font-size: calc(10/1440*100vw);
+                margin-bottom: 2%;
+              }
+              .status-tag-en{
+                font-size: calc(14/1920*100vw);
+                border-radius: calc(5/1440*100vw); 
+                padding: calc(2/1440*100vw) calc(15/1440*100vw);
+                margin-bottom: 2%;
+              }
+            }
+          }
+          
+          
+        .card_bottom{
           text-align: left;
-          padding-left: calc(20/1920*100vw);
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding-right: calc(20/1920*100vw);
+          .submitter{
+            margin-bottom: calc(5/1440*100vw);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            justify-content: space-between;
+          }
         }
-        .inspectIcon{
-          font-size: calc(60/1920*100vw);
-          color: $border;
-        }
-        .score {
-          font-size: calc(32/1440*100vw); 
-          margin-right: calc(5/1440*100vw);
-          margin-bottom: calc(30/1440*100vw);
-        }
-        .status-tag {
-          border-radius: calc(5/1440*100vw); 
-          padding: calc(2/1440*100vw) calc(15/1440*100vw);
-        }
-        .status-tag-en{
-          font-size: calc(14/1920*100vw);
-          border-radius: calc(5/1440*100vw); 
-          padding: calc(2/1440*100vw) calc(15/1440*100vw);
-        }
+
         .margin-bottom-5 {
           margin-bottom: calc(5/1440*100vw);
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
+          justify-content: space-between;
           
         }
         .item-score{
@@ -1581,16 +1680,16 @@ $filterWidth: (100%-706);
           font-size: calc(12/1920*100vw);
         }
         .item-content{
-            text-align: left;
-            padding-left: calc(20/1920*100vw);
-            span{
-              font-size: calc(14/1920*100vw);
-              color: $tab;
-              display: block;
-              margin-bottom: calc(15/1920*100vw);
-              overflow: hidden;
-              text-overflow: ellipsis;
-            }
+          text-align: left;
+          padding-left: calc(20/1920*100vw);
+          span{
+            font-size: calc(14/1920*100vw);
+            color: $tab;
+            display: block;
+            margin-bottom: calc(15/1920*100vw);
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
         }
     }
 }

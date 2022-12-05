@@ -278,7 +278,8 @@ export default{
         "daysww":"XX",
         "weeks":"week",
         "pageSize":"Display per page",
-        "pageSizeUnit":"entries"
+        "pageSizeUnit":"entries",
+        "rate":"率"
     },
     "remotePatrol":{
         "InspectionDetail":"Export report",
@@ -521,7 +522,8 @@ export default{
         "resubmiteRpt":"Confirm submit report",
         "systemReject":"System withdrawal",
         "systemRejectMsg":"No sign-off staff; please reconfirm",
-        "cannotSwitchMimicMode":"Currently editing report, cannot switch modes"
+        "cannotSwitchMimicMode":"Currently editing report, cannot switch modes",
+        "tipLimitGroupScore":"得分超過類別上限時以上限計算總分",
     },
     "eventView":{
         "ClosedEvent":"Closed Events",
@@ -790,7 +792,19 @@ export default{
         "bindWorkFLow":"Binding WorkFLow",
         "isRequired":"Required",
         "notRequired":"Not Required",
-        "selectStoreTag":"Quick select"
+        "selectStoreTag":"Quick select",
+        "groupScore":"類別分值",
+        "advanceSetting":"Advance Setting",
+        "advanceSettingOn":"ON",
+        "advanceSettingOff":"OFF",
+        "setGroupScoreRange0":"類別分值上限 輸入範圍 0 ~ 9999",
+        "setGroupScoreRange":"類別分值上限 輸入範圍 -9999 ~ 9999",
+        "groupScoreLimit":"類別分值上限",
+        "commentStatus":"巡檢總評選項顯示 (此設定將影響品牌之巡檢總評相關顯示)",
+        "autoSelectComment":"開啟依條件自動選取巡檢總評 ",
+        "selectByScore":"依分數條件自動選取 ",
+        "noUserDefinedName":"無自定義名稱 ",
+        "needHeighterThan":"考評範圍最高值需高於最低值! ",
     },
     "deviceView":{
         "EzvizAccount":"Streaming Service Account",
@@ -1419,9 +1433,10 @@ export default{
         "tooltipListcan4":"Inspection report can only be viewed after sign-off has passed",
         "auditFlow":"Sign-off process",
         "nodeOrder":"Node serial number",
-
         "cantEmptyDays" : "The number of days to stay cannot be empty. ",
-        "cantTooMuchDays" : "The length of stay cannot exceed 365 days. "
+        "cantTooMuchDays" : "The length of stay cannot exceed 365 days. ",
+        "cantEmptyInspectStatus" : "巡檢總評選項自定義名稱不可為空! ",
+
       },
       "inceptionRpt":{
           "sendAudit":"Submit sign-off",
@@ -1471,7 +1486,8 @@ export default{
         "nickNameTip":"The nick name of sub-category supports up to 50 characters",
         "pleaseInputNickName":"Please enter the nick name of the mystery",
         "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name.",
-        "mystery":"Mystery Shopper"
+        "mysterio":"Mystery Shopper",
+        "allMysterio":"All of Mystery Shopper",
     }
   
   }

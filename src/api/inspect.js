@@ -288,3 +288,23 @@ export const getAllReportIds = data => {
     data
   });
 };
+
+
+
+
+export const getInspectStatus = params => {
+  return request({
+    url: `${version}/general/setting/get`,
+    method: 'get',
+    params
+  });
+};
+
+
+export const updateInspectStatus = data => {
+  return request({
+    url: `${version}/general/setting/inspect/status/name/update`,
+    method: 'post',
+    data
+  });
+}

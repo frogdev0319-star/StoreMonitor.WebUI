@@ -79,15 +79,18 @@
                 {{ $t('remotePatrol.scorecount') }}
               </span>
               <span v-if="MinScoreMsg" class="score_msg">
-                *{{ $t('insSettingView.minScoreEmpty') }}
+                * {{ $t('insSettingView.minScoreEmpty') }}
               </span>
             </template>
+
+            <!-- 考評總分範圍設置 -->
             <template>
               <span class="rangeScore">
                 {{ $t('insSettingView.totalScorRange') }}：
               </span>
               <el-input
                 :placeholder="$t('insSettingView.setMinScore')"
+                ref="min_score"
                 v-model="minScore"
                 class="input"
                 @blur="inputChangeMin"/>
@@ -96,16 +99,13 @@
               </span>
               <el-input
                 :placeholder="$t('insSettingView.setMaxScore')"
+                ref="max_score"
                 v-model="maxScore"
                 class="input"
                 @blur="inputChangeMax"/>
               <span class="input-text">
                 {{ $t('remotePatrol.scorecount') }}
               </span>
-              <span v-if="ScoreMsg" class="score_msg">
-                *{{ $t('insSettingView.rangeScoreTips') }}
-              </span>
-              
             </template>
             <template>
               <span class="rangeScore">
@@ -119,23 +119,144 @@
                 {{ $t('remotePatrol.scorecount') }}
               </span>
             </template>
+
+            <span v-if="ScoreMsg" class="score_msg">
+              *{{ $t('insSettingView.rangeScoreTips') }}
+            </span>
           </p>
         </div>
       </setting-table>
     </el-col>
+    
+
+    <!-- 巡檢總評選項顯示 -->
+    <el-col :span="24" class="el-rute-content storeLevel">
+      <setting-table :table-name="$t('insSettingView.commentStatus')">
+        <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
+          <div class="overall_options">
+
+            <div class="overall_row" v-for="(item, index) in defaultDefineName" :key="index">
+              <el-radio-group class="storevue-radio radio_item" v-model="item.defineStatus">
+                <el-radio :label="0" style="margin-right: 60px">{{item.name}}</el-radio> 
+                <el-radio :label="1" >{{ $t('insSettingView.userDefined')}} </el-radio> 
+              </el-radio-group>
+              <el-input
+                :ref=item.refName
+                :placeholder="$t('audit.workFlows.defineItem')" 
+                v-model="item.newName"
+                :disabled="item.defineStatus == 0"
+                style="width: 200px;  margin: 0 20px ;"
+                @input="(val) => itemInputChanged_overall({ val, item })"
+                />
+            </div>
+            
+            <span class="text_limit_sign" v-if="showInputLimit_overallItem"> {{$t('insSettingView.inputRuletip')}} </span>
+          </div>
+        </div>
+      </setting-table>
+    </el-col>
+
+
+
+    <!-- 巡檢建議值 -->
     <el-col :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.isCheckSuggest')">
-        <div slot="tableDetail">
-          <p class="rule-item">
-            <el-checkbox class="storevue-checkbox-outlined" v-model="dangerousOnFailedItem">
-              <span>
-                {{ $t('insSettingView.tab1FailedDangeous') }}
-              </span>
-            </el-checkbox>
-          </p>
+        <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
+          <el-checkbox class="storevue-checkbox-outlined" v-model="setting_isAutoMappingActivate" @change="switchIsAutoMappingActivate">
+            <span>
+              {{$t('insSettingView.autoSelectComment')}} 
+            </span>
+          </el-checkbox>
+
+          <div v-if="setting_isAutoMappingActivate" style="width: 100%;">
+          <!-- radio 1 -->
+          <el-radio-group class="storevue-radio suggestvalue" v-model="setting_autoMappingByTotalScore">
+            <div class="suggestvalue_section" style="margin-bottom: 3px">
+
+              <el-radio :label="true" style="margin-bottom: 10px">{{$t('insSettingView.selectByScore')}} </el-radio> 
+
+                <div class="for_flex">
+                  <div class="suggestvalue_naming">
+                      <div class="item_name">
+                        <div v-if="defaultDefineName[0].newName !== ''">{{defaultDefineName[0].newName}}</div>
+                        <div style="color: #c0c0c0" v-if="defaultDefineName[0].newName == ''">{{$t('insSettingView.noUserDefinedName')}}</div>
+                      </div>
+                      <div class="item_name">
+                        <div v-if="defaultDefineName[1].newName !== ''">{{defaultDefineName[1].newName}}</div>
+                        <div style="color: #c0c0c0" v-if="defaultDefineName[1].newName == ''">{{$t('insSettingView.noUserDefinedName')}}</div>
+                      </div>
+                      
+                      <div class="item_name">
+                        <div v-if="defaultDefineName[2].newName !== ''">{{defaultDefineName[2].newName}}</div>
+                        <div style="color: #c0c0c0" v-if="defaultDefineName[2].newName == ''">{{$t('insSettingView.noUserDefinedName')}}</div>
+                      </div>
+                  </div>
+
+                  <div class="suggestvalue_score">
+                    <!-- low score -->
+                    <div class="item_score">
+                      <div class="score">{{minScore}} {{$t('statistics.score')}}</div>   
+                      <span style="margin: 0 15px"> ~ </span>  
+                      <div class="score"> {{showScoreMin}} {{$t('statistics.score')}}</div>
+                    </div>
+
+                    <!-- middle score -->
+                    <div class="item_score">
+                      <div class="score">
+                        <el-input
+                          placeholder="" 
+                          style="width: 90px;"
+                          v-model="scoreMiddleLow"
+                          type="number"
+                          :disabled = "!setting_autoMappingByTotalScore"
+                          @blur="inputScoreMiddleMin"
+                          
+                          />
+                          {{$t('statistics.score')}}
+                        </div>  
+                      <span style="margin: 0 15px"> ~ </span>  
+                      <div class="score"> 
+                        <el-input
+                          placeholder="" 
+                          style="width: 90px;"
+                          v-model="scoreMiddleHeight"
+                          type="number"
+                          :disabled = "!setting_autoMappingByTotalScore"
+                          @blur="inputScoreMiddleMax"/>
+                          {{$t('statistics.score')}} 
+                      </div>
+                      <span v-if="ScoreMsg" class="score_msg" style="margin-left: 20px">
+                          * {{$t('insSettingView.needHeighterThan')}}
+                      </span>
+                    </div>
+                    
+                    <!-- hight score -->
+                    <div class="item_score">
+                      <div class="score">{{showScoreMax}}  {{$t('statistics.score')}}</div>   
+                      <span style="margin: 0 15px"> ~ </span>  
+                      <div class="score"> {{maxScore}}  {{$t('statistics.score')}}</div>
+                    </div>
+
+                    
+                  </div>
+                </div>
+
+            </div>
+
+            <!-- radio 2 -->
+            <div class="suggestvalue_section">
+              <el-radio :label="false" v-model="dangerousOnFailedItem">
+                <span  style="font-weight: 400">{{$t('insSettingView.tab1FailedDangeous')}}</span> ： <span style="color: #1375bc; font-weight: 900">{{defaultDefineName[0].newName}}</span></el-radio> 
+            </div>
+            
+          </el-radio-group>
+          </div>
+
         </div>
       </setting-table>
     </el-col>
+
+    <!-- 巡檢附件上傳 -->
     <el-col v-if="mode === 1" :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.isCheckAnnex')">
         <div slot="tableDetail">
@@ -149,6 +270,9 @@
         </div>
       </setting-table>
     </el-col>
+    
+
+    <!-- 巡檢簽名 -->
     <el-col v-if="mode === 1" :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.inspectionSignature')">
         <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
@@ -194,17 +318,14 @@
                   @click="deleteSign(index)"
               />
               </div>
-              
             </div>
-            <span class="text_limit_sign"  v-if="showInputLimit"> {{$t('insSettingView.inputRuletip')}}  </span>
-
-
+            <span class="text_limit_sign" v-if="showInputLimit"> {{$t('insSettingView.inputRuletip')}}  </span>
           </div>
-          
         </div>
       </setting-table>
     </el-col>
 
+    <!-- 自定義評估選項 -->
     <el-col :span="24" class="el-rute-content" style="margin-bottom:20px;">
       <setting-table :table-name="$t('insSettingView.btnAttributeValues')">
         <div slot="tableDetail" class="setting-config" >
@@ -345,9 +466,6 @@
         </div>
       </setting-table>
     </el-col>
-
-
-
   </el-row>
 </template>
 
@@ -373,7 +491,13 @@ export default {
       includedInTotalScoreWithType1: false,
       qualifiedForIgnoredWithType1: false,
       qualifiedForIgnoredWithType2: false,
+
+
+      setting_isAutoMappingActivate: false,
+      setting_autoMappingByTotalScore: true,
       dangerousOnFailedItem: false,
+
+
       onSitePhotoOnly: false,
       lang: this.$i18n.locale,
       ScoreMsg: false,
@@ -407,7 +531,31 @@ export default {
           ]
         },
       n : 1,
-      showInputLimit: false
+      showInputLimit: false,
+      showInputLimit_overallItem: false,
+      defaultDefineName:[
+        {
+          name:  this.$t('overview.danger') ,
+          newName:  this.$t('overview.danger'),
+          defineStatus: 0,
+          refName: 'bad'
+        },
+        {
+          name: this.$t('overview.improve'),
+          newName: this.$t('overview.improve'),
+          defineStatus: 0,
+          refName: 'fair'
+        },
+        {
+          name: this.$t('overview.echartGood'),
+          newName: this.$t('overview.echartGood'),
+          defineStatus: 0,
+          refName: 'good'
+        },
+      ],
+      scoreMiddleLow: 0,
+      scoreMiddleHeight: 0,
+      inspectStatus:"",
     };
   },
   watch: {
@@ -430,9 +578,13 @@ export default {
       this.bindWorkFlowData.inspectTagId = this.inspectId
       // console.log('this.workFlowToBind ~~~~>> ', this.workFlowToBind);
     },
+
+    
     enableDelay(val){
       if(val == true && this.delayDay == undefined)  this.delayDay = 1
     },
+
+
     onSiteSignature:{
       immediate: false, 
       deep: true,
@@ -458,17 +610,85 @@ export default {
         }
       }
     },
+
+    setting_autoMappingByTotalScore(val){
+      if(this.setting_isAutoMappingActivate) this.dangerousOnFailedItem = !val     
+    },
+
+    defaultDefineName:{
+      immediate: false, 
+      deep: true,
+      handler (val, old ) {
+        // if(val[0].defineStatus == 0) val[0].newName = val[0].name
+        for(let i of val ){
+          if(i.defineStatus == 0) i.newName = i.name
+        }
+      }
+    },
+
+  },
+  computed:{
+    showScoreMin(){
+      var tempScore =  (parseFloat(this.scoreMiddleLow) - 0.1)
+      return Number.isInteger(tempScore) ? tempScore.toFixed(0) : tempScore.toFixed(1)
+    },
+    showScoreMax(){
+      var tempScore =  (parseFloat(this.scoreMiddleHeight) + 0.1)
+      return Number.isInteger(tempScore) ? tempScore.toFixed(0) : tempScore.toFixed(1)
+    }
   },
 
   async mounted() {
     
     await this.getRule();
     await this.workflowItems()
-    console.log('this.signatureData :>> ', this.signatureData);
-    
+    await this.getInspectStatus()
+
+    for (let i = 0; i < 3; i++) {
+      if(this.defaultDefineName[i].name !== this.inspectStatus["status_" + i]) {
+          this.defaultDefineName[i].defineStatus = 1
+          this.defaultDefineName[i].newName = this.inspectStatus["status_"+ i]
+        } else {
+          this.defaultDefineName[i].defineStatus = 0
+          this.defaultDefineName[i].newName = this.defaultDefineName[i].name
+        }
+    }
+    // console.log('this.inspectStatus  mounted:>> ', this.inspectStatus);
+    // console.log('this.defaultDefineName  mounted:>> ', this.defaultDefineName);
+    // console.log('this.setting_autoMappingByTotalScore  mounted >>>>>>>----->> ', this.setting_autoMappingByTotalScore);
+
   },
 
   methods: {
+
+    switchIsAutoMappingActivate(val){
+      if(!val){
+        this.setting_autoMappingByTotalScore = false
+        this.dangerousOnFailedItem = false
+      } else {
+        this.setting_autoMappingByTotalScore = true
+        this.dangerousOnFailedItem = false
+      }
+      console.log('this.setting_autoMappingByTotalScore :>> ', this.setting_autoMappingByTotalScore);
+      console.log('this.dangerousOnFailedItem :>> ', this.dangerousOnFailedItem);
+    },
+
+    countNumMin(){
+      var minScore = parseInt(this.minScore)
+      var maxScore = parseInt(this.maxScore)
+
+      var middleLow = (((maxScore - minScore) * .5) + minScore)
+      this.scoreMiddleLow = Number.isInteger(middleLow) ? middleLow.toFixed(0) : middleLow.toFixed(1)
+    },
+    countNumMax(){
+      var minScore = parseInt(this.minScore)
+      var maxScore = parseInt(this.maxScore)
+      var middleHeight = (((maxScore - minScore) * .8) + minScore)
+      this.scoreMiddleHeight = Number.isInteger(middleHeight) ? middleHeight.toFixed(0) : middleHeight.toFixed(1)
+    },
+    
+
+
     async submitRule() {
       const self = this;
       if(this.enableDelay && this.delayDay == undefined){
@@ -491,7 +711,15 @@ export default {
           await this.bindWorkflow(this.bindWorkFlowData)
         }
       }
-      
+
+      for (let i = 0; i < 3; i++) {
+        if(this.defaultDefineName[i].defineStatus == 1 && this.defaultDefineName[i].newName == "") {
+          // this.$refs.stayOver.focus()
+          util.notify(this.defaultDefineName[i].name + ", "+ this.$t('audit.workFlows.cantEmptyInspectStatus'), 'error', 2000)
+          return 
+          } 
+      }
+  
       if ((this.passFailBtnAttr === 'userDefined' && !this.validateUserDefinedPassFailBtnValue()) ||
           (this.otherBtnAttr === 'userDefined' && !this.validateUserDefinedOtherBtnValue())) {
         util.notify(this.$t('insSettingView.enterBtnAttr'), 'warning', 3000);
@@ -510,7 +738,31 @@ export default {
             { name: 'maxScore', value: parseFloat(self.maxScore) },
             { name: 'baseScore', value: parseFloat(self.baseScore) },
             { name: 'standardScore', value: parseFloat(self.standardScore) },
-            { name: 'dangerousOnFailedItem', value: self.dangerousOnFailedItem },
+            
+
+            { name: 'setting_isAutoMappingActivate', 
+              category: "generalRule",
+              value: self.setting_isAutoMappingActivate 
+            },
+            
+            {
+              name: "setting_autoMappingByTotalScore", // 依分數條件自動選取
+              category: "generalRule",
+              value: self.setting_autoMappingByTotalScore ,
+              extra: [
+                  {
+                    key: "mappingScore_bottom", // 下標值
+                    value: self.scoreMiddleLow
+                  },
+                  {
+                    key: "mappingScore_top", // 上標值
+                    value: self.scoreMiddleHeight
+                  }
+                ]
+            },
+
+            { name: 'dangerousOnFailedItem', value: this.dangerousOnFailedItem },
+
             { name: 'onSitePhotoOnly', value: self.onSitePhotoOnly },
             { name: 'onSiteSignature', value: self.onSiteSignature },
             { name: 'checkin', value: self.checkin },
@@ -531,15 +783,24 @@ export default {
             }
           ]
         };
-      
-
-
+    
       if(this.onSiteSignature) params.ruleItems.push(this.signatureData)
         console.log('params', params)
-        const res = await self.updateInspectRule(params);
-      
+        
+      if(this.minScore === undefined || this.minScore === '') {
+        util.notify("最低考評總分範圍不可為空", 'error', 2000 );
+        this.$refs.min_score.focus()
+        return
+      }
+      if(this.maxScore === undefined || this.maxScore === null || this.maxScore === '') {
+        util.notify("最高考評總分範圍不可為空", 'error', 2000 );
+        this.$refs.max_score.focus()
+        return
+      }
 
-      if (res.errCode === 0) {
+      const statusNameRes = await self.updateInspectStatus();
+      const res = await self.updateInspectRule(params);
+      if (res.errCode === 0 && statusNameRes.errCode == 0) {
           util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           return false;
         } else {
@@ -547,10 +808,9 @@ export default {
           return false;
         }
       }
-
-      
-
     },
+
+
     async getRule() {
       const self = this;
       const ruleData = JSON.parse(sessionStorage.getItem('ruleData'));
@@ -588,6 +848,16 @@ export default {
               case 'dangerousOnFailedItem':
                 self.dangerousOnFailedItem = item.value;
                 break;
+              case 'setting_isAutoMappingActivate':
+                self.setting_isAutoMappingActivate = item.value;
+                break;
+              case 'setting_autoMappingByTotalScore':
+                self.setting_autoMappingByTotalScore = item.value
+                self.scoreMiddleLow = item.extra[0].value
+                self.scoreMiddleHeight = item.extra[1].value
+                break;
+
+
               case 'onSitePhotoOnly':
                 self.onSitePhotoOnly = item.value;
                 break;
@@ -665,23 +935,112 @@ export default {
         });
       });
     },
+
+
+
+    getInspectStatus(){
+      return new Promise((resolve, reject) => {
+        inpectRESTful.getInspectStatus().then(res => {
+          resolve(res);
+          this.inspectStatus = res.data.settingContent.general_setting_inspect_status_name
+          delete this.inspectStatus.update_time
+          delete this.inspectStatus.update_user_id
+          console.log('this.inspectStatus :>> ', this.inspectStatus);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
+    updateInspectStatus(){
+      var status = {
+          "status_0": this.defaultDefineName[0].newName,
+          "status_1": this.defaultDefineName[1].newName,
+          "status_2": this.defaultDefineName[2].newName,
+      }
+      console.log('status ~~~~~~~~>> ', status);
+      return new Promise((resolve, reject) => {
+        inpectRESTful.updateInspectStatus(status).then(res => {
+          resolve(res);
+          
+        }).catch(err => {
+          reject(err);
+        });
+      });
+
+    },
+
+    inputChangeMin(e) {
+      const self = this;
+      let minScore = self.getUtilScore(e.target.value);
+      // if(minScore == "") minScore = 0
+
+      console.log("min", minScore === self.maxScore)
+      // console.log("max", self.maxScore )
+
+      if(minScore === self.maxScore) minScore = minScore - 1
+      this.countNumMin()
+      this.countNumMax()
+      self.minScore = minScore
+      self.ScoreMsg = parseFloat(self.minScore) > parseFloat(self.maxScore);
+      self.MinScoreMsg = (self.hundredMarkType=='1' && self.baseScore.toString()=="");
+    },
+    
     inputChangeMax(e) {
       let maxScore = this.getUtilScore(e.target.value);
+      // if(maxScore < 1) maxScore = 1
+
+      if(this.minScore === maxScore) maxScore = maxScore + 1
+      this.countNumMin()
+      this.countNumMax()
+
       if (this.hundredMarkType === '1') {
         maxScore = parseFloat(maxScore) > parseFloat(this.baseScore) ? parseFloat(this.baseScore) : maxScore;
       }
       this.maxScore = maxScore;
       this.standardScore = parseFloat(this.standardScore) > parseFloat(this.maxScore)
         ? parseFloat(this.maxScore) : this.standardScore;
-      this.ScoreMsg = parseFloat(this.minScore) > parseFloat(this.maxScore);
+      this.ScoreMsg = parseFloat(this.minScore) >= parseFloat(this.maxScore);
     },
 
-    inputChangeMin(e) {
+    
+
+
+
+    inputScoreMiddleMin(e){
       const self = this;
-      self.minScore = self.getUtilScore(e.target.value);
-      self.ScoreMsg = parseFloat(self.minScore) > parseFloat(self.maxScore);
-      self.MinScoreMsg = (self.hundredMarkType=='1' && self.baseScore.toString()=="");
+      self.scoreMiddleHeight = parseInt(self.scoreMiddleHeight)
+      self.scoreMiddleLow = self.getUtilScore(e.target.value);
+      if(self.scoreMiddleLow == '' || self.scoreMiddleLow == null){
+        this.countNumMin()
+      }
+      else if(self.scoreMiddleLow <= this.minScore + 1) {
+        self.scoreMiddleLow = this.minScore + 2
+      } 
+      else if(self.scoreMiddleLow >= self.scoreMiddleHeight){
+        self.scoreMiddleLow = self.scoreMiddleHeight - 1
+      }
     },
+
+    inputScoreMiddleMax(e){
+      const self = this;
+      self.scoreMiddleLow = parseInt(self.scoreMiddleLow)
+      self.scoreMiddleHeight = self.getUtilScore(e.target.value);
+
+      console.log('typeof scoreMiddleLow :>> ', typeof(self.scoreMiddleLow));
+      console.log('typeof scoreMiddleHeight :>> ', typeof(self.scoreMiddleHeight));
+      if(self.scoreMiddleHeight == '' || self.scoreMiddleHeight == null){
+        this.countNumMax()
+      }
+      else if(self.scoreMiddleHeight >= this.maxScore) {
+        self.scoreMiddleHeight = this.maxScore - 2
+      }
+      else if(self.scoreMiddleLow >= self.scoreMiddleHeight){
+        self.scoreMiddleHeight = self.scoreMiddleLow + 1
+      }
+  
+    },
+
 
     getUtilScore(val) {
       val = val.replace(/[^-?\d\.]/g, '');
@@ -821,6 +1180,22 @@ export default {
       }
     },
 
+
+    itemInputChanged_overall({ val, item }){
+      const content = filterString.all(val, 20);
+      item.newName = content
+      const length = filterString.getContentLength(val);
+      if(length > 20) {
+        this.showInputLimit_overallItem = true
+      } else {
+        this.showInputLimit_overallItem = false
+      }
+    },
+
+ 
+
+
+
   }
 };
 </script>
@@ -887,6 +1262,24 @@ $itemHeight:50px;
     }
   }
 }
+
+.overall_options{
+  width: 100%;
+  padding: 10px 0;
+  }
+  .overall_row{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    .radio_item{
+      .el-radio{
+        width: 60px !important;
+      }
+    }  
+  }
+
+
 
 .text_limit_sign{
   position: relative;
@@ -1018,4 +1411,75 @@ $itemHeight:50px;
       }
     }
 }
+</style>
+
+<style lang="sass" scoped>
+  .suggestvalue
+    width: 100%
+    display: flex
+    flex-direction: column
+    justify-content: flex-start
+    align-items: flex-start
+    .suggestvalue_section
+      width: 100%
+      background: #f7f9fa
+      margin-bottom: 20px
+      padding: 20px 20px
+      font-size: 15px
+    
+      .for_flex
+        margin-top: 10px
+        display: flex
+        flex-direction: row
+        justify-content: flex-start
+        align-items: flex-start
+        .suggestvalue_naming
+          margin-left: 30px
+          margin-right: 20px
+          .item_name
+            min-width: 70px
+            height: 45px
+            display: flex
+            flex-direction: row
+            justify-content: flex-start
+            align-items: center
+          
+        .suggestvalue_score
+          .item_score
+            height: 45px
+            display: flex
+            flex-direction: row
+            justify-content: flex-start
+            align-items: center
+            .score
+              width: 110px
+              display: flex
+              flex-direction: row
+              justify-content: flex-end
+              align-items: center
+              .el-input--medium
+                margin-right: 5px
+
+              
+  
+
+</style>
+
+<style lang="sass">
+.suggestvalue_score
+  .item_score 
+    .score
+      .el-input--medium .el-input__inner
+        text-align: right
+.score
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button 
+    -webkit-appearance: none
+    margin: 0
+
+.storeLevel
+  .setting-table-container
+    .setting-header
+      background: #e4f3fd
+
 </style>

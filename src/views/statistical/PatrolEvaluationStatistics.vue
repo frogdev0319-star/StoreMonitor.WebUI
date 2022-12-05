@@ -23,7 +23,7 @@
                 @setDefaultSortAndPage="setDefaultSortAndPage" 
             />
         </el-col>
-        <div class="statistics-content" id="imgTest_avg1" style="height:194px;margin-top:200px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
+        <div class="statistics-content" id="imgTest_avg1" style="height:194px;margin-top:200px;box-shadow:none;" :style="{width:ispdf?'1280px':null}">
             <div class="head">
                 <el-col :span="17">
                     <div class="region-titles">
@@ -76,7 +76,7 @@
         </div>
 
         <!-- 考評結果分佈 --> 
-        <div class="statistics-content" id="imgTest_avg2" style="height:900px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
+        <div class="statistics-content" id="imgTest_avg2" style="height:900px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1280px':null}">
             <div class="head">
                 <div class="region-titles">
                     <span class="title">
@@ -162,7 +162,7 @@
                         <v-chart ref="storeChart" :id="part1-region-line-chart" :options="part1.barStoreOption" autoresize :style="{width:part1.barStoreOption?part1.barStoreOption.width:'100%',height:'100%'}" />
                     </div>
                 </div>
-                <div v-else style="margin-top:20.5px;height:100%;" :style="{width:ispdf?'1024px':null}">
+                <div v-else style="margin-top:20.5px;height:100%;" :style="{width:ispdf?'1280px':null}">
                     <div style="margin-top:20.5px;">
                         <table-only ref="elTP" 
                             :column-data="part1StoreInfoTableCol" 
@@ -197,7 +197,7 @@
         </div>
 
         <!-- 考評得分分佈 -->
-        <div class="statistics-content" id="imgTest_avg3" style="height:1010px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
+        <div class="statistics-content" id="imgTest_avg3" style="height:1010px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1280px':null}">
             <div class="head">
                 <div class="region-titles">
                     <span class="title">
@@ -280,7 +280,7 @@
                     </div>
                 </div>
 
-                <div v-else style="main-rgtop:20.5px;height:100%;" :style="{width:ispdf?'1024px':null}">
+                <div v-else style="main-rgtop:20.5px;height:100%;" :style="{width:ispdf?'1280px':null}">
                     <div style="margin-top:20.5px;padding-right:10px;">
                         <table-only ref="elTP" 
                             :column-data="part2StoreInfoTableCol" 
@@ -303,7 +303,7 @@
                             @onCellClick="onEvenListNumClickPart2" 
                             />
                     </div>
-                    <div style="width:100%; margin-top:12px;height:31px;" :style="{width:ispdf?'1024px':null}">
+                    <div style="width:100%; margin-top:12px;height:31px;" :style="{width:ispdf?'1280px':null}">
                         <tbl-pagination-only :total="part2.table.total" :pagesize="part2.table.sizeNum" :current-page="part2.table.page" layout="prev,pager, next,sizes,slot" @sizeChange="handlePageAndSizeChangePart2" @currentChange="handlePageAndSizeChangePart2" />
                     </div>
                 </div>
@@ -319,7 +319,7 @@
 
         <!-- 考評達標率 -->
         <!-- v-if="part3.standardScore!=-9999" -->
-        <div id="imgTest_avg4" v-if="part3.standardScore!=-9999" class="statistics-content" style="height:1000px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
+        <div id="imgTest_avg4" v-if="part3.standardScore!=-9999" class="statistics-content" style="height:1000px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1280px':null}">
             <div class="head">
                 <div class="region-titles">
                     <span class="title">
@@ -394,7 +394,7 @@
                 <div v-if="part3.storeMode==1" style="height:100%;overflow-y:hidden;overflow-x:auto">
                     <v-chart ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption" autoresize :style="{width:part3.barStoreOption?part3.barStoreOption.width :'100%',height:'100%'}" />
                 </div>
-                <div v-else style="margin-top:20.5px;height:100%;overflow-x:auto;" :style="{width:ispdf?'1024px':null}">
+                <div v-else style="margin-top:20.5px;height:100%;overflow-x:auto;" :style="{width:ispdf?'1280px':null}">
                     <div style="margin-top:20.5px;padding-right:10px;">
                         <table-only ref="elTP" 
                             :column-data="part3StoreInfoTableCol" 
@@ -436,7 +436,7 @@
 
     
     <div id="pdf-area" v-if="ispdf" ref="printPDF" class="statistics-container">
-        <div style="width:1024px;">
+        <div style="width:1280px;">
             <div class="statistics-content-pdf" style="height: 194px;marginTop:20px;box-shadow:none;">
                 <div id="img_avg1">
                     <img :src="pdfSrc_avg1" style="display: block;width:100%;height: auto;">
@@ -479,7 +479,8 @@ import {
     getInspectStatsOverviewWithGroup
 } from '@/api/inspectOverview';
 import {
-    GetInspectTagList
+    GetInspectTagList,
+    getInspectStatus
 } from '@/api/inspect';
 import SearchComponent from '@/components/SearchComponent';
 import resize from '@/components/mixins/echartResize';
@@ -1279,6 +1280,8 @@ export default {
             part1BarcharWidth: '100%',
             part2BarcharWidth: '100%',
             part3BarcharWidth: '100%',
+
+            inspectStatus:'',
             curSubmitter:'-1',
         };
     },
@@ -1292,13 +1295,18 @@ export default {
     watch: {
         async accountChanged(val) {
             if (val !== 0) {
+                await this.getInspectStatus();
                 await this.initData();
+                await this.renameTableLabel();
             }
         },
     },
 
     async created() {
+        await this.getInspectStatus()
         await this.initData();
+        await this.renameTableLabel();
+        
     },
 
     beforeDestroy() {
@@ -1307,6 +1315,57 @@ export default {
     },
 
     methods: {
+        getInspectStatus(){
+            return new Promise((resolve, reject) => {
+                getInspectStatus().then(res => {
+                resolve(res);
+                this.inspectStatus = res.data.settingContent.general_setting_inspect_status_name
+                delete this.inspectStatus.update_time
+                delete this.inspectStatus.update_user_id
+                console.log('this.inspectStatus :>> ', this.inspectStatus);
+                }).catch(err => {
+                reject(err);
+                });
+            });
+        },
+
+        renameTableLabel(){
+            // part1StoreInfoTableCol
+            this.part1StoreInfoTableCol[8].label = this.inspectStatus.status_2
+            this.part1StoreInfoTableCol[9].label = this.inspectStatus.status_1
+            this.part1StoreInfoTableCol[10].label = this.inspectStatus.status_0
+
+            // regionInfoData
+            this.regionInfoData[3].label = this.inspectStatus.status_2
+            this.regionInfoData[4].label = this.inspectStatus.status_1
+            this.regionInfoData[5].label = this.inspectStatus.status_0
+            console.log('this.regionInfoData ~~~~~>> ', this.regionInfoData);
+
+            // storeInfoData
+            this.storeInfoData[6].label = this.inspectStatus.status_2
+            this.storeInfoData[7].label = this.inspectStatus.status_1
+            this.storeInfoData[8].label = this.inspectStatus.status_0
+            console.log('this.storeInfoData ~~~~~>> ', this.storeInfoData);
+
+            // exportDataHeader
+            this.exportDataHeader[6].label = this.inspectStatus.status_2
+            this.exportDataHeader[7].label = this.inspectStatus.status_1
+            this.exportDataHeader[8].label = this.inspectStatus.status_0
+
+            // exportRegionHeader
+            this.exportRegionHeader[3].label = this.inspectStatus.status_2
+            this.exportRegionHeader[4].label = this.inspectStatus.status_1
+            this.exportRegionHeader[5].label = this.inspectStatus.status_0
+
+            // exportPart1DataHeader
+            this.exportPart1DataHeader[8].label = this.inspectStatus.status_2
+            this.exportPart1DataHeader[9].label = this.inspectStatus.status_1
+            this.exportPart1DataHeader[10].label = this.inspectStatus.status_0
+
+        },
+
+
+
         getLangStyleValue(langArray) {
             return util.getLangStyleValue(langArray);
         },
@@ -1399,12 +1458,12 @@ export default {
         onEvenListNumClickPart2(e) {
             if (e.prop == 'compareTrend') {
                 if(!PermissionHelper.enableAppraisalCompareStatistics()){
-                  message({
-                      message: this.$i18n.t('route.noPatrolCompareStatAuthority'),
-                      type: 'error',
-                      duration: 5 * 1000
+                    message({
+                        message: this.$i18n.t('route.noPatrolCompareStatAuthority'),
+                        type: 'error',
+                        duration: 5 * 1000
                     });
-                  return;
+                    return;
                 }
                 let params = JSON.parse(JSON.stringify(this.params));
                 params.storeIds = [e.row.innerId]
@@ -1434,12 +1493,12 @@ export default {
         onEvenListNumClickPart3(e) {
             if (e.prop == 'compareTrend') {
                 if(!PermissionHelper.enableAppraisalCompareStatistics()){
-                  message({
-                      message: this.$i18n.t('route.noPatrolCompareStatAuthority'),
-                      type: 'error',
+                    message({
+                        message: this.$i18n.t('route.noPatrolCompareStatAuthority'),
+                        type: 'error',
                       duration: 5 * 1000
                     });
-                  return;
+                    return;
                 }
                 let params = JSON.parse(JSON.stringify(this.params))
                 params.storeIds = [e.row.innerId]
@@ -1463,9 +1522,9 @@ export default {
                 message: this.$i18n.t('route.noReportAuthority'),
                 type: 'error',
                 duration: 5 * 1000
-              });
+            });
             return;
-          }
+            }
             let searchParams = JSON.parse(JSON.stringify(this.params))
             searchParams.jump = true;
 
@@ -2410,6 +2469,11 @@ export default {
             let totalImproved = 0;
             let totalQualified = 0;
             let totalReport = 0;
+
+            self.resultLegend[0].type = this.inspectStatus.status_0
+            self.resultLegend[1].type = this.inspectStatus.status_1
+            self.resultLegend[2].type = this.inspectStatus.status_2
+
             const jsonArray = self.resultLegend.slice(0, 3);
             let seriesData = [];
             const params = {};
@@ -2499,15 +2563,15 @@ export default {
                 }
                 seriesData = [{
                         value: totalDargerous,
-                        name: self.$t('overview.danger')
+                        name: "self.inspectStatus.status_0"
                     },
                     {
                         value: totalImproved,
-                        name: self.$t('overview.improve')
+                        name: self.inspectStatus.status_1
                     },
                     {
                         value: totalQualified,
-                        name: self.$t('overview.echartGood')
+                        name: self.inspectStatus.status_2
                     }
                 ];
                 const totalArray = [totalDargerous, totalImproved, totalQualified];
@@ -3627,9 +3691,9 @@ export default {
             this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
         },
 
-        exportPdf(){
-            console.log('exportPdf ~~~~~~~>> ');
-        },
+        // exportPdf(){
+        //     console.log('exportPdf ~~~~~~~>> ');
+        // },
         setDefaultSortAndPage(paramsObj) {
             this.defaultSort = paramsObj.defaultSort;
             this.order = this.params.order = paramsObj.order;
@@ -3914,7 +3978,7 @@ export default {
                     .excellent_nums {
                         flex-grow: 1;
                         text-align: right;
-                        margin-left: calc(20 / 1920 * 10vw);
+                        // margin-left: calc(20 / 1920 * 10vw);
                         font-size: calc(15 / 1920 * 100vw);
                         line-height: calc(14 / 1920 * 100vw);
                     }

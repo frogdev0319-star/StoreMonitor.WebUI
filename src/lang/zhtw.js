@@ -278,7 +278,8 @@ export default{
       "daysww":"號",
       "weeks":"週",
       "pageSize":"每頁顯示",
-      "pageSizeUnit":"筆"
+      "pageSizeUnit":"筆",
+      "rate":"率"
   },
   "remotePatrol":{
       "InspectionDetail":"匯出報告",
@@ -771,7 +772,7 @@ export default{
       "tHeaderH":"是否必填",
       "tHeaderI":"權重",
       "tab1CalculateScore":"與其他tab組合時，Tab1（Pass&Fail）項目分值參與考評總分運算",
-      "tab1FailedDangeous":"Tab1（Pass&Fail）中存在不合格項時，巡檢結果為：立即督導",
+      "tab1FailedDangeous":"Tab1（Pass&Fail）中存在不合格項時，巡檢結果為",
       "tab1IgnoredQualified":"Tab1(Pass&Fail)中忽略項目視同得分",
       "tab2IgnoredQualified":"Tab2（Score）中忽略項目視同得分",
       "templateEmpty":"巡檢表不能為空！",
@@ -796,7 +797,20 @@ export default{
       "bindWorkFLow":"巡檢表綁定流程",
       "isRequired":"必填",
       "notRequired":"非必填",
-      "selectStoreTag":"快速選擇"
+      "selectStoreTag":"快速選擇",
+      "groupScore":"類別分值",
+      "advanceSetting":"進階設定",
+      "advanceSettingOn":"開啟",
+      "advanceSettingOff":"關閉",
+      "setGroupScoreRange0":"類別分值上限 輸入範圍 0 ~ 9999",
+      "setGroupScoreRange":"類別分值上限 輸入範圍 -9999 ~ 9999",
+      "groupScoreLimit":"類別分值上限",
+      "commentStatus":"巡檢總評選項顯示 (此設定將影響品牌之巡檢總評相關顯示)",
+      "autoSelectComment":"開啟依條件自動選取巡檢總評 ",
+      "selectByScore":"依分數條件自動選取 ",
+      "noUserDefinedName":"無自定義名稱 ",
+      "needHeighterThan":"考評範圍最高值需高於最低值! ",
+      
   },
   "deviceView":{
       "EzvizAccount":"串流服務帳號",
@@ -1427,7 +1441,9 @@ export default{
         "auditFlow":"簽核流程",
         "nodeOrder":"節點序號",
         "cantEmptyDays" : "停留天數不可為空! ",
-        "cantTooMuchDays" : "天數不可超過365天! "
+        "cantTooMuchDays" : "天數不可超過365天! ",
+        "cantEmptyInspectStatus" : "巡檢總評選項自定義名稱不可為空! ",
+
 
     },
     "inceptionRpt":{
@@ -1480,7 +1496,6 @@ export default{
       "duplicateNickName":"已有相同的神秘客代稱，請重新輸入",
       "mysterio":"神秘客",
       "allMysterio":"全部神秘客",
-      "mystery":"神秘客"
   }
 
 }
