@@ -339,7 +339,7 @@ export const navbarRoute = {
       },
       {
         path: '/patrolItem_old',
-        name: 'patrolItem_old',
+        name: 'patrolItemsStat',
         component: resolve => require(['@/views/statistical/InspectItemStatistics_old'], resolve),
         hidden: true,
         meta: {
