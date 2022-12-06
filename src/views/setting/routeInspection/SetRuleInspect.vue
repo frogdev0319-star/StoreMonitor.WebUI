@@ -207,7 +207,6 @@
                           placeholder="" 
                           style="width: 90px;"
                           v-model="scoreMiddleLow"
-                          type="number"
                           :disabled = "!setting_autoMappingByTotalScore"
                           @blur="inputScoreMiddleMin"
                           
@@ -220,7 +219,6 @@
                           placeholder="" 
                           style="width: 90px;"
                           v-model="scoreMiddleHeight"
-                          type="number"
                           :disabled = "!setting_autoMappingByTotalScore"
                           @blur="inputScoreMiddleMax"/>
                           {{$t('statistics.score')}} 
@@ -1013,7 +1011,12 @@ export default {
       self.minScore = parseFloat(self.minScore)
       self.scoreMiddleHeight = parseFloat(self.scoreMiddleHeight)
 
+      var isNotNumber = isNaN(self.scoreMiddleLow)
+
       if(self.scoreMiddleLow == '' || self.scoreMiddleLow == null){
+        this.countNumMin()
+      }
+      else if(isNotNumber){
         this.countNumMin()
       }
       else if(self.scoreMiddleLow <= self.minScore + 0.1) {
@@ -1031,7 +1034,12 @@ export default {
       self.maxScore = parseFloat(self.maxScore)
       self.scoreMiddleLow = parseFloat(self.scoreMiddleLow)
 
+      var isNotNumber = isNaN(self.scoreMiddleHeight)
+
       if(self.scoreMiddleHeight == '' || self.scoreMiddleHeight == null){
+        this.countNumMax()
+      }
+      else if(isNotNumber){
         this.countNumMax()
       }
       else if(self.scoreMiddleHeight >= self.maxScore) {
