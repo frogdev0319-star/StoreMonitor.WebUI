@@ -531,6 +531,7 @@ export default{
       "mapDistance1":"與",
       "mapDistance2":"距離約",
       "mapDistance3":"公尺",
+      "seconds":"秒"
   },
   "eventView":{
       "ClosedEvent":"已結案事件",

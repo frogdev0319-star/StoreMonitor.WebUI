@@ -54,12 +54,12 @@
             <span :class="isexportPDF ? 'pdf-info-value' : 'info-value'">{{ report.submitterName }}</span>
             <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.generateTime')+'：' }}</span>
             <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
-            <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.signInTime')+'：' }}</span>
-            <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
-            <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.patrolTime')+'：' }}</span>
-            <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
-            <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.signInDistance')+'：' }}</span>
-            <span :class="isexportPDF ? 'pdf-info-value' : ''">{{$t('remotePatrol.aroundDistance')+'150m'}}</span>
+            <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.signInTime')+'：' }}</span>
+            <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ signInTime }}</span>
+            <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.patrolTime')+'：' }}</span>
+            <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ inceptionExecutTime }}</span>
+            <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.signInDistance')+'：' }}</span>
+            <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{$t('remotePatrol.aroundDistance')+signInDistance}}</span>
         </div>
         <div class="weather-content">
           <img v-if="weatherImg" class="weather-info-content" :src="weatherImg">
@@ -89,9 +89,9 @@
         <div v-if="standard!=-1" style="margin-left: calc(20/1440*100vw)" class="status-tag"
           :style="standard == 1 ? {'color':'#59ab22','background-color':'#e8f6de'}: {'color':'#f57848','background-color':'#ffefeb'}"
         >{{standard == 1 ? $t('remotePatrol.goalAchieved') : $t('remotePatrol.farBehind')}}</div>
-        <div v-if="checkinInfo" style="color: #69727c; font-size: 12px; margin-left: 20px">
+        <!--<div v-if="checkinInfo" style="color: #69727c; font-size: 12px; margin-left: 20px">
           {{ checkinInfo }}
-        </div>
+        </div>-->
       </div>
     </div>
     <div class="template-titles" v-if="!isexportPDF">
@@ -505,9 +505,10 @@
               <div class="pdf_font_20">
                 <div class="content-title"><span class="pdf_font_20">{{ $t('remotePatrol.mapDistance1')+`${report.storeName}`+$t('remotePatrol.mapDistance2')+`${pageItem.distance}`+$t('remotePatrol.mapDistance3') }}</span></div>
                 <hr class="hr-horizontal" />
-                
               </div>
-              <img :src= "pageItem.data" style="width:calc(984/1440*100vw); margin-top:9px;"/>
+              <div style="display:flex;flex-direction:row; justify-content:start;" :style="isexportPDF ? 'height:calc(984/1440*100vw)' : ''">
+                <img :src= "pageItem.data" style="width:calc(984/1440*100vw);height:auto; margin-top:10px;margin-bottom:10px"/>
+              </div>
             </div>
           </div>
         </el-col>
@@ -565,6 +566,7 @@ import {
   getInspectStatus
 } from '@/api/inspect';
 import { CancelWorkflow,taskDrawback,GetTaskInfo } from '@/api/workflow';
+import {getDetailedStoreInfo} from '@/api/store';
 import util from '@/common/util';
 import videojs from '../../../static/video.js';
 import 'videojs-contrib-hls';
@@ -673,8 +675,14 @@ export default {
       showEditBtn:true,
       showCancelBtn:false,
       auditState:1,
-
-      inspectStatus: ''
+      hasSignRecord:false,
+      inspectStatus: '',
+      inceptionExecutTime:'',
+      storeLatitude:0.0,
+      storeLongitude:0.0,
+      signInDistance:'',
+      signInTime:'',
+      signMapUrl:''
     };
   },
 
@@ -1011,6 +1019,7 @@ export default {
         this.report.submitterName = data.submitterName;
         this.report.tagName = data.tagName;
         this.report.iconSrc = this.getIconSrc(data.status);
+        //this.getStoreLongitudeLatitude(data.storeId);
         this.totalScore = data.totalScore;
         this.standard = data.standard;
         this.allRemarkItemsFlag = res.data[0].info.type === 1
@@ -1019,7 +1028,18 @@ export default {
         this.weatherImg = data.weatherInfo ? data.weatherInfo.icon : '';
         this.signaturesList = this.isInsiteInspect && data.signatures ? data.signatures : [];
         this.reportData = data;
+        
         this.auditState = data.auditState;
+        this.hasSignRecord = res.data[0].inspectSettings.filter(settingItem => settingItem.name === 'checkin')[0].value;
+        console.log(">>>>hasSignRecord:",this.hasSignRecord);
+        if(data.checkinRecord && this.hasSignRecord){
+          this.signInTime = (data.sign_in_ts>0)?util.getDateStr2(data.checkinRecord.ts):'';
+          console.log(">>>>signInTime:",this.signInTime);
+          this.inceptionExecutTime = (data.sign_in_ts>0)?util.getDiffTimeStr(data.ts,data.checkinRecord.ts):'';
+          this.signMapUrl = data.report_sign_map_url;
+          this.signInDistance = data.execute_sign_distance;
+        }
+        
         this.getGroupsData(data.groups);
         console.log("this.reportData:",this.reportData);
         this.getTab1AndTab3BtnName(res.data[0].inspectSettings);
@@ -1105,8 +1125,8 @@ export default {
         const signatureObj = { name: 'signature', class: 'signature-detail', ifExpand: false, data: this.signaturesList };
         pageData.push(signatureObj);
       }
-      if (this.isInsiteInspect) {
-        const mapObj = { name: 'signatureInfo', class: 'signature-map', ifExpand: false, distance: 100, data:require('../../../static/google.png') };
+      if (this.isInsiteInspect && this.hasSignRecord) {
+        const mapObj = { name: 'signatureInfo', class: 'signature-map', ifExpand: false, distance: this.signInDistance, data:this.signMapUrl };
         pageData.push(mapObj);
       }
       this.pageData = pageData;
@@ -1906,6 +1926,37 @@ export default {
     doGetTaskInfo(){
       var resWorkflowTask = GetTaskInfo(self.report.reportId);
     },
+    getStoreLongitudeLatitude(storeId){
+      getDetailedStoreInfo({storeId}).then(res => {
+        this.storeLatitude = res.data.latitude;
+        this.storeLongitude = res.data.longitude;
+      }).catch(err => {
+        console.log('getStoreLongitudeLatitude: ' + err);
+      });
+    },
+    getSingnInDistance(lat1, lon1, lat2, lon2) {
+    	if ((lat1 == lat2) && (lon1 == lon2)) {
+    		return 0;
+    	}
+    	else {
+    		var radlat1 = Math.PI * lat1/180;
+    		var radlat2 = Math.PI * lat2/180;
+    		var theta = lon1-lon2;
+    		var radtheta = Math.PI * theta/180;
+    		var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+    		if (dist > 1) {
+    			dist = 1;
+    		}
+    		dist = Math.acos(dist);
+    		dist = dist * 180/Math.PI;
+    		dist = dist * 60 * 1.1515;
+        //距離幾公尺
+         dist = dist * 1609.344; //公尺
+    		//if (unit=="K") { dist = dist * 1.609344 }//公里
+    		//if (unit=="N") { dist = dist * 0.8684 }//海里
+    		return dist;
+    	}
+    }
   }
 };
 </script>
