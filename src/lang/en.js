@@ -524,6 +524,11 @@ export default{
         "systemRejectMsg":"No sign-off staff; please reconfirm",
         "cannotSwitchMimicMode":"Currently editing report, cannot switch modes",
         "tipLimitGroupScore":"得分超過類別上限時以上限計算總分",
+        "signatureInfo":"Check in Infomation",
+        "mapDistance1":"與",
+        "mapDistance2":"距離約",
+        "mapDistance3":"meters",
+        "seconds":"sec."
     },
     "eventView":{
         "ClosedEvent":"Closed Events",

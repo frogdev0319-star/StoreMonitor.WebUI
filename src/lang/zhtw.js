@@ -527,6 +527,7 @@ export default{
       "systemReject":"系統撤回",
       "systemRejectMsg":"無可簽核人員，請重新確認",
       "cannotSwitchMimicMode":"正在編輯報告，不能切換模式",
+      "tipLimitGroupScore":"得分超過類別上限時以上限計算總分",
       "signatureInfo":"簽到資訊",
       "mapDistance1":"與",
       "mapDistance2":"距離約",

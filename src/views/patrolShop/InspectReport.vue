@@ -485,8 +485,8 @@
             </div>
           </div>
         </el-col>
-        <el-col>
-          <div v-if="pageItem.class === 'signature-map'">
+        <el-col style="float:none">
+          <div v-if="pageItem.class === 'signature-map'" style="page-break-before: always;">
             <div
               :style="isexportPDF ? 'height:60px;line-height:60px' : ''"
               class="item-header"
@@ -503,7 +503,7 @@
             </div>
             <div v-if="pageItem.ifExpand" class="item-content">
               <div class="pdf_font_20">
-                <div class="content-title"><span class="pdf_font_20">{{ $t('remotePatrol.mapDistance1')+`${report.storeName}`+$t('remotePatrol.mapDistance2')+`${pageItem.distance}`+$t('remotePatrol.mapDistance3') }}</span></div>
+                <div class="content-title"><span class="pdf_font_20">{{ $t('remotePatrol.mapDistance1')+`${report.storeName}`+$t('remotePatrol.mapDistance2')+`${pageItem.distance}`}}</span></div>
                 <hr class="hr-horizontal" />
               </div>
               <div style="display:flex;flex-direction:row; justify-content:start;" :style="isexportPDF ? 'height:calc(984/1440*100vw)' : ''">
@@ -1033,11 +1033,11 @@ export default {
         this.hasSignRecord = res.data[0].inspectSettings.filter(settingItem => settingItem.name === 'checkin')[0].value;
         console.log(">>>>hasSignRecord:",this.hasSignRecord);
         if(data.checkinRecord && this.hasSignRecord){
-          this.signInTime = (data.sign_in_ts>0)?util.getDateStr2(data.checkinRecord.ts):'';
+          this.signInTime = util.getDateStr2(data.checkinRecord.ts);
           console.log(">>>>signInTime:",this.signInTime);
-          this.inceptionExecutTime = (data.sign_in_ts>0)?util.getDiffTimeStr(data.ts,data.checkinRecord.ts):'';
-          this.signMapUrl = data.report_sign_map_url;
-          this.signInDistance = data.execute_sign_distance;
+          this.inceptionExecutTime = util.getDiffTimeStr(data.ts,data.checkinRecord.ts);
+          this.signMapUrl = data.checkinRecord.report_sign_map_url;
+          this.signInDistance = data.checkinRecord.execute_sign_distance+this.$i18n.t('remotePatrol.mapDistance3');
         }
         
         this.getGroupsData(data.groups);
