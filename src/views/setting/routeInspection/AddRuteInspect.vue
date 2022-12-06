@@ -692,6 +692,7 @@ export default {
     cancelEditTab() {
       const self = this;
       self.showEditTab = false;
+      self.showLengthNameWarning = false;
     },
 
     handleSheetClick() {
