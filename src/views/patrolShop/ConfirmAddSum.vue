@@ -1363,7 +1363,7 @@ export default {
                 if (!s_item.isIgnore && !s_item.manualIgnore) {
                   ScoreX += s_item.itemgetScore;
                   Score_totalScoreX += s_item.itemScore;
-                  notAddIgnoretotalScore += p_item.weight == -1 ? s_item.itemScore : s_item.itemScore * p_item.weight / 100;
+                  notAddIgnoretotalScore += s_item.itemScore;
                   tab2NotIgnoredItemsGetScore += s_item.itemgetScore;
                 } else {
                   ScoreN += s_item.itemScore;
@@ -1527,7 +1527,9 @@ export default {
                   tab2IgnoredItemsGetScore = util.accMul(tab2ConIgLimit,tempWeight);
                 }else{
                   let tab2ConNoIgLimit = (tab2NotIgnoredItemsGetScore>item.groupScore?item.groupScore:tab2NotIgnoredItemsGetScore);//不含忽略
+                  console.log("沒忽略+tab2:",tab2ConNoIgLimit);
                   tab2NotIgnoredItemsGetScore = util.accMul(tab2ConNoIgLimit,tempWeight);
+                  console.log("沒忽略+tab2 > tab2NotIgnoredItemsGetScore:",tab2NotIgnoredItemsGetScore);
                 }
 
                 totalGetscore = (totalGetscore>item.groupScore)?item.groupScore:totalGetscore;

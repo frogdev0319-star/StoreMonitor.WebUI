@@ -669,20 +669,20 @@ export default {
         this.setting_autoMappingByTotalScore = true
         this.dangerousOnFailedItem = false
       }
-      console.log('this.setting_autoMappingByTotalScore :>> ', this.setting_autoMappingByTotalScore);
-      console.log('this.dangerousOnFailedItem :>> ', this.dangerousOnFailedItem);
+      // console.log('this.setting_autoMappingByTotalScore :>> ', this.setting_autoMappingByTotalScore);
+      // console.log('this.dangerousOnFailedItem :>> ', this.dangerousOnFailedItem);
     },
 
     countNumMin(){
-      var minScore = parseInt(this.minScore)
-      var maxScore = parseInt(this.maxScore)
+      var minScore = parseFloat(this.minScore)
+      var maxScore = parseFloat(this.maxScore)
 
       var middleLow = (((maxScore - minScore) * .5) + minScore)
       this.scoreMiddleLow = Number.isInteger(middleLow) ? middleLow.toFixed(0) : middleLow.toFixed(1)
     },
     countNumMax(){
-      var minScore = parseInt(this.minScore)
-      var maxScore = parseInt(this.maxScore)
+      var minScore = parseFloat(this.minScore)
+      var maxScore = parseFloat(this.maxScore)
       var middleHeight = (((maxScore - minScore) * .8) + minScore)
       this.scoreMiddleHeight = Number.isInteger(middleHeight) ? middleHeight.toFixed(0) : middleHeight.toFixed(1)
     },
@@ -975,9 +975,6 @@ export default {
       let minScore = self.getUtilScore(e.target.value);
       // if(minScore == "") minScore = 0
 
-      console.log("min", minScore === self.maxScore)
-      // console.log("max", self.maxScore )
-
       if(minScore === self.maxScore) minScore = minScore - 1
       this.countNumMin()
       this.countNumMax()
@@ -1009,34 +1006,39 @@ export default {
 
     inputScoreMiddleMin(e){
       const self = this;
-      self.scoreMiddleHeight = parseInt(self.scoreMiddleHeight)
-      self.scoreMiddleLow = self.getUtilScore(e.target.value);
+      // self.scoreMiddleHeight = parseInt(self.scoreMiddleHeight)
+      
+      var scoreMiddleLow = self.getUtilScore(e.target.value);
+      self.scoreMiddleLow = parseFloat(scoreMiddleLow)
+      self.minScore = parseFloat(self.minScore)
+      self.scoreMiddleHeight = parseFloat(self.scoreMiddleHeight)
+
       if(self.scoreMiddleLow == '' || self.scoreMiddleLow == null){
         this.countNumMin()
       }
-      else if(self.scoreMiddleLow <= this.minScore + 1) {
-        self.scoreMiddleLow = this.minScore + 2
+      else if(self.scoreMiddleLow <= self.minScore + 0.1) {
+        self.scoreMiddleLow = (self.minScore + 0.2).toFixed(1)
       } 
       else if(self.scoreMiddleLow >= self.scoreMiddleHeight){
-        self.scoreMiddleLow = self.scoreMiddleHeight - 1
+        this.countNumMin()
       }
     },
 
     inputScoreMiddleMax(e){
       const self = this;
-      self.scoreMiddleLow = parseInt(self.scoreMiddleLow)
-      self.scoreMiddleHeight = self.getUtilScore(e.target.value);
+      var scoreMiddleHeight = self.getUtilScore(e.target.value);
+      self.scoreMiddleHeight = parseFloat(scoreMiddleHeight)
+      self.maxScore = parseFloat(self.maxScore)
+      self.scoreMiddleLow = parseFloat(self.scoreMiddleLow)
 
-      console.log('typeof scoreMiddleLow :>> ', typeof(self.scoreMiddleLow));
-      console.log('typeof scoreMiddleHeight :>> ', typeof(self.scoreMiddleHeight));
       if(self.scoreMiddleHeight == '' || self.scoreMiddleHeight == null){
         this.countNumMax()
       }
-      else if(self.scoreMiddleHeight >= this.maxScore) {
-        self.scoreMiddleHeight = this.maxScore - 2
+      else if(self.scoreMiddleHeight >= self.maxScore) {
+        self.scoreMiddleHeight = (self.maxScore - 0.2).toFixed(1)
       }
       else if(self.scoreMiddleLow >= self.scoreMiddleHeight){
-        self.scoreMiddleHeight = self.scoreMiddleLow + 1
+        this.countNumMax()
       }
   
     },
