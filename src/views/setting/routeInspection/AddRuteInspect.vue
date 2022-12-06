@@ -924,7 +924,7 @@ export default {
         return false;
       }
       if(this.GroupScoreTip){
-        util.notify(self.$t('insSettingView.setGroupScoreRange'), 'warning', 3000);
+        util.notify(self.activeSheetName=='0'? self.$t('insSettingView.setGroupScoreRange0'):self.$t('insSettingView.setGroupScoreRange'), 'warning', 3000);
         return false;
       }
       let mode = 0;
