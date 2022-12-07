@@ -180,6 +180,9 @@
         </div>
       </div>
     </div>
+
+    
+    <!-- 新增/編輯巡檢項 -->
     <dialog-pop
       v-if="showAddNape"
       :title="updateType.type===0?$t('insSettingView.addTitleItem'):$t('insSettingView.editTitleItem')"
@@ -190,6 +193,7 @@
       :is-warning="true"
       @cancelHandler="showAddNape = false"
       @confirmHandler="confirmUpdateNape">
+      
       <div class="dialog-content padding">
         <el-form class="NapeForm" label-position="top" size="mini">
           <el-form-item style="margin-bottom: 20px">
@@ -273,6 +277,7 @@
               <span v-if="OtherScoreTipEmpty" class="rules">{{ $t('insSettingView.setOtherEmpty') }}</span>
             </el-form-item>
           </div>
+          
           <el-form-item :label="$t('insSettingView.inspectionDescp')">
             <el-input type="textarea" v-model="ItemDescription"
                       :placeholder="$t('insSettingView.description')"
@@ -286,6 +291,7 @@
         <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmUpdateNape">{{ $t('insSettingView.confirm') }}</el-button>
       </div>
     </dialog-pop>
+    
     <dialog-pop
       :title="$t('insSettingView.confirmDelete')"
       :append-to-body="true"
@@ -319,6 +325,7 @@
         </div>
       </div>
     </dialog-pop>
+    
     <dialog-pop
       v-if="showAddGroup"
       :title="isEditCategory ? $t('insSettingView.updateCategory') : $t('insSettingView.addCategory')"
@@ -353,8 +360,8 @@
           </div>
           <el-select v-model="parentId" style="width:100%" size="mini" :disabled="notAllowedChangeParentId">
             <el-option v-for="(catergy, index) in parentCatergoryList"
-                       :key="index"
-                       :label="catergy.label" :value="catergy.value"></el-option>
+              :key="index"
+              :label="catergy.label" :value="catergy.value"></el-option>
           </el-select>
         </div>
         <div v-if="showGroupScoreSetting">
