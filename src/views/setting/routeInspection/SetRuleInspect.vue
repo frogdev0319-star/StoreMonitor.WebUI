@@ -554,6 +554,7 @@ export default {
       scoreMiddleLow: 0,
       scoreMiddleHeight: 0,
       inspectStatus:"",
+      settingStatus: true
     };
   },
   watch: {
@@ -610,7 +611,10 @@ export default {
     },
 
     setting_autoMappingByTotalScore(val){
-      if(this.setting_isAutoMappingActivate) this.dangerousOnFailedItem = !val     
+      if(this.setting_isAutoMappingActivate) {
+        this.dangerousOnFailedItem = !val
+        this.settingStatus = val
+      }     
     },
 
     defaultDefineName:{
@@ -664,8 +668,8 @@ export default {
         this.setting_autoMappingByTotalScore = false
         this.dangerousOnFailedItem = false
       } else {
-        this.setting_autoMappingByTotalScore = true
-        this.dangerousOnFailedItem = false
+        this.setting_autoMappingByTotalScore = this.settingStatus
+        this.dangerousOnFailedItem = !this.settingStatus
       }
       // console.log('this.setting_autoMappingByTotalScore :>> ', this.setting_autoMappingByTotalScore);
       // console.log('this.dangerousOnFailedItem :>> ', this.dangerousOnFailedItem);
@@ -786,12 +790,12 @@ export default {
         console.log('params', params)
         
       if(this.minScore === undefined || this.minScore === '') {
-        util.notify("最低考評總分範圍不可為空", 'error', 2000 );
+        util.notify(this.$t('insSettingView.cantEmptyScoreLow'), 'error', 2000 );
         this.$refs.min_score.focus()
         return
       }
       if(this.maxScore === undefined || this.maxScore === null || this.maxScore === '') {
-        util.notify("最高考評總分範圍不可為空", 'error', 2000 );
+        util.notify(this.$t('insSettingView.cantEmptyScoreHeight'), 'error', 2000 );
         this.$refs.max_score.focus()
         return
       }
@@ -807,7 +811,6 @@ export default {
         }
       }
     },
-
 
     async getRule() {
       const self = this;
@@ -843,6 +846,7 @@ export default {
               case 'maxScore':
                 self.maxScore = item.value;
                 break;
+
               case 'dangerousOnFailedItem':
                 self.dangerousOnFailedItem = item.value;
                 break;
@@ -851,10 +855,11 @@ export default {
                 break;
               case 'setting_autoMappingByTotalScore':
                 self.setting_autoMappingByTotalScore = item.value
+                self.settingStatus= item.value
+
                 self.scoreMiddleLow = item.extra[0].value
                 self.scoreMiddleHeight = item.extra[1].value
                 break;
-
 
               case 'onSitePhotoOnly':
                 self.onSitePhotoOnly = item.value;
