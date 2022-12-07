@@ -532,7 +532,10 @@ export default{
       "mapDistance1":"與",
       "mapDistance2":"距離約",
       "mapDistance3":"公尺",
-      "seconds":"秒"
+      "seconds":"秒",
+      "reportSubmitting":"報告送出中...",
+      "storeCode":"門店代碼",
+      "inspectSummary":"巡檢總評"
   },
   "eventView":{
       "ClosedEvent":"已結案事件",

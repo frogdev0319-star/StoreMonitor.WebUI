@@ -7,6 +7,40 @@
           path = "eventManage"
           @storeChange = "onStoreChange"
         >
+        <template v-slot:others>
+            <div class="last-row" >
+              <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.reportType') }}</span>
+              <div class="flex-center report-type-area">
+                <el-select
+                  v-model="curReportType"
+                  class="el-province"
+                  :placeholder="$t('remotePatrol.all')"
+                  size="mini"
+                  style="margin-right:0px;border:none;"
+                  @change="getInspectList"
+                >
+                  <el-option
+                    v-for="item in reportTypeList"
+                    :key="item.mode"
+                    :label="item.label"
+                    :value="item.mode"/>
+                </el-select>
+                <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" />
+                  <el-select
+                    class="el-province"
+                  style="margin-left:0px;border:none;border-radius:0px;"
+                  v-model="inspectId"
+                  :placeholder="$t('insSettingView.selectPost')"
+                  size="mini">
+                  <el-option
+                    v-for="item in inspectTableList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"/>
+                </el-select>
+              </div>
+            </div>
+          </template>
         </store-filter>
       </div>
       <div class="flex-center" style="justify-content: space-between; margin: 20px 0 20px 0px;font-size:calc(16/1920*100vw)">
@@ -216,6 +250,7 @@
 
 import util from '@/common/util.js';
 import { eventRESTful } from '@/api/index';
+import {  GetInspectTagList } from '@/api/inspect';
 import { getCookie } from '@/common/auth';
 import { isLoginIn } from '@/api/login';
 import { mapGetters } from 'vuex';
@@ -359,7 +394,16 @@ export default {
             ],
       tabContentId:[{key:'en',value:'#en-tabs-content'},{key:'zh',value:'#en-tabs-content'},{key:'zhtw',value:'#en-tabs-content'},
         {key:'ja-JP',value:'#en-tabs-content'},{key:'ko-KR',value:'#en-tabs-content'},{key:'vi-VN',value:'#en-tabs-content'},
-        {key:'id-ID',value:'#en-tabs-content'},{key:'th-TH',value:'#th-tabs-content'}]
+        {key:'id-ID',value:'#en-tabs-content'},{key:'th-TH',value:'#th-tabs-content'}],
+      curReportType: -1,
+      reportTypeList: [
+        { 'mode': -1, 'label': this.$t('remotePatrol.all') },
+        { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
+        { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') }
+      ],
+      inspectId: '',
+      inspectTableList: [],
+      inspectCatch:'-1',
     };
   },
 
@@ -425,6 +469,7 @@ export default {
     const self = this;
     self.windowHeight = window.innerHeight;
     if (!self.$route.meta.isBack || self.isFirstLoad) {
+      self.getInspectList();
       self.initData();
     } else {
       console.log("Activate")
@@ -1288,6 +1333,18 @@ export default {
         self.inspectId = '-1';
       }
   },
+
+  getTagAll() {
+      return new Promise((resolve, reject) => {
+        GetInspectTagList().then(res => {
+          const data = res.data;
+          resolve(data);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+   },
+  
 
   beforeRouteEnter(to, from, next) {
     to.meta.keepAlive = true;

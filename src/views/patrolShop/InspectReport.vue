@@ -782,18 +782,26 @@ export default {
         reportIds:[this.report.reportId]
       };
       const tHeader = [
+        this.$t('remotePatrol.regionI'),
+        this.$t('remotePatrol.regionII'),
         this.$t('remotePatrol.storeName'),
+        this.$t('remotePatrol.storeCode'),
         this.$t('remotePatrol.inspectName'),//巡檢表名稱
         this.$t('remotePatrol.category'),
         this.$t('insSettingView.subCategory'),
         this.$t('overview.items'),
         this.$t('remotePatrol.inspectItemScore'),
         this.$t('remotePatrol.patrolResult'),
-        this.$t('remotePatrol.inspectTotalScore'),
-        this.$t('remotePatrol.exportAllDetail'),
+        this.$t('remotePatrol.inspectTotalScore'),//報告總分inspectSummary
+        this.$t('remotePatrol.inspectSummary'), //巡檢總評
+        this.$t('remotePatrol.submitter'), //送出人
+        this.$t('remotePatrol.exportAllDetail'),// 詳情
         this.$t('audit.inceptionRpt.attachment'),
         this.$t('titleView.description'),
-        this.$t('remotePatrol.createRptDT')];
+        this.$t('remotePatrol.signatureInfo'), //簽到資訊-地圖link
+        this.$t('remotePatrol.signInTime'),
+        this.$t('remotePatrol.createRptDT'),
+        ];
       
       downLoadInspectReportEntireDetail(params).then(res => {
         console.log("res:",res);
