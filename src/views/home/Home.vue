@@ -275,7 +275,7 @@
               <p style="text-align: left">
                 v3.0.5.3
                   &copy; {{ getFullYear }} Advantech Intelligent City
-                Services Co., Ltd. (AiCS) All Rights Reserved.
+                  Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
             </footer>
           </el-col>
