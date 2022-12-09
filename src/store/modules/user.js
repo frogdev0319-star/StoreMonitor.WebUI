@@ -317,7 +317,7 @@ const user = {
     GetUserAuthorities({ commit }) {
       return new Promise((resolve, reject) => {
         getUserAuthorities().then((res) => {
-          if (res.data && (!res.data.services || res.data.services.includes('Custom_Inspection'))) {
+          if (res.data && (!res.data.services || res.data.services.includes('Custom_iQM_Inspection'))) {
             console.log('@@@@',res.data.userId);
             commit('SET_AUTHORITY', res.data.authorities);
             commit('SET_ROLES', [res.data.title]);

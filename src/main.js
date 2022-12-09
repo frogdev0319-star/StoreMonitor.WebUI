@@ -84,7 +84,7 @@ function getBrandList(brandList) {
   const tempAccount = [];
   brandList.forEach((accountItem) => {
     const res = accountItem['srp'].filter((srpItem) =>
-      srpItem.type === 'Custom_Inspection' && srpItem.enable && srpItem.visible);
+      srpItem.type === 'Custom_iQM_Inspection' && srpItem.enable && srpItem.visible);
     //  console.log(res)
     if (res && res.length) {
       accountItem['srp'] = res;
