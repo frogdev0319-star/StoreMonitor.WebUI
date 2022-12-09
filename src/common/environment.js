@@ -54,8 +54,8 @@ const _Environments = {
     clientId: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a'
   },
   iservicePreview:{
-    CHINA_WEBSITE: 'https://preview-inspection.wise-iservice/api',
-    GLOBAL_WEBSITE: 'https://preview-inspection.wise-iservice/api/',
+    CHINA_WEBSITE: 'https://preview-inspection.wise-iservice/storemonitor/api',
+    GLOBAL_WEBSITE: 'https://preview-inspection.wise-iservice/storemonitor/api/',
     VERSION: version,
     clientId: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a'
   }
