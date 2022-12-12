@@ -1680,10 +1680,11 @@ export default {
           s_count = s_count + inspectSettings.baseScore;
         }
         self.scorecount = parseFloat(s_count.toFixed(1));
-        if(inspectSettings.maxScore && s_count > inspectSettings.maxScore)
+        if(typeof inspectSettings.maxScore !='undefined' && s_count > inspectSettings.maxScore)
           self.scorecount = inspectSettings.maxScore;
-        if(inspectSettings.minScore && s_count < inspectSettings.minScore )
+        if(typeof inspectSettings.minScore != 'undefined' && s_count < inspectSettings.minScore ){
           self.scorecount = inspectSettings.minScore;
+        }
         
         self.summary = this.groupbyKey(inspect, 'type');
         eventList.forEach((item, index) => {
