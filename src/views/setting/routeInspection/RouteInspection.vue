@@ -650,6 +650,7 @@ export default {
     async getTagList(val, sheetIndex) {
       const self = this;
       const TagData = await self.getTagAll();
+       console.log(">>>self.patrolActive:",self.patrolActive);
       if (TagData.length != 0) {
         if (val == 'del' || self.$route.params.val == 'del') {
           if (Number(self.patrolActive) == TagData.length) {

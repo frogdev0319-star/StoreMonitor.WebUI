@@ -26,18 +26,26 @@
                     :value="item.mode"/>
                 </el-select>
                 <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" />
-                  <el-select
+                  <multi-select
+                    class="store-group-select region"
+                    :selected="inspectId"
+                    :prompt-msg="$t('remotePatrol.all')"
+                    :all-select="0"
+                    :alltype="0"
+                    :options="inspectTableList"
+                    @changeInput="changeSelect(arguments)"/>
+                  <!--<el-select
                     class="el-province"
-                  style="margin-left:0px;border:none;border-radius:0px;"
-                  v-model="inspectId"
-                  :placeholder="$t('insSettingView.selectPost')"
-                  size="mini">
+                    style="margin-left:0px;border:none;border-radius:0px;"
+                    v-model="inspectId"
+                    :placeholder="$t('insSettingView.selectPost')"
+                    size="mini">
                   <el-option
                     v-for="item in inspectTableList"
                     :key="item.id"
                     :label="item.name"
                     :value="item.id"/>
-                </el-select>
+                  </el-select>-->
               </div>
             </div>
           </template>
@@ -401,9 +409,9 @@ export default {
         { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
         { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') }
       ],
-      inspectId: '',
+      inspectId: [],
       inspectTableList: [],
-      inspectCatch:'-1',
+      inspectCatch:[],
     };
   },
 
@@ -852,10 +860,19 @@ export default {
           like: like,
           searchMysteryMode : this.searchParams.searchMysteryMode
       }
+
       console.log("1.this.params:",params);
       if(storeId && storeId!='-1' && storeId!=""){
         console.log("storeId:",storeId);
          params.clause['storeId'] = storeId;
+      }
+      if(this.inspectId.length>0){
+        let inspectTagId = this.inspectId;
+        if(this.inspectId[0]==='-1'){
+          params['inspectTagId'] = inspectTagId.slice(1);
+        }else{
+          params['inspectTagId'] = inspectTagId;
+        }
       }
       console.log("2.this.params:",params);
       console.log("this.searchParams:",this.searchParams);
@@ -1187,6 +1204,7 @@ export default {
       params.searchMysteryMode = -1;
       params.curReportType = this.curReportType;
       params.inspectTagId = this.inspectId;
+      console.log(">>>Save params:",params);
       const searchConditon = {
         path: 'eventManage',
         params: params
@@ -1245,6 +1263,7 @@ export default {
           this.ifGetParamsFromCash = true;
           this.curReportType = (typeof searchParams.curReportType =='undefined')? -1 : searchParams.curReportType;
           this.inspectCatch = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
+          console.log("EventMange > getSearchParams > this.inspectCatch:",this.inspectCatch);
         } else {
           this.searchParams = {};
           this.curState = [0];
@@ -1304,33 +1323,49 @@ export default {
     async getInspectList() {
       const self = this;
       const inspectArr = await self.getTagAll();
-      const newArr = [];
+      const newArr = ['-1'];
       const inspectList = [];
       inspectArr.forEach(_item => {
         if (self.curReportType === -1) {
           if (!newArr.includes(_item.id)) {
             newArr.push(_item.id);
-            inspectList.push(_item);
+            inspectList.push(
+              {
+                label: _item.name,
+                value: _item.id
+              }
+            );
           }
         } else if (self.curReportType === 0) {
           if (!newArr.includes(_item.id) && _item.mode === 0) {
             newArr.push(_item.id);
-            inspectList.push(_item);
+            inspectList.push(
+              {
+                label: _item.name,
+                value: _item.id
+              }
+            );
           }
         } else if (self.curReportType === 1) {
           if (!newArr.includes(_item.id) && _item.mode === 1) {
             newArr.push(_item.id);
-            inspectList.push(_item);
+            inspectList.push(
+              {
+                label: _item.name,
+                value: _item.id
+              }
+            );
           }
         }
       });
       self.inspectTableList = inspectList;
-      self.inspectTableList.length > 0 && self.inspectTableList.unshift({ id: '-1', name: self.$t('remotePatrol.all') });
+      //self.inspectTableList.length > 0 && self.inspectTableList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
       if (inspectList.length !== 0) {
-        self.inspectId = self.ifGetParamsFromCash ? self.inspectCatch : self.inspectTableList[0].id;
+        console.log(">>>>self.ifGetParamsFromCash:",self.ifGetParamsFromCash);
+        self.inspectId = self.ifGetParamsFromCash ? self.inspectCatch : newArr;
         self.ifGetParamsFromCash = false;
       } else {
-        self.inspectId = '-1';
+        self.inspectId = newArr;
       }
   },
 
@@ -1344,7 +1379,10 @@ export default {
         });
       });
    },
-  
+
+  changeSelect(val) {
+      this.inspectId = Array.from(val)[0];
+  },
 
   beforeRouteEnter(to, from, next) {
     to.meta.keepAlive = true;
