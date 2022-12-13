@@ -280,12 +280,13 @@
               class="el-pag"
               @current-change="currentChange"
               @size-change="sizeChange"/>-->
+              <div class="pageSizeTitle" style="color: #666">巡檢報告共有 <b style="font-size: 16px">{{totalElements}} </b> 筆</div>
+
               <tbl-pagination-only
               :btn-style="{backgroundColor:'transparent'}"
               :total="total"
               :current-page="page"
               :page-size="sizeNum"
-              :totalElements = "totalElements"
               layout = "prev,pager, next,sizes,slot"
               @sizeChange="sizeChange"
               @currentChange="currentChange"
@@ -1701,7 +1702,13 @@ $filterWidth: (100%-706);
 .el-pat{
     //position: absolute;
     height: 30px;
-    margin-top: -10px;
+    margin-top: 0px;
+    margin-right: calc(20/1920*100vw);;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    
     .el-pag{
         position: absolute;
         //float: right;
