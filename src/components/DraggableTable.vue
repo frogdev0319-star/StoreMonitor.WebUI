@@ -44,6 +44,8 @@
             </div>
           </template>
           <div class="table-operation">
+            <!-- btn icon  with svg -->
+            <!-- <div class="el-icon-edit" style="font-size: 20px; color: #999"></div> -->
             <img 
               v-if="showEditBtn"
               :src="`./static/img/table-edit.png`" 

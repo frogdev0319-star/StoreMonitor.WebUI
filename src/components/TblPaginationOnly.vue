@@ -1,5 +1,6 @@
 <template>
   <div class="toolbar pagination">
+    <div class="pageSizeTitle" style="color: #666">巡檢報告共有 <b style="font-size: 16px">{{totalElements}} </b> 筆</div>
     <el-button class="btnArrow" :style="btnStyle" icon="el-icon-arrow-left" :disabled="currentPage==1" @click="handlePrevClick"></el-button>
     <div class="pageNum">{{currentPage}}</div>
     <el-button class="btnArrow" :style="btnStyle" icon="el-icon-arrow-right" :disabled="currentPage>=total" @click="handleNextClick"></el-button>
@@ -73,6 +74,10 @@ export default {
       type:Array,
       default: () => [],
       required: false
+    },
+    totalElements:{
+      type: Number,
+      default: 0,
     }
   },
   computed:{

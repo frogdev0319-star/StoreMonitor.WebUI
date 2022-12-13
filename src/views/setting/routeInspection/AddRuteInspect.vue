@@ -100,6 +100,7 @@
                         <div class="group-right">
                           <div class="show-edit">
                             <div class="nape-items-handle" v-if="hoverId === item.id">
+                              
                               <img style="margin-top:15px" :src="`./static/img/table-edit.png`" height="26px" @click="editCategory(index,item)"/>
                               <img style="margin-top:15px" :src="`./static/img/table-delete.png`" height="26px" @click="deleteGroup(index, item)"/>
                             </div>
@@ -180,6 +181,9 @@
         </div>
       </div>
     </div>
+
+    
+    <!-- 新增/編輯巡檢項 -->
     <dialog-pop
       v-if="showAddNape"
       :title="updateType.type===0?$t('insSettingView.addTitleItem'):$t('insSettingView.editTitleItem')"
@@ -190,8 +194,10 @@
       :is-warning="true"
       @cancelHandler="showAddNape = false"
       @confirmHandler="confirmUpdateNape">
-      <div class="dialog-content padding">
+      
+      <div class="dialog-content content_padding">
         <el-form class="NapeForm" label-position="top" size="mini">
+          <!-- 巡檢項名稱 -->
           <el-form-item style="margin-bottom: 20px">
             <div class="score_item">
               <span class="sign">*</span>
@@ -203,7 +209,9 @@
             <span v-if="enterListNameRuletip" class="rules">{{ $t('insSettingView.enterListNameRuletip') }}</span>
             <span v-if="enterItemNameTip" class="rules">{{ $t('insSettingView.itemTitleEmpty') }}</span>
           </el-form-item>
-          <el-form-item>
+
+          <!-- 必填 -->
+          <el-form-item style="margin-bottom: 20px">  
             <div class="score_item">
               <span class="sign">*</span>
               <span class="item_label">{{ $t('insSettingView.isRequired') }}</span>
@@ -213,10 +221,12 @@
               <el-radio label="1">{{ $t('insSettingView.isRequired') }}</el-radio>
             </el-radio-group>
           </el-form-item>
+
+          <!-- 巡檢項類型 -->
           <el-form-item>
             <div class="score_item">
               <span class="sign">*</span>
-              <span class="item_label">{{$t('insSettingView.inspectItemType')}}</span>
+              <span class="item_label">{{$t('insSettingView.inspectItemType')}} </span>
             </div>
             <el-radio-group class="attribute-group" v-model="itemType">
               <div v-for="(typeItem, typeIndex) in itemsTypeList" :key="typeItem.value" style="display: inline-flex">
@@ -224,11 +234,14 @@
               </div>
             </el-radio-group>
           </el-form-item>
+
+          <!-- 項目分值 -->
           <div v-if="itemType === 0" class="score-content">
+            <!-- 1 -->
             <el-form-item v-if="activeSheetName==='1'" style="margin-bottom: 20px">
               <div class="score_item">
                 <span class="sign">*</span>
-                <span class="item_label">{{$t('insSettingView.sheetscore3')}}</span>
+                <span class="sub_label">{{$t('insSettingView.sheetscore3')}}</span>
                 <span class="item_des">{{$t('insSettingView.sheetscore3_des')}}</span>
               </div>
               <el-input v-model="ItemScoreOption"
@@ -237,12 +250,13 @@
               <span v-if="ScoreOptionsTips0" class="rules">{{ $t('insSettingView.excelScoreItemEmpty') }}</span>
               <span v-if="ScoreOptionsTips1" class="rules">{{ $t('insSettingView.setScoreItemRange') }}</span>
             </el-form-item>
-            <el-form-item v-if="activeSheetName==='1'" style="margin-bottom: 20px">
+
+            <el-form-item v-if="activeSheetName==='1'" style="margin-bottom: 5px">
               <el-col :span="10">
-                <el-form-item style="margin-bottom: 20px;">
+                <el-form-item >
                   <div class="score_item">
                     <span class="sign">*</span>
-                    <span class="item_label">{{$t('insSettingView.sheetscore0')}}</span>
+                    <span class="sub_label">{{$t('insSettingView.sheetscore0')}} </span>
                   </div>
                   <el-input v-model.number="ItemTotalScore" disabled
                             :placeholder="$t('insSettingView.enterScore')"
@@ -252,7 +266,7 @@
                 </el-form-item>
               </el-col>
               <el-col :span="12" :offset="2">
-                <el-form-item :label="$t('insSettingView.sheetscore1')" style="margin-bottom: 20px;">
+                <el-form-item :label="$t('insSettingView.sheetscore1')" >
                   <el-input v-model.number="ItemMinScore"
                             :placeholder="$t('insSettingView.enterScore')"
                             @input="napeMinScoreChange"/>
@@ -260,10 +274,12 @@
                 </el-form-item>
               </el-col>
             </el-form-item>
+
+            <!-- 3 -->
             <el-form-item v-if="activeSheetName!=='1'">
               <div class="score_item">
                 <span v-if="activeSheetName==='2'" class="sign">*</span>
-                <span class="item_label">{{$t('insSettingView.score')}}</span>
+                <span class="sub_label">{{$t('insSettingView.score')}}</span>
               </div>
               <el-input v-model.number="ItemSheetScore"
                         :placeholder="$t('insSettingView.enterScore')"
@@ -273,19 +289,78 @@
               <span v-if="OtherScoreTipEmpty" class="rules">{{ $t('insSettingView.setOtherEmpty') }}</span>
             </el-form-item>
           </div>
-          <el-form-item :label="$t('insSettingView.inspectionDescp')">
+          
+          <!-- 巡檢項目詳細說明  -->
+          <el-form-item style="margin-bottom: 20px; margin-top: 20px;">
+            <div class="score_item">
+              <span class="item_label">{{$t('insSettingView.inspectionDescp')}}</span>
+            </div>
             <el-input type="textarea" v-model="ItemDescription"
-                      :placeholder="$t('insSettingView.description')"
-                      @input="napeDepChange"></el-input>
+                :placeholder="$t('insSettingView.description')"
+                @input="napeDepChange"></el-input>
             <span v-if="descriptionRuletip" class="rules">{{ $t('insSettingView.descriptionRuletip') }}</span>
           </el-form-item>
+
+          <!-- 進階設定 -->
+          <el-form-item >
+            <div class="score_item">
+              <span class="item_label">進階設定</span>
+            </div>
+            
+            <el-radio-group class="attribute-group">
+              <div style="display: inline-flex">
+                <el-radio label="開啟" >開啟</el-radio>
+                <el-radio label="關閉" >關閉</el-radio>
+              </div>
+            </el-radio-group>
+
+            <div class="score-content" style="margin-bottom: 10px; ">
+              <el-form-item >
+                <div class="score_item">
+                  <span class="sign">*</span>
+                  <span class="sub_label">備註標籤</span>
+                  <span class="item_des">{{$t('insSettingView.sheetscore3_des')}}</span>
+                </div>
+                <el-input 
+                  style="margin-bottom: 5px"
+                  :placeholder="請輸入備註標籤"
+                  @input="napeScoreOptionsChange" 
+                />
+                <div class="aaa">
+                  <el-radio-group class="attribute-group">
+                    <div style="display: inline-flex">
+                      <el-radio label="aa" >必填</el-radio>
+                      <el-radio label="bb" >非必填</el-radio>
+                      <el-radio label="cc" >僅不合格必填</el-radio>
+                    </div>
+                  </el-radio-group>
+                </div>
+                <div class="bbb"  style="margin-left: 23px;">
+                  <el-checkbox class="storevue-checkbox-outlined">
+                    <span class="check_text">文字</span>
+                  </el-checkbox>
+                  <el-checkbox class="storevue-checkbox-outlined">
+                    <span class="check_text">圖片或影片</span>
+                  </el-checkbox>
+
+                </div>
+
+              </el-form-item>
+            </div>
+
+
+          </el-form-item>
+
+        
         </el-form>
       </div>
+
       <div slot="footer" class="dialog-footer">
         <el-button class="file-cancel-btn" size="mini" style="" @click="showAddNape = false">{{ $t('insSettingView.cancel') }}</el-button>
         <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmUpdateNape">{{ $t('insSettingView.confirm') }}</el-button>
       </div>
     </dialog-pop>
+    
     <dialog-pop
       :title="$t('insSettingView.confirmDelete')"
       :append-to-body="true"
@@ -319,6 +394,7 @@
         </div>
       </div>
     </dialog-pop>
+    
     <dialog-pop
       v-if="showAddGroup"
       :title="isEditCategory ? $t('insSettingView.updateCategory') : $t('insSettingView.addCategory')"
@@ -353,8 +429,8 @@
           </div>
           <el-select v-model="parentId" style="width:100%" size="mini" :disabled="notAllowedChangeParentId">
             <el-option v-for="(catergy, index) in parentCatergoryList"
-                       :key="index"
-                       :label="catergy.label" :value="catergy.value"></el-option>
+              :key="index"
+              :label="catergy.label" :value="catergy.value"></el-option>
           </el-select>
         </div>
         <div v-if="showGroupScoreSetting">
@@ -1883,6 +1959,37 @@ export default {
   }
 };
 </script>
+
+<style lang="sass" scoped>
+  .checkbox_outlined
+    color: #333
+  .score_item
+    color: #f31d65
+    font-weight: 900
+    .item_label
+      font-size: 14px
+      color:#424151
+      margin-right: 10px
+      color: #222
+      font-weight: 900
+      line-height: 20px
+    .sub_label
+      color: #606266
+      font-weight: 400
+    .item_des
+      color: #f31d65 !important
+      font-weight: 400 !important
+
+  .content_padding
+    padding: 0 calc(20/1920*100vw)
+  .check_text
+    font-size: calc(14/1920*100vw)
+    color: #606266
+            
+        
+  
+</style>
+
 <style lang="scss" scoped>
 @import '../../../assets/css/importfile.css';
 @import '../../../assets/css/textstyle.css';
@@ -1925,10 +2032,12 @@ export default {
       .score_item{
         display: inline;
         margin:0;
+        color: #290 !important;
         .item_label{
           font-size: 14px;
           color:#424151;
           margin-right:10px;
+          
         }
         .item_des{
           font-size: 12px;
@@ -1948,6 +2057,7 @@ export default {
           left: 0;
       }
     }
+    
     .el-addrute{
         width: 100%;
         height: 100%;
@@ -2531,11 +2641,12 @@ export default {
 
   .score-content{
     background-color: #edf0f2;
-    padding: 20px calc(20/1920*100vw);
+    padding: 10px calc(15/1920*100vw);
+    padding-top: 5px;
     /*border: 1px solid #acaeb1;*/
     height: auto;
     position: relative;
-    margin-bottom: 20px;
+    // margin-bottom: 20px;
     border-radius: 5px;
   }
   .el-radio{
@@ -2587,8 +2698,7 @@ export default {
 .el-dialog__body{
     padding: 0px !important;
 }
-.addNape .el-dialog__body .dialog-content .NapeForm{
-}
+
 #el-menuscrollbar .el-scrollbar__wrap {
   overflow-x: hidden;
 }

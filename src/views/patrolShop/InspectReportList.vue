@@ -267,6 +267,7 @@
           class="card-content self-loading">
           <div class="empty-content">{{ noData }}</div>
         </div>
+        
         <div class="el-pat">
             <!--<el-pagination
               :page-size="sizeNum"
@@ -284,10 +285,12 @@
               :total="total"
               :current-page="page"
               :page-size="sizeNum"
+              :totalElements = "totalElements"
               layout = "prev,pager, next,sizes,slot"
               @sizeChange="sizeChange"
               @currentChange="currentChange"
             />
+            
           </div>
       </div>
     </div>
@@ -553,7 +556,8 @@ export default {
       showExportAllWarn:false,
       showExportAllNotice:false,
 
-      inspectStatus:''
+      inspectStatus:'',
+      totalElements: 0
     };
   },
 
@@ -858,6 +862,7 @@ export default {
           let data = [];
           if (errCode === 0) {
             data = res.data.content;
+            this.totalElements = res.data.totalElements
           } 
           const temp = [];
           self.isLoading = true;
@@ -905,7 +910,7 @@ export default {
           }
           //);
           self.reportList = temp;
-          console.log('self.reportList ~~~~~>> ', self.reportList);
+          console.log('self.reportList !!!~~~~~>> ', self.reportList);
 
           self.total = Math.ceil(res.data.totalElements/self.sizeNum);
           self.isLoading = false;
