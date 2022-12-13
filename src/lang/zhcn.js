@@ -804,6 +804,8 @@ export default{
       "selectByScore":"依分数条件自动选取 ",
       "noUserDefinedName":"无自定义名称 ",
       "needHeighterThan":"考评范围最高值需高于最低值! ",
+      "cantEmptyScoreLow":"最低考评总分范围不可为空! ",
+      "cantEmptyScoreHeight":"最高考评总分范围不可为空! "
   },
   "deviceView":{
       "EzvizAccount":"串流服务账号",

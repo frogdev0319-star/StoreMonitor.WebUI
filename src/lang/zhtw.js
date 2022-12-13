@@ -802,6 +802,9 @@ export default{
       "selectByScore":"依分數條件自動選取 ",
       "noUserDefinedName":"無自定義名稱 ",
       "needHeighterThan":"考評範圍最高值需高於最低值! ",
+      "cantEmptyScoreLow":"最低考評總分範圍不可為空! ",
+      "cantEmptyScoreHeight":"最高考評總分範圍不可為空! ",
+
       
   },
   "deviceView":{
