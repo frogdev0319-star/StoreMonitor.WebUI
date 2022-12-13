@@ -389,8 +389,8 @@ export default {
       require:false
     },
     expandCompProperties:{
-      type: String,
-      default: ""
+      type: Object,
+      default: {}
     }
   },
   data() {
@@ -421,7 +421,7 @@ export default {
         return { submitter: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs,isexportPDF:this.isexportPDF,isMystery:this.expandCompProperties.isMystery }
       }else if(this.expandComponent=== 'IncepItemTop5'){
         console.log("this.expandCompProperties:",this.expandCompProperties);
-        return { storeId: this.expands, beginTs:this.expandCompProperties.beginTs, endTs:this.expandCompProperties.endTs, isexportPDF:this.isexportPDF }
+        return { storeId: this.expands, beginTs:this.expandCompProperties.beginTs, endTs:this.expandCompProperties.endTs, isexportPDF:this.isexportPDF,inspectTagIds:this.expandCompProperties.inspectTagIds }
       }else if(this.expandComponent=== 'EventCommentList'){
         //console.log("this.expands:",this.expands);
         return { storeId: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs,itemId:this.expandCompProperties.itemId,isexportPDF:this.isexportPDF }
@@ -438,6 +438,14 @@ export default {
     tableData(val){
       console.log("tableData changed");
       this.closeAllExpand();
+    },
+    expandCompProperties:{
+      immediate: true, 
+      deep: true,
+      handler (val,old ) {
+        console.log(">>>>expandCompProperties val:",val);
+        console.log(">>>>expandCompProperties old:",old);
+      }
     }
   },
   created() {},

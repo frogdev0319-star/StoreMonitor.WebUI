@@ -959,7 +959,7 @@ export default {
       ifSaveParams: false,
       defaultSort: { prop: 'numOfTotal', order: 'ascending' },
       isLoading: true,
-      componentsProps:{beginTs:this.$moment().subtract(29, 'days').startOf('d').toDate(),endTs: this.$moment().endOf('d').toDate()},
+      componentsProps:{beginTs:this.$moment().subtract(29, 'days').startOf('d').toDate(),endTs: this.$moment().endOf('d').toDate(),inspectTagIds:[]},
       eventItemTable:{
         order:{direction: 'descending',property: 'numOfTotal'},
         column_data:[
@@ -1208,6 +1208,7 @@ export default {
       self.storeDateValue = util.getDates(self.params.beginTs) + '-' + util.getDates(self.params.endTs);
       self.componentsProps.beginTs = self.params.beginTs;
       self.componentsProps.endTs = self.params.endTs;
+      self.componentsProps.inspectTagIds = [self.inspectId];
       if (self.params.storeIds.length === 0) {
         self.eventTableData = [];
         self.storeIds = [];
@@ -1269,6 +1270,7 @@ export default {
       params.beginTs = this.params.beginTs;
       params.endTs = this.params.endTs;
       params.storeIds = this.storeIds.filter(storeId => storeId !== '-1');
+      params.inspectTagIds = [this.inspectId];
       console.log("getUpperGloableEventData > params.storeIds:",params.storeIds);
       params.regionMode = 0;
 
@@ -1329,6 +1331,7 @@ export default {
       params.groupMode = region[0].value;
       this.params.groupMode = region[0].value;
       params.storeIds = this.compareIds;
+      params.inspectTagIds = [this.inspectId];
       if(region[0].value<3){ //store, area1, area2
         this.params.storeIds=this.compareIds.filter(storeId => storeId !== '-1')
         params.storeIds = this.compareIds.filter(storeId => storeId !== '-1');
@@ -1393,17 +1396,20 @@ export default {
       const self = this;
       self.componentsProps.beginTs = self.params.beginTs;
       self.componentsProps.endTs = self.params.endTs;
+      self.componentsProps.inspectTagIds = [self.inspectId];
       let region = this.areaMode.filter((r)=>{ return r.key==this.compareType});
       self.params.groupMode = region[0].value;
       let searchCondition = {}
       if(region[0].value<3){ //store, area1, area2
         searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,storeIds:self.compareIds.filter(storeId => storeId !== '-1'),
+          inspectTagIds : [this.inspectId],
           order:{"direction":this.barchartOrder,"property":"numOfTotal"}
         };
         //console.log("*getEventTableData>searchCondition:",searchCondition);
       }else{ //groupType, storeGroup
         self.params.groupIds=this.compareGroupAndTypeId;
         searchCondition  = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,groupIds:this.compareGroupAndTypeId,
+        inspectTagIds : [this.inspectId],
         order:{"direction":this.barchartOrder,"property":"numOfTotal"}
         };
       }
@@ -1652,13 +1658,18 @@ export default {
       const self = this;
       self.componentsProps.beginTs = self.params.beginTs;
       self.componentsProps.endTs = self.params.endTs;
+      console.log(">>>>self.inspectId:",self.inspectId);
+      self.componentsProps.inspectTagIds = [self.inspectId];
       let region = this.areaMode.filter((r)=>{ return r.key==this.compareType});
       self.params.groupMode = region[0].value;
       self.params.storeIds = self.compareIds.filter(storeId => storeId !== '-1');
+      self.params.inspectTagIds = [this.inspectId];
       let searchCondition = {}
       //if(region[0].value<3){ //store, area1, area2
       //console.log("getEventTableData > this.compareIds:",self.compareIds);
-      searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:0,storeIds:self.compareIds};
+      searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:0,storeIds:self.compareIds,
+          inspectTagIds : [this.inspectId]
+      };
           //filter:{"page":this.page-1,"size":this.sizeNum},
           //order:this.order
         //};

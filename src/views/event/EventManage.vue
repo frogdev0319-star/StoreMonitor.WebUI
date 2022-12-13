@@ -869,9 +869,9 @@ export default {
       if(this.inspectId.length>0){
         let inspectTagId = this.inspectId;
         if(this.inspectId[0]==='-1'){
-          params['inspectTagId'] = inspectTagId.slice(1);
+          params['inspectTagIds'] = inspectTagId.slice(1);
         }else{
-          params['inspectTagId'] = inspectTagId;
+          params['inspectTagIds'] = inspectTagId;
         }
       }
       console.log("2.this.params:",params);
@@ -1005,7 +1005,15 @@ export default {
       if(storeId!='-1'){
         params['clause']['storeId'] = storeId
       }
-      console.log("820: params",params);
+      if(this.inspectId.length>0){
+        let inspectTagId = this.inspectId;
+        if(this.inspectId[0]==='-1'){
+          params['inspectTagIds'] = inspectTagId.slice(1);
+        }else{
+          params['inspectTagIds'] = inspectTagId;
+        }
+      }
+      console.log("1008: params",params);
       if(this.searchParams.hasOwnProperty('searchParams')){
         if(this.searchParams.searchParams.hasOwnProperty('clause')  && this.searchParams['searchFrom']=='PatrolPersonStat'){
           params.clause['assigner'] =  this.searchParams.searchParams.clause.assigner;
