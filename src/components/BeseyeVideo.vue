@@ -821,7 +821,7 @@ export default {
     },
 
     startVideo() {
-      if (this.videoAuthority === false && !self.$store.getters.mimicMode) {
+      if (this.videoAuthority === false && !this.$store.getters.mimicMode) {
         this.showError = true;
         this.errorText = this.$t('remotePatrol.videoLicense');
         return;

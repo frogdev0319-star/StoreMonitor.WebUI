@@ -273,7 +273,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.0.4.11
+                v3.0.5.4
                 &copy; {{ getFullYear }} Advantech Intelligent City
                 Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
@@ -655,6 +655,8 @@ export default {
     clickCollapse() {
       this.$store.dispatch("setCollapsed", !this.collapsed);
       this.collapsed = !this.collapsed;
+
+
     },
 
     handleopen(index) {

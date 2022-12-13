@@ -29,7 +29,7 @@
                   <!--<span :class="lang === 'en'? 'en-span-class' : ''">{{ $t('statistics.patrolPerson.insPerson') }}<span>-->
                 </div>
                 <div>
-                  <el-radio :label="true" :class="lang === 'en'? 'en-span-class' : ''">{{ $t('mysterio.mystery') }}</el-radio>
+                  <el-radio :label="true" :class="lang === 'en'? 'en-span-class' : ''">{{ $t('mysterio.mysterio') }}</el-radio>
                 </div>
               </el-radio-group>
                <div class="date-range">

@@ -25,15 +25,17 @@
             </div>
           </div>
         </el-col>
+        
+        <!-- 各區域門店巡檢情況 -->
         <el-col :span="14" class="store-list">
-          <div class="title">{{ $t('overview.patrolStatus') }}</div>
+          <div class="title">{{ $t('overview.patrolStatus') }} </div>
           <div class="region-result">
             <div class="region-content">
               <div class="region-result-panel">
                 <v-chart
                   ref="storeChart"
                   :options="storeOptions"
-                  :auto-resize="true"
+                  autoresize
                   class="result-content"
                   @timelinechanged="timelineHandler"/>
                 <i v-if="showPreviousGroup" class="el-icon-arrow-left icon-arrow" @click="previousGroup"/>
@@ -42,8 +44,8 @@
               </div>
             </div>
           </div>
-
         </el-col>
+
         <el-col :span="6" class="focus-list">
           <div class="title flex-center">
             <span v-if="isWorstArea" class="area-title">{{ $t('overview.worstRegion') }}</span>
@@ -101,7 +103,7 @@
               <div class="pct-panel">
                   <v-chart
                       ref="temsPie"
-                      :auto-resize="true"
+                      autoresize
                       :options="itemsOptions"
                       class="chart-content"
                   />
@@ -160,7 +162,7 @@
               <el-col :span="8" class="item-radar">
                 <div v-if="itemsTopFive.length > 0" class="rader-panel">
                   <div class="radar-title">{{ curItemName }}</div>
-                  <v-chart ref="itemsRadar" :options="itemsRadarOption" :auto-resize="true" class="radar-content"/>
+                  <v-chart ref="itemsRadar" :options="itemsRadarOption" autoresize class="radar-content"/>
                 </div>
                 <div v-else class="radar-empty">
                   {{ $t('overview.noData') }}
@@ -192,7 +194,7 @@
             <div class="cycle-panel">
               <div class="panel-info">*{{ $t('overview.dataZoomInfo') }}</div>
               <div class="panel-bubble">
-                <v-chart ref="cycleChart" :options="cycleOption" :auto-resize="true" class="radar-content"/>
+                <v-chart ref="cycleChart" :options="cycleOption" autoresize class="radar-content"/>
               </div>
               <div class="cycle-axis">{{ $t('overview.cycle') }}</div>
               <div class="pass-rate-axis">{{ $t('overview.passRate') }}</div>
@@ -216,6 +218,9 @@ import {
   getInspectStatsOverviewWithRegion,
   getInspectStatsOverRegion
 } from '@/api/inspectOverview';
+import {
+    getInspectStatus
+} from '@/api/inspect';
 import { mapGetters } from 'vuex';
 import resize from '@/components/mixins/echartResize';
 import SearchConditionUtil from '@/common/SearchConditionUtil.js';
@@ -314,7 +319,9 @@ export default {
       descending: require('../../../static/img/descending.png'),
       ascending: require('../../../static/img/ascending.png'),
       currentIndex: 0,
-      fontFamily: 'NotoSansCJKtc,Roboto, Microsoft YaHei'
+      fontFamily: 'NotoSansCJKtc,Roboto, Microsoft YaHei',
+
+      inspectStatus: ''
     };
   },
 
@@ -323,22 +330,26 @@ export default {
   },
 
   watch: {
-    accountChanged(val) {
+    async accountChanged(val) {
       const self = this;
       if (val !== 0) {
         self.timeMode = 1;
         self.isEnSpan = false;
         self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
         self.currentIndex = 0;
-        self.getSearchParams();
-        self.getPatrolOverviewData();
+
+        await self.getInspectStatus();
+        await self.getSearchParams();
+        await self.getPatrolOverviewData();
       }
-    }
+    },
+    
   },
 
-  created() {
-    this.getSearchParams();
-    this.getPatrolOverviewData();
+  async created() {
+    await this.getInspectStatus();
+    await this.getSearchParams();
+    await this.getPatrolOverviewData();
   },
 
   beforeDestroy() {
@@ -349,6 +360,29 @@ export default {
   },
 
   methods: {
+    getInspectStatus(){
+      return new Promise((resolve, reject) => {
+          getInspectStatus().then(res => {
+          resolve(res);
+          this.inspectStatus = res.data.settingContent.general_setting_inspect_status_name
+          delete this.inspectStatus.update_time
+          delete this.inspectStatus.update_user_id
+          console.log('this.inspectStatus ~~~~>> ', this.inspectStatus);
+
+          this.renameTableLabel()
+
+          }).catch(err => {
+          reject(err);
+          });
+      });
+    },
+
+    renameTableLabel(){
+      this.resultList[2] = this.inspectStatus.status_2
+      this.resultList[1] = this.inspectStatus.status_1
+      this.resultList[0] = this.inspectStatus.status_0
+    },
+
     changBestAndWorst() {
       const self = this;
       self.isWorstArea = !self.isWorstArea;
@@ -732,8 +766,8 @@ export default {
       if (self.isWorstArea) {
         firstColor = '#f11e66';
         secondColor = '#f59249';
-        firstName = self.$t('overview.danger');
-        secondName = self.$t('overview.improve');
+        firstName = self.inspectStatus.status_0;
+        secondName = self.inspectStatus.status_1;
         try {
           result.sort(self.compareDanger);
           maxValue = self.findMaxDanger(result);
@@ -744,7 +778,7 @@ export default {
         firstColor = '#57e78f';
         secondColor = '#8fd92e';
         firstName = self.$t('overview.excellent');
-        secondName = self.$t('overview.echartGood');
+        secondName = self.inspectStatus.status_2;
         try {
           result.sort(self.compareExcellent);
           maxValue = self.findMaxExcellent(result);
@@ -1116,7 +1150,7 @@ export default {
         { name: 'inspectCycle', index: 0, text: this.$t('overview.cycle') },
         { name: 'passRate', index: 1, text: this.$t('overview.passRate') },
         { name: 'excellentRate', index: 2, text: this.$t('overview.excellentRate') },
-        { name: 'dangerRate', index: 3, text: this.$t('overview.dangerRate') },
+        { name: 'dangerRate', index: 3, text: this.inspectStatus.status_0 + this.$t('overview.rate') },
         { name: 'region', index: 5, text: this.$t('overview.region') }
       ];
 
@@ -1161,11 +1195,24 @@ export default {
             fontSize: 12
           },
           data: [
-            { name: this.$t('overview.dangerousMore'), icon: 'rect' },
-            { name: this.$t('overview.DangerousLess'), icon: 'rect' },
-            { name: this.$t('overview.excellentLess'), icon: 'rect' },
-            { name: this.$t('overview.excellentMore'), icon: 'rect' }]
+            {
+              name: this.inspectStatus.status_0 + "≥60%", 
+              icon: 'rect' },
+            {
+              name: this.inspectStatus.status_0 + "＜60%", 
+              icon: 'rect' 
+            },
+            { 
+              name: this.$t('overview.excellentLess'), 
+              icon: 'rect' 
+            },
+            { 
+              name: this.$t('overview.excellentMore'), 
+              icon: 'rect' 
+            }]
         },
+
+        
         textStyle: {
           fontFamily: this.fontFamily
         },
@@ -1295,7 +1342,7 @@ export default {
 
         series: [
           {
-            name: this.$t('overview.dangerousMore'),
+            name: this.inspectStatus.status_0 + "≥60%",
             type: 'scatter',
             itemStyle: itemDangerStyle,
             symbolSize: function() {
@@ -1324,7 +1371,7 @@ export default {
             data: []
           },
           {
-            name: this.$t('overview.DangerousLess'),
+            name: this.inspectStatus.status_0 + "＜60%",
             type: 'scatter',
             itemStyle: itemDangerStyle,
             symbolSize: 15,
@@ -1588,14 +1635,15 @@ export default {
             }
           ],
           series: [
-            { name: this.$t('overview.danger'), type: 'bar', barWidth: 35, barGap: '10' },
-            { name: this.$t('overview.improve'), type: 'bar', barWidth: 35, barGap: '10' },
-            { name: this.$t('overview.echartGood'), type: 'bar', barWidth: 35, barGap: '10' }
+            { name: this.inspectStatus.status_0, type: 'bar', barWidth: 35, barGap: '10' },
+            { name: this.inspectStatus.status_1, type: 'bar', barWidth: 35, barGap: '10' },
+            { name: this.inspectStatus.status_2, type: 'bar', barWidth: 35, barGap: '10' }
           ]
         },
 
         options: []
       };
+      console.log('regionOption~~~~~>', regionOption)
       return regionOption;
     },
 

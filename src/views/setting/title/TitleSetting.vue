@@ -482,7 +482,8 @@ export default {
 
     setParentIfChecked() {
       this.roleNameList.forEach(item => {
-        item.checked = !item.children.find(_item => _item.checked === false);
+        item.disabled = false;
+        item.checked = !item.children.find(_item => (_item.checked === false && _item.visabled===true));
       });
     },
 
@@ -615,7 +616,7 @@ export default {
       self.roleNameList[index].children.forEach(item => {
         if (item.checked) {
           childrenCheckedNum++;
-        } else if (item.disabled) {
+        } else if (item.disabled || !item.visabled) {
           childrenDisableNum++;
         }
       });

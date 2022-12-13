@@ -278,7 +278,8 @@ export default{
       "daysww":"号",
       "weeks":"周",
       "pageSize":"每页显示",
-      "pageSizeUnit":"笔"
+      "pageSizeUnit":"笔",
+      "rate":"率"
   },
   "remotePatrol":{
       "InspectionDetail":"导出报告",
@@ -521,7 +522,8 @@ export default{
       "resubmiteRpt":"确认送出报告",
       "systemReject":"系统撤回",
       "systemRejectMsg":"无可签核人员，请重新确认",
-      "cannotSwitchMimicMode":"正在编辑报告，不能切换模式"		   
+      "cannotSwitchMimicMode":"正在编辑报告，不能切换模式",
+      "tipLimitGroupScore":"得分超过类别上限时以上限计算总分",
   },
   "eventView":{
       "ClosedEvent":"已结案事件",
@@ -788,7 +790,21 @@ export default{
       "bindWorkFLow":"巡检表绑定流程",
       "isRequired":"必填",
       "notRequired":"非必填",
-      "selectStoreTag":"快速选择"
+      "selectStoreTag":"快速选择",
+      "groupScore":"类别分值",
+      "advanceSetting":"进阶设定",
+      "advanceSettingOn":"开启",
+      "advanceSettingOff":"关闭",
+      "setGroupScoreRange0":"类别分值上限 输入范围 0 ~ 9999",
+      "setGroupScoreRange":"类别分值上限 输入范围 -9999 ~ 9999",
+      "groupScoreLimit":"类别分值上限",
+      "commentStatus":"巡检总评选项显示 (此设定将影响品牌之巡检总评相关显示)",
+      "autoSelectComment":"开启依条件自动选取巡检总评 ",
+      "selectByScore":"依分数条件自动选取 ",
+      "noUserDefinedName":"无自定义名称 ",
+      "needHeighterThan":"考评范围最高值需高于最低值! ",
+      "cantEmptyScoreLow":"最低考评总分范围不可为空! ",
+      "cantEmptyScoreHeight":"最高考评总分范围不可为空! "
   },
   "deviceView":{
       "EzvizAccount":"串流服务账号",
@@ -1417,7 +1433,8 @@ export default{
         "auditFlow":"签核流程",
         "nodeOrder":"节点序号",
         "cantEmptyDays" : "停留天数不可为空!",
-        "cantTooMuchDays" : "停留天数不可超过365天!"
+        "cantTooMuchDays" : "停留天数不可超过365天!",
+        "cantEmptyInspectStatus" : "巡检总评选项自定义名称不可为空! ",
     },
     "inceptionRpt":{
         "sendAudit":"送出签核",
@@ -1467,7 +1484,8 @@ export default{
       "nickNameTip":"神秘客代称长度不可超过50个字元！",
       "pleaseInputNickName":"请输入神秘客代称",
       "duplicateNickName":"已有相同的神秘客代称，请重新输入",
-      "mystery":"神秘客"
+      "mysterio":"神秘客",
+      "allMysterio":"全部神秘客",
   }
 
 }
