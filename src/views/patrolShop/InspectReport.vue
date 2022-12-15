@@ -80,11 +80,11 @@
         </div>
 
         
-        <div v-if="standard!=-1" style="margin-left: calc(20/1440*100vw)" class="status-tag"
+        <div v-if="showTag" style="margin-left: calc(20/1440*100vw)" class="status-tag"
           :style="standard == 1 ? {'color':'#59ab22','background-color':'#e8f6de'}: {'color':'#f57848','background-color':'#ffefeb'}"
         >{{standard == 1 ? $t('remotePatrol.goalAchieved') : $t('remotePatrol.farBehind')}}</div>
         <div v-if="checkinInfo" style="color: #69727c; font-size: 12px; margin-left: 20px">
-          {{ checkinInfo }}
+          {{ checkinInfo }} 
         </div>
       </div>
     </div>
@@ -642,7 +642,8 @@ export default {
       showCancelBtn:false,
       auditState:1,
 
-      inspectStatus: ''
+      inspectStatus: '',
+      showTag: false,
     };
   },
 
@@ -674,6 +675,14 @@ export default {
     }
   },
 
+  watch:{
+    standard(val){
+      if(val !== -1) {
+        this.showTag = true
+      }
+    }
+
+  },
   created() {
     this.getStoredTemplateId();
     this.getRouterData();
