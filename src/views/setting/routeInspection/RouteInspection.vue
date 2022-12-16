@@ -626,6 +626,7 @@ export default {
           resolve(data);
         }).catch(err => {
           console.log(err.message);
+          reject(err);
         });
       });
     },
@@ -1313,7 +1314,17 @@ export default {
           const key = cell.header && cell.header.tag;
           if (!mapping[key]) return;
           if (mapping[key] === 'availableScores') {
-            item[mapping[key]] = cell.v ? cell.v.split('/').map(item => Number(item)) : cell.v === 0 ? [0] : [];
+            let score = [];
+            if(cell.v){
+               cell.v.split('/').map(item => {
+                if(!isNaN(Number(item))){
+                  score.push( Number(item));
+                }
+                
+              })
+              console.log(">>>>score:",score);
+            }
+            item[mapping[key]] = cell.v ? score : cell.v === 0 ? [0] : [];
           } else if (mapping[key] === 'itemScore') {
             item[mapping[key]] = cell.v ? Number(cell.v) : 0;
             if (cell.v === '' || cell.v === undefined) {

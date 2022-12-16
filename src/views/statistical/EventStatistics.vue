@@ -1180,10 +1180,22 @@ export default {
     async initData() {
       this.params.filter = { page: this.page - 1, size: this.sizeNum };
       this.params.order = this.order;
-      //this.getSearchParams();
+      this.getSearchParams();
+    },
+    getSearchParams() {
+      const searchParams = SearchConditionUtil.getSearchCondition('eventStatistics');
+      //console.log(">>>eventstistics > searchParams:",searchParams);
+      this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+      this.params.beginTs = this.dateValue[0].valueOf();
+      this.params.endTs = this.dateValue[1].valueOf();
+      if (Object.keys(searchParams).length > 0) {
+        this.inspectId = searchParams.inspectId;
+      } else {
+        this.searchParams = {};
+      }
     },
     async emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
-      //console.log("eventStatistics > searchParams:",searchParams);
+      //console.log(">>>>eventStatistics > searchParams:",searchParams);
       this.params = searchParams;
       this.storeIds = this.params.storeIds;
       this.compareIds = this.compareIds2 = this.params.storeIds;
@@ -1194,7 +1206,10 @@ export default {
       this.timeMode = timeMode;
       this.storePatrolLists = storePatrolLists;
       this.curCountry = this.params.curCountry;
-      this.inspectId = this.params.inspectId;
+      if(searchParams.inspectId && searchParams.inspectId!=''){
+        //console.log(">>>>eventStatistics > this.params.inspectId:",searchParams.inspectId);
+        this.inspectId = searchParams.inspectId;
+      }
       const searchParamsObj = {
           path: 'eventStatistics',
           params: this.params
@@ -1271,7 +1286,7 @@ export default {
       params.endTs = this.params.endTs;
       params.storeIds = this.storeIds.filter(storeId => storeId !== '-1');
       params.inspectTagIds = [this.inspectId];
-      console.log("getUpperGloableEventData > params.storeIds:",params.storeIds);
+      console.log("getUpperGloableEventData > params.inspectTagIds:",params.inspectTagIds);
       params.regionMode = 0;
 
       try {
@@ -1663,7 +1678,7 @@ export default {
       let region = this.areaMode.filter((r)=>{ return r.key==this.compareType});
       self.params.groupMode = region[0].value;
       self.params.storeIds = self.compareIds.filter(storeId => storeId !== '-1');
-      self.params.inspectTagIds = [this.inspectId];
+      self.params.inspectTagIds = [self.inspectId];
       let searchCondition = {}
       //if(region[0].value<3){ //store, area1, area2
       //console.log("getEventTableData > this.compareIds:",self.compareIds);
