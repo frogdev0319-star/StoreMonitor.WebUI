@@ -1658,8 +1658,8 @@ export default {
       const self = this;
       self.componentsProps.beginTs = self.params.beginTs;
       self.componentsProps.endTs = self.params.endTs;
-      console.log(">>>>self.inspectId:",self.inspectId);
-      self.componentsProps.inspectTagIds = [self.inspectId];
+      //console.log(">>>>self.inspectId:",self.inspectId);
+      self.componentsProps.inspectTagIds = (self.inspectId=='')?[]:[self.inspectId];
       let region = this.areaMode.filter((r)=>{ return r.key==this.compareType});
       self.params.groupMode = region[0].value;
       self.params.storeIds = self.compareIds.filter(storeId => storeId !== '-1');
@@ -1668,7 +1668,7 @@ export default {
       //if(region[0].value<3){ //store, area1, area2
       //console.log("getEventTableData > this.compareIds:",self.compareIds);
       searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:0,storeIds:self.compareIds,
-          inspectTagIds : [this.inspectId]
+          inspectTagIds : (self.inspectId=='')?[]:[this.inspectId]
       };
           //filter:{"page":this.page-1,"size":this.sizeNum},
           //order:this.order
@@ -1860,6 +1860,7 @@ export default {
       params.inputSearchValue = "";
       params.beginTs=self.params.beginTs;
       params.endTs=self.params.endTs;
+      params.inspectTagId = [self.inspectId];
       params.searchFrom='EventStatistics';
 
       if(row.prop == "numOfTotal"){

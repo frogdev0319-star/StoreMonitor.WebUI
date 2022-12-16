@@ -1249,6 +1249,8 @@ export default {
             this.storeFilterObj.storeIds=searchParams.curStore;
             this.dateValue = [util.getDates(searchParams.beginTs),searchParams.endTs];
             this.params.searchMysteryMode = -1;
+            //console.log("EventMange > getSearchParams > searchParams.inspectTagId:",searchParams.inspectTagId);
+            this.inspectId = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
             //console.log("1..EventMange > getSearchParams > dateValue:",this.dateValue);
           }else{
             this.storeFilterObj.filterStoreIds = (searchParams.curStore)?searchParams.curStore:[];
