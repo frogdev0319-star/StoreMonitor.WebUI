@@ -459,7 +459,7 @@
         </div>
         <div v-if="showGroupScoreSetting">
           <div class="dialog-form-item-name">
-            <span>{{ $t('insSettingView.advanceSetting') }}</span>
+            <span>{{$t('insSettingView.advanceSetting') }}</span>
           </div>
           <div style="line-height:28px;">
             <el-radio-group class="attribute-group" v-model="itemAdvanceSetting">
@@ -721,25 +721,23 @@ export default {
   },
 
   methods: {
-
     getSettingStatus(){
       // rule 1
-      if(this.itemRequired == "0" && this.itemType == 1){
+      if(this.itemRequired == "0" && this.itemType == 1 && this.memo_is_advanced == true){
         this.memo_config.memo_required_type = "1"
       }
       // rule 2
-      else if(this.itemType == 0){
+      else if(this.itemType == 0 && this.memo_is_advanced == true){
         this.memo_config.memo_required_type = "1"
       }
       // rule 3
-      else if(this.itemRequired == "1" && this.itemType == 1){
+      else if(this.itemRequired == "1" && this.itemType == 1 && this.memo_is_advanced == true){
         this.memo_config.memo_required_type = "0"
       }
       // 關閉不傳入 api
-      if(this.memo_is_advanced == 'false'){
+      if(this.memo_is_advanced == 'false' && this.memo_is_advanced == false){
         this.memo_options.length = 0
       }
-
     },
 
     toItemRequired(){
@@ -1421,12 +1419,14 @@ export default {
       console.log('memo_options :>> ', this.memo_options);
       console.log('memo_config :>> ', this.memo_config);
 
+      console.log('this.memo_options.length :>> ', this.memo_options.length);
 
-      if(this.memo_options.length == 0){
+      if(this.memo_options.length === 0 && this.memo_is_advanced == "true"){
+        console.log('XDXDXD :>> ');
         this.$refs.memo_tag.focus()
         this.memo_optionsTips0 = true
+        return
       }
-
 
       const self = this;
       if (self.ItemName.trim().length === 0) {
@@ -1510,13 +1510,16 @@ export default {
         return false;
       }
 
-      // call API
-      // if(self.updateType.type===0){
-      //   self.addItem(itemScore,qualifiedScore,selectAvailable);
+      const memoRequiredType = parseInt(this.memo_config.memo_required_type)
+      this.memo_config.memo_required_type = memoRequiredType
 
-      // }else if(self.updateType.type===1){
-      //   self.editItem(itemScore,qualifiedScore,selectAvailable);
-      // }
+      // call API
+      if(self.updateType.type===0){
+        self.addItem(itemScore,qualifiedScore,selectAvailable);
+
+      }else if(self.updateType.type===1){
+        self.editItem(itemScore,qualifiedScore,selectAvailable);
+      }
     },
 
     addItem(itemScore,qualifiedScore,selectAvailable){
@@ -1529,7 +1532,11 @@ export default {
         qualifiedScore: qualifiedScore,
         availableScores: selectAvailable,
         type: this.itemType,
-        required: this.itemRequired === '1'
+        required: this.itemRequired === '1',
+
+        memo_is_advanced: this.memo_is_advanced,
+        memo_options: [...this.memo_options],
+        memo_config: {...this.memo_config}
       };
         temp.push(objItem);
         const obj = {
@@ -1541,6 +1548,8 @@ export default {
         const params = {
           'request': tempParam
         };
+
+        console.log('params ~~~~~>> ', params);
         inpectRESTful.addInspectItem(params).then((res) => {
           const codeMsg = res.errMsg;
           if (codeMsg != undefined && codeMsg == 'Success') {
@@ -1568,12 +1577,6 @@ export default {
                 const res = resApply;
               });
             }
-            /*setTimeout(function() {
-              if (self.routeName == '远程巡检') {
-                console.log("in tabName = ",self.tabName);
-                PubSub.publish('change-color', { showTag: true });
-              }
-            }, 1000);*/
           } else {
             util.notify(self.$t('insSettingView.addFail'), 'warning', 3000);
             return false;
@@ -1584,6 +1587,7 @@ export default {
     },
 
     editItem(itemScore,qualifiedScore,selectAvailable){
+
       const self = this;
       const temp = [];
       const obj = {
@@ -1594,12 +1598,18 @@ export default {
           qualifiedScore: qualifiedScore,
           availableScores: selectAvailable,
           type: this.itemType,
-          required: this.itemRequired === '1'
+          required: this.itemRequired === '1',
+
+          memo_is_advanced: this.memo_is_advanced,
+          memo_options: [...this.memo_options],
+          memo_config: {...this.memo_config}
         };
         temp.push(obj);
         const params = {
           'items': temp
         };
+
+        console.log('params ~~~~~>> ', params);
         inpectRESTful.updateInspectItem(params).then(res => {
           const codeMsg = res.errMsg;
           if (codeMsg != undefined && codeMsg == 'Success') {
@@ -1616,6 +1626,8 @@ export default {
     },
 
     handleEdit(index, item) {
+
+      console.log('item ++++++++++:>> ', item);
       this.showAddNape = true;
       this.updateType = {type:1,id:item.id};
       this.setDialogContent();
@@ -1626,7 +1638,23 @@ export default {
       this.ItemScoreOption = item.availableScoreStr;
       this.ItemDescription = item.napeDep;
       this.itemType = item.type;
-      this.itemRequired = item.required ? '1' : '0'
+      this.itemRequired = item.required ? '1' : '0';
+
+      this.memo_is_advanced = item.memo_is_advanced.toString()
+      
+      this.memo_option = item.memo_options.join("/")
+      this.memo_options = item.memo_options
+
+      console.log('this.memo_config :>> ', this.memo_config);
+
+      if(item.memo_config == null){
+        this.memo_config.memo_required_type = "0"
+        this.memo_config.memo_check_text = true
+        this.memo_config.memo_check_media = false
+      } else {
+        this.memo_config = item.memo_config
+        this.memo_config.memo_required_type = this.memo_config.memo_required_type.toString()
+      }
     },
 
     handleDelete(item) {
@@ -1798,10 +1826,14 @@ export default {
         self.napeList = [];
         self.setItemTitle('');
       }
+
+
+      
     },
 
     getItemsList(index, item) {
       const self = this;
+      
       const temp = [];
       item.items.forEach((_item, index) => {
         let availableScoreStr = '';
@@ -1835,8 +1867,15 @@ export default {
           checked: false,
           type: _item.type,
           sequence: _item.sequence,
-          required: _item.required
+          required: _item.required,
+          
+          memo_is_advanced: _item.memo_is_advanced,
+          memo_options: _item.memo_options,
+          memo_config: _item.memo_config,
+
         };
+
+        console.log('obj :+++++++++++>> ', obj);
         temp.push(obj);
       });
       self.napeList = temp;
