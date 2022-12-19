@@ -866,7 +866,7 @@ export default {
         console.log("storeId:",storeId);
          params.clause['storeId'] = storeId;
       }
-      if(this.inspectId.length>0){
+      if(this.inspectId.length>0 && this.searchParams['searchFrom']!='PatrolPersonStat'){
         let inspectTagId = this.inspectId;
         if(this.inspectId[0]==='-1'){
           params['inspectTagIds'] = inspectTagId.slice(1);
@@ -1005,7 +1005,7 @@ export default {
       if(storeId!='-1'){
         params['clause']['storeId'] = storeId
       }
-      if(this.inspectId.length>0){
+      if(this.inspectId.length>0 && this.searchParams['searchFrom']!='PatrolPersonStat'){
         let inspectTagId = this.inspectId;
         if(this.inspectId[0]==='-1'){
           params['inspectTagIds'] = inspectTagId.slice(1);
@@ -1229,6 +1229,7 @@ export default {
           
           if(searchParams['searchFrom']=='PatrolPersonStat'){
             //this.dateValue =[searchParams.];
+            this.curReportType = -1;
             this.storeFilterObj.filterStoreIds = searchParams.curStore;
             this.storeFilterObj.curStore=searchParams.curStore;
             this.storeFilterObj.storeIds=searchParams.curStore;
@@ -1239,6 +1240,7 @@ export default {
             this.params.endTs = searchParams.endTs;
             this.dateValue = [util.getDates(searchParams.beginTs),searchParams.endTs];
             this.params.searchMysteryMode = searchParams.searchMysteryMode;
+            
             //console.log("1.EventMange > getSearchParams > dateValue:",this.dateValue);
             //util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
           }else if(searchParams['searchFrom']=="EventStatistics"){
@@ -1250,7 +1252,9 @@ export default {
             this.dateValue = [util.getDates(searchParams.beginTs),searchParams.endTs];
             this.params.searchMysteryMode = -1;
             //console.log("EventMange > getSearchParams > searchParams.inspectTagId:",searchParams.inspectTagId);
-            this.inspectId = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
+            this.curReportType = -1;
+            this.inspectCatch = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
+            this.inspectId = this.inspectCatch;
             //console.log("1..EventMange > getSearchParams > dateValue:",this.dateValue);
           }else{
             this.storeFilterObj.filterStoreIds = (searchParams.curStore)?searchParams.curStore:[];
@@ -1259,6 +1263,9 @@ export default {
             this.params.beginTs = this.dateValue[0].valueOf();
             this.params.endTs = this.dateValue[1].valueOf();
             this.params.searchMysteryMode = -1;
+            this.curReportType = (typeof searchParams.curReportType =='undefined')? -1 : searchParams.curReportType;
+            this.inspectCatch = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
+            console.log("EventMange > getSearchParams > this.inspectCatch:",this.inspectCatch);
           }
           this.inputSearchValue = searchParams.inputSearchValue;
           this.curState = searchParams.curState;
@@ -1271,9 +1278,7 @@ export default {
           this.params = searchParams.searchParams;
           this.searchParams = searchParams;
           this.ifGetParamsFromCash = true;
-          this.curReportType = (typeof searchParams.curReportType =='undefined')? -1 : searchParams.curReportType;
-          this.inspectCatch = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
-          console.log("EventMange > getSearchParams > this.inspectCatch:",this.inspectCatch);
+          
         } else {
           this.searchParams = {};
           this.curState = [0];
