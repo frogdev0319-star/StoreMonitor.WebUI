@@ -186,8 +186,8 @@
     <!-- 新增/編輯巡檢項 -->
     <dialog-pop
       v-if="showAddNape"
-      :title="updateType.type===0?$t('insSettingView.addTitleItem'):$t('insSettingView.editTitleItem')"
       :visible.sync="showAddNape"
+      :title="updateType.type===0?$t('insSettingView.addTitleItem'):$t('insSettingView.editTitleItem')"
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
@@ -195,7 +195,7 @@
       @cancelHandler="showAddNape = false"
       @confirmHandler="confirmUpdateNape">
       
-      <div class="dialog-content content_padding">
+      <div class="dialog-content content_padding" style="padding-bottom: 10px">
         <el-form class="NapeForm" label-position="top" size="mini">
           <!-- 巡檢項名稱 -->
           <el-form-item style="margin-bottom: 20px">
@@ -216,9 +216,9 @@
               <span class="sign">*</span>
               <span class="item_label">{{ $t('insSettingView.isRequired') }}</span>
             </div>
-            <el-radio-group class="attribute-group" v-model="itemRequired">
-              <el-radio label="0">{{ $t('insSettingView.notRequired') }}</el-radio>
+            <el-radio-group class="attribute-group" v-model="itemRequired" @change="toItemRequired">
               <el-radio label="1">{{ $t('insSettingView.isRequired') }}</el-radio>
+              <el-radio label="0">{{ $t('insSettingView.notRequired') }}</el-radio>
             </el-radio-group>
           </el-form-item>
 
@@ -226,9 +226,9 @@
           <el-form-item>
             <div class="score_item">
               <span class="sign">*</span>
-              <span class="item_label">{{$t('insSettingView.inspectItemType')}} </span>
+              <span class="item_label">{{$t('insSettingView.inspectItemType')}}</span>
             </div>
-            <el-radio-group class="attribute-group" v-model="itemType">
+            <el-radio-group class="attribute-group" v-model="itemType" @change="toItemType">
               <div v-for="(typeItem, typeIndex) in itemsTypeList" :key="typeItem.value" style="display: inline-flex">
                 <el-radio :label="typeItem.value" :key="typeIndex">{{typeItem.label}}</el-radio>
               </div>
@@ -236,21 +236,26 @@
           </el-form-item>
 
           <!-- 項目分值 -->
-          <div v-if="itemType === 0" class="score-content">
+          <div class="score-content">
+            
             <!-- 1 -->
-            <el-form-item v-if="activeSheetName==='1'" style="margin-bottom: 20px">
+            <el-form-item v-if="activeSheetName==='1'" style="margin-bottom: 5px">
               <div class="score_item">
                 <span class="sign">*</span>
-                <span class="sub_label">{{$t('insSettingView.sheetscore3')}}</span>
+                <span class="sub_label">{{$t('insSettingView.sheetscore3')}} </span>
                 <span class="item_des">{{$t('insSettingView.sheetscore3_des')}}</span>
               </div>
-              <el-input v-model="ItemScoreOption"
-                        :placeholder="$t('insSettingView.enterScore')"
-                        @input="napeScoreOptionsChange"></el-input>
-              <span v-if="ScoreOptionsTips0" class="rules">{{ $t('insSettingView.excelScoreItemEmpty') }}</span>
-              <span v-if="ScoreOptionsTips1" class="rules">{{ $t('insSettingView.setScoreItemRange') }}</span>
+              <el-input 
+                v-model="ItemScoreOption"
+                :disabled="(itemType === 1)"
+                :placeholder="$t('insSettingView.enterScore')"
+                @input="napeScoreOptionsChange"
+              />
+              <span v-if="ScoreOptionsTips0" class="rules">{{ $t('insSettingView.excelScoreItemEmpty') }}aaa1</span>
+              <span v-if="ScoreOptionsTips1" class="rules">{{ $t('insSettingView.setScoreItemRange') }}aaa2</span>
             </el-form-item>
 
+            <!-- 2 -->
             <el-form-item v-if="activeSheetName==='1'" style="margin-bottom: 5px">
               <el-col :span="10">
                 <el-form-item >
@@ -258,19 +263,24 @@
                     <span class="sign">*</span>
                     <span class="sub_label">{{$t('insSettingView.sheetscore0')}} </span>
                   </div>
-                  <el-input v-model.number="ItemTotalScore" disabled
-                            :placeholder="$t('insSettingView.enterScore')"
-                            @input="napeTotalScoreChange"/>
-                  <span v-if="ItemTotalScoreTip0" class="rules">{{ $t('insSettingView.setFullScoreEmpty') }}</span>
-                  <span v-if="ItemTotalScoreTip1" class="rules">{{ $t('insSettingView.setFullScoreRange') }}</span>
+                  <el-input 
+                    v-model.number="ItemTotalScore" 
+                    disabled
+                    :placeholder="$t('insSettingView.enterScore')"
+                    @input="napeTotalScoreChange"/>
+                  <span v-if="ItemTotalScoreTip0" class="rules">{{ $t('insSettingView.setFullScoreEmpty') }} bbb2</span>
+                  <span v-if="ItemTotalScoreTip1" class="rules">{{ $t('insSettingView.setFullScoreRange') }}bbb2</span>
                 </el-form-item>
               </el-col>
               <el-col :span="12" :offset="2">
                 <el-form-item :label="$t('insSettingView.sheetscore1')" >
-                  <el-input v-model.number="ItemMinScore"
-                            :placeholder="$t('insSettingView.enterScore')"
-                            @input="napeMinScoreChange"/>
-                  <span v-if="ItemMinScoreTip" class="rules">{{ $t('insSettingView.setMinScoreRange') }}</span>
+                  <el-input 
+                    v-model.number="ItemMinScore"
+                    :disabled="(itemType === 1)"
+                    :placeholder="$t('insSettingView.enterScore')"
+                    @input="napeMinScoreChange"
+                    />
+                  <span v-if="ItemMinScoreTip" class="rules">{{ $t('insSettingView.setMinScoreRange') }} </span>
                 </el-form-item>
               </el-col>
             </el-form-item>
@@ -279,14 +289,18 @@
             <el-form-item v-if="activeSheetName!=='1'">
               <div class="score_item">
                 <span v-if="activeSheetName==='2'" class="sign">*</span>
-                <span class="sub_label">{{$t('insSettingView.score')}}</span>
+                <span class="sub_label">{{$t('insSettingView.score')}} </span>
               </div>
-              <el-input v-model.number="ItemSheetScore"
-                        :placeholder="$t('insSettingView.enterScore')"
-                        @input="napeSheetScoreChange"/>
-              <span v-if="PFScoreTip" class="rules">{{ $t('insSettingView.setPassFileRange') }}</span>
-              <span v-if="OtherScoreTip" class="rules">{{ $t('insSettingView.setOtherRange') }}</span>
-              <span v-if="OtherScoreTipEmpty" class="rules">{{ $t('insSettingView.setOtherEmpty') }}</span>
+              <el-input
+                ref="itemsheet_score"
+                :disabled="(itemType === 1)"
+                v-model.number="ItemSheetScore"
+                :placeholder="$t('insSettingView.enterScore')"
+                @input="napeSheetScoreChange"/>
+
+              <span v-if="PFScoreTip" class="memo_rules">{{ $t('insSettingView.setPassFileRange') }} </span>
+              <span v-if="OtherScoreTip" class="memo_rules">{{ $t('insSettingView.setOtherRange') }} </span>
+              <span v-if="OtherScoreTipEmpty" class="memo_rules">{{ $t('insSettingView.setOtherEmpty') }} </span> 
             </el-form-item>
           </div>
           
@@ -307,51 +321,58 @@
               <span class="item_label">進階設定</span>
             </div>
             
-            <el-radio-group class="attribute-group">
+            <el-radio-group class="attribute-group" v-model="memo_is_advanced" @change="getSettingStatus">
               <div style="display: inline-flex">
-                <el-radio label="開啟" >開啟</el-radio>
-                <el-radio label="關閉" >關閉</el-radio>
+                <el-radio label= "true" >開啟</el-radio>
+                <el-radio label= "false" >關閉</el-radio>
               </div>
             </el-radio-group>
 
-            <div class="score-content" style="margin-bottom: 10px; ">
+            <div class="score-content" style="margin-bottom: 10px; " v-if="memo_is_advanced == 'true'"> 
               <el-form-item >
                 <div class="score_item">
                   <span class="sign">*</span>
                   <span class="sub_label">備註標籤</span>
-                  <span class="item_des">{{$t('insSettingView.sheetscore3_des')}}</span>
+                  <span class="item_des">多項請以"/"隔開</span>
                 </div>
-                <el-input 
+                <el-input
+                  ref="memo_tag"
+                  v-model="memo_option"
                   style="margin-bottom: 5px"
-                  :placeholder="請輸入備註標籤"
-                  @input="napeScoreOptionsChange" 
+                  placeholder="請輸入備註標籤"
+                  @input="memoOptionsChange" 
                 />
-                <div class="aaa">
-                  <el-radio-group class="attribute-group">
+                <span v-if="memo_optionsTips0" class="memo_rules">備註標籤不可為空</span>
+
+                <div class="advance_memo_required_type">
+                  <el-radio-group class="attribute-group" v-model="memo_config.memo_required_type">
                     <div style="display: inline-flex">
-                      <el-radio label="aa" >必填</el-radio>
-                      <el-radio label="bb" >非必填</el-radio>
-                      <el-radio label="cc" >僅不合格必填</el-radio>
+                      <el-radio label="0" :disabled='(itemRequired == "0" && itemType == 1)' >必填</el-radio>
+                      <el-radio label="1" :disabled='(itemRequired == "1" && itemType == 1)'>非必填</el-radio>
+                      <el-radio label="2" :disabled='(itemRequired == "0" && itemType == 1) || (itemRequired == "1" && itemType == 1)'>僅不合格必填</el-radio>
                     </div>
                   </el-radio-group>
                 </div>
-                <div class="bbb"  style="margin-left: 23px;">
-                  <el-checkbox class="storevue-checkbox-outlined">
+                <div class="advance_memo_check"  style="margin-left: 23px;" >
+                  <el-checkbox 
+                    :disabled='(itemRequired == "0" && itemType == 1)'
+                    class="storevue-checkbox-outlined" 
+                    v-model="memo_config.memo_check_text"
+                  >
                     <span class="check_text">文字</span>
                   </el-checkbox>
-                  <el-checkbox class="storevue-checkbox-outlined">
+                  <el-checkbox 
+                    :disabled='(itemRequired == "0" && itemType == 1)'
+                    class="storevue-checkbox-outlined" 
+                    v-model="memo_config.memo_check_media"
+                    >
                     <span class="check_text">圖片或影片</span>
                   </el-checkbox>
-
                 </div>
-
               </el-form-item>
+
             </div>
-
-
           </el-form-item>
-
-        
         </el-form>
       </div>
 
@@ -376,6 +397,8 @@
         <div class="dialog-content">{{ $t('insSettingView.confirmCurDel') }}</div>
       </div>
     </dialog-pop>
+
+    <!-- 確認刪除 -->
     <dialog-pop
       :title="$t('insSettingView.confirmDelete')"
       :append-to-body="true"
@@ -394,7 +417,8 @@
         </div>
       </div>
     </dialog-pop>
-    
+
+    <!-- 添加巡檢類別 -->
     <dialog-pop
       v-if="showAddGroup"
       :title="isEditCategory ? $t('insSettingView.updateCategory') : $t('insSettingView.addCategory')"
@@ -660,6 +684,18 @@ export default {
       itemAdvanceSetting:'0',
       itemGroupScore:0,
       GroupScoreTip:false,
+
+      memo_is_advanced: "true",
+      memo_option: "",
+      memo_options: [],
+      memo_config: {
+          memo_required_type: "0",
+          memo_check_text: true,
+          memo_check_media: false
+      },
+
+      memo_optionsTips0: false,
+
     };
   },
   computed: {
@@ -685,6 +721,34 @@ export default {
   },
 
   methods: {
+
+    getSettingStatus(){
+      // rule 1
+      if(this.itemRequired == "0" && this.itemType == 1){
+        this.memo_config.memo_required_type = "1"
+      }
+      // rule 2
+      else if(this.itemType == 0){
+        this.memo_config.memo_required_type = "1"
+      }
+      // rule 3
+      else if(this.itemRequired == "1" && this.itemType == 1){
+        this.memo_config.memo_required_type = "0"
+      }
+      // 關閉不傳入 api
+      if(this.memo_is_advanced == 'false'){
+        this.memo_options.length = 0
+      }
+
+    },
+
+    toItemRequired(){
+      this.getSettingStatus()
+    },
+    toItemType(){
+      this.getSettingStatus()
+    },
+
     getLangStyleValue(langArray){
       return util.getLangStyleValue(langArray);
     },
@@ -1353,6 +1417,17 @@ export default {
     },
 
     confirmUpdateNape() {
+      console.log('memo_is_advanced :>> ', this.memo_is_advanced);
+      console.log('memo_options :>> ', this.memo_options);
+      console.log('memo_config :>> ', this.memo_config);
+
+
+      if(this.memo_options.length == 0){
+        this.$refs.memo_tag.focus()
+        this.memo_optionsTips0 = true
+      }
+
+
       const self = this;
       if (self.ItemName.trim().length === 0) {
         self.enterItemNameTip = true;
@@ -1367,6 +1442,7 @@ export default {
       if (self.activeSheetName == '0') {
         if (self.ItemSheetScore === '') {
           if(self.itemType === 0 ) {
+            this.$refs.itemsheet_score.focus()
             self.OtherScoreTipEmpty = true;
           }
           qualifiedScore = null;
@@ -1419,6 +1495,7 @@ export default {
         }
       } else if (self.activeSheetName == '2') {
         if (self.ItemSheetScore === '') {
+          this.$refs.itemsheet_score.focus()
           self.OtherScoreTipEmpty = true;
         }else if(parseFloat(self.ItemSheetScore) > 100 || parseFloat(self.ItemSheetScore) < -100){
           self.OtherScoreTip = true;
@@ -1432,12 +1509,14 @@ export default {
           self.descriptionRuletip || self.ScoreOptionsTips0 || self.ScoreOptionsTips1){
         return false;
       }
-      if(self.updateType.type===0){
-        self.addItem(itemScore,qualifiedScore,selectAvailable);
 
-      }else if(self.updateType.type===1){
-        self.editItem(itemScore,qualifiedScore,selectAvailable);
-      }
+      // call API
+      // if(self.updateType.type===0){
+      //   self.addItem(itemScore,qualifiedScore,selectAvailable);
+
+      // }else if(self.updateType.type===1){
+      //   self.editItem(itemScore,qualifiedScore,selectAvailable);
+      // }
     },
 
     addItem(itemScore,qualifiedScore,selectAvailable){
@@ -1815,6 +1894,7 @@ export default {
           self.OtherScoreTip=false;
         }
       }
+      if(val !=='') this.OtherScoreTipEmpty = false
     },
 
     napeScoreOptionsChange(val){
@@ -1838,6 +1918,7 @@ export default {
         })
       }
     },
+
 
     napeNameChange(val) {
       const self = this;
@@ -1868,6 +1949,33 @@ export default {
         self.descriptionRuletip = false;
       }
     },
+
+
+    memoOptionsChange(val){
+      const self = this;
+      if(val !== "") self.memo_optionsTips0 = false
+      self.memo_options = self.memo_option.split('/');
+      // 刪除重複 & 空字串
+      self.memo_options = [...new Set(self.memo_options)].filter(i => i !== "")
+      console.log(self.memo_options);
+      
+      
+      // self.ScoreOptionsTips0 = false;
+      // if(val===''){
+      //   self.ScoreOptionsTips1 = false;
+      // }else{
+      //   self.ItemScoreOptions.forEach(item=>{
+      //     if(!isNaN(parseFloat(item)) && parseFloat(item) >= -50 && parseFloat(item) <= 50){
+      //       self.ItemTotalScore = self.ItemScoreOptions[self.ItemScoreOptions.length - 1];
+      //       self.ItemMinScore = self.ItemTotalScore;
+      //       self.ScoreOptionsTips1 = false;
+      //     }else{
+      //       self.ScoreOptionsTips1 = true;
+      //     }
+      //   })
+      // }
+    },
+
 
     notShowInputRuleTips(e) {
       if (e === 'enterName') {
@@ -2056,6 +2164,7 @@ export default {
           top: 100%;
           left: 0;
       }
+      
     }
     
     .el-addrute{
@@ -2649,6 +2758,17 @@ export default {
     // margin-bottom: 20px;
     border-radius: 5px;
   }
+  .memo_rules{
+    display: block;
+    color: #ff2400;
+    font-size: 12px;
+    margin-top: 0px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  
   .el-radio{
     margin-right: calc(20/1920*100vw);
   }
