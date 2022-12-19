@@ -808,8 +808,8 @@ export default {
         const that = this;
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
-          const filterVal = ['storename', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 'totlascore', 'detail', 'attachment','comment',
-            'reportts'];
+          const filterVal = ['province','city','storename','code', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 
+          'totlascore','status','submitter', 'detail', 'attachment','comment','singinmap','signints','reportts'];
           const curData = res.data;
           const tagName = this.report.tagName;
           const data = that.formatJson(filterVal, curData);
