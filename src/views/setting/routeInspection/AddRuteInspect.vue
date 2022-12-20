@@ -347,8 +347,8 @@
                 <div class="advance_memo_required_type">
                   <el-radio-group class="attribute-group" v-model="memo_config.memo_required_type">
                     <div style="display: inline-flex">
-                      <el-radio label="0" :disabled='(itemRequired == "0" && itemType == 1)' >必填</el-radio>
-                      <el-radio label="1" :disabled='(itemRequired == "1" && itemType == 1)'>非必填</el-radio>
+                      <el-radio label="1" :disabled='(itemRequired == "0" && itemType == 1)' >必填</el-radio>
+                      <el-radio label="0" :disabled='(itemRequired == "1" && itemType == 1)'>非必填</el-radio>
                       <el-radio label="2" :disabled='(itemRequired == "0" && itemType == 1) || (itemRequired == "1" && itemType == 1)'>僅不合格必填</el-radio>
                     </div>
                   </el-radio-group>
