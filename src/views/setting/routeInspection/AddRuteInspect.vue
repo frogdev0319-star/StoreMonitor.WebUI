@@ -324,7 +324,7 @@
             <el-radio-group class="attribute-group" v-model="memo_is_advanced" @change="getSettingStatus">
               <div style="display: inline-flex">
                 <el-radio label= "true" >開啟</el-radio>
-                <el-radio label= "false" >關閉</el-radio>
+                <el-radio label= "false" :disabled='(itemRequired == "1" && itemType == 1)'>關閉</el-radio>
               </div>
             </el-radio-group>
 
@@ -713,6 +713,7 @@ export default {
   mounted() {
     this.initData();
     this.getTitleList();
+    
     document.getElementById('addInspection').addEventListener('mousedown', this.notShowDragInfo, false);
   },
 
@@ -722,28 +723,33 @@ export default {
 
   methods: {
     getSettingStatus(){
+      console.log('this.itemRequired :>> ', this.itemRequired);
+      console.log('this.itemType :>> ', this.itemType);
+
       // rule 1
-      if(this.itemRequired == "0" && this.itemType == 1 && this.memo_is_advanced == true){
-        this.memo_config.memo_required_type = "1"
-      }
-      // rule 2
-      else if(this.itemType == 0 && this.memo_is_advanced == true){
-        this.memo_config.memo_required_type = "1"
-      }
-      // rule 3
-      else if(this.itemRequired == "1" && this.itemType == 1 && this.memo_is_advanced == true){
+      if(this.itemRequired == "0" && this.itemType == 1 && this.memo_is_advanced == "true"){
         this.memo_config.memo_required_type = "0"
       }
+      // rule 2
+      else if(this.itemType == 0 && this.memo_is_advanced == "true"){
+        this.memo_config.memo_required_type = "0"
+      }
+      // rule 3
+      else if(this.itemRequired == "1" && this.itemType == 1 && this.memo_is_advanced == "true"){
+        this.memo_config.memo_required_type = "1"
+      }
       // 關閉不傳入 api
-      if(this.memo_is_advanced == 'false' && this.memo_is_advanced == false){
+      if(this.memo_is_advanced == 'false' && this.memo_is_advanced == "false"){
         this.memo_options.length = 0
       }
     },
 
     toItemRequired(){
+      console.log('toItemRequired  :>> ');
       this.getSettingStatus()
     },
     toItemType(){
+      console.log('toItemType  :>> ');
       this.getSettingStatus()
     },
 
@@ -1176,6 +1182,7 @@ export default {
       this.showAddGroup = true;
       this.activeId = item.id;
       this.getParentCatergoryList();
+      
     },
 
     deleteItemData(idArr) {
@@ -1648,6 +1655,7 @@ export default {
       this.memo_option = item.memo_options.join("/")
       this.memo_options = item.memo_options
 
+      
       console.log('this.memo_config :>> ', this.memo_config);
 
       if(item.memo_config == null){
@@ -1658,6 +1666,7 @@ export default {
         this.memo_config = item.memo_config
         this.memo_config.memo_required_type = this.memo_config.memo_required_type.toString()
       }
+      this.getSettingStatus()
     },
 
     handleDelete(item) {
