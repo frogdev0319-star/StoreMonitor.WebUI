@@ -1320,6 +1320,10 @@ export default {
       self.updateType = {type:0};
       self.setDialogContent();
       self.ItemSheetScore = self.activeSheetName === '0' ? '' : 0;
+
+      self.memo_option = ''
+      self.memo_options = []
+      
     },
 
     deleteNape(item) {
@@ -1641,7 +1645,6 @@ export default {
       this.itemRequired = item.required ? '1' : '0';
 
       this.memo_is_advanced = item.memo_is_advanced.toString()
-      
       this.memo_option = item.memo_options.join("/")
       this.memo_options = item.memo_options
 
