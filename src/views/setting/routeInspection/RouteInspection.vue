@@ -626,6 +626,9 @@ export default {
           resolve(data);
         }).catch(err => {
           console.log(err.message);
+          reject(err);
+          //util.notify(this.$t('insSettingView.importFail'), 'warning', 3000);
+          //self.loading = false;
         });
       });
     },

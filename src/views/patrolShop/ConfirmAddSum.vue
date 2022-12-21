@@ -631,14 +631,17 @@ export default {
       next();
     }
   },
-  mounted() {
+  async mounted() {
     const self = this;
-    self.getInspectStatus();
-    self.getInspectRule();
+    await self.getInspectStatus();
+    await self.getRouteData();
 
-    self.getRouteData();
-    self.getUpLoadBucketInfo();
-    self.getOssInfo();
+    await self.getInspectRule();
+
+    await self.getUpLoadBucketInfo();
+    await self.getOssInfo();
+
+    
 
     
   },
@@ -2067,14 +2070,6 @@ export default {
           this.isAutoMappingActivate = res.data.find(i => {
             return i.name == "setting_isAutoMappingActivate"
           })
-          
-
-          console.log('this.dangerousOnFailedItem ~~~~~>>>> ', this.dangerousOnFailedItem);
-          console.log('this.autoMappingByTotalScore ~~~~~>>>> ', this.autoMappingByTotalScore);
-          console.log('this.isAutoMappingActivate ~~~~~>>>> ', this.isAutoMappingActivate);
-
-          console.log('this.scorecount ~~~~~>>>> ', this.scorecount);
-          console.log('this.resultList ~~~~~>>>> ', this.resultList);
 
           this.scoreMiddleLow = this.autoMappingByTotalScore.extra.find(i => i.key === "mappingScore_bottom").value
           this.scoreMiddleHeight = this.autoMappingByTotalScore.extra.find(i => i.key === "mappingScore_top").value
