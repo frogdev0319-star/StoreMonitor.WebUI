@@ -438,14 +438,6 @@ export default {
     tableData(val){
       console.log("tableData changed");
       this.closeAllExpand();
-    },
-    expandCompProperties:{
-      immediate: true, 
-      deep: true,
-      handler (val,old ) {
-        console.log(">>>>expandCompProperties val:",val);
-        console.log(">>>>expandCompProperties old:",old);
-      }
     }
   },
   created() {},

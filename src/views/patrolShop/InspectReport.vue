@@ -804,7 +804,7 @@ export default {
         this.$t('remotePatrol.patrolResult'),
         this.$t('remotePatrol.inspectTotalScore'),//報告總分inspectSummary
         this.$t('remotePatrol.inspectSummary'), //巡檢總評
-        this.$t('remotePatrol.submitter'), //送出人
+        this.$t('eventView.submitter'), //送出人
         this.$t('remotePatrol.exportAllDetail'),// 詳情
         this.$t('audit.inceptionRpt.attachment'),
         this.$t('titleView.description'),
@@ -818,8 +818,8 @@ export default {
         const that = this;
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
-          const filterVal = ['storename', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 'totlascore', 'detail', 'attachment','comment',
-            'reportts'];
+          const filterVal = ['province','city','storename','code', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 
+          'totlascore','status','submitter', 'detail', 'attachment','comment','singinmap','signints','reportts'];
           const curData = res.data;
           const tagName = this.report.tagName;
           const data = that.formatJson(filterVal, curData);
