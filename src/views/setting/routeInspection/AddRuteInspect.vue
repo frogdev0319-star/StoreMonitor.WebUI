@@ -369,7 +369,7 @@
                     <span class="check_text">圖片或影片  </span>
                   </el-checkbox>
                  
-                  <span v-if="memo_configTips" class="memo_rules"> 必填時，請勾選文字或影片</span>
+                  <span v-if="memo_configTips" class="memo_rules"> 「必填」或「僅不合格必填」時，請勾選文字或影片</span>
 
                 </div>
               </el-form-item>
