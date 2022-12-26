@@ -251,8 +251,8 @@
                 :placeholder="$t('insSettingView.enterScore')"
                 @input="napeScoreOptionsChange"
               />
-              <span v-if="ScoreOptionsTips0" class="rules">{{ $t('insSettingView.excelScoreItemEmpty') }}aaa1</span>
-              <span v-if="ScoreOptionsTips1" class="rules">{{ $t('insSettingView.setScoreItemRange') }}aaa2</span>
+              <span v-if="ScoreOptionsTips0" class="rules">{{ $t('insSettingView.excelScoreItemEmpty') }}</span>
+              <span v-if="ScoreOptionsTips1" class="rules">{{ $t('insSettingView.setScoreItemRange') }}</span>
             </el-form-item>
 
             <!-- 2 -->
@@ -268,8 +268,8 @@
                     disabled
                     :placeholder="$t('insSettingView.enterScore')"
                     @input="napeTotalScoreChange"/>
-                  <span v-if="ItemTotalScoreTip0" class="rules">{{ $t('insSettingView.setFullScoreEmpty') }} bbb2</span>
-                  <span v-if="ItemTotalScoreTip1" class="rules">{{ $t('insSettingView.setFullScoreRange') }}bbb2</span>
+                  <span v-if="ItemTotalScoreTip0" class="rules">{{ $t('insSettingView.setFullScoreEmpty') }} </span>
+                  <span v-if="ItemTotalScoreTip1" class="rules">{{ $t('insSettingView.setFullScoreRange') }}</span>
                 </el-form-item>
               </el-col>
               <el-col :span="12" :offset="2">
@@ -331,7 +331,7 @@
             <div class="score-content" style="margin-bottom: 10px; " v-if="memo_is_advanced == 'true'"> 
               <el-form-item >
                 <div class="score_item">
-                  <span class="sign">*</span>
+                  <!-- <span class="sign">*</span> -->
                   <span class="sub_label">備註標籤</span>
                   <span class="item_des">多項請以"/"隔開</span>
                 </div>
@@ -342,10 +342,9 @@
                   placeholder="請輸入備註標籤"
                   @input="memoOptionsChange" 
                 />
-                <span v-if="memo_optionsTips0" class="memo_rules">備註標籤不可為空</span>
 
                 <div class="advance_memo_required_type">
-                  <el-radio-group class="attribute-group" v-model="memo_config.memo_required_type">
+                  <el-radio-group class="attribute-group" v-model="memo_config.memo_required_type" @change="getADvanceSettingStatus">
                     <div style="display: inline-flex">
                       <el-radio label="1" :disabled='(itemRequired == "0" && itemType == 1)' >必填</el-radio>
                       <el-radio label="0" :disabled='(itemRequired == "1" && itemType == 1)'>非必填</el-radio>
@@ -353,21 +352,25 @@
                     </div>
                   </el-radio-group>
                 </div>
-                <div class="advance_memo_check"  style="margin-left: 23px;" >
+                <div class="advance_memo_check"  style="margin-left: 23px;">
                   <el-checkbox 
-                    :disabled='(itemRequired == "0" && itemType == 1)'
+                    ref="xxdd"
+                    :disabled='((itemRequired == "0" && itemType == 1) || memo_config.memo_required_type == "0")'
                     class="storevue-checkbox-outlined" 
                     v-model="memo_config.memo_check_text"
                   >
                     <span class="check_text">文字</span>
                   </el-checkbox>
                   <el-checkbox 
-                    :disabled='(itemRequired == "0" && itemType == 1)'
+                    :disabled='((itemRequired == "0" && itemType == 1) || memo_config.memo_required_type == "0")'
                     class="storevue-checkbox-outlined" 
                     v-model="memo_config.memo_check_media"
                     >
-                    <span class="check_text">圖片或影片</span>
+                    <span class="check_text">圖片或影片  </span>
                   </el-checkbox>
+                 
+                  <span v-if="memo_configTips" class="memo_rules"> 「必填」或「僅不合格必填」時，請勾選文字或影片</span>
+
                 </div>
               </el-form-item>
 
@@ -696,6 +699,8 @@ export default {
 
       memo_optionsTips0: false,
 
+      memo_configTips : false
+
     };
   },
   computed: {
@@ -721,6 +726,24 @@ export default {
     sessionStorage.removeItem('itemSettingData');
   },
 
+  watch: {
+    memo_config:{
+      immediate: true, 
+      deep: true,
+      handler (val) {
+        console.log("currentPage:",val);
+
+        if(val.memo_required_type == "1" || val.memo_required_type == "2"){
+          if(val.memo_check_text !== false || val.memo_check_media !== false)  {
+            this.memo_configTips = false
+          } 
+        } else if(val.memo_required_type == "0"){
+          this.memo_configTips = false
+        }
+      }
+    }
+  },
+
   methods: {
     getSettingStatus(){
       console.log('this.itemRequired :>> ', this.itemRequired);
@@ -742,6 +765,19 @@ export default {
       if(this.memo_is_advanced == 'false' && this.memo_is_advanced == "false"){
         this.memo_options.length = 0
       }
+    },
+
+    getADvanceSettingStatus(){
+      if(this.memo_config.memo_required_type == "0") {
+        this.memo_config.memo_check_text = false
+        this.memo_config.memo_check_media = false
+      } 
+      else if(this.memo_config.memo_required_type == "1" || this.memo_config.memo_required_type == "2") {
+        this.memo_config.memo_check_text = true
+        this.memo_config.memo_check_media = false
+      }
+
+      
     },
 
     toItemRequired(){
@@ -1401,6 +1437,7 @@ export default {
       self.ScoreOptionsTips0 = false;
       self.ScoreOptionsTips1 = false;
       self.GroupScoreTip = false;
+      self.memo_configTips = false;
       this.itemType = 0;
     },
 
@@ -1432,12 +1469,12 @@ export default {
 
       console.log('this.memo_options.length :>> ', this.memo_options.length);
 
-      if(this.memo_options.length === 0 && this.memo_is_advanced == "true"){
-        console.log('XDXDXD :>> ');
-        this.$refs.memo_tag.focus()
-        this.memo_optionsTips0 = true
-        return
-      }
+      // if(this.memo_options.length === 0 && this.memo_is_advanced == "true"){
+      //   console.log('XDXDXD :>> ');
+      //   this.$refs.memo_tag.focus()
+      //   this.memo_optionsTips0 = true
+      //   return
+      // }
 
       const self = this;
       if (self.ItemName.trim().length === 0) {
@@ -1515,9 +1552,21 @@ export default {
           qualifiedScore = null;
         }
       }
+
+      if(this.memo_config.memo_required_type == "1" || this.memo_config.memo_required_type == "2"){
+        if(this.memo_config.memo_check_text == false && this.memo_config.memo_check_media == false)  {
+          this.memo_configTips = true
+        } else {
+          this.memo_configTips = false
+        }
+      } else if(this.memo_config.memo_required_type == "0"){
+        this.memo_configTips = false
+      }
+
+
       if(self.enterItemNameTip || self.PFScoreTip || self.ItemTotalScoreTip0 || self.ItemTotalScoreTip1 ||
           self.ItemMinScoreTip || self.OtherScoreTip || self.enterListNameRuletip || self.OtherScoreTipEmpty ||
-          self.descriptionRuletip || self.ScoreOptionsTips0 || self.ScoreOptionsTips1){
+          self.descriptionRuletip || self.ScoreOptionsTips0 || self.ScoreOptionsTips1 || self.memo_configTips){
         return false;
       }
 
@@ -1667,6 +1716,7 @@ export default {
         this.memo_config.memo_required_type = this.memo_config.memo_required_type.toString()
       }
       this.getSettingStatus()
+      this.getADvanceSettingStatus()
     },
 
     handleDelete(item) {
