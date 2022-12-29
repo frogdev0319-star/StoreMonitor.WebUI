@@ -762,6 +762,7 @@
 
                     <!-- text input -->
                     <div style="position: relative">
+                      <div class="alert">!</div>
                       <el-input
                         :autosize="{ minRows: 2, maxRows: 7 }"
                         v-model="item.inspectInput"
@@ -769,6 +770,7 @@
                         :disabled="item.disabled"
                         size="mini"
                         class="storevue-textarea"
+                        style="border: 1px solid #910"
                         type="textarea"
                         resize="none"
                         @input="(val) => itemDescriptionChanged({ val, item })"
@@ -784,13 +786,13 @@
                     </div>
 
                     <!-- notification -->
-                    <div class="advance_memo" v-if="(item.memo_config.memo_required_type == 1)"> 
+                    <div class="advance_memo" v-if="(item.memo_config !== null && item.memo_config.memo_required_type == 1)"> 
                       * 請加入 <span v-show="(item.memo_config.memo_check_text == true)">「文字」</span>
                               <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">、</span>
                               <span v-show="(item.memo_config.memo_check_media == true)">「圖片或影片」</span> 類型附件
                     </div>
 
-                    <div class="advance_memo" v-else-if="(item.memo_config.memo_required_type == 2)"> 
+                    <div class="advance_memo" v-else-if="(item.memo_config !== null && item.memo_config.memo_required_type == 2)"> 
                       * 不合格時需加入 <span v-show="(item.memo_config.memo_check_text == true)">「文字」</span>
                           <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">、</span>
                           <span v-show="(item.memo_config.memo_check_media == true)">「圖片或影片」</span> 類型附件
@@ -2980,18 +2982,32 @@ export default {
                 }
               }
 
-              if(_item.memo_config.memo_required_type === 1){
-                if(_item.inspectInput == "" && _item.memo_config.memo_check_text) memoCheckText = true
-                if(_item.sourceList.length == 0 && _item.memo_config.memo_check_media) memoCheckMedia = true
-              }
-              else if(_item.memo_config.memo_required_type === 2){
-                if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle && _item.inspectInput == "" && _item.memo_config.memo_check_text){
-                  memoCheckText = true
+
+              if(_item.memo_config !== null){
+                if(_item.memo_config.memo_required_type === 1){
+                  if(_item.inspectInput == "" && _item.memo_config.memo_check_text) {
+                    memoCheckText = true
+                    console.log('_index ::::::::>>', _index)
+                    }
+                  if(_item.sourceList.length == 0 && _item.memo_config.memo_check_media){ 
+                    memoCheckMedia = true
+                    console.log('_index ::::::::>>', _index)
+                    }
                 }
-                if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle &&_item.sourceList.length == 0 && _item.memo_config.memo_check_media){
-                  memoCheckMedia = true
+                else if(_item.memo_config.memo_required_type === 2){
+                  if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle && _item.inspectInput == "" && _item.memo_config.memo_check_text){
+                    memoCheckText = true
+                    console.log('_index ::::::::>>', _index)
+                  }
+                  if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle &&_item.sourceList.length == 0 && _item.memo_config.memo_check_media){
+                    memoCheckMedia = true
+                    console.log('_index ::::::::>>', _index)
+                  }
                 }
               }
+              
+
+
             });
           });
         });
