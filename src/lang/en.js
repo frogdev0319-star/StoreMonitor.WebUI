@@ -366,6 +366,10 @@ export default{
         "fluency":"SD",
         "fullScreenMode":"Full Screen Mode",
         "generateTime":"Generated Time:",
+        "signInTime":"Check In Time",
+        "patrolTime":"Inspection Time",
+        "signInDistance":"Check In Distance",
+        "aroundDistance":"around ",
         "getAccessTokenError":"Failed to get Access Token",
         "getBeseyeStreamError":"Failed to get beseye stream info!",
         "getscore":"Inspection score",
@@ -528,7 +532,12 @@ export default{
         "mapDistance1":"與",
         "mapDistance2":"距離約",
         "mapDistance3":"meters",
-        "seconds":"sec."
+        "hour":"hr(s)",
+        "seconds":"sec(s)",
+        "minute":"min(s)",
+        "reportSubmitting":"Report submitting...",
+        "storeCode":"Store Code",
+        "inspectSummary":"巡检总评"
     },
     "eventView":{
         "ClosedEvent":"Closed Events",

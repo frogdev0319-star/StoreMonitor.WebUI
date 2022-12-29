@@ -532,7 +532,9 @@ export default{
       "mapDistance1":"與",
       "mapDistance2":"距離約",
       "mapDistance3":"公尺",
+      "hour":"時",
       "seconds":"秒",
+      "minute":"分",
       "reportSubmitting":"報告送出中...",
       "storeCode":"門店代碼",
       "inspectSummary":"巡檢總評"

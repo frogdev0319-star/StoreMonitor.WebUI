@@ -316,7 +316,7 @@ export default {
     var minutes = Math.floor(diff / 1000 / 60);
     diff -= minutes * 1000 * 60;
     var seconds = Math.round(diff / 1000);
-    const resultTime = hours + i18n.t('scheduleView.hour') + minutes +  i18n.t('insSettingView.scores') + seconds+i18n.t('remotePatrol.seconds');
+    const resultTime = hours + i18n.t('remotePatrol.hour') + minutes +  i18n.t('remotePatrol.minute') + seconds+i18n.t('remotePatrol.seconds');
     return resultTime;
   },
 

@@ -532,6 +532,12 @@ export default{
       "mapDistance1":"与",
       "mapDistance2":"距离约",
       "mapDistance3":"公尺",
+      "hour":"时",
+      "seconds":"秒",
+      "minute":"分",
+      "reportSubmitting":"报告送出中...",
+      "storeCode":"门店代码",
+      "inspectSummary":"巡检总评"
   },
   "eventView":{
       "ClosedEvent":"已结案事件",
