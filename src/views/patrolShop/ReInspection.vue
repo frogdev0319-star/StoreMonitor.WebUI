@@ -22,6 +22,7 @@
             {{isFullScreenMode? $t('remotePatrol.defaulteMode'):$t('remotePatrol.fullScreenMode')}}
           </div>
         </div>
+
         <el-dialog
           v-if="showCutDialog"
           :title="$t('remotePatrol.edit')"
@@ -344,6 +345,7 @@
             <div class="padding-vertical-sm">{{noAllInspectObj.showInfo}}</div>
           </div>
         </dialog-pop>
+
         <dialog-pop
           v-if="requiredObj.dialogCosed"
           :title="requiredObj.title"
@@ -353,7 +355,7 @@
           @confirmHandler="requiredObj.dialogCosed = false"
           >
           <div class="dialog-slot">
-            <div class="padding-vertical-sm">{{requiredObj.showInfo}}</div>
+            <div class="padding-vertical-sm">{{requiredObj.showInfo}} </div>
           </div>
         </dialog-pop>
         <dialog-pop
@@ -380,6 +382,49 @@
             {{leaveObj.showInfo}}
           </div>
         </dialog-pop>
+
+        <!-- 備註標籤 memoConfigTextObj-->
+        <dialog-pop
+          v-if="memoConfigTextObj.dialogCosed"
+          :title="memoConfigTextObj.title"
+          :isWarning="memoConfigTextObj.isWarning"
+          :visible="memoConfigTextObj.dialogCosed"
+          @cancelHandler="memoConfigTextObj.dialogCosed = false"
+          @confirmHandler="memoConfigTextObj.dialogCosed = false"
+          >
+          <div class="dialog-slot">
+            <div class="padding-vertical-sm">{{memoConfigTextObj.showInfo}} </div>
+          </div>
+        </dialog-pop>
+
+        <dialog-pop
+          v-if="memoConfigMediaObj.dialogCosed"
+          :title="memoConfigMediaObj.title"
+          :isWarning="memoConfigMediaObj.isWarning"
+          :visible="memoConfigMediaObj.dialogCosed"
+          @cancelHandler="memoConfigMediaObj.dialogCosed = false"
+          @confirmHandler="memoConfigMediaObj.dialogCosed = false"
+          >
+          <div class="dialog-slot">
+            <div class="padding-vertical-sm">{{memoConfigMediaObj.showInfo}} </div>
+          </div>
+        </dialog-pop>
+
+        <dialog-pop
+          v-if="memoConfigTextAndMediaObj.dialogCosed"
+          :title="memoConfigTextAndMediaObj.title"
+          :isWarning="memoConfigTextAndMediaObj.isWarning"
+          :visible="memoConfigTextAndMediaObj.dialogCosed"
+          @cancelHandler="memoConfigTextAndMediaObj.dialogCosed = false"
+          @confirmHandler="memoConfigTextAndMediaObj.dialogCosed = false"
+          >
+          <div class="dialog-slot">
+            <div class="padding-vertical-sm">{{memoConfigTextAndMediaObj.showInfo}} </div>
+          </div>
+        </dialog-pop>
+
+
+
         <div v-if="showGuide && inspectList.length > 0" class="guide-content">
           
           <div class="guide-rside">
@@ -524,7 +569,9 @@
           </div>
         </div>
         <hr v-if="!isFullScreenMode" class="hr-horizontal" :style="isFullScreenMode?{'margin-bottom': '20px'}:{}">
+
         <div v-if="sheetName.length!=0" :class="{'flex': isFullScreenMode, fullWidth: isFullScreenMode}">
+  
           <div v-if="isFullScreenMode" style="width: 200px; padding-right: 10px">
             <el-input
               :placeholder="$t('insSettingView.enterInspectFilter')"
@@ -588,7 +635,10 @@
               </div>
             </div>
           </div>
+
+          <!-- right side -->
           <div class="fullWidth rside">
+            
             <div v-if="!showFeedBack" class="padding" :class="{flex:isFullScreenMode && $store.getters.collapsed}" style="background-color: rgb(237, 240, 242); height: 60vh; overflow: auto;flex-wrap: wrap; justify-content: space-between">
               <div
                 v-for="(item_) in inspectList"
@@ -603,6 +653,8 @@
                   <div class="flex fullWidth">
                     <div class="font-15" style="text-align: left; width: calc(20/1920*100vw)" :style="item.checked?{'color':'#006ab7'}:{}">{{(index+1) + '.'}}</div>
                     <div class="flex padding-bottom-sm spacer" :style="item.checked?{'background-color':'#f2f9fe'}:{}">
+                      
+                      <!-- subject -->
                       <div
                         :class="!item.manualIgnore?'noraml-title':'ignore-title'"
                         :style="item.checked?{'color':'#006ab7'}:{'color': '#484848'}"
@@ -612,6 +664,8 @@
                         <span style="color: #c60957" v-if="item.required">*</span>
                         {{ item.subject }}
                       </div>
+
+                      <!-- dropdown -->
                       <div v-if="item.itemType === 0">
                         <el-dropdown v-if="item.groupType !== 1" :class="!item.manualIgnore?'noraml-title':'ignore-title'"
                                       trigger="click" class="item-score" size="small" :disabled="(item.manualIgnore || item.notEdit)">
@@ -646,6 +700,8 @@
                       </div>
                     </div>
                   </div>
+
+                  <!-- description -->
                   <div style="margin-left: calc(20/1920*100vw)" :style="item.checked?{'background-color':'#f2f9fe'}:{}">
                     <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" style=" word-break: break-all" class="details-content margin-bottom-sm">
                       {{ item.description }}
@@ -654,7 +710,10 @@
                       {{ $t('remotePatrol.failedRecord') + item.lastUnqualifiedNumber }}
                     </div>
                   </div>
+
+                  <!-- comment -->
                   <div style="padding-left: calc(20/1920*100vw)">
+                    <!-- img -->
                     <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
                       <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                         <div v-if="_item.mediaType == 3" class="flex-center">
@@ -683,6 +742,7 @@
                         </div>
                       </div>
                     </div>
+                    
                     <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="img-source-content">
                       <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                         <div v-if="_item.mediaType==2" class="img-content">
@@ -699,6 +759,8 @@
                         </div>
                       </div>
                     </div>
+
+                    <!-- text input -->
                     <div style="position: relative">
                       <el-input
                         :autosize="{ minRows: 2, maxRows: 7 }"
@@ -720,6 +782,20 @@
                         {{$t('remotePatrol.confirm')}}
                       </button>
                     </div>
+
+                    <!-- notification -->
+                    <div class="advance_memo" v-if="(item.memo_config.memo_required_type == 1)"> 
+                      * 請加入 <span v-show="(item.memo_config.memo_check_text == true)">「文字」</span>
+                              <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">、</span>
+                              <span v-show="(item.memo_config.memo_check_media == true)">「圖片或影片」</span> 類型附件
+                    </div>
+
+                    <div class="advance_memo" v-else-if="(item.memo_config.memo_required_type == 2)"> 
+                      * 不合格時需加入 <span v-show="(item.memo_config.memo_check_text == true)">「文字」</span>
+                          <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">、</span>
+                          <span v-show="(item.memo_config.memo_check_media == true)">「圖片或影片」</span> 類型附件
+                    </div>
+                    
                     <span v-if="item.RuleCountTip" class="rules">{{
                       $t("remotePatrol.commentCountRuleTip")
                     }}</span>
@@ -731,6 +807,7 @@
               </div>
               
             </div>
+            
             <div v-if="showFeedBack" style="background-color: rgb(237, 240, 242); height: 60vh; overflow: auto;">
               <div v-if="showFeedBackInfo&&showFeedBack" class="item-content paper" style="margin: 20px; height: calc(100% - 40px); position: relative">
                 <div id="feedback-content">
@@ -793,7 +870,7 @@
                   </div>
                 </div>
                 <div class="flex fullWidth" style="justify-content: right"><img :src="plusSrc" alt="plusSrc" class="plus-icon" @click="addFeedBack"></div>
-               
+      
               </div>
             </div>
           </div>
@@ -997,6 +1074,8 @@ export default {
         isWarning: true,
         dialogCosed: false
       },
+
+      // requiredObj
       requiredObj: {
         title: this.$t('remotePatrol.prompt'),
         showInfo: this.$t('remotePatrol.requiredValid'),
@@ -1015,6 +1094,28 @@ export default {
         isWarning: false,
         dialogCosed: false
       },
+
+      // 備註標籤
+      memoConfigTextObj: {
+        title: this.$t('remotePatrol.prompt'),
+        showInfo: '尚有必填項目未完成，備註標籤請加入「文字」類型附件',
+        isWarning: true,
+        dialogCosed: false
+      },
+      memoConfigMediaObj: {
+        title: this.$t('remotePatrol.prompt'),
+        showInfo: '尚有必填項目未完成，備註標籤請加入「圖片或影像」類型附件',
+        isWarning: true,
+        dialogCosed: false
+      },
+      memoConfigTextAndMediaObj: {
+        title: this.$t('remotePatrol.prompt'),
+        showInfo: '尚有必填項目未完成，備註標籤請加入「文字」或「圖片或影像」類型附件',
+        isWarning: true,
+        dialogCosed: false
+      },
+
+
       recorder: null,
       videoCanvasSrc: '',
       isRecordingStarted: false,
@@ -1080,6 +1181,8 @@ export default {
       auditCancelable:false,
       reportStatus:-1,
       enableMimicMode:false,
+
+      showIgnoreItem: false
     };
   },
   computed: {
@@ -1101,7 +1204,6 @@ export default {
     }
   },
   watch: {
-   
     accountChanged(val, oldVal) {
       const self = this;
       if (val !== 0) {
@@ -1168,7 +1270,7 @@ export default {
         // from.meta.keepAlive=false;
         this.editCount = 0;
         this.$store.dispatch('setEditCount', this.editCount);
-         self.$store.dispatch('setEditReport', false);
+        self.$store.dispatch('setEditReport', false);
         self.$store.dispatch('setPatrolHistory', null);
         self.$store.dispatch('setPatrolComment', null);
         self.$store.dispatch('setStoreList', []);
@@ -1803,10 +1905,8 @@ export default {
     
     changeInspect(val) {
       const self = this;
-      console.log('val :::::::::>> ', val);
+      
       sessionStorage.setItem('inspectId', JSON.stringify(val))
-
-
       // console.log(self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 0, self.$store.getters.PatrolHistory != null)
       if (self.$store.getters.editCount > 0) {
         self.changeInspectObj.dialogCosed = true;
@@ -1820,6 +1920,9 @@ export default {
     },
 
     changeInspectList(val) {
+      console.log('changeInspectList :::::::::>> ');
+      console.log('val :::::::::>> ', val);
+
       const self = this;
       if (!self.showGuide && self.$refs.vendorVideo) {
         self.$refs.vendorVideo.editCount = 0;
@@ -1837,7 +1940,7 @@ export default {
       self.isShowWarn = false;
       self.notShowAlert = false;
       this.showIgnoreItem = false;
-       this.$emit("listenerChild", false); 
+      this.$emit("listenerChild", false); 
       self.eventList = [];
       // self.showChannelBtns = [];
       self.curSheetIndex = 0;
@@ -1860,6 +1963,9 @@ export default {
         if (res.errCode == 0) {
           const data = res.data.groups;
           const inspectSettings = {};
+
+          console.log('res.data :::::::::::::::::>> ', res.data);
+
           res.data.inspectSettings.forEach(item => {
             switch (item.name) {
               case 'includedInTotalScoreWithType1':
@@ -1977,6 +2083,12 @@ export default {
                 {val: -1, scoreTitle: btnNameArr[1], isClick: false}
                 ];
               itemObj.itemType = _item.type;
+              
+              // 處理備註標籤
+              itemObj.memo_is_advanced = _item.memo_is_advanced
+              itemObj.memo_options = _item.memo_options
+              itemObj.memo_config = _item.memo_config
+
               tempItems.push(itemObj);
             });
             obj.items = tempItems;
@@ -1997,6 +2109,9 @@ export default {
             })
             handleData.push(obj);
           })
+
+          console.log('handleData :::::::::::::::::>> ', handleData);
+          
           for (let i = 0; i < handleData.length; i++) {
             let count = 0, label = '';
             if (handleData[i].subcatergy.length === 0){
@@ -2833,25 +2948,48 @@ export default {
       this.$router.push({ name: 'confirmSum', params: params });
     },
 
+
+
     async confirmSummary() {
       const self = this;
       const temp = [];
       let count = 0;
       let dealCount = 0;
       let requiredValid = false;
+      let memoCheckText = false;
+      let memoCheckMedia = false;
+      let memoCheckMediaAndText = false;
+
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
+
+      console.log('self.sheetName ::::::::>> ', self.sheetName);
+      console.log('sheetName ::::::::>> ', sheetName);
+
       sheetName.forEach(s_item => {
           s_item.inspectList.forEach(item => {
             
             item.items.forEach((_item, _index) => {
               if (!_item.manualIgnore && _item.required) {
-              console.log(_item)
+              console.log("_item ::::::::>>", _item)
                 if (
                   (_item.itemType === 0 && _item.itemgetScore === '--') || 
                   (_item.itemType === 1 && _item.sourceList.length === 0)
                 ) {
                   requiredValid = true
+                }
+              }
+
+              if(_item.memo_config.memo_required_type === 1){
+                if(_item.inspectInput == "" && _item.memo_config.memo_check_text) memoCheckText = true
+                if(_item.sourceList.length == 0 && _item.memo_config.memo_check_media) memoCheckMedia = true
+              }
+              else if(_item.memo_config.memo_required_type === 2){
+                if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle && _item.inspectInput == "" && _item.memo_config.memo_check_text){
+                  memoCheckText = true
+                }
+                if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle &&_item.sourceList.length == 0 && _item.memo_config.memo_check_media){
+                  memoCheckMedia = true
                 }
               }
             });
@@ -2882,10 +3020,24 @@ export default {
           count = count + s_item.count;
         });
       }
+
       if (requiredValid) {
         self.requiredObj.dialogCosed = true;
         return false;
       }
+
+      // 備註標籤文字
+      if (memoCheckText) {
+        self.memoConfigTextObj.dialogCosed = true;
+        return false;
+      }
+      // 備註標籤圖片或影像
+      if (memoCheckMedia) {
+        self.memoConfigMediaObj.dialogCosed = true;
+        return false;
+      }
+      
+
       if(this.allRemarkItemsFlag && dealCount === 0){
         util.notify(this.$t('remotePatrol.invalidInspection'), 'warning', 3000);
         return false;
@@ -2896,6 +3048,9 @@ export default {
       }
       this.resolveConfoirmSummaryData();
     },
+
+
+
 
     spreadContent() {
       const self = this;
@@ -3646,6 +3801,15 @@ export default {
   }
 };
 </script>
+
+<style lang="sass" scoped>
+  .advance_memo
+    font-size: 12px
+    color: #f31d65
+    text-align: left
+    margin-top: 5px
+</style>
+
 <style lang="scss" scoped>
   $red:#f31d65;
   $black:#182752;
