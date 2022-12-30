@@ -762,7 +762,6 @@
 
                     <!-- text input -->
                     <div style="position: relative">
-                      <div class="alert">!</div>
                       <el-input
                         :autosize="{ minRows: 2, maxRows: 7 }"
                         v-model="item.inspectInput"
@@ -770,7 +769,6 @@
                         :disabled="item.disabled"
                         size="mini"
                         class="storevue-textarea"
-                        style="border: 1px solid #910"
                         type="textarea"
                         resize="none"
                         @input="(val) => itemDescriptionChanged({ val, item })"
