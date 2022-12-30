@@ -463,6 +463,7 @@ export default {
       isEdit:false,
       editDesRuletip:[false,false,false,false,false],
       attFileCount:0,
+      videoAttFileCount:0,
       addAttIcon: require('../../../../static/img/icon_attachment.svg'),
       attachFileList:[],
       bucketVideo: '',
@@ -480,6 +481,7 @@ export default {
     },
     attachFileList(){
       this.attFileCount = this.attachFileList.length;
+      this.videoAttFileCount = this.attachFileList.filter(item=>item.type==1).length;
     }
   },
 
@@ -1135,10 +1137,10 @@ export default {
         util.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
         return;
       }
-      /*if(files[0].type.includes("video") && files[0].size > maxSize){
-        util.notify(self.$t('audit.inceptionRpt.maxFileSizeAlert'), 'warning', 3000);
+      if(files[0].type.includes("video") && self.videoAttFileCount==2){
+        util.notify(self.$t('eventView.maximumAttVedio'), 'warning', 3000);
         return;
-      }*/
+      }
       if(files[0].type.includes("image")){
         var objImg={
           fileName:`${self.bucketImage}/inspect_${util.getCurTimeStr()}_${this.event.storeId}_${files[0].name}`,

@@ -587,7 +587,8 @@ export default{
       "expiredate":"Waktu menutup",
       "closeSelectedEvent":"Konfirmasi tutup kejadian yang dipilih?",
       "confirmBachClose":"Konfirmasi tutup banyak kejadian sekaligus",
-      "expiretag":"Kedaluwarsa"
+      "expiretag":"Kedaluwarsa",
+      "maximumAttVedio":"Only can uploade 2 vedio attachment"
   },
   "insSettingView":{
       "Addscoreitems":"Item nilai tambahan",

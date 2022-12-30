@@ -587,7 +587,8 @@ export default{
       "expiredate":"終了時間",
       "closeSelectedEvent":"選択したイベントの終了を確認しますか？",
       "confirmBachClose":"イベントの一括終了を確認する",
-      "expiretag":"期限切れ"
+      "expiretag":"期限切れ",
+      "maximumAttVedio":"Only can uploade 2 vedio attachment"
   },
   "insSettingView":{
       "Addscoreitems":"追加のスコアリングアイテム",

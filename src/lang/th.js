@@ -587,7 +587,8 @@ export default{
       "expiredate":"เวลาปิด",
       "closeSelectedEvent":"ยืนยันปิดเหตุการณ์ที่เลือกหรือไม่",
       "confirmBachClose":"ยืนยันปิดเหตุการณ์เป็นกลุ่ม",
-      "expiretag":"หมดอายุแล้ว"
+      "expiretag":"หมดอายุแล้ว",
+      "maximumAttVedio":"Only can uploade 2 vedio attachment"
   },
   "insSettingView":{
       "Addscoreitems":"รายการการให้คะแนนเพิ่มเติม",

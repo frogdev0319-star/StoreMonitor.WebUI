@@ -588,7 +588,8 @@ export default{
       "expiredate":" 結案時間 ",
       "closeSelectedEvent":"確認將選擇事件結案?",
       "confirmBachClose":"確認批次結案",
-      "expiretag":"逾期"
+      "expiretag":"逾期",
+      "maximumAttVedio":"僅能上傳2個影片附件檔案"
   },
   "insSettingView":{
       "Addscoreitems":"附加評分項目",

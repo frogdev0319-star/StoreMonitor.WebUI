@@ -587,7 +587,8 @@ export default{
       "expiredate":"마감 시간",
       "closeSelectedEvent":"선택한 이벤트 마감을 확인하시겠습니까?",
       "confirmBachClose":"이벤트 일괄 마감 확인",
-      "expiretag":"만료됨"
+      "expiretag":"만료됨",
+      "maximumAttVedio":"Only can uploade 2 vedio attachment"
   },
   "insSettingView":{
       "Addscoreitems":"추가한 득점 항목",

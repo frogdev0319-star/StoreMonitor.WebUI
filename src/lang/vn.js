@@ -587,7 +587,8 @@ export default{
       "expiredate":"Thời gian đóng",
       "closeSelectedEvent":"Xác nhận đóng sự kiện đã chọn?",
       "confirmBachClose":"Xác nhận đóng hàng loạt sự kiện",
-      "expiretag":"Đã hết hạn"
+      "expiretag":"Đã hết hạn",
+      "maximumAttVedio":"Only can uploade 2 vedio attachment"
   },
   "insSettingView":{
       "Addscoreitems":"Các mục chấm điểm bổ sung",

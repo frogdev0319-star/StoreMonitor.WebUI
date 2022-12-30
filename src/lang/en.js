@@ -588,7 +588,8 @@ export default{
         "expiredate":"Closing time",
         "closeSelectedEvent":"Confirm close choosed event?",
         "confirmBachClose":"Confirm bach close events",
-        "expiretag":"Expired"
+        "expiretag":"Expired",
+        "maximumAttVedio":"Only can uploade 2 vedio attachment"
     },
     "insSettingView":{
         "Addscoreitems":"Additional scoring items",
