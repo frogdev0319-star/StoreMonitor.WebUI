@@ -1926,8 +1926,10 @@ $h1:#292e36;
             padding-left: 16px;
             color: $black;
             width: calc(520/1440*100vw);
-            @include point(height,535);
+            @include point(height,565);
             @include point(padding-top,20);
+            overflow-x: hidden;
+            overflow-y: auto;
             .dealInfo-label{
                 font-weight: bold;
                 margin-bottom: 25px;
