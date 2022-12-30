@@ -52,13 +52,13 @@
         <div class="pdf_font_24">
             <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.submitter') }}</span>
             <span :class="isexportPDF ? 'pdf-info-value' : 'info-value'">{{ report.submitterName }}</span>
-            <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.generateTime')+'：' }}</span>
+            <span class="info-label">{{ $t('remotePatrol.generateTime')+'：' }}</span>
             <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
-            <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.signInTime')+'：' }}</span>
+            <span v-if="hasSignRecord" class="info-label">{{ $t('remotePatrol.signInTime')+'：' }}</span>
             <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ signInTime }}</span>
-            <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.patrolTime')+'：' }}</span>
+            <span v-if="hasSignRecord" class="info-label">{{ $t('remotePatrol.patrolTime')+'：' }}</span>
             <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ inceptionExecutTime }}</span>
-            <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.signInDistance')+'：' }}</span>
+            <span v-if="hasSignRecord" class="info-label">{{ $t('remotePatrol.signInDistance')+'：' }}</span>
             <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{$t('remotePatrol.aroundDistance')+signInDistance}}</span>
         </div>
         <div class="weather-content">
@@ -1029,8 +1029,21 @@ export default {
     },
 
     async getReportInfo(res) {
+      const self = this;
       if (res.errCode === 0 && res.data.length > 0) {
-        const data = res.data[0].info;  
+        const data = res.data[0].info; 
+        
+        switch (data.mode) {
+          case 0:
+            self.report.inspectType = self.$t('overview.remotePatrol');
+            break;
+          case 1:
+            console.log("data.mode:",data.mode); 
+            self.isInsiteInspect = true;
+            self.report.inspectType = self.$t('overview.onsitePatrol');
+            self.showEditBtn = false;
+            break;
+        }
         this.report.storeName = data.storeName;
         this.report.status = data.status;
         this.report.dateStr = util.getDateStr2(data.ts);
@@ -1049,10 +1062,8 @@ export default {
         
         this.auditState = data.auditState;
         this.hasSignRecord = res.data[0].inspectSettings.filter(settingItem => settingItem.name === 'checkin')[0].value;
-        console.log(">>>>hasSignRecord:",this.hasSignRecord);
         if(data.checkinRecord && this.hasSignRecord){
           this.signInTime = util.getDateStr2(data.checkinRecord.ts);
-          console.log(">>>>signInTime:",this.signInTime);
           this.inceptionExecutTime = util.getDiffTimeStr(data.ts,data.checkinRecord.ts);
           this.signMapUrl = data.checkinRecord.report_sign_map_url;
           this.signInDistance = data.checkinRecord.execute_sign_distance+this.$i18n.t('remotePatrol.mapDistance3');
