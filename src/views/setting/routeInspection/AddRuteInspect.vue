@@ -368,8 +368,7 @@
                     >
                     <span class="check_text">圖片或影片  </span>
                   </el-checkbox>
-                 
-                  <span v-if="memo_configTips" class="memo_rules"> 「必填」或「僅不合格必填」時，請勾選文字或影片</span>
+                  <span v-if="memo_configTips" class="memo_rules"> 至少選擇一項備註類別（文字、圖片或影片）</span>
 
                 </div>
               </el-form-item>
@@ -688,7 +687,7 @@ export default {
       itemGroupScore:0,
       GroupScoreTip:false,
 
-      memo_is_advanced: "true",
+      memo_is_advanced: "false",
       memo_option: "",
       memo_options: [],
       memo_config: {
@@ -752,18 +751,27 @@ export default {
       // rule 1
       if(this.itemRequired == "0" && this.itemType == 1 && this.memo_is_advanced == "true"){
         this.memo_config.memo_required_type = "0"
+        this.memo_config.memo_check_text = false
+        this.memo_config.memo_check_media = false
       }
       // rule 2
       else if(this.itemType == 0 && this.memo_is_advanced == "true"){
         this.memo_config.memo_required_type = "0"
+        this.memo_config.memo_check_text = false
+        this.memo_config.memo_check_media = false
       }
       // rule 3
       else if(this.itemRequired == "1" && this.itemType == 1 && this.memo_is_advanced == "true"){
         this.memo_config.memo_required_type = "1"
+        this.memo_config.memo_check_text = true
+        this.memo_config.memo_check_media = false
       }
       // 關閉不傳入 api
-      if(this.memo_is_advanced == 'false' && this.memo_is_advanced == "false"){
+      if(this.memo_is_advanced == 'false'){
         this.memo_options.length = 0
+        this.memo_config.memo_required_type = "0"
+        this.memo_config.memo_check_text = false
+        this.memo_config.memo_check_media = false
       }
     },
 
@@ -1366,6 +1374,7 @@ export default {
 
       self.memo_option = ''
       self.memo_options = []
+      self.memo_is_advanced = "false"
       
     },
 
@@ -1715,8 +1724,8 @@ export default {
         this.memo_config = item.memo_config
         this.memo_config.memo_required_type = this.memo_config.memo_required_type.toString()
       }
-      this.getSettingStatus()
-      this.getADvanceSettingStatus()
+      // this.getSettingStatus()
+      // this.getADvanceSettingStatus()
     },
 
     handleDelete(item) {
