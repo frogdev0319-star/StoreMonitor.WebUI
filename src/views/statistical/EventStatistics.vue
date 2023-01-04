@@ -1942,6 +1942,8 @@ export default {
     },
     async doGetInspecEvenItems(){
       const self = this;
+      self.showInvolveTableArea = false;
+      self.eventInvolveTable.table_data = [];
       //console.log("compareIds2",self.compareIds2);
       if(self.compareIds2.length>0 ){
         let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,inspectTagId:self.inspectId,storeIds:self.compareIds2 };
