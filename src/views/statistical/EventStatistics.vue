@@ -1744,7 +1744,8 @@ export default {
       this.doFilterEventListBySelBar();
     },
     barchartClick(bar){
-      if(this.barActiveinnerId == bar.data.innerId){
+      //console.log("barchartClick:",bar);
+      if(this.barActiveName == bar.data.name){
         this.barActiveinnerId = '-1';
         this.barActiveName = '';
         this.doFilterEventListBySelBar();
@@ -1798,7 +1799,7 @@ export default {
         });
         const filterVal = ['province', 'city', 'groupName', 'storeGroup', 'storeType','code', 'numOfTotal', 'numOfUnprocessed', 'numOfInprocess',
           'numOfProcessed', 'numOfRejected','completedRate'];
-        const curData = that.allEventTableData;
+        const curData = that.eventTableData;
         const data = that.formatJson(filterVal, curData);
         const fileName = this.compareType+'_Inspection event' + '_' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
