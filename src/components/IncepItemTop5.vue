@@ -217,6 +217,7 @@ export default {
             params.activeName = '4';
             params.beginTs=this.beginTs;
             params.endTs=this.endTs;
+            params.inspectTagId = this.inspectTagIds;
             params.searchFrom='EventStatistics';
             const searchConditon = {
                 path: 'eventManage',
