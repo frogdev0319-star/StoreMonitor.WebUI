@@ -299,73 +299,79 @@
           </div>
         </div>
       </div>
+      
       <div class="submit-content">
-        <span style="display:block;"><span style="color:red;">* </span>{{ $t('eventView.addDetails') }}</span>
-        <div class="description" v-for="(des, idx) in addDescriptionList" :key="idx">
-            <img :src="delDesImg" style="widht:16px;height:16px;align-self:start;margin-top:10px;" :key="'img_'+idx" @click="onDeleteDescription(idx)" />
-            <div class="edit-description">
-              <div class="edit-input">
-                
-                <el-input 
-                  class="edit-event-input"
-                  v-model="addDescriptionList[idx]"
-                  type="textarea"
-                  resize="none"
-                  :readonly="!isEdit"
-                  @input="(val)=>editDesChang(val,idx)"
-                />
-                <span v-if="editDesRuletip[idx]" class="rules">{{ $t('eventView.RateRuletip') }}</span>
+        <el-scrollbar class="submit-content-scroll">
+        <div>
+          <span style="display:block;"><span style="color:red;">* </span>{{ $t('eventView.addDetails') }}</span>
+          <div class="description" v-for="(des, idx) in addDescriptionList" :key="idx">
+              <img :src="delDesImg" style="widht:16px;height:16px;align-self:start;margin-top:10px;" :key="'img_'+idx" @click="onDeleteDescription(idx)" />
+              <div class="edit-description">
+                <div class="edit-input">
+                  
+                  <el-input 
+                    class="edit-event-input"
+                    v-model="addDescriptionList[idx]"
+                    type="textarea"
+                    resize="none"
+                    :readonly="!isEdit"
+                    @input="(val)=>editDesChang(val,idx)"
+                  />
+                  <span v-if="editDesRuletip[idx]" class="rules">{{ $t('eventView.RateRuletip') }}</span>
+                </div>
+                <div class="edit-icon-div" >
+                  <img :src="editDesImg" style="width:20px;height:20px;align-self:center;cursor:pointer;" @click="onEditDescription"/>
+                </div>
               </div>
-              <div class="edit-icon-div" >
-                <img :src="editDesImg" style="width:20px;height:20px;align-self:center;cursor:pointer;" @click="onEditDescription"/>
-              </div>
+          </div>
+          <div v-if="curDeslistNum<5" class="des-input"> 
+            <div style="min-height:36px;height:auto;"> 
+            <el-input
+              :autosize="{ minRows: 2}"
+              v-model="eventDes"
+              :placeholder="$t('eventView.describe')"
+              size="mini"
+              type="textarea"
+              resize="none"
+              class="input-area"
+              :disabled="curStatus==2 || curStatus==4 || curDeslistNum>=5"
+              @input="(val)=>ivsIdChange(val)"
+              @blur="notShowInputRuleTips"/>
+              <span v-if="ivsIdRuletip" class="rules">{{ $t('eventView.RateRuletip') }}</span>
             </div>
-        </div>
-        <div v-if="curDeslistNum<5" class="des-input"> 
-          <div style="min-height:36px;height:auto;"> 
-          <el-input
-            :autosize="{ minRows: 2}"
-            v-model="eventDes"
-            :placeholder="$t('eventView.describe')"
-            size="mini"
-            type="textarea"
-            resize="none"
-            class="input-area"
-            :disabled="curStatus==2 || curStatus==4 || curDeslistNum>=5"
-            @input="(val)=>ivsIdChange(val)"
-            @blur="notShowInputRuleTips"/>
-            <span v-if="ivsIdRuletip" class="rules">{{ $t('eventView.RateRuletip') }}</span>
+            <div  class="btn-content">
+              <div class="btn-des-confirm" @click="comfirmAddDes">{{ $t('remotePatrol.confirm') }}</div>
+            </div>
           </div>
-          <div  class="btn-content">
-            <div class="btn-des-confirm" @click="comfirmAddDes">{{ $t('remotePatrol.confirm') }}</div>
-          </div>
-        </div>
-        <div style="margin-top:24px;margin-left:16px;margin-bottom:15px">{{ $t('eventView.addAttchement') }}</div>
-        <div class="attach-area" >
-          <div v-for="(imgItem,index) in attachFileList" :key="'img'+index" class="source-details" >
-            <!--video-->
-              <div v-if="imgItem.type===1" class="img-content">
+          <div style="margin-top:24px;margin-left:16px;margin-bottom:15px">{{ $t('eventView.addAttchement') }}</div>
+          <div class="attach-area">
+            <div v-for="(imgItem,index) in attachFileList" :key="'img'+index" class="source-details" >
+              <!--video-->
+                <div v-if="imgItem.type===1" class="img-content">
+                  <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
+                  <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon" @click="playAttachVideo(imgItem,index)">
+                  <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
+                </div>
+              <div v-else-if="imgItem.type===2" class="img-content">
                 <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
-                <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon" @click="playAttachVideo(imgItem,index)">
-                <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
+                <el-image
+                  :src="imgItem.src"
+                  class="imgLittle"
+                  :preview-src-list="getAuditImgList(index)"/>
               </div>
-            <div v-else-if="imgItem.type===2" class="img-content">
-              <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
-              <el-image
-                :src="imgItem.src"
-                class="imgLittle"
-                :preview-src-list="getAuditImgList(index)"/>
             </div>
-          </div>
-          <div v-if="attFileCount<10" class="attach-add" @click="$refs.auditfile.click()">
-            <input type="file" style="display: none" accept="image/png,image/jpeg,video/mp4" max-size="2" @change="doAddAttachment" ref="auditfile" />
-            <div style="height:16px;display: flex;flex-direction: row;align-items: center;">
-              <img :src="addAttIcon" widht="16px" height="16px" style="border-radius:10px;"/>
-              <div class="att-txt">{{ $t('audit.inceptionRpt.attachment') }}</div>
+            <div v-if="attFileCount<10" class="attach-add" @click="$refs.auditfile.click()">
+              <input type="file" style="display: none" accept="image/png,image/jpeg,video/mp4" max-size="2" @change="doAddAttachment" ref="auditfile" />
+              <div style="height:16px;display: flex;flex-direction: row;align-items: center;">
+                <img :src="addAttIcon" widht="16px" height="16px" style="border-radius:10px;"/>
+                <div class="att-txt">{{ $t('audit.inceptionRpt.attachment') }}</div>
+              </div>
             </div>
           </div>
         </div>
+        </el-scrollbar>
       </div>
+      
       <el-dialog :visible.sync="uploadProgress" :close-on-click-modal="false" width="510px" top="35vh" left="40vh" class="AddSumupLoad">
         <div class="body-content">
           <p>{{ $t('remotePatrol.uploading') }}</p>
@@ -1912,7 +1918,13 @@ $h1:#292e36;
               }
             }
         }
-        
+        .submit-content-scroll{
+          @include point(height,545);
+          /deep/
+          .el-scrollbar__wrap{
+              overflow: auto;
+            }
+        }
         .submit-content{
             background-color: #FFF;
             border: solid 1px #f0f0f0;
@@ -1922,19 +1934,19 @@ $h1:#292e36;
             text-align: left;
             font-size: 15px;
             margin-top: 23px;
-            padding-bottom:15px;
+            /*padding-bottom:15px;*/
             padding-left: 16px;
             color: $black;
+            overflow: hidden;
             width: calc(520/1440*100vw);
-            @include point(height,565);
             @include point(padding-top,20);
-            overflow-x: hidden;
-            overflow-y: auto;
+            @include point(height,570);
             .dealInfo-label{
                 font-weight: bold;
                 margin-bottom: 25px;
                 display: block;
             }
+            
             .description{
               margin:16px 19px 0px 16px;
               display:flex;
@@ -2023,6 +2035,7 @@ $h1:#292e36;
               margin-top: 15px;
               margin-left: 16px;
               margin-right: 19px;
+              margin-bottom:10px;
               .attach-add{
                 height:calc(64/900*100vh);
                 width:calc(86/1440*100vw);
