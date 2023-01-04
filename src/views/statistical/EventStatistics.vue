@@ -1141,7 +1141,8 @@ export default {
         {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
       ],
       WindowWidth:util.getWindowWidth(),
-      compareGroupAndTypeId:[]
+      compareGroupAndTypeId:[],
+      inspectName : ''
     };
   },
 
@@ -1184,18 +1185,20 @@ export default {
     },
     getSearchParams() {
       const searchParams = SearchConditionUtil.getSearchCondition('eventStatistics');
-      //console.log(">>>eventstistics > searchParams:",searchParams);
+      
       this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
       this.params.beginTs = this.dateValue[0].valueOf();
       this.params.endTs = this.dateValue[1].valueOf();
       if (Object.keys(searchParams).length > 0) {
         this.inspectId = searchParams.inspectId;
+        this.inspectName = searchParams.inspectName;
+        //console.log(">>>eventstistics > this.inspectName:",this.inspectName);
       } else {
         this.searchParams = {};
       }
     },
     async emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
-      //console.log(">>>>eventStatistics > searchParams:",searchParams);
+      //console.log(">>>>eventStatistics > storePatrolLists:",storePatrolLists);
       this.params = searchParams;
       this.storeIds = this.params.storeIds;
       this.compareIds = this.compareIds2 = this.params.storeIds;
@@ -1204,11 +1207,12 @@ export default {
       this.curRegionII = regionII;
       this.regionMode = regionMode;
       this.timeMode = timeMode;
-      this.storePatrolLists = storePatrolLists;
+      this.inspectName = storePatrolLists;
       this.curCountry = this.params.curCountry;
       if(searchParams.inspectId && searchParams.inspectId!=''){
         //console.log(">>>>eventStatistics > this.params.inspectId:",searchParams.inspectId);
         this.inspectId = searchParams.inspectId;
+        this.params['inspectName'] =  storePatrolLists;
       }
       const searchParamsObj = {
           path: 'eventStatistics',
@@ -2173,7 +2177,7 @@ export default {
         const filterVal = ['groupName', 'itemName', 'numOfUnqualified', 'percentage', 'numOfStore'];
         const curData = self.eventItemTable.itemAllData;
         const data = self.formatJson(filterVal, curData);
-        const fileName = this.selEventItemName+'_Inspection item event' + '_' + util.getCurDateStr();
+        const fileName = (this.selEventItem == -1 ? this.inspectName:this.selEventItemName)+'_Inspection item event' + '_' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
