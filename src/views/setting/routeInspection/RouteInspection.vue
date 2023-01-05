@@ -1365,11 +1365,11 @@ export default {
               };
             }
           } else {
-            if (requestGroups[names[rowCells.parent.v]]) {
-              requestGroups[names[rowCells.parent.v]].items.push(item);
+            if ( requestGroups[rowCells.parent.id]) {
+              requestGroups[rowCells.parent.id].items.push(item);
             } else {
-              requestGroups[names[rowCells.parent.v]] = {
-                groupId: names[rowCells.parent.v],
+              requestGroups[rowCells.parent.id] = {
+                groupId: rowCells.parent.id,
                 items: [item]
               };
             }
@@ -1836,7 +1836,7 @@ export default {
             _this.$refs.loadFileEx.value = '';
             return false;
           }
-
+          
           const arrSheet1 = _this.getPassAndFailArrData(outdata.PassFail, passFailSheetFlagObj.indexArrPassFail);
           const arrSheet2 = _this.getScoreArrData(outdata.Score, scoreSheetFlagObj.indexArrScore);
           const arrSheet3 = _this.getOtherArrData(outdata.Others, otherSheetFlagObj.indexArrOthers);
