@@ -2980,31 +2980,26 @@ export default {
                 }
               }
 
-
               if(_item.memo_config !== null){
+                const hasText = _item.sourceList.some(i => i.mediaType === 3)
+                const hasImg = _item.sourceList.some(i => i.mediaType === 2)
                 if(_item.memo_config.memo_required_type === 1){
-                  if(_item.inspectInput == "" && _item.memo_config.memo_check_text) {
+                  if(_item.memo_config.memo_check_text && !hasText) {
                     memoCheckText = true
-                    console.log('_index ::::::::>>', _index)
                     }
-                  if(_item.sourceList.length == 0 && _item.memo_config.memo_check_media){ 
+                  if(_item.memo_config.memo_check_media && !hasImg){ 
                     memoCheckMedia = true
-                    console.log('_index ::::::::>>', _index)
                     }
                 }
                 else if(_item.memo_config.memo_required_type === 2){
-                  if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle && _item.inspectInput == "" && _item.memo_config.memo_check_text){
+                  if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle && _item.memo_config.memo_check_text && !hasText){
                     memoCheckText = true
-                    console.log('_index ::::::::>>', _index)
                   }
-                  if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle &&_item.sourceList.length == 0 && _item.memo_config.memo_check_media){
+                  if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle && _item.memo_config.memo_check_media && !hasImg){
                     memoCheckMedia = true
-                    console.log('_index ::::::::>>', _index)
                   }
                 }
               }
-              
-
 
             });
           });
