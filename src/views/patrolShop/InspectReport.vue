@@ -50,16 +50,16 @@
       </div>
       <div class="info-content">
         <div class="pdf_font_24">
-            <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.submitter') }}</span>
+            <span class="info-label">{{ $t('remotePatrol.submitter') }}</span>
             <span :class="isexportPDF ? 'pdf-info-value' : 'info-value'">{{ report.submitterName }}</span>
             <span class="info-label">{{ $t('remotePatrol.generateTime')+'：' }}</span>
             <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
-            <span v-if="hasSignRecord" class="info-label">{{ $t('remotePatrol.signInTime')+'：' }}</span>
-            <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ signInTime }}</span>
-            <span v-if="hasSignRecord" class="info-label">{{ $t('remotePatrol.patrolTime')+'：' }}</span>
-            <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ inceptionExecutTime }}</span>
-            <span v-if="hasSignRecord" class="info-label">{{ $t('remotePatrol.signInDistance')+'：' }}</span>
-            <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{$t('remotePatrol.aroundDistance')+signInDistance}}</span>
+            <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.signInTime')+'：' }}</span>
+            <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ signInTime }}</span>
+            <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.patrolTime')+'：' }}</span>
+            <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ inceptionExecutTime }}</span>
+            <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.signInDistance')+'：' }}</span>
+            <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{$t('remotePatrol.aroundDistance')+signInDistance}}</span>
         </div>
         <div class="weather-content">
           <img v-if="weatherImg" class="weather-info-content" :src="weatherImg">
@@ -93,6 +93,14 @@
           {{ checkinInfo }}
         </div>-->
       </div>
+    </div>
+    <div v-if="isexportPDF && hasSignRecord" class="pdf_font_24 info-content" style="margin-left:46px">
+      <span v-if="hasSignRecord" class="info-label">{{ $t('remotePatrol.signInTime')+'：' }}</span>
+      <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ signInTime }}</span>
+      <span v-if="hasSignRecord" class="info-label" style="margin-left:calc(40/1980*100vw)">{{ $t('remotePatrol.patrolTime')+'：' }}</span>
+      <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ inceptionExecutTime }}</span>
+      <span v-if="hasSignRecord" class="info-label" style="margin-left:calc(40/1980*100vw)">{{ $t('remotePatrol.signInDistance')+'：' }}</span>
+      <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{$t('remotePatrol.aroundDistance')+signInDistance}}</span>
     </div>
     <div class="template-titles" v-if="!isexportPDF">
       <el-select 
