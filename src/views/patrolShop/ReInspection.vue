@@ -790,12 +790,20 @@
                               <span v-show="(item.memo_config.memo_check_media == true)">「圖片或影片」</span> 類型附件
                     </div>
 
-                    <div class="advance_memo" v-else-if="(item.memo_config !== null && item.memo_config.memo_required_type == 2)"> 
-                      * 不合格時需加入 <span v-show="(item.memo_config.memo_check_text == true)">「文字」</span>
+                    <div class="advance_memo" v-else-if="( item.memo_config !== null && item.memo_config.memo_required_type == 2)"> 
+                      <div class="" v-if="(item.qualifiedScore === 0)">
+                      * 不合格時需加入 
+                          <span v-show="(item.memo_config.memo_check_text == true)">「文字」</span>
                           <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">、</span>
                           <span v-show="(item.memo_config.memo_check_media == true)">「圖片或影片」</span> 類型附件
+                      </div>
+                      <div class="advance_memo" v-else-if="(item.qualifiedScore > 0)">
+                      * 低於 {{item.qualifiedScore}} 分時，需加入
+                          <span v-show="(item.memo_config.memo_check_text == true)">「文字」</span>
+                          <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">、</span>
+                          <span v-show="(item.memo_config.memo_check_media == true)">「圖片或影片」</span> 類型附件
+                      </div> 
                     </div>
-                    
                     <span v-if="item.RuleCountTip" class="rules">{{
                       $t("remotePatrol.commentCountRuleTip")
                     }}</span>
@@ -2958,7 +2966,6 @@ export default {
       let requiredValid = false;
       let memoCheckText = false;
       let memoCheckMedia = false;
-      let memoCheckMediaAndText = false;
 
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
@@ -2979,25 +2986,81 @@ export default {
                   requiredValid = true
                 }
               }
-
+              
+              
               if(_item.memo_config !== null){
-                const hasText = _item.sourceList.some(i => i.mediaType === 3)
-                const hasImg = _item.sourceList.some(i => i.mediaType === 2)
-                if(_item.memo_config.memo_required_type === 1){
-                  if(_item.memo_config.memo_check_text && !hasText) {
-                    memoCheckText = true
+                switch (_item.type) {
+                  case 0:
+                    // console.log('this is type ===:>> 0');
+                    // console.log('_item.type ::::::::>> ', _item.type);
+                    const hasText_tab1 = _item.sourceList.some(i => i.mediaType === 3)
+                    const hasImg_tab1 = _item.sourceList.some(i => i.mediaType === 2)
+                    if(_item.memo_config.memo_required_type === 1){
+                      if(_item.memo_config.memo_check_text && !hasText_tab1) {
+                        memoCheckText = true
+                        }
+                      else if(_item.memo_config.memo_check_media && !hasImg_tab1){ 
+                        memoCheckMedia = true
+                        }
                     }
-                  if(_item.memo_config.memo_check_media && !hasImg){ 
-                    memoCheckMedia = true
+                    else if(_item.memo_config.memo_required_type === 2){
+                      if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle && _item.memo_config.memo_check_text && !hasText_tab1){
+                        memoCheckText = true
+                      }
+                      else if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle && _item.memo_config.memo_check_media && !hasImg_tab1){
+                        memoCheckMedia = true
+                      }
                     }
-                }
-                else if(_item.memo_config.memo_required_type === 2){
-                  if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle && _item.memo_config.memo_check_text && !hasText){
-                    memoCheckText = true
-                  }
-                  if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle && _item.memo_config.memo_check_media && !hasImg){
-                    memoCheckMedia = true
-                  }
+                    break;
+
+                  case 1:
+                    // console.log('this is type ===:>> 1  ');
+                    // console.log('_item.type ::::::::>> ', _item.type);
+                    const hasText_tab2 = _item.sourceList.some(i => i.mediaType === 3)
+                    const hasImg_tab2 = _item.sourceList.some(i => i.mediaType === 2)
+                    if(_item.memo_config.memo_required_type === 1){
+                      if(_item.memo_config.memo_check_text && !hasText_tab2) {
+                        memoCheckText = true
+                        }
+                      else if(_item.memo_config.memo_check_media && !hasImg_tab2){ 
+                        memoCheckMedia = true
+                        }
+                    }
+                    else if(_item.memo_config.memo_required_type === 2){
+                      if(_item.qualifiedScore > _item.itemgetScore && _item.memo_config.memo_check_text && !hasText_tab2){
+                        memoCheckText = true
+                      }
+                      else if(_item.qualifiedScore > _item.itemgetScore && _item.memo_config.memo_check_media && !hasImg_tab2){
+                        memoCheckMedia = true
+                      }
+                    }
+                    break;
+
+                  case 2:
+                    // console.log('this is type ===:>> 2  ');
+                    // console.log('_item.type ::::::::>> ', _item.type);
+                    const hasText_tab3 = _item.sourceList.some(i => i.mediaType === 3)
+                    const hasImg_tab3 = _item.sourceList.some(i => i.mediaType === 2)
+                    if(_item.memo_config.memo_required_type === 1){
+                      if(_item.memo_config.memo_check_text && !hasText_tab3) {
+                        memoCheckText = true
+                        }
+                      else if(_item.memo_config.memo_check_media && !hasImg_tab3){ 
+                        memoCheckMedia = true
+                        }
+                    }
+                    else if(_item.memo_config.memo_required_type === 2){
+                      if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle && _item.memo_config.memo_check_text && !hasText_tab3){
+                        memoCheckText = true
+                      }
+                      else if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle && _item.memo_config.memo_check_media && !hasImg_tab3){
+                        memoCheckMedia = true
+                      }
+                    }
+                    break;
+                  
+                  default:
+                    break
                 }
               }
 
@@ -5233,11 +5296,12 @@ export default {
     .group_content {
       border: 1px solid #e6e6e6;
       border-radius: 4px;
-      padding: calc(5/1920*100vw) calc(20/1920*100vw);
+      padding: 6px calc(20/1920*100vw);
       margin-right: calc(10/1920*100vw);
       margin-top: calc(10/1920*100vw);
       cursor: pointer;
       font-size: calc(15/1920*100vw);
+      line-height: 1.8
     }
     .noraml-color{
       background-color: #006ab7;
