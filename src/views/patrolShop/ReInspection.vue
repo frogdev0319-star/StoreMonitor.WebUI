@@ -393,7 +393,7 @@
           @confirmHandler="memoConfigTextObj.dialogCosed = false"
           >
           <div class="dialog-slot">
-            <div class="padding-vertical-sm">{{memoConfigTextObj.showInfo}} </div>
+            <div class="padding-vertical-sm" style="color: #f31d65">{{memoConfigTextObj.showInfo}} </div>
           </div>
         </dialog-pop>
 
@@ -409,20 +409,6 @@
             <div class="padding-vertical-sm">{{memoConfigMediaObj.showInfo}} </div>
           </div>
         </dialog-pop>
-
-        <dialog-pop
-          v-if="memoConfigTextAndMediaObj.dialogCosed"
-          :title="memoConfigTextAndMediaObj.title"
-          :isWarning="memoConfigTextAndMediaObj.isWarning"
-          :visible="memoConfigTextAndMediaObj.dialogCosed"
-          @cancelHandler="memoConfigTextAndMediaObj.dialogCosed = false"
-          @confirmHandler="memoConfigTextAndMediaObj.dialogCosed = false"
-          >
-          <div class="dialog-slot">
-            <div class="padding-vertical-sm">{{memoConfigTextAndMediaObj.showInfo}} </div>
-          </div>
-        </dialog-pop>
-
 
 
         <div v-if="showGuide && inspectList.length > 0" class="guide-content">
@@ -1116,12 +1102,7 @@ export default {
         isWarning: true,
         dialogCosed: false
       },
-      memoConfigTextAndMediaObj: {
-        title: this.$t('remotePatrol.prompt'),
-        showInfo: '尚有必填項目未完成，備註標籤請加入「文字」或「圖片或影像」類型附件',
-        isWarning: true,
-        dialogCosed: false
-      },
+
 
 
       recorder: null,
