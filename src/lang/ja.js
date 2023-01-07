@@ -365,6 +365,10 @@ export default{
       "fluency":"SD",
       "fullScreenMode":"フルスクリーンモード",
       "generateTime":"生成時間",
+      "signInTime":"Check In Time",
+      "patrolTime":"Inspection Time",
+      "signInDistance":"Check In Distance",
+      "aroundDistance":"around ",
       "getAccessTokenError":"アクセストークンを取得できませんでした",
       "getBeseyeStreamError":"beseyeストリーム情報の取得に失敗しました！",
       "getscore":"インスペクションスコア",
@@ -521,7 +525,18 @@ export default{
       "resubmiteRpt":"レポート提出の確認",
       "systemReject":"システムの取り消し",
       "systemRejectMsg":"承認スタッフはいません。再確認してください。",
-      "cannotSwitchMimicMode":"現在レポートを編集中のため、モードを切り替えることはできません"
+      "cannotSwitchMimicMode":"現在レポートを編集中のため、モードを切り替えることはできません",
+      "tipLimitGroupScore":"得分超過類別上限時以上限計算總分",
+      "signatureInfo":"Check in Infomation",
+      "mapDistance1":"與",
+      "mapDistance2":"距離約",
+      "mapDistance3":"meters",
+      "hour":"hr(s)",
+      "seconds":"sec(s)",
+      "minute":"min(s)",
+      "reportSubmitting":"Report submitting...",
+      "storeCode":"Store Code",
+      "inspectSummary":"巡检总评"
   },
   "eventView":{
       "ClosedEvent":"クローズドイベント",
@@ -530,6 +545,7 @@ export default{
       "ReturnEvent":"拒否されたイベント",
       "Returned":"拒否する",
       "addDetails":"処理の詳細を追加します",
+      "addAttchement":"添付ファイルの追加",
       "adding":"追加",
       "all":"オール",
       "allEvents":"すべてのイベント",
@@ -571,7 +587,8 @@ export default{
       "expiredate":"終了時間",
       "closeSelectedEvent":"選択したイベントの終了を確認しますか？",
       "confirmBachClose":"イベントの一括終了を確認する",
-      "expiretag":"期限切れ"
+      "expiretag":"期限切れ",
+      "maximumAttVedio":"Only can uploade 2 vedio attachment"
   },
   "insSettingView":{
       "Addscoreitems":"追加のスコアリングアイテム",

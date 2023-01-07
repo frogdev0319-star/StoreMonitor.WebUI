@@ -365,6 +365,10 @@ export default{
       "fluency":"SD",
       "fullScreenMode":"전체 화면 모드",
       "generateTime":"생성 시간",
+      "signInTime":"Check In Time",
+      "patrolTime":"Inspection Time",
+      "signInDistance":"Check In Distance",
+      "aroundDistance":"around ",
       "getAccessTokenError":"액세스 토큰을 가져오지 못했습니다.",
       "getBeseyeStreamError":"beseye 스트림 정보 불러오기 실패!",
       "getscore":"검사 점수",
@@ -521,7 +525,18 @@ export default{
       "resubmiteRpt":"보고서 제출 확인",
       "systemReject":"시스템 중단",
       "systemRejectMsg":"최종 서명 직원이 없습니다. 다시 확인하십시오",
-      "cannotSwitchMimicMode":"현재 보고서를 편집하는 중이어서 모드를 전환할 수 없습니다."
+      "cannotSwitchMimicMode":"현재 보고서를 편집하는 중이어서 모드를 전환할 수 없습니다.",
+      "tipLimitGroupScore":"得分超過類別上限時以上限計算總分",
+      "signatureInfo":"Check in Infomation",
+      "mapDistance1":"與",
+      "mapDistance2":"距離約",
+      "mapDistance3":"meters",
+      "hour":"hr(s)",
+      "seconds":"sec(s)",
+      "minute":"min(s)",
+      "reportSubmitting":"Report submitting...",
+      "storeCode":"Store Code",
+      "inspectSummary":"巡检总评"
   },
   "eventView":{
       "ClosedEvent":"종료된 이벤트",
@@ -530,6 +545,7 @@ export default{
       "ReturnEvent":"거절한 이벤트",
       "Returned":"거절",
       "addDetails":"처리 세부 추가",
+      "addAttchement":"첨부 파일 추가",
       "adding":"추가",
       "all":"전부",
       "allEvents":"모든 이벤트",
@@ -571,7 +587,8 @@ export default{
       "expiredate":"마감 시간",
       "closeSelectedEvent":"선택한 이벤트 마감을 확인하시겠습니까?",
       "confirmBachClose":"이벤트 일괄 마감 확인",
-      "expiretag":"만료됨"
+      "expiretag":"만료됨",
+      "maximumAttVedio":"Only can uploade 2 vedio attachment"
   },
   "insSettingView":{
       "Addscoreitems":"추가한 득점 항목",

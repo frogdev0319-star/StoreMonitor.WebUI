@@ -50,10 +50,16 @@
       </div>
       <div class="info-content">
         <div class="pdf_font_24">
-            <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.submitter') }}</span>
+            <span class="info-label">{{ $t('remotePatrol.submitter') }}</span>
             <span :class="isexportPDF ? 'pdf-info-value' : 'info-value'">{{ report.submitterName }}</span>
-            <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.generateTime') }}</span>
+            <span class="info-label">{{ $t('remotePatrol.generateTime')+'：' }}</span>
             <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
+            <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.signInTime')+'：' }}</span>
+            <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ signInTime }}</span>
+            <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.patrolTime')+'：' }}</span>
+            <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ inceptionExecutTime }}</span>
+            <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.signInDistance')+'：' }}</span>
+            <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{$t('remotePatrol.aroundDistance')+signInDistance}}</span>
         </div>
         <div class="weather-content">
           <img v-if="weatherImg" class="weather-info-content" :src="weatherImg">
@@ -83,10 +89,18 @@
         <div v-if="showTag" style="margin-left: calc(20/1440*100vw)" class="status-tag"
           :style="standard == 1 ? {'color':'#59ab22','background-color':'#e8f6de'}: {'color':'#f57848','background-color':'#ffefeb'}"
         >{{standard == 1 ? $t('remotePatrol.goalAchieved') : $t('remotePatrol.farBehind')}}</div>
-        <div v-if="checkinInfo" style="color: #69727c; font-size: 12px; margin-left: 20px">
-          {{ checkinInfo }} 
-        </div>
+        <!--<div v-if="checkinInfo" style="color: #69727c; font-size: 12px; margin-left: 20px">
+          {{ checkinInfo }}
+        </div>-->
       </div>
+    </div>
+    <div v-if="isexportPDF && hasSignRecord" class="pdf_font_24 info-content" style="margin-left:46px">
+      <span v-if="hasSignRecord" class="info-label">{{ $t('remotePatrol.signInTime')+'：' }}</span>
+      <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ signInTime }}</span>
+      <span v-if="hasSignRecord" class="info-label" style="margin-left:calc(40/1980*100vw)">{{ $t('remotePatrol.patrolTime')+'：' }}</span>
+      <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ inceptionExecutTime }}</span>
+      <span v-if="hasSignRecord" class="info-label" style="margin-left:calc(40/1980*100vw)">{{ $t('remotePatrol.signInDistance')+'：' }}</span>
+      <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{$t('remotePatrol.aroundDistance')+signInDistance}}</span>
     </div>
     <div class="template-titles" v-if="!isexportPDF">
       <el-select 
@@ -479,6 +493,33 @@
             </div>
           </div>
         </el-col>
+        <el-col style="float:none">
+          <div v-if="pageItem.class === 'signature-map'" style="page-break-before: always;">
+            <div
+              :style="isexportPDF ? 'height:60px;line-height:60px' : ''"
+              class="item-header"
+              @click="hideOrShowDetail(pageItem, pageIndex)">
+              <div class="icon-header">
+                <i
+                  :style="isexportPDF ? 'font-size:22px;' : ''"
+                  :class="pageItem.ifExpand ? 'icon-zhedie1': 'icon-zhankai1'"
+                  class="iconfont icontemp"/>
+                <span class="title-lable"><span class="pdf_font_20">
+                  {{ $t(`remotePatrol.${pageItem.name}`) }}</span>
+                </span>
+              </div>
+            </div>
+            <div v-if="pageItem.ifExpand" class="item-content">
+              <div class="pdf_font_20">
+                <div class="content-title"><span class="pdf_font_20">{{ $t('remotePatrol.mapDistance1')+`${report.storeName}`+$t('remotePatrol.mapDistance2')+`${pageItem.distance}`}}</span></div>
+                <hr class="hr-horizontal" />
+              </div>
+              <div style="display:flex;flex-direction:row; justify-content:start;" :style="isexportPDF ? 'height:calc(984/1440*100vw)' : ''">
+                <img :src= "pageItem.data" style="width:calc(984/1440*100vw);height:auto; margin-top:10px;margin-bottom:10px"/>
+              </div>
+            </div>
+          </div>
+        </el-col>
       </el-row>
       <el-row>
         <el-col v-if="!hasChart" :style="isexportPDF ? 'height:450px;' : 'height:0px;'" class="pie-content">
@@ -533,6 +574,7 @@ import {
   getInspectStatus
 } from '@/api/inspect';
 import { CancelWorkflow,taskDrawback,GetTaskInfo } from '@/api/workflow';
+import {getDetailedStoreInfo} from '@/api/store';
 import util from '@/common/util';
 import videojs from '../../../static/video.js';
 import 'videojs-contrib-hls';
@@ -641,9 +683,16 @@ export default {
       showEditBtn:true,
       showCancelBtn:false,
       auditState:1,
-
       inspectStatus: '',
       showTag: false,
+      hasSignRecord:false,
+      inspectStatus: '',
+      inceptionExecutTime:'',
+      storeLatitude:0.0,
+      storeLongitude:0.0,
+      signInDistance:'',
+      signInTime:'',
+      signMapUrl:''
     };
   },
 
@@ -751,26 +800,34 @@ export default {
         reportIds:[this.report.reportId]
       };
       const tHeader = [
+        this.$t('remotePatrol.regionI'),
+        this.$t('remotePatrol.regionII'),
         this.$t('remotePatrol.storeName'),
+        this.$t('remotePatrol.storeCode'),
         this.$t('remotePatrol.inspectName'),//巡檢表名稱
         this.$t('remotePatrol.category'),
         this.$t('insSettingView.subCategory'),
         this.$t('overview.items'),
         this.$t('remotePatrol.inspectItemScore'),
         this.$t('remotePatrol.patrolResult'),
-        this.$t('remotePatrol.inspectTotalScore'),
-        this.$t('remotePatrol.exportAllDetail'),
+        this.$t('remotePatrol.inspectTotalScore'),//報告總分inspectSummary
+        this.$t('remotePatrol.inspectSummary'), //巡檢總評
+        this.$t('eventView.submitter'), //送出人
+        this.$t('remotePatrol.exportAllDetail'),// 詳情
         this.$t('audit.inceptionRpt.attachment'),
         this.$t('titleView.description'),
-        this.$t('remotePatrol.createRptDT')];
+        this.$t('remotePatrol.signatureInfo'), //簽到資訊-地圖link
+        this.$t('remotePatrol.signInTime'),
+        this.$t('remotePatrol.createRptDT'),
+        ];
       
       downLoadInspectReportEntireDetail(params).then(res => {
         console.log("res:",res);
         const that = this;
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
-          const filterVal = ['storename', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 'totlascore', 'detail', 'attachment','comment',
-            'reportts'];
+          const filterVal = ['province','city','storename','code', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 
+          'totlascore','status','submitter', 'detail', 'attachment','comment','singinmap','signints','reportts'];
           const curData = res.data;
           const tagName = this.report.tagName;
           const data = that.formatJson(filterVal, curData);
@@ -980,14 +1037,28 @@ export default {
     },
 
     async getReportInfo(res) {
+      const self = this;
       if (res.errCode === 0 && res.data.length > 0) {
-        const data = res.data[0].info;  
+        const data = res.data[0].info; 
+        
+        switch (data.mode) {
+          case 0:
+            self.report.inspectType = self.$t('overview.remotePatrol');
+            break;
+          case 1:
+            console.log("data.mode:",data.mode); 
+            self.isInsiteInspect = true;
+            self.report.inspectType = self.$t('overview.onsitePatrol');
+            self.showEditBtn = false;
+            break;
+        }
         this.report.storeName = data.storeName;
         this.report.status = data.status;
         this.report.dateStr = util.getDateStr2(data.ts);
         this.report.submitterName = data.submitterName;
         this.report.tagName = data.tagName;
         this.report.iconSrc = this.getIconSrc(data.status);
+        //this.getStoreLongitudeLatitude(data.storeId);
         this.totalScore = data.totalScore;
         this.standard = data.standard;
         this.allRemarkItemsFlag = res.data[0].info.type === 1
@@ -996,7 +1067,16 @@ export default {
         this.weatherImg = data.weatherInfo ? data.weatherInfo.icon : '';
         this.signaturesList = this.isInsiteInspect && data.signatures ? data.signatures : [];
         this.reportData = data;
+        
         this.auditState = data.auditState;
+        this.hasSignRecord = res.data[0].inspectSettings.filter(settingItem => settingItem.name === 'checkin')[0].value;
+        if(data.checkinRecord && this.hasSignRecord){
+          this.signInTime = util.getDateStr2(data.checkinRecord.ts);
+          this.inceptionExecutTime = util.getDiffTimeStr(data.ts,data.checkinRecord.ts);
+          this.signMapUrl = data.checkinRecord.report_sign_map_url;
+          this.signInDistance = data.checkinRecord.execute_sign_distance+this.$i18n.t('remotePatrol.mapDistance3');
+        }
+        
         this.getGroupsData(data.groups);
         console.log("this.reportData:",this.reportData);
         this.getTab1AndTab3BtnName(res.data[0].inspectSettings);
@@ -1081,6 +1161,10 @@ export default {
       if (this.isInsiteInspect && this.signaturesList.length > 0) {
         const signatureObj = { name: 'signature', class: 'signature-detail', ifExpand: false, data: this.signaturesList };
         pageData.push(signatureObj);
+      }
+      if (this.isInsiteInspect && this.hasSignRecord) {
+        const mapObj = { name: 'signatureInfo', class: 'signature-map', ifExpand: false, distance: this.signInDistance, data:this.signMapUrl };
+        pageData.push(mapObj);
       }
       this.pageData = pageData;
     },
@@ -1879,6 +1963,37 @@ export default {
     doGetTaskInfo(){
       var resWorkflowTask = GetTaskInfo(self.report.reportId);
     },
+    getStoreLongitudeLatitude(storeId){
+      getDetailedStoreInfo({storeId}).then(res => {
+        this.storeLatitude = res.data.latitude;
+        this.storeLongitude = res.data.longitude;
+      }).catch(err => {
+        console.log('getStoreLongitudeLatitude: ' + err);
+      });
+    },
+    getSingnInDistance(lat1, lon1, lat2, lon2) {
+    	if ((lat1 == lat2) && (lon1 == lon2)) {
+    		return 0;
+    	}
+    	else {
+    		var radlat1 = Math.PI * lat1/180;
+    		var radlat2 = Math.PI * lat2/180;
+    		var theta = lon1-lon2;
+    		var radtheta = Math.PI * theta/180;
+    		var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+    		if (dist > 1) {
+    			dist = 1;
+    		}
+    		dist = Math.acos(dist);
+    		dist = dist * 180/Math.PI;
+    		dist = dist * 60 * 1.1515;
+        //距離幾公尺
+         dist = dist * 1609.344; //公尺
+    		//if (unit=="K") { dist = dist * 1.609344 }//公里
+    		//if (unit=="N") { dist = dist * 0.8684 }//海里
+    		return dist;
+    	}
+    }
   }
 };
 </script>
@@ -2608,6 +2723,9 @@ export default {
         }
       }
       .signature-detail{
+        @extend .row-detail;
+      }
+      .signature-map{
         @extend .row-detail;
       }
     }

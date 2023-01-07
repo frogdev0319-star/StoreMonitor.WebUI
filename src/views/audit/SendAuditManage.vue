@@ -111,7 +111,7 @@ export default{
             isFirstLoad: false,
             isLoading:false,
             storeFilterObj:{},
-            ifSearchData: true,
+            ifSearchData: false,
             ifSaveParams: false,
             ifChangeAccount: false,
             searchParams: {},

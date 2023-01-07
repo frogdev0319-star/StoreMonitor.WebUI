@@ -366,6 +366,10 @@ export default{
         "fluency":"SD",
         "fullScreenMode":"Full Screen Mode",
         "generateTime":"Generated Time:",
+        "signInTime":"Check In Time",
+        "patrolTime":"Inspection Time",
+        "signInDistance":"Check In Distance",
+        "aroundDistance":"around ",
         "getAccessTokenError":"Failed to get Access Token",
         "getBeseyeStreamError":"Failed to get beseye stream info!",
         "getscore":"Inspection score",
@@ -524,6 +528,16 @@ export default{
         "systemRejectMsg":"No sign-off staff; please reconfirm",
         "cannotSwitchMimicMode":"Currently editing report, cannot switch modes",
         "tipLimitGroupScore":"得分超過類別上限時以上限計算總分",
+        "signatureInfo":"Check in Infomation",
+        "mapDistance1":"與",
+        "mapDistance2":"距離約",
+        "mapDistance3":"meters",
+        "hour":"hr(s)",
+        "seconds":"sec(s)",
+        "minute":"min(s)",
+        "reportSubmitting":"Report submitting...",
+        "storeCode":"Store Code",
+        "inspectSummary":"巡检总评"
     },
     "eventView":{
         "ClosedEvent":"Closed Events",
@@ -532,6 +546,7 @@ export default{
         "ReturnEvent":"Rejected Events",
         "Returned":"Returned",
         "addDetails":"Add Handling Details",
+        "addAttchement":"Add Attachment",
         "adding":"Add",
         "all":"All",
         "allEvents":"All Events",
@@ -573,7 +588,8 @@ export default{
         "expiredate":"Closing time",
         "closeSelectedEvent":"Confirm close choosed event?",
         "confirmBachClose":"Confirm bach close events",
-        "expiretag":"Expired"
+        "expiretag":"Expired",
+        "maximumAttVedio":"Only can uploade 2 vedio attachment"
     },
     "insSettingView":{
         "Addscoreitems":"Additional scoring items",

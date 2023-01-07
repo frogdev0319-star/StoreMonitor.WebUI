@@ -959,7 +959,7 @@ export default {
       ifSaveParams: false,
       defaultSort: { prop: 'numOfTotal', order: 'ascending' },
       isLoading: true,
-      componentsProps:{beginTs:this.$moment().subtract(29, 'days').startOf('d').toDate(),endTs: this.$moment().endOf('d').toDate()},
+      componentsProps:{beginTs:this.$moment().subtract(29, 'days').startOf('d').toDate(),endTs: this.$moment().endOf('d').toDate(),inspectTagIds:[]},
       eventItemTable:{
         order:{direction: 'descending',property: 'numOfTotal'},
         column_data:[
@@ -1141,7 +1141,8 @@ export default {
         {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
       ],
       WindowWidth:util.getWindowWidth(),
-      compareGroupAndTypeId:[]
+      compareGroupAndTypeId:[],
+      inspectName : ''
     };
   },
 
@@ -1180,10 +1181,24 @@ export default {
     async initData() {
       this.params.filter = { page: this.page - 1, size: this.sizeNum };
       this.params.order = this.order;
-      //this.getSearchParams();
+      this.getSearchParams();
+    },
+    getSearchParams() {
+      const searchParams = SearchConditionUtil.getSearchCondition('eventStatistics');
+      
+      this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+      this.params.beginTs = this.dateValue[0].valueOf();
+      this.params.endTs = this.dateValue[1].valueOf();
+      if (Object.keys(searchParams).length > 0) {
+        this.inspectId = searchParams.inspectId;
+        this.inspectName = searchParams.inspectName;
+        //console.log(">>>eventstistics > this.inspectName:",this.inspectName);
+      } else {
+        this.searchParams = {};
+      }
     },
     async emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
-      //console.log("eventStatistics > searchParams:",searchParams);
+      //console.log(">>>>eventStatistics > storePatrolLists:",storePatrolLists);
       this.params = searchParams;
       this.storeIds = this.params.storeIds;
       this.compareIds = this.compareIds2 = this.params.storeIds;
@@ -1192,9 +1207,13 @@ export default {
       this.curRegionII = regionII;
       this.regionMode = regionMode;
       this.timeMode = timeMode;
-      this.storePatrolLists = storePatrolLists;
+      this.inspectName = storePatrolLists;
       this.curCountry = this.params.curCountry;
-      this.inspectId = this.params.inspectId;
+      if(searchParams.inspectId && searchParams.inspectId!=''){
+        //console.log(">>>>eventStatistics > this.params.inspectId:",searchParams.inspectId);
+        this.inspectId = searchParams.inspectId;
+        this.params['inspectName'] =  storePatrolLists;
+      }
       const searchParamsObj = {
           path: 'eventStatistics',
           params: this.params
@@ -1208,6 +1227,7 @@ export default {
       self.storeDateValue = util.getDates(self.params.beginTs) + '-' + util.getDates(self.params.endTs);
       self.componentsProps.beginTs = self.params.beginTs;
       self.componentsProps.endTs = self.params.endTs;
+      self.componentsProps.inspectTagIds = [self.inspectId];
       if (self.params.storeIds.length === 0) {
         self.eventTableData = [];
         self.storeIds = [];
@@ -1269,7 +1289,8 @@ export default {
       params.beginTs = this.params.beginTs;
       params.endTs = this.params.endTs;
       params.storeIds = this.storeIds.filter(storeId => storeId !== '-1');
-      console.log("getUpperGloableEventData > params.storeIds:",params.storeIds);
+      params.inspectTagIds = [this.inspectId];
+      console.log("getUpperGloableEventData > params.inspectTagIds:",params.inspectTagIds);
       params.regionMode = 0;
 
       try {
@@ -1329,6 +1350,7 @@ export default {
       params.groupMode = region[0].value;
       this.params.groupMode = region[0].value;
       params.storeIds = this.compareIds;
+      params.inspectTagIds = [this.inspectId];
       if(region[0].value<3){ //store, area1, area2
         this.params.storeIds=this.compareIds.filter(storeId => storeId !== '-1')
         params.storeIds = this.compareIds.filter(storeId => storeId !== '-1');
@@ -1393,17 +1415,20 @@ export default {
       const self = this;
       self.componentsProps.beginTs = self.params.beginTs;
       self.componentsProps.endTs = self.params.endTs;
+      self.componentsProps.inspectTagIds = [self.inspectId];
       let region = this.areaMode.filter((r)=>{ return r.key==this.compareType});
       self.params.groupMode = region[0].value;
       let searchCondition = {}
       if(region[0].value<3){ //store, area1, area2
         searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,storeIds:self.compareIds.filter(storeId => storeId !== '-1'),
+          inspectTagIds : [this.inspectId],
           order:{"direction":this.barchartOrder,"property":"numOfTotal"}
         };
         //console.log("*getEventTableData>searchCondition:",searchCondition);
       }else{ //groupType, storeGroup
         self.params.groupIds=this.compareGroupAndTypeId;
         searchCondition  = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,groupIds:this.compareGroupAndTypeId,
+        inspectTagIds : [this.inspectId],
         order:{"direction":this.barchartOrder,"property":"numOfTotal"}
         };
       }
@@ -1652,13 +1677,18 @@ export default {
       const self = this;
       self.componentsProps.beginTs = self.params.beginTs;
       self.componentsProps.endTs = self.params.endTs;
+      //console.log(">>>>self.inspectId:",self.inspectId);
+      self.componentsProps.inspectTagIds = (self.inspectId=='')?[]:[self.inspectId];
       let region = this.areaMode.filter((r)=>{ return r.key==this.compareType});
       self.params.groupMode = region[0].value;
       self.params.storeIds = self.compareIds.filter(storeId => storeId !== '-1');
+      self.params.inspectTagIds = [self.inspectId];
       let searchCondition = {}
       //if(region[0].value<3){ //store, area1, area2
       //console.log("getEventTableData > this.compareIds:",self.compareIds);
-      searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:0,storeIds:self.compareIds};
+      searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:0,storeIds:self.compareIds,
+          inspectTagIds : (self.inspectId=='')?[]:[this.inspectId]
+      };
           //filter:{"page":this.page-1,"size":this.sizeNum},
           //order:this.order
         //};
@@ -1718,7 +1748,8 @@ export default {
       this.doFilterEventListBySelBar();
     },
     barchartClick(bar){
-      if(this.barActiveinnerId == bar.data.innerId){
+      //console.log("barchartClick:",bar);
+      if(this.barActiveName == bar.data.name){
         this.barActiveinnerId = '-1';
         this.barActiveName = '';
         this.doFilterEventListBySelBar();
@@ -1772,7 +1803,7 @@ export default {
         });
         const filterVal = ['province', 'city', 'groupName', 'storeGroup', 'storeType','code', 'numOfTotal', 'numOfUnprocessed', 'numOfInprocess',
           'numOfProcessed', 'numOfRejected','completedRate'];
-        const curData = that.allEventTableData;
+        const curData = that.eventTableData;
         const data = that.formatJson(filterVal, curData);
         const fileName = this.compareType+'_Inspection event' + '_' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
@@ -1849,6 +1880,7 @@ export default {
       params.inputSearchValue = "";
       params.beginTs=self.params.beginTs;
       params.endTs=self.params.endTs;
+      params.inspectTagId = [self.inspectId];
       params.searchFrom='EventStatistics';
 
       if(row.prop == "numOfTotal"){
@@ -1914,6 +1946,8 @@ export default {
     },
     async doGetInspecEvenItems(){
       const self = this;
+      self.showInvolveTableArea = false;
+      self.eventInvolveTable.table_data = [];
       //console.log("compareIds2",self.compareIds2);
       if(self.compareIds2.length>0 ){
         let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,inspectTagId:self.inspectId,storeIds:self.compareIds2 };
@@ -2143,7 +2177,7 @@ export default {
         const filterVal = ['groupName', 'itemName', 'numOfUnqualified', 'percentage', 'numOfStore'];
         const curData = self.eventItemTable.itemAllData;
         const data = self.formatJson(filterVal, curData);
-        const fileName = this.selEventItemName+'_Inspection item event' + '_' + util.getCurDateStr();
+        const fileName = (this.selEventItem == -1 ? this.inspectName:this.selEventItemName)+'_Inspection item event' + '_' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
       });
     },

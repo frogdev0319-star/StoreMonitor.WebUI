@@ -365,6 +365,10 @@ export default{
       "fluency":"SD",
       "fullScreenMode":"โหมดเต็มหน้าจอ",
       "generateTime":"เวลาที่สร้าง:",
+      "signInTime":"Check In Time",
+      "patrolTime":"Inspection Time",
+      "signInDistance":"Check In Distance",
+      "aroundDistance":"around ",
       "getAccessTokenError":"ไม่สามารถรับโทเค็นในการเข้าถึง",
       "getBeseyeStreamError":"ไม่สามารถรับข้อมูลสตรีม beseye!",
       "getscore":"คะแนนการตรวจสอบ",
@@ -521,7 +525,18 @@ export default{
       "resubmiteRpt":"ยืนยันส่งรายงาน",
       "systemReject":"การถอนของระบบ",
       "systemRejectMsg":"ไม่มีพนักงานลงนาม โปรดยืนยันใหม่",
-      "cannotSwitchMimicMode":"กำลังแก้ไขรายงาน ไม่สามารถสลับโหมดได้"
+      "cannotSwitchMimicMode":"กำลังแก้ไขรายงาน ไม่สามารถสลับโหมดได้",
+      "tipLimitGroupScore":"得分超過類別上限時以上限計算總分",
+      "signatureInfo":"Check in Infomation",
+      "mapDistance1":"與",
+      "mapDistance2":"距離約",
+      "mapDistance3":"meters",
+      "hour":"hr(s)",
+      "seconds":"sec(s)",
+      "minute":"min(s)",
+      "reportSubmitting":"Report submitting...",
+      "storeCode":"Store Code",
+      "inspectSummary":"巡检总评"
   },
   "eventView":{
       "ClosedEvent":"เหตุการณ์ที่ปิดแล้ว",
@@ -530,6 +545,7 @@ export default{
       "ReturnEvent":"เหตุการณ์ที่ปฏิเสธ",
       "Returned":"ส่งคืนแล้ว",
       "addDetails":"เพิ่มรายละเอียดการจัดการ",
+      "addAttchement":"เพิ่มไฟล์แนบ",
       "adding":"เพิ่ม",
       "all":"ทั้งหมด",
       "allEvents":"เหตุการณ์ทั้งหมด",
@@ -571,7 +587,8 @@ export default{
       "expiredate":"เวลาปิด",
       "closeSelectedEvent":"ยืนยันปิดเหตุการณ์ที่เลือกหรือไม่",
       "confirmBachClose":"ยืนยันปิดเหตุการณ์เป็นกลุ่ม",
-      "expiretag":"หมดอายุแล้ว"
+      "expiretag":"หมดอายุแล้ว",
+      "maximumAttVedio":"Only can uploade 2 vedio attachment"
   },
   "insSettingView":{
       "Addscoreitems":"รายการการให้คะแนนเพิ่มเติม",

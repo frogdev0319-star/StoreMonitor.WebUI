@@ -366,6 +366,10 @@ export default{
       "fluency":"流畅",
       "fullScreenMode":"宽萤幕模式",
       "generateTime":"报告产生时间：",
+      "signInTime":"签到时间",
+      "patrolTime":"巡检花费时间",
+      "signInDistance":"签到距离",
+      "aroundDistance":"约",
       "getAccessTokenError":"获取Access Token失败",
       "getBeseyeStreamError":"获取Beseye视频流信息失败！",
       "getscore":"本次得分",
@@ -524,6 +528,16 @@ export default{
       "systemRejectMsg":"无可签核人员，请重新确认",
       "cannotSwitchMimicMode":"正在编辑报告，不能切换模式",
       "tipLimitGroupScore":"得分超过类别上限时以上限计算总分",
+      "signatureInfo":"签到资讯",
+      "mapDistance1":"与",
+      "mapDistance2":"距离约",
+      "mapDistance3":"公尺",
+      "hour":"时",
+      "seconds":"秒",
+      "minute":"分",
+      "reportSubmitting":"报告送出中...",
+      "storeCode":"门店代码",
+      "inspectSummary":"巡检总评"
   },
   "eventView":{
       "ClosedEvent":"已结案事件",
@@ -532,6 +546,7 @@ export default{
       "ReturnEvent":"退回事件",
       "Returned":"已退回",
       "addDetails":"添加处理信息",
+      "addDetails":"添加附件",
       "adding":"追加",
       "all":"全部",
       "allEvents":"全部事件",
@@ -573,7 +588,8 @@ export default{
       "expiredate":" 结案时间 ",
       "closeSelectedEvent":"确认将选择事件结案?",
       "confirmBachClose":"确认批量结案",
-      "expiretag":"逾期"
+      "expiretag":"逾期",
+      "maximumAttVedio":"仅能上传2个影片附件档案"
   },
   "insSettingView":{
       "Addscoreitems":"附加评分项目",

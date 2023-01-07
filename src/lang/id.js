@@ -365,6 +365,10 @@ export default{
       "fluency":"SD",
       "fullScreenMode":"Mode Layar Penuh",
       "generateTime":"Waktu Dibuat:",
+      "signInTime":"Check In Time",
+      "patrolTime":"Inspection Time",
+      "signInDistance":"Check In Distance",
+      "aroundDistance":"around ",
       "getAccessTokenError":"Gagal mendapatkan Token Akses",
       "getBeseyeStreamError":"Gagal mendapatkan info stream beseye!",
       "getscore":"Nilai inspeksi",
@@ -521,7 +525,18 @@ export default{
       "resubmiteRpt":"Konfirmasi kirim laporan",
       "systemReject":"Penarikan sistem",
       "systemRejectMsg":"Tidak ada staf penutup; konfirmasi ulang",
-      "cannotSwitchMimicMode":"Sedang mengedit laporan, tidak bisa beralih mode"
+      "cannotSwitchMimicMode":"Sedang mengedit laporan, tidak bisa beralih mode",
+      "tipLimitGroupScore":"得分超過類別上限時以上限計算總分",
+      "signatureInfo":"Check in Infomation",
+      "mapDistance1":"與",
+      "mapDistance2":"距離約",
+      "mapDistance3":"meters",
+      "hour":"hr(s)",
+      "seconds":"sec(s)",
+      "minute":"min(s)",
+      "reportSubmitting":"Report submitting...",
+      "storeCode":"Store Code",
+      "inspectSummary":"巡检总评"
   },
   "eventView":{
       "ClosedEvent":"Kejadian Ditutup",
@@ -530,6 +545,7 @@ export default{
       "ReturnEvent":"Kejadian Ditolak",
       "Returned":"Dikembalikan",
       "addDetails":"Tambah Rincian Penanganan",
+      "addAttchement":"Tambahkan lampiran",
       "adding":"Tambah",
       "all":"Semua",
       "allEvents":"Semua Kejadian",
@@ -571,7 +587,8 @@ export default{
       "expiredate":"Waktu menutup",
       "closeSelectedEvent":"Konfirmasi tutup kejadian yang dipilih?",
       "confirmBachClose":"Konfirmasi tutup banyak kejadian sekaligus",
-      "expiretag":"Kedaluwarsa"
+      "expiretag":"Kedaluwarsa",
+      "maximumAttVedio":"Only can uploade 2 vedio attachment"
   },
   "insSettingView":{
       "Addscoreitems":"Item nilai tambahan",

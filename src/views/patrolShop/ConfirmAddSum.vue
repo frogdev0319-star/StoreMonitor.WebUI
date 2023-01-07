@@ -452,6 +452,14 @@
         <el-progress :percentage="Math.round(uploadingnumOfPic/totalnumOfPic*100)"/>
       </div>
     </el-dialog>
+    <el-dialog :visible="reportSubmitting" :close-on-click-modal="false" width="510px" top="35vh" left="40vh" class="AddSumupLoad">
+      <div class="body-content">
+        <div class="empty-content">
+          <img :src="loadingGif" class="loading_rotate">
+          <span class="empty-text">{{ $t('remotePatrol.reportSubmitting') }}</span>
+        </div>
+      </div>
+    </el-dialog>
     <dialog-pop
       :title="$t('remotePatrol.resubmiteRpt')"
       :isWarning="true"
@@ -494,6 +502,8 @@ export default {
   components: {DialogPop},
   data() {
     return {
+      loadingGif: require('../../../static/img/loading.svg'),
+      reportSubmitting:false,
       dialogCommentVideo: false,
       uploadProgress: false,
       totalnumOfPic: 0,
@@ -961,6 +971,7 @@ export default {
           util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
           return false;
       }
+      
       let curSumIndex = [];
       curSumIndex = self.resultList.filter(x => x.isActive);
       status = curSumIndex[0].label;
@@ -980,6 +991,7 @@ export default {
         params['reportId']=this.reportId;
         upload === 0 && self.doModifyReportSubmit(params,auditAttachment,sendEvent);
       } else{
+        self.reportSubmitting = true;
         upload === 0 && submitInspectItem1(params).then(res => {
           if (res.errCode === 0) {
             const data = res.data;
@@ -1014,10 +1026,11 @@ export default {
                     isBindWorkflow:!!PermissionHelper.enableSendAudit() || !!PermissionHelper.enableMimicMode
                   };
                 }
-                
+                self.reportSubmitting = false;
                 self.$router.push({ name: 'submitEvent', params: { data: routeData }});
               }).catch(err=>{
                   console.log("err:",err);
+                  self.reportSubmitting = false;
                   util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
                   return false;
                 }
@@ -1031,6 +1044,7 @@ export default {
             }
             
           } else {
+            self.reportSubmitting = false;
             util.notify(res.errMsg, 'error', 3000);
             routeData = {
               isSuccess: false,
@@ -1041,6 +1055,7 @@ export default {
           if(!self.isBindWorkflow)
             self.$router.push({ name: 'submitEvent', params: { data: routeData}});
         }).catch(err => {
+          self.reportSubmitting = false;
           util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
           return false;
         });
@@ -1056,6 +1071,7 @@ export default {
         reLoadData: self.$route.params,
         isBindWorkflow:!!PermissionHelper.enableSendAudit() 
       };
+      self.reportSubmitting = true;
       var resReportModify = modifyReportWorkflow(params);
       var resWorkflowTask = getReportWorkflowTask({type:0,inspectReportId:self.reportId});
       Promise.all([resReportModify,resWorkflowTask]).then( async (result) =>{
@@ -1088,6 +1104,7 @@ export default {
           console.log("save db:",workflowParams);
           await Database.addDataToDB('rpt'+self.reportId, workflowParams);
           console.log("routeData:",routeData);
+          self.reportSubmitting = false;
           self.$router.push({ name: 'auditReportdetails', params: routeData});
         }else{
           //if(self.auditState==7){ **3.0.4.2 不用判斷都使用reSubmit//系統撤回重送
@@ -1151,11 +1168,13 @@ export default {
                 isBindWorkflow:!!PermissionHelper.enableSendAudit() 
             };
             Database.removeDataFromDB('rpt'+self.reportId);
+            self.reportSubmitting = false;
             self.$router.push({ name: 'submitEvent', params: { data: routeData}});
           }else{
             util.notify(wfRes.errMsg, 'error', 3000);
           }
         }).catch(err=>{
+            self.reportSubmitting = false;
             console.log("ReSubmitWorkflow err:",err);
             util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
             return false;

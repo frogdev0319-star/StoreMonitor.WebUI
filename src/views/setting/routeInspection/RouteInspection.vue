@@ -626,6 +626,9 @@ export default {
           resolve(data);
         }).catch(err => {
           console.log(err.message);
+          reject(err);
+          //util.notify(this.$t('insSettingView.importFail'), 'warning', 3000);
+          //self.loading = false;
         });
       });
     },
@@ -650,6 +653,7 @@ export default {
     async getTagList(val, sheetIndex) {
       const self = this;
       const TagData = await self.getTagAll();
+       console.log(">>>self.patrolActive:",self.patrolActive);
       if (TagData.length != 0) {
         if (val == 'del' || self.$route.params.val == 'del') {
           if (Number(self.patrolActive) == TagData.length) {
@@ -1312,7 +1316,17 @@ export default {
           const key = cell.header && cell.header.tag;
           if (!mapping[key]) return;
           if (mapping[key] === 'availableScores') {
-            item[mapping[key]] = cell.v ? cell.v.split('/').map(item => Number(item)) : cell.v === 0 ? [0] : [];
+            let score = [];
+            if(cell.v){
+               cell.v.split('/').map(item => {
+                if(!isNaN(Number(item))){
+                  score.push( Number(item));
+                }
+                
+              })
+              console.log(">>>>score:",score);
+            }
+            item[mapping[key]] = cell.v ? score : cell.v === 0 ? [0] : [];
           } else if (mapping[key] === 'itemScore') {
             item[mapping[key]] = cell.v ? Number(cell.v) : 0;
             if (cell.v === '' || cell.v === undefined) {
@@ -1351,11 +1365,11 @@ export default {
               };
             }
           } else {
-            if (requestGroups[names[rowCells.parent.v]]) {
-              requestGroups[names[rowCells.parent.v]].items.push(item);
+            if ( requestGroups[rowCells.parent.id]) {
+              requestGroups[rowCells.parent.id].items.push(item);
             } else {
-              requestGroups[names[rowCells.parent.v]] = {
-                groupId: names[rowCells.parent.v],
+              requestGroups[rowCells.parent.id] = {
+                groupId: rowCells.parent.id,
                 items: [item]
               };
             }
@@ -1822,7 +1836,7 @@ export default {
             _this.$refs.loadFileEx.value = '';
             return false;
           }
-
+          
           const arrSheet1 = _this.getPassAndFailArrData(outdata.PassFail, passFailSheetFlagObj.indexArrPassFail);
           const arrSheet2 = _this.getScoreArrData(outdata.Score, scoreSheetFlagObj.indexArrScore);
           const arrSheet3 = _this.getOtherArrData(outdata.Others, otherSheetFlagObj.indexArrOthers);

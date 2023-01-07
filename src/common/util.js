@@ -307,6 +307,19 @@ export default {
     return str;
   },
 
+  getDiffTimeStr(startDate, endDate) {
+    //console.log(">>>>>startDate:",startDate);
+    //console.log(">>>>>endDate:",endDate);
+    var diff = (new Date(startDate)).getTime() - (new Date(endDate)).getTime();
+    var hours = Math.floor(diff / 1000 / 60 / 60);
+    diff -= hours * 1000 * 60 * 60;
+    var minutes = Math.floor(diff / 1000 / 60);
+    diff -= minutes * 1000 * 60;
+    var seconds = Math.round(diff / 1000);
+    const resultTime = hours + i18n.t('remotePatrol.hour') + minutes +  i18n.t('remotePatrol.minute') + seconds+i18n.t('remotePatrol.seconds');
+    return resultTime;
+  },
+
   base64ToBlob(urlData) {
     let arr = urlData.split(',');
     let mime = arr[0].match(/:(.*?);/)[1] || 'image/jpeg';

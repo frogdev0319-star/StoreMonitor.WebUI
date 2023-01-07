@@ -365,6 +365,10 @@ export default{
       "fluency":"SD",
       "fullScreenMode":"Chế độ toàn màn hình",
       "generateTime":"Thời gian khởi tạo:",
+      "signInTime":"Check In Time",
+      "patrolTime":"Inspection Time",
+      "signInDistance":"Check In Distance",
+      "aroundDistance":"around ",
       "getAccessTokenError":"Không nhận được token truy cập",
       "getBeseyeStreamError":"Không nhận được thông tin beseye!",
       "getscore":"Điểm kiểm tra",
@@ -521,7 +525,18 @@ export default{
       "resubmiteRpt":"Xác nhận gửi báo cáo",
       "systemReject":"Rút khỏi hệ thống",
       "systemRejectMsg":"Không có nhân viên đăng xuất; hãy xác nhận lại",
-      "cannotSwitchMimicMode":"Đang chỉnh sửa báo cáo, không thể chuyển chế độ"
+      "cannotSwitchMimicMode":"Đang chỉnh sửa báo cáo, không thể chuyển chế độ",
+      "tipLimitGroupScore":"得分超過類別上限時以上限計算總分",
+      "signatureInfo":"Check in Infomation",
+      "mapDistance1":"與",
+      "mapDistance2":"距離約",
+      "mapDistance3":"meters",
+      "hour":"hr(s)",
+      "seconds":"sec(s)",
+      "minute":"min(s)",
+      "reportSubmitting":"Report submitting...",
+      "storeCode":"Store Code",
+      "inspectSummary":"巡检总评"
   },
   "eventView":{
       "ClosedEvent":"Các sự kiện đã đóng",
@@ -530,6 +545,7 @@ export default{
       "ReturnEvent":"Các sự kiện đã hủy",
       "Returned":"Đã hoàn lại",
       "addDetails":"Thêm các chi tiết xử lý",
+      "addAttchement":"Thêm tập tin đính kèm",
       "adding":"Thêm",
       "all":"Tất cả",
       "allEvents":"Tất cả sự kiện",
@@ -571,7 +587,8 @@ export default{
       "expiredate":"Thời gian đóng",
       "closeSelectedEvent":"Xác nhận đóng sự kiện đã chọn?",
       "confirmBachClose":"Xác nhận đóng hàng loạt sự kiện",
-      "expiretag":"Đã hết hạn"
+      "expiretag":"Đã hết hạn",
+      "maximumAttVedio":"Only can uploade 2 vedio attachment"
   },
   "insSettingView":{
       "Addscoreitems":"Các mục chấm điểm bổ sung",

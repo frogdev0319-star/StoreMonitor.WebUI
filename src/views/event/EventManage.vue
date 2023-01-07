@@ -7,6 +7,48 @@
           path = "eventManage"
           @storeChange = "onStoreChange"
         >
+        <template v-slot:others>
+            <div class="last-row" >
+              <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.reportType') }}</span>
+              <div class="flex-center report-type-area">
+                <el-select
+                  v-model="curReportType"
+                  class="el-province"
+                  :placeholder="$t('remotePatrol.all')"
+                  size="mini"
+                  style="margin-right:0px;border:none;"
+                  @change="getInspectList"
+                >
+                  <el-option
+                    v-for="item in reportTypeList"
+                    :key="item.mode"
+                    :label="item.label"
+                    :value="item.mode"/>
+                </el-select>
+                <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" />
+                  <multi-select
+                    class="store-group-select region"
+                    :selected="inspectId"
+                    :prompt-msg="$t('remotePatrol.all')"
+                    :all-select="0"
+                    :alltype="0"
+                    :options="inspectTableList"
+                    @changeInput="changeSelect(arguments)"/>
+                  <!--<el-select
+                    class="el-province"
+                    style="margin-left:0px;border:none;border-radius:0px;"
+                    v-model="inspectId"
+                    :placeholder="$t('insSettingView.selectPost')"
+                    size="mini">
+                  <el-option
+                    v-for="item in inspectTableList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"/>
+                  </el-select>-->
+              </div>
+            </div>
+          </template>
         </store-filter>
       </div>
       <div class="flex-center" style="justify-content: space-between; margin: 20px 0 20px 0px;font-size:calc(16/1920*100vw)">
@@ -216,6 +258,7 @@
 
 import util from '@/common/util.js';
 import { eventRESTful } from '@/api/index';
+import {  GetInspectTagList } from '@/api/inspect';
 import { getCookie } from '@/common/auth';
 import { isLoginIn } from '@/api/login';
 import { mapGetters } from 'vuex';
@@ -359,7 +402,16 @@ export default {
             ],
       tabContentId:[{key:'en',value:'#en-tabs-content'},{key:'zh',value:'#en-tabs-content'},{key:'zhtw',value:'#en-tabs-content'},
         {key:'ja-JP',value:'#en-tabs-content'},{key:'ko-KR',value:'#en-tabs-content'},{key:'vi-VN',value:'#en-tabs-content'},
-        {key:'id-ID',value:'#en-tabs-content'},{key:'th-TH',value:'#th-tabs-content'}]
+        {key:'id-ID',value:'#en-tabs-content'},{key:'th-TH',value:'#th-tabs-content'}],
+      curReportType: -1,
+      reportTypeList: [
+        { 'mode': -1, 'label': this.$t('remotePatrol.all') },
+        { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
+        { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') }
+      ],
+      inspectId: [],
+      inspectTableList: [],
+      inspectCatch:[],
     };
   },
 
@@ -425,6 +477,7 @@ export default {
     const self = this;
     self.windowHeight = window.innerHeight;
     if (!self.$route.meta.isBack || self.isFirstLoad) {
+      self.getInspectList();
       self.initData();
     } else {
       console.log("Activate")
@@ -807,10 +860,19 @@ export default {
           like: like,
           searchMysteryMode : this.searchParams.searchMysteryMode
       }
+
       console.log("1.this.params:",params);
       if(storeId && storeId!='-1' && storeId!=""){
         console.log("storeId:",storeId);
          params.clause['storeId'] = storeId;
+      }
+      if(this.inspectId.length>0 && this.searchParams['searchFrom']!='PatrolPersonStat'){
+        let inspectTagId = this.inspectId;
+        if(this.inspectId[0]==='-1'){
+          params['inspectTagIds'] = inspectTagId.slice(1);
+        }else{
+          params['inspectTagIds'] = inspectTagId;
+        }
       }
       console.log("2.this.params:",params);
       console.log("this.searchParams:",this.searchParams);
@@ -943,7 +1005,15 @@ export default {
       if(storeId!='-1'){
         params['clause']['storeId'] = storeId
       }
-      console.log("820: params",params);
+      if(this.inspectId.length>0 && this.searchParams['searchFrom']!='PatrolPersonStat'){
+        let inspectTagId = this.inspectId;
+        if(this.inspectId[0]==='-1'){
+          params['inspectTagIds'] = inspectTagId.slice(1);
+        }else{
+          params['inspectTagIds'] = inspectTagId;
+        }
+      }
+      console.log("1008: params",params);
       if(this.searchParams.hasOwnProperty('searchParams')){
         if(this.searchParams.searchParams.hasOwnProperty('clause')  && this.searchParams['searchFrom']=='PatrolPersonStat'){
           params.clause['assigner'] =  this.searchParams.searchParams.clause.assigner;
@@ -1140,6 +1210,9 @@ export default {
       params.page = this.params.filter.page;
       params.order = this.order;
       params.searchMysteryMode = -1;
+      params.curReportType = this.curReportType;
+      params.inspectTagId = this.inspectId;
+      console.log(">>>Save params:",params);
       const searchConditon = {
         path: 'eventManage',
         params: params
@@ -1156,6 +1229,7 @@ export default {
           
           if(searchParams['searchFrom']=='PatrolPersonStat'){
             //this.dateValue =[searchParams.];
+            this.curReportType = -1;
             this.storeFilterObj.filterStoreIds = searchParams.curStore;
             this.storeFilterObj.curStore=searchParams.curStore;
             this.storeFilterObj.storeIds=searchParams.curStore;
@@ -1166,6 +1240,7 @@ export default {
             this.params.endTs = searchParams.endTs;
             this.dateValue = [util.getDates(searchParams.beginTs),searchParams.endTs];
             this.params.searchMysteryMode = searchParams.searchMysteryMode;
+            
             //console.log("1.EventMange > getSearchParams > dateValue:",this.dateValue);
             //util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
           }else if(searchParams['searchFrom']=="EventStatistics"){
@@ -1176,6 +1251,10 @@ export default {
             this.storeFilterObj.storeIds=searchParams.curStore;
             this.dateValue = [util.getDates(searchParams.beginTs),searchParams.endTs];
             this.params.searchMysteryMode = -1;
+            //console.log("EventMange > getSearchParams > searchParams.inspectTagId:",searchParams.inspectTagId);
+            this.curReportType = -1;
+            this.inspectCatch = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
+            this.inspectId = this.inspectCatch;
             //console.log("1..EventMange > getSearchParams > dateValue:",this.dateValue);
           }else{
             this.storeFilterObj.filterStoreIds = (searchParams.curStore)?searchParams.curStore:[];
@@ -1184,6 +1263,9 @@ export default {
             this.params.beginTs = this.dateValue[0].valueOf();
             this.params.endTs = this.dateValue[1].valueOf();
             this.params.searchMysteryMode = -1;
+            this.curReportType = (typeof searchParams.curReportType =='undefined')? -1 : searchParams.curReportType;
+            this.inspectCatch = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
+            console.log("EventMange > getSearchParams > this.inspectCatch:",this.inspectCatch);
           }
           this.inputSearchValue = searchParams.inputSearchValue;
           this.curState = searchParams.curState;
@@ -1196,6 +1278,7 @@ export default {
           this.params = searchParams.searchParams;
           this.searchParams = searchParams;
           this.ifGetParamsFromCash = true;
+          
         } else {
           this.searchParams = {};
           this.curState = [0];
@@ -1203,6 +1286,9 @@ export default {
           this.params.beginTs = this.dateValue[0].valueOf();
           this.params.endTs = this.dateValue[1].valueOf();
           this.params.searchMysteryMode = -1;
+          this.inspectCatch = '-1';
+          this.curReportType = -1;
+          this.ifGetParamsFromCash = false;
         }
       
     },
@@ -1248,8 +1334,69 @@ export default {
       }).catch(err => {
         console.log('EventDetail-addComment:' + err);
       });
-    }
+    },
+    async getInspectList() {
+      const self = this;
+      const inspectArr = await self.getTagAll();
+      const newArr = ['-1'];
+      const inspectList = [];
+      inspectArr.forEach(_item => {
+        if (self.curReportType === -1) {
+          if (!newArr.includes(_item.id)) {
+            newArr.push(_item.id);
+            inspectList.push(
+              {
+                label: _item.name,
+                value: _item.id
+              }
+            );
+          }
+        } else if (self.curReportType === 0) {
+          if (!newArr.includes(_item.id) && _item.mode === 0) {
+            newArr.push(_item.id);
+            inspectList.push(
+              {
+                label: _item.name,
+                value: _item.id
+              }
+            );
+          }
+        } else if (self.curReportType === 1) {
+          if (!newArr.includes(_item.id) && _item.mode === 1) {
+            newArr.push(_item.id);
+            inspectList.push(
+              {
+                label: _item.name,
+                value: _item.id
+              }
+            );
+          }
+        }
+      });
+      self.inspectTableList = inspectList;
+      //self.inspectTableList.length > 0 && self.inspectTableList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
+      if (inspectList.length !== 0) {
+        console.log(">>>>self.ifGetParamsFromCash:",self.ifGetParamsFromCash);
+        self.inspectId = self.ifGetParamsFromCash ? self.inspectCatch : newArr;
+        self.ifGetParamsFromCash = false;
+      } else {
+        self.inspectId = newArr;
+      }
+  },
 
+  getTagAll() {
+      return new Promise((resolve, reject) => {
+        GetInspectTagList().then(res => {
+          const data = res.data;
+          resolve(data);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+   },
+
+  changeSelect(val) {
+      this.inspectId = Array.from(val)[0];
   },
 
   beforeRouteEnter(to, from, next) {
@@ -1273,7 +1420,8 @@ export default {
     }
   }
 
-};
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -1565,6 +1713,24 @@ $h1:#292e36;
   padding-bottom: 6px; // 6px为横向滚动条高度
 }
 
+.last-row{
+      display: flex;
+      flex-direction: row;
+      width:100%;
+      margin-left: 42px;
+      height: 36px;
+      align-items: flex-start;
+      align-items:center;
+      justify-content: flex-start;
+      padding-right: (180/1920*100vw);
+}
+.report-type-area{
+    width:calc(346/1440*100vw);
+    height: calc(36/1920*100vw);
+    background-color: #FFF;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+}
 </style>
 <style scoped>
     .el-select >>> .el-input__inner{
