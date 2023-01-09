@@ -447,7 +447,7 @@
             @ezvizCutPictureFeedback="ezvizPictureFeedback"/>
         </div>
         <div class="channelbar-content padding" style="flex: 1">
-          <div v-if="isFullScreenMode" class="patrol-select title ">
+          <div v-if="isFullScreenMode" class="patrol-select title "> 
             <div class="patrol-content text-left flex-center" :class="{'margin-bottom-md': isFullScreenMode}">
               {{ $t('remotePatrol.selectInspect') }}
               <el-select 
@@ -2827,7 +2827,8 @@ export default {
       const self = this;
       self.allIgnoreObj.dialogCosed = false;
     },
-
+    
+    // sourceList
     async resolveConfoirmSummaryData() {
       const inspectList = [];
       const indexFeed = this.sheetName.map(x => x.groupId).indexOf('feedBack');
@@ -2841,8 +2842,8 @@ export default {
             item.items.forEach((_item, _index) => {
               if (_item.inputCount === 0) {
                 _item.isIgnore = true;
-                _item.inspectInput = '';
-                _item.sourceList = [];
+                // _item.inspectInput = '';
+                // _item.sourceList = [];
                 if (inspectSettings.qualifiedForIgnoredWithType1 && _item.type === 0
                   || inspectSettings.qualifiedForIgnoredWithType2 && _item.type === 1) {
                   _item.itemgetScore = _item.itemScore;
@@ -2860,8 +2861,8 @@ export default {
               this.hasIgnoretemp.forEach((h_item, h_index) => {
                 if (this.hasIgnoretemp[h_index].inputCount == 0) {
                   this.hasIgnoretemp[h_index].isIgnore = true;
-                  this.hasIgnoretemp[h_index].inspectInput = '';
-                  this.hasIgnoretemp[h_index].sourceList = [];
+                  // this.hasIgnoretemp[h_index].inspectInput = '';
+                  // this.hasIgnoretemp[h_index].sourceList = [];
                   if (inspectSettings.qualifiedForIgnoredWithType1 && h_item.type === 0
                     || inspectSettings.qualifiedForIgnoredWithType2 && h_item.type === 1) {
                     h_item.itemgetScore = h_item.itemScore;
@@ -2938,7 +2939,7 @@ export default {
     },
 
 
-
+    
     async confirmSummary() {
       const self = this;
       const temp = [];

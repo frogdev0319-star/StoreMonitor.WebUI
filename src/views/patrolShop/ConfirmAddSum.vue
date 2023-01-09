@@ -780,6 +780,9 @@ export default {
           self.oss = res.data;
         }
       });
+
+      console.log('inspect ::::::::::>> ', inspect);
+
       const temp = [];
       for (const i in inspect) {
         for (const g in inspect[i].inspectList) {
@@ -847,6 +850,7 @@ export default {
           }
         }
       }
+
       //feedBack
       const feedEventList = [];
       for (const i in self.eventList) {
@@ -1273,6 +1277,9 @@ export default {
         self.isBindWorkflow = routeData.isBindWorkflow;
         self.isEditReport = routeData.isEditReport;
         self.auditCancelable = routeData.auditCancelable;
+
+
+        console.log('self.inspectList :::::::>> ', self.inspectList);
 
         if(self.isEditReport) {
           self.reportId = routeData.reportId;
