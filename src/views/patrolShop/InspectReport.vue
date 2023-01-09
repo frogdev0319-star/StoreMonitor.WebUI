@@ -1043,10 +1043,12 @@ export default {
         
         switch (data.mode) {
           case 0:
+            self.report.inspectSrc = self.inspectSrc;
             self.report.inspectType = self.$t('overview.remotePatrol');
             break;
           case 1:
             console.log("data.mode:",data.mode); 
+            self.report.inspectSrc = self.insiteInspectSrc;
             self.isInsiteInspect = true;
             self.report.inspectType = self.$t('overview.onsitePatrol');
             self.showEditBtn = false;
