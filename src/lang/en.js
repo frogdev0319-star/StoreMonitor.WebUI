@@ -1476,7 +1476,9 @@ export default{
           "editAuditFail":"Failed to resubmit sign-off",
           "auditReport":"Sign-off record",
           "saveReport":"Save",
-          "submitReport":"Save and submit"
+          "submitReport":"Save and submit",
+          "warnWorkflowUnbind":"The binding process of the inspection form has been cancelled, please complete the setting of the inspection form binding process before continuing this operation",
+          "errorEditReport":"Edit Report Error"
       }
     },
     "mysterio":{

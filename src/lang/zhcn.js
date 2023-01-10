@@ -1474,7 +1474,9 @@ export default{
         "editAuditFail":"重送签核失败",
         "auditReport":"签核纪录表",
         "saveReport":"保存",
-        "submitReport":"储存并送出"
+        "submitReport":"储存并送出",
+        "warnWorkflowUnbind":"巡检表绑定流程已被取消，请完成巡检表绑定流程设定后再继续此操作",
+        "errorEditReport":"编辑报告错误"
     }
   },
   "mysterio":{

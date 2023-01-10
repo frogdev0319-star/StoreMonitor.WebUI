@@ -1455,8 +1455,6 @@ export default{
         "cantEmptyDays" : "停留天數不可為空! ",
         "cantTooMuchDays" : "天數不可超過365天! ",
         "cantEmptyInspectStatus" : "巡檢總評選項自定義名稱不可為空! ",
-
-
     },
     "inceptionRpt":{
         "sendAudit":"送出簽核",
@@ -1478,7 +1476,9 @@ export default{
         "editAuditFail":"重送簽核失敗",
         "auditReport":"簽核紀錄表",
         "saveReport":"儲存",
-        "submitReport":"儲存並送出"
+        "submitReport":"儲存並送出",
+        "warnWorkflowUnbind":"巡檢表綁定流程已被取消，請完成巡檢表綁定流程設定後再繼續此操作",
+        "errorEditReport":"編輯報告錯誤"
     }
   },
   "mysterio":{

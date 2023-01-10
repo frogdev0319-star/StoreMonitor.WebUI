@@ -564,6 +564,19 @@
       @cancelHandler="onCancelAudit"
       @confirmHandler="onConfirmCancelAudit">
     </dialog-pop>
+
+    <dialog-pop
+      v-if="workflowUnbindDialogShow"
+      :title="warnWorkflowUnbindTitle"
+      :isWarning="true"
+      :visible="workflowUnbindDialogShow"
+      :showCancelbtn="false"
+      @confirmHandler="workflowUnbindDialogShow=false"
+    >
+      <div class="dialog-slot">
+            {{warnWorkflowUnbind}}
+      </div>
+    </dialog-pop>
   </div>
 </template>
 <script>
@@ -571,7 +584,8 @@ import ECharts from 'vue-echarts';
 import { 
   getInspectReportInfo,
   downLoadInspectReportEntireDetail,
-  getInspectStatus
+  getInspectStatus,
+  checkOutInspectItemV3
 } from '@/api/inspect';
 import { CancelWorkflow,taskDrawback,GetTaskInfo } from '@/api/workflow';
 import {getDetailedStoreInfo} from '@/api/store';
@@ -692,7 +706,10 @@ export default {
       storeLongitude:0.0,
       signInDistance:'',
       signInTime:'',
-      signMapUrl:''
+      signMapUrl:'',
+      workflowUnbindDialogShow:false,
+      warnWorkflowUnbind:this.$t('audit.inceptionRpt.warnWorkflowUnbind'),
+      warnWorkflowUnbindTitle:this.$t('audit.inceptionRpt.errorEditReport'),
     };
   },
 
@@ -1890,52 +1907,76 @@ export default {
           return result;
       })
     },
+    async getWorkFloBind(){
+      const self = this;
+      var isBindWorkflow = true;
+      const params = {
+        storeId: self.reportData.storeId,
+        mode: 0,
+        authorizedOnly: this.enableMimicMode?0:1,
+        tagName: self.patrolstore,
+        inspectId: self.reportData.tagId,
+        isMysteryMode:this.enableMimicMode
+      };
+      const result = await checkOutInspectItemV3(params);
+      console.log(">>>>>getWorkFloBind result:",result);
+      if(result.errCode == 0) isBindWorkflow = result.data.isBindWorkflow;
+      return isBindWorkflow;
+    },
     async goBackRemoteInception(){
       const self = this;
-      console.log("goBackRemoteInception");
-      self.$store.dispatch('setPatrolComment', {suggest:self.reportData.comment, status:self.reportData.status});
-      var BackPatrolParam = {
-        isEdit:true,
-        reportId:self.report.reportId,
-        reportStaus:self.reportData.status,
-        reportComment:self.reportData.comment,
-        tagId:self.reportData.tagId,
-        tagName : self.reportData.tagName,
-        backSheetGroup:self.backSheetGroup,
-        activeIndex : 0,
-        store:self.reportData.storeId,
-        auditCancelable:self.showCancelBtn,
-        //hasIgnoretemp:[],//略過的巡檢項內容
-        //inspectItemList:[], //當下巡檢項內容
-        eventList:await self.doGetFeebackItem(), ////問題回饋內容 info.feedback"
-        curSheetIndex:0,
-        curGroupIndex:0,
-        curItemIndex:0,
-        curItemId:0
-      };
+      let isStillBind = await self.getWorkFloBind();
       
-      var params = {
-        isEdit:true,
-        reportComment:this.reportData.comment
-      };
-      if(self.auditState!=3 && self.auditState!=6  && self.auditState!=7){//撤回跟駁回不需要再drawback
-      console.log("doDrawbak!!!!");
-        var drawbackParam = {inspectReportId:self.report.reportId};
-        taskDrawback(drawbackParam).then(res=>{
+      if(!isStillBind){
+        console.log(">>>>isStillBind:",isStillBind)
+        self.workflowUnbindDialogShow = true;
+        return;
+      }else{
+        console.log("goBackRemoteInception");
+        self.$store.dispatch('setPatrolComment', {suggest:self.reportData.comment, status:self.reportData.status});
+        var BackPatrolParam = {
+          isEdit:true,
+          reportId:self.report.reportId,
+          reportStaus:self.reportData.status,
+          reportComment:self.reportData.comment,
+          tagId:self.reportData.tagId,
+          tagName : self.reportData.tagName,
+          backSheetGroup:self.backSheetGroup,
+          activeIndex : 0,
+          store:self.reportData.storeId,
+          auditCancelable:self.showCancelBtn,
+          //hasIgnoretemp:[],//略過的巡檢項內容
+          //inspectItemList:[], //當下巡檢項內容
+          eventList:await self.doGetFeebackItem(), ////問題回饋內容 info.feedback"
+          curSheetIndex:0,
+          curGroupIndex:0,
+          curItemIndex:0,
+          curItemId:0
+        };
+        
+        var params = {
+          isEdit:true,
+          reportComment:this.reportData.comment
+        };
+        if(self.auditState!=3 && self.auditState!=6  && self.auditState!=7){//撤回跟駁回不需要再drawback
+        console.log("doDrawbak!!!!");
+          var drawbackParam = {inspectReportId:self.report.reportId};
+          taskDrawback(drawbackParam).then(res=>{
+              self.$store.dispatch('setBackPatrolParam', BackPatrolParam);
+            /*self.$store.dispatch('setStoreList', self.storeList);*/
+            self.$store.dispatch('setStoreCache', self.reportData.storeId);
+            this.$router.push({ name: 'remotePatrol', params: params });
+          }).catch(err=>{
+            util.notify(self.$t('audit.inceptionRpt.editAuditFail')+':'+err, 'warning', 3000);
             self.$store.dispatch('setBackPatrolParam', BackPatrolParam);
-          /*self.$store.dispatch('setStoreList', self.storeList);*/
-          self.$store.dispatch('setStoreCache', self.reportData.storeId);
-          this.$router.push({ name: 'remotePatrol', params: params });
-        }).catch(err=>{
-          util.notify(self.$t('audit.inceptionRpt.editAuditFail')+':'+err, 'warning', 3000);
+            self.$store.dispatch('setStoreCache', self.reportData.storeId);
+            this.$router.push({ name: 'remotePatrol', params: params });
+          });
+        }else{//除非送簽者自己回去編輯
           self.$store.dispatch('setBackPatrolParam', BackPatrolParam);
           self.$store.dispatch('setStoreCache', self.reportData.storeId);
           this.$router.push({ name: 'remotePatrol', params: params });
-        });
-      }else{//除非送簽者自己回去編輯
-        self.$store.dispatch('setBackPatrolParam', BackPatrolParam);
-        self.$store.dispatch('setStoreCache', self.reportData.storeId);
-        this.$router.push({ name: 'remotePatrol', params: params });
+        }
       }
     },
     doCancelAudit(){
