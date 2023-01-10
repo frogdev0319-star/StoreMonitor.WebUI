@@ -2130,7 +2130,7 @@ export default {
       }
       .title-icon{
         width: calc(20/1440*100vw);
-        height: calc(20/1440*100vw);
+        // height: calc(20/1440*100vw);
       }
       .pdf-report-title{
         font-size: 18px;

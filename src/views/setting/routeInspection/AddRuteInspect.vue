@@ -697,7 +697,6 @@ export default {
       },
 
       memo_optionsTips0: false,
-
       memo_configTips : false
 
     };
@@ -784,8 +783,6 @@ export default {
         this.memo_config.memo_check_text = true
         this.memo_config.memo_check_media = false
       }
-
-      
     },
 
     toItemRequired(){

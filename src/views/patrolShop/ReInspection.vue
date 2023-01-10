@@ -393,7 +393,7 @@
           @confirmHandler="memoConfigTextObj.dialogCosed = false"
           >
           <div class="dialog-slot">
-            <div class="padding-vertical-sm">{{memoConfigTextObj.showInfo}} </div>
+            <div class="padding-vertical-sm" style="color: #f31d65">{{memoConfigTextObj.showInfo}} </div>
           </div>
         </dialog-pop>
 
@@ -409,20 +409,6 @@
             <div class="padding-vertical-sm">{{memoConfigMediaObj.showInfo}} </div>
           </div>
         </dialog-pop>
-
-        <dialog-pop
-          v-if="memoConfigTextAndMediaObj.dialogCosed"
-          :title="memoConfigTextAndMediaObj.title"
-          :isWarning="memoConfigTextAndMediaObj.isWarning"
-          :visible="memoConfigTextAndMediaObj.dialogCosed"
-          @cancelHandler="memoConfigTextAndMediaObj.dialogCosed = false"
-          @confirmHandler="memoConfigTextAndMediaObj.dialogCosed = false"
-          >
-          <div class="dialog-slot">
-            <div class="padding-vertical-sm">{{memoConfigTextAndMediaObj.showInfo}} </div>
-          </div>
-        </dialog-pop>
-
 
 
         <div v-if="showGuide && inspectList.length > 0" class="guide-content">
@@ -461,7 +447,7 @@
             @ezvizCutPictureFeedback="ezvizPictureFeedback"/>
         </div>
         <div class="channelbar-content padding" style="flex: 1">
-          <div v-if="isFullScreenMode" class="patrol-select title ">
+          <div v-if="isFullScreenMode" class="patrol-select title "> 
             <div class="patrol-content text-left flex-center" :class="{'margin-bottom-md': isFullScreenMode}">
               {{ $t('remotePatrol.selectInspect') }}
               <el-select 
@@ -790,12 +776,20 @@
                               <span v-show="(item.memo_config.memo_check_media == true)">「圖片或影片」</span> 類型附件
                     </div>
 
-                    <div class="advance_memo" v-else-if="(item.memo_config !== null && item.memo_config.memo_required_type == 2)"> 
-                      * 不合格時需加入 <span v-show="(item.memo_config.memo_check_text == true)">「文字」</span>
+                    <div class="advance_memo" v-else-if="( item.memo_config !== null && item.memo_config.memo_required_type == 2)"> 
+                      <div class="" v-if="(item.qualifiedScore === 0)">
+                      * 不合格時需加入 
+                          <span v-show="(item.memo_config.memo_check_text == true)">「文字」</span>
                           <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">、</span>
                           <span v-show="(item.memo_config.memo_check_media == true)">「圖片或影片」</span> 類型附件
+                      </div>
+                      <div class="advance_memo" v-else-if="(item.qualifiedScore > 0)">
+                      * 低於 {{item.qualifiedScore}} 分時，需加入
+                          <span v-show="(item.memo_config.memo_check_text == true)">「文字」</span>
+                          <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">、</span>
+                          <span v-show="(item.memo_config.memo_check_media == true)">「圖片或影片」</span> 類型附件
+                      </div> 
                     </div>
-                    
                     <span v-if="item.RuleCountTip" class="rules">{{
                       $t("remotePatrol.commentCountRuleTip")
                     }}</span>
@@ -1108,12 +1102,7 @@ export default {
         isWarning: true,
         dialogCosed: false
       },
-      memoConfigTextAndMediaObj: {
-        title: this.$t('remotePatrol.prompt'),
-        showInfo: '尚有必填項目未完成，備註標籤請加入「文字」或「圖片或影像」類型附件',
-        isWarning: true,
-        dialogCosed: false
-      },
+
 
 
       recorder: null,
@@ -2838,7 +2827,8 @@ export default {
       const self = this;
       self.allIgnoreObj.dialogCosed = false;
     },
-
+    
+    // sourceList
     async resolveConfoirmSummaryData() {
       const inspectList = [];
       const indexFeed = this.sheetName.map(x => x.groupId).indexOf('feedBack');
@@ -2852,8 +2842,8 @@ export default {
             item.items.forEach((_item, _index) => {
               if (_item.inputCount === 0) {
                 _item.isIgnore = true;
-                _item.inspectInput = '';
-                _item.sourceList = [];
+                // _item.inspectInput = '';
+                // _item.sourceList = [];
                 if (inspectSettings.qualifiedForIgnoredWithType1 && _item.type === 0
                   || inspectSettings.qualifiedForIgnoredWithType2 && _item.type === 1) {
                   _item.itemgetScore = _item.itemScore;
@@ -2871,8 +2861,8 @@ export default {
               this.hasIgnoretemp.forEach((h_item, h_index) => {
                 if (this.hasIgnoretemp[h_index].inputCount == 0) {
                   this.hasIgnoretemp[h_index].isIgnore = true;
-                  this.hasIgnoretemp[h_index].inspectInput = '';
-                  this.hasIgnoretemp[h_index].sourceList = [];
+                  // this.hasIgnoretemp[h_index].inspectInput = '';
+                  // this.hasIgnoretemp[h_index].sourceList = [];
                   if (inspectSettings.qualifiedForIgnoredWithType1 && h_item.type === 0
                     || inspectSettings.qualifiedForIgnoredWithType2 && h_item.type === 1) {
                     h_item.itemgetScore = h_item.itemScore;
@@ -2949,7 +2939,7 @@ export default {
     },
 
 
-
+    
     async confirmSummary() {
       const self = this;
       const temp = [];
@@ -2958,7 +2948,6 @@ export default {
       let requiredValid = false;
       let memoCheckText = false;
       let memoCheckMedia = false;
-      let memoCheckMediaAndText = false;
 
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
@@ -2979,32 +2968,83 @@ export default {
                   requiredValid = true
                 }
               }
-
-
+              
+              
               if(_item.memo_config !== null){
-                if(_item.memo_config.memo_required_type === 1){
-                  if(_item.inspectInput == "" && _item.memo_config.memo_check_text) {
-                    memoCheckText = true
-                    console.log('_index ::::::::>>', _index)
+                switch (_item.type) {
+                  case 0:
+                    // console.log('this is type ===:>> 0');
+                    // console.log('_item.type ::::::::>> ', _item.type);
+                    const hasText_tab1 = _item.sourceList.some(i => i.mediaType === 3)
+                    const hasImg_tab1 = _item.sourceList.some(i => i.mediaType === 2)
+                    if(_item.memo_config.memo_required_type === 1){
+                      if(_item.memo_config.memo_check_text && !hasText_tab1) {
+                        memoCheckText = true
+                        }
+                      else if(_item.memo_config.memo_check_media && !hasImg_tab1){ 
+                        memoCheckMedia = true
+                        }
                     }
-                  if(_item.sourceList.length == 0 && _item.memo_config.memo_check_media){ 
-                    memoCheckMedia = true
-                    console.log('_index ::::::::>>', _index)
+                    else if(_item.memo_config.memo_required_type === 2){
+                      if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle && _item.memo_config.memo_check_text && !hasText_tab1){
+                        memoCheckText = true
+                      }
+                      else if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle && _item.memo_config.memo_check_media && !hasImg_tab1){
+                        memoCheckMedia = true
+                      }
                     }
-                }
-                else if(_item.memo_config.memo_required_type === 2){
-                  if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle && _item.inspectInput == "" && _item.memo_config.memo_check_text){
-                    memoCheckText = true
-                    console.log('_index ::::::::>>', _index)
-                  }
-                  if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle &&_item.sourceList.length == 0 && _item.memo_config.memo_check_media){
-                    memoCheckMedia = true
-                    console.log('_index ::::::::>>', _index)
-                  }
+                    break;
+
+                  case 1:
+                    // console.log('this is type ===:>> 1  ');
+                    // console.log('_item.type ::::::::>> ', _item.type);
+                    const hasText_tab2 = _item.sourceList.some(i => i.mediaType === 3)
+                    const hasImg_tab2 = _item.sourceList.some(i => i.mediaType === 2)
+                    if(_item.memo_config.memo_required_type === 1){
+                      if(_item.memo_config.memo_check_text && !hasText_tab2) {
+                        memoCheckText = true
+                        }
+                      else if(_item.memo_config.memo_check_media && !hasImg_tab2){ 
+                        memoCheckMedia = true
+                        }
+                    }
+                    else if(_item.memo_config.memo_required_type === 2){
+                      if(_item.qualifiedScore > _item.itemgetScore && _item.memo_config.memo_check_text && !hasText_tab2){
+                        memoCheckText = true
+                      }
+                      else if(_item.qualifiedScore > _item.itemgetScore && _item.memo_config.memo_check_media && !hasImg_tab2){
+                        memoCheckMedia = true
+                      }
+                    }
+                    break;
+
+                  case 2:
+                    // console.log('this is type ===:>> 2  ');
+                    // console.log('_item.type ::::::::>> ', _item.type);
+                    const hasText_tab3 = _item.sourceList.some(i => i.mediaType === 3)
+                    const hasImg_tab3 = _item.sourceList.some(i => i.mediaType === 2)
+                    if(_item.memo_config.memo_required_type === 1){
+                      if(_item.memo_config.memo_check_text && !hasText_tab3) {
+                        memoCheckText = true
+                        }
+                      else if(_item.memo_config.memo_check_media && !hasImg_tab3){ 
+                        memoCheckMedia = true
+                        }
+                    }
+                    else if(_item.memo_config.memo_required_type === 2){
+                      if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle && _item.memo_config.memo_check_text && !hasText_tab3){
+                        memoCheckText = true
+                      }
+                      else if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle && _item.memo_config.memo_check_media && !hasImg_tab3){
+                        memoCheckMedia = true
+                      }
+                    }
+                    break;
+                  
+                  default:
+                    break
                 }
               }
-              
-
 
             });
           });
@@ -5238,11 +5278,12 @@ export default {
     .group_content {
       border: 1px solid #e6e6e6;
       border-radius: 4px;
-      padding: calc(5/1920*100vw) calc(20/1920*100vw);
+      padding: 6px calc(20/1920*100vw);
       margin-right: calc(10/1920*100vw);
       margin-top: calc(10/1920*100vw);
       cursor: pointer;
       font-size: calc(15/1920*100vw);
+      line-height: 1.8
     }
     .noraml-color{
       background-color: #006ab7;
