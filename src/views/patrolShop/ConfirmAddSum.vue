@@ -6,10 +6,10 @@
         <div class="spacer"></div>
         <div v-if="isEditReport"><!--isEditReport-->
           <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="confirm-btn" type="primary" @click="submit(false)">
-            {{ $t('audit.inceptionRpt.saveReport') }}
+            {{ $t('audit.inceptionRpt.saveReport') }} 
           </el-button>
           <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="storevue-button-filled" type="primary" @click="showConfirmSubmitMsg=true">
-            {{ $t('audit.inceptionRpt.submitReport') }}
+            {{ $t('audit.inceptionRpt.submitReport') }} 
           </el-button>
         </div>
         <div v-else>
@@ -189,6 +189,7 @@
             </template>
           </table>
         </div>
+
         <el-row v-for="(item,index) in tempList" :key="index" class="row-detail">
           <el-col v-if="item.data.length!=0">
             <div class="item-header">
@@ -754,6 +755,7 @@ export default {
       this.submit(true);
     },
 
+
     async submit(sendEvent) {
       const self = this;
       let upload = 0;
@@ -808,7 +810,7 @@ export default {
             objItem.storeId = self.store.storeId;
             objItem.inspectItemId = inspect[i].inspectList[g].items[j].id;
             const tempFileUrl = [];
-            if (!inspect[i].inspectList[g].items[j].isIgnore) {
+            // if (!inspect[i].inspectList[g].items[j].isIgnore) {
               for (const k in inspect[i].inspectList[g].items[j].sourceList) {
                 const obj = {};
                 if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 2 || inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 1) {
@@ -844,14 +846,17 @@ export default {
                 }
                 tempFileUrl.push(obj);
               }
-            }
+            // }
             objItem.attachment = tempFileUrl;
+
+            console.log('objItem ::::::::::>> ', objItem);
             temp.push(objItem);
           }
         }
       }
 
       //feedBack
+      console.log('self.eventList ::::::::::>> ', self.eventList);
       const feedEventList = [];
       for (const i in self.eventList) {
         const obj = {};
@@ -990,6 +995,10 @@ export default {
         isCreateEvent:sendEvent
       };
       
+      console.log('params ::::::::::>> ', params);
+
+      
+      
       let routeData = null;
       if(self.reportId!=-1 && self.isEditReport){
         params['reportId']=this.reportId;
@@ -1066,6 +1075,10 @@ export default {
       }
       self.uploadProgress = false;
     },
+
+
+
+
 
     doModifyReportSubmit(params,auditAttachment,sendEvent){
       const self = this;
@@ -1259,9 +1272,7 @@ export default {
             if(x.label==self.curSumIndex) x.isActive=true;
           });
       }
-      console.log()
       self.userId = getCookie('UserId');
-      
       Database.getDataFromDB(getCookie('UserId')).then(res => {
         const inpectResult = res;
         console.log("***inspect:",inpectResult);
@@ -1758,6 +1769,7 @@ export default {
         });
         const eventpic = eventList.filter(x => x.sourceObj != null);
         self.totalnumOfPic = Number(inspectPic) + Number(eventpic.length);
+        // 缺失項
         tempList[0] = {
           itemTitleName: self.$t('remotePatrol.notableItem'),
           iconSrc: 'icon-zhongxindingwei',
@@ -1765,6 +1777,7 @@ export default {
           data: this.getGroupsItems('unqualifiedItems'),
           detailType: 0
         };
+        // 不適用項
         tempList[1] = {
           itemTitleName: self.$t('remotePatrol.ignoreds'),
           iconSrc: 'icon-hulve',
@@ -1772,6 +1785,8 @@ export default {
           data: this.getGroupsItems('ignoreItems'),
           detailType: 1
         };
+        
+        // 問題回饋
         tempList[2] = {
           itemTitleName: self.$t('remotePatrol.feedbacks'),
           iconSrc: 'icon-fankui',
@@ -1780,6 +1795,7 @@ export default {
           detailType: 2
         };
         self.tempList = tempList;
+        console.log('self.tempList ::::::::::::::>> ', self.tempList);
       }).catch(err => {
         console.log(err);
       });
