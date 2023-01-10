@@ -680,6 +680,7 @@ export default{
       "excelPassFailScoreType":"项目分值选填，取值范围为0.5~50",
       "excelScoreItemEmpty":"评分选项不能为空！",
       "excelScoreItemType":"评分选项必填，取值范围为-50~50",
+      "excelScoreInvalidType":"数值栏位输入错误(如: 遗漏'/'或存在非合法数值)",
       "export":"导出",
       "exportFailTitle":"导出失败",
       "group":"大类",

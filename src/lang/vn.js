@@ -679,6 +679,7 @@ export default{
       "excelPassFailScoreType":"Điểm: Không bắt buộc, 0,5~50 điểm",
       "excelScoreItemEmpty":"Không được để trống các tùy chọn điểm!",
       "excelScoreItemType":"Các tùy chọn điểm: Bắt buộc, -50~50",
+      "excelScoreInvalidType":"數值欄位輸入錯誤(如: 遺漏'/'或存在非合法數值)",
       "export":"Xuất",
       "exportFailTitle":"Không xuất được",
       "group":"các nhóm",

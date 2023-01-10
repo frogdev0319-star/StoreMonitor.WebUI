@@ -1985,7 +1985,6 @@ export default {
           //   rowDataObj.description = this.getTableCellData(_item.__EMPTY_7);
           //   rowDataObj.required = _item.__EMPTY_8;
           // }
-
           rowDataArray.push(rowDataObj);
         });
         return rowDataArray;
@@ -2077,7 +2076,8 @@ export default {
           flagScoreItemType: false,
           flagDesLengthScore: false,
           flagScoreItemEmpty: false,
-          flagFullScoreLimitation: false
+          flagFullScoreLimitation: false,
+          flagScoreTypeInvalid:false
         }
       };
       if (scoreArr.length === 0) {
@@ -2110,13 +2110,18 @@ export default {
         }
         let maxScore = 0;
         if (tableVersion === 1) {
+          
           if (item.score != undefined) {
             if (typeof item.score !== 'number' && item.score.indexOf('/') !== -1) {
               const f_Score = item.score.split('/');
               const scoreArr = [];
               f_Score.forEach(f_item => {
-                if (!isNaN(Number(f_item)) && parseFloat(f_item) >= -50 && parseFloat(f_item) <= 50) {
-                  scoreArr.push(parseFloat(_this.getFloat(f_item)));
+                try{
+                  if (!isNaN(Number(f_item)) && parseFloat(f_item) >= -50 && parseFloat(f_item) <= 50) {
+                    scoreArr.push(parseFloat(_this.getFloat(f_item)));
+                  }
+                }catch(err){
+                  scoreFlagObj.flags.flagScoreTypeInvalid = true;
                 }
               });
               scoreArr.length === 0 ? scoreFlagObj.flags.flagScoreItemType = true : item.score = scoreArr;
@@ -2154,6 +2159,9 @@ export default {
               f_Score.forEach(f_item => {
                 if (!isNaN(Number(f_item)) && parseFloat(f_item) >= -50) {
                   scoreArr.push(parseFloat(_this.getFloat(f_item)));
+                }else{
+                  //console.log(">>>2. score f_item is not a number:",f_Score);
+                  scoreFlagObj.flags.flagScoreTypeInvalid = true;
                 }
               });
               if (scoreArr.length === 0) {
@@ -2336,6 +2344,9 @@ export default {
         }
         if (othersFlag.flagOtherScoreType) {
           warningInfo.push('[Others]' + ' ' + this.$t('insSettingView.excelOtherScoreType'));
+        }
+        if(scoreFlag.flagScoreTypeInvalid){
+          warningInfo.push('[Score]' + ' ' + this.$t('insSettingView.excelScoreInvalidType'));
         }
         /*if (scoreFlag.flagScoreItemType) {
           warningInfo.push('[Score]' + ' ' + this.$t('insSettingView.excelScoreItemType'));

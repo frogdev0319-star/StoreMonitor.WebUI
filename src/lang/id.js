@@ -679,6 +679,7 @@ export default{
       "excelPassFailScoreType":"Nilai: Opsional, 0,5~50poin",
       "excelScoreItemEmpty":"Opsi nilai tidak boleh kosong!",
       "excelScoreItemType":"Opsi Nilai: Wajib diisi, -50~50",
+      "excelScoreInvalidType":"數值欄位輸入錯誤(如: 遺漏'/'或存在非合法數值)",
       "export":"Ekspor",
       "exportFailTitle":"Gagal mengekspor",
       "group":"grup",

@@ -679,6 +679,7 @@ export default{
       "excelPassFailScoreType":"スコア：オプション、0.5～50ポイント",
       "excelScoreItemEmpty":"スコアオプションをエンプティーにすることはできません！",
       "excelScoreItemType":"スコアオプション：必須、-50〜満点",
+      "excelScoreInvalidType":"數值欄位輸入錯誤(如: 遺漏'/'或存在非合法數值)",
       "export":"エクスポート",
       "exportFailTitle":"エクスポートできませんでした",
       "group":"グループ",

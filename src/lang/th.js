@@ -678,6 +678,7 @@ export default{
       "excelPassFailScoreType":"คะแนน:ทางเลือก, 0.5~50 คะแนน",
       "excelScoreItemEmpty":"ตัวเลือกคะแนนไม่สามารถว่างเปล่า!",
       "excelScoreItemType":"ตัวเลือกคะแนน: จำเป็น, -50~50",
+      "excelScoreInvalidType":"數值欄位輸入錯誤(如: 遺漏'/'或存在非合法數值)",
       "export":"ส่งออก",
       "exportFailTitle":"ไม่สามารถส่งออก",
       "group":"กลุ่ม",

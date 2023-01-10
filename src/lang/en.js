@@ -680,6 +680,7 @@ export default{
         "excelPassFailScoreType":"Score:Optional, 0.5~50points",
         "excelScoreItemEmpty":"The score options cannot be empty!",
         "excelScoreItemType":"Score Options: Required, -50~50",
+        "excelScoreInvalidType":"數值欄位輸入錯誤(如: 遺漏'/'或存在非合法數值)",
         "export":"Export",
         "exportFailTitle":"Failed to export",
         "group":"groups",

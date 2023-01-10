@@ -679,6 +679,7 @@ export default{
       "excelPassFailScoreType":"점수: 선택 사항, 0.5-50점",
       "excelScoreItemEmpty":"점수 선택이 비어있으면 안된다!",
       "excelScoreItemType":"득점 선택: 필수-50~만점",
+      "excelScoreInvalidType":"數值欄位輸入錯誤(如: 遺漏'/'或存在非合法數值)",
       "export":"내보내기",
       "exportFailTitle":"내보내기 실패",
       "group":"그룹",
