@@ -476,6 +476,7 @@
               <div class="signature-details">
                 <div
                   v-for="(signatureItem, signatureIndex) in pageItem.data"
+                  v-show="signatureItem.content"
                   :key="signatureIndex"
                   class="signature-item">
                   <img
