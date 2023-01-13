@@ -537,7 +537,16 @@ export default{
       "minute":"分",
       "reportSubmitting":"报告送出中...",
       "storeCode":"门店代码",
-      "inspectSummary":"巡检总评"
+      "inspectSummary":"巡检总评",
+      "pleaseAdd":"* 请加入 ",
+      "notQualifyAdd":"* 不合格时需加入 ",
+      "lowerThan":"* 低于 ",
+      "lowScoreAdd":"分时，需加入",
+      "textItem":"「文字」 ",
+      "mediaItem":"「图片或影片」 ",
+      "attachments":"类型附件 ",
+      "notFinishWithText":"尚有必填项目未完成，备注标签请加入「文字」类型附件 ",
+      "notFinishWithMedia":"尚有必填项目未完成，备注标签请加入「图片或影像」类型附件",
   },
   "eventView":{
       "ClosedEvent":"已结案事件",
@@ -821,7 +830,14 @@ export default{
       "noUserDefinedName":"无自定义名称 ",
       "needHeighterThan":"考评范围最高值需高于最低值! ",
       "cantEmptyScoreLow":"最低考评总分范围不可为空! ",
-      "cantEmptyScoreHeight":"最高考评总分范围不可为空! "
+      "cantEmptyScoreHeight":"最高考评总分范围不可为空! ",
+      "memoAdvanced":"備註標籤",
+      "memoSeparate":"(多項請以\"/\"隔開)",
+      "inputMemoAdvanced":"請輸入備註標籤 ",
+      "memoCheckText":"文字 ",
+      "memoCheckMedai":"圖片或影片 ",
+      "notQualifyIsRequired":"僅不合格必填 ",
+      "selectAtLeastOne":"至少選擇一項備註類別（文字、圖片或影片 "
   },
   "deviceView":{
       "EzvizAccount":"串流服务账号",

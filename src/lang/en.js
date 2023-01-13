@@ -537,7 +537,17 @@ export default{
         "minute":"min(s)",
         "reportSubmitting":"Report submitting...",
         "storeCode":"Store Code",
-        "inspectSummary":"巡检总评"
+        "inspectSummary":"巡檢總評",
+        "pleaseAdd":"* 請加入 ",
+        "notQualifyAdd":"* 不合格時需加入 ",
+        "lowerThan":"* 低於 ",
+        "lowScoreAdd":"分時，需加入 ",
+        "textItem":"「文字」 ",
+        "mediaItem":"「圖片或影片」 ",
+        "attachments":"類型附件 ",
+        "notFinishWithText":"尚有必填項目未完成，備註標籤請加入「文字」類型附件 ",
+        "notFinishWithMedia":"尚有必填項目未完成，備註標籤請加入「圖片或影像」類型附件 "
+
     },
     "eventView":{
         "ClosedEvent":"Closed Events",
@@ -821,7 +831,14 @@ export default{
         "noUserDefinedName":"無自定義名稱 ",
         "needHeighterThan":"考評範圍最高值需高於最低值! ",
         "cantEmptyScoreLow":"最低考評總分範圍不可為空! ",
-        "cantEmptyScoreHeight":"最高考評總分範圍不可為空! "
+        "cantEmptyScoreHeight":"最高考評總分範圍不可為空! ",
+        "memoAdvanced":"備註標籤",
+        "memoSeparate":"(多項請以\"/\"隔開)",
+        "inputMemoAdvanced":"請輸入備註標籤 ",
+        "memoCheckText":"文字 ",
+        "memoCheckMedai":"圖片或影片 ",
+        "notQualifyIsRequired":"僅不合格必填 ",
+        "selectAtLeastOne":"至少選擇一項備註類別（文字、圖片或影片) "
     },
     "deviceView":{
         "EzvizAccount":"Streaming Service Account",
