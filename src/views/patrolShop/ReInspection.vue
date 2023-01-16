@@ -406,7 +406,7 @@
           @confirmHandler="memoConfigMediaObj.dialogCosed = false"
           >
           <div class="dialog-slot">
-            <div class="padding-vertical-sm">{{memoConfigMediaObj.showInfo}} </div>
+            <div class="padding-vertical-sm" style="color: #f31d65">{{memoConfigMediaObj.showInfo}} </div>
           </div>
         </dialog-pop>
 
@@ -771,23 +771,23 @@
 
                     <!-- notification -->
                     <div class="advance_memo" v-if="(item.memo_config !== null && item.memo_config.memo_required_type == 1)"> 
-                      * 請加入 <span v-show="(item.memo_config.memo_check_text == true)">「文字」</span>
-                              <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">、</span>
-                              <span v-show="(item.memo_config.memo_check_media == true)">「圖片或影片」</span> 類型附件
+                      {{$t('remotePatrol.pleaseAdd')}} <span v-show="(item.memo_config.memo_check_text == true)"> {{$t('remotePatrol.textItem')}}</span>
+                          <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">, </span>
+                          <span v-show="(item.memo_config.memo_check_media == true)">{{$t('remotePatrol.mediaItem')}}</span> {{$t('remotePatrol.attachments')}}
                     </div>
 
                     <div class="advance_memo" v-else-if="( item.memo_config !== null && item.memo_config.memo_required_type == 2)"> 
                       <div class="" v-if="(item.qualifiedScore === 0)">
-                      * 不合格時需加入 
-                          <span v-show="(item.memo_config.memo_check_text == true)">「文字」</span>
-                          <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">、</span>
-                          <span v-show="(item.memo_config.memo_check_media == true)">「圖片或影片」</span> 類型附件
+                      {{$t('remotePatrol.notQualifyAdd')}} 
+                          <span v-show="(item.memo_config.memo_check_text == true)"> {{$t('remotePatrol.textItem')}}</span>
+                          <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">, </span>
+                          <span v-show="(item.memo_config.memo_check_media == true)">{{$t('remotePatrol.mediaItem')}}</span> {{$t('remotePatrol.attachments')}}
                       </div>
                       <div class="advance_memo" v-else-if="(item.qualifiedScore > 0)">
-                      * 低於 {{item.qualifiedScore}} 分時，需加入
-                          <span v-show="(item.memo_config.memo_check_text == true)">「文字」</span>
-                          <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">、</span>
-                          <span v-show="(item.memo_config.memo_check_media == true)">「圖片或影片」</span> 類型附件
+                        {{$t('remotePatrol.lowerThan')}}  {{item.qualifiedScore}} {{$t('remotePatrol.lowScoreAdd')}}
+                          <span v-show="(item.memo_config.memo_check_text == true)"> {{$t('remotePatrol.textItem')}}</span>
+                          <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">, </span>
+                          <span v-show="(item.memo_config.memo_check_media == true)">{{$t('remotePatrol.mediaItem')}}</span> {{$t('remotePatrol.attachments')}}
                       </div> 
                     </div>
                     <span v-if="item.RuleCountTip" class="rules">{{
@@ -1092,13 +1092,13 @@ export default {
       // 備註標籤
       memoConfigTextObj: {
         title: this.$t('remotePatrol.prompt'),
-        showInfo: '尚有必填項目未完成，備註標籤請加入「文字」類型附件',
+        showInfo: this.$t('remotePatrol.notFinishWithText'),
         isWarning: true,
         dialogCosed: false
       },
       memoConfigMediaObj: {
         title: this.$t('remotePatrol.prompt'),
-        showInfo: '尚有必填項目未完成，備註標籤請加入「圖片或影像」類型附件',
+        showInfo: this.$t('remotePatrol.notFinishWithMedia'),
         isWarning: true,
         dialogCosed: false
       },

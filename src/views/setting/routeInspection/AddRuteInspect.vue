@@ -318,13 +318,13 @@
           <!-- 進階設定 -->
           <el-form-item >
             <div class="score_item">
-              <span class="item_label">進階設定</span>
+              <span class="item_label">{{ $t('insSettingView.advanceSetting') }} </span>
             </div>
             
             <el-radio-group class="attribute-group" v-model="memo_is_advanced" @change="getSettingStatus">
               <div style="display: inline-flex">
-                <el-radio label= "true" >開啟</el-radio>
-                <el-radio label= "false" :disabled='(itemRequired == "1" && itemType == 1)'>關閉</el-radio>
+                <el-radio label= "true" >{{ $t('insSettingView.advanceSettingOn') }}</el-radio>
+                <el-radio label= "false" :disabled='(itemRequired == "1" && itemType == 1)'>{{ $t('insSettingView.advanceSettingOff') }}</el-radio>
               </div>
             </el-radio-group>
 
@@ -332,8 +332,8 @@
               <el-form-item >
                 <div class="score_item">
                   <!-- <span class="sign">*</span> -->
-                  <span class="sub_label">備註標籤</span>
-                  <span class="item_des">多項請以"/"隔開</span>
+                  <span class="sub_label">{{ $t('insSettingView.memoAdvanced') }}</span>
+                  <span class="item_des">{{ $t('insSettingView.memoSeparate') }}</span>
                 </div>
                 <el-input
                   ref="memo_tag"
@@ -346,9 +346,9 @@
                 <div class="advance_memo_required_type">
                   <el-radio-group class="attribute-group" v-model="memo_config.memo_required_type" @change="getADvanceSettingStatus">
                     <div style="display: inline-flex">
-                      <el-radio label="1" :disabled='(itemRequired == "0" && itemType == 1)' >必填</el-radio>
-                      <el-radio label="0" :disabled='(itemRequired == "1" && itemType == 1)'>非必填</el-radio>
-                      <el-radio label="2" :disabled='(itemRequired == "0" && itemType == 1) || (itemRequired == "1" && itemType == 1)'>僅不合格必填</el-radio>
+                      <el-radio label="1" :disabled='(itemRequired == "0" && itemType == 1)' >{{ $t('insSettingView.isRequired') }}</el-radio>
+                      <el-radio label="0" :disabled='(itemRequired == "1" && itemType == 1)'>{{ $t('insSettingView.notRequired') }}</el-radio>
+                      <el-radio label="2" :disabled='(itemRequired == "0" && itemType == 1) || (itemRequired == "1" && itemType == 1)'>{{ $t('insSettingView.notQualifyIsRequired') }}</el-radio>
                     </div>
                   </el-radio-group>
                 </div>
@@ -359,16 +359,16 @@
                     class="storevue-checkbox-outlined" 
                     v-model="memo_config.memo_check_text"
                   >
-                    <span class="check_text">文字</span>
+                    <span class="check_text">{{ $t('insSettingView.memoCheckText') }}</span>
                   </el-checkbox>
                   <el-checkbox 
                     :disabled='((itemRequired == "0" && itemType == 1) || memo_config.memo_required_type == "0")'
                     class="storevue-checkbox-outlined" 
                     v-model="memo_config.memo_check_media"
                     >
-                    <span class="check_text">圖片或影片  </span>
+                    <span class="check_text">{{ $t('insSettingView.memoCheckMedai') }}</span>
                   </el-checkbox>
-                  <span v-if="memo_configTips" class="memo_rules"> 至少選擇一項備註類別（文字、圖片或影片）</span>
+                  <span v-if="memo_configTips" class="memo_rules"> {{ $t('insSettingView.selectAtLeastOne') }}）</span>
 
                 </div>
               </el-form-item>
