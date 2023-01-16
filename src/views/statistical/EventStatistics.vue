@@ -2104,7 +2104,7 @@ export default {
       }
     },
     onClickEventItem(item,index){
-        this.showInvolveTableArea = false;
+        //this.showInvolveTableArea = false;
         if(this.selEventItem == item.id){
             this.selEventItem = -1
             this.selEventItemIds = [];
@@ -2130,6 +2130,7 @@ export default {
     },
     async getItemDetail(){
       const self = this;
+      self.showInvolveTableArea = false;
       if(this.selEventItem == -1 && self.allEventItemIds.length>0){
         let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,itemIds:self.allEventItemIds,storeIds:self.compareIds2};
         //console.log(params)
