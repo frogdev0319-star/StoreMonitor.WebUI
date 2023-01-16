@@ -393,7 +393,7 @@
           @confirmHandler="memoConfigTextObj.dialogCosed = false"
           >
           <div class="dialog-slot">
-            <div class="padding-vertical-sm" style="color: #f31d65">{{memoConfigTextObj.showInfo}} </div>
+            <div class="padding-vertical-sm">{{memoConfigTextObj.showInfo}} </div>
           </div>
         </dialog-pop>
 
@@ -406,7 +406,7 @@
           @confirmHandler="memoConfigMediaObj.dialogCosed = false"
           >
           <div class="dialog-slot">
-            <div class="padding-vertical-sm" style="color: #f31d65">{{memoConfigMediaObj.showInfo}} </div>
+            <div class="padding-vertical-sm">{{memoConfigMediaObj.showInfo}} </div>
           </div>
         </dialog-pop>
 
@@ -1091,13 +1091,13 @@ export default {
       // 備註標籤
       memoConfigTextObj: {
         title: this.$t('remotePatrol.prompt'),
-        showInfo: this.$t('remotePatrol.notFinishWithText'),
+        showInfo: this.$t('remotePatrol.requiredValid'),
         isWarning: true,
         dialogCosed: false
       },
       memoConfigMediaObj: {
         title: this.$t('remotePatrol.prompt'),
-        showInfo: this.$t('remotePatrol.notFinishWithMedia'),
+        showInfo: this.$t('remotePatrol.requiredValid'),
         isWarning: true,
         dialogCosed: false
       },
