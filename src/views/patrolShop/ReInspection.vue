@@ -455,6 +455,7 @@
                 class="storevue-select-grey" 
                 :value="patrolstore" 
                 :placeholder="$t('remotePatrol.selectInspect')"
+                :disabled = "emptyPatrolList"
                 @change="changeInspect">
                 <el-option
                   v-for="item in PatrolList"
@@ -537,6 +538,7 @@
               class="storevue-select-grey" 
               :value="patrolstore" 
               :placeholder="$t('remotePatrol.selectInspect')"
+              :disabled = "emptyPatrolList"
               @change="changeInspect">
               <el-option
                 v-for="item in PatrolList"
@@ -1170,7 +1172,9 @@ export default {
       reportStatus:-1,
       enableMimicMode:false,
 
-      showIgnoreItem: false
+      showIgnoreItem: false,
+      emptyPatrolList: true
+    
     };
   },
   computed: {
@@ -1214,6 +1218,12 @@ export default {
       self.getAllStore();
       //console.log("enableMimicMode:",this.enableMimicMode);
     },
+
+    PatrolList(val){
+      console.log('val :>> ', val);
+      if(val.length > 0) this.emptyPatrolList = false
+
+    }
   },
 
   beforeRouteLeave(to, from, next) {
