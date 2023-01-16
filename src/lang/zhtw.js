@@ -113,7 +113,13 @@ export default{
       "generalMode":"一般模式",
       "mimicMode":"神秘客模式",
       "MysterioManage":"神秘客權限",
-      "MysterioSetting":"門店權限設定"
+      "MysterioSetting":"門店權限設定",
+      "InceptionSchedule":"巡檢排程",
+      "ScheduleSetting":"排程設定",
+      "ScheduleHistory":"排程紀錄",
+      "schedulePersonal":"巡檢排程｜個人排程",
+      "schedulePersonalCreate":"巡檢排程｜個人排程｜建立排程",
+      "schedulePersonalModify":"巡檢排程｜個人排程｜編輯排程",
   },
   "overview":{
       "DangerousLess":"立即督導＜60%",
@@ -1522,6 +1528,11 @@ export default{
       "duplicateNickName":"已有相同的神秘客代稱，請重新輸入",
       "mysterio":"神秘客",
       "allMysterio":"全部神秘客",
-  }
+  },
+  "schedule":{
+    "inceptionSchedule":"巡檢排程",
+    "scheduleSetting":"排程設定",
+    "scheduleHistory":"排程紀錄"
+  },
 
 }

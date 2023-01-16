@@ -304,6 +304,25 @@ export default {
           ]
         },
         {
+          roleName: this.$t('schedule.inceptionSchedule'),
+          checked: false,
+          disabled: false,
+          children: [
+            {
+              roleName: this.$t('schedule.scheduleSetting'),
+              checked: false,
+              disabled: false,
+              visabled:true
+            },
+            {
+              roleName: this.$t('schedule.scheduleHistory'),
+              checked: false,
+              disabled: false,
+              visabled:true
+            }
+          ]
+        },
+        {
           roleName: this.$t('route.systemSetting'),
           checked: false,
           disabled: false,
@@ -453,17 +472,21 @@ export default {
       this.roleNameList[3].children[4].checked = !!PermissionHelper.enableSingleStoreStatStatistics();
       this.roleNameList[3].children[5].checked = !!PermissionHelper.enableAppraisalCompareStatistics();
 
-      this.roleNameList[5].children[0].checked = !!PermissionHelper.enableDeviceSetting();
-      this.roleNameList[5].children[1].checked = !!PermissionHelper.enablePatrolSetting();
-      this.roleNameList[5].children[2].checked = !!PermissionHelper.enableStoreSetting();
-      this.roleNameList[5].children[3].checked = !!PermissionHelper.enableScheduleSetting();
-      this.roleNameList[5].children[4].checked = !!PermissionHelper.enableReportSetting();
-      this.roleNameList[5].children[5].checked = !!PermissionHelper.enableWorkflowSetting();
+      this.roleNameList[6].children[0].checked = !!PermissionHelper.enableDeviceSetting();
+      this.roleNameList[6].children[1].checked = !!PermissionHelper.enablePatrolSetting();
+      this.roleNameList[6].children[2].checked = !!PermissionHelper.enableStoreSetting();
+      this.roleNameList[6].children[3].checked = !!PermissionHelper.enableScheduleSetting();
+      this.roleNameList[6].children[4].checked = !!PermissionHelper.enableReportSetting();
+      this.roleNameList[6].children[5].checked = !!PermissionHelper.enableWorkflowSetting();
 
       //auditSetting
       this.roleNameList[4].children[0].checked = !!PermissionHelper.enableSendAudit();
       this.roleNameList[4].children[1].checked = !!PermissionHelper.enableWaitAudit();
       this.roleNameList[4].children[2].checked = !!PermissionHelper.enableTranscriptNotify();
+
+      //Schedule
+      this.roleNameList[5].children[0].checked = !!PermissionHelper.enableScheduleSetting2();
+      this.roleNameList[5].children[1].checked = !!PermissionHelper.enableScheduleHistroy();
 
       if (authorities.length === 7 && resetFlag) {
         this.ifAccessVideo = PermissionHelper.enableVideo() === 1;
@@ -562,7 +585,12 @@ export default {
       const auditElement = newAuth.splice(4,1)[0];
       newAuth.push(auditElement);
       newAuth.forEach((item, index) => {
-        let tempAuthorityNum = Math.pow(2, (index==5)?6:index) * decAuthorityNum;
+        /**因為新家的權限只能往後加，所以5以後順序需要特別處理 */
+        let powerIdx = index;
+        if(index==5) powerIdx=6;
+        else if(index==6) powerIdx=7;
+        /********************/
+        let tempAuthorityNum = Math.pow(2, powerIdx) * decAuthorityNum;
         item.children.forEach((_item, _index) => {
           if(_item.checked){
             if(index === 4 && _index === 0){

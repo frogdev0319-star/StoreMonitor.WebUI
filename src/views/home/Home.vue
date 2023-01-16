@@ -930,6 +930,19 @@ export default {
           parentBread: { path: "/mysterio", name: "MysterioManage" },
         },
 
+        //巡檢排程
+        {
+          paths:["/personalSchedule"],
+          parentBread: { path: "/schedulSetting", name: "schedulePersonal" },
+        },
+        {
+          paths:["/scheduleDetailCreate"],
+          parentBread: { path: "/personalSchedule", name: "schedulePersonalCreate" },
+        },
+        {
+          paths:["/scheduleDetailModify"],
+          parentBread: { path: "/personalSchedule", name: "schedulePersonalModify" },
+        }
       ];
       const pathAndBreadMap = pathAndBreadMaps.find((map) =>
         map.paths.includes(currentRoute)

@@ -303,6 +303,67 @@ export const navbarRoute = {
     return auditRoute;
   },
 
+  getInceptionSchedule(){
+    const schduleRoute = {
+      path: '/home',
+      name: 'InceptionSchedule',
+      component: Home,
+      iconCls: 'iconfont icon-shijian',
+      styles: 'font-size:22px',
+      leaf: false,
+      hidden: false,
+      children: []
+    };
+    !PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleSetting2() && schduleRoute.children.push(
+      {
+        path: '/scheduleSetting',
+        name: 'ScheduleSetting',
+        component: resolve => require(['@/views/schedule/ScheduleSetting'], resolve),
+        meta: {
+          keepAlive: true, // the component is't to be cache.
+          requireAuth: true
+        },
+        isReadOnly: false
+      },
+      {
+        path: '/personalSchedule',
+        name: 'personalSchedule',
+        hidden: true,
+        component: resolve => require(['@/views/schedule/details/personalSchedule'], resolve)
+      },
+      {
+        path: '/scheduleDetailCreate',
+        name: 'scheduleDetail',
+        hidden: true,
+        meta: {
+          keepAlive: false
+        },
+        component: resolve => require(['@/views/schedule/details/scheduleDetail'], resolve)
+      },
+      {
+        path: '/scheduleDetailModify',
+        name: 'scheduleDetail',
+        hidden: true,
+        meta: {
+          keepAlive: false
+        },
+        component: resolve => require(['@/views/schedule/details/scheduleDetail'], resolve)
+      }
+    ) && !PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleHistroy() && schduleRoute.children.push(
+      {
+        path: '/scheduleHistory',
+        name: 'ScheduleHistory',
+        component: resolve => require(['@/views/schedule/ScheduleHistory'], resolve),
+        meta: {
+          keepAlive: true, // the component is't to be cache.
+          requireAuth: true
+        },
+        isReadOnly: false
+      }
+    )
+    return schduleRoute;
+  },
+
   getStatisticalRoute() {
     const statisticsRoute = {
       path: '/home',
