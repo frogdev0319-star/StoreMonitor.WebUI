@@ -546,7 +546,7 @@ export default{
       "mediaItem":"「图片或影片」 ",
       "attachments":"类型附件 ",
       "notFinishWithText":"尚有必填项目未完成，备注标签请加入「文字」类型附件 ",
-      "notFinishWithMedia":"尚有必填项目未完成，备注标签请加入「图片或影像」类型附件",
+      "notFinishWithMedia":"尚有必填项目未完成，备注标签请加入「图片或影像」类型附件"
   },
   "eventView":{
       "ClosedEvent":"已结案事件",
@@ -831,13 +831,13 @@ export default{
       "needHeighterThan":"考评范围最高值需高于最低值! ",
       "cantEmptyScoreLow":"最低考评总分范围不可为空! ",
       "cantEmptyScoreHeight":"最高考评总分范围不可为空! ",
-      "memoAdvanced":"備註標籤",
-      "memoSeparate":"(多項請以\"/\"隔開)",
-      "inputMemoAdvanced":"請輸入備註標籤 ",
-      "memoCheckText":"文字 ",
-      "memoCheckMedai":"圖片或影片 ",
-      "notQualifyIsRequired":"僅不合格必填 ",
-      "selectAtLeastOne":"至少選擇一項備註類別（文字、圖片或影片 "
+      "memoAdvanced":"备注标签",
+      "memoSeparate":'(多项请以"/"隔开)',
+      "inputMemoAdvanced":"请输入备注标签 ",
+      "memoCheckText":"文字",
+      "memoCheckMedai":"图片或影片 ",
+      "notQualifyIsRequired":"仅不合格必填 ",
+      "selectAtLeastOne":"至少选择一项备注类别（文字、图片或影片)"
   },
   "deviceView":{
       "EzvizAccount":"串流服务账号",

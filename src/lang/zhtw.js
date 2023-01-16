@@ -546,7 +546,7 @@ export default{
       "mediaItem":"「圖片或影片」 ",
       "attachments":"類型附件 ",
       "notFinishWithText":"尚有必填項目未完成，備註標籤請加入「文字」類型附件 ",
-      "notFinishWithMedia":"尚有必填項目未完成，備註標籤請加入「圖片或影像」類型附件 ",
+      "notFinishWithMedia":"尚有必填項目未完成，備註標籤請加入「圖片或影像」類型附件 "
   },
   "eventView":{
       "ClosedEvent":"已結案事件",
@@ -835,7 +835,7 @@ export default{
       "memoCheckText":"文字 ",
       "memoCheckMedai":"圖片或影片 ",
       "notQualifyIsRequired":"僅不合格必填 ",
-      "selectAtLeastOne":"至少選擇一項備註類別（文字、圖片或影片) ",
+      "selectAtLeastOne":"至少選擇一項備註類別（文字、圖片或影片) "
   },
   "deviceView":{
       "EzvizAccount":"串流服務帳號",
