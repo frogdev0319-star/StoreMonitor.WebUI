@@ -555,7 +555,6 @@
           </div>
         </div>
         <hr v-if="!isFullScreenMode" class="hr-horizontal" :style="isFullScreenMode?{'margin-bottom': '20px'}:{}">
-
         <div v-if="sheetName.length!=0" :class="{'flex': isFullScreenMode, fullWidth: isFullScreenMode}">
   
           <div v-if="isFullScreenMode" style="width: 200px; padding-right: 10px">
