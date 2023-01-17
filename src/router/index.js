@@ -324,16 +324,16 @@ export const navbarRoute = {
           requireAuth: true
         },
         isReadOnly: false
-      },
+      } ,
       {
         path: '/personalSchedule',
-        name: 'personalSchedule',
+        name: 'PersonalSchedule',
         hidden: true,
         component: resolve => require(['@/views/schedule/details/personalSchedule'], resolve)
       },
       {
         path: '/scheduleDetailCreate',
-        name: 'scheduleDetail',
+        name: 'CreateSchedule',
         hidden: true,
         meta: {
           keepAlive: false
@@ -342,14 +342,15 @@ export const navbarRoute = {
       },
       {
         path: '/scheduleDetailModify',
-        name: 'scheduleDetail',
+        name: 'ModifySchedule',
         hidden: true,
         meta: {
           keepAlive: false
         },
         component: resolve => require(['@/views/schedule/details/scheduleDetail'], resolve)
       }
-    ) && !PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleHistroy() && schduleRoute.children.push(
+    ) && primaryPathesList.push('/scheduleSetting', '/personalSchedule','/scheduleDetailCreate','scheduleDetailModify');
+    !PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleHistroy() && schduleRoute.children.push(
       {
         path: '/scheduleHistory',
         name: 'ScheduleHistory',
@@ -360,7 +361,7 @@ export const navbarRoute = {
         },
         isReadOnly: false
       }
-    )
+    ) && primaryPathesList.push('/scheduleHistory');
     return schduleRoute;
   },
 

@@ -488,7 +488,7 @@ export default {
       this.roleNameList[5].children[0].checked = !!PermissionHelper.enableScheduleSetting2();
       this.roleNameList[5].children[1].checked = !!PermissionHelper.enableScheduleHistroy();
 
-      if (authorities.length === 7 && resetFlag) {
+      if (authorities.length === 8 && resetFlag) {
         this.ifAccessVideo = PermissionHelper.enableVideo() === 1;
         this.ifReceiveMes = PermissionHelper.enableMessage() === 2;
       }
@@ -582,13 +582,12 @@ export default {
       this.infoForm.authorities = [];
       const decAuthorityNum = Math.pow(2, 32);
       const newAuth = this.roleNameList.slice(0);
-      const auditElement = newAuth.splice(4,1)[0];
-      newAuth.push(auditElement);
+      const auditElement = newAuth.splice(4,2);//將簽核權限,排程管理提出來，往後放 備註:4原本是系統設定
+      newAuth.push.apply(newAuth,auditElement);
       newAuth.forEach((item, index) => {
-        /**因為新家的權限只能往後加，所以5以後順序需要特別處理 */
+        /**因為新加的權限只能往後加，所以5以後順序需要特別處理 */
         let powerIdx = index;
-        if(index==5) powerIdx=6;
-        else if(index==6) powerIdx=7;
+        if(index>=5) powerIdx=index+1;
         /********************/
         let tempAuthorityNum = Math.pow(2, powerIdx) * decAuthorityNum;
         item.children.forEach((_item, _index) => {

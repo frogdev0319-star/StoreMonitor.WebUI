@@ -510,6 +510,11 @@ export default {
         //神秘客
         { curPath: ["/mysterioSetting"], activePath: "/mysterio" },
 
+        //[巡檢排程]
+        { curPath: ["/personalSchedule"], activePath: "/ScheduleSetting" },
+        { curPath: ["/scheduleDetailCreate"], activePath: "/personalSchedule" },
+        { curPath: ["/scheduleDetailModify"], activePath: "/personalSchedule" },
+
       ];
       const pathMAP = pathMapArr.find((item) => item.curPath.includes(path));
       console.log('pathMAP :>> ', pathMAP);
@@ -933,15 +938,15 @@ export default {
         //巡檢排程
         {
           paths:["/personalSchedule"],
-          parentBread: { path: "/schedulSetting", name: "schedulePersonal" },
+          parentBread: { path: "/scheduleSetting", name: "ScheduleSetting" },
         },
         {
           paths:["/scheduleDetailCreate"],
-          parentBread: { path: "/personalSchedule", name: "schedulePersonalCreate" },
+          parentBread: { path: "/personalSchedule", name: "PersonalSchedule" },
         },
         {
           paths:["/scheduleDetailModify"],
-          parentBread: { path: "/personalSchedule", name: "schedulePersonalModify" },
+          parentBread: { path: "/personalSchedule", name: "PersonalSchedule" },
         }
       ];
       const pathAndBreadMap = pathAndBreadMaps.find((map) =>
