@@ -137,8 +137,8 @@
 
             <div class="overall_row" v-for="(item, index) in defaultDefineName" :key="index">
               <el-radio-group class="storevue-radio radio_item" v-model="item.defineStatus">
-                <el-radio :label="0" style="margin-right: 60px">{{item.name}}</el-radio> 
-                <el-radio :label="1" >{{ $t('insSettingView.userDefined')}} </el-radio> 
+                <el-radio :label="0" style="margin-right: 60px; min-width: 100px;" >{{item.name}}</el-radio> 
+                <el-radio :label="1" style=" width: fit-content;">{{ $t('insSettingView.userDefined')}} </el-radio> 
               </el-radio-group>
               <el-input
                 :ref=item.refName
