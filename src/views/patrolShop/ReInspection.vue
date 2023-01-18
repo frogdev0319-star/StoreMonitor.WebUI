@@ -635,11 +635,17 @@
                   <div class="spacer font-13" style="text-align: left; border-left: 4px solid #2c90d9; padding-left: 8px;">{{ item_.groupName }}</div>
                   <div v-if="!showIgnoreItem ">{{ item_.dealCount+'/'+item_.count }}</div>
                 </div>
+
                 <hr v-if="!showIgnoreItem ||item_.ignoreCount>0"  class="hr-horizontal">
-                <div   v-for="(item,index) in item_.items.filter(d => d.subject.indexOf(searchItemValue ) > -1 && (!showIgnoreItem || d.ignore )) " :key="index" class="item-details padding-sm">
-                  <div class="flex fullWidth">
+                <div v-for="(item,index) in item_.items.filter(d => d.subject.indexOf(searchItemValue ) > -1 && (!showIgnoreItem || d.ignore )) " 
+                  :key="index" 
+                  class="item-details padding-sm"
+                  :style="item.checked?{'background-color':'#f2f9fe'}:{}"
+                  >
+                
+                  <div class="flex fullWidth" >
                     <div class="font-15" style="text-align: left; width: calc(20/1920*100vw)" :style="item.checked?{'color':'#006ab7'}:{}">{{(index+1) + '.'}}</div>
-                    <div class="flex padding-bottom-sm spacer" :style="item.checked?{'background-color':'#f2f9fe'}:{}">
+                    <div class="flex padding-bottom-sm spacer" >
                       
                       <!-- subject -->
                       <div
@@ -649,7 +655,7 @@
                         style="text-align: left; font-weight: 500; word-break: break-all;"
                         @click="clickItem({item,index:showIgnoreItem?item.originIndex:index})">
                         <span style="color: #c60957" v-if="item.required">*</span>
-                        {{ item.subject }}
+                        {{ item.subject }} 
                       </div>
 
                       <!-- dropdown -->
@@ -689,7 +695,7 @@
                   </div>
 
                   <!-- description -->
-                  <div style="margin-left: calc(20/1920*100vw)" :style="item.checked?{'background-color':'#f2f9fe'}:{}">
+                  <div style="margin-left: calc(20/1920*100vw)" >
                     <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" style=" word-break: break-all" class="details-content margin-bottom-sm">
                       {{ item.description }}
                     </div>
@@ -704,20 +710,16 @@
                     <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
                       <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                         <div v-if="_item.mediaType == 3" class="flex-center">
-                          <img
-                            v-if="_item.showDelBtn"
-                            :src="deleteInspectIcon"
-                            alt="delete"
-                            @click="deleteItemResource({ item, index: _index })"
-                          />
+                        
                           <div
-                            class="paper flex-center margin-bottom-sm inspect-text"
+                            class=" flex-center comment_list "
                             :style="curEditIndex === _index?{'border':'1px solid #006ab7'}:{'border':'1px solid #e6e6e6'}"
                           >
-                            <div style="flex: 1; text-align: left; margin: 5px">
-                              {{ _item.src }}
+                            <div style="flex: 1; text-align: left; margin: 5px; font-size: 13px;">
+                              {{ _item.src }} 
                             </div>
                             <hr v-if="_item.showDelBtn" class="hr-vertical" />
+                            <!-- 編輯 -->
                             <img
                               v-if="_item.showDelBtn"
                               :src="editInspectIcon"
@@ -726,6 +728,14 @@
                               @click="editItemResource({ item, index: _index })"
                             />
                           </div>
+                          <!-- 刪除 -->
+                          <img
+                            v-if="_item.showDelBtn"
+                            :src="deleteInspectIcon_new"
+                            alt="delete"
+                            class="to_delete"
+                            @click="deleteItemResource({ item, index: _index })"
+                          />
                         </div>
                       </div>
                     </div>
@@ -946,7 +956,10 @@ export default {
       channelIcon: require('../../../static/img/channel.png'),
       channelActiveIcon: require('../../../static/img/channel_active.png'),
       deleteInspectIcon: require('../../../static/img/cross.png'),
+
+      deleteInspectIcon_new: require('../../../static/img/table-delete.png'),
       editInspectIcon: require('../../../static/img/pen.png'),
+
       starYellowIcon: require('../../../static/img/star-yellow.png'),
       starGreyIcon: require('../../../static/img/star-grey.png'),
       defaultModeIcon: require('../../../static/img/default-mode.png'),
@@ -3871,6 +3884,20 @@ export default {
     color: #f31d65
     text-align: left
     margin-top: 5px
+
+  .comment_list
+    width: 100%
+    padding: 4px
+    margin-bottom: 5px
+    // background: rgb(242, 249, 254)
+  .to_delete
+    margin-bottom: 5px
+    transition: all .3s
+    cursor: pointer
+    margin-left: 5px
+    &:hover
+      transform: scale(1.1)
+
 </style>
 
 <style lang="scss" scoped>
