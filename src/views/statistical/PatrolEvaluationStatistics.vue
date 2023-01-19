@@ -2573,7 +2573,7 @@ export default {
                 }
                 seriesData = [{
                         value: totalDargerous,
-                        name: "self.inspectStatus.status_0"
+                        name: self.inspectStatus.status_0
                     },
                     {
                         value: totalImproved,
