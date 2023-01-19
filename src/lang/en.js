@@ -279,7 +279,7 @@ export default{
         "weeks":"week",
         "pageSize":"Display per page",
         "pageSizeUnit":"entries",
-        "rate":"rate"
+        "rate":" rate"
     },
     "remotePatrol":{
         "InspectionDetail":"Export report",
