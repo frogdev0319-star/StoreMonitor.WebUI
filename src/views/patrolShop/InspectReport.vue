@@ -940,14 +940,14 @@ export default {
           delete this.inspectStatus.update_time
           delete this.inspectStatus.update_user_id
           
-          if(this.inspectStatus.is_customize_2 == false){
+            if(this.inspectStatus.is_customize_2 == false){
             this.inspectStatus.status_2 = this.$t('overview.echartGood')
           }
           if(this.inspectStatus.is_customize_1 == false){
             this.inspectStatus.status_1 = this.$t('overview.improve')
           }
-          if(this.inspectStatus.is_customize_1 == false){
-            this.inspectStatus.status_1 = this.$t('overview.danger')
+          if(this.inspectStatus.is_customize_0 == false){
+            this.inspectStatus.status_0 = this.$t('overview.danger')
           }
           console.log('this.inspectStatus~~~~~ :>> ', this.inspectStatus);
           

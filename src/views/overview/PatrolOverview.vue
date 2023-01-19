@@ -374,8 +374,8 @@ export default {
           if(this.inspectStatus.is_customize_1 == false){
             this.inspectStatus.status_1 = this.$t('overview.improve')
           }
-          if(this.inspectStatus.is_customize_1 == false){
-            this.inspectStatus.status_1 = this.$t('overview.danger')
+          if(this.inspectStatus.is_customize_0 == false){
+            this.inspectStatus.status_0 = this.$t('overview.danger')
           }
           console.log('this.inspectStatus ~~~~>> ', this.inspectStatus);
 
