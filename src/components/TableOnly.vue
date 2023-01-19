@@ -482,7 +482,12 @@ export default {
       document.body.removeChild(spancontent);
       }
       console.log(column.label+"has icon:",this.columnData[$index])
-      /*if(typeof this.columnData[$index].hasIcon != 'undefined' && this.columnData[$index].hasIcon){
+      let hasIcon = false;
+      if(this.columnData[$index] && this.columnData[$index].hasOwnProperty('hasIcon'))
+        hasIcon = this.columnData[$index].hasIcon;
+      
+      if(hasIcon){
+        column.minWidth+16;
         return h(
           'div',[ 
                   h('span',column.label),
@@ -496,7 +501,7 @@ export default {
                   ])                        
                 ]
           )
-      }else*/
+      }else
         return h('span', {}, [column.label]);
     },
     setCellStyle({ row, column, rowIndex, columnIndex }) {
