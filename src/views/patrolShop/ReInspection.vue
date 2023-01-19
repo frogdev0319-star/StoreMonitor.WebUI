@@ -393,7 +393,7 @@
           @confirmHandler="memoConfigTextObj.dialogCosed = false"
           >
           <div class="dialog-slot">
-            <div class="padding-vertical-sm" style="color: #f31d65">{{memoConfigTextObj.showInfo}} </div>
+            <div class="padding-vertical-sm">{{memoConfigTextObj.showInfo}} </div>
           </div>
         </dialog-pop>
 
@@ -406,7 +406,7 @@
           @confirmHandler="memoConfigMediaObj.dialogCosed = false"
           >
           <div class="dialog-slot">
-            <div class="padding-vertical-sm" style="color: #f31d65">{{memoConfigMediaObj.showInfo}} </div>
+            <div class="padding-vertical-sm">{{memoConfigMediaObj.showInfo}} </div>
           </div>
         </dialog-pop>
 
@@ -455,6 +455,7 @@
                 class="storevue-select-grey" 
                 :value="patrolstore" 
                 :placeholder="$t('remotePatrol.selectInspect')"
+                :disabled = "emptyPatrolList"
                 @change="changeInspect">
                 <el-option
                   v-for="item in PatrolList"
@@ -537,6 +538,7 @@
               class="storevue-select-grey" 
               :value="patrolstore" 
               :placeholder="$t('remotePatrol.selectInspect')"
+              :disabled = "emptyPatrolList"
               @change="changeInspect">
               <el-option
                 v-for="item in PatrolList"
@@ -555,7 +557,6 @@
           </div>
         </div>
         <hr v-if="!isFullScreenMode" class="hr-horizontal" :style="isFullScreenMode?{'margin-bottom': '20px'}:{}">
-
         <div v-if="sheetName.length!=0" :class="{'flex': isFullScreenMode, fullWidth: isFullScreenMode}">
   
           <div v-if="isFullScreenMode" style="width: 200px; padding-right: 10px">
@@ -1092,13 +1093,13 @@ export default {
       // 備註標籤
       memoConfigTextObj: {
         title: this.$t('remotePatrol.prompt'),
-        showInfo: this.$t('remotePatrol.notFinishWithText'),
+        showInfo: this.$t('remotePatrol.requiredValid'),
         isWarning: true,
         dialogCosed: false
       },
       memoConfigMediaObj: {
         title: this.$t('remotePatrol.prompt'),
-        showInfo: this.$t('remotePatrol.notFinishWithMedia'),
+        showInfo: this.$t('remotePatrol.requiredValid'),
         isWarning: true,
         dialogCosed: false
       },
@@ -1171,7 +1172,9 @@ export default {
       reportStatus:-1,
       enableMimicMode:false,
 
-      showIgnoreItem: false
+      showIgnoreItem: false,
+      emptyPatrolList: true
+    
     };
   },
   computed: {
@@ -1215,6 +1218,12 @@ export default {
       self.getAllStore();
       //console.log("enableMimicMode:",this.enableMimicMode);
     },
+
+    PatrolList(val){
+      console.log('val :>> ', val);
+      if(val.length > 0) this.emptyPatrolList = false
+
+    }
   },
 
   beforeRouteLeave(to, from, next) {

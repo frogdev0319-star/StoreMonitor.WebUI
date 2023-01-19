@@ -137,8 +137,8 @@
 
             <div class="overall_row" v-for="(item, index) in defaultDefineName" :key="index">
               <el-radio-group class="storevue-radio radio_item" v-model="item.defineStatus">
-                <el-radio :label="0" style="margin-right: 60px">{{item.name}}</el-radio> 
-                <el-radio :label="1" >{{ $t('insSettingView.userDefined')}} </el-radio> 
+                <el-radio :label="0" style="margin-right: 60px; min-width: 100px;" >{{item.name}}</el-radio> 
+                <el-radio :label="1" style=" width: fit-content;">{{ $t('insSettingView.userDefined')}} </el-radio> 
               </el-radio-group>
               <el-input
                 :ref=item.refName
@@ -533,22 +533,25 @@ export default {
       showInputLimit_overallItem: false,
       defaultDefineName:[
         {
-          name:  this.$t('overview.danger') ,
+          name: this.$t('overview.danger') ,
           newName:  this.$t('overview.danger'),
           defineStatus: 0,
-          refName: 'bad'
+          refName: 'bad',
+          is_customize: false
         },
         {
           name: this.$t('overview.improve'),
           newName: this.$t('overview.improve'),
           defineStatus: 0,
-          refName: 'fair'
+          refName: 'fair',
+          is_customize: false
         },
         {
           name: this.$t('overview.echartGood'),
           newName: this.$t('overview.echartGood'),
           defineStatus: 0,
-          refName: 'good'
+          refName: 'good',
+          is_customize: false
         },
       ],
       scoreMiddleLow: 0,
@@ -623,8 +626,15 @@ export default {
       handler (val, old ) {
         // if(val[0].defineStatus == 0) val[0].newName = val[0].name
         for(let i of val ){
-          if(i.defineStatus == 0) i.newName = i.name
+          if(i.defineStatus == 0) {
+            i.newName = i.name
+            i.is_customize = false
+          } else if(i.defineStatus == 1){
+            i.is_customize = true
+          }
+          
         }
+        console.log('val :>> ', val);
       }
     },
 
@@ -646,15 +656,26 @@ export default {
     await this.workflowItems()
     await this.getInspectStatus()
 
+    console.log('this.defaultDefineName >>>>>>>> ', this.defaultDefineName);
+    console.log('this.inspectStatuse >>>>>>>> ', this.inspectStatus);
     for (let i = 0; i < 3; i++) {
-      if(this.defaultDefineName[i].name !== this.inspectStatus["status_" + i]) {
+      if(this.inspectStatus["is_customize_" + i] == false){
+        this.defaultDefineName[i].defineStatus = 0
+        this.defaultDefineName[i].newName = this.defaultDefineName[i].name
+      } else {
           this.defaultDefineName[i].defineStatus = 1
           this.defaultDefineName[i].newName = this.inspectStatus["status_"+ i]
-        } else {
-          this.defaultDefineName[i].defineStatus = 0
-          this.defaultDefineName[i].newName = this.defaultDefineName[i].name
-        }
+      }
+      
+      // if(this.defaultDefineName[i].name !== this.inspectStatus["status_" + i]) {
+      //     this.defaultDefineName[i].defineStatus = 1
+      //     this.defaultDefineName[i].newName = this.inspectStatus["status_"+ i]
+      //   } else {
+      //     this.defaultDefineName[i].defineStatus = 0
+      //     this.defaultDefineName[i].newName = this.defaultDefineName[i].name
+      //   }
     }
+    
     // console.log('this.inspectStatus  mounted:>> ', this.inspectStatus);
     // console.log('this.defaultDefineName  mounted:>> ', this.defaultDefineName);
     // console.log('this.setting_autoMappingByTotalScore  mounted >>>>>>>----->> ', this.setting_autoMappingByTotalScore);
@@ -957,10 +978,16 @@ export default {
 
     updateInspectStatus(){
       var status = {
-          "status_0": this.defaultDefineName[0].newName,
-          "status_1": this.defaultDefineName[1].newName,
-          "status_2": this.defaultDefineName[2].newName,
+          status_0: this.defaultDefineName[0].newName,
+          is_customize_0: this.defaultDefineName[0].is_customize,
+          status_1: this.defaultDefineName[1].newName,
+          is_customize_1: this.defaultDefineName[1].is_customize,
+          status_2: this.defaultDefineName[2].newName,
+          is_customize_2: this.defaultDefineName[2].is_customize,
       }
+
+
+
       console.log('status ~~~~~~~~>> ', status);
       return new Promise((resolve, reject) => {
         inpectRESTful.updateInspectStatus(status).then(res => {
@@ -1288,9 +1315,9 @@ $itemHeight:50px;
     justify-content: flex-start;
     align-items: center;
     .radio_item{
-      .el-radio{
-        width: 60px !important;
-      }
+      // .el-radio{
+      //   width: 60px !important;
+      // }
     }  
   }
 
