@@ -69,8 +69,6 @@
             </div>
           </template>
           <span v-else-if="_item.formatter" v-html="_item.formatter(row)"/>
-
-
           <!-- workflow switch state -->
           <template v-else-if="_item.forDescription">
             <div class="forDescription">
@@ -403,6 +401,7 @@ export default {
       expands: "",
       expandRowKeys: [],
       isLoading:false,
+      iconQuestion:require('../../static/img/icon-question.png'),
     };
   },
   filters:{
@@ -456,6 +455,11 @@ export default {
     },
 
     renderHeader(h, { column, $index }) {
+      var colElement = [column.label];
+      if(column.hasIcon){
+         colElement = [column.label];
+
+      }
       if(util.getWindowWidth()>1366){
       let realWidth = 0;
       let span = document.createElement('span');
@@ -477,7 +481,23 @@ export default {
       document.body.removeChild(span);
       document.body.removeChild(spancontent);
       }
-      return h('span', {}, [column.label]);
+      console.log(column.label+"has icon:",this.columnData[$index])
+      /*if(typeof this.columnData[$index].hasIcon != 'undefined' && this.columnData[$index].hasIcon){
+        return h(
+          'div',[ 
+                  h('span',column.label),
+                  h('el-tooltip',
+                  { props:{placement:'top-start',width:'200',trigger:'hover',content:'1234'}},
+                  [
+                    h('i', {
+                        class: 'iconfont question-icon icon-bangzhu',
+                        style: {fontSize:'14px',marginLeft:'4px'}
+                      })
+                  ])                        
+                ]
+          )
+      }else*/
+        return h('span', {}, [column.label]);
     },
     setCellStyle({ row, column, rowIndex, columnIndex }) {
       let obj = {};if (columnIndex === 0) {
@@ -906,6 +926,9 @@ export default {
   .moveup_disable, .movedown_disable
     opacity: 0.3 !important
     pointer-events: none !important
+  .question-icon
+    font: size 14px
+    margin: left 4px
   
 
 </style>

@@ -62,6 +62,7 @@ export const navbarRoute = {
   getOverviewRoute() {
     primaryPathesList = [];
     const overviewRoute = {
+      id:0,
       path: '/home',
       name: 'overview',
       component: Home,
@@ -88,6 +89,7 @@ export const navbarRoute = {
   getPatrolRoute() {
     console.log("PermissionHelper.enableInspectReport()",PermissionHelper.enableInspectReport());
     const patrolRoute = {
+      id:1,
       path: '/home',
       name: 'patrolManage',
       component: Home,
@@ -163,6 +165,7 @@ export const navbarRoute = {
   },
   getEventRoute() {
     const eventRoute = {
+      id:2,
       path: '/home',
       name: 'eventManage',
       component: Home,
@@ -195,6 +198,7 @@ export const navbarRoute = {
 
   getAuditRoute() {
     const auditRoute = {
+      id:4,
       path: '/home',
       name: 'AuditManage',
       component: Home,
@@ -305,6 +309,7 @@ export const navbarRoute = {
 
   getInceptionSchedule(){
     const schduleRoute = {
+      id:5,
       path: '/home',
       name: 'InceptionSchedule',
       component: Home,
@@ -316,6 +321,7 @@ export const navbarRoute = {
     };
     !PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleSetting2() && schduleRoute.children.push(
       {
+
         path: '/scheduleSetting',
         name: 'ScheduleSetting',
         component: resolve => require(['@/views/schedule/ScheduleSetting'], resolve),
@@ -367,6 +373,7 @@ export const navbarRoute = {
 
   getStatisticalRoute() {
     const statisticsRoute = {
+      id:3,
       path: '/home',
       name: 'statistics',
       component: Home,
@@ -475,6 +482,7 @@ export const navbarRoute = {
   },
   getSystemSettingRoute() {
     const systemSettingRoute = {
+      id:6,
       path: '/home',
       name: 'systemSetting',
       iconCls: 'iconfont icon-button',

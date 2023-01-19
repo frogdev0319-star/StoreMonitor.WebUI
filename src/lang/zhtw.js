@@ -1536,7 +1536,12 @@ export default{
     "scheduleSetting":"排程設定",
     "scheduleHistory":"排程紀錄",
     "lastUpdatePerson":"最後更新人",
-    "getScheduleSettingFail":"取得排程設定失敗"
+    "getScheduleSettingFail":"取得排程設定失敗",
+    "schStartDate":"開始執行",
+    "schName":"排程名稱",
+    "incepNum":"巡檢數量",
+    "schEndDate":"結束執行",
+    "addSchedule":"新增排程",
   },
 
 }

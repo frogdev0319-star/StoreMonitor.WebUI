@@ -159,8 +159,8 @@
                   :disabled="item.isReadOnly"
                   :style="{'paddingLeft':'calc(30/1920*100vw) !important','height': 'calc(66/1920*100vw)','lineHeight': 'calc(66/1920*100vw)'}"
                 >
-                  <img class="menu_img" :src="($route.name=='auth')? `./../static/img/menu/${index}.png`:`./static/img/menu/${index}.png`" />
-                  <img class="menu_img-active" :src="($route.name=='auth')? `./../static/img/menu/${index}-active.png`:`./static/img/menu/${index}-active.png`" />
+                  <img class="menu_img" :src="($route.name=='auth')? `./../static/img/menu/${item.id}.png`:`./static/img/menu/${item.id}.png`" />
+                  <img class="menu_img-active" :src="($route.name=='auth')? `./../static/img/menu/${item.id}-active.png`:`./static/img/menu/${item.id}-active.png`" />
                   <span class="span1">{{collapsed ? "" : $t(`route.${item.children[0].name}`)}}</span>
                 </el-menu-item>
 
@@ -171,8 +171,8 @@
                   :index="index+''"
                   :style="{}">
                   <template slot="title">
-                    <img class="menu_img" :src="($route.name=='auth')? `./../static/img/menu/${index}.png`:`./static/img/menu/${index}.png`"/>
-                    <img class="menu_img-active" :src="($route.name=='auth')? `./../static/img/menu/${index}-active.png`:`./static/img/menu/${index}-active.png`"/>
+                    <img class="menu_img" :src="($route.name=='auth')? `./../static/img/menu/${item.id}.png`:`./static/img/menu/${item.id}.png`"/>
+                    <img class="menu_img-active" :src="($route.name=='auth')? `./../static/img/menu/${item.id}-active.png`:`./static/img/menu/${item.id}-active.png`"/>
                     <span class="span2">{{collapsed ? "" : $t(`route.${item.name}`) }}</span>
                   </template>
                   <div v-for="child in item.children" :key="child.path">
