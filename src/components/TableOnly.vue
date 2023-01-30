@@ -441,7 +441,7 @@ export default {
   created() {},
   mounted() {
     //console.log(this.columnData)
-    console.log("this.expandCompProperties ????--->", this.expandCompProperties)
+    //console.log("this.expandCompProperties ????--->", this.expandCompProperties)
     
   },
   methods: {
@@ -481,7 +481,7 @@ export default {
         document.body.removeChild(spancontent);
       }
       let idx = (this.showSelectionColumn)? $index-1 : $index;
-      console.log(column.label+"has icon:",this.columnData[idx])
+      //console.log(column.label+"has icon:",this.columnData[idx])
       let hasIcon = false;
       if(this.columnData[idx] && this.columnData[idx].hasOwnProperty('hasIcon'))
         hasIcon = true;

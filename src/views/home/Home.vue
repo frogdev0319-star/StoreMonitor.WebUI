@@ -942,11 +942,11 @@ export default {
         },
         {
           paths:["/scheduleDetailCreate"],
-          parentBread: { path: "/personalSchedule", name: "PersonalSchedule" },
+          parentBread: { path: "/personalSchedule", name: "schedulePersonalCreate" },
         },
         {
           paths:["/scheduleDetailModify"],
-          parentBread: { path: "/personalSchedule", name: "PersonalSchedule" },
+          parentBread: { path: "/personalSchedule", name: "schedulePersonalModify" },
         }
       ];
       const pathAndBreadMap = pathAndBreadMaps.find((map) =>

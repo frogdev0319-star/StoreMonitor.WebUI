@@ -27,11 +27,11 @@
                         <span>{{$t('schedule.addSchedule')}}</span>
                     </div>
                 </delay-button>
-                <delay-button type="empty" @click="deleteSchedule">
+                <el-button class="storevue-button-empty" :disabled="!enableDeleteBtn" @click="deleteSchedule" style="min-height:32px">
                     <div class="button-area">
                         <span>{{$t('scheduleView.delete')}}</span>
                     </div>
-                </delay-button>
+                </el-button>
             </div>
             <table-only
                 ref="elTP"
@@ -50,7 +50,8 @@
                 :tableHeight = "760"
                 :cellStyle="{backgroundColor: '#fff !important'}"
                 @handleOperation="handleOperation"  
-                @sortChange="handleSortChange"                                
+                @sortChange="handleSortChange"    
+                @selection-change="handleSelectionChange"                            
             />
             <div style="width:100%; margin-top:12px;height:31px;">
                 <tbl-pagination-only
@@ -64,6 +65,17 @@
                 />
             </div>
         </div>
+        <dialog-pop
+          :title="$t('schedule.deleteSchedule')"
+          :isWarning="true"
+          :visible="showConfirmDelete"
+          @cancelHandler = "showConfirmDelete=false"
+          @confirmHandler="onConfirmDeleteSch"
+          >
+          <div class="dialog-slot">
+            {{$t('schedule.confirmDeleteSchedule')}}
+          </div>
+        </dialog-pop>
     </div>
 </template>
 
@@ -72,13 +84,15 @@ import { mapGetters } from 'vuex';
 import DateTimeSelector from '@/components/DateTimeSelector';import TableOnly from '@/components/TableOnly';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
 import DelayButton from '@/components/DelayButton';
+import DialogPop from '@/components/DialogPop'
 import util from '@/common/util';
 
 export default{
     name: 'PersonalSchedule',
-    components: {DateTimeSelector,TableOnly,TblPaginationOnly,DelayButton},
+    components: {DateTimeSelector,TableOnly,TblPaginationOnly,DelayButton,DialogPop},
     data(){
       return {
+        person:'',
         inputSearchValue:'',
         dateValue:[],
         columnData:[
@@ -99,7 +113,7 @@ export default{
             'isExpand': false,
             'hasIcon':{
                 icon:require('@/../static/img/table-help.png'),
-                tooltipContent:'巡檢類型 | 巡檢表名稱'
+                tooltipContent:this.$t('schedule.tagInfo')
             }
           },
           {
@@ -151,20 +165,103 @@ export default{
         curPage:1,
         curSizeNum:10,
         defaultSort:{prop: 'startDate', order: 'descending'},
+        enableDeleteBtn:false,
+        SelSchedulId:[],
+        showConfirmDelete:false,
       }
     },
     computed: {
       ...mapGetters({ accountChanged: 'accountChanged' })
     },
-    created:{
-
+    created(){
+        this.init();
     },
     methods:{
-        addNewSchedule(){
+        init(){
+            console.log(">>>router:",this.$route.params);
+            this.person = this.$route.params.nickName;
+        },
+        dateChange(val) {
+            const self = this;
+            const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
+            const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
+            self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
+            self.dateValue[1] = self.dateValue[1];
+            self.inputSearchValue = '';
+        },
+        doSearchScheduleList(){
 
         },
+        addNewSchedule(){
+            this.$router.push({ name: 'CreateSchedule', params: { userId: this.person }});
+        },
         deleteSchedule(){
-
+            this.showConfirmDelete = true;
+        },
+        handleSelectionChange(val){
+            console.log("handleSelectionChange:",val);
+            this.SelSchedulId = [];
+            if(val.length>0){
+                this.enableDeleteBtn = true;
+                val.map((item)=>{
+                    this.SelSchedulId.push(item.id);
+                })
+            }else{
+                this.enableDeleteBtn = false;
+            }
+        },
+        onConfirmDeleteSch(){
+            this.showConfirmDelete = false;
+        },
+        handleOperation({ method, row }) {
+            switch(method){
+                case 'copy':{
+                break;
+                }
+                case 'set':{
+                this.$router.push({ name: 'ModifySchedule', params: { data: row }});
+                break;      
+                }
+                case 'delete':{
+                break;      
+                }
+                default: {
+                break;
+                }
+            }
+        },
+        setTable() {
+            this.total = Math.ceil(this.scheduleList.length/this.curSizeNum);
+            if(this.defaultSort.prop=="startDate"){
+                if(this.defaultSort.order=='ascending'){
+                util.sortArrayByKeyAsc(this.scheduleList,"startDate")
+                }else{
+                util.sortArrayByKeyDesc(this.scheduleList,"startDate")
+                }
+            }else if(this.defaultSort.prop=="endDate"){
+                if(this.defaultSort.order=='ascending'){
+                util.sortArrayByKeyAsc(this.scheduleList,"endDate")
+                }else{
+                util.sortArrayByKeyDesc(this.scheduleList,"endDate")
+                }
+            }
+            this.tableData = [];
+            this.tableData = [...this.scheduleList.slice( (this.curPage - 1)* this.curSizeNum, this.curPage* this.curSizeNum)];
+        },
+        handleSortChange(order, defaultSort) {
+            this.defaultSort = { ...defaultSort };
+            this.setTable();
+        },
+        currentChange(val) {
+            const self = this;
+            self.curPage = val.page;
+            self.setTable();
+        },
+        sizeChange(val) {
+            const self = this;
+            self.curSizeNum = val.size;
+            self.curPage = 1;
+            self.setTable();
         },
     }
 }

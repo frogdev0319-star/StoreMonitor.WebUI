@@ -265,7 +265,7 @@ export default{
         }
     },
     goSettingPage(row){
-      this.$router.push({name: 'PersonalSchedule',params: {userId:row.userId, nickName:row.nickname}});
+      this.$router.push({name: 'PersonalSchedule',params: {userId:row.userId, nickName:row.userName}});
     },
     setTable() {
       this.total = Math.ceil(this.scheduleList.length/this.curSizeNum);

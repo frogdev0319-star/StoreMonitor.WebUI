@@ -1540,8 +1540,11 @@ export default{
     "schStartDate":"開始執行",
     "schName":"排程名稱",
     "incepNum":"巡檢數量",
-    "schEndDate":"結束執行",
+    "schEndDate":"最後執行",
     "addSchedule":"新增排程",
+    "tagInfo":"巡檢類型 | 巡檢表名稱",
+    "deleteSchedule":"刪除排程",
+    "confirmDeleteSchedule":"是否需要刪除已選擇的排程？",
   },
 
 }
