@@ -70,6 +70,7 @@
             <el-button id="confirmBtn" size="mini" type="primary" @click="confirmEdit">{{ $t('remotePatrol.confirm') }}</el-button>
           </div>
         </el-dialog>
+        
         <el-dialog
           v-if="dialogCommentVideo"
           :title="$t('remotePatrol.view')"
