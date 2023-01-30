@@ -97,7 +97,10 @@ export default{
             'width': 300,
             'maxWidth': 300,
             'isExpand': false,
-            'hasIcon':true
+            'hasIcon':{
+                icon:require('@/../static/img/table-help.png'),
+                tooltipContent:'巡檢類型 | 巡檢表名稱'
+            }
           },
           {
             'prop': 'incepNum',

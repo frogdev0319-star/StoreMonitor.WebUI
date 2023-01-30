@@ -401,7 +401,6 @@ export default {
       expands: "",
       expandRowKeys: [],
       isLoading:false,
-      iconQuestion:require('../../static/img/icon-question.png'),
     };
   },
   filters:{
@@ -461,30 +460,31 @@ export default {
 
       }
       if(util.getWindowWidth()>1366){
-      let realWidth = 0;
-      let span = document.createElement('span');
-      let spancontent = document.createElement('span');
+        let realWidth = 0;
+        let span = document.createElement('span');
+        let spancontent = document.createElement('span');
 
-      span.style.display = 'inline-block';
-      span.innerText = column.label;
-      document.body.appendChild(span);
-      //console.log(column.label+" label:"+span.clientWidth )
-      spancontent.style.display = 'inline-block';
-      spancontent.innerText = column.prop;
-      document.body.appendChild(spancontent);
-      //console.log(column.label+" label:"+spancontent.clientWidth )
+        span.style.display = 'inline-block';
+        span.innerText = column.label;
+        document.body.appendChild(span);
+        //console.log(column.label+" label:"+span.clientWidth )
+        spancontent.style.display = 'inline-block';
+        spancontent.innerText = column.prop;
+        document.body.appendChild(spancontent);
+        //console.log(column.label+" label:"+spancontent.clientWidth )
 
-      realWidth = (spancontent.clientWidth>span.clientWidth)?spancontent.clientWidth:span.clientWidth;
-      if(column.sortable) column.minWidth = realWidth+16;
-      else column.minWidth = realWidth;
-      //console.log(column.label+"realWidth:"+realWidth )
-      document.body.removeChild(span);
-      document.body.removeChild(spancontent);
+        realWidth = (spancontent.clientWidth>span.clientWidth)?spancontent.clientWidth:span.clientWidth;
+        if(column.sortable) column.minWidth = realWidth+16;
+        else column.minWidth = realWidth;
+        //console.log(column.label+"realWidth:"+realWidth )
+        document.body.removeChild(span);
+        document.body.removeChild(spancontent);
       }
-      console.log(column.label+"has icon:",this.columnData[$index])
+      let idx = (this.showSelectionColumn)? $index-1 : $index;
+      console.log(column.label+"has icon:",this.columnData[idx])
       let hasIcon = false;
-      if(this.columnData[$index] && this.columnData[$index].hasOwnProperty('hasIcon'))
-        hasIcon = this.columnData[$index].hasIcon;
+      if(this.columnData[idx] && this.columnData[idx].hasOwnProperty('hasIcon'))
+        hasIcon = true;
       
       if(hasIcon){
         column.minWidth+16;
@@ -492,12 +492,25 @@ export default {
           'div',[ 
                   h('span',column.label),
                   h('el-tooltip',
-                  { props:{placement:'top-start',width:'200',trigger:'hover',content:'1234'}},
+                  { props:{placement:'top-start',width:'200',trigger:'hover',content:this.columnData[idx].hasIcon.tooltipContent}},
                   [
-                    h('i', {
+                    h('img',{
+                      style:{
+                        width:"14px",
+                        height:"14px",
+                        cursor:"pointer",
+                        marginLeft:"4px",
+                        verticalAlign:"middle",
+                        marginTop:"-2px"
+                      },
+                      attrs:{
+                        src:this.columnData[idx].hasIcon.icon
+                      }
+                    })
+                    /*h('i', {
                         class: 'iconfont question-icon icon-bangzhu',
                         style: {fontSize:'14px',marginLeft:'4px'}
-                      })
+                      })*/
                   ])                        
                 ]
           )
