@@ -1,6 +1,6 @@
 <template>
   <div class="date-selector-container" :style="{'width':getLangStyleValue(contentWidth)}">
-      <div class="time-title">{{ $t('overview.date') }}</div>
+      <div class="time-title">{{ dateRangeTitle }}</div>
       <div class="paper shadow-light" style="display:flex; flex-direction:row;">
         <el-select class="bDateSel" :class="getLangStyleValue(selecClass)" v-model="dateRange" value-key="value" :style="{'width':getLangStyleValue(rangeWidth)}" @change="changeDateRange">
             <el-option 
@@ -46,6 +46,10 @@ export default {
       type: Boolean,
       default: false
     },
+    dateRangeTitle:{
+      type:String,
+      default:''
+    },
   },
   data() {
     return {
@@ -84,6 +88,8 @@ export default {
     },
   },
   mounted() {
+
+    if(this.dateRangeTitle=="")this.dateRangeTitle = this.$t('overview.date');
     this.dateRangevalue = 4;
     this.getDefaultTimeList();
   },

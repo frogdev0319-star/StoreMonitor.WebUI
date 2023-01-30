@@ -1,0 +1,33 @@
+<svg id="menu_btn_date_ac" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26">
+  <defs>
+    <style>
+      .cls-1, .cls-4 {
+        fill: none;
+      }
+
+      .cls-2 {
+        fill: #006ab7;
+      }
+
+      .cls-2, .cls-4 {
+        stroke: #006ab7;
+        stroke-linejoin: round;
+        stroke-width: 1.5px;
+      }
+
+      .cls-3 {
+        fill: #fff;
+      }
+
+      .cls-4 {
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <rect id="Rectangle-Copy-5" class="cls-1" width="26" height="26"/>
+  <rect id="Rectangle" class="cls-2" width="18" height="4" transform="translate(4 8)"/>
+  <rect id="Rectangle-Copy" class="cls-2" width="18" height="7" transform="translate(4 14)"/>
+  <path id="Path-5" class="cls-3" d="M23,12v2H3V12Z"/>
+  <path id="Path" class="cls-4" d="M11,7c0-1.657-.9-3-2-3S7,5.343,7,7s.9,3,2,3"/>
+  <path id="Path-2" data-name="Path" class="cls-4" d="M18,7c0-1.657-.9-3-2-3s-2,1.343-2,3,.9,3,2,3"/>
+</svg>

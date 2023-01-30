@@ -69,8 +69,6 @@
             </div>
           </template>
           <span v-else-if="_item.formatter" v-html="_item.formatter(row)"/>
-
-
           <!-- workflow switch state -->
           <template v-else-if="_item.forDescription">
             <div class="forDescription">
@@ -456,28 +454,68 @@ export default {
     },
 
     renderHeader(h, { column, $index }) {
-      if(util.getWindowWidth()>1366){
-      let realWidth = 0;
-      let span = document.createElement('span');
-      let spancontent = document.createElement('span');
+      var colElement = [column.label];
+      if(column.hasIcon){
+         colElement = [column.label];
 
-      span.style.display = 'inline-block';
-      span.innerText = column.label;
-      document.body.appendChild(span);
-      //console.log(column.label+" label:"+span.clientWidth )
-      spancontent.style.display = 'inline-block';
-      spancontent.innerText = column.prop;
-      document.body.appendChild(spancontent);
-      //console.log(column.label+" label:"+spancontent.clientWidth )
-
-      realWidth = (spancontent.clientWidth>span.clientWidth)?spancontent.clientWidth:span.clientWidth;
-      if(column.sortable) column.minWidth = realWidth+16;
-      else column.minWidth = realWidth;
-      //console.log(column.label+"realWidth:"+realWidth )
-      document.body.removeChild(span);
-      document.body.removeChild(spancontent);
       }
-      return h('span', {}, [column.label]);
+      if(util.getWindowWidth()>1366){
+        let realWidth = 0;
+        let span = document.createElement('span');
+        let spancontent = document.createElement('span');
+
+        span.style.display = 'inline-block';
+        span.innerText = column.label;
+        document.body.appendChild(span);
+        //console.log(column.label+" label:"+span.clientWidth )
+        spancontent.style.display = 'inline-block';
+        spancontent.innerText = column.prop;
+        document.body.appendChild(spancontent);
+        //console.log(column.label+" label:"+spancontent.clientWidth )
+
+        realWidth = (spancontent.clientWidth>span.clientWidth)?spancontent.clientWidth:span.clientWidth;
+        if(column.sortable) column.minWidth = realWidth+16;
+        else column.minWidth = realWidth;
+        //console.log(column.label+"realWidth:"+realWidth )
+        document.body.removeChild(span);
+        document.body.removeChild(spancontent);
+      }
+      let idx = (this.showSelectionColumn)? $index-1 : $index;
+      console.log(column.label+"has icon:",this.columnData[idx])
+      let hasIcon = false;
+      if(this.columnData[idx] && this.columnData[idx].hasOwnProperty('hasIcon'))
+        hasIcon = true;
+      
+      if(hasIcon){
+        column.minWidth+16;
+        return h(
+          'div',[ 
+                  h('span',column.label),
+                  h('el-tooltip',
+                  { props:{placement:'top-start',width:'200',trigger:'hover',content:this.columnData[idx].hasIcon.tooltipContent}},
+                  [
+                    h('img',{
+                      style:{
+                        width:"14px",
+                        height:"14px",
+                        cursor:"pointer",
+                        marginLeft:"4px",
+                        verticalAlign:"middle",
+                        marginTop:"-2px"
+                      },
+                      attrs:{
+                        src:this.columnData[idx].hasIcon.icon
+                      }
+                    })
+                    /*h('i', {
+                        class: 'iconfont question-icon icon-bangzhu',
+                        style: {fontSize:'14px',marginLeft:'4px'}
+                      })*/
+                  ])                        
+                ]
+          )
+      }else
+        return h('span', {}, [column.label]);
     },
     setCellStyle({ row, column, rowIndex, columnIndex }) {
       let obj = {};if (columnIndex === 0) {
@@ -906,6 +944,9 @@ export default {
   .moveup_disable, .movedown_disable
     opacity: 0.3 !important
     pointer-events: none !important
+  .question-icon
+    font: size 14px
+    margin: left 4px
   
 
 </style>

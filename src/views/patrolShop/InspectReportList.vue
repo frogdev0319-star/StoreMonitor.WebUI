@@ -1157,6 +1157,17 @@ export default {
           delete this.inspectStatus.update_time
           delete this.inspectStatus.update_user_id
           console.log('this.inspectStatus~~~~~ :>> ', this.inspectStatus);
+
+            if(this.inspectStatus.is_customize_2 == false){
+            this.inspectStatus.status_2 = this.$t('overview.echartGood')
+          }
+          if(this.inspectStatus.is_customize_1 == false){
+            this.inspectStatus.status_1 = this.$t('overview.improve')
+          }
+          if(this.inspectStatus.is_customize_0 == false){
+            this.inspectStatus.status_0 = this.$t('overview.danger')
+          }
+
           
           this.appraiseList.forEach(item =>{
             if(item.status === 0) {item.label = this.inspectStatus.status_0}
@@ -1646,7 +1657,7 @@ $filterWidth: (100%-706);
               display: flex;
               flex-wrap: wrap;
               flex-direction: row;
-              align-items: flex-start;
+              align-items: stretch;
               justify-content: flex-start;
               margin-bottom: 1%;
               .status-tag {
