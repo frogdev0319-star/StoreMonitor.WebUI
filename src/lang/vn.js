@@ -278,7 +278,8 @@ export default{
       "daysww":"XX",
       "weeks":"tuần",
       "pageSize":"Chọn nhanh",
-      "pageSizeUnit":"Hiển thị theo trang"
+      "pageSizeUnit":"Hiển thị theo trang",
+      "rate":" Tỷ lệ"
   },
   "remotePatrol":{
       "InspectionDetail":"Xuất báo cáo",
@@ -365,10 +366,10 @@ export default{
       "fluency":"SD",
       "fullScreenMode":"Chế độ toàn màn hình",
       "generateTime":"Thời gian khởi tạo:",
-      "signInTime":"Check In Time",
-      "patrolTime":"Inspection Time",
-      "signInDistance":"Check In Distance",
-      "aroundDistance":"around ",
+      "signInTime":"Thời gian đăng ký",
+      "patrolTime":"Thời gian cần để kiểm tra",
+      "signInDistance":"Quãng đường đăng ký",
+      "aroundDistance":"Xấp xỉ ",
       "getAccessTokenError":"Không nhận được token truy cập",
       "getBeseyeStreamError":"Không nhận được thông tin beseye!",
       "getscore":"Điểm kiểm tra",
@@ -526,17 +527,26 @@ export default{
       "systemReject":"Rút khỏi hệ thống",
       "systemRejectMsg":"Không có nhân viên đăng xuất; hãy xác nhận lại",
       "cannotSwitchMimicMode":"Đang chỉnh sửa báo cáo, không thể chuyển chế độ",
-      "tipLimitGroupScore":"得分超過類別上限時以上限計算總分",
-      "signatureInfo":"Check in Infomation",
-      "mapDistance1":"與",
-      "mapDistance2":"距離約",
-      "mapDistance3":"meters",
-      "hour":"hr(s)",
-      "seconds":"sec(s)",
-      "minute":"min(s)",
+      "tipLimitGroupScore":"Tính tổng số điểm theo giới hạn trên khi điểm vượt mức giới hạn trên của danh mục",
+      "signatureInfo":"Thông tin đăng ký",
+      "mapDistance1":" Và ",
+      "mapDistance2":" Quãng đường xấp xỉ ",
+      "mapDistance3":"Mét",
+      "hour":"Giờ",
+      "seconds":"Giây",
+      "minute":"Phút",
       "reportSubmitting":"Report submitting...",
-      "storeCode":"Store Code",
-      "inspectSummary":"巡检总评"
+      "storeCode":"Mã cửa hàng",
+      "inspectSummary":"Tóm tắt nội dung kiểm tra",
+      "pleaseAdd":"* Vui lòng bổ sung",
+      "notQualifyAdd":"* Cần được bổ sung khi không đủ điều kiện",
+      "lowerThan":"* Nhỏ hơn ",
+      "lowScoreAdd":"số điểm, cần bổ sung ",
+      "textItem":"“Văn bản”",
+      "mediaItem":"“Hình ảnh hoặc video”",
+      "attachments":"Loại đính kèm",
+      "notFinishWithText":"Hiện có các mục chưa được hoàn thiện; vui lòng bổ sung các đính kèm dạng “Văn bản” để làm nhãn ghi chú",
+      "notFinishWithMedia":"Hiện có các mục chưa được hoàn thiện; vui lòng bổ sung các đính kèm dạng “Hình ảnh hoặc video” để làm nhãn ghi chú"
   },
   "eventView":{
       "ClosedEvent":"Các sự kiện đã đóng",
@@ -588,7 +598,7 @@ export default{
       "closeSelectedEvent":"Xác nhận đóng sự kiện đã chọn?",
       "confirmBachClose":"Xác nhận đóng hàng loạt sự kiện",
       "expiretag":"Đã hết hạn",
-      "maximumAttVedio":"Only can uploade 2 vedio attachment"
+      "maximumAttVedio":"Chỉ được đăng tải 2 nội dung video"
   },
   "insSettingView":{
       "Addscoreitems":"Các mục chấm điểm bổ sung",
@@ -679,7 +689,7 @@ export default{
       "excelPassFailScoreType":"Điểm: Không bắt buộc, 0,5~50 điểm",
       "excelScoreItemEmpty":"Không được để trống các tùy chọn điểm!",
       "excelScoreItemType":"Các tùy chọn điểm: Bắt buộc, -50~50",
-      "excelScoreInvalidType":"數值欄位輸入錯誤(如: 遺漏'/'或存在非合法數值)",
+      "excelScoreInvalidType":"Giá trị đầu vào bị lỗi (ví dụ như: Thiếu '/’ hoặc giá trị không hợp lệ)",
       "export":"Xuất",
       "exportFailTitle":"Không xuất được",
       "group":"các nhóm",
@@ -711,7 +721,6 @@ export default{
       "mustSignature":"Phải có chữ ký",
       "uncertainSignature":"Không bắt buộc có chữ ký",
       "inputData":"Vui lòng nhập người phụ trách",
-      "signatureOne":"Sign 1",
       "bindWorkflow":"Chọn quy trình ràng buộc",
       "select":"Vui lòng chọn",
       "no":"Không",
@@ -803,11 +812,32 @@ export default{
       "minScoreEmpty":"Không được để trống tổng đ",
       "weight":"%trọng lượng",
       "weightSetting":"Cài đặt trọng lượng",
-      "weightTotalError":"Weight cannot be greater or less than 100%",
+      "weightTotalError":"Trọng lượng không được lớn hơn hoặc thấp hơn 100%",
       "bindWorkFLow":"Đang liên kết luồng công việc",
       "isRequired":"Bắt buộc",
       "notRequired":"Not Required",
-      "selectStoreTag":"Chọn nhanh"
+      "selectStoreTag":"Chọn nhanh",
+      "groupScore":"Điểm danh mục",
+      "advanceSetting":"Cài đặt nâng cao",
+      "advanceSettingOn":"BẬT",
+      "advanceSettingOff":"TẮT",
+      "setGroupScoreRange0":"Giới hạn trên của mức đầu vào điểm danh mục là 0 ~ 9999",
+      "setGroupScoreRange":"Giới hạn trên của mức đầu vào điểm danh mục là -9999 ~ 9999",
+      "groupScoreLimit":"Giới hạn trên của điểm danh mục",
+      "commentStatus":"Hiển thị tùy chọn tóm tắt kết quả kiểm tra (cài đặt này sẽ tác động đến nội dung hiển thị tóm tắt kết quả kiểm tra của nhãn hiệu)",
+      "autoSelectComment":"Bật chức năng tự động chọn tóm tắt kết quả kiểm tra theo điều kiện ",
+      "selectByScore":"Tự động chọn theo điều kiện",
+      "noUserDefinedName":"Không có tên tùy biến",
+      "needHeighterThan":"Giá trị tối đa của mức đánh giá phải cao hơn giá trị tối thiểu!",
+      "cantEmptyScoreLow":"Mức tối thiểu cho tổng điểm đánh giá không được để trống! ",
+      "cantEmptyScoreHeight":"Mức tối đa cho tổng điểm đánh giá không được để trống! ",
+      "memoAdvanced":"Nhãn ghi chú",
+      "memoSeparate":"(Vui lòng sử dụng\"/\" để phân chia các mục)",
+      "inputMemoAdvanced":"Vui lòng nhập nhãn ghi chú ",
+      "memoCheckText":"Văn bản",
+      "memoCheckMedai":"Hình ảnh hoặc video",
+      "notQualifyIsRequired":"Chỉ cần nếu không đủ điều kiện",
+      "selectAtLeastOne":"Chọn tối thiểu một loại ghi chú (văn bản, hình ảnh hoặc video)"
   },
   "deviceView":{
       "EzvizAccount":"Tài khoản dịch vụ Streaming",
@@ -1321,8 +1351,8 @@ export default{
         "addAttachment":"Thêm tập tin đính kèm",
         "pleaseSign":"Hãy ký tên",
         "needSign":"Phiên đăng xuất này cần phải đính kèm tập tin chữ ký",
-        "selectComment":"Please choose to sign-off on comments!",
-        "rejectReason":"Please fill in the reason for rejection!",
+        "selectComment":"Vui lòng chọn để ký duyệt các bình luận!",
+        "rejectReason":"Vui lòng điền lý do hủy bỏ!"
     },
     "sendAudit":{
         "all":"Tất cả",
@@ -1354,8 +1384,8 @@ export default{
         "comfirmDelete":"Xác nhận xóa quy trình đăng xuất hiện tại?",
         "comfirmDeleteNode":"Xác nhận xóa nút mạng quy trình đăng xuất hiện tại?",
         "canNotDelete":"“Không thể xóa quy trình đăng xuất này",
-        "isBind":"Đã liên kết bảng kiểm tra”",
-        "cantClose":"“Không thể ngưng kích hoạt",
+        "canNotClose":"This process cannot be closed",
+        "makeSureUsign":"lease confirm whether the following inspection table is in use:",
         "dulplicateScuccess":"Đã sao chép quy trình thành công",
         "deleteScuccess":"Xóa thành công",
         "deleteFail":"Không thể xóa",
@@ -1435,8 +1465,9 @@ export default{
         "tooltipListcan4":"Chỉ có thể xem báo cáo kiểm tra sau khi đăng xuất thành công",
         "auditFlow":"Quy trình đăng xuất",
         "nodeOrder":"Số xê-ri node",
-        "cantEmptyDays" : "The number of days to stay cannot be empty. ",
-        "cantTooMuchDays" : "The length of stay cannot exceed 365 days. "
+        "cantEmptyDays" : "Số ngày lưu trú không được để trống.",
+        "cantTooMuchDays" : "TThời gian lưu trú không được vượt quá 365 ngày.",
+        "cantEmptyInspectStatus" : "Tên tùy biến cho tùy chọn tóm tắt kết quả kiểm tra không được để trống"
     },
     "inceptionRpt":{
         "sendAudit":"Gửi đăng xuất",
@@ -1458,7 +1489,9 @@ export default{
         "editAuditFail":"Không thể gửi lại đăng xuất",
         "auditReport":"Bản ghi đăng xuất",
         "saveReport":"Bảo lưu",
-        "submitReport":"Lưu và gửi"
+        "submitReport":"Lưu và gửi",
+        "warnWorkflowUnbind":"Quy trình ràng buộc của hình thức kiểm tra đã bị hủy, vui lòng hoàn thành cài đặt quy trình ràng buộc hình thức kiểm tra trước khi tiếp tục hoạt động này",
+        "errorEditReport":"Sửa báo cáo bị lỗi"
     }
   },
   "mysterio":{
@@ -1482,11 +1515,12 @@ export default{
       "pleaseChooseTag":"Chọn Kiểm tra",
       "comfirmDelMysterio":"Xác nhận xóa thành viên người mua sắm bí mật này",
       "saveMysterioSettingFail":"Không thể lưu nhóm quyền truy cập",
-      "nickName":"Nick Name",
-      "nickNameTip":"The nick name of sub-category supports up to 50 characters",
-      "pleaseInputNickName":"Please enter the nick name of the mystery",
-      "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name.",
-      "mystery":"Mystery Shopper"
+      "nickName":"Tên hiệu",
+      "nickNameTip":"Hỗ trợ tối đa 50 ký tự cho tên hiệu của tiểu danh mục",
+      "pleaseInputNickName":"Vui lòng nhập tên hiệu cho người mua sắm bí ẩn.",
+      "duplicateNickName":"Tên hiệu người mua sắm bí ẩn này đã tồn tại, vui lòng nhập lại tên hiệu.",
+      "mysterio":"Người mua sắm bí ẩn",
+      "allMysterio":"Tất cả người mua sắm bí ẩn"
   }
 
 }
