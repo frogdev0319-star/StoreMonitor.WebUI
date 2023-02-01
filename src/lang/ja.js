@@ -1352,7 +1352,7 @@ export default{
         "pleaseSign":"署名してください",
         "needSign":"この承認には、署名ファイルを添付する必要があります",
         "selectComment":"コメントでサインオフを選択してください！",
-        "rejectReason":"却下理由を記入してください！",
+        "rejectReason":"却下理由を記入してください！"
     },
     "sendAudit":{
         "all":"オール",
@@ -1467,7 +1467,7 @@ export default{
         "nodeOrder":"ノードの通し番号",
         "cantEmptyDays" : "滞在日数を空にすることはできません。",
         "cantTooMuchDays" : "滞在期間は365日を超えることはできません。",
-        "cantEmptyInspectStatus" : "検査概要オプションのカスタム名を空にすることはできません",
+        "cantEmptyInspectStatus" : "検査概要オプションのカスタム名を空にすることはできません"
     },
     "inceptionRpt":{
         "sendAudit":"承認の送信",
@@ -1520,7 +1520,7 @@ export default{
       "pleaseInputNickName":"ミステリーのニックネームを入力してください。",
       "duplicateNickName":"同じミステリーニックネームが既に存在します。ニックネームを再入力してください。",
       "mysterio":"ミステリーショッパー",
-      "allMysterio":"ミステリーショッパーのすべて",
+      "allMysterio":"ミステリーショッパーのすべて"
   }
 
 }

@@ -1352,7 +1352,7 @@ export default{
         "pleaseSign":"Tanda tangan",
         "needSign":"Penutup ini memerlukan lampiran file tanda tangan",
         "selectComment":"Pilih untuk mengakhiri komentar!",
-        "rejectReason":"Tulis alasan penolakan!",
+        "rejectReason":"Tulis alasan penolakan!"
     },
     "sendAudit":{
         "all":"Semua",
@@ -1467,7 +1467,7 @@ export default{
         "nodeOrder":"Nomor seri node",
         "cantEmptyDays" : "Jumlah hari menginap tidak boleh kosong.",
         "cantTooMuchDays" : "Lama menginap tidak boleh melebihi 365 hari.",
-        "cantEmptyInspectStatus" : "Nama kustom opsi rangkuman inspeksi tidak boleh kosong",
+        "cantEmptyInspectStatus" : "Nama kustom opsi rangkuman inspeksi tidak boleh kosong"
     },
     "inceptionRpt":{
         "sendAudit":"Kumpulkan penutup",
@@ -1520,7 +1520,7 @@ export default{
       "pleaseInputNickName":"Tulis nickname misteri.",
       "duplicateNickName":"Nickname misteri sudah ada, tulis lagi yang lain.",
       "mysterio":"Pembeli Misterius",
-      "allMysterio":"Semua Pembeli Misterius",
+      "allMysterio":"Semua Pembeli Misterius"
   }
 
 }

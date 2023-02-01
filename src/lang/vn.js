@@ -1352,7 +1352,7 @@ export default{
         "pleaseSign":"Hãy ký tên",
         "needSign":"Phiên đăng xuất này cần phải đính kèm tập tin chữ ký",
         "selectComment":"Vui lòng chọn để ký duyệt các bình luận!",
-        "rejectReason":"Vui lòng điền lý do hủy bỏ!",
+        "rejectReason":"Vui lòng điền lý do hủy bỏ!"
     },
     "sendAudit":{
         "all":"Tất cả",
@@ -1467,7 +1467,7 @@ export default{
         "nodeOrder":"Số xê-ri node",
         "cantEmptyDays" : "Số ngày lưu trú không được để trống.",
         "cantTooMuchDays" : "TThời gian lưu trú không được vượt quá 365 ngày.",
-        "cantEmptyInspectStatus" : "Tên tùy biến cho tùy chọn tóm tắt kết quả kiểm tra không được để trống",
+        "cantEmptyInspectStatus" : "Tên tùy biến cho tùy chọn tóm tắt kết quả kiểm tra không được để trống"
     },
     "inceptionRpt":{
         "sendAudit":"Gửi đăng xuất",
@@ -1520,7 +1520,7 @@ export default{
       "pleaseInputNickName":"Vui lòng nhập tên hiệu cho người mua sắm bí ẩn.",
       "duplicateNickName":"Tên hiệu người mua sắm bí ẩn này đã tồn tại, vui lòng nhập lại tên hiệu.",
       "mysterio":"Người mua sắm bí ẩn",
-      "allMysterio":"Tất cả người mua sắm bí ẩn",
+      "allMysterio":"Tất cả người mua sắm bí ẩn"
   }
 
 }

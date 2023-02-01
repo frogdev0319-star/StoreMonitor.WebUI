@@ -1352,7 +1352,7 @@ export default{
         "pleaseSign":"서명하십시오",
         "needSign":"이 최종 서명에는 서명 파일을 첨부해야 합니다",
         "selectComment":"댓글에 대해 최종 서명을 해 주십시오!",
-        "rejectReason":"거부 사유를 작성해 주십시오!",
+        "rejectReason":"거부 사유를 작성해 주십시오!"
     },
     "sendAudit":{
         "all":"전부",
@@ -1467,7 +1467,7 @@ export default{
         "nodeOrder":"노드 일련 번호",
         "cantEmptyDays" : "머무른 일 수는 비워 둘 수 없습니다.",
         "cantTooMuchDays" : "머무른 일 수가 365일을 초과해서는 안 됩니다.",
-        "cantEmptyInspectStatus" : "검사 요약 옵션의 사용자 정의 이름은 비워 둘 수 없습니다.",
+        "cantEmptyInspectStatus" : "검사 요약 옵션의 사용자 정의 이름은 비워 둘 수 없습니다."
     },
     "inceptionRpt":{
         "sendAudit":"최종 서명 제출",
@@ -1520,7 +1520,7 @@ export default{
       "pleaseInputNickName":"미스터리의 별명을 입력하십시오.",
       "duplicateNickName":"동일한 미스터리 별명이 이미 있습니다. 별명을 다시 입력해 주십시오.",
       "mysterio":"미스터리 쇼퍼",
-      "allMysterio":"모든 미스터리 쇼퍼",
+      "allMysterio":"모든 미스터리 쇼퍼"
   }
 
 }

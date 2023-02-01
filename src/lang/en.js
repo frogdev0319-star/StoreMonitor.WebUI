@@ -1353,7 +1353,7 @@ export default{
         "pleaseSign":"Please sign",
         "needSign":"This sign-off requires attaching a signature file",
         "selectComment":"Please choose to sign-off on comments!",
-        "rejectReason":"Please fill in the reason for rejection!",
+        "rejectReason":"Please fill in the reason for rejection!"
       },
       "sendAudit":{
           "all":"All",
@@ -1469,7 +1469,7 @@ export default{
         "nodeOrder":"Node serial number",
         "cantEmptyDays" : "The number of days to stay cannot be empty. ",
         "cantTooMuchDays" : "The length of stay cannot exceed 365 days.",
-        "cantEmptyInspectStatus" : "Custom name of the inspection summary option cannot be empty",
+        "cantEmptyInspectStatus" : "Custom name of the inspection summary option cannot be empty"
 
       },
       "inceptionRpt":{
@@ -1523,7 +1523,7 @@ export default{
         "pleaseInputNickName":"Please enter the nick name of the mystery",
         "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name.",
         "mysterio":"Mystery Shopper",
-        "allMysterio":"All of Mystery Shopper",
+        "allMysterio":"All of Mystery Shopper"
     }
   
   }
