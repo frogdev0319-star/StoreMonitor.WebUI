@@ -721,7 +721,6 @@ export default{
       "mustSignature":"必签",
       "uncertainSignature":"非必签",
       "inputData":"请输入负责人",
-      "signatureOne":"签名 1",
       "bindWorkflow":"选择绑定流程",
       "select":"请选择",
       "no":"无",
