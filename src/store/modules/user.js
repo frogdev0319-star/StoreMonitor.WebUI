@@ -46,6 +46,7 @@ const user = {
     mimicMode:false,
     isMystery:false,
     editReport:false,
+    editSchUserId:'',
   },
 
   mutations: {
@@ -175,6 +176,9 @@ const user = {
     SET_EDIT_REPORT:(state,mode)=>{
       state.editReport = mode;
     },
+    SET_EDIT_SCHUSERID:(state,mode)=>{
+      state.editSchUserId = mode;
+    },
   },
   actions: {
     setEditCount({ commit }, count) {
@@ -220,6 +224,9 @@ const user = {
     },
     setEditReport({ commit }, mode){
       commit('SET_EDIT_REPORT',mode)
+    },
+    setEditSchUserId({commit},mode){
+      commit('SET_EDIT_SCHUSERID',mode)
     },
     GetDash({ commit }) {
       return new Promise((resolve, reject) => {

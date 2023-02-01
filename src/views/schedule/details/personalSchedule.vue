@@ -1,7 +1,7 @@
 <template>
     <div class="ScheduleContainer">
         <div class="search-bar">
-            <date-time-selector class="time-selector" :dateRangeTitle="$t('schedule.schStartDate')" @change="dateChange"/>
+            <date-time-selector class="time-selector" :dateRangeTitle="$t('schedule.schStartDate')" :pickFuturerDate="true" @change="dateChange"/>
             <div class='keyword-area'>
                 <div class="search-label">{{$t('remotePatrol.keywords')}}</div>
                 <el-input
@@ -81,7 +81,9 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import DateTimeSelector from '@/components/DateTimeSelector';import TableOnly from '@/components/TableOnly';
+import {scheduleRESTful} from '@/api/index';
+import DateTimeSelector from '@/components/DateTimeSelector';
+import TableOnly from '@/components/TableOnly';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
 import DelayButton from '@/components/DelayButton';
 import DialogPop from '@/components/DialogPop'
@@ -92,12 +94,13 @@ export default{
     components: {DateTimeSelector,TableOnly,TblPaginationOnly,DelayButton,DialogPop},
     data(){
       return {
+        userId:'',
         person:'',
         inputSearchValue:'',
         dateValue:[],
         columnData:[
         {
-            'prop': 'schName',
+            'prop': 'taskName',
             'label': this.$t('schedule.schName'),
             'sortable': false,
             'width': 200,
@@ -105,7 +108,7 @@ export default{
             'isExpand': false
           },
           {
-            'prop': 'tagName',
+            'prop': 'tagNameMode',
             'label': this.$t('statistics.patrolPerson.tagName'),
             'sortable': false,
             'width': 300,
@@ -117,7 +120,7 @@ export default{
             }
           },
           {
-            'prop': 'incepNum',
+            'prop': 'taskCounts',
             'label': this.$t('schedule.incepNum'),
             'sortable': false,
             'width': 100,
@@ -125,7 +128,7 @@ export default{
             'isExpand': false
           },
           {
-            'prop': 'startDate',
+            'prop': 'taskStartStr',
             'label': this.$t('schedule.schStartDate'),
             'sortable': 'custom',
             'width': 50,
@@ -133,7 +136,7 @@ export default{
             'isExpand': false
           },
           {
-            'prop': 'endDate',
+            'prop': 'taskFinalStr',
             'label': this.$t('schedule.schEndDate'),
             'sortable': 'custom',
             'width': 130,
@@ -141,8 +144,7 @@ export default{
             'isExpand': false
           }
         ],
-        tableData:[{schName:'1',tagName:'test',incepNum:3,startDate:'2023/01/01',endDate:'2023/01/02'}],
-        scheduleList:[],
+        tableData:[],
         columnOperationData:{
           label: this.$t('titleView.operation'),
           minWidth: '50',
@@ -164,11 +166,20 @@ export default{
         total:0,
         curPage:1,
         curSizeNum:10,
-        defaultSort:{prop: 'startDate', order: 'descending'},
+        defaultSort:{prop: 'taskStartStr', order: 'descending'},
         enableDeleteBtn:false,
         SelSchedulId:[],
         showConfirmDelete:false,
       }
+    },
+    beforeRouteLeave(to, from, next) {
+        const self = this;
+        if(to.name == "ModifySchedule" || to.name == "CreateSchedule"){
+            self.$store.dispatch('setEditSchUserId', self.userId);
+        }else{
+            self.$store.dispatch('setEditSchUserId', '');
+        }
+        next();
     },
     computed: {
       ...mapGetters({ accountChanged: 'accountChanged' })
@@ -178,7 +189,7 @@ export default{
     },
     methods:{
         init(){
-            console.log(">>>router:",this.$route.params);
+            this.userId = (Object.getOwnPropertyNames(this.$route.params).length>0)?this.$route.params.userId:this.$store.getters.editSchUserId;
             this.person = this.$route.params.nickName;
         },
         dateChange(val) {
@@ -188,12 +199,61 @@ export default{
             self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
             self.dateValue[1] = self.dateValue[1];
             self.inputSearchValue = '';
+            this.doSearchScheduleList();
         },
         doSearchScheduleList(){
+            const self = this;
+            self.isLoadingData = true;
+            let beginTs = self.$moment.utc(self.$moment(self.dateValue[0])).valueOf();
+            let endTs = self.$moment.utc(self.$moment(self.dateValue[1])).valueOf();
+            const params={
+              userId:self.userId,
+              beginTs,
+              endTs,
+              filter:{
+                page:this.curPage-1,
+                size:this.curSizeNum
+              },
+              order:{
+                direction:this.defaultSort.order=='ascending'? 'asc':'desc',
+                property:this.defaultSort.prop=="taskStartStr"?"taskStart":(this.defaultSort.prop=="taskFinalStr"?"taskFinal":this.defaultSort.prop),
+              }
+            }
+            if(self.inputSearchValue.trim()!=""){
+              params["keyword"] = self.inputSearchValue;
+            }
+            scheduleRESTful.getPersonTaskList(params).then(res=>{
+              var userData = [];
 
+              if(res.errCode == 0){
+                res.data.content.map(item =>{
+                  //const mapUser = self.doMapUser(item.userId);
+                  //console.log("mapUser:",mapUser);
+                  let obj = {...item};
+                  let mode = item.tagMode==0?self.$t('remotePatrol.remotePatrol'):self.$t('remotePatrol.onsitePatrol');
+                  obj['tagNameMode'] = mode+'\n'+item.tagName;
+                  //obj['updateTs']=item.updateTime,
+                  obj['taskStartStr']=(item.updateTime==0)?'-':util.getDateStr(item.taskStart),
+                  obj['taskFinalStr']=(item.updateTime==0)?'-':util.getDateStr(item.taskFinal),
+                  obj['updateUserName']=(item.updateUserName == "NONE")?'-':item.updateUserName,
+                  userData.push(obj);
+                });
+                self.tableData = [];
+                self.tableData = userData;
+                self.total = res.data.totalPages;
+                self.isLoadingData = false;
+              }else{
+                util.notify(self.$t('schedule.getScheduleSettingFail'), 'error', 3000);
+              }
+
+            }).catch(err=>{
+              console.log("getScheduleListFail error",err);
+              util.notify(self.$t('schedule.getScheduleSettingFail')+',error:'+err, 'error', 3000);
+              this.isLoadingData = false;
+            });
         },
         addNewSchedule(){
-            this.$router.push({ name: 'CreateSchedule', params: { userId: this.person }});
+            this.$router.push({ name: 'CreateSchedule', params: { userId: this.userId,userName:this.person}});
         },
         deleteSchedule(){
             this.showConfirmDelete = true;
@@ -214,54 +274,35 @@ export default{
             this.showConfirmDelete = false;
         },
         handleOperation({ method, row }) {
+            let params= { userId: this.userId,taskGroupUuid: row.taskGroupUuid };
+            console.log("handleOperation params:",params);
             switch(method){
                 case 'copy':{
-                break;
+                    break;
                 }
                 case 'set':{
-                this.$router.push({ name: 'ModifySchedule', params: { data: row }});
-                break;      
-                }
-                case 'delete':{
-                break;      
+                    this.$router.push({ name: 'ModifySchedule', params: { userId: this.userId,userName:this.person,taskGroupUuid: row.taskGroupUuid }});
+                    break;      
                 }
                 default: {
-                break;
+                    break;
                 }
             }
-        },
-        setTable() {
-            this.total = Math.ceil(this.scheduleList.length/this.curSizeNum);
-            if(this.defaultSort.prop=="startDate"){
-                if(this.defaultSort.order=='ascending'){
-                util.sortArrayByKeyAsc(this.scheduleList,"startDate")
-                }else{
-                util.sortArrayByKeyDesc(this.scheduleList,"startDate")
-                }
-            }else if(this.defaultSort.prop=="endDate"){
-                if(this.defaultSort.order=='ascending'){
-                util.sortArrayByKeyAsc(this.scheduleList,"endDate")
-                }else{
-                util.sortArrayByKeyDesc(this.scheduleList,"endDate")
-                }
-            }
-            this.tableData = [];
-            this.tableData = [...this.scheduleList.slice( (this.curPage - 1)* this.curSizeNum, this.curPage* this.curSizeNum)];
         },
         handleSortChange(order, defaultSort) {
             this.defaultSort = { ...defaultSort };
-            this.setTable();
+            this.doSearchScheduleList();
         },
         currentChange(val) {
             const self = this;
             self.curPage = val.page;
-            self.setTable();
+            self.doSearchScheduleList();
         },
         sizeChange(val) {
             const self = this;
             self.curSizeNum = val.size;
             self.curPage = 1;
-            self.setTable();
+            self.doSearchScheduleList();
         },
     }
 }
@@ -394,6 +435,13 @@ export default{
     /deep/
       .el-table th .cell{
       padding-left: 0px !important;
+      span{
+        white-space: pre-line;
+      }
+    }
+    /deep/
+    .el-table .cell span{
+      white-space: pre-line;
     }
     /deep/
     .el-table

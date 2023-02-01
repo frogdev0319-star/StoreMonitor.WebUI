@@ -8,6 +8,7 @@ import * as beseyeRESTful from './beseye';
 import * as skywatchRESTful from './skywatch';
 import * as workflowRESTful from './workflow';
 import * as mysteroRESTful from './mystero'
+import * as scheduleRESTful from './scheduleTask';
 export default api;
 
 export {
@@ -20,4 +21,5 @@ export {
   skywatchRESTful,
   workflowRESTful,
   mysteroRESTful,
+  scheduleRESTful
 };

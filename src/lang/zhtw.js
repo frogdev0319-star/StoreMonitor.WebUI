@@ -1545,6 +1545,12 @@ export default{
     "tagInfo":"巡檢類型 | 巡檢表名稱",
     "deleteSchedule":"刪除排程",
     "confirmDeleteSchedule":"是否需要刪除已選擇的排程？",
+    "store":"門店/時區",
+    "schExeDate":"執行日期",
+    "reportUploadDate":"報告上傳時間",
+    "incepPerson":"執行人",
+    "inCompleted":"未完成",
+    "Completed":"已完成"
   },
 
 }

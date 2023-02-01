@@ -62,8 +62,8 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import { getAllUserInfoNoAuth } from '@/api/login';
 import { getDepartmentList } from '@/api/checkin';
+import {scheduleRESTful} from '@/api/index';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import TableOnly from '@/components/TableOnly';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
@@ -104,7 +104,7 @@ export default{
             'isExpand': false
           },
           {
-            'prop': 'lastUpdatePerson',
+            'prop': 'updateUserName',
             'label': this.$t('schedule.lastUpdatePerson'),
             'sortable': false,
             'width': 50,
@@ -121,7 +121,6 @@ export default{
           }
       ],
       tableData:[],
-      scheduleList:[],
       columnOperationData:{
         label: this.$t('titleView.operation'),
         minWidth: '50',
@@ -162,6 +161,7 @@ export default{
   },
   created() {
     this.getPosition();
+    this.getScheduleList();
   },
   methods: {
     getPosition() {
@@ -185,55 +185,50 @@ export default{
         userIdList.push(department.contents);
         this.positionsList.push(departmentJson);
       });
-      this.positionIds = this.ifCachedParams ? this.positionIds : this.positionsList.map(depart => depart.value);
-      this.getScheduleList();
+      this.positionIds = this.positionsList.map(depart => depart.value);
+      //this.getScheduleList();
     },
     handlePositionsChange(positionIds) {
       this.positionIds = positionIds;
-    },
-    doGetUserList(){
-        getAllUserInfoNoAuth().then(res=>{
-            if(res.code==0){
-
-            }
-        })
     },
     doSearchScheduleList(){
         this.getScheduleList()
     },
     getScheduleList(){
         const self = this;
-        self.scheduleList=[];
         self.isLoadingData = true;
-        /*const params={
+        const params={
           positionId:this.positionIds,
           filter:{
             page:this.curPage-1,
-            size:(getAll)?500:this.curSizeNum
+            size:this.curSizeNum
           },
           order:{
             direction:this.defaultSort.order=='ascending'? 'asc':'desc',
-            property:this.defaultSort.prop,
+            property:this.defaultSort.prop=="updateTsStr"?"updateTime":this.defaultSort.prop,
           }
-        }*/
-        getAllUserInfoNoAuth().then().then(res=>{
+        }
+        if(self.inputSearchValue.trim()!=""){
+          params["keyword"] = self.inputSearchValue;
+        }
+        scheduleRESTful.getSchedulePersonList(params).then(res=>{
           var userData = [];
           
           if(res.errCode == 0){
-            res.data.map(item =>{
+            res.data.content.map(item =>{
               //const mapUser = self.doMapUser(item.userId);
               //console.log("mapUser:",mapUser);
               let obj = {...item};
-              var position = this.positionsList.find(pos=>{return pos.contents.includes(item.userId)})
+              var position = this.positionsList.find(pos=>{return pos.value == item.title})
               obj['id']=item.userId;
               obj['position'] = (position)? position.label:"";
               //obj['updateTs']=item.updateTime,
-              //obj['updateTsStr']=util.getDateStr(item.updateTime),
-              obj['lastUpdatePerson']=item.permissionStores,
+              obj['updateTsStr']=(item.updateTime==0)?'-':util.getDateStr(item.updateTime),
+              obj['updateUserName']=(item.updateUserName == "NONE")?'-':item.updateUserName,
               userData.push(obj);
             });
-            this.tableData = [];
-            this.tableData = userData;
+            self.tableData = [];
+            self.tableData = userData;
             self.total = res.data.totalPages;
             self.isLoadingData = false;
           }else{
@@ -267,32 +262,20 @@ export default{
     goSettingPage(row){
       this.$router.push({name: 'PersonalSchedule',params: {userId:row.userId, nickName:row.userName}});
     },
-    setTable() {
-      this.total = Math.ceil(this.scheduleList.length/this.curSizeNum);
-      if(this.defaultSort.prop=="updateTsStr"){
-        if(this.defaultSort.order=='ascending'){
-          util.sortArrayByKeyAsc(this.scheduleList,"updateTs")
-        }else{
-          util.sortArrayByKeyDesc(this.scheduleList,"updateTs")
-        }
-      }
-      this.tableData = [];
-      this.tableData = [...this.scheduleList.slice( (this.curPage - 1)* this.curSizeNum, this.curPage* this.curSizeNum)];
-    },
     handleSortChange(order, defaultSort) {
       this.defaultSort = { ...defaultSort };
-      this.setTable();
+      this.getScheduleList();
     },
     currentChange(val) {
         const self = this;
         self.curPage = val.page;
-        self.setTable();
+        self.getScheduleList();
     },
     sizeChange(val) {
         const self = this;
         self.curSizeNum = val.size;
         self.curPage = 1;
-        self.setTable();
+        self.getScheduleList();
     },
   }
 }
