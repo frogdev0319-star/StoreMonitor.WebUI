@@ -260,6 +260,7 @@ export default{
         }
     },
     goSettingPage(row){
+      sessionStorage.setItem('PersonalSchedule', JSON.stringify(row));//存在sessionStorage，下一頁refresh時才會留著
       this.$router.push({name: 'PersonalSchedule',params: {userId:row.userId, nickName:row.userName}});
     },
     handleSortChange(order, defaultSort) {

@@ -172,15 +172,6 @@ export default{
         showConfirmDelete:false,
       }
     },
-    beforeRouteLeave(to, from, next) {
-        const self = this;
-        if(to.name == "ModifySchedule" || to.name == "CreateSchedule"){
-            self.$store.dispatch('setEditSchUserId', self.userId);
-        }else{
-            self.$store.dispatch('setEditSchUserId', '');
-        }
-        next();
-    },
     computed: {
       ...mapGetters({ accountChanged: 'accountChanged' })
     },
@@ -189,8 +180,13 @@ export default{
     },
     methods:{
         init(){
-            this.userId = (Object.getOwnPropertyNames(this.$route.params).length>0)?this.$route.params.userId:this.$store.getters.editSchUserId;
-            this.person = this.$route.params.nickName;
+            //存在sessionStorage，refresh時才會留著
+            const data = sessionStorage.getItem('PersonalSchedule')
+            this.personSchedule = JSON.parse(data)
+            
+            this.userId = (Object.getOwnPropertyNames(this.$route.params).length>0)?this.$route.params.userId:this.personSchedule.userId;
+            
+            this.person = (Object.getOwnPropertyNames(this.$route.params).length>0)?this.$route.params.nickName:this.personSchedule.userName;
         },
         dateChange(val) {
             const self = this;
