@@ -714,7 +714,7 @@ export default {
       await getAllUserInfoNoAuth().then(res=>{
         this.userInfo = res.data
         this.userData = this.userInfo
-        // console.log('this.userInfo ------>> ', this.userInfo);
+        console.log('this.userInfo ------>> ', this.userInfo);
       }).catch(err => {
         console.log('error' + err);
       });

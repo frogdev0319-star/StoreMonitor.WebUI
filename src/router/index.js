@@ -355,6 +355,7 @@ export const navbarRoute = {
         },
         component: resolve => require(['@/views/schedule/details/scheduleDetail'], resolve)
       }
+
     ) && primaryPathesList.push('/scheduleSetting', '/personalSchedule','/scheduleDetailCreate','scheduleDetailModify');
     !PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleHistroy() && schduleRoute.children.push(
       {
