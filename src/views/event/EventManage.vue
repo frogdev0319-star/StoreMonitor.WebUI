@@ -454,7 +454,6 @@ export default {
       const self = this;
       if (val === 0 && self.totalElements > 0) {
         self.params.filter.page -= 1;
-        console.log('numberofElements');
         self.getEventList();
       }
     }
@@ -480,7 +479,6 @@ export default {
       self.getInspectList();
       self.initData();
     } else {
-      console.log("Activate")
       self.getEventList('Back');
       self.getEventCount();
       self.$route.meta.isBack = false;
@@ -497,23 +495,19 @@ export default {
         this.searchParams['searchFrom'] = '';
         this.ifSaveParams && this.saveSearchParams(true);
     }else if(this.searchParams['searchFrom']=='EventStatistics'){
-        console.log("in beforeDestroy");
         delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
         this.searchParams['searchFrom'] = '';
         this.ifSaveParams && this.saveSearchParams(true);
     }
   },
   deactivated() {
-      console.log('deactivated');
       //console.log('searchFrom:',this.searchParams['searchFrom']);
       
       if(this.searchParams['searchFrom']=='PatrolPersonStat'){
-          //console.log("in deactivated");
           delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
           this.searchParams['searchFrom'] = '';
           this.ifSaveParams && this.saveSearchParams(true);
       }else if(this.searchParams['searchFrom']=='EventStatistics'){
-        //console.log("in beforeDestroy");
         delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
         this.searchParams['searchFrom'] = '';
         this.ifSaveParams && this.saveSearchParams(true);
@@ -535,8 +529,6 @@ export default {
         realWidth = span.clientWidth;
         if(column.sortable == 'custom') realWidth = realWidth;
         else column.minWidth = realWidth;
-        //console.log(column.label+":"+column.minWidth);
-        //console.log(column.label+" realWidth:"+realWidth);
         if(column.minWidth<realWidth) column.minWidth = realWidth;
 
         document.body.removeChild(span);
@@ -572,7 +564,6 @@ export default {
     },
 
     dateChange(val) {
-      console.log("dateChange");
       const self = this;
       const tabIndex = Number(self.activeName);
       const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
@@ -615,23 +606,19 @@ export default {
     },
 
     searchData() {
-      console.log("SearchData")
       this.tableDataList[Number(this.activeName)].page = 1;
       this.getEventListAndCount();
     },
 
     getEventListAndCount() {
-      console.log("Get Event List and Count")
       if (this.dateValue.length === 0) return;
       this.getEventList('');
       this.getEventCount();
     },
 
     rowClickItem(row) {
-      console.log("rowClickItem",row);
       if(!this.stopRowClick){
         this.event = row;
-        console.log("rowClickItem:",this.event);
         sessionStorage.setItem('event', JSON.stringify(this.event));
         sessionStorage.setItem('queryparams', JSON.stringify(this.params));
         this.$router.push({ name: 'eventDetails', params: { event: this.event }});
@@ -640,9 +627,7 @@ export default {
       }
     },
     cellClickItem(row, column, cell, event){
-      //console.log("column:",column);
       if(column.type == "selection"){
-        //console.log("cell in");
         this.stopRowClick = true;
       }
     },
@@ -657,7 +642,7 @@ export default {
     sortChange(col) {
       const self = this;
       const tabIndex = Number(self.activeName);
-      console.log("sortChange page:",self.tableDataList[tabIndex].page);
+      //console.log("sortChange page:",self.tableDataList[tabIndex].page);
       self.tableDataList[tabIndex].page = 1;
       const order = col.order;
       self.order = order;
@@ -686,7 +671,7 @@ export default {
     },
 
     async getEventList(val) {
-      console.log("GetEventList");
+      //"GetEventList");
       const self = this;
       const tabIndex = Number(this.activeName);
       for(var k in self.tableDataList){
@@ -714,7 +699,7 @@ export default {
         delete self.params.clause.storeId;
         return;
       }
-      console.log("@@@self.params:",self.params);
+      //console.log("@@@self.params:",self.params);
       eventRESTful.getEventList(self.params).then((res) => {
         const data = res.data.content;
         //console.log("data:",data);
@@ -756,15 +741,12 @@ export default {
           };
           temp.push(obj);
         });
-        console.log("Set ",tabIndex,temp)
         self.tableDataList[tabIndex].tableData = temp;
         self.tableDataList[tabIndex].total = res.data.totalPages;
         self.tableDataList[tabIndex].eventCount = res.data.totalElements;
-        console.log("res.data.pageable.pageNumber:",res.data.pageable.pageNumber);
         self.tableDataList[tabIndex].page = res.data.pageable.pageNumber+1;
         self.totalElements = res.data.totalElements;
         if(tabIndex == this.activeName){
-          console.log("@@res.data.pageable.pageNumber:",res.data.pageable.pageNumber);
           self.page = (res.data.pageable.pageNumber+1);
           self.total = res.data.totalPages;
         }
@@ -790,7 +772,6 @@ export default {
       }
       let storeId = null;
       var p = Object.assign({}, this.params);
-      console.log("*p:",p)
       //if(this.searchParams['searchFrom']=='PatrolPersonStat' || this.searchParams['searchFrom']=="EventStatistics")
         storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : (p.hasOwnProperty('clause'))?p.clause.storeId:'-1';
       /*else{
@@ -800,7 +781,7 @@ export default {
         }
         storeId =  (tempStore!="-1")? tempStore :((Object.keys(this.storeFilterObj).length > 0) ? this.storeFilterObj.filterStoreIds :'-1');
       }*/
-      console.log("getEventListRequestParams > storeId:",storeId);
+      //console.log("getEventListRequestParams > storeId:",storeId);
       let status = [];
       if (this.curState.length !== 0) {
         if (this.curState.length === 1) {
@@ -823,7 +804,7 @@ export default {
       }
       let page = 0;
       if (val === 'currentChange') {
-        console.log('currentChange',this.tableDataList[tabIndex].page);
+        //console.log('currentChange',this.tableDataList[tabIndex].page);
         page = this.tableDataList[tabIndex].page-1;
       }
       if (val === 'Back') {
@@ -861,9 +842,9 @@ export default {
           searchMysteryMode : this.searchParams.searchMysteryMode
       }
 
-      console.log("1.this.params:",params);
+      //console.log("1.this.params:",params);
       if(storeId && storeId!='-1' && storeId!=""){
-        console.log("storeId:",storeId);
+        //console.log("storeId:",storeId);
          params.clause['storeId'] = storeId;
       }
       if(this.inspectId.length>0 && this.searchParams['searchFrom']!='PatrolPersonStat'){
@@ -874,8 +855,8 @@ export default {
           params['inspectTagIds'] = inspectTagId;
         }
       }
-      console.log("2.this.params:",params);
-      console.log("this.searchParams:",this.searchParams);
+      //console.log("2.this.params:",params);
+      //console.log("this.searchParams:",this.searchParams);
       if(this.searchParams.hasOwnProperty('searchParams')){
         if(this.searchParams.searchParams.hasOwnProperty('clause') && this.searchParams['searchFrom']=='PatrolPersonStat'){
           params.clause['assigner'] =  this.searchParams.searchParams.clause.assigner;
@@ -915,7 +896,7 @@ export default {
 
     currentChange(val) {
       const self = this;
-      console.log("currentChange val:",val);
+      //console.log("currentChange val:",val);
       self.tableDataList[Number(self.activeName)].page = val.page;
       self.page = val.page;
       self.getEventList('currentChange');
@@ -928,7 +909,7 @@ export default {
     },
 
     handleSelectionChange(val){
-      console.log("handleSelectionChange:",val);
+      //console.log("handleSelectionChange:",val);
       this.closingEventId = [];
       if(val.length>0){
         this.showCloseBtn = true;
@@ -963,7 +944,7 @@ export default {
       }
       //self.getEventListRequestParams('currentChange');
       //}
-      console.log("Get Event Count")
+      //console.log("Get Event Count")
       //console.log(self.params)
       //console.log(self.params.clause.storeId);
       if ( self.params.clause.storeId && self.params.clause.storeId.length === 0) {
@@ -981,7 +962,7 @@ export default {
       /*else
         storeId =  (self.searchParams.hasOwnProperty('clause'))?self.searchParams.clause.storeId:Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds :'-1';
       */
-      console.log("getEventCount > storeId:",storeId)
+      //console.log("getEventCount > storeId:",storeId)
       let like = {};
       if (self.inputSearchValue.trim().length !== 0) {
         const inputValue = self.inputSearchValue.trim();
@@ -1013,7 +994,7 @@ export default {
           params['inspectTagIds'] = inspectTagId;
         }
       }
-      console.log("1008: params",params);
+      //console.log("1008: params",params);
       if(this.searchParams.hasOwnProperty('searchParams')){
         if(this.searchParams.searchParams.hasOwnProperty('clause')  && this.searchParams['searchFrom']=='PatrolPersonStat'){
           params.clause['assigner'] =  this.searchParams.searchParams.clause.assigner;
@@ -1032,7 +1013,7 @@ export default {
       } else {
         eventRESTful.GetEventCountByStatus(params).then(res => {
           const data = res.data;
-          console.log("GetEventCountByStatus > data:",data);
+          //console.log("GetEventCountByStatus > data:",data);
           let numOfEventTotal = 0;
           for (let i = 0; i < 4; i++) {
             self.tableDataList[i].eventCount = data[i].numOfEvent;
@@ -1163,7 +1144,7 @@ export default {
       this.getEventListAndCount() ;
     },
     getRouterData(routeData) {
-      console.log("1.eventManage routeData:", routeData);
+      //console.log("1.eventManage routeData:", routeData);
       let start = '', end = '';
       start = this.$moment(this.dateValue[0]).valueOf();
       const endTime = this.dateValue[1];
@@ -1181,20 +1162,20 @@ export default {
             size: 10
           },
         };
-        console.log("eventManage params:", this.params);
+        //console.log("eventManage params:", this.params);
         sessionStorage.setItem('event_manage', '');
-        console.log("2.eventManage routeData:", sessionStorage.getItem('event_manage'));
+        //console.log("2.eventManage routeData:", sessionStorage.getItem('event_manage'));
         this.getEventList('Back');
     },
     saveSearchParams(isLeave=false) {
-      console.log("saveSearchParams:",this.storeFilterObj);
+      //console.log("saveSearchParams:",this.storeFilterObj);
       const params = this.storeFilterObj;
       const { clause, filter, like, order } = { ...this.params };
       if(isLeave){
         let tempClause = clause;
         delete clause["assigner"];
         params.searchParams = { clause:tempClause, filter, like, order };
-        console.log("leave searchParams:",params.searchParams);
+        //console.log("leave searchParams:",params.searchParams);
       }else{
         //params.curStore = this.storeFilterObj.filterStoreIds;
         params.searchParams = { clause, filter, like, order };
@@ -1212,12 +1193,12 @@ export default {
       params.searchMysteryMode = -1;
       params.curReportType = this.curReportType;
       params.inspectTagId = this.inspectId;
-      console.log(">>>Save params:",params);
+      //console.log(">>>Save params:",params);
       const searchConditon = {
         path: 'eventManage',
         params: params
       };
-      console.log("save params:",params);
+      //console.log("save params:",params);
       SearchConditionUtil.saveSearchCondition(searchConditon);
     },
 
@@ -1294,7 +1275,7 @@ export default {
     },
 
     onStoreChange(storeObj) {
-      console.log("onStoreChange>storeFilterObj",storeObj);
+      //console.log("onStoreChange>storeFilterObj",storeObj);
       this.storeFilterObj = storeObj;
       this.ifSearchData && this.getEventListAndCount();
       this.ifSearchData = false;
@@ -1377,7 +1358,7 @@ export default {
       //self.inspectTableList.length > 0 && self.inspectTableList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
       if (inspectList.length !== 0) {
         console.log(">>>>self.ifGetParamsFromCash:",self.ifGetParamsFromCash);
-        self.inspectId = self.ifGetParamsFromCash ? self.inspectCatch : newArr;
+        self.inspectId = (self.ifGetParamsFromCash && self.inspectCatch!='-1') ? self.inspectCatch : newArr;
         self.ifGetParamsFromCash = false;
       } else {
         self.inspectId = newArr;
