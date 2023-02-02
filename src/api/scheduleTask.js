@@ -17,3 +17,11 @@ export const getSchedulePersonList = data => {
       data
     });
   };
+
+  export const CopySchedulePersonSchedule = data => {
+    return request({
+      url: `${version}/report/schedule/person/task/duplicate`,
+      method: 'post',
+      data
+    });
+  };

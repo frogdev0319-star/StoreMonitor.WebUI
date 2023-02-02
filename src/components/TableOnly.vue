@@ -834,6 +834,7 @@ export default {
     tr{
       background-color: #f7f9fa !important;
     }
+  
     /**** body的scrollbar
     .el-table__body-wrapper::-webkit-scrollbar {
 	      width: 4px; 
@@ -851,6 +852,9 @@ export default {
       border-radius: 5px;
       border: solid 1px #f5f5f5;
       background-color: #fff;
+    }
+    .el-table th div{
+      vertical-align: middle;
     }
     /**** body的scrollbar
     .el-table__body-wrapper::-webkit-scrollbar {

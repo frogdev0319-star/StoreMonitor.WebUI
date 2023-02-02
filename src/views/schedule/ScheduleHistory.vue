@@ -64,7 +64,7 @@
             :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
             :tableHeight = "760"
             :cellStyle="{backgroundColor: '#fff !important'}"
-            @handleOperation="handleOperation"  
+            @onCellClick="onCellClick"  
             @sortChange="handleSortChange"    
             @selection-change="handleSelectionChange"                            
         />
@@ -96,7 +96,6 @@ export default{
   components: {DateTimeSelector,TableOnly,TblPaginationOnly,DelayButton,DialogPop},
   data(){
     return {
-      person:'',
       inputSearchValue:'',
       dateValue:[],
       columnData:[
@@ -117,7 +116,7 @@ export default{
           'isExpand': false
         },
         {
-          'prop': 'startDate',
+          'prop': 'startDateStr',
           'label': this.$t('schedule.schExeDate'),
           'sortable': 'custom',
           'width': 50,
@@ -137,7 +136,7 @@ export default{
           }
         },
         {
-          'prop': 'reportUploadDate',
+          'prop': 'reportUploadDateStr',
           'label': this.$t('schedule.reportUploadDate'),
           'sortable': 'custom',
           'width': 130,
@@ -161,7 +160,7 @@ export default{
           'isExpand': false
         },
         {
-          'prop': 'operator',
+          'prop': 'detail',
           'label': this.$t('audit.sendAudit.operation'),
           'sortable': false,
           'width': 50,
@@ -169,21 +168,15 @@ export default{
           'isExpand': false,
           'isCellClick':true,
           'align': 'left',
-          'customIcon': false,
-          'methods': 'set'
         }
       ],
-      tableData:[{schName:'1',tagName:'test',incepNum:3,startDate:'2023/01/01',endDate:'2023/01/02'}],
-      scheduleList:[
-      ],
+      tableData:[{schName:'1',store:'門店名稱\n'+'+8',tagName:'遠程巡檢\ntest',incepNum:3,startDateStr:'2023/01/01',reportUploadDateStr:'2023/01/02',detail:'查看'}],
       isLoadingData:true,
       total:0,
       curPage:1,
       curSizeNum:10,
-      defaultSort:{prop: 'startDate', order: 'descending'},
-      enableDeleteBtn:false,
+      defaultSort:{prop: 'reportUploadDateStr', order: 'descending'},
       SelSchedulId:[],
-      showConfirmDelete:false,
       curSchStatus:-1,
       schStatusList:[
         { 'mode': -1, 'label': this.$t('remotePatrol.all') },
@@ -205,9 +198,8 @@ export default{
     async accountChanged(val) {
       const self = this;
       if (val !== 0) {
-        /*this.ifCachedParams = false;
-        self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
-        const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
+        self.init();
+        /*const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
         const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
         self.params.beginTs = start;
         self.params.endTs = end;
@@ -218,16 +210,65 @@ export default{
 
   },
   created() {
-
+    this.init();
   },
   methods:{
     getLangStyleValue(langArray){
-      /*var lang_style = langArray.find( item => {return item.key==this.$i18n.locale});
-      return lang_style.value;*/
-
       return util.getLangStyleValue(langArray);
     },
+    init(){
+      this.curSchStatus= -1,
+      this.inputSearchValue='',
+      this.dateValue = [this.$moment().startOf('month').toDate(), this.$moment(new Date()).endOf('d').toDate()];
+    },
+    dateChange(val) {
+        console.log(">>>>dateChange!!");
+        const self = this;
+        const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
+        const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
+        self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
+        self.dateValue[1] = self.dateValue[1];
+        self.inputSearchValue = '';
+        this.doSearchScheduleHis();
+    },
+    doSearchScheduleHis(){
+      const self = this;
+      let order = self.defaultSort;
+      order.direction = this.defaultSort.order=='ascending'? 'asc':'desc';
+      if(self.defaultSort.prop=="reportUploadDateStr") order.prop = "reportUploadDate";
+      else if(self.defaultSort.prop=="startDateStr") order.prop = "startDate";
+      let beginTs = self.$moment.utc(self.$moment(self.dateValue[0])).valueOf();
+      let endTs = self.$moment.utc(self.$moment(self.dateValue[1])).valueOf();
+      const params={
+        beginTs,
+        endTs,
+        filter:{
+          page:this.curPage-1,
+          size:this.curSizeNum
+        },
+        order
+      }
 
+    },
+    onCellClick(row){
+      console.log(">>>>row:",row);
+    },
+    handleSortChange(order, defaultSort) {
+        this.defaultSort = { ...defaultSort };
+        
+        this.doSearchScheduleHis();
+    },
+    currentChange(val) {
+        const self = this;
+        self.curPage = val.page;
+        self.doSearchScheduleHis();
+    },
+    sizeChange(val) {
+        const self = this;
+        self.curSizeNum = val.size;
+        self.curPage = 1;
+        self.doSearchScheduleHis();
+    },
   }
 }
 </script>
@@ -373,6 +414,10 @@ export default{
     /deep/
       .el-table th .cell{
       padding-left: 0px !important;
+    }
+    /deep/
+    .el-table .cell span{
+      white-space: pre-line;
     }
     /deep/
     .el-table

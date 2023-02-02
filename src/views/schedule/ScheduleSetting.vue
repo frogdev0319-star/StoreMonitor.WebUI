@@ -147,23 +147,22 @@ export default{
     async accountChanged(val) {
       const self = this;
       if (val !== 0) {
-        /*this.ifCachedParams = false;
-        self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
-        const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
-        const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
-        self.params.beginTs = start;
-        self.params.endTs = end;
-        self.getSearchCondition();
-        self.curStoreTag = [];*/
+        self.positionIds= [],
+        self.positionsList= [],
+        self.inputSearchValue='',
+        self.init();
       }
     },
 
   },
   created() {
-    this.getPosition();
-    this.getScheduleList();
+    this.init();
   },
   methods: {
+    init(){
+      this.getPosition();
+      this.getScheduleList();
+    },
     getPosition() {
         getDepartmentList({ type: 1 }).then(res =>{
             console.log("getDepartmentList res:",res)

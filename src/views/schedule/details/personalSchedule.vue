@@ -229,8 +229,9 @@ export default{
                   let mode = item.tagMode==0?self.$t('remotePatrol.remotePatrol'):self.$t('remotePatrol.onsitePatrol');
                   obj['tagNameMode'] = mode+'\n'+item.tagName;
                   //obj['updateTs']=item.updateTime,
-                  obj['taskStartStr']=(item.updateTime==0)?'-':util.getDateStr(item.taskStart),
-                  obj['taskFinalStr']=(item.updateTime==0)?'-':util.getDateStr(item.taskFinal),
+                  obj['taskStartStr']=(item.taskStart==0)?'-':self.$moment.utc(self.$moment(item.taskStart)).format("YYYY/MM/DD hh:mm:ss");//util.getDateStr(item.taskStart),
+                  //console.log(">>>taskStartStr:",self.$moment.utc(self.$moment(item.taskStart)).format("YYYY/MM/DD hh:mm:ss"));
+                  obj['taskFinalStr']=(item.taskFinal==0)?'-':self.$moment.utc(self.$moment(item.taskFinalS)).format("YYYY/MM/DD hh:mm:ss");//util.getDateStr(item.taskFinal),
                   obj['updateUserName']=(item.updateUserName == "NONE")?'-':item.updateUserName,
                   userData.push(obj);
                 });
@@ -274,6 +275,7 @@ export default{
             console.log("handleOperation params:",params);
             switch(method){
                 case 'copy':{
+                    this.doCopyScheduleTask(row.taskGroupUuid);
                     break;
                 }
                 case 'set':{
@@ -300,6 +302,13 @@ export default{
             self.curPage = 1;
             self.doSearchScheduleList();
         },
+        doCopyScheduleTask(taskGroupUuid){
+            scheduleRESTful.CopySchedulePersonSchedule({taskGroupUuid}).then(res => {
+                if(res.errCode==0){
+                    this.doSearchScheduleList();
+                }
+            })
+        }
     }
 }
 </script>
