@@ -64,6 +64,10 @@
             <div v-if="_item.customIcon" >
               <img :src="_item.src" style="width:24px;height:24px;cursor:pointer;" @click="cellClick(row,_item.prop)">
             </div>
+            <div v-else-if="_item.isCompound">
+              <span v-if="row[_item.prop].isCellClick" style="cursor:pointer;color:#006ab7;font-size:calc(15/1920*100vw);" @click="cellClick(row,_item.prop)">{{ row[_item.prop].value}}</span>
+              <span v-else v-html="row[_item.prop].html"/>
+            </div>
             <div v-else>
               <span style="cursor:pointer;color:#006ab7;font-size:calc(15/1920*100vw);" @click="cellClick(row,_item.prop)">{{ row[_item.prop]}}</span>
             </div>

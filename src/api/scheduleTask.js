@@ -25,3 +25,11 @@ export const getSchedulePersonList = data => {
       data
     });
   };
+
+  export const getScheduleTaskHistory = data => {
+    return request({
+      url: `${version}/report/schedule/record/list`,
+      method: 'post',
+      data
+    });
+  };

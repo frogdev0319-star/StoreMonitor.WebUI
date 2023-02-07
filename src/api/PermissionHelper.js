@@ -167,10 +167,14 @@ export default class PermissionHelper {
 
   //index(7) => 巡檢排程
   static enableScheduleSetting2() {
-    return true;//this.enableAuthorities(7, 0x0, 0x01);
+    return this.enableAuthorities(7, 0x0, 0x01);
   }
   static enableScheduleHistroy() {
-    return true;//this.enableAuthorities(7, 0x0, 0x02);
+    return this.enableAuthorities(7, 0x0, 0x02);
+  }
+
+  static enableScheduleExecuted() {
+    return this.enableAuthorities(7, 0x0, 0x04);
   }
 
   //秘密客權限

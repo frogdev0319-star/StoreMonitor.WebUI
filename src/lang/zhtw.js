@@ -1535,6 +1535,7 @@ export default{
     "inceptionSchedule":"巡檢排程",
     "scheduleSetting":"排程設定",
     "scheduleHistory":"排程紀錄",
+    "scheduleExecuted":"排程執行",
     "lastUpdatePerson":"最後更新人",
     "getScheduleSettingFail":"取得排程設定失敗",
     "schStartDate":"開始執行",
@@ -1550,7 +1551,16 @@ export default{
     "reportUploadDate":"報告上傳時間",
     "incepPerson":"執行人",
     "inCompleted":"未完成",
-    "Completed":"已完成"
+    "exportAll":"全部匯出",
+    "isProcessing":"簽核中",
+    "NA":"無",
+    "storeTimeZone":"們墊時區",
+    "inceptionMode":"巡檢類型",
+    "generated":"已產生",
+    "exportScheduleRecordTips":"匯出排程紀錄提示",
+    "exportScheduleRecordMsg1":"排程紀錄匯出執行中，匯出完成將自動下載檔案",
+    "exportScheduleRecordMsg2":"於執行時間您仍可繼續操作系統功能",
+    "exportScheduleRecordWarn":"請選擇匯出項目"
   },
 
 }

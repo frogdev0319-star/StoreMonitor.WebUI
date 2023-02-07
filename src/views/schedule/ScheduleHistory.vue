@@ -38,7 +38,7 @@
       <div class="scheduleLlist-area">
         <delay-button
           :class="getLangStyleValue(exportBtnClass)"
-          style="margin-left:32px;background-color:#FFF;color:#006ab7;float:right;"
+          style="background-color:#FFF;color:#006ab7;float:right;"
           type="default"
           size="mini"
           @click="export2Excel"
@@ -46,6 +46,18 @@
           <div class="button-area">
             <img :src="exportPng" class="icon-excel">
             <span>{{ $t('eventView.exportReport') }}</span>
+          </div>
+        </delay-button>
+        <delay-button
+          :class="getLangStyleValue(exportBtnClass)"
+          style="margin-left:32px;background-color:#FFF;color:#006ab7;float:right;"
+          type="default"
+          size="mini"
+          @click="exportAll"
+        >
+          <div class="button-area">
+            <img :src="exportPng" class="icon-excel">
+            <span>{{ $t('schedule.exportAll') }}</span>
           </div>
         </delay-button>
         <table-only
@@ -80,27 +92,50 @@
             />
         </div>
       </div>
+      <dialog-pop
+        :title="$t('schedule.exportScheduleRecordTips')"
+        :isWarning="false"
+        :visible="showExportExcelNotice"
+        :showCancelbtn="false"
+        @confirmHandler="showExportExcelNotice = false"
+        >
+        <div class="noticeDialog">
+          {{this.$t('schedule.exportScheduleRecordMsg1')}}<br/>
+          {{this.$t('schedule.exportScheduleRecordMsg2')}}
+        </div>
+      </dialog-pop>
+      <dialog-pop
+        :title="$t('schedule.exportScheduleRecordWarn')"
+        :isWarning="true"
+        :visible="showExportExcelWarning"
+        :showCancelbtn="false"
+        @confirmHandler="showExportExcelWarning = false"
+        >
+      </dialog-pop>
     </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
+import {scheduleRESTful} from '@/api/index';
 import DateTimeSelector from '@/components/DateTimeSelector';import TableOnly from '@/components/TableOnly';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
 import DelayButton from '@/components/DelayButton';
 import DialogPop from '@/components/DialogPop'
 import util from '@/common/util';
+import vm from '@/main.js';
 
 export default{
   name: 'ScheduleHistory',
   components: {DateTimeSelector,TableOnly,TblPaginationOnly,DelayButton,DialogPop},
   data(){
     return {
+      lang: this.$i18n.locale,
       inputSearchValue:'',
       dateValue:[],
       columnData:[
         {
-          'prop': 'schName',
+          'prop': 'taskName',
           'label': this.$t('schedule.schName'),
           'sortable': false,
           'width': 200,
@@ -116,7 +151,7 @@ export default{
           'isExpand': false
         },
         {
-          'prop': 'startDateStr',
+          'prop': 'remindTimeStr',
           'label': this.$t('schedule.schExeDate'),
           'sortable': 'custom',
           'width': 50,
@@ -124,7 +159,7 @@ export default{
           'isExpand': false
         },
         {
-          'prop': 'tagName',
+          'prop': 'tagNameMode',
           'label': this.$t('statistics.patrolPerson.tagName'),
           'sortable': false,
           'width': 300,
@@ -136,7 +171,7 @@ export default{
           }
         },
         {
-          'prop': 'reportUploadDateStr',
+          'prop': 'reportTsStr',
           'label': this.$t('schedule.reportUploadDate'),
           'sortable': 'custom',
           'width': 130,
@@ -144,7 +179,7 @@ export default{
           'isExpand': false
         },
         {
-          'prop': 'incepPerson',
+          'prop': 'submitterName',
           'label': this.$t('schedule.incepPerson'),
           'sortable': false,
           'width': 100,
@@ -152,35 +187,46 @@ export default{
           'isExpand': false
         },
         {
-          'prop': 'incepPerson',
+          'prop': 'isExecute',
           'label': this.$t('audit.workFlows.workFlowsStauts'),
           'sortable': false,
-          'width': 100,
-          'maxWidth': 100,
-          'isExpand': false
+          'width': 50,
+          'maxWidth': 50,
+          'isExpand': false,
+          'formatter': function(row) {
+            let cellValue = row.isExecute;
+            const width = vm.$i18n.locale.indexOf('ja') == -1 ?'68px':'68px';
+            if (cellValue) { //已完成
+              const html = `<div style="background-color:#edf6e8;color:#59ab22;border-radius: 5px;font-size:12px; text-align:center; width:`+width+`;">`+vm.$t('audit.sendAudit.completed')+`</div>`
+              return html;
+            } else {
+              const html = `<div style="background-color:#fff2ef;color:#f57848;border-radius: 5px;font-size:12px; text-align:center; width:`+width+`;">`+vm.$t('schedule.inCompleted')+`</div>`
+              return html;
+            }
+          }
         },
         {
-          'prop': 'detail',
+          'prop': 'porcessMode',
           'label': this.$t('audit.sendAudit.operation'),
           'sortable': false,
           'width': 50,
           'maxWidth': 50,
           'isExpand': false,
-          'isCellClick':true,
-          'align': 'left',
+          'isCompound':true,
+          'isCellClick':true
         }
       ],
-      tableData:[{schName:'1',store:'門店名稱\n'+'+8',tagName:'遠程巡檢\ntest',incepNum:3,startDateStr:'2023/01/01',reportUploadDateStr:'2023/01/02',detail:'查看'}],
+      tableData:[],
       isLoadingData:true,
       total:0,
       curPage:1,
       curSizeNum:10,
-      defaultSort:{prop: 'reportUploadDateStr', order: 'descending'},
-      SelSchedulId:[],
+      defaultSort:{prop: 'reportTsStr', order: 'descending'},
+      SelScheduleTask:[],
       curSchStatus:-1,
       schStatusList:[
         { 'mode': -1, 'label': this.$t('remotePatrol.all') },
-        { 'mode': 0, 'label': this.$t('schedule.Completed') },
+        { 'mode': 0, 'label': this.$t('audit.sendAudit.completed') },
         { 'mode': 1, 'label': this.$t('schedule.inCompleted') }
       ],
       exportPng: require('../../../static/img/excel.png'),
@@ -189,6 +235,8 @@ export default{
         {key:'ja-JP',value:'ja-export-btn'},{key:'ko-KR',value:'ko-export-btn'},{key:'vi-VN',value:'vi-export-btn'},
         {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
       ],
+      showExportExcelNotice:false,
+      showExportExcelWarning:false,
     }
   },
   computed: {
@@ -233,10 +281,12 @@ export default{
     },
     doSearchScheduleHis(){
       const self = this;
-      let order = self.defaultSort;
-      order.direction = this.defaultSort.order=='ascending'? 'asc':'desc';
-      if(self.defaultSort.prop=="reportUploadDateStr") order.prop = "reportUploadDate";
-      else if(self.defaultSort.prop=="startDateStr") order.prop = "startDate";
+      let order = {
+        direction:this.defaultSort.order=='ascending'? 'asc':'desc',
+        property:self.defaultSort.prop
+      };
+      if(self.defaultSort.prop=="reportTsStr") order.property = "reportTs";
+      else if(self.defaultSort.prop=="remindTimeStr") order.property = "remindTime";
       let beginTs = self.$moment.utc(self.$moment(self.dateValue[0])).valueOf();
       let endTs = self.$moment.utc(self.$moment(self.dateValue[1])).valueOf();
       const params={
@@ -247,11 +297,53 @@ export default{
           size:this.curSizeNum
         },
         order
+      };
+      if(this.inputSearchValue.trim()!=""){
+        params['keyword']=this.inputSearchValue;
       }
+      scheduleRESTful.getScheduleTaskHistory(params).then(res=>{
+        var hisData = [];
+        if(res.errCode == 0){
+          res.data.content.map(item =>{
+            let obj = {...item};
+            let mode = item.inspectTagMode==0?self.$t('remotePatrol.remotePatrol'):self.$t('remotePatrol.onsitePatrol');
+            obj['store']= item.storeName+'\n'+item.storeTimeZone;
+            obj['tagNameMode'] = mode+'\n'+item.inspectTagName;
+            obj['remindTimeStr']=(item.remindTime==0)?'-':self.$moment.utc(self.$moment(item.remindTime)).format("YYYY/MM/DD");//util.getDateStr(item.taskStart),
+            obj['reportTsStr']=(item.reportTs==0)?'-':self.$moment.utc(self.$moment(item.reportTsStr)).format("YYYY/MM/DD hh:mm:ss");//util.getDateStr(item.taskFinal),
+            obj['submitterName']=(item.submitterName == "NONE")?'-':item.submitterName;
+            if(item.isProcessing){//簽核中
+              obj['porcessMode'] = {isCellClick:false,value:this.$t('schedule.isProcessing'),html:`<span style="font-size:calc(15/1920*100vw);">`+this.$t('schedule.isProcessing')+`</span>`};
+            }else{
+              if(item.reportId==-1){//無
+                obj['porcessMode'] = {isCellClick:false,value:this.$t('schedule.NA'),html:`<span style="font-size:calc(15/1920*100vw);">`+this.$t('schedule.NA')+`</span>`};
+              }else{
+                obj['porcessMode'] = {isCellClick:true,value:this.$t('eventView.view')};
+              }
+            }
+            hisData.push(obj);
+          });
+          self.tableData = [];
+          self.tableData = hisData;
+          self.total = res.data.totalPages;
+          self.isLoadingData = false;
+        }else{
+          util.notify(self.$t('schedule.getScheduleSettingFail'), 'error', 3000);
+        }
+      })
 
     },
     onCellClick(row){
-      console.log(">>>>row:",row);
+      const parsObj = {
+            id : row.reportId,
+            storeName : row.storeName,
+            status : '',
+            ts : row.reportTs,
+            submitterName : row.submitterName,
+            tagName : row.inspectTagName,
+            mode : row.inspectTagMode,
+          };
+      this.$router.push({ name: 'reportDetails', params: { data: parsObj }});
     },
     handleSortChange(order, defaultSort) {
         this.defaultSort = { ...defaultSort };
@@ -269,6 +361,94 @@ export default{
         self.curPage = 1;
         self.doSearchScheduleHis();
     },
+    handleSelectionChange(val){
+      console.log("handleSelectionChange:",val);
+      this.SelScheduleTask = [];
+      if(val.length>0){
+        this.SelScheduleTask = val;
+      }
+    },
+    export2Excel(){
+      if(this.SelScheduleTask.length>0){
+        this.showExportExcelNotice = true;
+        const tHeader = [
+          this.$t('schedule.schName'),
+          this.$t('remotePatrol.storeName'),
+          this.$t('schedule.storeTimeZone'),
+          this.$t('schedule.schExeDate'),
+          this.$t('schedule.inceptionMode'),
+          this.$t('statistics.patrolPerson.tagName'),//巡檢表名稱
+          this.$t('schedule.reportUploadDate'),
+          this.$t('schedule.incepPerson'),
+          this.$t('route.reports')
+        ];
+        var exportData = [];
+        const fileName = this.$t('schedule.scheduleHistory')+"_"+util.getCurDateStr();
+        this.SelScheduleTask.map(item=>{
+          console.log(">>>>ecport item:",item);
+          let processMode = "";
+          if(item.isProcessing){//簽核中
+              processMode = this.$t('schedule.isProcessing');
+          }else{
+            if(item.reportId==-1){//無
+              processMode = this.$t('schedule.NA');
+            }else{
+              processMode = this.$t('schedule.generated');
+            }
+          }
+          exportData.push([
+            item.taskName,
+            item.storeName,
+            item.storeTimeZone,
+            item.remindTimeStr,
+            item.inspectTagMode==0?this.$t('remotePatrol.remotePatrol'):this.$t('remotePatrol.onsitePatrol'),
+            item.inspectTagName,
+            item.reportTsStr,
+            item.submitterName,
+            processMode
+          ]);
+        })
+        require.ensure([], async() => {
+            const { export_json_to_excel } = require('@/excel/Export2Excel');
+            export_json_to_excel(tHeader, exportData, fileName);
+          });
+        
+      }else{
+        this.showExportExcelWarning = true;
+        
+      }
+    },
+    exportAll(){
+      this.showExportExcelNotice = true;
+      const fileName = this.$t('schedule.scheduleHistory')+"_"+util.getCurDateStr();
+      const tHeader = [
+        this.$t('schedule.schName'),
+        this.$t('remotePatrol.storeName'),
+        this.$t('schedule.storeTimeZone'),
+        this.$t('schedule.schExeDate'),
+        this.$t('schedule.inceptionMode'),
+        this.$t('statistics.patrolPerson.tagName'),//巡檢表名稱
+        this.$t('schedule.reportUploadDate'),
+        this.$t('schedule.incepPerson'),
+        this.$t('route.reports')
+      ];
+      /*downLoadInspectReportEntireDetail(params).then(res => {
+        console.log("res:",res);
+        const that = this;
+        require.ensure([], async() => {
+          const { export_json_to_excel } = require('@/excel/Export2Excel');
+          const filterVal = ['province','city','storename','code', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 
+          'totlascore','status','submitter', 'detail', 'attachment','comment','singinmap','signints','reportts'];
+          const curData = res.data;
+          const tagName = this.report.tagName;
+          const data = that.formatJson(filterVal, curData);
+          const fileName = this.report.storeName+'_'+tagName+'_'+that.$t('remotePatrol.details') + '_' + util.getCurDateStr();
+          export_json_to_excel(tHeader, data, fileName);
+        });
+      }).catch(err => {
+        console.log('RouteInspection-downItem: ' + err);
+      });*/
+    }
   }
 }
 </script>
@@ -449,5 +629,23 @@ export default{
         background-position: center right 0px;
         border: none;
     }
+}
+.icon-span{
+        display:inline-block;
+        min-width:68px;
+        height:24px;
+        font-size: 12px;
+        border-radius: 5px;
+        white-space: nowrap;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+    .ja-icon{
+      @extend .icon-span;
+      width: 90px;
+    }
+.noticeDialog{
+  text-align: left;
+  margin-left: calc(20/1920*100vw);
 }
 </style>
