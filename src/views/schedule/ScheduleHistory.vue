@@ -311,9 +311,10 @@ export default{
       scheduleRESTful.getScheduleTaskHistory(params).then(res=>{
         var hisData = [];
         if(res.errCode == 0){
-          res.data.content.map(item =>{
+          res.data.content.map((item,idx )=>{
             let obj = {...item};
             let mode = item.inspectTagMode==0?self.$t('remotePatrol.remotePatrol'):self.$t('remotePatrol.onsitePatrol');
+            obj['squence'] = idx;
             obj['store']= item.storeName+'\n'+item.storeTimeZone;
             obj['tagNameMode'] = mode+'\n'+item.inspectTagName;
             obj['remindTimeStr']=(item.remindTime==0)?'-':self.$moment.utc(self.$moment(item.remindTime)).format("YYYY/MM/DD");//util.getDateStr(item.taskStart),
@@ -378,6 +379,7 @@ export default{
     },
     export2Excel(){
       if(this.SelScheduleTask.length>0){
+        this.SelScheduleTask.sort((a, b) => { return a['squence'] - b['squence']; });
         this.showExportExcelNotice = true;
         const tHeader = [
           this.$t('schedule.schName'),
@@ -394,7 +396,6 @@ export default{
         var exportData = [];
         const fileName = this.$t('schedule.scheduleHistory')+"_"+util.getCurDateStr();
         this.SelScheduleTask.map(item=>{
-          console.log(">>>>ecport item:",item);
           let processMode = "";
           if(item.isProcessing){//簽核中
               processMode = this.$t('schedule.isProcessing');
@@ -470,7 +471,6 @@ export default{
         params['keyword']=this.inputSearchValue;
       }
       scheduleRESTful.exportScheduleTaskHistory(params).then(res => {
-        console.log("res:",res);
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
           const filterVal = ['taskName','storeName','storeTimeZone','inspectTagName', 'remindTime', 'inspectTagMode', 'reportTs', 'submitterName',
