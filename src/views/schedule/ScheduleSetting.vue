@@ -161,7 +161,7 @@ export default{
   methods: {
     init(){
       this.getPosition();
-      this.getScheduleList();
+      //this.getScheduleList();
     },
     getPosition() {
         getDepartmentList({ type: 1 }).then(res =>{
@@ -185,7 +185,7 @@ export default{
         this.positionsList.push(departmentJson);
       });
       this.positionIds = this.positionsList.map(depart => depart.value);
-      //this.getScheduleList();
+      this.getScheduleList();
     },
     handlePositionsChange(positionIds) {
       this.positionIds = positionIds;
@@ -197,7 +197,7 @@ export default{
         const self = this;
         self.isLoadingData = true;
         const params={
-          positionId:this.positionIds,
+          titleList:this.positionIds,
           filter:{
             page:this.curPage-1,
             size:this.curSizeNum

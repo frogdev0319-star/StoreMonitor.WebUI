@@ -33,3 +33,19 @@ export const getSchedulePersonList = data => {
       data
     });
   };
+
+  export const deletePersonTaskList = data => {
+    return request({
+      url: `${version}/report/schedule/person/task/deleteGroup`,
+      method: 'post',
+      data
+    });
+  };
+
+  export const exportScheduleTaskHistory = data => {
+    return request({
+      url: `${version}/report/schedule/record/list/export`,
+      method: 'post',
+      data
+    });
+  };

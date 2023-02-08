@@ -10,7 +10,6 @@
               :placeholder="$t('remotePatrol.all')"
               size="mini"
               style="margin-right:0px;border:none;"
-              @change="getInspectList"
             >
               <el-option
                 v-for="item in schStatusList"
@@ -31,7 +30,7 @@
             class="search-button"
             type="primary"
             size="mini"
-            @click="doSearchScheduleList">
+            @click="doSearchScheduleHis">
             <span>{{ $t('remotePatrol.search') }}</span>
           </delay-button>
       </div>
@@ -67,7 +66,6 @@
             :showSelectionColumn="true"
             :column-data="columnData"
             :table-data="tableData"
-            :table-operation ="columnOperationData"
             :highlight-current-row= "false"
             :is-loading-data="isLoadingData"
             :allowRowExpand = "false"
@@ -130,6 +128,7 @@ export default{
   components: {DateTimeSelector,TableOnly,TblPaginationOnly,DelayButton,DialogPop},
   data(){
     return {
+      firstLoad:true,
       lang: this.$i18n.locale,
       inputSearchValue:'',
       dateValue:[],
@@ -187,20 +186,23 @@ export default{
           'isExpand': false
         },
         {
-          'prop': 'isExecute',
+          'prop': 'status',
           'label': this.$t('audit.workFlows.workFlowsStauts'),
           'sortable': false,
           'width': 50,
           'maxWidth': 50,
           'isExpand': false,
           'formatter': function(row) {
-            let cellValue = row.isExecute;
+            let cellValue = row.status;
             const width = vm.$i18n.locale.indexOf('ja') == -1 ?'68px':'68px';
-            if (cellValue) { //已完成
+            if (cellValue==0) { //已完成
               const html = `<div style="background-color:#edf6e8;color:#59ab22;border-radius: 5px;font-size:12px; text-align:center; width:`+width+`;">`+vm.$t('audit.sendAudit.completed')+`</div>`
               return html;
-            } else {
+            } else if(cellValue==1){
               const html = `<div style="background-color:#fff2ef;color:#f57848;border-radius: 5px;font-size:12px; text-align:center; width:`+width+`;">`+vm.$t('schedule.inCompleted')+`</div>`
+              return html;
+            }else{
+              const html = `<div style="background-color:#efefef;color:#6e6e6e;border-radius: 5px;font-size:12px; text-align:center; width:`+width+`;">`+vm.$t('schedule.deleted')+`</div>`
               return html;
             }
           }
@@ -227,7 +229,8 @@ export default{
       schStatusList:[
         { 'mode': -1, 'label': this.$t('remotePatrol.all') },
         { 'mode': 0, 'label': this.$t('audit.sendAudit.completed') },
-        { 'mode': 1, 'label': this.$t('schedule.inCompleted') }
+        { 'mode': 1, 'label': this.$t('schedule.inCompleted') },
+        { 'mode': 2, 'label': this.$t('schedule.deleted') }
       ],
       exportPng: require('../../../static/img/excel.png'),
       exportBtnClass:[
@@ -265,19 +268,22 @@ export default{
       return util.getLangStyleValue(langArray);
     },
     init(){
-      this.curSchStatus= -1,
-      this.inputSearchValue='',
-      this.dateValue = [this.$moment().startOf('month').toDate(), this.$moment(new Date()).endOf('d').toDate()];
+      this.curSchStatus= -1;
+      this.inputSearchValue='';
     },
     dateChange(val) {
-        console.log(">>>>dateChange!!");
         const self = this;
         const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
         const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
         self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
         self.dateValue[1] = self.dateValue[1];
-        self.inputSearchValue = '';
-        this.doSearchScheduleHis();
+        if(this.firstLoad){ 
+            this.doSearchScheduleHis();
+            this.firstLoad = false;
+        }
+    },
+    onStatusChanged(val){
+      console.log(">>>>onStatusChanged:",this.curSchStatus);
     },
     doSearchScheduleHis(){
       const self = this;
@@ -290,6 +296,7 @@ export default{
       let beginTs = self.$moment.utc(self.$moment(self.dateValue[0])).valueOf();
       let endTs = self.$moment.utc(self.$moment(self.dateValue[1])).valueOf();
       const params={
+        status:this.curSchStatus,
         beginTs,
         endTs,
         filter:{
@@ -312,6 +319,7 @@ export default{
             obj['remindTimeStr']=(item.remindTime==0)?'-':self.$moment.utc(self.$moment(item.remindTime)).format("YYYY/MM/DD");//util.getDateStr(item.taskStart),
             obj['reportTsStr']=(item.reportTs==0)?'-':self.$moment.utc(self.$moment(item.reportTsStr)).format("YYYY/MM/DD hh:mm:ss");//util.getDateStr(item.taskFinal),
             obj['submitterName']=(item.submitterName == "NONE")?'-':item.submitterName;
+            obj['status'] = item.isDelete ? '2': (item.isExecute ? 0:1);
             if(item.isProcessing){//簽核中
               obj['porcessMode'] = {isCellClick:false,value:this.$t('schedule.isProcessing'),html:`<span style="font-size:calc(15/1920*100vw);">`+this.$t('schedule.isProcessing')+`</span>`};
             }else{
@@ -380,6 +388,7 @@ export default{
           this.$t('statistics.patrolPerson.tagName'),//巡檢表名稱
           this.$t('schedule.reportUploadDate'),
           this.$t('schedule.incepPerson'),
+          this.$t('audit.workFlows.workFlowsStauts'),
           this.$t('route.reports')
         ];
         var exportData = [];
@@ -396,6 +405,7 @@ export default{
               processMode = this.$t('schedule.generated');
             }
           }
+          let status = this.schStatusList.filter(status => status.mode==item.status)[0].label;
           exportData.push([
             item.taskName,
             item.storeName,
@@ -405,6 +415,7 @@ export default{
             item.inspectTagName,
             item.reportTsStr,
             item.submitterName,
+            status,
             processMode
           ]);
         })
@@ -418,6 +429,9 @@ export default{
         
       }
     },
+    formatJson(filterVal, jsonData) {
+      return jsonData.map(v => filterVal.map(j => v[j]));
+    },
     exportAll(){
       this.showExportExcelNotice = true;
       const fileName = this.$t('schedule.scheduleHistory')+"_"+util.getCurDateStr();
@@ -430,24 +444,44 @@ export default{
         this.$t('statistics.patrolPerson.tagName'),//巡檢表名稱
         this.$t('schedule.reportUploadDate'),
         this.$t('schedule.incepPerson'),
+        this.$t('audit.workFlows.workFlowsStauts'),
         this.$t('route.reports')
       ];
-      /*downLoadInspectReportEntireDetail(params).then(res => {
+      const self = this;
+      let order = {
+        direction:this.defaultSort.order=='ascending'? 'asc':'desc',
+        property:self.defaultSort.prop
+      };
+      if(self.defaultSort.prop=="reportTsStr") order.property = "reportTs";
+      else if(self.defaultSort.prop=="remindTimeStr") order.property = "remindTime";
+      let beginTs = self.$moment.utc(self.$moment(self.dateValue[0])).valueOf();
+      let endTs = self.$moment.utc(self.$moment(self.dateValue[1])).valueOf();
+      const params={
+        status:this.curSchStatus,
+        beginTs,
+        endTs,
+        filter:{
+          page:0,
+          size:99999 //全部
+        },
+        order
+      };
+      if(this.inputSearchValue.trim()!=""){
+        params['keyword']=this.inputSearchValue;
+      }
+      scheduleRESTful.exportScheduleTaskHistory(params).then(res => {
         console.log("res:",res);
-        const that = this;
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
-          const filterVal = ['province','city','storename','code', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 
-          'totlascore','status','submitter', 'detail', 'attachment','comment','singinmap','signints','reportts'];
-          const curData = res.data;
-          const tagName = this.report.tagName;
-          const data = that.formatJson(filterVal, curData);
-          const fileName = this.report.storeName+'_'+tagName+'_'+that.$t('remotePatrol.details') + '_' + util.getCurDateStr();
+          const filterVal = ['taskName','storeName','storeTimeZone','inspectTagName', 'remindTime', 'inspectTagMode', 'reportTs', 'submitterName',
+          'taskStatus','reportStatus'];
+          const curData = res.data.content;
+          const data = self.formatJson(filterVal, curData);
           export_json_to_excel(tHeader, data, fileName);
         });
       }).catch(err => {
         console.log('RouteInspection-downItem: ' + err);
-      });*/
+      });
     }
   }
 }

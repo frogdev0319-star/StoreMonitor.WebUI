@@ -94,6 +94,7 @@ export default{
     components: {DateTimeSelector,TableOnly,TblPaginationOnly,DelayButton,DialogPop},
     data(){
       return {
+        firstLoad:true,
         userId:'',
         person:'',
         inputSearchValue:'',
@@ -195,7 +196,10 @@ export default{
             self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
             self.dateValue[1] = self.dateValue[1];
             self.inputSearchValue = '';
-            this.doSearchScheduleList();
+            if(this.firstLoad){ 
+                this.doSearchScheduleList();
+                this.firstLoad = false;
+            }
         },
         doSearchScheduleList(){
             const self = this;
@@ -261,14 +265,22 @@ export default{
             if(val.length>0){
                 this.enableDeleteBtn = true;
                 val.map((item)=>{
-                    this.SelSchedulId.push(item.id);
+                    this.SelSchedulId.push(item.taskGroupUuid);
                 })
             }else{
                 this.enableDeleteBtn = false;
             }
         },
         onConfirmDeleteSch(){
+            console.log("SelSchedulId:",this.SelSchedulId);
             this.showConfirmDelete = false;
+            scheduleRESTful.deletePersonTaskList({taskGroupUuidArray:this.SelSchedulId}).then(res=>{
+                if(res.errCode==0){
+                   this.doSearchScheduleList();
+                }else{
+                    util.notify(this.$t('schedule.deletePersonSchError'), 'error', 2000);
+                }
+            })
         },
         handleOperation({ method, row }) {
             let params= { userId: this.userId,taskGroupUuid: row.taskGroupUuid };

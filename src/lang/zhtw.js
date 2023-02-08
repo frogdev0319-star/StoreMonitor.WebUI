@@ -1560,7 +1560,9 @@ export default{
     "exportScheduleRecordTips":"匯出排程紀錄提示",
     "exportScheduleRecordMsg1":"排程紀錄匯出執行中，匯出完成將自動下載檔案",
     "exportScheduleRecordMsg2":"於執行時間您仍可繼續操作系統功能",
-    "exportScheduleRecordWarn":"請選擇匯出項目"
+    "exportScheduleRecordWarn":"請選擇匯出項目",
+    "deletePersonSchError":"個人排程刪除失敗",
+    "deleted":"已刪除"
   },
 
 }

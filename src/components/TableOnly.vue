@@ -392,7 +392,9 @@ export default {
     },
     expandCompProperties:{
       type: Object,
-      default: {}
+      default:  () => {
+        return {};
+      }
     }
   },
   data() {
