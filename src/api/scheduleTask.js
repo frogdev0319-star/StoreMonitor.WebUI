@@ -49,3 +49,12 @@ export const getSchedulePersonList = data => {
       data
     });
   };
+
+  
+  export const getPersonScheduleData = data => {
+    return request({
+      url: `${version}/report/report/schedule/person/fetch`,
+      method: 'post',
+      data
+    });
+  };

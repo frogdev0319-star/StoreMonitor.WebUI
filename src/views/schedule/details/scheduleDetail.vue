@@ -120,7 +120,16 @@
 
 
       <div v-loading="isLoadingData" class="setting-details self-loading">
-        <div class="inspect-basic flex-column">
+        <div class="inspect-basic empty_data" v-if="!scheDuleData">
+          <img
+            :src="emptyData"
+            alt="emptyData"
+          />
+          <p style="color: #b7c7df">暫無數據</p>
+
+        </div>
+        
+        <div class="inspect-basic flex-column" v-if="scheDuleData">
           <!-- 全部門店 -->
           <div class="role-all-checkbox" style="margin-bottom: 25px">
             <el-checkbox
@@ -560,8 +569,7 @@
                 <div class="store_name">研華林口店</div>
                 <div class="store_name">研華林口店</div>
                 <div class="store_name">研華林口店</div>
-              
-
+            
               </div>
             </div>
           </div>
@@ -574,6 +582,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import {scheduleRESTful} from '@/api/index';
 import DateTimeSelector from '@/components/DateTimeSelector';
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
@@ -582,40 +591,41 @@ import TableOnly from '@/components/TableOnly';
 import util from '@/common/util';
 
 export default{
-    name: 'PersonalSchedule',
-    components: {
-      DateTimeSelector,
-      DelayButton,
-      SettingTable,
-      TableOnly,
-      DialogPop
-    },
-    data(){
-      return {
-        tempboolean_1: true,
-        tempboolean_2: true,
-        value1: '',
-        value2: '',
-        value3: '',
-        remiderStyle:['當下','前一日','前1小時'],
-        templateList:['aaa','bbb','ccc'],
-        tags: [
-          {
-            userName: "阿信小障",
-            type: "info"
-          },
-          {
-            userName: "阿信",
-            type: "info"
-          },
-          {
-            userName: "飄髮哥",
-            type: "info"
-          },
-          {
-            userName: "Albert",
-            type: "info"
-          },
+  name: 'PersonalSchedule',
+  components: {
+    DateTimeSelector,
+    DelayButton,
+    SettingTable,
+    TableOnly,
+    DialogPop
+  },
+  data(){
+    return {
+      
+      tempboolean_1: true,
+      tempboolean_2: true,
+      value1: '',
+      value2: '',
+      value3: '',
+      remiderStyle:['當下','前一日','前1小時'],
+      templateList:['aaa','bbb','ccc'],
+      tags: [
+        {
+          userName: "阿信小障",
+          type: "info"
+        },
+        {
+          userName: "阿信",
+          type: "info"
+        },
+        {
+          userName: "飄髮哥",
+          type: "info"
+        },
+        {
+          userName: "Albert",
+          type: "info"
+        },
       ],
       searchUserData:[
         {
@@ -644,108 +654,122 @@ export default{
           "timeZone": "+8"
           
         },
-        
-    ],
 
-        // ======
-        add_width: "1000",
-        edit_width: "500",
-        showingAddStore: false,
-        showingEditStore: false,
-
-        userColumnData: [
-          {
-            'prop': 'section1',
-            'label': "區域一",
-            'width': 100,
-            'maxWidth': 100,
-          },
-          {
-            'prop': 'section2',
-            'label': "區域二",
-            'width': 110,
-            'maxWidth': 110,
-          },
-          {
-            'prop': 'store',
-            'label': "門店",
-            'width': 100,
-            'maxWidth': 100,
-          },
-          {
-            'prop': 'timeZone',
-            'label': "門店時區",
-            'width': 100,
-            'maxWidth': 100,
-          },
-        ],
-        userData:[],
-        inputSearchUser: '',
-        showSelectionColumn: true,
+      ],
+      // ====== !! ======
     
-        
-        inputSearchUser: '',
-        titleList:[],
-        titleListAry:[],
-        departmentAry:[],
-        curTemplateDepartment: '',
-        curTemplateTitleList: '',
-      // ======
+      scheDuleData: false,
+      emptyData: require('../../../../static/img/icon_data.svg'),
 
-
-
-        inputSearchValue:'',
-        dateValue:[],
-        tableData:[{schName:'1',tagName:'test',incepNum:3,startDate:'2023/01/01',endDate:'2023/01/02'}],
-        scheduleList:[],
-        columnOperationData:{
-          label: this.$t('titleView.operation'),
-          minWidth: '50',
-          align: 'left',
-          operation: [
-              {
-                lable: '',
-                icon: 'icon-copy',
-                methods: 'copy'
-              },
-              {
-                lable: '',
-                icon: 'icon-setting',
-                methods: 'set'
-              }
-          ]
-        },
-        loading: false,
-        isLoadingData: false,
-        total:0,
-        curPage:1,
-        curSizeNum:10,
-        defaultSort:{prop: 'startDate', order: 'descending'},
-        inspectionStyle: ['現場巡檢','遠端巡檢'],
-        
-      }
-    },
-    computed: {
-      ...mapGetters({ accountChanged: 'accountChanged' })
-    },
-    created:{
-
-    },
-    methods:{
-      confirmAddStoreDialog(){
-
-      },
-      hideAddStoreDialog(key){
-        this[key] = false;
-      },
-
-       // 刪除 tag
-      handleClose(tag){
-        console.log('tag--->', tag)
       
-      },
+      // ======
+      add_width: "1000",
+      edit_width: "500",
+      showingAddStore: false,
+      showingEditStore: false,
+      userColumnData: [
+        {
+          'prop': 'section1',
+          'label': "區域一",
+          'width': 100,
+          'maxWidth': 100,
+        },
+        {
+          'prop': 'section2',
+          'label': "區域二",
+          'width': 110,
+          'maxWidth': 110,
+        },
+        {
+          'prop': 'store',
+          'label': "門店",
+          'width': 100,
+          'maxWidth': 100,
+        },
+        {
+          'prop': 'timeZone',
+          'label': "門店時區",
+          'width': 100,
+          'maxWidth': 100,
+        },
+      ],
+      userData:[],
+      inputSearchUser: '',
+      showSelectionColumn: true,
 
+      
+      inputSearchUser: '',
+      titleList:[],
+      titleListAry:[],
+      departmentAry:[],
+      curTemplateDepartment: '',
+      curTemplateTitleList: '',
+    // ======
+    
+      inputSearchValue:'',
+      dateValue:[],
+      tableData:[{schName:'1',tagName:'test',incepNum:3,startDate:'2023/01/01',endDate:'2023/01/02'}],
+      scheduleList:[],
+      columnOperationData:{
+        label: this.$t('titleView.operation'),
+        minWidth: '50',
+        align: 'left',
+        operation: [
+            {
+              lable: '',
+              icon: 'icon-copy',
+              methods: 'copy'
+            },
+            {
+              lable: '',
+              icon: 'icon-setting',
+              methods: 'set'
+            }
+        ]
+      },
+      loading: false,
+      isLoadingData: false,
+      total:0,
+      curPage:1,
+      curSizeNum:10,
+      defaultSort:{prop: 'startDate', order: 'descending'},
+      inspectionStyle: ['現場巡檢','遠端巡檢'],
+      
     }
+  },
+  computed: {
+    ...mapGetters({ accountChanged: 'accountChanged' })
+  },
+  created() {
+    this.getPersonScheduleData()
+  },
+
+  methods: {
+    confirmAddStoreDialog(){
+
+    },
+    hideAddStoreDialog(key){
+      this[key] = false;
+    },
+
+      // 刪除 tag
+    handleClose(tag){
+      console.log('tag--->', tag)
+    },
+
+    getPersonScheduleData(){
+      var param = {
+            taskGroupUuid: "task_group_1675153721"
+        }
+      scheduleRESTful.getPersonScheduleData(param).then(res =>{
+          if(res.errCode == 0){
+            console.log('res =========>> ', res);
+          }
+        }
+      )
+    },
+
+  }
 }
 </script>
 
@@ -821,6 +845,14 @@ export default{
         padding: 20px 26px 48px 24px
   .setting-titles
     border-bottom: 1px solid #e3e9f4 
+
+  .empty_data
+    height: 50vh
+    display: flex
+    flex-direction: column
+    justify-content: center
+    align-items: center
+
   .inspect-basic
     padding: 20px 25px
 
@@ -940,6 +972,9 @@ export default{
             margin-left: -28px
             
 </style>
+
+
+
 <!-- <style scoped lang="scss">
 .ScheduleContainer{
     width:100%;
