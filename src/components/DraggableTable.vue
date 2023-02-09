@@ -1,6 +1,6 @@
 <template>
   <div :class="showTableHeader ? 'dragable-table-content' : 'dragable-noheader-table-content'">
-    <div v-if="showTableHeader" class="dragable-table-header">
+    <!-- <div v-if="showTableHeader" class="dragable-table-header">
       <div
         v-for="(headerItem, headerIndex) in tableHeader"
         :key="headerIndex"
@@ -8,8 +8,8 @@
         class="table-header-item">
         {{ headerItem.name }}
       </div>
-    </div>
-    <slot/>
+    </div> -->
+
     <div class="dragable-table-list">
       <draggable v-model="sortableTableData" @update="handleUpdate">
         <div v-for="(contentItem, contentIndex) in sortableTableData" :key="contentItem.sequence" class="table-content-item">
@@ -180,7 +180,9 @@ export default {
     .table-checkbox-name{
       width: 27%;
       .table-name{
+        width: 250px;
         margin-left: 0;
+        margin-right: 40px;
         padding-left: calc(38/1920*100vw);
       }
     }
