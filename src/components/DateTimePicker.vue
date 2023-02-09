@@ -45,6 +45,10 @@ export default {
     dateTimeValue:{
       type: Array,
       default:()=>{return [];}
+    },
+    pickFuturerDate:{
+      type:Boolean,
+      default:false
     }
   },
   data() {
@@ -59,7 +63,8 @@ export default {
       //dateTimeValue: [this.$moment().subtract(29, 'days'), this.$moment()],
       pickerOptions: {
         disabledDate: (time) => {
-          return time.getTime() > this.$moment(new Date()).endOf('d').toDate();
+          console.log("this.pickFuturerDate:",this.pickFuturerDate);
+          return (this.pickFuturerDate)?false:time.getTime() > this.$moment(new Date()).endOf('d').toDate();
         },
         onPick:({ maxDate, minDate })=>{
             console.log("maxDate:"+ maxDate + ", minDate:"+minDate);

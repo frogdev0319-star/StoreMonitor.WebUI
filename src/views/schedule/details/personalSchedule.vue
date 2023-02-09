@@ -1,7 +1,7 @@
 <template>
     <div class="ScheduleContainer">
         <div class="search-bar">
-            <date-time-selector class="time-selector" :dateRangeTitle="$t('schedule.schStartDate')" @change="dateChange"/>
+            <date-time-selector class="time-selector" :dateRangeTitle="$t('schedule.schStartDate')" :pickFuturerDate="true" @change="dateChange"/>
             <div class='keyword-area'>
                 <div class="search-label">{{$t('remotePatrol.keywords')}}</div>
                 <el-input
@@ -27,11 +27,11 @@
                         <span>{{$t('schedule.addSchedule')}}</span>
                     </div>
                 </delay-button>
-                <delay-button type="empty" @click="deleteSchedule">
+                <el-button class="storevue-button-empty" :disabled="!enableDeleteBtn" @click="deleteSchedule" style="min-height:32px">
                     <div class="button-area">
                         <span>{{$t('scheduleView.delete')}}</span>
                     </div>
-                </delay-button>
+                </el-button>
             </div>
             <table-only
                 ref="elTP"
@@ -50,7 +50,8 @@
                 :tableHeight = "760"
                 :cellStyle="{backgroundColor: '#fff !important'}"
                 @handleOperation="handleOperation"  
-                @sortChange="handleSortChange"                                
+                @sortChange="handleSortChange"    
+                @selection-change="handleSelectionChange"                            
             />
             <div style="width:100%; margin-top:12px;height:31px;">
                 <tbl-pagination-only
@@ -64,26 +65,43 @@
                 />
             </div>
         </div>
+        <dialog-pop
+          :title="$t('schedule.deleteSchedule')"
+          :isWarning="true"
+          :visible="showConfirmDelete"
+          @cancelHandler = "showConfirmDelete=false"
+          @confirmHandler="onConfirmDeleteSch"
+          >
+          <div class="dialog-slot">
+            {{$t('schedule.confirmDeleteSchedule')}}
+          </div>
+        </dialog-pop>
     </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
-import DateTimeSelector from '@/components/DateTimeSelector';import TableOnly from '@/components/TableOnly';
+import {scheduleRESTful} from '@/api/index';
+import DateTimeSelector from '@/components/DateTimeSelector';
+import TableOnly from '@/components/TableOnly';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
 import DelayButton from '@/components/DelayButton';
+import DialogPop from '@/components/DialogPop'
 import util from '@/common/util';
 
 export default{
     name: 'PersonalSchedule',
-    components: {DateTimeSelector,TableOnly,TblPaginationOnly,DelayButton},
+    components: {DateTimeSelector,TableOnly,TblPaginationOnly,DelayButton,DialogPop},
     data(){
       return {
+        firstLoad:true,
+        userId:'',
+        person:'',
         inputSearchValue:'',
         dateValue:[],
         columnData:[
         {
-            'prop': 'schName',
+            'prop': 'taskName',
             'label': this.$t('schedule.schName'),
             'sortable': false,
             'width': 200,
@@ -91,7 +109,7 @@ export default{
             'isExpand': false
           },
           {
-            'prop': 'tagName',
+            'prop': 'tagNameMode',
             'label': this.$t('statistics.patrolPerson.tagName'),
             'sortable': false,
             'width': 300,
@@ -99,11 +117,11 @@ export default{
             'isExpand': false,
             'hasIcon':{
                 icon:require('@/../static/img/table-help.png'),
-                tooltipContent:'巡檢類型 | 巡檢表名稱'
+                tooltipContent:this.$t('schedule.tagInfo')
             }
           },
           {
-            'prop': 'incepNum',
+            'prop': 'taskCounts',
             'label': this.$t('schedule.incepNum'),
             'sortable': false,
             'width': 100,
@@ -111,7 +129,7 @@ export default{
             'isExpand': false
           },
           {
-            'prop': 'startDate',
+            'prop': 'taskStartStr',
             'label': this.$t('schedule.schStartDate'),
             'sortable': 'custom',
             'width': 50,
@@ -119,7 +137,7 @@ export default{
             'isExpand': false
           },
           {
-            'prop': 'endDate',
+            'prop': 'taskFinalStr',
             'label': this.$t('schedule.schEndDate'),
             'sortable': 'custom',
             'width': 130,
@@ -127,8 +145,7 @@ export default{
             'isExpand': false
           }
         ],
-        tableData:[{schName:'1',tagName:'test',incepNum:3,startDate:'2023/01/01',endDate:'2023/01/02'}],
-        scheduleList:[],
+        tableData:[],
         columnOperationData:{
           label: this.$t('titleView.operation'),
           minWidth: '50',
@@ -150,22 +167,160 @@ export default{
         total:0,
         curPage:1,
         curSizeNum:10,
-        defaultSort:{prop: 'startDate', order: 'descending'},
+        defaultSort:{prop: 'taskStartStr', order: 'descending'},
+        enableDeleteBtn:false,
+        SelSchedulId:[],
+        showConfirmDelete:false,
       }
     },
     computed: {
       ...mapGetters({ accountChanged: 'accountChanged' })
     },
-    created:{
-
+    created(){
+        this.init();
     },
     methods:{
-        addNewSchedule(){
+        init(){
+            //存在sessionStorage，refresh時才會留著
+            const data = sessionStorage.getItem('PersonalSchedule')
+            this.personSchedule = JSON.parse(data)
+            
+            this.userId = (Object.getOwnPropertyNames(this.$route.params).length>0)?this.$route.params.userId:this.personSchedule.userId;
+            
+            this.person = (Object.getOwnPropertyNames(this.$route.params).length>0)?this.$route.params.nickName:this.personSchedule.userName;
+        },
+        dateChange(val) {
+            const self = this;
+            const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
+            const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
+            self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
+            self.dateValue[1] = self.dateValue[1];
+            self.inputSearchValue = '';
+            if(this.firstLoad){ 
+                this.doSearchScheduleList();
+                this.firstLoad = false;
+            }
+        },
+        doSearchScheduleList(){
+            const self = this;
+            self.isLoadingData = true;
+            let beginTs = self.$moment.utc(self.$moment(self.dateValue[0])).valueOf();
+            let endTs = self.$moment.utc(self.$moment(self.dateValue[1])).valueOf();
+            const params={
+              userId:self.userId,
+              beginTs,
+              endTs,
+              filter:{
+                page:this.curPage-1,
+                size:this.curSizeNum
+              },
+              order:{
+                direction:this.defaultSort.order=='ascending'? 'asc':'desc',
+                property:this.defaultSort.prop=="taskStartStr"?"taskStart":(this.defaultSort.prop=="taskFinalStr"?"taskFinal":this.defaultSort.prop),
+              }
+            }
+            if(self.inputSearchValue.trim()!=""){
+              params["keyword"] = self.inputSearchValue;
+            }
+            scheduleRESTful.getPersonTaskList(params).then(res=>{
+              var userData = [];
 
+              if(res.errCode == 0){
+                res.data.content.map(item =>{
+                  //const mapUser = self.doMapUser(item.userId);
+                  //console.log("mapUser:",mapUser);
+                  let obj = {...item};
+                  let mode = item.tagMode==0?self.$t('remotePatrol.remotePatrol'):self.$t('remotePatrol.onsitePatrol');
+                  obj['tagNameMode'] = mode+'\n'+item.tagName;
+                  //obj['updateTs']=item.updateTime,
+                  obj['taskStartStr']=(item.taskStart==0)?'-':self.$moment.utc(self.$moment(item.taskStart)).format("YYYY/MM/DD hh:mm:ss");//util.getDateStr(item.taskStart),
+                  //console.log(">>>taskStartStr:",self.$moment.utc(self.$moment(item.taskStart)).format("YYYY/MM/DD hh:mm:ss"));
+                  obj['taskFinalStr']=(item.taskFinal==0)?'-':self.$moment.utc(self.$moment(item.taskFinalS)).format("YYYY/MM/DD hh:mm:ss");//util.getDateStr(item.taskFinal),
+                  obj['updateUserName']=(item.updateUserName == "NONE")?'-':item.updateUserName,
+                  userData.push(obj);
+                });
+                self.tableData = [];
+                self.tableData = userData;
+                self.total = res.data.totalPages;
+                self.isLoadingData = false;
+              }else{
+                util.notify(self.$t('schedule.getScheduleSettingFail'), 'error', 3000);
+              }
+
+            }).catch(err=>{
+              console.log("getScheduleListFail error",err);
+              util.notify(self.$t('schedule.getScheduleSettingFail')+',error:'+err, 'error', 3000);
+              this.isLoadingData = false;
+            });
+        },
+        addNewSchedule(){
+            this.$router.push({ name: 'CreateSchedule', params: { userId: this.userId,userName:this.person}});
         },
         deleteSchedule(){
-
+            this.showConfirmDelete = true;
         },
+        handleSelectionChange(val){
+            console.log("handleSelectionChange:",val);
+            this.SelSchedulId = [];
+            if(val.length>0){
+                this.enableDeleteBtn = true;
+                val.map((item)=>{
+                    this.SelSchedulId.push(item.taskGroupUuid);
+                })
+            }else{
+                this.enableDeleteBtn = false;
+            }
+        },
+        onConfirmDeleteSch(){
+            console.log("SelSchedulId:",this.SelSchedulId);
+            this.showConfirmDelete = false;
+            scheduleRESTful.deletePersonTaskList({taskGroupUuidArray:this.SelSchedulId}).then(res=>{
+                if(res.errCode==0){
+                   this.doSearchScheduleList();
+                }else{
+                    util.notify(this.$t('schedule.deletePersonSchError'), 'error', 2000);
+                }
+            })
+        },
+        handleOperation({ method, row }) {
+            let params= { userId: this.userId,taskGroupUuid: row.taskGroupUuid };
+            console.log("handleOperation params:",params);
+            switch(method){
+                case 'copy':{
+                    this.doCopyScheduleTask(row.taskGroupUuid);
+                    break;
+                }
+                case 'set':{
+                    this.$router.push({ name: 'ModifySchedule', params: { userId: this.userId,userName:this.person,taskGroupUuid: row.taskGroupUuid }});
+                    break;      
+                }
+                default: {
+                    break;
+                }
+            }
+        },
+        handleSortChange(order, defaultSort) {
+            this.defaultSort = { ...defaultSort };
+            this.doSearchScheduleList();
+        },
+        currentChange(val) {
+            const self = this;
+            self.curPage = val.page;
+            self.doSearchScheduleList();
+        },
+        sizeChange(val) {
+            const self = this;
+            self.curSizeNum = val.size;
+            self.curPage = 1;
+            self.doSearchScheduleList();
+        },
+        doCopyScheduleTask(taskGroupUuid){
+            scheduleRESTful.CopySchedulePersonSchedule({taskGroupUuid}).then(res => {
+                if(res.errCode==0){
+                    this.doSearchScheduleList();
+                }
+            })
+        }
     }
 }
 </script>
@@ -297,6 +452,13 @@ export default{
     /deep/
       .el-table th .cell{
       padding-left: 0px !important;
+      span{
+        white-space: pre-line;
+      }
+    }
+    /deep/
+    .el-table .cell span{
+      white-space: pre-line;
     }
     /deep/
     .el-table

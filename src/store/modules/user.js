@@ -221,6 +221,7 @@ const user = {
     setEditReport({ commit }, mode){
       commit('SET_EDIT_REPORT',mode)
     },
+
     GetDash({ commit }) {
       return new Promise((resolve, reject) => {
         getDashServerInfo().then(res => {

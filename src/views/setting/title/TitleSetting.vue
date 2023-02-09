@@ -319,6 +319,12 @@ export default {
               checked: false,
               disabled: false,
               visabled:true
+            },
+            {
+              roleName: this.$t('schedule.scheduleExecuted'),
+              checked: false,
+              disabled: false,
+              visabled:true
             }
           ]
         },
@@ -487,6 +493,7 @@ export default {
       //Schedule
       this.roleNameList[5].children[0].checked = !!PermissionHelper.enableScheduleSetting2();
       this.roleNameList[5].children[1].checked = !!PermissionHelper.enableScheduleHistroy();
+      this.roleNameList[5].children[2].checked = !!PermissionHelper.enableScheduleExecuted();
 
       if (authorities.length === 8 && resetFlag) {
         this.ifAccessVideo = PermissionHelper.enableVideo() === 1;

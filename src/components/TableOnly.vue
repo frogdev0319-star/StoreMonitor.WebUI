@@ -64,6 +64,10 @@
             <div v-if="_item.customIcon" >
               <img :src="_item.src" style="width:24px;height:24px;cursor:pointer;" @click="cellClick(row,_item.prop)">
             </div>
+            <div v-else-if="_item.isCompound">
+              <span v-if="row[_item.prop].isCellClick" style="cursor:pointer;color:#006ab7;font-size:calc(15/1920*100vw);" @click="cellClick(row,_item.prop)">{{ row[_item.prop].value}}</span>
+              <span v-else v-html="row[_item.prop].html"/>
+            </div>
             <div v-else>
               <span style="cursor:pointer;color:#006ab7;font-size:calc(15/1920*100vw);" @click="cellClick(row,_item.prop)">{{ row[_item.prop]}}</span>
             </div>
@@ -388,7 +392,9 @@ export default {
     },
     expandCompProperties:{
       type: Object,
-      default: {}
+      default:  () => {
+        return {};
+      }
     }
   },
   data() {
@@ -441,7 +447,7 @@ export default {
   created() {},
   mounted() {
     //console.log(this.columnData)
-    console.log("this.expandCompProperties ????--->", this.expandCompProperties)
+    //console.log("this.expandCompProperties ????--->", this.expandCompProperties)
     
   },
   methods: {
@@ -481,7 +487,7 @@ export default {
         document.body.removeChild(spancontent);
       }
       let idx = (this.showSelectionColumn)? $index-1 : $index;
-      console.log(column.label+"has icon:",this.columnData[idx])
+      //console.log(column.label+"has icon:",this.columnData[idx])
       let hasIcon = false;
       if(this.columnData[idx] && this.columnData[idx].hasOwnProperty('hasIcon'))
         hasIcon = true;
@@ -834,6 +840,7 @@ export default {
     tr{
       background-color: #f7f9fa !important;
     }
+  
     /**** body的scrollbar
     .el-table__body-wrapper::-webkit-scrollbar {
 	      width: 4px; 
@@ -851,6 +858,9 @@ export default {
       border-radius: 5px;
       border: solid 1px #f5f5f5;
       background-color: #fff;
+    }
+    .el-table th div{
+      vertical-align: middle;
     }
     /**** body的scrollbar
     .el-table__body-wrapper::-webkit-scrollbar {

@@ -16,6 +16,7 @@
         :diablePick="diablePick" 
         :dateTimeValue="dateTimeValue"
         :showTooltips="showTooltips"
+        :pickFuturerDate="pickFuturerDate"
         @change="dateChange"/>
     </div>
     <el-tooltip
@@ -50,6 +51,10 @@ export default {
       type:String,
       default:''
     },
+    pickFuturerDate:{
+      type:Boolean,
+      default:false
+    }
   },
   data() {
     return {
