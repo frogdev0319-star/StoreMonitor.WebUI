@@ -53,7 +53,16 @@ export const getSchedulePersonList = data => {
   
   export const getPersonScheduleData = data => {
     return request({
-      url: `${version}/report/report/schedule/person/fetch`,
+      url: `${version}/report/schedule/person/task/fetch`,
+      method: 'post',
+      data
+    });
+  };
+
+
+  export const saveScheduleData = data => {
+    return request({
+      url: `${version}/report/schedule/person/task/save`,
       method: 'post',
       data
     });

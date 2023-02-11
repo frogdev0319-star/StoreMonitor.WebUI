@@ -7,6 +7,7 @@
           class="search-button"
           type="filled"
           size="mini"
+          @click="saveScheduleData"
           >
           <span>儲存</span>
       </delay-button>
@@ -158,20 +159,20 @@
 
               <div class="task_list_store flex-column" v-for="item in scheduleDataList" :key="item.id">
                 <!-- 店名 -->
-                <div class="" style="margin-bottom: 10px">
+                <div class="" style="margin-bottom: 5px">
                   <el-checkbox
                     class="storevue-checkbox-outlined"
                     v-model="tempboolean_2"
                     style="margin-right: 8px"
                     />
-                    <span class="role-name">{{item.name}}</span>
+                    <span class="role-name">{{item.storeName}}</span>
                 </div>
                 <div class="memo_setting">
                   <!-- 提醒日期 -->
                   <div class="remider_setting flex-column">
                     <p>提醒日期</p>
                     <el-date-picker
-                      v-model="value1"
+                      v-model="item.remindDate"
                       type="date"
                       placeholder="提醒日期">
                     </el-date-picker>
@@ -180,7 +181,7 @@
                   <div class="remider_setting flex-column">
                     <p>提醒時間</p>
                     <el-time-select
-                      v-model="value2"
+                      v-model="item.remindTimePoint"
                       :picker-options="{
                         start: '00:00',
                         step: '01:00',
@@ -194,17 +195,17 @@
                   <div class="remider_setting flex-column">
                     <p>提醒方式</p>
                     <el-select
-                      v-model="value3"
+                      v-model="item.remindStyle"
                       multiple
                       filterable
                       :loading="loading" 
                       style="width:300px">
                       <el-option
-                        v-for= "(item, index) in remiderStyle"
-                        :key="index"
-                        :label="item"
-                        :value="item">
-                      </el-option>
+                        v-for= "(i, index) in remiderStyle"
+                        :key= "index"
+                        :label= "i.label"
+                        :value= "i.value"
+                        />
                     </el-select>
                   </div>
                   <div class="remider_setting flex-column">
@@ -213,265 +214,8 @@
                 </div>
               </div>
 
-
-              <br>
-              <br>
-              <br>
-              <br>
-              <br>
-              <p>-------------------------</p>
-               <br>
-              <br>
-              <br>
-              <br>
-              <br>
-
-              <div class="task_list_store flex-column">
-                <!-- 店名 -->
-                <div class="" style="margin-bottom: 10px">
-                  <el-checkbox
-                    class="storevue-checkbox-outlined"
-                    v-model="tempboolean_2"
-                    style="margin-right: 8px"
-                    />
-                    <span class="role-name">研華林口店</span>
-                </div>
-                <div class="memo_setting">
-                  <!-- 提醒日期 -->
-                  <div class="remider_setting flex-column">
-                    <p>提醒日期</p>
-                    <el-date-picker
-                      v-model="value1"
-                      type="date"
-                      placeholder="提醒日期">
-                    </el-date-picker>
-                  </div>
-                  <!-- 提醒時間 -->
-                  <div class="remider_setting flex-column">
-                    <p>提醒時間</p>
-                    <el-time-select
-                      v-model="value2"
-                      :picker-options="{
-                        start: '00:00',
-                        step: '01:00',
-                        end: '23:00'
-                      }"
-                      placeholder="提醒時間">
-                    </el-time-select>
-                  </div>
-
-                  <!-- 提醒方式 -->
-                  <div class="remider_setting flex-column">
-                    <p>提醒方式</p>
-                    <el-select
-                      v-model="value3"
-                      multiple
-                      filterable
-                      :loading="loading" 
-                      style="width:300px">
-                      <el-option
-                        v-for= "(item, index) in remiderStyle"
-                        :key="index"
-                        :label="item"
-                        :value="item">
-                      </el-option>
-                    </el-select>
-                  </div>
-                  <div class="remider_setting flex-column">
-                    <div class="clear_all">重設</div> 
-                  </div>
-                </div>
-              </div>
-
-
-              <div class="task_list_store flex-column">
-                <!-- 店名 -->
-                <div class="" style="margin-bottom: 10px">
-                  <el-checkbox
-                    class="storevue-checkbox-outlined"
-                    v-model="tempboolean_2"
-                    style="margin-right: 8px"
-                    />
-                    <span class="role-name">研華內湖店</span>
-                </div>
-                <div class="memo_setting">
-                  <!-- 提醒日期 -->
-                  <div class="remider_setting flex-column">
-                    <p>提醒日期</p>
-                    <el-date-picker
-                      v-model="value1"
-                      type="date"
-                      placeholder="提醒日期">
-                    </el-date-picker>
-                  </div>
-                  <!-- 提醒時間 -->
-                  <div class="remider_setting flex-column">
-                    <p>提醒時間</p>
-                    <el-time-select
-                      v-model="value2"
-                      :picker-options="{
-                        start: '00:00',
-                        step: '01:00',
-                        end: '23:00'
-                      }"
-                      placeholder="提醒時間">
-                    </el-time-select>
-                  </div>
-
-                  <!-- 提醒方式 -->
-                  <div class="remider_setting flex-column">
-                    <p>提醒方式</p>
-                    <el-select
-                      v-model="value3"
-                      multiple
-                      filterable
-                      :loading="loading" 
-                      style="width:300px">
-                      <el-option
-                        v-for= "(item, index) in remiderStyle"
-                        :key="index"
-                        :label="item"
-                        :value="item">
-                      </el-option>
-                    </el-select>
-                  </div>
-                  <div class="remider_setting flex-column">
-                    <div class="clear_all">重設</div> 
-                  </div>
-                </div>
-              </div>
           </div>
         </div>
-
-
-        <div class="store_list flex-column">
-          <!-- 區域 -->
-          <div class="role-all-checkbox" style="margin-bottom: 10px">
-            <el-checkbox
-              v-model="tempboolean_2" 
-              class="storevue-checkbox-filled" 
-              style="margin-right: 8px"
-            />
-            <span class="group-name">新北市 - 板橋區</span>
-          </div>
-          
-          <div class="task_list flex-column">
-            <div class="task_list_store flex-column">
-              <!-- 店名 -->
-              <div class="" style="margin-bottom: 10px">
-                <el-checkbox
-                  class="storevue-checkbox-outlined"
-                  v-model="tempboolean_2"
-                  style="margin-right: 8px"
-                  />
-                  <span class="role-name">研華林口店</span>
-              </div>
-              <div class="memo_setting">
-                <!-- 提醒日期 -->
-                <div class="remider_setting flex-column">
-                  <p>提醒日期</p>
-                  <el-date-picker
-                    v-model="value1"
-                    type="date"
-                    placeholder="提醒日期">
-                  </el-date-picker>
-                </div>
-                <!-- 提醒時間 -->
-                <div class="remider_setting flex-column">
-                  <p>提醒時間</p>
-                  <el-time-select
-                    v-model="value2"
-                    :picker-options="{
-                      start: '00:00',
-                      step: '01:00',
-                      end: '23:00'
-                    }"
-                    placeholder="提醒時間">
-                  </el-time-select>
-                </div>
-
-                <!-- 提醒方式 -->
-                <div class="remider_setting flex-column">
-                  <p>提醒方式</p>
-                  <el-select
-                    v-model="value3"
-                    multiple
-                    filterable
-                    :loading="loading" 
-                    style="width: 300px">
-                    <el-option
-                      v-for= "(item, index) in remiderStyle"
-                      :key="index"
-                      :label="item"
-                      :value="item">
-                    </el-option>
-                  </el-select>
-                </div>
-                <div class="remider_setting flex-column">
-                  <div class="clear_all">重設</div> 
-                </div>
-              </div>
-            </div>
-
-            <div class="task_list_store flex-column">
-              <!-- 店名 -->
-              <div class="" style="margin-bottom: 10px">
-                <el-checkbox
-                  class="storevue-checkbox-outlined"
-                  v-model="tempboolean_2"
-                  style="margin-right: 8px"
-                  />
-                  <span class="role-name">研華內湖店</span>
-              </div>
-              <div class="memo_setting">
-                <!-- 提醒日期 -->
-                <div class="remider_setting flex-column">
-                  <p>提醒日期</p>
-                  <el-date-picker
-                    v-model="value1"
-                    type="date"
-                    placeholder="提醒日期">
-                  </el-date-picker>
-                </div>
-                <!-- 提醒時間 -->
-                <div class="remider_setting flex-column">
-                  <p>提醒時間</p>
-                  <el-time-select
-                    v-model="value2"
-                    :picker-options="{
-                      start: '00:00',
-                      step: '01:00',
-                      end: '23:00'
-                    }"
-                    placeholder="提醒時間">
-                  </el-time-select>
-                </div>
-
-                <!-- 提醒方式 -->
-                <div class="remider_setting flex-column">
-                  <p>提醒方式</p>
-                  <el-select
-                    v-model="value3"
-                    multiple
-                    filterable
-                    :loading="loading" 
-                    style="width:300px">
-                    <el-option
-                      v-for= "(item, index) in remiderStyle"
-                      :key="index"
-                      :label="item"
-                      :value="item">
-                    </el-option>
-                  </el-select>
-                </div>
-                <div class="remider_setting flex-column">
-                  <div class="clear_all">重設</div> 
-                </div>
-              </div>
-            </div>
-        </div>
-      </div>
-
         </div>
       </div>
     </div>
@@ -617,7 +361,6 @@
             <div class="remider_setting flex-column">
               <p style="font-size: 14px; font-weight: 900"><span style="color: #f31d65">*</span>提醒方式</p>
               <el-select
-                v-model="value3"
                 multiple
                 filterable
                 :loading="loading" 
@@ -625,8 +368,8 @@
                 <el-option
                   v-for= "(item, index) in remiderStyle"
                   :key="index"
-                  :label="item"
-                  :value="item">
+                  :label="item.label"
+                  :value="item.value">
                 </el-option>
               </el-select>
             </div>
@@ -657,6 +400,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import {scheduleRESTful} from '@/api/index';
+import { getBriefStoreList} from '@/api/store';
 import DateTimeSelector from '@/components/DateTimeSelector';
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
@@ -680,8 +424,9 @@ export default{
       tempboolean_2: true,
       value1: '',
       value2: '',
-      value3: '',
-      remiderStyle:['當下','前一日','前1小時'],
+      value3: [],
+      vvv: ["remindMode_OneDay"],
+      
       templateList:['aaa','bbb','ccc'],
       tags: [
         {
@@ -733,69 +478,24 @@ export default{
       // ====== !! ======
     
       scheduleData: true,
-      scheduleDataList:[
+      scheduleDataList:[],
+      remiderStyle:[
         {
-          "accountId": "xAtUZurF3w52",
-          "id": 14,
-          "inspectTagId": 873,
-          "remindMode_Currently": false,
-          "remindMode_OneDay": false,
-          "remindMode_OneHour": false,
-          "remindTime": 1675245600000,
-          "storeId": "JrT7zbFj0u12",
-          "name": "58度c",
-          "city": "林口",
-          "province": "桃園市",
-          "taskName": "排成新增",
-          "taskGroupUuid": "task_group_1675153721",
-          "updateTime": 1675068685204,
-          "userId": "AsmGhMVnSxDa"
+          value: 'remindMode_Currently',
+          label: '當下'
         },
         {
-          "accountId": "xAtUZurF3w52",
-          "id": 15,
-          "inspectTagId": 873,
-          "remindMode_Currently": false,
-          "remindMode_OneDay": false,
-          "remindMode_OneHour": false,
-          "remindTime": 1675504800000,
-          "storeId": "1MJR3BkFX92v",
-          "name": "68度c",
-          "city": "林口",
-          "province": "桃園市",
-          "taskName": "排成新增",
-          "taskGroupUuid": "task_group_1675153721",
-          "updateTime": 1675068685204,
-          "userId": "AsmGhMVnSxDa"
+          value: 'remindMode_OneDay',
+          label: '前一日'
         },
         {
-          "accountId": "xAtUZurF3w52",
-          "id": 16,
-          "inspectTagId": 873,
-          "remindMode_Currently": true,
-          "remindMode_OneDay": true,
-          "remindMode_OneHour": true,
-          "remindTime": 1675850400000,
-          "storeId": "PHf8d3rTU9BX",
-          "name": "95度c",
-          "city": "林口",
-          "province": "桃園市",
-          "taskName": "排成新增",
-          "taskGroupUuid": "task_group_1675153721",
-          "updateTime": 1675068685204,
-          "userId": "AsmGhMVnSxDa"
-        }
+          value: 'remindMode_OneHour',
+          label: '前1小時'
+        },
       ],
+      storeList: [],
       emptyData: require('../../../../static/img/icon_data.svg'),
 
-
-
-
-
-
-
-      
-    
 
       
       // ======
@@ -876,34 +576,130 @@ export default{
   computed: {
     ...mapGetters({ accountChanged: 'accountChanged' })
   },
-  created() {
-    // this.getPersonScheduleData()
+  watch:{
+
+  },
+
+  async created() {
+    await this.getBriefStoreList();
+    await this.getPersonScheduleData();
   },
 
   methods: {
-    confirmAddStoreDialog(){
-
+    getBriefStoreList() {
+      getBriefStoreList().then(res => {
+        this.storeList = res.data
+        console.log('this.storeList =========>>>> ', this.storeList);
+      })
     },
-    hideAddStoreDialog(key){
-      this[key] = false;
-    },
-
-      // 刪除 tag
-    handleClose(tag){
-      console.log('tag--->', tag)
-    },
-
     getPersonScheduleData(){
       var param = {
-            taskGroupUuid: "task_group_1675153721"
+        "taskGroupUuid": "task_group_1676047037"
         }
       scheduleRESTful.getPersonScheduleData(param).then(res =>{
           if(res.errCode == 0){
-            console.log('res =========>> ', res);
+            res.data.forEach(i => {
+              this.storeList.forEach(store => {
+                if(i.storeId == store.storeId){
+                  i.storeName = store.name
+                  // i.remindTime = this.getdate(i.remindTime)
+                  i.remindDate = this.getdate(i.remindTime)
+                  i.remindTimePoint = this.getTimePoint(i.remindTime)
+                  i.remindStyle = []
+                  if(i.remindMode_Currently == true) i.remindStyle.push("remindMode_Currently")
+                  if(i.remindMode_OneDay == true) i.remindStyle.push("remindMode_OneDay")
+                  if(i.remindMode_OneHour == true) i.remindStyle.push("remindMode_OneHour")
+                }
+              })
+              
+            });
+            this.scheduleDataList = res.data
+            console.log('ScheduleData =========>> ', res.data);
+
           }
         }
       )
     },
+
+    saveScheduleData(){
+
+      console.log('this.scheduleDataList =======>> ', this.scheduleDataList);
+
+      var param = {}
+      param.taskList = [...this.scheduleDataList]
+      param.userId = "dEJ9y1Jy02KZ"
+      param.inspectTagId= 872
+      param.taskName= "20230210給三井-1",
+      param.taskGroupUuid = "task_group_1676047037"
+
+      param.taskList.forEach(i => {
+        i.taskId = i.id
+        console.log('i.remindStyle :>> ', i.remindStyle);
+        i.isRemindModeCurrently = i.remindStyle.includes('remindMode_Currently') ? true : false
+        i.isRemindModeOneHour = i.remindStyle.includes('remindMode_OneHour') ? true : false
+        i.isRemindModeOneDay = i.remindStyle.includes('remindMode_OneDay') ? true : false
+        // delete i.accountId
+        // delete i.storeName
+        // delete i.reportId
+        // delete i.remindDate
+        // delete i.remindTimePoint
+        // delete i.remindStyle
+        // delete i.taskName
+        // delete i.userId
+        // delete i.taskGroupUuid
+        // delete i.inspectTagId
+        // delete i.id
+        // delete i.remindMode_OneDay
+        // delete i.remindMode_OneHour
+        // delete i.remindMode_Currently
+      })
+
+      console.log('param 1  =======>> ', param);
+
+      scheduleRESTful.saveScheduleData(param).then(res =>{
+        if(res.errCode === 0){
+            console.log("this.scheduleDataList====>", this.scheduleDataList)
+        }
+      })
+
+    },
+
+
+
+
+    pad2(n){
+      return (n < 10 ? '0' : '') + n;
+    },
+    getdate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      return year + "-"+ month +"-"+ day 
+    },
+    getTimePoint(t){
+      var date = new Date(t);
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return hour +":"+ min +":"+ sec
+    },
+
+    confirmAddStoreDialog(){
+    },
+    hideAddStoreDialog(key){
+      this[key] = false;
+    },
+    // 刪除 tag
+    handleClose(tag){
+      console.log('tag--->', tag)
+    },
+    handleSelectionChange(val){
+      console.log('handleSelectionChange val :>> ', val);
+    },
+
+    
+  
 
   }
 }
@@ -1005,7 +801,7 @@ export default{
         background: #f7f9fa
         margin-left: 28px
         .task_list_store
-          margin-bottom: 10px
+          margin-bottom: 20px
   .memo_setting
     display: flex
     flex-direction: row
