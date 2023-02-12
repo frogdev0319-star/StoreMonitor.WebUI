@@ -40,8 +40,10 @@
               <div class="title-name"><span style="color: #c60957">* </span> 巡檢表</div>
               <div class="title-status" style="margin-right: 10px"> 
                 <el-select
+                  :value="ddd" 
                   placeholder="巡檢表"
                   style="width: 250px"
+
                   >
                   <el-option
                     v-for="(item, index) in inspectionStyle"
@@ -53,6 +55,7 @@
               </div>
               <div class="title-status"> 
                 <el-select
+                  :value="ddd" 
                   placeholder="巡檢表名稱"
                   style="width: 250px"
                   >
@@ -81,9 +84,11 @@
           <div class="title-name">關鍵字</div>
           <div class="title-status" > 
             <el-input
-              ref="inputName"
+              v-model="inputSearchStoreList"
+              ref="inputSearchStoreList"
               class="ppip"
               style="width: 250px"
+              clearable
               />
           </div>
         </div>
@@ -113,6 +118,7 @@
             class="blue_border"
             type="primary"
             size="mini"
+            @click="deleteSchedule"
             >
             <span>刪除</span>
           </delay-button>
@@ -122,7 +128,7 @@
 
       <div v-loading="isLoadingData" class="setting-details self-loading">
         <!-- 暫無數據 -->
-        <div class="inspect-basic empty_data" v-if="!scheduleData">
+        <div class="inspect-basic empty_data" v-if="hasScheduleData == false">
           <img
             :src="emptyData"
             alt="emptyData"
@@ -132,7 +138,7 @@
         
 
         <!-- 有數據 -->
-        <div class="inspect-basic flex-column" v-if="scheduleData">
+        <div class="inspect-basic flex-column" v-else>
           <!-- 全部門店 -->
           <div class="role-all-checkbox" style="margin-bottom: 25px">
             <el-checkbox
@@ -153,17 +159,18 @@
                 style="margin-right: 8px"
               />
               <span class="group-name">桃園市 - 龜山區</span>
+              
             </div>
             
             <div class="task_list flex-column">
-
-              <div class="task_list_store flex-column" v-for="item in scheduleDataList" :key="item.id">
+              <div class="task_list_store flex-column" v-for="item in searchSheduleDataList" :key="item.id">
                 <!-- 店名 -->
                 <div class="" style="margin-bottom: 5px">
                   <el-checkbox
                     class="storevue-checkbox-outlined"
-                    v-model="tempboolean_2"
+                    v-model="item.checked"
                     style="margin-right: 8px"
+                    @change="handleCheckboxChange(item)"
                     />
                     <span class="role-name">{{item.storeName}}</span>
                 </div>
@@ -174,6 +181,7 @@
                     <el-date-picker
                       v-model="item.remindDate"
                       type="date"
+                      value-format="yyyy-MM-dd"
                       placeholder="提醒日期">
                     </el-date-picker>
                   </div>
@@ -196,20 +204,25 @@
                     <p>提醒方式</p>
                     <el-select
                       v-model="item.remindStyle"
+                      :placeholder="$t('audit.workFlows.inspectionForm')"
                       multiple
                       filterable
-                      :loading="loading" 
-                      style="width:300px">
+                      style="width:300px"
+                      >
                       <el-option
-                        v-for= "(i, index) in remiderStyle"
-                        :key= "index"
-                        :label= "i.label"
-                        :value= "i.value"
-                        />
+                        v-for="(_item, index) in selectRemiderStyle"
+                        :key="index"
+                        :label="_item.label"
+                        :value="_item.value"
+                      />
+
                     </el-select>
                   </div>
                   <div class="remider_setting flex-column">
-                    <div class="clear_all">重設</div> 
+                    <div 
+                    class="clear_all"
+                    @click="resetData(item)"
+                    >重設</div> 
                   </div>
                 </div>
               </div>
@@ -219,6 +232,8 @@
         </div>
       </div>
     </div>
+
+
 
     <!-- Add Store -->
     <dialog-pop
@@ -241,22 +256,24 @@
                   <div class="title-name">{{$t('audit.workFlows.keywords')}}</div>
                   <div class="title-status"> 
                     <el-input
-                      :placeholder="$t('audit.workFlows.searchNameMail')"
+                      v-model="inputSearchStore"
+                      placeholder="搜尋門店"
                       style="width: 200px"
                       clearable
                       />
                   </div>
                 </div>
-                <!-- 區域二 -->
+                <!-- 區域一 -->
                 <div class="flex-row" style="margin-right: 3%; margin-bottom: 10px;">
                   <div class="title-name"> 區域一</div>
                   <div class="title-status"> 
                     <el-select
-                      :placeholder="$t('audit.workFlows.depart')"
+                      v-model="curTempProvinceList"
+                      placeholder="區域一"
                       style="width: 180px"
                       >
                       <el-option
-                        v-for="(item, index) in templateList"
+                        v-for="(item, index) in provinceAry"
                         :key="index"
                         :label="item"
                         :value="item"
@@ -269,11 +286,12 @@
                   <div class="title-name">區域二</div>
                   <div class="title-status"> 
                     <el-select
-                      :placeholder="$t('audit.workFlows.position')"
+                      v-model="curTempCityList"
+                      placeholder="區域二"
                       style="width: 180px"
                       >
                       <el-option
-                        v-for="(item, index) in templateList"
+                        v-for="(item, index) in cityAry"
                         :key="index"
                         :label="item"
                         :value="item"
@@ -286,21 +304,21 @@
               <div class="title-name"> 選擇門店 </div>
               <div class="user_selected">
                 <el-tag
-                  v-for="(t, index) in tags"
+                  v-for="(tag, index) in tags"
                   :key="index"
                   closable
-                  :type="t.type"
+                  :type="tag.type"
                   @close="handleClose(tag)">
-                  {{t.userName}}
+                  {{tag.name}}
                 </el-tag>
               </div>
             </div>
             <div class="users">
               <table-only
-                ref="usersList"
+                ref="storeDataList"
                 class="table-white"
-                :column-data ="userColumnData"
-                :table-data ="searchUserData"
+                :column-data ="storeColumnData"
+                :table-data ="showSearchStoreData"
                 :showSelectionColumn = showSelectionColumn
                 
                 :highlight-current-row = "false"
@@ -325,8 +343,8 @@
       :close-on-click-modal="false"
       :show-close="false"
       :visible="showingEditStore"
-      @cancelHandler="hideAddStoreDialog('showingEditStore')"
-      @confirmHandler="confirmAddStoreDialog"
+      @cancelHandler="hideEditStoreDialog('showingEditStore')"
+      @confirmHandler="confirmEditStoreDialog"
     >
       <div class="dialog-slot">
         <div class="dialog-content">
@@ -361,16 +379,18 @@
             <div class="remider_setting flex-column">
               <p style="font-size: 14px; font-weight: 900"><span style="color: #f31d65">*</span>提醒方式</p>
               <el-select
+                v-model="vvv"
                 multiple
                 filterable
                 :loading="loading" 
                 style="width:300px">
                 <el-option
-                  v-for= "(item, index) in remiderStyle"
-                  :key="index"
-                  :label="item.label"
-                  :value="item.value">
-                </el-option>
+                    v-for= "(selected, index) in selectRemiderStyle"
+
+                    :label= "selected.label"
+                    :value= "selected.value"
+                    :key= "index"
+                  />
               </el-select>
             </div>
           </div>
@@ -380,13 +400,8 @@
             <div class="remider_setting flex-column">
               <p style="font-size: 14px; font-weight: 900">已選門店總數：10</p>
               <div class="selected_stores flex-column">
-                <div class="store_name">研華林口店</div>
-                <div class="store_name">研華林口店</div>
-                <div class="store_name">研華林口店</div>
-                <div class="store_name">研華林口店</div>
-                <div class="store_name">研華林口店</div>
-                <div class="store_name">研華林口店</div>
-            
+                <div class="store_name" v-for= "(_store, index) in handleSchedule" :key="index">{{_store.storeName}}</div>
+
               </div>
             </div>
           </div>
@@ -419,67 +434,24 @@ export default{
   },
   data(){
     return {
-      
-      tempboolean_1: true,
-      tempboolean_2: true,
+      ddd: '',
+      tempboolean_1: false,
+      tempboolean_2: false,
       value1: '',
       value2: '',
       value3: [],
       vvv: ["remindMode_OneDay"],
-      
-      templateList:['aaa','bbb','ccc'],
-      tags: [
-        {
-          userName: "阿信小障",
-          type: "info"
-        },
-        {
-          userName: "阿信",
-          type: "info"
-        },
-        {
-          userName: "飄髮哥",
-          type: "info"
-        },
-        {
-          userName: "Albert",
-          type: "info"
-        },
-      ],
-      searchUserData:[
-        {
-          "section1": "台北市",
-          "section2": "信義區",
-          "store": "研華林口店",
-          "timeZone": "+8"
-        },
-        {
-          "section1": "新北市",
-          "section2": "板橋區",
-          "store": "新埔店",
-          "timeZone": "+8"
-        },
-        {
-          "section1": "桃園市",
-          "section2": "桃園區",
-          "store": "站前店",
-          "timeZone": "+8"
-        
-        },
-        {
-          "section1": "新竹市",
-          "section2": "竹北市",
-          "store": "竹北科技園區店",
-          "timeZone": "+8"
-          
-        },
 
-      ],
+      templateList:['aaa','bbb','ccc'],
+      
+      
       // ====== !! ======
-    
-      scheduleData: true,
+
+      scheduleStatus:'',
+      hasScheduleData: true,
       scheduleDataList:[],
-      remiderStyle:[
+      
+      selectRemiderStyle:[
         {
           value: 'remindMode_Currently',
           label: '當下'
@@ -495,6 +467,7 @@ export default{
       ],
       storeList: [],
       emptyData: require('../../../../static/img/icon_data.svg'),
+      handleSchedule: [],
 
 
       
@@ -503,21 +476,21 @@ export default{
       edit_width: "500",
       showingAddStore: false,
       showingEditStore: false,
-      userColumnData: [
+      storeColumnData: [
         {
-          'prop': 'section1',
+          'prop': 'province',
           'label': "區域一",
           'width': 100,
           'maxWidth': 100,
         },
         {
-          'prop': 'section2',
+          'prop': 'city',
           'label': "區域二",
           'width': 110,
           'maxWidth': 110,
         },
         {
-          'prop': 'store',
+          'prop': 'name',
           'label': "門店",
           'width': 100,
           'maxWidth': 100,
@@ -529,17 +502,24 @@ export default{
           'maxWidth': 100,
         },
       ],
-      userData:[],
-      inputSearchUser: '',
-      showSelectionColumn: true,
 
-      
-      inputSearchUser: '',
-      titleList:[],
-      titleListAry:[],
-      departmentAry:[],
-      curTemplateDepartment: '',
-      curTemplateTitleList: '',
+      searchStoreData:[],
+      selectStoreTags: [],
+      tags: [],
+      addStoreTemp: [],
+
+
+      inputSearchStore:'',
+      curTempProvinceList:'',
+      provinceAry:[],
+      curTempCityList:'',
+      cityAry:[],
+
+      inputSearchStoreList:'',
+
+
+
+      showSelectionColumn: true,
     // ======
     
       inputSearchValue:'',
@@ -579,24 +559,108 @@ export default{
   watch:{
 
   },
+  mounted() {
+    this.showSearchStoreData = this.searchStoreData
+    this.searchSheduleDataList = this.scheduleDataList 
+  },
+
+  computed: {
+    searchSheduleDataList :{
+      get(){
+        return this.filterInputSearchScheduleDataList(this.scheduleDataList)
+      },
+      set(val){
+        console.log('val', val)
+			}
+    },
+
+    showSearchStoreData :{
+      get(){
+        return this.filterInputSearchStore(this.filterCurTemplateProvince(this.filterCurTemplateCity(this.searchStoreData)))
+      },
+      set(val){
+        console.log('val', val)
+			}
+    }
+
+  },
 
   async created() {
-    await this.getBriefStoreList();
-    await this.getPersonScheduleData();
+    await this.init()
   },
 
   methods: {
-    getBriefStoreList() {
-      getBriefStoreList().then(res => {
+    filterInputSearchScheduleDataList(data){
+      return data.filter( item => item.storeName.indexOf(this.inputSearchStoreList) > -1)
+    },
+
+    // dialoge
+    filterInputSearchStore(stores){
+        return stores.filter( item => item.name.indexOf(this.inputSearchStore) > -1)
+    },
+    filterCurTemplateProvince(stores){
+        if(this.curTempProvinceList.length == 0 ){
+          return stores
+        }else{
+          return stores.filter(item => item.province.includes(this.curTempProvinceList))
+        }
+    },
+    filterCurTemplateCity(stores){
+      if(this.curTempCityList.length == 0){
+        return stores
+      }else{
+        return stores.filter(item => item.city == this.curTempCityList )
+      }
+    }, 
+
+
+
+
+    async init(){
+      
+      await this.getBriefStoreList();
+
+      var status = sessionStorage.getItem('scheduleParams');
+      this.scheduleStatus = JSON.parse(status)
+      console.log('this.scheduleStatus  =========>>', this.scheduleStatus)
+
+      if(this.scheduleStatus){
+          this.hasScheduleData = true
+          
+          await this.getPersonScheduleData();
+          
+      }else {
+        this.hasScheduleData = false
+      }
+        
+  
+      
+    },
+
+
+    async getBriefStoreList() {
+      await getBriefStoreList().then(res => {
         this.storeList = res.data
         console.log('this.storeList =========>>>> ', this.storeList);
+        this.searchStoreData = [...this.storeList]
+        
+        console.log('this.searchStoreData =========>>>> ', this.searchStoreData);
+
+        var p = this.searchStoreData.map(p => p.province)
+        const pppSet = new Set(p)
+        this.provinceAry = [...pppSet]
+
+        var c = this.searchStoreData.map(c => c.city)
+        const cccSet = new Set(c)
+        this.cityAry = [...cccSet]
+
       })
     },
-    getPersonScheduleData(){
+    async getPersonScheduleData(){
       var param = {
-        "taskGroupUuid": "task_group_1676047037"
+        taskGroupUuid: this.scheduleStatus.taskGroupUuid
         }
-      scheduleRESTful.getPersonScheduleData(param).then(res =>{
+      await scheduleRESTful.getPersonScheduleData(param).then(res =>{
           if(res.errCode == 0){
             res.data.forEach(i => {
               this.storeList.forEach(store => {
@@ -605,6 +669,7 @@ export default{
                   // i.remindTime = this.getdate(i.remindTime)
                   i.remindDate = this.getdate(i.remindTime)
                   i.remindTimePoint = this.getTimePoint(i.remindTime)
+                  i.checked = false
                   i.remindStyle = []
                   if(i.remindMode_Currently == true) i.remindStyle.push("remindMode_Currently")
                   if(i.remindMode_OneDay == true) i.remindStyle.push("remindMode_OneDay")
@@ -614,58 +679,46 @@ export default{
               
             });
             this.scheduleDataList = res.data
-            console.log('ScheduleData =========>> ', res.data);
+            console.log('this.scheduleDataList =========>> ', res.data);
 
           }
         }
       )
     },
 
+    // SAVE
     saveScheduleData(){
-
-      console.log('this.scheduleDataList =======>> ', this.scheduleDataList);
+      console.log('this.scheduleDataList =======>> 1', this.scheduleDataList);
 
       var param = {}
       param.taskList = [...this.scheduleDataList]
-      param.userId = "dEJ9y1Jy02KZ"
-      param.inspectTagId= 872
-      param.taskName= "20230210給三井-1",
-      param.taskGroupUuid = "task_group_1676047037"
-
+      param.taskGroupUuid = this.scheduleStatus.taskGroupUuid
+      param.userId = this.scheduleStatus.userId
+  
+      param.inspectTagId= 643
+      param.taskName= "排排程排一排",
+      
       param.taskList.forEach(i => {
-        i.taskId = i.id
-        console.log('i.remindStyle :>> ', i.remindStyle);
+        i.taskId = i.hasOwnProperty("id") ? i.id : -999
         i.isRemindModeCurrently = i.remindStyle.includes('remindMode_Currently') ? true : false
         i.isRemindModeOneHour = i.remindStyle.includes('remindMode_OneHour') ? true : false
         i.isRemindModeOneDay = i.remindStyle.includes('remindMode_OneDay') ? true : false
-        // delete i.accountId
-        // delete i.storeName
-        // delete i.reportId
-        // delete i.remindDate
-        // delete i.remindTimePoint
-        // delete i.remindStyle
-        // delete i.taskName
-        // delete i.userId
-        // delete i.taskGroupUuid
-        // delete i.inspectTagId
-        // delete i.id
-        // delete i.remindMode_OneDay
-        // delete i.remindMode_OneHour
-        // delete i.remindMode_Currently
+        // i.taskId = i.hasOwnProperty(taskId) ? i.id : -999
+
+        var t = i.remindDate + " " + i.remindTimePoint
+        var d =  new Date(t)
+        i.remindTime = d.getTime()
+
       })
 
-      console.log('param 1  =======>> ', param);
-
+      console.log('param for save =======>> ', param)
       scheduleRESTful.saveScheduleData(param).then(res =>{
         if(res.errCode === 0){
-            console.log("this.scheduleDataList====>", this.scheduleDataList)
+            console.log("this.scheduleDataList====> 2", this.scheduleDataList)
         }
       })
 
     },
-
-
-
 
     pad2(n){
       return (n < 10 ? '0' : '') + n;
@@ -685,22 +738,102 @@ export default{
       return hour +":"+ min +":"+ sec
     },
 
-    confirmAddStoreDialog(){
-    },
+    
+    
     hideAddStoreDialog(key){
       this[key] = false;
+
+      this.inputSearchStore = ''
+      this.curTempProvinceList = ''
+      this.curTempCityList = ''
+      // 清除所有勾選
+      this.$refs.storeDataList.clear()
     },
+
+    hideEditStoreDialog(key){
+      this[key] = false;
+    },
+    
+    handleSelectionChange(val){
+      console.log('handleSelectionChange val :>> ', val.val);
+      // tag 用
+      this.selectStoreTags = val.val
+
+      this.tags = this.selectStoreTags.map(_item => ({
+          name : _item.name,
+          type: 'info'
+        }))
+      // console.log('this.tags', this.tags)
+
+      // 顯示頁面用
+      this.addStoreTemp = val.val.map((_item, index, array) => (
+        {
+          taskId: -999,
+          storeId: _item.storeId,
+          storeName: _item.name,
+          isRemindModeOneDay: false,
+          isRemindModeOneHour: false,
+          isRemindModeCurrently: false,
+          remindTime: ''
+        }
+      ))
+    },
+
     // 刪除 tag
     handleClose(tag){
       console.log('tag--->', tag)
-    },
-    handleSelectionChange(val){
-      console.log('handleSelectionChange val :>> ', val);
+      this.tags.splice(this.tags.indexOf(tag), 1);
+      this.$refs.storeDataList.toggleChecked_store(tag)
+
+
     },
 
-    
-  
+    confirmAddStoreDialog(){
+      console.log('confirmAddStoreDialog --->')
+      this.showingAddStore = false
+      this.scheduleDataList = [...this.addStoreTemp, ...this.scheduleDataList]
 
+      console.log('this.scheduleDataList', this.scheduleDataList)
+      this.$refs.storeDataList.clear()
+
+    },
+
+    confirmEditStoreDialog(){
+      console.log('confirmEditStoreDialog --->')
+    },
+
+
+    handleCheckboxChange(val){
+      if(val.checked == true) {
+        this.handleSchedule.push(val)
+      } else if (val.checked == false){
+
+        var n = this.handleSchedule.findIndex(i => i.checked == false)
+        this.handleSchedule.splice(n, 1)
+      }
+      console.log('this.handleSchedule', this.handleSchedule)
+    },
+
+    deleteSchedule(){
+      // console.log('this.scheduleDataList', this.scheduleDataList)
+      let deltedId = this.handleSchedule.map(a => a.id)
+      let deletedSchedule = this.scheduleDataList.filter(b => !deltedId.includes(b.id))
+      this.scheduleDataList = deletedSchedule
+            
+    },
+    resetData(val){
+      console.log('val', val)
+      this.scheduleDataList.forEach( i => {
+        if(i.id == val.id){
+          i.remindTime = ''
+          i.remindDate = ''
+          i.remindTimePoint = ''
+          i.remindStyle = []
+
+        }
+      })
+
+    }
   }
 }
 </script>

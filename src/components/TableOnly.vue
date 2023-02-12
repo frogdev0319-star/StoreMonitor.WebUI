@@ -689,6 +689,19 @@ export default {
       
     },
 
+    toggleChecked_store(tag){
+      console.log('unChecked')
+      console.log('tag !!!', tag)
+      console.log('this.tableData !!!', this.tableData)
+
+      var row = this.tableData.filter(element => 
+          element.name == tag.name
+      );
+      console.log('row', row)
+      this.$refs.tablePagination.toggleRowSelection(row[0])
+      
+    },
+
     fromInputSelect(data){
       // console.log('data~~~>', data)
       var temp = []

@@ -254,6 +254,7 @@ export default{
             });
         },
         addNewSchedule(){
+            sessionStorage.removeItem('scheduleParams')
             this.$router.push({ name: 'CreateSchedule', params: { userId: this.userId,userName:this.person}});
         },
         deleteSchedule(){
@@ -285,6 +286,8 @@ export default{
         handleOperation({ method, row }) {
             let params= { userId: this.userId,taskGroupUuid: row.taskGroupUuid };
             console.log("handleOperation params:",params);
+            sessionStorage.setItem('scheduleParams', JSON.stringify(params))
+            
             switch(method){
                 case 'copy':{
                     this.doCopyScheduleTask(row.taskGroupUuid);
