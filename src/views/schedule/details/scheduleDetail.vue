@@ -41,32 +41,29 @@
               <div class="title-name"><span style="color: #c60957">* </span> 巡檢表</div>
               <div class="title-status" style="margin-right: 10px"> 
                 <el-select
-                  :value="scheduleStatus.tagNameMode" 
+                  v-model="inspectionMode" 
                   placeholder="巡檢表"
                   style="width: 250px"
-                  disabled
-
                   >
                   <el-option
-                    v-for="(item, index) in inspectionStyle"
+                    v-for="(_item, index) in inspectionStyle"
                     :key="index"
-                    :label="item"
-                    :value="item"
+                    :label="_item.label"
+                    :value="_item.value"
                   />
                 </el-select>
               </div>
               <div class="title-status"> 
                 <el-select
-                  :value="scheduleStatus.tagName" 
+                  v-model="inspectionName" 
                   placeholder="巡檢表名稱"
                   style="width: 250px"
-                  disabled
                   >
                   <el-option
-                    v-for="(item, index) in templateList"
+                    v-for="(_item, index) in inspectTypeList"
                     :key="index"
-                    :label="item"
-                    :value="item"
+                    :label="_item.name"
+                    :value="_item.id"
                   />
                 </el-select>
               </div>
@@ -188,6 +185,7 @@
                       type="date"
                       value-format="yyyy-MM-dd"
                       :picker-options="pickerOptions"
+                      :disabled="(item.remindTime < Date.now() && item.remindTime !== '' )"
                       placeholder="提醒日期">
                     </el-date-picker>
                   </div>
@@ -201,6 +199,7 @@
                         step: '01:00',
                         end: '23:00'
                       }"
+                      :disabled="(item.remindTime < Date.now() && item.remindTime !== '')"
                       placeholder="提醒時間">
                     </el-time-select>
                   </div>
@@ -213,6 +212,7 @@
                       :placeholder="$t('audit.workFlows.inspectionForm')"
                       multiple
                       filterable
+                      :disabled="(item.remindTime < Date.now() && item.remindTime !== '')"
                       style="width:300px"
                       >
                       <el-option
@@ -226,8 +226,10 @@
                   </div>
                   <div class="remider_setting flex-column">
                     <div 
+                    v-if="(item.remindTime > Date.now())"
                     class="clear_all"
                     @click="resetData(item)"
+                    
                     >重設</div> 
                   </div>
                 </div>
@@ -422,6 +424,7 @@
 import { mapGetters } from 'vuex';
 import {scheduleRESTful} from '@/api/index';
 import { getBriefStoreList} from '@/api/store';
+import {  GetInspectTagList } from '@/api/inspect';
 import DateTimeSelector from '@/components/DateTimeSelector';
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
@@ -476,8 +479,8 @@ export default{
         remindDate:'',
         remindTimePoint:'',
         remindStyle:[]
-
       },
+      
         
   
       // ======
@@ -527,7 +530,7 @@ export default{
       inputSearchStoreList:'',
       showSelectionColumn: true,
     // ======
-    
+      
       inputSearchValue:'',
       dateValue:[],
       tableData:[{schName:'1',tagName:'test',incepNum:3,startDate:'2023/01/01',endDate:'2023/01/02'}],
@@ -550,16 +553,29 @@ export default{
         ]
       },
       loading: false,
-      isLoadingData: false,
+      isLoadingData: true,
       total:0,
       curPage:1,
       curSizeNum:10,
       defaultSort:{prop: 'startDate', order: 'descending'},
-      inspectionStyle: ['現場巡檢','遠端巡檢'],
+
+      inspectionMode:'',
+      inspectionName:'',
+      inspectionStyle: [
+        {
+          value : 1,
+          label: '現場巡檢'
+        },
+        {
+          value : 0,
+          label: '遠端巡檢'
+        },
+      ],
+      allInspectTypeList: [],
+      inspectTypeList: [],
 
       pickerOptions: {
         disabledDate(time) {
-            console.log('time :>> ', time);
             return Date.now() > time.getTime()  ;
           }
       }
@@ -570,13 +586,20 @@ export default{
     ...mapGetters({ accountChanged: 'accountChanged' })
   },
   watch:{
-    scheduleDataList(val){
-      // console.log('watch val ======>> ', val);
-      this.hasScheduleData = val.length == 0 ? false : true
-    },
     handleSchedule(val){
       this.isActive = val.length == 0 ? false : true
+    },
+
+    inspectionMode(val){
+      console.log('inspectionMode val', val)
+      this.inspectTypeList = [...this.allInspectTypeList]
+      this.inspectTypeList = this.inspectTypeList.filter( i => i.mode === val)
+    },
+
+    inspectionName(val){
+      console.log('inspectionName val', val)
     }
+
 
   },
   mounted() {
@@ -634,27 +657,51 @@ export default{
 
     async init(){
       await this.getBriefStoreList();
+      await this.getTagAll()
+
       var status = sessionStorage.getItem('scheduleParams');
       this.scheduleStatus = JSON.parse(status)
-      console.log('this.scheduleStatus  =========>>', this.scheduleStatus)
-
-      if(this.scheduleStatus){
-        this.taskName = this.scheduleStatus.taskName
-        this.scheduleStatus.tagNameMode = this.scheduleStatus.tagNameMode.slice(0, 4)
-      }
+      console.log('this.scheduleStatus  !!=========>>', this.scheduleStatus)
       
+      if(this.scheduleStatus.action == "editSchedule"){
+        
+        this.hasScheduleData = true
 
-      if(this.scheduleStatus){
-          this.hasScheduleData = true
-          
-          await this.getPersonScheduleData();
-          
-      }else {
+        this.taskName = this.scheduleStatus.taskName
+        this.inspectionName = this.scheduleStatus.tagName
+        var status =  this.allInspectTypeList.find( d => d.name == this.scheduleStatus.tagName)
+        this.inspectionMode = status.mode
+        this.inspectionName = status.name
+        
+        await this.getPersonScheduleData();
+      }
+      else if(this.scheduleStatus.action == "addSchedule"){
         this.hasScheduleData = false
       }
+      this.isLoadingData = false
       
     },
 
+    // 取得巡檢表
+    getTagAll() {
+      return new Promise((resolve, reject) => {
+        GetInspectTagList().then(res => {
+          const data = res.data;
+          resolve(data);
+
+          this.allInspectTypeList = data.map(i => ({
+            id: i.id,
+            name: i.name,
+            mode: i.mode
+          }))
+          console.log(' this.allInspectTypeList =========>>>> ',  this.allInspectTypeList)
+          
+        }).catch(err => {
+          reject(err);
+        });
+      });
+  },
+  
 
     async getBriefStoreList() {
       await getBriefStoreList().then(res => {
@@ -705,24 +752,54 @@ export default{
 
     // SAVE
     saveScheduleData(){
-      // this.isLoadingData = true
+      this.isLoadingData = true
       console.log('this.scheduleDataList =======>> 1', this.scheduleDataList);
+      console.log('this.scheduleStatus', this.scheduleStatus)
 
+      if(this.taskName == ''){
+        util.notify("排程名稱不可為空", 'error', 2000 );
+        this.isLoadingData = false
+        return
+      }
+
+      if(this.inspectionName == ''){
+        util.notify("請選擇巡檢表", 'error', 2000 );
+        this.isLoadingData = false
+        return
+      }
+
+      if(this.scheduleDataList.length < 1){
+        util.notify("請至少設定一筆排程！", 'error', 2000 );
+        this.isLoadingData = false
+        return
+      }
+
+    
       var param = {}
       param.taskList = [...this.scheduleDataList]
-      param.taskGroupUuid = this.scheduleStatus.taskGroupUuid
-      param.userId = this.scheduleStatus.userId
-  
-      param.inspectTagId= this.scheduleDataList[0].inspectTagId
-      param.taskName= this.taskName
       
+      var status =  this.allInspectTypeList.find( d => d.name == this.scheduleStatus.tagName)
+      
+      if(this.scheduleStatus.action == "addSchedule"){
+        console.log('addSchedule')
+        param.userId = this.scheduleStatus.userId
+        param.inspectTagId = this.inspectionName
+        param.taskName = this.taskName
+      } 
+      else if(this.scheduleStatus.action == "editSchedule"){
+        console.log('editSchedule')
+        param.userId = this.scheduleStatus.userId
+        param.inspectTagId = status.id
+        param.taskName = this.taskName
+        param.taskGroupUuid = this.scheduleStatus.taskGroupUuid
+      }
+      
+
       param.taskList.forEach(i => {
         i.taskId = i.hasOwnProperty("id") ? i.id : -999
         i.isRemindModeCurrently = i.remindStyle.includes('remindMode_Currently') ? true : false
         i.isRemindModeOneHour = i.remindStyle.includes('remindMode_OneHour') ? true : false
         i.isRemindModeOneDay = i.remindStyle.includes('remindMode_OneDay') ? true : false
-        // i.taskId = i.hasOwnProperty(taskId) ? i.id : -999
-
         var t = i.remindDate + " " + i.remindTimePoint
         var d =  new Date(t)
         i.remindTime = d.getTime()
@@ -741,14 +818,14 @@ export default{
         util.notify("請至少設定一筆排程！", 'error', 2000 );
         return
       }
-      // scheduleRESTful.saveScheduleData(param).then(res =>{
-      //   if(res.errCode === 0){
-      //       console.log("this.scheduleDataList====> 2", this.scheduleDataList)
-      //       this.isLoadingData = false
-      //       util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
-      //   }
-      // })
 
+      scheduleRESTful.saveScheduleData(param).then(res =>{
+        if(res.errCode === 0){
+            console.log("this.scheduleDataList====> 2", this.scheduleDataList)
+            this.isLoadingData = false
+            util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
+        }
+      })
     },
 
     pad2(n){
@@ -824,6 +901,7 @@ export default{
 
       console.log('this.scheduleDataList', this.scheduleDataList)
       this.$refs.storeDataList.clear()
+      this.hasScheduleData = true
 
     },
 
@@ -891,12 +969,12 @@ export default{
 
 <style scoped lang="sass">
   .btn_disable
-    border: 1px solid #c0c0c0 !important
-    color: #c0c0c0 !important
+    border: 1px solid #C0C4CA !important
+    color: #C0C4CA !important
     pointer-events: none !important
     &:hover
-      background: #c0c0c0 !important
-      color: #c0c0c0 !important
+      background: #C0C4CA !important
+      color: #C0C4CA !important
   .flex-row
     display: flex
     flex-direction: row

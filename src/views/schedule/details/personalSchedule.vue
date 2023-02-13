@@ -259,6 +259,12 @@ export default{
         },
         addNewSchedule(){
             sessionStorage.removeItem('scheduleParams')
+
+            let params= {
+                action: 'addSchedule',
+                userId: this.userId, 
+            };
+            sessionStorage.setItem('scheduleParams', JSON.stringify(params))
             this.$router.push({ name: 'CreateSchedule', params: { userId: this.userId,userName:this.person}});
         },
         deleteSchedule(){
@@ -281,14 +287,16 @@ export default{
             this.showConfirmDelete = false;
             scheduleRESTful.deletePersonTaskList({taskGroupUuidArray:this.SelSchedulId}).then(res=>{
                 if(res.errCode==0){
-                   this.doSearchScheduleList();
+                    this.doSearchScheduleList();
                 }else{
                     util.notify(this.$t('schedule.deletePersonSchError'), 'error', 2000);
                 }
             })
         },
         handleOperation({ method, row }) {
+            sessionStorage.removeItem('scheduleParams')
             let params= { 
+                action: 'editSchedule',
                 userId: this.userId, 
                 taskGroupUuid: row.taskGroupUuid,  
                 taskName: row.taskName,
