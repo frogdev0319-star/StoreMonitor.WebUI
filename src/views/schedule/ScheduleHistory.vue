@@ -541,6 +541,7 @@ export default{
         }
     }
     .scheduleLlist-area{
+       width: 100%;
         background-color: #FFF;
         border-radius: 5px;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
@@ -554,6 +555,7 @@ export default{
             align-items: center;
         }
         .tbl-schedule{
+           width:100%;
             border: none;
             margin-top: 40px;
             /deep/ .el-table__header-wrapper .el-table-column--selection{
@@ -624,6 +626,7 @@ export default{
     .el-table{
         border:none;
         box-shadow: none;
+        width: 100% !important;
     }
     /deep/
       .el-table th .cell{
