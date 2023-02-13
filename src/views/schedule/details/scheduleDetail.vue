@@ -28,6 +28,7 @@
               <div class="title-name"><span style="color: #c60957">* </span>排程名稱</div>
               <div class="title-status"> 
                 <el-input
+                  v-model="taskName"
                   ref="inputName"
                   class="ppip"
                   style="width: 250px"
@@ -40,9 +41,10 @@
               <div class="title-name"><span style="color: #c60957">* </span> 巡檢表</div>
               <div class="title-status" style="margin-right: 10px"> 
                 <el-select
-                  :value="ddd" 
+                  :value="scheduleStatus.tagNameMode" 
                   placeholder="巡檢表"
                   style="width: 250px"
+                  disabled
 
                   >
                   <el-option
@@ -55,9 +57,10 @@
               </div>
               <div class="title-status"> 
                 <el-select
-                  :value="ddd" 
+                  :value="scheduleStatus.tagName" 
                   placeholder="巡檢表名稱"
                   style="width: 250px"
+                  disabled
                   >
                   <el-option
                     v-for="(item, index) in templateList"
@@ -234,7 +237,6 @@
     </div>
 
 
-
     <!-- Add Store -->
     <dialog-pop
       ref="dailog"
@@ -336,6 +338,7 @@
       </div>
     </dialog-pop>
 
+
     <!-- Edit Store -->
     <dialog-pop
       ref="dailog"
@@ -355,8 +358,9 @@
               
               <p style="font-size: 14px; font-weight: 900"><span style="color: #f31d65">*</span> 提醒日期</p>
               <el-date-picker
-                v-model="value1"
+                v-model="editSchedule.remindDate"
                 type="date"
+                value-format="yyyy-MM-dd"
                 placeholder="提醒日期">
               </el-date-picker>
             </div>
@@ -364,7 +368,7 @@
             <div class="remider_setting flex-column">
               <p style="font-size: 14px; font-weight: 900"><span style="color: #f31d65">*</span>提醒時間</p>
               <el-time-select
-                v-model="value2"
+                v-model="editSchedule.remindTimePoint"
                 :picker-options="{
                   start: '00:00',
                   step: '01:00',
@@ -379,14 +383,13 @@
             <div class="remider_setting flex-column">
               <p style="font-size: 14px; font-weight: 900"><span style="color: #f31d65">*</span>提醒方式</p>
               <el-select
-                v-model="vvv"
+                v-model="editSchedule.remindStyle"
                 multiple
                 filterable
                 :loading="loading" 
                 style="width:300px">
                 <el-option
                     v-for= "(selected, index) in selectRemiderStyle"
-
                     :label= "selected.label"
                     :value= "selected.value"
                     :key= "index"
@@ -398,7 +401,7 @@
           <div class="memo_setting">
             <!-- 已選門店總數 -->
             <div class="remider_setting flex-column">
-              <p style="font-size: 14px; font-weight: 900">已選門店總數：10</p>
+              <p style="font-size: 14px; font-weight: 900">已選門店總數： {{ handleSchedule.length}}</p>
               <div class="selected_stores flex-column">
                 <div class="store_name" v-for= "(_store, index) in handleSchedule" :key="index">{{_store.storeName}}</div>
 
@@ -437,16 +440,13 @@ export default{
       ddd: '',
       tempboolean_1: false,
       tempboolean_2: false,
-      value1: '',
-      value2: '',
-      value3: [],
-      vvv: ["remindMode_OneDay"],
+    
 
       templateList:['aaa','bbb','ccc'],
       
       
       // ====== !! ======
-
+      taskName:'',
       scheduleStatus:'',
       hasScheduleData: true,
       scheduleDataList:[],
@@ -468,9 +468,15 @@ export default{
       storeList: [],
       emptyData: require('../../../../static/img/icon_data.svg'),
       handleSchedule: [],
-
-
       
+      editSchedule:{
+        remindDate:'',
+        remindTimePoint:'',
+        remindStyle:[]
+
+      },
+        
+  
       // ======
       add_width: "1000",
       edit_width: "500",
@@ -557,7 +563,10 @@ export default{
     ...mapGetters({ accountChanged: 'accountChanged' })
   },
   watch:{
-
+    scheduleDataList(val){
+      // console.log('watch val ======>> ', val);
+      this.hasScheduleData = val.length == 0 ? false : true
+    }
   },
   mounted() {
     this.showSearchStoreData = this.searchStoreData
@@ -582,7 +591,6 @@ export default{
         console.log('val', val)
 			}
     }
-
   },
 
   async created() {
@@ -613,16 +621,14 @@ export default{
       }
     }, 
 
-
-
-
     async init(){
-      
       await this.getBriefStoreList();
-
       var status = sessionStorage.getItem('scheduleParams');
       this.scheduleStatus = JSON.parse(status)
       console.log('this.scheduleStatus  =========>>', this.scheduleStatus)
+
+      this.taskName = this.scheduleStatus.taskName
+      this.scheduleStatus.tagNameMode = this.scheduleStatus.tagNameMode.slice(0, 4)
 
       if(this.scheduleStatus){
           this.hasScheduleData = true
@@ -632,8 +638,6 @@ export default{
       }else {
         this.hasScheduleData = false
       }
-        
-  
       
     },
 
@@ -680,7 +684,6 @@ export default{
             });
             this.scheduleDataList = res.data
             console.log('this.scheduleDataList =========>> ', res.data);
-
           }
         }
       )
@@ -688,6 +691,7 @@ export default{
 
     // SAVE
     saveScheduleData(){
+      this.isLoadingData = true
       console.log('this.scheduleDataList =======>> 1', this.scheduleDataList);
 
       var param = {}
@@ -695,8 +699,8 @@ export default{
       param.taskGroupUuid = this.scheduleStatus.taskGroupUuid
       param.userId = this.scheduleStatus.userId
   
-      param.inspectTagId= 643
-      param.taskName= "排排程排一排",
+      param.inspectTagId= this.scheduleDataList[0].inspectTagId
+      param.taskName= this.taskName
       
       param.taskList.forEach(i => {
         i.taskId = i.hasOwnProperty("id") ? i.id : -999
@@ -715,6 +719,8 @@ export default{
       scheduleRESTful.saveScheduleData(param).then(res =>{
         if(res.errCode === 0){
             console.log("this.scheduleDataList====> 2", this.scheduleDataList)
+            this.isLoadingData = false
+            util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
         }
       })
 
@@ -784,8 +790,6 @@ export default{
       console.log('tag--->', tag)
       this.tags.splice(this.tags.indexOf(tag), 1);
       this.$refs.storeDataList.toggleChecked_store(tag)
-
-
     },
 
     confirmAddStoreDialog(){
@@ -799,7 +803,24 @@ export default{
     },
 
     confirmEditStoreDialog(){
-      console.log('confirmEditStoreDialog --->')
+      console.log('this.editSchedule :>> ', this.editSchedule);
+      console.log('this.handleSchedule :>> ', this.handleSchedule);
+
+      let needEditId = this.handleSchedule.map(_item => _item.id)
+      console.log('needEditId :>> ', needEditId);
+
+      this.scheduleDataList.forEach(_item => {
+        needEditId.forEach(id => {
+          if(_item.id == id){
+            _item.remindDate = this.editSchedule.remindDate
+            _item.remindTimePoint = this.editSchedule.remindTimePoint
+            _item.remindStyle = this.editSchedule.remindStyle
+          }
+        })
+      })
+      console.log('this.scheduleDataList :>> ', this.scheduleDataList);
+      this.showingEditStore = false
+
     },
 
 

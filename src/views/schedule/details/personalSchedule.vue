@@ -171,6 +171,7 @@ export default{
         enableDeleteBtn:false,
         SelSchedulId:[],
         showConfirmDelete:false,
+
       }
     },
     computed: {
@@ -238,11 +239,14 @@ export default{
                   obj['taskFinalStr']=(item.taskFinal==0)?'-':self.$moment.utc(self.$moment(item.taskFinalS)).format("YYYY/MM/DD hh:mm:ss");//util.getDateStr(item.taskFinal),
                   obj['updateUserName']=(item.updateUserName == "NONE")?'-':item.updateUserName,
                   userData.push(obj);
+                  
                 });
                 self.tableData = [];
                 self.tableData = userData;
                 self.total = res.data.totalPages;
                 self.isLoadingData = false;
+                
+                
               }else{
                 util.notify(self.$t('schedule.getScheduleSettingFail'), 'error', 3000);
               }
@@ -284,9 +288,16 @@ export default{
             })
         },
         handleOperation({ method, row }) {
-            let params= { userId: this.userId,taskGroupUuid: row.taskGroupUuid };
+            let params= { 
+                userId: this.userId, 
+                taskGroupUuid: row.taskGroupUuid,  
+                taskName: row.taskName,
+                tagName: row.tagName,
+                tagNameMode: row.tagNameMode
+            };
             console.log("handleOperation params:",params);
             sessionStorage.setItem('scheduleParams', JSON.stringify(params))
+            console.log('row :>> ', row);
             
             switch(method){
                 case 'copy':{
