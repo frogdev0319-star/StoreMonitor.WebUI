@@ -49,3 +49,21 @@ export const getSchedulePersonList = data => {
       data
     });
   };
+
+  
+  export const getPersonScheduleData = data => {
+    return request({
+      url: `${version}/report/schedule/person/task/fetch`,
+      method: 'post',
+      data
+    });
+  };
+
+
+  export const saveScheduleData = data => {
+    return request({
+      url: `${version}/report/schedule/person/task/save`,
+      method: 'post',
+      data
+    });
+  };

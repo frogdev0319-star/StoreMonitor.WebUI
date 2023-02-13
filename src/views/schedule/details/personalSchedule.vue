@@ -171,6 +171,7 @@ export default{
         enableDeleteBtn:false,
         SelSchedulId:[],
         showConfirmDelete:false,
+
       }
     },
     computed: {
@@ -238,11 +239,14 @@ export default{
                   obj['taskFinalStr']=(item.taskFinal==0)?'-':self.$moment.utc(self.$moment(item.taskFinalS)).format("YYYY/MM/DD hh:mm:ss");//util.getDateStr(item.taskFinal),
                   obj['updateUserName']=(item.updateUserName == "NONE")?'-':item.updateUserName,
                   userData.push(obj);
+                  
                 });
                 self.tableData = [];
                 self.tableData = userData;
                 self.total = res.data.totalPages;
                 self.isLoadingData = false;
+                
+                
               }else{
                 util.notify(self.$t('schedule.getScheduleSettingFail'), 'error', 3000);
               }
@@ -254,6 +258,13 @@ export default{
             });
         },
         addNewSchedule(){
+            sessionStorage.removeItem('scheduleParams')
+
+            let params= {
+                action: 'addSchedule',
+                userId: this.userId, 
+            };
+            sessionStorage.setItem('scheduleParams', JSON.stringify(params))
             this.$router.push({ name: 'CreateSchedule', params: { userId: this.userId,userName:this.person}});
         },
         deleteSchedule(){
@@ -276,15 +287,26 @@ export default{
             this.showConfirmDelete = false;
             scheduleRESTful.deletePersonTaskList({taskGroupUuidArray:this.SelSchedulId}).then(res=>{
                 if(res.errCode==0){
-                   this.doSearchScheduleList();
+                    this.doSearchScheduleList();
                 }else{
                     util.notify(this.$t('schedule.deletePersonSchError'), 'error', 2000);
                 }
             })
         },
         handleOperation({ method, row }) {
-            let params= { userId: this.userId,taskGroupUuid: row.taskGroupUuid };
+            sessionStorage.removeItem('scheduleParams')
+            let params= { 
+                action: 'editSchedule',
+                userId: this.userId, 
+                taskGroupUuid: row.taskGroupUuid,  
+                taskName: row.taskName,
+                tagName: row.tagName,
+                tagNameMode: row.tagNameMode
+            };
             console.log("handleOperation params:",params);
+            sessionStorage.setItem('scheduleParams', JSON.stringify(params))
+            console.log('row :>> ', row);
+            
             switch(method){
                 case 'copy':{
                     this.doCopyScheduleTask(row.taskGroupUuid);
