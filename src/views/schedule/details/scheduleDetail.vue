@@ -111,6 +111,8 @@
             class="blue_border"
             type="primary"
             size="mini"
+            :class="{ btn_disable: !isActive }"
+            :disable="!isActive"
             @click="showingEditStore = true"
             >
             <span>編輯</span>
@@ -121,13 +123,14 @@
             class="blue_border"
             type="primary"
             size="mini"
+            :class="{ btn_disable: !isActive }"
+            :disable="!isActive"
             @click="deleteSchedule"
             >
             <span>刪除</span>
           </delay-button>
         </div>
       </div>
-
 
       <div v-loading="isLoadingData" class="setting-details self-loading">
         <!-- 暫無數據 -->
@@ -162,7 +165,6 @@
                 style="margin-right: 8px"
               />
               <span class="group-name">桃園市 - 龜山區</span>
-              
             </div>
             
             <div class="task_list flex-column">
@@ -185,6 +187,7 @@
                       v-model="item.remindDate"
                       type="date"
                       value-format="yyyy-MM-dd"
+                      :picker-options="pickerOptions"
                       placeholder="提醒日期">
                     </el-date-picker>
                   </div>
@@ -440,14 +443,14 @@ export default{
       ddd: '',
       tempboolean_1: false,
       tempboolean_2: false,
-    
-
+  
       templateList:['aaa','bbb','ccc'],
-      
-      
       // ====== !! ======
+      isActive: false,
+
       taskName:'',
-      scheduleStatus:'',
+      scheduleStatus: {},
+      
       hasScheduleData: true,
       scheduleDataList:[],
       
@@ -522,9 +525,6 @@ export default{
       cityAry:[],
 
       inputSearchStoreList:'',
-
-
-
       showSelectionColumn: true,
     // ======
     
@@ -556,6 +556,13 @@ export default{
       curSizeNum:10,
       defaultSort:{prop: 'startDate', order: 'descending'},
       inspectionStyle: ['現場巡檢','遠端巡檢'],
+
+      pickerOptions: {
+        disabledDate(time) {
+            console.log('time :>> ', time);
+            return Date.now() > time.getTime()  ;
+          }
+      }
       
     }
   },
@@ -566,7 +573,11 @@ export default{
     scheduleDataList(val){
       // console.log('watch val ======>> ', val);
       this.hasScheduleData = val.length == 0 ? false : true
+    },
+    handleSchedule(val){
+      this.isActive = val.length == 0 ? false : true
     }
+
   },
   mounted() {
     this.showSearchStoreData = this.searchStoreData
@@ -627,8 +638,11 @@ export default{
       this.scheduleStatus = JSON.parse(status)
       console.log('this.scheduleStatus  =========>>', this.scheduleStatus)
 
-      this.taskName = this.scheduleStatus.taskName
-      this.scheduleStatus.tagNameMode = this.scheduleStatus.tagNameMode.slice(0, 4)
+      if(this.scheduleStatus){
+        this.taskName = this.scheduleStatus.taskName
+        this.scheduleStatus.tagNameMode = this.scheduleStatus.tagNameMode.slice(0, 4)
+      }
+      
 
       if(this.scheduleStatus){
           this.hasScheduleData = true
@@ -691,7 +705,7 @@ export default{
 
     // SAVE
     saveScheduleData(){
-      this.isLoadingData = true
+      // this.isLoadingData = true
       console.log('this.scheduleDataList =======>> 1', this.scheduleDataList);
 
       var param = {}
@@ -712,17 +726,28 @@ export default{
         var t = i.remindDate + " " + i.remindTimePoint
         var d =  new Date(t)
         i.remindTime = d.getTime()
-
       })
 
       console.log('param for save =======>> ', param)
-      scheduleRESTful.saveScheduleData(param).then(res =>{
-        if(res.errCode === 0){
-            console.log("this.scheduleDataList====> 2", this.scheduleDataList)
-            this.isLoadingData = false
-            util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
+
+      param.taskList.forEach(i => {
+        if(!i.remindTime ||  i.remindDate == '' || i.remindTimePoint == ''){
+          util.notify("門店排程提提醒日期或時間不可為空！", 'error', 2000 );
+          return
         }
       })
+
+      if(param.taskList.length < 1){
+        util.notify("請至少設定一筆排程！", 'error', 2000 );
+        return
+      }
+      // scheduleRESTful.saveScheduleData(param).then(res =>{
+      //   if(res.errCode === 0){
+      //       console.log("this.scheduleDataList====> 2", this.scheduleDataList)
+      //       this.isLoadingData = false
+      //       util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
+      //   }
+      // })
 
     },
 
@@ -836,10 +861,15 @@ export default{
     },
 
     deleteSchedule(){
-      // console.log('this.scheduleDataList', this.scheduleDataList)
+      console.log('this.scheduleDataList', this.scheduleDataList)
+      if(this.handleSchedule.length === this.scheduleDataList.length  ){
+        util.notify("請至少設定一筆排程！", 'error', 2000 );
+        return
+      }
       let deltedId = this.handleSchedule.map(a => a.id)
       let deletedSchedule = this.scheduleDataList.filter(b => !deltedId.includes(b.id))
       this.scheduleDataList = deletedSchedule
+      this.handleSchedule = []
             
     },
     resetData(val){
@@ -860,6 +890,13 @@ export default{
 </script>
 
 <style scoped lang="sass">
+  .btn_disable
+    border: 1px solid #c0c0c0 !important
+    color: #c0c0c0 !important
+    pointer-events: none !important
+    &:hover
+      background: #c0c0c0 !important
+      color: #c0c0c0 !important
   .flex-row
     display: flex
     flex-direction: row
