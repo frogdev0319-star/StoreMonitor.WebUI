@@ -835,7 +835,7 @@ export default{
         i.isRemindModeCurrently = i.remindStyle.includes('remindMode_Currently') ? true : false
         i.isRemindModeOneHour = i.remindStyle.includes('remindMode_OneHour') ? true : false
         i.isRemindModeOneDay = i.remindStyle.includes('remindMode_OneDay') ? true : false
-        var t = i.remindDate + " " + i.remindTimePoint + " " + "GMT"
+        var t = i.remindDate + " " + i.remindTimePoint 
         // var d =  new Date(t)
         // i.remindTime = d.getTime()
 
