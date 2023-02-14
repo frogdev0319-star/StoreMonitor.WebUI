@@ -599,8 +599,6 @@ export default{
     inspectionName(val){
       console.log('inspectionName val', val)
     }
-
-
   },
   mounted() {
     this.showSearchStoreData = this.searchStoreData
@@ -666,7 +664,6 @@ export default{
       if(this.scheduleStatus.action == "editSchedule"){
         
         this.hasScheduleData = true
-
         this.taskName = this.scheduleStatus.taskName
         this.inspectionName = this.scheduleStatus.tagName
         var status =  this.allInspectTypeList.find( d => d.name == this.scheduleStatus.tagName)
@@ -719,6 +716,12 @@ export default{
         const cccSet = new Set(c)
         this.cityAry = [...cccSet]
 
+
+        //分類縣市
+        var vvv = [...this.storeList]
+        var rrr = vvv.sort((a,b) => a.province > b.province)
+
+        console.log('rrr :>> ', rrr);
       })
     },
     async getPersonScheduleData(){
@@ -800,15 +803,18 @@ export default{
         i.isRemindModeCurrently = i.remindStyle.includes('remindMode_Currently') ? true : false
         i.isRemindModeOneHour = i.remindStyle.includes('remindMode_OneHour') ? true : false
         i.isRemindModeOneDay = i.remindStyle.includes('remindMode_OneDay') ? true : false
-        var t = i.remindDate + " " + i.remindTimePoint
-        var d =  new Date(t)
-        i.remindTime = d.getTime()
+        var t = i.remindDate + " " + i.remindTimePoint + " " + "GMT"
+        // var d =  new Date(t)
+        // i.remindTime = d.getTime()
+
+        // utc time
+        i.remindTime = Date.parse(t)
       })
 
       console.log('param for save =======>> ', param)
 
       param.taskList.forEach(i => {
-        if(!i.remindTime ||  i.remindDate == '' || i.remindTimePoint == ''){
+        if(!i.remindTime ||  i.remindDate == '' || i.remindTimePoint == ''){  
           util.notify("門店排程提提醒日期或時間不可為空！", 'error', 2000 );
           return
         }
@@ -958,10 +964,8 @@ export default{
           i.remindDate = ''
           i.remindTimePoint = ''
           i.remindStyle = []
-
         }
       })
-
     }
   }
 }
