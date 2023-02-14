@@ -412,7 +412,7 @@
             <div class="remider_setting flex-column">
               <p style="font-size: 14px; font-weight: 900">已選門店總數： {{ handleSchedule.length}}</p>
               <div class="selected_stores flex-column">
-                <div class="store_name" v-for= "(_store, index) in handleSchedule" :key="index">{{_store.storeName}}</div>
+                <div class="store_name" v-for="(_store, index) in handleSchedule" :key="index">{{_store.storeName}}</div>
 
               </div>
             </div>
@@ -795,11 +795,11 @@ export default{
         return
       }
 
-      if(this.scheduleDataList.length < 1){
-        util.notify("請至少設定一筆排程！", 'error', 2000 );
-        this.isLoadingData = false
-        return
-      }
+      // if(this.scheduleDataList.length < 1){
+      //   util.notify("請至少設定一筆排程！", 'error', 2000 );
+      //   this.isLoadingData = false
+      //   return
+      // }
 
     
       var param = {
@@ -896,9 +896,7 @@ export default{
       this.$refs.storeDataList.clear()
     },
 
-    hideEditStoreDialog(key){
-      this[key] = false;
-    },
+    
     
     handleSelectionChange(val){
       console.log('handleSelectionChange val :>> ', val.val);
@@ -962,7 +960,6 @@ export default{
 
             this.showScheduleDataList = newArr
             console.log('this.showScheduleDataList', this.showScheduleDataList)
-            this.scheduleStatus.action = "editSchedule"
       }
 
       console.log('this.showScheduleDataList', this.showScheduleDataList)
@@ -992,6 +989,7 @@ export default{
       this.scheduleDataList.forEach(_item => {
         needEditId.forEach(id => {
           if(_item.id == id){
+            _item.checked = false
             _item.remindDate = this.editSchedule.remindDate
             _item.remindTimePoint = this.editSchedule.remindTimePoint
             _item.remindStyle = this.editSchedule.remindStyle
@@ -999,9 +997,15 @@ export default{
         })
       })
       console.log('this.scheduleDataList :>> ', this.scheduleDataList);
+      this.handleSchedule = []
       this.showingEditStore = false
-
     },
+
+    hideEditStoreDialog(key){
+      this[key] = false;
+      this.handleSchedule = []
+    },
+
     selectProvince(val){
       console.log('val', val)
   
