@@ -848,12 +848,14 @@ export default{
       param.taskList.forEach(i => {
         if(!i.remindTime ||  i.remindDate == '' || i.remindTimePoint == ''){  
           util.notify("門店排程提提醒日期或時間不可為空！", 'error', 2000 );
+          this.isLoadingData = false
           return
         }
       })
 
       if(param.taskList.length < 1){
         util.notify("請至少設定一筆排程！", 'error', 2000 );
+        this.isLoadingData = false
         return
       }
 
@@ -896,7 +898,12 @@ export default{
       this.$refs.storeDataList.clear()
     },
 
-    
+    // 刪除 tag
+    handleClose(tag){
+      console.log('tag--->', tag)
+      this.tags.splice(this.tags.indexOf(tag), 1);
+      this.$refs.storeDataList.toggleChecked_store(tag)
+    },
     
     handleSelectionChange(val){
       console.log('handleSelectionChange val :>> ', val.val);
@@ -920,95 +927,109 @@ export default{
           isRemindModeOneDay: false,
           isRemindModeOneHour: false,
           isRemindModeCurrently: false,
-          remindTime: ''
+          remindTime: '',
+          tempId: Math.random().toString(36).slice(2)
         }
       ))
       console.log('this.addStoreTemp', this.addStoreTemp)
     },
 
-    // 刪除 tag
-    handleClose(tag){
-      console.log('tag--->', tag)
-      this.tags.splice(this.tags.indexOf(tag), 1);
-      this.$refs.storeDataList.toggleChecked_store(tag)
-    },
-
     confirmAddStoreDialog(){
       console.log('confirmAddStoreDialog --->')
-      console.log('this.showScheduleDataList', this.showScheduleDataList)
+      console.log('this.showScheduleDataList ::::>>>>', this.showScheduleDataList)
       
       this.showingAddStore = false
       // this.scheduleDataList = [...this.addStoreTemp, ...this.scheduleDataList]
 
       if(this.scheduleStatus.action == "addSchedule") {
-        var noRepeat =  this.searchStoreData.filter((item, index, array) => array.findIndex(s => item.city === s.city) === index)
+        if(this.showScheduleDataList.length == 0){
+          var noRepeat =  this.searchStoreData.filter((item, index, array) => array.findIndex(s => item.city === s.city) === index)
             var newArr = noRepeat.map( s => ({
               city: s.city,
               province: s.province,
               checked: false,
-              taskList: []
+              taskList: [],
+              
             }))
 
             console.log('newArr', newArr)
             newArr.forEach(d => {
-              this.scheduleDataList.forEach( g => {
+              this.addStoreTemp.forEach( g => {
                 if(d.province == g.province && d.city == g.city){
-                  d.taskList.push(g)
+                  d.taskList.unshift(g)
+                  
                 }
               })
             })
-
             this.showScheduleDataList = newArr
-            console.log('this.showScheduleDataList', this.showScheduleDataList)
-      }
-
-      console.log('this.showScheduleDataList', this.showScheduleDataList)
-      
-      this.showScheduleDataList.forEach( i =>{
-        this.addStoreTemp.forEach(t => {
-          if(i.city == t.city && i.province == t.province){
-            i.taskList.unshift(t)
-          }
+        }else{
+          this.showScheduleDataList.forEach( i =>{
+            this.addStoreTemp.forEach(t => {
+              if(i.city == t.city && i.province == t.province){
+                i.taskList.unshift(t)
+              }
+            })
+          })
+        }
+      } 
+      else if(this.scheduleStatus.action == "editSchedule"){
+        this.showScheduleDataList.forEach( i =>{
+          this.addStoreTemp.forEach(t => {
+            if(i.city == t.city && i.province == t.province){
+              i.taskList.unshift(t)
+            }
+          })
         })
-        
-      })
-
-      console.log('this.scheduleDataList', this.scheduleDataList)
+      }
+      console.log('this.showScheduleDataList end', this.showScheduleDataList)
       this.$refs.storeDataList.clear()
       this.hasScheduleData = true
-
     },
 
     confirmEditStoreDialog(){
       console.log('this.editSchedule :>> ', this.editSchedule);
       console.log('this.handleSchedule :>> ', this.handleSchedule);
 
-      let needEditId = this.handleSchedule.map(_item => _item.id)
+      let needEditId = this.handleSchedule.map(_item => _item.storeId)
       console.log('needEditId :>> ', needEditId);
 
-      this.scheduleDataList.forEach(_item => {
-        needEditId.forEach(id => {
-          if(_item.id == id){
-            _item.checked = false
-            _item.remindDate = this.editSchedule.remindDate
-            _item.remindTimePoint = this.editSchedule.remindTimePoint
-            _item.remindStyle = this.editSchedule.remindStyle
+      this.showScheduleDataList.forEach(_item => {
+        _item.taskList.forEach(l => {
+          needEditId.forEach(id => {
+          if(l.storeId == id){
+            l.checked = false
+            l.remindDate = this.editSchedule.remindDate
+            l.remindTimePoint = this.editSchedule.remindTimePoint
+            l.remindStyle = this.editSchedule.remindStyle
           }
         })
+        })
       })
-      console.log('this.scheduleDataList :>> ', this.scheduleDataList);
       this.handleSchedule = []
       this.showingEditStore = false
+
+      this.editSchedule.remindDate = ''
+      this.editSchedule.remindTimePoint = ''
+      this.editSchedule.remindStyle = []
+
     },
 
     hideEditStoreDialog(key){
       this[key] = false;
       this.handleSchedule = []
+      this.showScheduleDataList.forEach(_item => {
+        _item.taskList.forEach(l => {
+          l.checked = false
+        })
+      })
+      this.editSchedule.remindDate = ''
+      this.editSchedule.remindTimePoint = ''
+      this.editSchedule.remindStyle = []
     },
+
 
     selectProvince(val){
       console.log('val', val)
-  
     },
 
     handleCheckboxChange(val){
@@ -1023,21 +1044,38 @@ export default{
     },
 
     deleteSchedule(){
-      console.log('this.scheduleDataList', this.scheduleDataList)
-      if(this.handleSchedule.length === this.scheduleDataList.length ){
+      console.log('delete!!!!! :>>');
+      console.log('this.showScheduleDataList', this.showScheduleDataList)
+
+      var num = 0
+      this.showScheduleDataList.forEach(i => (
+        num = num + i.taskList.length
+      ))
+      console.log('num :>> ', num);
+
+      if(this.handleSchedule.length === num){
         util.notify("請至少設定一筆排程！", 'error', 2000 );
         return
       }
-      
 
-      let deltedId = this.handleSchedule.map(a => a.id)
-      console.log('deltedId', deltedId)
-      let deletedSchedule = this.showScheduleDataList.forEach( i =>{
+      if(this.scheduleStatus.action == "addSchedule"){
+        let deltedId = this.handleSchedule.map(a => a.tempId)
+        console.log('deltedId :>> ', deltedId);
+
+        this.showScheduleDataList.forEach( i =>{
+          i.taskList = i.taskList.filter(b => !deltedId.includes(b.tempId))
+        })
+      }
+      else if(this.scheduleStatus.action == "editSchedule"){
+        let deltedId = this.handleSchedule.map(a => a.id)
+        console.log('deltedId :>> ', deltedId);
+
+        this.showScheduleDataList.forEach( i =>{
           i.taskList = i.taskList.filter(b => !deltedId.includes(b.id))
-      })
-      console.log('deletedSchedule', deletedSchedule)
-
-    
+        })
+      }
+      
+      this.handleSchedule = []
     },
     resetData(val){
       console.log('val', val)
@@ -1260,165 +1298,3 @@ export default{
             margin-left: -28px
             
 </style>
-
-
-
-<!-- <style scoped lang="scss">
-.ScheduleContainer{
-    width:100%;
-    .search-bar{
-        display:flex;
-        flex-direction:row;
-        margin: 0px 0 20px 0px;
-        height:calc(36/1920*100vw);
-        align-items: center;
-        font-size:calc(16/1920*100vw);
-        .keyword-area{
-            display: flex;
-            flex-direction: row;
-            margin-left: calc(32/1980*100vw);
-            align-items: center;
-            .search-label{
-                min-width: 45px;
-                text-align: left;
-                align-self: center;
-                font-family: NotoSansCJKTC;
-                font-size: calc(15/1920*100vw);
-                font-weight: normal;
-                word-break: keep-all;
-                padding-right: 16px;
-
-
-            }
-        }
-        .search-button{
-            margin-left:35px;
-            width: 102px;
-            height: calc(36/1920*100vw);
-            // background-color: #556679;
-            // border-color: #556679;
-            color:#fff;
-            font-size: calc(15/1920*100vw);
-        }
-    }
-    .scheduleLlist-area{
-        background-color: #FFF;
-        border-radius: 5px;
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
-        padding: 20px 26px 48px 24px;
-        .buttons{
-            height: 40px;
-            width: 100%;
-            display: flex;
-            flex-direction: row;
-            justify-content: end;
-            align-items: center;
-        }
-        .tbl-schedule{
-            border: none;
-            margin-top: 20px;
-            /deep/ .el-table__header-wrapper .el-table-column--selection{
-                padding-left: 0px !important;
-                font-size: 14px !important;
-            }
-            /deep/.el-table__header-wrapper
-            .el-table-column--selection
-            .el-checkbox__inner
-            {
-                border-radius: 1px;
-                border: none;
-                background-color: #fff;
-                &:hover{
-                    border-color: #dcdfe6 !important;
-                }
-            }
-            /deep/ .el-table__header-wrapper .el-checkbox{
-                display:block;
-                .el-checkbox__input.is-indeterminate .el-checkbox__inner{
-                    background-color: #2c90d9;
-                    border-color: #2c90d9;
-                    color:#FFF;
-                }
-                .el-checkbox__input.is-checked .el-checkbox__inner {
-                    color: #1375bc;
-                    font-weight: 400;
-                    background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4NCiAgICA8cGF0aCBzdHlsZT0iZmlsbDpub25lIiBkPSJNMCAwaDE2djE2SDB6Ii8+DQogICAgPHBhdGggZD0ibS40IDMgMyA0IDYtNiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMy4xIDQuNSkiIHN0eWxlPSJzdHJva2U6IzJjOTBkOTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6MTA7c3Ryb2tlLXdpZHRoOjEuNXB4O2ZpbGw6bm9uZSIvPg0KPC9zdmc+DQo=) no-repeat;
-                    background-position: center right 0px;
-                    border: none;
-                }
-                .el-checkbox__input.is-focus .el-checkbox__inner {
-                border-color: #2c90d9;
-                }
-                .el-checkbox__inner:hover {
-                border-color: #2c90d9;
-                }
-            }
-            /deep/.el-table__body-wrapper .el-checkbox{
-                border: none;
-                .el-checkbox__input.is-checked .el-checkbox__inner {
-                    color: #1375bc;
-                    font-weight: 400;
-                    background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4NCiAgICA8cGF0aCBzdHlsZT0iZmlsbDpub25lIiBkPSJNMCAwaDE2djE2SDB6Ii8+DQogICAgPHBhdGggZD0ibS40IDMgMyA0IDYtNiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMy4xIDQuNSkiIHN0eWxlPSJzdHJva2U6IzJjOTBkOTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6MTA7c3Ryb2tlLXdpZHRoOjEuNXB4O2ZpbGw6bm9uZSIvPg0KPC9zdmc+DQo=) no-repeat;
-                    background-position: center right 20px;
-                    border: none;
-                }
-            }
-            /deep/ .el-table__body-wrapper::-webkit-scrollbar {
-                width: 4px; /*滚动条宽度*/
-                height: 150px; /*滚动条高度*/
-            }
-            /*定义滚动条轨道 内阴影+圆角*/
-            /deep/ .el-table__body-wrapper::-webkit-scrollbar-track {
-                /*box-shadow: 0px 1px 3px #071e4a inset; 滚动条的背景区域的内阴影*/
-                border-radius: 10px; /*滚动条的背景区域的圆角*/
-                background-color: #FFF; /*滚动条的背景颜色*/
-            }
-            /*定义滑块 内阴影+圆角*/
-            /deep/ .el-table__body-wrapper::-webkit-scrollbar-thumb {
-                box-shadow: 0px 1px 3px #acaeb1 inset; /*滚动条的内阴影*/
-                border-radius: 2px; /*滚动条的圆角*/
-                background-color: #acaeb1; /*滚动条的背景颜色*/
-            }
-        }
-    }
-    /deep/
-    .el-table{
-        border:none;
-        box-shadow: none;
-    }
-    /deep/
-      .el-table th .cell{
-      padding-left: 0px !important;
-    }
-    /deep/
-    .el-table
-    .el-table__body-wrapper
-    .el-table-column--selection
-    .el-checkbox__inner
-    {
-      border-radius: 1px;
-      border: solid 1px #acaeb1;
-      background-color: #fff;
-    }
-    /deep/
-    .el-table
-    .el-table__body-wrapper
-    .el-table-column--selection
-    .is-checked
-    .el-checkbox__inner
-    {
-      /*border-radius: 1px;
-      border: solid 1px #2c90d9;
-      background-color: #e0f2ff;
-      color:#2c90d9;
-      &::after{
-       border-color:#2c90d9;
-      }*/
-        color: #1375bc;
-        font-weight: 400;
-        background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4NCiAgICA8cGF0aCBzdHlsZT0iZmlsbDpub25lIiBkPSJNMCAwaDE2djE2SDB6Ii8+DQogICAgPHBhdGggZD0ibS40IDMgMyA0IDYtNiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMy4xIDQuNSkiIHN0eWxlPSJzdHJva2U6IzJjOTBkOTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6MTA7c3Ryb2tlLXdpZHRoOjEuNXB4O2ZpbGw6bm9uZSIvPg0KPC9zdmc+DQo=) no-repeat;
-        background-position: center right 0px;
-        border: none;
-    }
-}
-</style> -->
