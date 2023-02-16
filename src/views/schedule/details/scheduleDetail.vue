@@ -145,9 +145,10 @@
           <!-- 全部門店 -->
           <div class="role-all-checkbox" style="margin-bottom: 25px">
             <el-checkbox
-              v-model="tempboolean_1" 
+              v-model="seleAllSchedule" 
               class="storevue-checkbox-filled" 
               style="margin-right: 8px"
+              @change="selectAll"
             />
             <span class="group-name">全部門店</span>
           </div>
@@ -462,7 +463,6 @@ export default{
       scheduleDataList:[],
 
       showScheduleDataList:[],
-      
       selectRemiderStyle:[
         {
           value: 'remindMode_Currently',
@@ -480,6 +480,7 @@ export default{
       storeList: [],
       emptyData: require('../../../../static/img/icon_data.svg'),
       handleSchedule: [],
+      seleAllSchedule: false,
       
       editSchedule:{
         remindDate:'',
@@ -602,8 +603,16 @@ export default{
       this.inspectTypeList = this.inspectTypeList.filter( i => i.mode === val)
     },
 
-    inspectionName(val){
-      console.log('inspectionName val', val)
+    showScheduleDataList :{
+      handler(newValue){
+        // console.log('newValue :>> ', newValue);
+        newValue.forEach( i => {
+          var cancelChecked = i.taskList.every(t => t.checked == false)
+          if(cancelChecked) i.checked = false
+        }) 
+        
+      },
+      deep:true
     }
   },
   mounted() {
@@ -1008,6 +1017,14 @@ export default{
       this.handleSchedule = []
       this.showingEditStore = false
 
+      this.seleAllSchedule = false
+      
+      this.showScheduleDataList.forEach(_item => {
+        _item.checked = false
+        _item.taskList.forEach(l => {
+          l.checked = false
+        })
+      })
       this.editSchedule.remindDate = ''
       this.editSchedule.remindTimePoint = ''
       this.editSchedule.remindStyle = []
@@ -1017,7 +1034,10 @@ export default{
     hideEditStoreDialog(key){
       this[key] = false;
       this.handleSchedule = []
+      this.seleAllSchedule = false
+      
       this.showScheduleDataList.forEach(_item => {
+        _item.checked = false
         _item.taskList.forEach(l => {
           l.checked = false
         })
@@ -1025,11 +1045,54 @@ export default{
       this.editSchedule.remindDate = ''
       this.editSchedule.remindTimePoint = ''
       this.editSchedule.remindStyle = []
+      
+      
+      console.log('this.editSchedule :>> ', this.editSchedule);
     },
 
+    selectAll(val){
+      this.handleSchedule = []
+      if(val){
+        this.showScheduleDataList.forEach(i =>{
+          i.checked = true
+          i.taskList.forEach(t =>{
+            t.checked = true
+            this.handleSchedule.push(t)
+          })
+        })
+      } else {
+        this.showScheduleDataList.forEach(i =>{
+          i.checked = false
+          i.taskList.forEach(t =>{
+            t.checked = false
+            this.handleSchedule = []
+          })
+        })
+      }
+      console.log('this.handleSchedule :>> ', this.handleSchedule);
+    },
 
     selectProvince(val){
-      console.log('val', val)
+      if(val.checked){
+        this.showScheduleDataList.forEach( i => {
+          i.taskList.forEach(t => {
+            if(t.city === val.city) {
+              t.checked = true
+              this.handleSchedule.push(t)
+            }
+          })
+        })
+      } else {
+        this.showScheduleDataList.forEach( i => {
+          i.taskList.forEach(t => {
+            if(t.city === val.city) t.checked = false
+            this.handleSchedule = this.handleSchedule.filter(t => t.checked)
+          })
+        })
+      }
+
+      console.log('this.handleSchedule :>> ', this.handleSchedule);
+      console.log('this.showScheduleDataList :>> ', this.showScheduleDataList);
     },
 
     handleCheckboxChange(val){
