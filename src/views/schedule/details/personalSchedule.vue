@@ -234,9 +234,9 @@ export default{
                   let mode = item.tagMode==0?self.$t('remotePatrol.remotePatrol'):self.$t('remotePatrol.onsitePatrol');
                   obj['tagNameMode'] = mode+'\n'+item.tagName;
                   //obj['updateTs']=item.updateTime,
-                  obj['taskStartStr']=(item.taskStart==0)?'-':self.$moment.utc(self.$moment(item.taskStart)).format("YYYY/MM/DD hh:mm:ss");//util.getDateStr(item.taskStart),
+                  obj['taskStartStr']=(item.taskStart==0)?'-':self.$moment.utc(self.$moment(item.taskStart)).format("YYYY/MM/DD");//util.getDateStr(item.taskStart),
                   //console.log(">>>taskStartStr:",self.$moment.utc(self.$moment(item.taskStart)).format("YYYY/MM/DD hh:mm:ss"));
-                  obj['taskFinalStr']=(item.taskFinal==0)?'-':self.$moment.utc(self.$moment(item.taskFinalS)).format("YYYY/MM/DD hh:mm:ss");//util.getDateStr(item.taskFinal),
+                  obj['taskFinalStr']=(item.taskFinal==0)?'-':self.$moment.utc(self.$moment(item.taskFinal)).format("YYYY/MM/DD");//util.getDateStr(item.taskFinal),
                   obj['updateUserName']=(item.updateUserName == "NONE")?'-':item.updateUserName,
                   userData.push(obj);
                   
