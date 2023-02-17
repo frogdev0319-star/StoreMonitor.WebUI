@@ -305,7 +305,7 @@
         <div>
           <span style="display:block;"><span style="color:red;">* </span>{{ $t('eventView.addDetails') }}</span>
           <div class="description" v-for="(des, idx) in addDescriptionList" :key="idx">
-              <img :src="delDesImg" style="widht:16px;height:16px;align-self:start;margin-top:10px;" :key="'img_'+idx" @click="onDeleteDescription(idx)" />
+              <!-- <img :src="delDesImg" style="widht:16px;height:16px;align-self:start;margin-top:10px;" :key="'img_'+idx" @click="onDeleteDescription(idx)" /> -->
               <div class="edit-description">
                 <div class="edit-input">
                   
@@ -317,12 +317,21 @@
                     :readonly="!isEdit"
                     @input="(val)=>editDesChang(val,idx)"
                   />
+                  
                   <span v-if="editDesRuletip[idx]" class="rules">{{ $t('eventView.RateRuletip') }}</span>
                 </div>
                 <div class="edit-icon-div" >
                   <img :src="editDesImg" style="width:20px;height:20px;align-self:center;cursor:pointer;" @click="onEditDescription"/>
                 </div>
               </div>
+               <!-- 刪除 -->
+                          <img
+                            :key="'img_'+idx"
+                            :src="deleteInspectIcon_new"
+                            alt="delete"
+                            class="to_delete"
+                            @click="onDeleteDescription(idx)"
+                          />
           </div>
           <div v-if="curDeslistNum<5" class="des-input"> 
             <div style="min-height:36px;height:auto;"> 
@@ -471,6 +480,7 @@ export default {
       attFileCount:0,
       videoAttFileCount:0,
       addAttIcon: require('../../../../static/img/icon_attachment.svg'),
+      deleteInspectIcon_new: require('../../../../static/img/table-delete.png'),
       attachFileList:[],
       bucketVideo: '',
       bucketImage: '',
@@ -1220,6 +1230,13 @@ $h1:#292e36;
     display: flex;
     align-items: center;
 }
+.to_delete{ 
+    margin-bottom: 5px;
+    transition: all .3s;
+    cursor: pointer;
+    margin-left: 5px;
+  }
+  
 .AddSumupLoad >>> .el-dialog__body{
   padding:30px 40px !important;
   text-align: left;
@@ -1953,8 +1970,8 @@ $h1:#292e36;
               flex-direction:row;
               align-items: center;
               .edit-description{
-                margin-left:14px;
-                padding: 6px 9px 6px 16px;
+                // margin-left:14px;
+                padding: 6px 9px 6px 6px;
                 box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
                 border: solid 1px #e6e6e6;
                 border-radius: 5px;

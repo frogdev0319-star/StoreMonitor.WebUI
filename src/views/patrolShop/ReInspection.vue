@@ -641,7 +641,8 @@
                 <div v-for="(item,index) in item_.items.filter(d => d.subject.indexOf(searchItemValue ) > -1 && (!showIgnoreItem || d.ignore )) " 
                   :key="index" 
                   class="item-details padding-sm"
-                  :style="item.checked?{'background-color':'#f2f9fe'}:{}"
+                  :style="item.checked?{'background-color':'#f5f7fa'}:{}"
+                  @click="clickItem({item,index:showIgnoreItem?item.originIndex:index})"
                   >
                 
                   <div class="flex fullWidth" >
@@ -654,7 +655,7 @@
                         :style="item.checked?{'color':'#006ab7'}:{'color': '#484848'}"
                         class="spacer font-15"
                         style="text-align: left; font-weight: 500; word-break: break-all;"
-                        @click="clickItem({item,index:showIgnoreItem?item.originIndex:index})">
+                      >
                         <span style="color: #c60957" v-if="item.required">*</span>
                         {{ item.subject }} 
                       </div>
@@ -742,7 +743,7 @@
                     </div>
                     
                     <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="img-source-content">
-                      <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
+                      <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details" >
                         <div v-if="_item.mediaType==2" class="img-content">
                           <i v-if="_item.showDelBtn" class="el-icon-close icondelete" @click="deleteImg({item,index: _index})" />
                           <el-image
@@ -3880,6 +3881,7 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+
   .advance_memo
     font-size: 12px
     color: #f31d65
@@ -3898,6 +3900,10 @@ export default {
     margin-left: 5px
     &:hover
       transform: scale(1.1)
+  .input_bg
+    background: #FFF !important
+  .storevue-textarea textarea
+    background: #FFF !important
 
 </style>
 
@@ -3948,6 +3954,7 @@ export default {
     margin-bottom: calc(10/1920*100vw);
   }
   .item-details {
+    border-bottom: 1px solid #f5f7fa
   }
   .img-content{
     position: relative;
