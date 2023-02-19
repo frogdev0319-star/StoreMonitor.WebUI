@@ -766,8 +766,10 @@
                         v-model="item.inspectInput"
                         :placeholder="$t('remotePatrol.coment')"
                         :disabled="item.disabled"
+                        
                         size="mini"
-                        class="storevue-textarea"
+                        class="force_white"
+                        
                         type="textarea"
                         resize="none"
                         @input="(val) => itemDescriptionChanged({ val, item })"
@@ -3880,6 +3882,17 @@ export default {
 };
 </script>
 
+<style lang="sass">
+  .force_white .el-textarea__inner
+    background-color: #FFF !important
+    border-color: none !important
+    padding: 7px 70px 7px 7px
+    
+  .force_white .el-textarea__inner:focus
+    border-color: #c0c0c0 !important
+  
+</style>
+
 <style lang="sass" scoped>
 
   .advance_memo
@@ -3902,8 +3915,11 @@ export default {
       transform: scale(1.1)
   .input_bg
     background: #FFF !important
-  .storevue-textarea textarea
-    background: #FFF !important
+
+
+
+  
+    
 
 </style>
 
