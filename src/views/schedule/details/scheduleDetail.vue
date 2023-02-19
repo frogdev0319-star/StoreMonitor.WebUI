@@ -108,8 +108,8 @@
             class="blue_border"
             type="primary"
             size="mini"
-            :class="{ btn_disable: !isActive }"
-            :disable="!isActive"
+            :class="{ btn_disable: !edit_isActive }"
+            :disable="!edit_isActive"
             @click="showingEditStore = true"
             >
             <span>編輯</span>
@@ -120,8 +120,8 @@
             class="blue_border"
             type="primary"
             size="mini"
-            :class="{ btn_disable: !isActive }"
-            :disable="!isActive"
+            :class="{ btn_disable: !del_isActive }"
+            :disable="!del_isActive"
             @click="deleteSchedule"
             >
             <span>刪除</span>
@@ -176,20 +176,21 @@
                         v-model="item.checked"
                         style="margin-right: 8px"
                         @change="handleCheckboxChange(item)"
+                        
                         />
-                        <span class="role-name">{{item.storeName}}</span>
+                        <span class="role-name">{{item.storeName}} <span style="color: #999; font-size: 13px">({{item.timeZone}})</span></span>
                     </div>
                     <div class="memo_setting" >
-                      <!-- 提醒日期 -->
+                      <!-- 執行日期 -->
                       <div class="remider_setting flex-column">
-                        <p>提醒日期</p>
+                        <p>執行日期</p>
                         <el-date-picker
                           v-model="item.remindDate"
                           type="date"
                           value-format="yyyy-MM-dd"
                           :picker-options="pickerOptions"
                           :disabled="(item.remindTime < Date.now() && item.remindTime !== '' )"
-                          placeholder="提醒日期">
+                          placeholder="執行日期">
                         </el-date-picker>
                       </div>
                       <!-- 提醒時間 -->
@@ -212,7 +213,7 @@
                         <p>提醒方式</p>
                         <el-select
                           v-model="item.remindStyle"
-                          :placeholder="$t('audit.workFlows.inspectionForm')"
+                          placeholder="提醒方式"
                           multiple
                           filterable
                           :disabled="(item.remindTime < Date.now() && item.remindTime !== '')"
@@ -250,7 +251,7 @@
     <dialog-pop
       ref="dailog"
       class="popup_width"
-      :title= "$t('audit.workFlows.addCC')"
+      title= "加入門店"
       :close-on-click-modal="false"
       :show-close="false"
       :dialogWidth = "add_width"
@@ -362,16 +363,16 @@
         <div class="dialog-content">
 
           <div class="memo_setting">
-            <!-- 提醒日期 -->
+            <!-- 執行日期 -->
             <div class="remider_setting flex-column">
               
-              <p style="font-size: 14px; font-weight: 900"><span style="color: #f31d65">*</span> 提醒日期</p>
+              <p style="font-size: 14px; font-weight: 900"><span style="color: #f31d65">*</span> 執行日期</p>
               <el-date-picker
                 v-model="editSchedule.remindDate"
                 type="date"
                 :picker-options="pickerOptions"
                 value-format="yyyy-MM-dd"
-                placeholder="提醒日期">
+                placeholder="執行日期">
               </el-date-picker>
             </div>
             <!-- 提醒時間 -->
@@ -454,7 +455,8 @@ export default{
   
       templateList:['aaa','bbb','ccc'],
       // ====== !! ======
-      isActive: false,
+      edit_isActive: false,
+      del_isActive: false,
 
       taskName:'',
       scheduleStatus: {},
@@ -594,13 +596,19 @@ export default{
   },
   watch:{
     handleSchedule(val){
-      this.isActive = val.length == 0 ? false : true
+      this.edit_isActive = val.length == 0 ? false : true
+      this.del_isActive = val.length == 0 ? false : true
+      if(val.length == 0) this.seleAllSchedule = false
+
+      var isBeforeToday = this.handleSchedule.some(t => t.remindTime  < Date.now())
+      if(isBeforeToday) this.edit_isActive = false
     },
 
     inspectionMode(val){
       console.log('inspectionMode val', val)
       this.inspectTypeList = [...this.allInspectTypeList]
       this.inspectTypeList = this.inspectTypeList.filter( i => i.mode === val)
+      this.inspectionName = this.inspectTypeList[0].id
     },
 
     showScheduleDataList :{
@@ -613,7 +621,9 @@ export default{
         
       },
       deep:true
-    }
+    },
+
+  
   },
   mounted() {
     this.showSearchStoreData = this.searchStoreData
@@ -672,23 +682,27 @@ export default{
       await this.getBriefStoreList();
       await this.getTagAll()
 
+
       var status = sessionStorage.getItem('scheduleParams');
       this.scheduleStatus = JSON.parse(status)
       console.log('this.scheduleStatus  !!=========>>', this.scheduleStatus)
+      console.log('this.inspectionName', this.inspectionName)
       
       if(this.scheduleStatus.action == "editSchedule"){
-        
         this.hasScheduleData = true
         this.taskName = this.scheduleStatus.taskName
-        this.inspectionName = this.scheduleStatus.tagName
+        
         var status =  this.allInspectTypeList.find( d => d.name == this.scheduleStatus.tagName)
         this.inspectionMode = status.mode
-        this.inspectionName = status.name
         
         await this.getPersonScheduleData();
       }
       else if(this.scheduleStatus.action == "addSchedule"){
         this.hasScheduleData = false
+        this.inspectionMode = 1
+        var tempN = this.allInspectTypeList.filter( i => i.mode === 1)
+        this.inspectionName = tempN[0].id
+        
       }
       this.isLoadingData = false
       
@@ -748,7 +762,7 @@ export default{
                   i.remindDate = this.getdate(i.remindTime)
                   i.remindTimePoint = this.getTimePoint(i.remindTime)
                   i.checked = false
-                  
+                  i.timeZone = store.timeZone
                   i.remindStyle = []
                   if(i.remindMode_Currently == true) i.remindStyle.push("remindMode_Currently")
                   if(i.remindMode_OneDay == true) i.remindStyle.push("remindMode_OneDay")
@@ -758,6 +772,7 @@ export default{
               
             });
             this.scheduleDataList = res.data
+            this.inspectionName = this.scheduleStatus.tagName
             console.log('this.scheduleDataList =========>> ', res.data);
 
 
@@ -789,8 +804,14 @@ export default{
     // SAVE
     saveScheduleData(){
       this.isLoadingData = true
-      console.log('this.scheduleDataList =======>> 1', this.scheduleDataList);
+      console.log('this.showScheduleDataList =======>> 1', this.showScheduleDataList);
       console.log('this.scheduleStatus', this.scheduleStatus)
+      
+      if(this.showScheduleDataList.length < 1){
+        util.notify("請至少設定一筆排程！", 'error', 2000 );
+        this.isLoadingData = false
+        return
+      }
 
       if(this.taskName == ''){
         util.notify("排程名稱不可為空", 'error', 2000 );
@@ -833,7 +854,7 @@ export default{
       else if(this.scheduleStatus.action == "editSchedule"){
         console.log('editSchedule')
         param.userId = this.scheduleStatus.userId
-        param.inspectTagId = status.id
+        param.inspectTagId = this.inspectionName
         param.taskName = this.taskName
         param.taskGroupUuid = this.scheduleStatus.taskGroupUuid
       }
@@ -853,14 +874,18 @@ export default{
       })
 
       console.log('param for save =======>> ', param)
-
-      param.taskList.forEach(i => {
-        if(!i.remindTime ||  i.remindDate == '' || i.remindTimePoint == ''){  
-          util.notify("門店排程提提醒日期或時間不可為空！", 'error', 2000 );
-          this.isLoadingData = false
-          return
-        }
-      })
+      var isEmpty = param.taskList.some(i => (!i.remindTime ||  i.remindDate == '' || i.remindTimePoint == ''))
+      if(isEmpty){  
+        util.notify("門店排程提執行日期或時間不可為空！", 'error', 2000 );
+        this.isLoadingData = false
+        return false
+      }
+      if(param.taskList.some(i => i.remindStyle.length ==0)){
+        util.notify("提醒方式欄位為必填不可留空！", 'error', 2000 );
+        this.isLoadingData = false
+        return false
+      }
+      
 
       if(param.taskList.length < 1){
         util.notify("請至少設定一筆排程！", 'error', 2000 );
