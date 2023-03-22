@@ -465,7 +465,7 @@ export default {
       this.roleNameList[4].children[1].checked = !!PermissionHelper.enableWaitAudit();
       this.roleNameList[4].children[2].checked = !!PermissionHelper.enableTranscriptNotify();
 
-      if (authorities.length === 7 && resetFlag) {
+      if (authorities.length >= 7 && resetFlag) {
         this.ifAccessVideo = PermissionHelper.enableVideo() === 1;
         this.ifReceiveMes = PermissionHelper.enableMessage() === 2;
       }
