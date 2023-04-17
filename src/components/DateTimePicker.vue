@@ -67,7 +67,7 @@ export default {
           return (this.pickFuturerDate)?false:time.getTime() > this.$moment(new Date()).endOf('d').toDate();
         },
         onPick:({ maxDate, minDate })=>{
-            console.log("maxDate:"+ maxDate + ", minDate:"+minDate);
+            //console.log("maxDate:"+ maxDate + ", minDate:"+minDate);
 
             if(maxDate==null){
               maxDate = moment();

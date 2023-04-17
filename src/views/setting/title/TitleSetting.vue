@@ -495,7 +495,8 @@ export default {
       this.roleNameList[5].children[1].checked = !!PermissionHelper.enableScheduleHistroy();
       this.roleNameList[5].children[2].checked = !!PermissionHelper.enableScheduleExecuted();
 
-      if (authorities.length === 8 && resetFlag) {
+
+      if (authorities.length >= 7 && resetFlag) {
         this.ifAccessVideo = PermissionHelper.enableVideo() === 1;
         this.ifReceiveMes = PermissionHelper.enableMessage() === 2;
       }

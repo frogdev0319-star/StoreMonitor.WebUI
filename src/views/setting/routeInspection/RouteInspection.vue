@@ -56,7 +56,7 @@
               v-model="patrolActive"
               :style="{'min-height':varyWindowWidth*0.70+'px'}"
               @tab-click="handleClickPatrol" >
-              <el-tab-pane v-for="(_item,_index) in item.data" :key="_index" :name="_index.toString()">
+              <el-tab-pane v-for="(_item,_index) in item.data" :key="_item.id" :name="_index.toString()">
                 <div class="flex-center" style="color: #acaeb1; font-size: 15px; margin: 15px 0">
                   <div class="temp-select-area" :style="lang.indexOf('zh') === -1 ? {'width':'250px'}:{}">
                     <div class="temp-select-label" :style="lang.indexOf('zh') === -1 ? {'width':'105px'}:{}">{{ $t('overview.patrolLists') }}</div> 

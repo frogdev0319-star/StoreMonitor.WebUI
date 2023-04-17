@@ -111,9 +111,9 @@ export default {
   },
 
   mounted() {
+    //console.log("this.sortableTableData:",this.sortableTableData);
     this.getSequenceList();
   },
-
   methods: {
     getSequenceList() {
       this.oldSequenceList = this.sortableTableData.map(value => value.sequence);
