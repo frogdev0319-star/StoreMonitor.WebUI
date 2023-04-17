@@ -174,11 +174,11 @@
                       <div v-for="(_item,_index) in sourceList" :key="_index" >
                        <div  v-if="_item.mediaType == 3"  class="fullWidth source-details" >
                         <div class="flex-center">
-                          <img
+                          <!-- <img
                             :src="deleteInspectIcon"
                             alt="delete"
                             @click="deleteItemResource({ index: _index })"
-                          />
+                          /> -->
                           <div
                             class="paper flex-center margin-bottom-sm inspect-text"
                             :style="curEditIndex === _index?{'border':'1px solid #006ab7'}:{'border':'1px solid #e6e6e6'}"
@@ -194,6 +194,13 @@
                               @click="editItemResource({  index: _index })"
                             />
                           </div>
+                          <!-- 刪除 -->
+                          <img
+                            :src="deleteInspectIcon_new"
+                            alt="delete"
+                            class="to_delete"
+                            @click="deleteItemResource({ index: _index })"
+                          />
                         </div>
                       </div>
                       </div>
@@ -326,14 +333,16 @@
               <div v-if=" sourceList.filter((s, idx) =>s.mediaType==3 ).length!=0" :class="'noraml-title'" class="tsource-content">
                       <div v-for="(_item,_index) in sourceList" :key="_index" >
                        <div  v-if="_item.mediaType == 3"  class="fullWidth source-details" >
-                        <div class="flex-center">
-                          <img
+                        <div class="flex-center comment_list"
+                          
+                        >
+                          <!-- <img
                             :src="deleteInspectIcon"
                             alt="delete"
                             @click="deleteItemResource({ index: _index })"
-                          />
+                          /> -->
                           <div
-                            class="paper flex-center margin-bottom-sm inspect-text"
+                            class="flex-center inspect-text"
                             :style="curEditIndex === _index?{'border':'1px solid #006ab7'}:{'border':'1px solid #e6e6e6'}"
                           >
                             <div style="flex: 1; text-align: left; margin: 5px">
@@ -347,6 +356,12 @@
                               @click="editItemResource({  index: _index })"
                             />
                           </div>
+                          <img
+                              :src="deleteInspectIcon_new"
+                              alt="edit"
+                              style="margin: 5px"
+                              @click="deleteItemResource({ index: _index })"
+                            />
                         </div>
                       </div>
                       </div>
@@ -467,7 +482,10 @@ export default {
   data() {
     return {
       deleteInspectIcon: require('../../../static/img/cross.png'),
+      deleteInspectIcon_new: require('../../../static/img/table-delete.png'),
+
       editInspectIcon: require('../../../static/img/pen.png'),
+
       curEditIndex : -1,
       patrolstore: '',
       PatrolList: [],
@@ -2048,6 +2066,24 @@ export default {
   }
 };
 </script>
+<style lang="sass" scoped>
+  .inspect-text
+    padding: 10px
+    margin-left: 0 !important
+  .comment_list
+    width: 100%
+    padding: 4px
+    margin-bottom: 5px
+    // background: rgb(242, 249, 254)
+  .to_delete
+    margin-bottom: 5px
+    transition: all .3s
+    cursor: pointer
+    margin-left: 5px
+    &:hover
+      transform: scale(1.1)
+  
+</style>
 <style lang="scss" scoped>
 
 * {
@@ -2675,13 +2711,14 @@ $h1: #292e36;
         display: block;
       }
       .tsource-content{
-              min-height: 110px;
-              width: 90%;
-              margin: auto 20px;
+              // min-height: 110px;
+              width: 100%;
+              margin-bottom: 10px;
+              // margin: auto 20px;
               .source-details{
                 display: inline-block;
                 margin-right: 15px;
-                padding-top: 15px;
+                // padding-top: 15px;
                 position: relative;
                 span{
                   font-size: 12px;
