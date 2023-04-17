@@ -222,7 +222,7 @@ export default{
               obj['id']=item.userId;
               obj['position'] = (position)? position.label:"";
               //obj['updateTs']=item.updateTime,
-              obj['updateTsStr']=(item.updateTime==0)?'-':util.getDateStr(item.updateTime),
+              obj['updateTsStr']=(item.updateTime==0)?'--':util.getDateStr(item.updateTime),
               obj['updateUserName']=(item.updateUserName == "NONE")?'-':item.updateUserName,
               userData.push(obj);
             });

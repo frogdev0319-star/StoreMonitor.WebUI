@@ -319,7 +319,7 @@ export default{
             obj['tagNameMode'] = mode+'\n'+item.inspectTagName;
             obj['remindTimeStr']=(item.remindTime==0)?'-':self.$moment.utc(self.$moment(item.remindTime)).format("YYYY/MM/DD");//util.getDateStr(item.taskStart),
             obj['reportTsStr']=(item.reportTs==0)?'-':self.$moment.utc(self.$moment(item.reportTsStr)).format("YYYY/MM/DD hh:mm:ss");//util.getDateStr(item.taskFinal),
-            obj['submitterName']=(item.submitterName == "NONE")?'-':item.submitterName;
+            obj['submitterName']=(item.submitterName == "NONE")?'--':item.submitterName;
             obj['status'] = item.isDelete ? '2': (item.isExecute ? 0:1);
             if(item.isProcessing){//簽核中
               obj['porcessMode'] = {isCellClick:false,value:this.$t('schedule.isProcessing'),html:`<span style="font-size:calc(15/1920*100vw);">`+this.$t('schedule.isProcessing')+`</span>`};
