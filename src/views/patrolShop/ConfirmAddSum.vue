@@ -67,11 +67,11 @@
               <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
               <el-image
                 :src="imgItem.src"
-                style="width:140px;height:100px"
+                style="height:100px"
                 :preview-src-list="getAuditImgList(index)"/>
             </div>
           </div>
-          <div v-if="auditFileCount<10" class="attach-add" @click="$refs.auditfile.click()">
+          <div v-if="auditFileCount < 120" class="attach-add" @click="$refs.auditfile.click()">
             <input type="file" style="display: none" accept="image/png,image/jpeg,application/pdf" max-size="2" @change="doAddAttachment" ref="auditfile" />
             <div style="height:16px;display: flex;flex-direction: row;align-items: center;">
               <img src="../../../static/img/icon_attachment.svg" widht="16px" height="16px" style="border-radius:10px;"/>
@@ -119,6 +119,7 @@
       </div>
     </el-col>
 
+
     <!-- 巡檢預覽 -->
     <el-col v-if="!allRemarkItemsFlag" :span="24" class="sum-data">
       <span style="font-size: 18px; font-weight: bold">{{ $t('remotePatrol.preview') }}</span>
@@ -143,22 +144,27 @@
             </div>
             <div class="limit-text">{{$t('remotePatrol.tipLimitGroupScore')}}</div>
           </div>
+
           <table v-for="(s_item,s_index) in summary" :key="s_index" class="table table-bordered" style="margin-top:10px;">
             <thead>
               <tr>
                 <th v-for="(t_item ,t_index) in s_item.data[0].tHeader" :key="t_index" :style="t_item.width" scope="col">
-                  {{ t_item.name }}
+                  {{ t_item.name }} 
+                  <span style="color: #7d8cad; margin-left: 5px;" v-if="t_index == 0">( 總分: {{ getTotalSum(s_item.data)}} )</span>
                 </th>
               </tr>
             </thead>
-            <template v-for="(inspectItem, inspectIndex) in s_item.data">
-              <tbody :key="inspectIndex">
+            <template>
+              <tbody v-for="(inspectItem, inspectIndex) in s_item.data" :key="inspectIndex">
                 <tr style="vertical-align:middle;">
                   <td :rowspan="inspectItem.inspectList.length+1" style="vertical-align:middle;">
                     <div class="flex">
                       <div class="spacer">
                         <div v-if="inspectItem.weight != -1 && inspectItem.type != 2">{{ inspectItem.weight + '%' }} </div>
-                        <div class="sheet_title">{{ inspectItem.label }}</div>
+                        <div class="sheet_title">
+                          {{ inspectItem.label }} 
+                          <span style="color: #7d8cad; margin-left: 5px;">( 總分:{{getSum(inspectItem.inspectList)}} )</span>
+                        </div>
                       </div>
                       <div class="flex" style="align-items: center">
                         <span>{{$t('')}}</span>
@@ -172,15 +178,15 @@
                     <span class="item-name">{{ inspectItem.isCategory ? item.groupName : '--' }}</span>
                     <span v-if="inspectItem.isCategory" class="count-blag">{{ item.items.length }}</span>
                   </td>
-                  <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfQualified }}</span></td>
-                  <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfUnqualified }}</span></td>
-                  <td v-if="inspectItem.type === 1"><span>{{ getDoubleNum(item.itemScore) }}</span></td>
+                  <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfQualified }} </span></td>
+                  <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfUnqualified }} </span></td>
+                  <td v-if="inspectItem.type === 1"><span>{{ getDoubleNum(item.itemScore) }} </span></td>
                   <td>
                     <div style="display:flex;flex-direction:row;justify-content:space-between;">
                       <div style="flex:2;">{{ item.itemgetScore == '--' ? '--' : getDoubleNum(item.itemgetScore) }}</div>
                       <div style="display:flex;flex:1;flex-direction:row;align-content:center;">
                         <img v-if="item.groupScore != '-99999'" style="margin-right:4px;" :src="require('../../../static/img/group_score.svg')" width="15" height="15" />
-                        <div style="color:#9EACB6;font-size:10px;font-weight:normal;">{{ item.groupScore != '-99999'? item.groupScore:''}}</div>
+                        <div style="color:#9EACB6;font-size:10px;font-weight:normal;">{{ item.groupScore != '-99999'? item.groupScore:''}} </div>
                       </div>
                     </div>
                   </td>
@@ -190,6 +196,7 @@
           </table>
         </div>
 
+     
         <el-row v-for="(item,index) in tempList" :key="index" class="row-detail">
           <el-col v-if="item.data.length!=0">
             <div class="item-header">
@@ -647,6 +654,26 @@ export default {
     
   },
   methods: {
+    // 加總
+    getTotalSum(Array){
+      var tableTotalScore = 0
+      Array.forEach(i => {
+        i.inspectList.forEach( ii => {
+          tableTotalScore = tableTotalScore + ii.itemgetScore
+        })
+      })
+      return tableTotalScore
+
+    },
+    getSum(Array){
+      var totalScore = 0
+      Array.forEach(i => {
+        totalScore = totalScore + i.itemgetScore
+      })
+      return totalScore
+    },
+
+    // 四捨五入 
     getDoubleNum (num) {
       return Math.round(num * 100) / 100  
     },
@@ -1962,7 +1989,7 @@ export default {
       var fileName = files[0].name;
       if (!files.length)
         return;
-      if(self.auditFileCount==10){
+      if(self.auditFileCount == 120){
         util.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
         return;
       }
@@ -2421,7 +2448,8 @@ export default {
           }
           .source-details{
             display: inline-block;
-            margin-right: 15px;
+            margin-right: 9px;
+            margin-bottom: 3px;
             position: relative;
             .icondelete{
               position: absolute;

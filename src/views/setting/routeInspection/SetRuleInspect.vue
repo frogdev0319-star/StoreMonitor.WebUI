@@ -124,6 +124,21 @@
               *{{ $t('insSettingView.rangeScoreTips') }}
             </span>
           </p>
+
+          <!-- 顯示區域計分(僅支援網頁版) -->
+          <p class="rule-item">
+            <el-checkbox class="storevue-checkbox-outlined" v-model="aaa">
+              顯示區域計分(僅支援網頁版)
+            </el-checkbox>
+          </p>
+          <!-- 顯示巡檢類別計分 -->
+          <p class="rule-item">
+            <el-checkbox class="storevue-checkbox-outlined" v-model="bbb">
+              顯示巡檢類別計分
+            </el-checkbox>
+          </p>
+          
+
         </div>
       </setting-table>
     </el-col>
@@ -489,7 +504,8 @@ export default {
       includedInTotalScoreWithType1: false,
       qualifiedForIgnoredWithType1: false,
       qualifiedForIgnoredWithType2: false,
-
+      aaa: false,
+      bbb: false,
 
       setting_isAutoMappingActivate: false,
       setting_autoMappingByTotalScore: true,

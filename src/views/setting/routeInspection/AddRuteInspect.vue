@@ -222,6 +222,19 @@
             </el-radio-group>
           </el-form-item>
 
+          <!-- 必填 -->
+          <el-form-item style="margin-bottom: 20px">  
+            <div class="score_item">
+              <span class="sign">*</span>
+              <span class="item_label">重要巡檢項</span>
+            </div>
+            <el-radio-group class="attribute-group" v-model="itemRequired" @change="toItemRequired">
+              <el-radio label="1">開啟</el-radio>
+              <el-radio label="0">關閉</el-radio>
+            </el-radio-group>
+          </el-form-item>
+
+
           <!-- 巡檢項類型 -->
           <el-form-item>
             <div class="score_item">

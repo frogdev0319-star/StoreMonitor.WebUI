@@ -341,8 +341,9 @@
                   scope="col">{{ t_item.name }}</th>
               </tr>
             </thead>
-            <template v-for="(categoryItem, categoryIndex) in tableItem">
-              <tbody :key="categoryIndex" :class="hasChart ? 'pdf_font_20': 'pdf_font_16'" class="pdf_font_20">
+            aaa
+            <template >
+              <tbody v-for="(categoryItem, categoryIndex) in tableItem" :key="categoryIndex" :class="hasChart ? 'pdf_font_20': 'pdf_font_16'" class="pdf_font_20">
                 <tr style="vertical-align:middle;">
                   <td :rowspan="categoryItem.children.length + 1" style="vertical-align:middle;">
                     <div>
@@ -771,7 +772,11 @@ export default {
       console.log("this.report.reportId:",this.report.reportId);
       const reportInfoPromise = getInspectReportInfo({ reportIds: [this.report.reportId] });
       Promise.all([templatePromise, reportInfoPromise]).then(results => {
+
+        console.log('results[0] :>> ', results[0]);
         this.getInspectTemplateList(results[0]);
+
+        console.log('results[1] :>> ', results[1]);
         this.getReportInfo(results[1]);
       }).catch(err => {
         console.log('ReportDetail-getReportTemplateAndInfo:' + err);
@@ -1083,6 +1088,9 @@ export default {
             self.showEditBtn = false;
             break;
         }
+        console.log('this.report :>> ', this.report);
+
+
         this.report.storeName = data.storeName;
         this.report.status = data.status;
         this.report.dateStr = util.getDateStr2(data.ts);
@@ -1109,9 +1117,11 @@ export default {
         }
         
         this.getGroupsData(data.groups);
-        console.log("this.reportData:",this.reportData);
         this.getTab1AndTab3BtnName(res.data[0].inspectSettings);
-        this.getPageDataBasedOnTemplate(this.reportData);
+
+        console.log("this.reportData 1-->>>",this.reportData);
+        await this.getPageDataBasedOnTemplate(this.reportData);
+
         this.backSheetGroup = this.getGroupsItems(-1);
       }
     },
@@ -1129,7 +1139,7 @@ export default {
         obj.parentId = groupitem.parentId;
         obj.parentName = '';
         groupitem.items.forEach((item, index) => {
-          console.log("**item:",item);
+          // console.log("**item:",item);
           const details = {};
           details.itemId = item.id;
           details.subject = item.subject;
@@ -1173,16 +1183,23 @@ export default {
     },
 
     getPageDataBasedOnTemplate(data) {
-      const map = this.getDetailNameAndHandlerMap(data);
       
+
+      console.log('data 2:>> ', data);
+      
+      const map = this.getDetailNameAndHandlerMap(data);
+
       this.sortArrayByKey(this.templateConfig, 'position');
       const pageData = [];
+
       this.templateConfig.forEach(config => {
         if (map.has(config.name)) {
           const fnName = map.get(config.name);
           const returnDataJson = this[fnName](data);
           returnDataJson.name = config.name;
           pageData.push(returnDataJson);
+
+          console.log('returnDataJson :>> ', returnDataJson);
         }
       });
       if (this.showAllDetailsEnable) {
@@ -1197,7 +1214,9 @@ export default {
         const mapObj = { name: 'signatureInfo', class: 'signature-map', ifExpand: false, distance: this.signInDistance, data:this.signMapUrl };
         pageData.push(mapObj);
       }
-      this.pageData = pageData;
+      this.pageData = {...pageData};
+      console.log('this.pageData ~~~~>> ', this.pageData);
+
     },
 
     getDetailNameAndHandlerMap(data) {
@@ -3060,4 +3079,11 @@ export default {
   .el-menuscrollbar .el-scrollbar__wrap {
     overflow-x: hidden;
   }
+</style>
+<style lang="sass" scoped>
+  .spacer
+    display: flex
+    flex-direction: column
+    justify-content: center
+    align-items: center
 </style>
