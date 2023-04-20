@@ -80,8 +80,8 @@
                 </div>
               </div>
               <draggable class="spacer" style="background-color: #f7f9fa;" v-model="groupList" @update="handleUpdateCategorySequence">
-                <template v-for="(item,index) in groupList">
-                  <div :key="index" :class="item.id === activeParentId?'noraml-color':'noraml-groupColor'"
+                <template >
+                  <div v-for="(item,index) in groupList" :key="index" :class="item.id === activeParentId?'noraml-color':'noraml-groupColor'"
                       class="groupItem" @click="clickCategory(index,item)"
                       @mouseenter="onShowCategoryEditBtn(index,item)">
                     <div class="category-list">
@@ -222,13 +222,13 @@
             </el-radio-group>
           </el-form-item>
 
-          <!-- 必填 -->
+          <!-- 重要巡檢項 -->
           <el-form-item style="margin-bottom: 20px">  
             <div class="score_item">
               <span class="sign">*</span>
               <span class="item_label">重要巡檢項</span>
             </div>
-            <el-radio-group class="attribute-group" v-model="itemRequired" @change="toItemRequired">
+            <el-radio-group class="attribute-group" v-model="isImportant" >
               <el-radio label="1">開啟</el-radio>
               <el-radio label="0">關閉</el-radio>
             </el-radio-group>
@@ -678,6 +678,7 @@ export default {
       notAllowedChangeParentId: false,
       ifClickSubCategory: false,
       itemRequired: '0',
+      isImportant: '0',
       itemType: 0,
       childIndex: -1,
       oldGroupSequence: [],
@@ -802,6 +803,9 @@ export default {
       console.log('toItemRequired  :>> ');
       this.getSettingStatus()
     },
+
+
+    
     toItemType(){
       console.log('toItemType  :>> ');
       this.getSettingStatus()
@@ -1612,6 +1616,7 @@ export default {
         availableScores: selectAvailable,
         type: this.itemType,
         required: this.itemRequired === '1',
+        isImportant: this.isImportant === '1',
 
         memo_is_advanced: this.memo_is_advanced,
         memo_options: [...this.memo_options],
@@ -1678,6 +1683,7 @@ export default {
           availableScores: selectAvailable,
           type: this.itemType,
           required: this.itemRequired === '1',
+          isImportant: this.isImportant === '1',
 
           memo_is_advanced: this.memo_is_advanced,
           memo_options: [...this.memo_options],

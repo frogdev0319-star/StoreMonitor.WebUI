@@ -341,7 +341,9 @@
                   scope="col">{{ t_item.name }}</th>
               </tr>
             </thead>
-            aaa
+
+            ///
+
             <template >
               <tbody v-for="(categoryItem, categoryIndex) in tableItem" :key="categoryIndex" :class="hasChart ? 'pdf_font_20': 'pdf_font_16'" class="pdf_font_20">
                 <tr style="vertical-align:middle;">

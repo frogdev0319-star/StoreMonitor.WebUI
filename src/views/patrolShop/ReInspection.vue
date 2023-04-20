@@ -628,6 +628,8 @@
           <div class="fullWidth rside">
             
             <div v-if="!showFeedBack" class="padding" :class="{flex:isFullScreenMode && $store.getters.collapsed}" style="background-color: rgb(237, 240, 242); height: 60vh; overflow: auto;flex-wrap: wrap; justify-content: space-between">
+
+    
               <div
                 v-for="(item_) in inspectList"
                 :key="item_.id"
@@ -657,7 +659,7 @@
                         style="text-align: left; font-weight: 500; word-break: break-all;"
                       >
                         <span style="color: #c60957" v-if="item.required">*</span>
-                        {{ item.subject }} 
+                        <span :class= "{ is_important : item.isImportant}"> {{ item.subject }}  </span> 
                       </div>
 
                       <!-- dropdown -->
@@ -2062,6 +2064,8 @@ export default {
               itemObj.description = _item.description;
               itemObj.itemScore = _item.itemScore;
               itemObj.required = _item.required;
+              itemObj.isImportant = _item.isImportant;
+
               let itemScoreLength = [];
               if (_item.availableScores.length !== 0) {
                 itemScoreLength = _item.availableScores;
@@ -3916,7 +3920,8 @@ export default {
   .input_bg
     background: #FFF !important
 
-
+  .is_important
+    color: #f31d65
 
   
     

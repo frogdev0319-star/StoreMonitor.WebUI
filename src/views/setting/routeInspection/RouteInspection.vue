@@ -131,7 +131,7 @@
                 type="file"
                 style="display: none"
                 accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
-                     application/vnd.ms-excel"
+                    application/vnd.ms-excel"
                 @change="importfxx(this)" >
             </div>
           </el-tab-pane>

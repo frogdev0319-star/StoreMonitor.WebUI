@@ -127,13 +127,13 @@
 
           <!-- 顯示區域計分(僅支援網頁版) -->
           <p class="rule-item">
-            <el-checkbox class="storevue-checkbox-outlined" v-model="aaa">
+            <el-checkbox class="storevue-checkbox-outlined" v-model="setting_isShowDistrictSum">
               顯示區域計分(僅支援網頁版)
             </el-checkbox>
           </p>
           <!-- 顯示巡檢類別計分 -->
           <p class="rule-item">
-            <el-checkbox class="storevue-checkbox-outlined" v-model="bbb">
+            <el-checkbox class="storevue-checkbox-outlined" v-model="setting_isShowGroupSum">
               顯示巡檢類別計分
             </el-checkbox>
           </p>
@@ -504,8 +504,9 @@ export default {
       includedInTotalScoreWithType1: false,
       qualifiedForIgnoredWithType1: false,
       qualifiedForIgnoredWithType2: false,
-      aaa: false,
-      bbb: false,
+
+      setting_isShowDistrictSum: false,
+      setting_isShowGroupSum: false,
 
       setting_isAutoMappingActivate: false,
       setting_autoMappingByTotalScore: true,
@@ -772,6 +773,10 @@ export default {
             { name: 'includedInTotalScoreWithType1', value: self.includedInTotalScoreWithType1 },
             { name: 'qualifiedForIgnoredWithType1', value: self.qualifiedForIgnoredWithType1 },
             { name: 'qualifiedForIgnoredWithType2', value: self.qualifiedForIgnoredWithType2 },
+
+            { name: 'setting_isShowDistrictSum', value: self.setting_isShowDistrictSum },
+            { name: 'setting_isShowGroupSum', value: self.setting_isShowGroupSum },
+
             { name: 'hundredMarkType', value: parseInt(self.hundredMarkType) },
             { name: 'minScore', value: parseFloat(self.minScore) },
             { name: 'maxScore', value: parseFloat(self.maxScore) },
@@ -874,6 +879,14 @@ export default {
               case 'qualifiedForIgnoredWithType2':
                 self.qualifiedForIgnoredWithType2 = item.value;
                 break;
+
+              case 'setting_isShowDistrictSum':
+                self.setting_isShowDistrictSum = item.value;
+                break;
+              case 'setting_isShowGroupSum':
+                self.setting_isShowGroupSum = item.value;
+                break;
+
               case 'hundredMarkType':
                 self.hundredMarkType = item.value.toString();//item.value === 0 ? '-1' =>加回比例制,不用default
                 break;
