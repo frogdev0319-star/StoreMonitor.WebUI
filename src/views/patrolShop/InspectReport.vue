@@ -317,6 +317,8 @@
             </div>
             <div class="limit-text">{{$t('remotePatrol.tipLimitGroupScore')}}</div>
           </div>
+
+          
           <table v-for="(tableItem, tableIndex) in pageItem.data" :key="tableIndex" class="table table-bordered">
             <thead :class="hasChart ? 'pdf_font_20': 'pdf_font_16'">
               <tr v-if="tableItem[0].type === 0">
@@ -324,33 +326,47 @@
                   v-for="(t_item ,t_index) in theaderPassFail"
                   :key="t_index"
                   :style="isexportPDF ? t_item.pdfWidth: t_item.width"
-                  scope="col">{{ t_item.name }}</th>
+                  scope="col">{{ t_item.name }} 
+                  <span v-if="t_index == 0 && setting_isShowGroupSum" > ( 總分:  {{ getTotalSum( pageItem.data[tableIndex]) }} ) </span>
+                </th>
               </tr>
               <tr v-if="tableItem[0].type === 1">
                 <th
                   v-for="(t_item ,t_index) in theaderScore"
                   :key="t_index"
                   :style="isexportPDF ? t_item.pdfWidth: t_item.width"
-                  scope="col">{{ t_item.name }} </th>
+                  scope="col">{{ t_item.name }} 
+                  <span v-if="t_index == 0 && setting_isShowGroupSum"> ( 總分: {{ getTotalSum( pageItem.data[tableIndex]) }} ) </span>
+                </th>
               </tr>
               <tr v-if="tableItem[0].type === 2">
                 <th
                   v-for="(t_item ,t_index) in theaderOther"
                   :key="t_index"
                   :style="isexportPDF ? t_item.pdfWidth: t_item.width"
-                  scope="col">{{ t_item.name }}</th>
+                  scope="col">{{ t_item.name }} 
+                  <span v-if="t_index == 0 && setting_isShowGroupSum"> ( 總分: {{ getTotalSum( pageItem.data[tableIndex]) }} ) </span>
+                </th>
               </tr>
             </thead>
 
-            ///
-
+          
             <template >
+              <!-- <pre> --0-- {{ tableItem[0] }}  </pre> -->
+              <!-- <pre> --1-- {{ tableItem[1] }}</pre>
+              <pre> --2-- {{ tableItem[2] }}</pre>
+              <pre> --3-- {{ tableItem[3] }}</pre> -->
+
               <tbody v-for="(categoryItem, categoryIndex) in tableItem" :key="categoryIndex" :class="hasChart ? 'pdf_font_20': 'pdf_font_16'" class="pdf_font_20">
                 <tr style="vertical-align:middle;">
                   <td :rowspan="categoryItem.children.length + 1" style="vertical-align:middle;">
+                    
                     <div>
                       <div v-if="categoryItem.weight != -1 && categoryItem.type != 2">{{ categoryItem.weight + '%' }}</div>
-                      <div>{{ categoryItem.groupName }}</div>
+                      <div>
+                        {{ categoryItem.groupName }} 
+                        <span style="color: #7d8cad; margin-left: 5px;" v-if="setting_isShowDistrictSum"> ( 總分: {{ getSum(categoryItem.children) }} ) </span>
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -367,7 +383,8 @@
                   <td v-if="subcategory.type === 1"><span>{{ getDoubleNum(subcategory.weight == -1 ? subcategory.totalScore : subcategory.totalScore * subcategory.weight / 100) }}</span></td>
                   <td>
                     <div style="display:flex;flex-direction:row;justify-content:space-between;">
-                      <div style="flex:2;">{{ getDoubleNum(subcategory.actualScore) == Infinity ? '--' : getDoubleNum((subcategory.weight == -1 || subcategory.type==2 ) ? subcategory.actualScore : subcategory.actualScore * subcategory.weight / 100) }}</div>
+                      <!-- 分數 -->
+                      <div style="flex:2;">{{ getDoubleNum(subcategory.actualScore) == Infinity ? '--' : getDoubleNum((subcategory.weight == -1 || subcategory.type==2 ) ? subcategory.actualScore : subcategory.actualScore * subcategory.weight / 100) }} </div>
                       <div v-if="subcategory.children" style="display:flex;flex:1;flex-direction:row;align-content:center;">
                         <img v-if="categoryItem.isAdvanced" style="margin-right:4px;" :src="require('../../../static/img/group_score.svg')" width="15" height="15" />
                         <div style="color:#9EACB6;font-size:10px;font-weight:normal;">{{ categoryItem.isAdvanced? categoryItem.groupScore:''}}</div>
@@ -636,6 +653,9 @@ export default {
       hasAttachment: 0,
       varyWindowWidth: window.innerWidth,
 
+      setting_isShowGroupSum: false,
+      setting_isShowDistrictSum: false,
+
       videoSrc: require('../../../static/img/monitor.png'),
       inspectSrc: require('../../../static/img/remote_patrol.png'),
       insiteInspectSrc: require('../../../static/img/onsite_patrol.png'),
@@ -765,6 +785,46 @@ export default {
   },
 
   methods: {
+    // 加總
+    getTotalSum(Array){
+      var tableTotalScore = 0
+
+      Array.forEach(i => {
+        i.children.forEach( ii => {
+          var isInfinity = this.getDoubleNum(ii.actualScore)
+          if( isInfinity === Infinity) {
+            tableTotalScore = tableTotalScore + 0
+            } else {
+              if(ii.weight == -1 || ii.type== 2 ){
+                tableTotalScore = tableTotalScore + ii.actualScore
+              } else {
+                tableTotalScore = tableTotalScore + ii.actualScore * ii.weight / 100
+              }
+            }
+        })
+      })
+      return tableTotalScore
+
+    },
+
+    getSum(Array){
+      var totalScore = 0
+      Array.forEach(i => {
+        var isInfinity = this.getDoubleNum(i.actualScore)
+        if( isInfinity === Infinity) {
+          totalScore = totalScore + 0
+        } else {
+          if(i.weight == -1 || i.type==2 ){
+            totalScore = totalScore + i.actualScore
+          } else {
+            totalScore = totalScore + i.actualScore * i.weight / 100
+          }
+        }
+      })
+      return totalScore
+    },
+
+    
     getDoubleNum (num) {
       num = util.isDouble(num,2);
       return Math.round(num * 100) / 100  
@@ -780,6 +840,15 @@ export default {
 
         console.log('results[1] :>> ', results[1]);
         this.getReportInfo(results[1]);
+
+        this.setting_isShowGroupSum = (results[1].data[0].inspectSettings.find( i => i.name == "setting_isShowGroupSum")).value
+        this.setting_isShowDistrictSum = (results[1].data[0].inspectSettings.find( i => i.name == "setting_isShowDistrictSum")).value
+  
+        console.log('this.setting_isShowGroupSum  :>> ', this.setting_isShowGroupSum );
+        console.log('this.setting_isShowDistrictSum :>> ', this.setting_isShowDistrictSum);
+
+
+
       }).catch(err => {
         console.log('ReportDetail-getReportTemplateAndInfo:' + err);
       })
@@ -1216,7 +1285,7 @@ export default {
         const mapObj = { name: 'signatureInfo', class: 'signature-map', ifExpand: false, distance: this.signInDistance, data:this.signMapUrl };
         pageData.push(mapObj);
       }
-      this.pageData = {...pageData};
+      this.pageData = pageData;
       console.log('this.pageData ~~~~>> ', this.pageData);
 
     },

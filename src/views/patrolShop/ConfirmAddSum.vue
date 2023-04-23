@@ -150,7 +150,7 @@
               <tr>
                 <th v-for="(t_item ,t_index) in s_item.data[0].tHeader" :key="t_index" :style="t_item.width" scope="col">
                   {{ t_item.name }} 
-                  <span style="color: #7d8cad; margin-left: 5px;" v-if="t_index == 0">( 總分: {{ getTotalSum(s_item.data)}} )</span>
+                  <span style="color: #7d8cad; margin-left: 5px;" v-if="t_index == 0 && setting_isShowGroupSum">( 總分: {{ getTotalSum(s_item.data)}} )</span>
                 </th>
               </tr>
             </thead>
@@ -163,7 +163,7 @@
                         <div v-if="inspectItem.weight != -1 && inspectItem.type != 2">{{ inspectItem.weight + '%' }} </div>
                         <div class="sheet_title">
                           {{ inspectItem.label }} 
-                          <span style="color: #7d8cad; margin-left: 5px;">( 總分:{{getSum(inspectItem.inspectList)}} )</span>
+                          <span style="color: #7d8cad; margin-left: 5px;" v-if="setting_isShowDistrictSum">( 總分:{{getSum(inspectItem.inspectList)}} )</span>
                         </div>
                       </div>
                       <div class="flex" style="align-items: center">
@@ -588,6 +588,9 @@ export default {
       autoMappingByTotalScore: "",
       isAutoMappingActivate: "",
       dangerousOnFailedItem:"",
+
+      setting_isShowGroupSum: false,
+      setting_isShowDistrictSum: false,
 
       unqualifiedStatus:  false,
       scoreMiddleLow: 0,
@@ -2120,9 +2123,15 @@ export default {
           this.isAutoMappingActivate = res.data.find(i => {
             return i.name == "setting_isAutoMappingActivate"
           })
-
+          
           this.scoreMiddleLow = this.autoMappingByTotalScore.extra.find(i => i.key === "mappingScore_bottom").value
           this.scoreMiddleHeight = this.autoMappingByTotalScore.extra.find(i => i.key === "mappingScore_top").value
+
+          this.setting_isShowGroupSum = ( this.getInspectRuleSettings.find( i => i.name == "setting_isShowGroupSum")).value
+          this.setting_isShowDistrictSum = ( this.getInspectRuleSettings.find( i => i.name == "setting_isShowDistrictSum")).value
+          console.log('this.setting_isShowGroupSum  :>> ', this.setting_isShowGroupSum );
+          console.log('this.setting_isShowDistrictSum :>> ', this.setting_isShowDistrictSum);
+
           
           this.resultList[0].name =this.inspectStatus.status_2
           this.resultList[1].name =this.inspectStatus.status_1
