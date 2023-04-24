@@ -3,11 +3,13 @@
     <div v-for="(_item,_index) in reportDetailData" :key="_index" class="content-detail">
       <div class="content-detail-title">
         <div class="detail-title">
-          <p class="title1"><span class="pdf_font_20">{{ _index+1 }}.{{ _item.subject }}</span>
+          <p class="title1" ><span class="pdf_font_20" :class= "{ is_important : _item.isImportant}" >{{ _index+1 }}.{{ _item.subject }}  </span>
           <span 
             style="color: #85898e; font-size: 12px"
             v-if="_item.itemScore !== Number.MAX_VALUE" 
-            class="pdf_font_18">
+            class="pdf_font_18"
+            :class= "{ is_important_s  : _item.isImportant}" 
+            >
             {{ `( ${$t('remotePatrol.totalScoreUnit')}${_item.itemScore} )` }}</span></p>
           <p class="title2"><span class="pdf_font_18 title2_pdf">{{ _item.description }}</span></p>
         </div>
@@ -254,6 +256,12 @@ export default {
   }
   @mixin point($poi,$val){
     #{$poi}:checkRem($val);
+  }
+  .is_important {
+    color: #f31d65 !important
+  }
+  .is_important_s {
+    color: #fb6093 !important
   }
   .content-detail{
     margin-top: 10px;
