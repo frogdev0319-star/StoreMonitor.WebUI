@@ -1382,6 +1382,7 @@ export default {
       const self = this;
       self.showAddNape = true;
       this.itemRequired = '0';
+      this.isImportant = '0'
       self.updateType = {type:0};
       self.setDialogContent();
       self.ItemSheetScore = self.activeSheetName === '0' ? '' : 0;
@@ -1724,6 +1725,7 @@ export default {
       this.ItemDescription = item.napeDep;
       this.itemType = item.type;
       this.itemRequired = item.required ? '1' : '0';
+      this.isImportant = item.isImportant ? '1' : '0';
 
       this.memo_is_advanced = item.memo_is_advanced.toString()
       this.memo_option = item.memo_options.join("/")
@@ -1955,6 +1957,7 @@ export default {
           type: _item.type,
           sequence: _item.sequence,
           required: _item.required,
+          isImportant: _item.isImportant,
           
           memo_is_advanced: _item.memo_is_advanced,
           memo_options: _item.memo_options,
