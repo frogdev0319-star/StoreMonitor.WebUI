@@ -115,6 +115,8 @@
         />
       </el-select>
     </div>
+    
+    <!-- 巡檢詳情 -->
     <div class="el-acticle">
       <el-row v-for="(pageItem, pageIndex) in pageData" :class="pageItem.class" :key="pageIndex">
         <el-col>
@@ -129,7 +131,7 @@
                   :class="pageItem.ifExpand ? 'icon-zhedie1': 'icon-zhankai1'"
                   class="iconfont icontemp"/>
                 <span class="title-lable"><span class="pdf_font_20">
-                  {{ $t(`titleView.${pageItem.name}`) }}</span>
+                  {{ $t(`titleView.${pageItem.name}`) }} </span>
                 </span>
               </div>
               <div v-if="pageItem.itemCount > -1" class="count-header">
@@ -171,7 +173,7 @@
                   <div v-for="(item,index) in feedbacks" :key="index" class="content-detail">
                     <div class="content-detail-title" style="background-color:#fff;min-height:30px;">
                       <div class="detail-title">
-                        <p class="title1"><span class="pdf_font_20">{{ index+1 }}.{{ item.subject }}</span></p>
+                        <p class="title1"><span class="pdf_font_20">{{ index+1 }}.{{ item.subject }} </span></p>
                       </div>
                     </div>
                     <div
@@ -412,7 +414,7 @@
               class="pie-div">
                 <div class="pct-panel"
                 :style="isexportPDF ? {'width': '145px', 'height': '175px'}: {'width': '290px', 'height': '350px'}"
-                 >
+                >
                     <v-chart
                         ref="pieChartRef"
                         :auto-resize="true"
@@ -526,7 +528,7 @@
                   :class="pageItem.ifExpand ? 'icon-zhedie1': 'icon-zhankai1'"
                   class="iconfont icontemp"/>
                 <span class="title-lable"><span class="pdf_font_20">
-                  {{ $t(`remotePatrol.${pageItem.name}`) }}</span>
+                  {{ $t(`remotePatrol.${pageItem.name}`) }} </span>
                 </span>
               </div>
             </div>
@@ -1220,6 +1222,7 @@ export default {
           details.qualifiedScore = item.qualifiedScore;
           details.itemScore = item.itemScore;
           details.type = item.type;
+          details.isImportant = item.isImportant;
           details.passOfFailFlag = this.getItemsPassOrFailed(groupitem.type, item.score, item.qualifiedScore);
           if (item.attachment.length !== 0) {
             this.hasAttachment++;
@@ -1255,7 +1258,6 @@ export default {
 
     getPageDataBasedOnTemplate(data) {
       
-
       console.log('data 2:>> ', data);
       
       const map = this.getDetailNameAndHandlerMap(data);

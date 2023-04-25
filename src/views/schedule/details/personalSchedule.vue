@@ -12,23 +12,27 @@
             </div>
             <div style="flex:2"></div>
             <delay-button
-              class="search-button"
-              type="primary"
-              size="mini"
-              @click="doSearchScheduleList">
-              <span>{{ $t('remotePatrol.search') }}</span>
+                class="search-button"
+                type="primary"
+                size="mini"
+                @click="doSearchScheduleList">
+                <span>{{ $t('remotePatrol.search') }}</span>
             </delay-button>
         </div>
         <div class="scheduleLlist-area">
             <div class="buttons">
                 <delay-button @click="addNewSchedule">
                     <div class="button-area">
-                        <i class="iconfont el-icon-plus"/>
+                        <i class="iconfont el-icon-plus" />
                         <span>{{$t('schedule.addSchedule')}}</span>
                     </div>
                 </delay-button>
-                <el-button class="storevue-button-empty" :disabled="!enableDeleteBtn" @click="deleteSchedule" style="min-height:32px">
-                    <div class="button-area">
+
+                <el-button class="storevue-button-empty" 
+                    :disabled="!enableDeleteBtn" 
+                    style="min-height:31px; padding-top: 4px;"
+                    @click="deleteSchedule" >
+                    <div class="button-area ">
                         <span>{{$t('scheduleView.delete')}}</span>
                     </div>
                 </el-button>
@@ -66,15 +70,15 @@
             </div>
         </div>
         <dialog-pop
-          :title="$t('schedule.deleteSchedule')"
-          :isWarning="true"
-          :visible="showConfirmDelete"
-          @cancelHandler = "showConfirmDelete=false"
-          @confirmHandler="onConfirmDeleteSch"
-          >
-          <div class="dialog-slot">
-            {{$t('schedule.confirmDeleteSchedule')}}
-          </div>
+            :title="$t('schedule.deleteSchedule')"
+            :isWarning="true"
+            :visible="showConfirmDelete"
+            @cancelHandler = "showConfirmDelete=false"
+            @confirmHandler="onConfirmDeleteSch"
+            >
+            <div class="dialog-slot">
+                {{$t('schedule.confirmDeleteSchedule')}}
+            </div>
         </dialog-pop>
     </div>
 </template>
@@ -196,7 +200,7 @@ export default{
             const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
             self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
             self.dateValue[1] = self.dateValue[1];
-            self.inputSearchValue = '';
+            // self.inputSearchValue = '';
             if(this.firstLoad){ 
                 this.doSearchScheduleList();
                 this.firstLoad = false;
@@ -346,6 +350,15 @@ export default{
     }
 }
 </script>
+<style lang="sass" scoped>
+    .button-area
+        overflow: visible
+        display: flex
+        flex-direction: row
+        justify-content: center
+        align-items: center
+
+</style>
 
 <style scoped lang="scss">
 .ScheduleContainer{
