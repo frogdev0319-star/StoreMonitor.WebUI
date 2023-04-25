@@ -113,7 +113,9 @@ export default{
       "generalMode":"一般模式",
       "mimicMode":"神秘客模式",
       "MysterioManage":"神秘客权限",
-      "MysterioSetting":"门店权限设定"
+      "MysterioSetting":"门店权限设定",
+      "errorStoreNoPermission":"门店无服务权限，请联系管理员",
+      "errorStoreNameNoPerssion":"因{storeNames}无服务权限无法操作，请重新确认",
   },
   "overview":{
       "DangerousLess":"立即督导＜60%",

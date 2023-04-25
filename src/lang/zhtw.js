@@ -122,6 +122,8 @@ export default{
       "ModifySchedule":"編輯排程",
       "schedulePersonalCreate":"巡檢排程｜個人排程",
       "schedulePersonalModify":"巡檢排程｜個人排程",
+      "errorStoreNoPermission":"門店無服務權限，請聯繫管理員",
+      "errorStoreNameNoPerssion":"因{storeNames}無服務權限無法操作，請重新確認",
   },
   "overview":{
       "DangerousLess":"立即督導＜60%",

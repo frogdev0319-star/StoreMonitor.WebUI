@@ -10,7 +10,7 @@
         <span
             v-if="event.status === 0"
             class="event-status"
-            style="background-color:#fff2ef;color:#f57848;" 
+            style="background-color:#fff2ef;color:#f57848;"
             >
             {{ $t('eventView.pending') }}
           </span>
@@ -261,7 +261,7 @@
               </div>
               </div>
             </div>
-            
+
           </div>
           <!--<div v-if="event.sourceType !== 1" class="viedo-info">
             <div v-if="showCheckVideo" @click="checkVideo">
@@ -271,7 +271,7 @@
           </div>-->
         </div>
       </div>
-      
+
     </el-col>
     <el-col :span="12" class="rside" :style="{'height':windowHeight*0.82+'px','background-color':'#edf0f2'}">
       <div class="title">
@@ -299,7 +299,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="submit-content">
         <el-scrollbar class="submit-content-scroll">
         <div>
@@ -308,8 +308,8 @@
               <!-- <img :src="delDesImg" style="widht:16px;height:16px;align-self:start;margin-top:10px;" :key="'img_'+idx" @click="onDeleteDescription(idx)" /> -->
               <div class="edit-description">
                 <div class="edit-input">
-                  
-                  <el-input 
+
+                  <el-input
                     class="edit-event-input"
                     v-model="addDescriptionList[idx]"
                     type="textarea"
@@ -317,7 +317,7 @@
                     :readonly="!isEdit"
                     @input="(val)=>editDesChang(val,idx)"
                   />
-                  
+
                   <span v-if="editDesRuletip[idx]" class="rules">{{ $t('eventView.RateRuletip') }}</span>
                 </div>
                 <div class="edit-icon-div" >
@@ -333,8 +333,8 @@
                             @click="onDeleteDescription(idx)"
                           />
           </div>
-          <div v-if="curDeslistNum<5" class="des-input"> 
-            <div style="min-height:36px;height:auto;"> 
+          <div v-if="curDeslistNum<5" class="des-input">
+            <div style="min-height:36px;height:auto;">
             <el-input
               :autosize="{ minRows: 2}"
               v-model="eventDes"
@@ -380,7 +380,7 @@
         </div>
         </el-scrollbar>
       </div>
-      
+
       <el-dialog :visible.sync="uploadProgress" :close-on-click-modal="false" width="510px" top="35vh" left="40vh" class="AddSumupLoad">
         <div class="body-content">
           <p>{{ $t('remotePatrol.uploading') }}</p>
@@ -709,7 +709,7 @@ export default {
       if(event.relatedDeviceIds.length > 0){
         const relatedDeviceIds = event.relatedDeviceIds.sort();
         self.relatedChannels = [];
-        
+
         relatedDeviceIds.forEach(item => {
           deviceList.forEach(_item => {
             if (_item.id === item) {
@@ -770,22 +770,22 @@ export default {
           // 1 handled：add、closed、reject
           // 2 closed：
           // 3 reject：handle、add、closed
-          // 4 
+          // 4
           self.subBtnList.forEach(item => {
             console.log("item:",item);
             if (self.curStatus === 0 || self.curStatus === 3) {
               //if (item.order === 0 && !!PermissionHelper.enableEventHandle()) item.isShow = true;
-              //else if(item.order === 1 && !!PermissionHelper.enableEventAdd())  item.isShow = true; 
-              //else if(item.order === 2 && !!PermissionHelper.enableEventClose()) item.isShow = true; 
+              //else if(item.order === 1 && !!PermissionHelper.enableEventAdd())  item.isShow = true;
+              //else if(item.order === 2 && !!PermissionHelper.enableEventClose()) item.isShow = true;
               //else item.isShow = false;
               item.order === 0 || item.order === 1 || item.order === 2 ? item.isShow = true : item.isShow = false;
               item.order === 0 ? item.isActive = true : item.isActive = false;
             }
             if (self.curStatus === 1) {
-              
-              //if(item.order === 1 && !!PermissionHelper.enableEventAdd())  item.isShow = true; 
+
+              //if(item.order === 1 && !!PermissionHelper.enableEventAdd())  item.isShow = true;
               //else if(item.order === 2 && !!PermissionHelper.enableEventClose()) item.isShow = true;
-              //else if (item.order === 3 && !!PermissionHelper.enableEventReturn()) item.isShow = true; 
+              //else if (item.order === 3 && !!PermissionHelper.enableEventReturn()) item.isShow = true;
               //else item.isShow = false;
               item.order === 1 || item.order === 2 || item.order === 3 ? item.isShow = true : item.isShow = false;
               item.order === 1 ? item.isActive = true : item.isActive = false;
@@ -816,7 +816,7 @@ export default {
             if (self.curStatus === 2 || self.curStatus === 4) {
               self.showWinpBtn = false;
             }
-            
+
             obj.showContent = index === 0;
             obj.audioList = [];
             obj.sourceList = [];
@@ -903,6 +903,10 @@ export default {
     },
 
     async submit() {
+      if(this.licenseStatus == 61 ){
+        util.notify(this.$t('route.errorStoreNoPermission'), 'error', 1000 );
+        return;
+      }
       if (!util.validateLicense(this.licenseStatus)) {
         return;
       }
@@ -1190,7 +1194,7 @@ export default {
       reader.onload = (e) => {
         console.log("e:",e);
         objFile.src = e.target.result;
-        
+
         objFile.file = util.base64ToBlob(e.target.result);
         console.log(objFile.file);
       };
@@ -1230,13 +1234,13 @@ $h1:#292e36;
     display: flex;
     align-items: center;
 }
-.to_delete{ 
+.to_delete{
     margin-bottom: 5px;
     transition: all .3s;
     cursor: pointer;
     margin-left: 5px;
   }
-  
+
 .AddSumupLoad >>> .el-dialog__body{
   padding:30px 40px !important;
   text-align: left;
@@ -1396,7 +1400,7 @@ $h1:#292e36;
             .rate-video-dialog{
               border-radius: 5px;
             }
-            
+
             .dialog-hr{
                 border: none;
                 margin-bottom:10px;
@@ -1653,7 +1657,7 @@ $h1:#292e36;
               }
             }
         }
-        
+
         .eventInfo-content{
             text-align: left;
             @include point(margin-top,15);
@@ -1672,7 +1676,7 @@ $h1:#292e36;
                 @include point(min-height,50);
                 /*@include point(min-width,260);*/
                 width:calc(492/1440*100vw);
-                
+
             }
             .description{
                 text-align: left;
@@ -1800,7 +1804,7 @@ $h1:#292e36;
                       font-size: 14px;
                       color:#484848;
                       word-break:keep-all;
-                      
+
                   }
                   .description{
                       float: left;
@@ -1899,7 +1903,7 @@ $h1:#292e36;
               }
             }
           }
-        
+
           .btn-content{
             background-color: #FFF;
             display: flex;
@@ -1963,7 +1967,7 @@ $h1:#292e36;
                 margin-bottom: 25px;
                 display: block;
             }
-            
+
             .description{
               margin:16px 19px 0px 16px;
               display:flex;
@@ -2036,7 +2040,7 @@ $h1:#292e36;
                 }
               }
             }
-            
+
             .rules{
                 font-size: 10px;
                 color:#ff2400;

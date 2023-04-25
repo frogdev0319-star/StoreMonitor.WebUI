@@ -113,7 +113,9 @@ export default{
         "generalMode":"Normal mode",
         "mimicMode":"Mystery shopper mode",
         "MysterioManage":"Mystery shopper permissions",
-        "MysterioSetting":"Store permission setting"
+        "MysterioSetting":"Store permission setting",
+        "errorStoreNoPermission":"The store does not have service permissions, please contact the administrator",
+        "errorStoreNameNoPerssion":"Cannot be operated because {storeNames} has no service permission, please reconfirm"
     },
     "overview":{
         "DangerousLess":"Pool Ratio＜60%",
@@ -1525,5 +1527,5 @@ export default{
         "mysterio":"Mystery Shopper",
         "allMysterio":"All of Mystery Shopper"
     }
-  
+
   }

@@ -7,9 +7,9 @@
     ></store-filter>
     <div class="el-container" style="margin-top: 20px" :class="{'flex-column': isFullScreenMode}">
       <div :style="{'border-bottom-right-radius': isFullScreenMode ? '0px': 'unset', 'border-bottom-left-radius': isFullScreenMode ? '0px': 'unset'}"
-        :class="{liseAnmiClass:showSpread}" 
+        :class="{liseAnmiClass:showSpread}"
         class="lside paper spacer"
-        
+
       >
         <div class="el-header-title flex-center">
           <img v-if="enableMimicMode?false:true" :src="store.storeUp? starYellowIcon : starGreyIcon"  @click="addStoreUp" style="cursor: pointer">
@@ -70,7 +70,7 @@
             <el-button id="confirmBtn" size="mini" type="primary" @click="confirmEdit">{{ $t('remotePatrol.confirm') }}</el-button>
           </div>
         </el-dialog>
-        
+
         <el-dialog
           v-if="dialogCommentVideo"
           :title="$t('remotePatrol.view')"
@@ -143,7 +143,7 @@
                   resize="none"
                   @input="eventDesChanged"
                   @blur="notShowInputRuleTips('eventDes')"/>
-                
+
                 <button
                   class="inspect-btn"
                   @click="submitFeedbackItemResource()"
@@ -247,7 +247,7 @@
                   resize="none"
                   @input="eventDesChanged"
                   @blur="notShowInputRuleTips('eventDes')"/>
-                
+
                 <button
                   class="inspect-btn"
                   @click="submitFeedbackItemResource()"
@@ -413,7 +413,7 @@
 
 
         <div v-if="showGuide && inspectList.length > 0" class="guide-content">
-          
+
           <div class="guide-rside">
             <div class="num-content">
               <span class="guide-num">2</span>
@@ -448,13 +448,13 @@
             @ezvizCutPictureFeedback="ezvizPictureFeedback"/>
         </div>
         <div class="channelbar-content padding" style="flex: 1">
-          <div v-if="isFullScreenMode" class="patrol-select title "> 
+          <div v-if="isFullScreenMode" class="patrol-select title ">
             <div class="patrol-content text-left flex-center" :class="{'margin-bottom-md': isFullScreenMode}">
               {{ $t('remotePatrol.selectInspect') }}
-              <el-select 
+              <el-select
                 style="margin-left: 20px;"
-                class="storevue-select-grey" 
-                :value="patrolstore" 
+                class="storevue-select-grey"
+                :value="patrolstore"
                 :placeholder="$t('remotePatrol.selectInspect')"
                 :disabled = "emptyPatrolList"
                 @change="changeInspect">
@@ -467,7 +467,7 @@
                 </el-option>
               </el-select>
               <div class="spacer"></div>
-              <el-button :disabled="!allRemarkItemsFlag && !isDisabled"
+              <el-button :disabled="(!allRemarkItemsFlag && !isDisabled)||storeStatus==61 "　
                 class="storevue-button-filled"
                 :size="varyWindowWidth>1680?'small':'mini'" type="primary" @click="confirmSummary">
                 {{ $t('remotePatrol.confirmSum') }}
@@ -475,8 +475,8 @@
             </div>
           </div>
           <div class="channel-content" :class="{'margin-bottom-md': isFullScreenMode}" style="height: 100%; display: flex; flex-direction: column;">
-            <div 
-              class="flex-center title " 
+            <div
+              class="flex-center title "
               :style="{'justify-content': isFullScreenMode?'unset':'space-between'}"
             >
               {{ $t('remotePatrol.zoneList') }}
@@ -501,14 +501,14 @@
                 style="padding-top: 20px"
                 :style="{'justify-content':isFullScreenMode?'unset':'space-between'}"
               >
-                <div 
-                  v-for="(item,index) in showChannelBtns.filter(d => d.name.indexOf(serachChannelValue) > -1)" 
-                  :key="index" 
+                <div
+                  v-for="(item,index) in showChannelBtns.filter(d => d.name.indexOf(serachChannelValue) > -1)"
+                  :key="index"
                   class="btn-details"
                   :class="{'child-space': isFullScreenMode}"
                   :style="{'width':isFullScreenMode?'246px':'calc(50% - 10px)'}"
-                > 
-                  <div 
+                >
+                  <div
                     @click="clickBtn(item,index)"
                     class="channel"
                     :class="{'channel-isActive': item.isClick}"
@@ -523,21 +523,21 @@
               </div> -->
             </div>
           </div>
-          
+
           <hr v-if="isFullScreenMode" class="hr-horizontal" >
         </div>
       </div>
-      
-      
+
+
       <div :style="{'border-top-right-radius': isFullScreenMode ? '0px': 'unset', 'border-top-left-radius': isFullScreenMode ? '0px': 'unset'}"
       :class="{'margin-left-md': !isFullScreenMode, 'padding': isFullScreenMode}" v-if="!showSpread" class="rside paper spacer" >
         <div v-if="!isFullScreenMode" class="patrol-select title" :class="{'padding': !isFullScreenMode}">
           <div class="patrol-content text-left flex-center" :class="{'margin-bottom-md': isFullScreenMode}">
-            {{ $t('remotePatrol.selectInspect') }} 
-            <el-select 
+            {{ $t('remotePatrol.selectInspect') }}
+            <el-select
               style="margin-left: 20px;"
-              class="storevue-select-grey" 
-              :value="patrolstore" 
+              class="storevue-select-grey"
+              :value="patrolstore"
               :placeholder="$t('remotePatrol.selectInspect')"
               :disabled = "emptyPatrolList"
               @change="changeInspect">
@@ -550,7 +550,7 @@
               </el-option>
             </el-select>
             <div class="spacer"></div>
-            <el-button :disabled="!allRemarkItemsFlag && !isDisabled"
+            <el-button :disabled="(!allRemarkItemsFlag && !isDisabled)||storeStatus==61"
               class="storevue-button-filled"
               :size="varyWindowWidth>1680?'small':'mini'" type="primary" @click="confirmSummary">
               {{ $t('remotePatrol.confirmSum') }}
@@ -559,7 +559,7 @@
         </div>
         <hr v-if="!isFullScreenMode" class="hr-horizontal" :style="isFullScreenMode?{'margin-bottom': '20px'}:{}">
         <div v-if="sheetName.length!=0" :class="{'flex': isFullScreenMode, fullWidth: isFullScreenMode}">
-  
+
           <div v-if="isFullScreenMode" style="width: 200px; padding-right: 10px">
             <el-input
               :placeholder="$t('insSettingView.enterInspectFilter')"
@@ -626,10 +626,10 @@
 
           <!-- right side -->
           <div class="fullWidth rside">
-            
+
             <div v-if="!showFeedBack" class="padding" :class="{flex:isFullScreenMode && $store.getters.collapsed}" style="background-color: rgb(237, 240, 242); height: 60vh; overflow: auto;flex-wrap: wrap; justify-content: space-between">
 
-    
+
               <div
                 v-for="(item_) in inspectList"
                 :key="item_.id"
@@ -640,17 +640,17 @@
                 </div>
 
                 <hr v-if="!showIgnoreItem ||item_.ignoreCount>0"  class="hr-horizontal">
-                <div v-for="(item,index) in item_.items.filter(d => d.subject.indexOf(searchItemValue ) > -1 && (!showIgnoreItem || d.ignore )) " 
-                  :key="index" 
+                <div v-for="(item,index) in item_.items.filter(d => d.subject.indexOf(searchItemValue ) > -1 && (!showIgnoreItem || d.ignore )) "
+                  :key="index"
                   class="item-details padding-sm"
                   :style="item.checked?{'background-color':'#f5f7fa'}:{}"
                   @click="clickItem({item,index:showIgnoreItem?item.originIndex:index})"
                   >
-                
+
                   <div class="flex fullWidth" >
                     <div class="font-15" style="text-align: left; width: calc(20/1920*100vw)" :style="item.checked?{'color':'#006ab7'}:{}">{{(index+1) + '.'}}</div>
                     <div class="flex padding-bottom-sm spacer" >
-                      
+
                       <!-- subject -->
                       <div
                         :class="!item.manualIgnore?'noraml-title':'ignore-title'"
@@ -659,7 +659,7 @@
                         style="text-align: left; font-weight: 500; word-break: break-all;"
                       >
                         <span style="color: #c60957" v-if="item.required">*</span>
-                        <span :class= "{ is_important : item.isImportant}"> {{ item.subject }}  </span> 
+                        <span :class= "{ is_important : item.isImportant}"> {{ item.subject }}  </span>
                       </div>
 
                       <!-- dropdown -->
@@ -691,7 +691,7 @@
                               @click.native="checkScore({item,itemDS: itemDS,index: index, e:1})">{{ itemDS }}</el-dropdown-item>
                           </el-dropdown-menu>
                         </el-dropdown>
-                        <div v-if="!item.required" class="cancel-text" 
+                        <div v-if="!item.required" class="cancel-text"
                           :style="(item.notEdit && isEditReport)?{'pointer-events':'none'}:{'pointer-events':'auto'}"
                           @click="item.manualIgnore ? CancleIgnoreItem({item,index}) : ignoreItem({item,index,e:0})">{{item.manualIgnore ? $t('remotePatrol.cancel') : $t('remotePatrol.ignore')}}</div>
                       </div>
@@ -714,13 +714,13 @@
                     <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
                       <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                         <div v-if="_item.mediaType == 3" class="flex-center">
-                        
+
                           <div
                             class=" flex-center comment_list "
                             :style="curEditIndex === _index?{'border':'1px solid #006ab7'}:{'border':'1px solid #e6e6e6'}"
                           >
                             <div style="flex: 1; text-align: left; margin: 5px; font-size: 13px;">
-                              {{ _item.src }} 
+                              {{ _item.src }}
                             </div>
                             <hr v-if="_item.showDelBtn" class="hr-vertical" />
                             <!-- 編輯 -->
@@ -743,7 +743,7 @@
                         </div>
                       </div>
                     </div>
-                    
+
                     <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="img-source-content">
                       <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details" >
                         <div v-if="_item.mediaType==2" class="img-content">
@@ -768,10 +768,10 @@
                         v-model="item.inspectInput"
                         :placeholder="$t('remotePatrol.coment')"
                         :disabled="item.disabled"
-                        
+
                         size="mini"
                         class="force_white"
-                        
+
                         type="textarea"
                         resize="none"
                         @input="(val) => itemDescriptionChanged({ val, item })"
@@ -787,15 +787,15 @@
                     </div>
 
                     <!-- notification -->
-                    <div class="advance_memo" v-if="(item.memo_config !== null && item.memo_config.memo_required_type == 1)"> 
+                    <div class="advance_memo" v-if="(item.memo_config !== null && item.memo_config.memo_required_type == 1)">
                       {{$t('remotePatrol.pleaseAdd')}} <span v-show="(item.memo_config.memo_check_text == true)"> {{$t('remotePatrol.textItem')}}</span>
                           <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">, </span>
                           <span v-show="(item.memo_config.memo_check_media == true)">{{$t('remotePatrol.mediaItem')}}</span> {{$t('remotePatrol.attachments')}}
                     </div>
 
-                    <div class="advance_memo" v-else-if="( item.memo_config !== null && item.memo_config.memo_required_type == 2)"> 
+                    <div class="advance_memo" v-else-if="( item.memo_config !== null && item.memo_config.memo_required_type == 2)">
                       <div class="" v-if="(item.qualifiedScore === 0)">
-                      {{$t('remotePatrol.notQualifyAdd')}} 
+                      {{$t('remotePatrol.notQualifyAdd')}}
                           <span v-show="(item.memo_config.memo_check_text == true)"> {{$t('remotePatrol.textItem')}}</span>
                           <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">, </span>
                           <span v-show="(item.memo_config.memo_check_media == true)">{{$t('remotePatrol.mediaItem')}}</span> {{$t('remotePatrol.attachments')}}
@@ -805,7 +805,7 @@
                           <span v-show="(item.memo_config.memo_check_text == true)"> {{$t('remotePatrol.textItem')}}</span>
                           <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">, </span>
                           <span v-show="(item.memo_config.memo_check_media == true)">{{$t('remotePatrol.mediaItem')}}</span> {{$t('remotePatrol.attachments')}}
-                      </div> 
+                      </div>
                     </div>
                     <span v-if="item.RuleCountTip" class="rules">{{
                       $t("remotePatrol.commentCountRuleTip")
@@ -816,9 +816,9 @@
                   </div>
                 </div>
               </div>
-              
+
             </div>
-            
+
             <div v-if="showFeedBack" style="background-color: rgb(237, 240, 242); height: 60vh; overflow: auto;">
               <div v-if="showFeedBackInfo&&showFeedBack" class="item-content paper" style="margin: 20px; height: calc(100% - 40px); position: relative">
                 <div id="feedback-content">
@@ -881,7 +881,7 @@
                   </div>
                 </div>
                 <div class="flex fullWidth" style="justify-content: right"><img :src="plusSrc" alt="plusSrc" class="plus-icon" @click="addFeedBack"></div>
-      
+
               </div>
             </div>
           </div>
@@ -938,6 +938,7 @@ export default {
   },
   data() {
     return {
+      storeStatus:-1,
       serachChannelValue: '',
       isFullScreenMode: false,
       sheetName: [],
@@ -1193,7 +1194,7 @@ export default {
 
       showIgnoreItem: false,
       emptyPatrolList: true
-    
+
     };
   },
   computed: {
@@ -1376,7 +1377,7 @@ export default {
         self.isEditReport = PatrolHistory.isEditReport;
         self.auditState = PatrolHistory.auditState;
         self.auditCancelable = PatrolHistory.auditCancelable;
-        
+
       }
     }else if(BackPatrolParam != null){
       self.getAllStore();
@@ -1414,7 +1415,7 @@ export default {
   methods: {
     changeStore_(_item) {
       const self = this;
-      
+      self.storeStatus = _item.status;
       self.patrolstore = '';
       self.curSheetIndex = 0;
       self.curSheet = {};
@@ -1431,7 +1432,7 @@ export default {
       self.notShowAlert = false;
       this.showIgnoreItem = false;
       this.$emit("listenerChild", false);
-      
+
       self.showStoreUp = true;
       self.$refs.vendorVideo && (self.$refs.vendorVideo.editCount = 0);
       self.$refs.vendorVideo && self.$refs.vendorVideo.stopVideoPlay();
@@ -1455,7 +1456,7 @@ export default {
         obj.storeTitle = _item.name;
         obj.storeUp = _item.favorite;
         obj.device = _item.device;
-        
+
         self.getChannelByStore(_item);
         if (_item.favorite) {
           obj.storeUpTitle = this.$t('remotePatrol.stared');
@@ -1473,7 +1474,7 @@ export default {
           self.changeInspectList(self.curInspectId); //抓整個全新的巡檢項目,在做分數、附件更新
         }
       }
-      
+
     },
     changeBrand() {
       const self = this;
@@ -1615,7 +1616,7 @@ export default {
         this.eventList.push(obj);
       } else {
         this.eventList[this.feedbackIndex].eventName = this.eventName;
-        this.eventList[this.feedbackIndex].sourceList = this.feedbackSourceList; 
+        this.eventList[this.feedbackIndex].sourceList = this.feedbackSourceList;
         this.eventList[this.feedbackIndex].showDelBtn = true;
       }
       this.showAddTextFeedbackDialog = false;
@@ -1627,7 +1628,7 @@ export default {
       let tempId = null;
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
-      
+
         sheetName.forEach((s_item, s_index) => {
           s_item.inspectList[0].items.forEach((item, index) => {
             if (item.id === id) {
@@ -1638,7 +1639,7 @@ export default {
             }
           });
         });
-      
+
       return tempId;
     },
     getChannelIndexById(id) {
@@ -1781,7 +1782,7 @@ export default {
             resolve(res);
           });
         });
-        
+
       }else{
         return new Promise((resolve, reject) => {
           getStoreList(params).then(res => {
@@ -1919,10 +1920,10 @@ export default {
           break;
       }
     },
-    
+
     changeInspect(val) {
       const self = this;
-      
+
       sessionStorage.setItem('inspectId', JSON.stringify(val))
       // console.log(self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 0, self.$store.getters.PatrolHistory != null)
       if (self.$store.getters.editCount > 0) {
@@ -1957,7 +1958,7 @@ export default {
       self.isShowWarn = false;
       self.notShowAlert = false;
       this.showIgnoreItem = false;
-      this.$emit("listenerChild", false); 
+      this.$emit("listenerChild", false);
       self.eventList = [];
       // self.showChannelBtns = [];
       self.curSheetIndex = 0;
@@ -2102,7 +2103,7 @@ export default {
                 {val: -1, scoreTitle: btnNameArr[1], isClick: false}
                 ];
               itemObj.itemType = _item.type;
-              
+
               // 處理備註標籤
               itemObj.memo_is_advanced = _item.memo_is_advanced
               itemObj.memo_options = _item.memo_options
@@ -2130,32 +2131,32 @@ export default {
           })
 
           console.log('handleData :::::::::::::::::>> ', handleData);
-          
+
           for (let i = 0; i < handleData.length; i++) {
             let count = 0, label = '';
             if (handleData[i].subcatergy.length === 0){
               count = handleData[i].cateray.items.length;
               te_temp.push({
-                inspectList: [handleData[i].cateray], 
-                dealCount: 0, 
-                Effective: 0, 
-                count: count, 
+                inspectList: [handleData[i].cateray],
+                dealCount: 0,
+                Effective: 0,
+                count: count,
                 isClick: false,
-                label: handleData[i].cateray.groupName, 
-                type: handleData[i].cateray.type, 
+                label: handleData[i].cateray.groupName,
+                type: handleData[i].cateray.type,
                 isCategory: false,
                 weight: handleData[i].cateray.weight
               });
             } else {
               handleData[i].subcatergy.forEach(item => count += item.items.length);
               te_temp.push({
-                inspectList: handleData[i].subcatergy, 
-                dealCount: 0, 
-                Effective: 0, 
-                count: count, 
+                inspectList: handleData[i].subcatergy,
+                dealCount: 0,
+                Effective: 0,
+                count: count,
                 isClick: false,
-                label: handleData[i].cateray.groupName, 
-                type: handleData[i].cateray.type, 
+                label: handleData[i].cateray.groupName,
+                type: handleData[i].cateray.type,
                 isCategory: true,
                 weight: handleData[i].cateray.weight
               });
@@ -2201,7 +2202,7 @@ export default {
         sheet.Effective = 1;
         console.log("sheet:",sheet);
         if(sheet.groupId!="feedBack"){
-          
+
           var tabIncep = hisData.find( hd => hd.groupName==sheet.label );
           console.log("tabIncep:",tabIncep);
           if(tabIncep.children){//有三層時的第二層 對應sheet.inspectList
@@ -2259,7 +2260,7 @@ export default {
     },
     doGetcateryItems(sheetItem,cateryItems,type){ //type:0:合格率評分 1:巡檢評分項 2:附加評分項
       var dealCount=0;
-      
+
       for(let i=0; i<cateryItems.length; i++){
         var showDelBtn = true;
         sheetItem[i].id = cateryItems[i].itemId;
@@ -2314,7 +2315,7 @@ export default {
           }
           for(let j=0; j<cateryItems[i].sourceList.length;j++){
             var attItem = cateryItems[i].sourceList[j];
-              var fileName = attItem.url.substring(attItem.url.lastIndexOf('/')+1); 
+              var fileName = attItem.url.substring(attItem.url.lastIndexOf('/')+1);
               var attFile ={
                   mediaType:attItem.mediaType,
                   src:attItem.url,
@@ -2330,7 +2331,7 @@ export default {
           //console.log("sourceList:",attFile);
           sheetItem[i].sourceList = att;
         }
-      } 
+      }
       console.log("*after fill sheetItem:",sheetItem);
       return sheetItem;
     },
@@ -2344,12 +2345,15 @@ export default {
     onStoreChange (storeData) {
       this.curSelStoreId = storeData.curSelectedStore
       const storeItem = this.storeList.find(store => store.storeId === this.curSelStoreId);
+      if(storeItem && storeItem.status == 61){
+          util.notify(this.$t('route.errorStoreNoPermission'), 'error', 1000 );
+      }
       if (!this.$store.getters.storeCache && !this.isEditReport) {
         this.changeStore_(storeItem);
       } else {
         this.$store.dispatch('setStoreCache', '');
       }
-      
+
     },
     async getAllStore () {
       const self = this;
@@ -2641,7 +2645,7 @@ export default {
       const self = this;
       item.sourceList.splice(index, 1);
       self.sourceListLength--;
-      
+
       self.sheetName[self.curSheetIndex].inspectList.forEach((inspect, idx) => {
         inspect.items.forEach(item_ => {
           if (item_.id === item.id) self.curGroupIndex = idx
@@ -2659,7 +2663,7 @@ export default {
       self.curItem.disabled = true;
 
         self.showGuide = false;
-        
+
         self.sheetName[self.curSheetIndex].inspectList.forEach((inspect, idx) => {
           inspect.items.forEach(item_ => {
             if (item_.id === self.curItemId) self.curGroupIndex = idx
@@ -2683,7 +2687,7 @@ export default {
             self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].scoreList.forEach(x => {
               x.isClick = false;
             });
-        
+
         const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
         const sheetName = JSON.parse(JSON.stringify(self.sheetName.slice(0, indexFeed)));
         const hasIgnoretemp = [];
@@ -2716,7 +2720,7 @@ export default {
       self.sheetName[self.curSheetIndex].dealCount--
       this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].dealCount--
       // if (self.sheetName[self.curSheetIndex].dealCount != 0) {
-        
+
       // }
       self.notShowAlert ? self.notShowAlert = false : null;
 
@@ -2798,7 +2802,7 @@ export default {
     clickItem({item, index}) {
 
       const self = this;
- 
+
       self.sourceList = [];
       self.sourceListLength = item.sourceList.length;
       self.curDeviceId = item.deviceId[0];
@@ -2830,7 +2834,7 @@ export default {
       const self = this;
       self.leaveObj.dialogCosed = false;
       if (self.$refs.vendorVideo) self.$refs.vendorVideo.editCount = 0;
-      
+
     },
     cancelLeave() {
       const self = this;
@@ -2857,7 +2861,7 @@ export default {
       const self = this;
       self.allIgnoreObj.dialogCosed = false;
     },
-    
+
     // sourceList
     async resolveConfoirmSummaryData() {
       const inspectList = [];
@@ -2969,7 +2973,7 @@ export default {
     },
 
 
-    
+
     async confirmSummary() {
       const self = this;
       const temp = [];
@@ -2987,19 +2991,19 @@ export default {
 
       sheetName.forEach(s_item => {
           s_item.inspectList.forEach(item => {
-            
+
             item.items.forEach((_item, _index) => {
               if (!_item.manualIgnore && _item.required) {
               console.log("_item ::::::::>>", _item)
                 if (
-                  (_item.itemType === 0 && _item.itemgetScore === '--') || 
+                  (_item.itemType === 0 && _item.itemgetScore === '--') ||
                   (_item.itemType === 1 && _item.sourceList.length === 0)
                 ) {
                   requiredValid = true
                 }
               }
-              
-              
+
+
               if(_item.memo_config !== null){
                 switch (_item.type) {
                   case 0:
@@ -3011,7 +3015,7 @@ export default {
                       if(_item.memo_config.memo_check_text && !hasText_tab1) {
                         memoCheckText = true
                         }
-                      else if(_item.memo_config.memo_check_media && !hasImg_tab1){ 
+                      else if(_item.memo_config.memo_check_media && !hasImg_tab1){
                         memoCheckMedia = true
                         }
                     }
@@ -3034,7 +3038,7 @@ export default {
                       if(_item.memo_config.memo_check_text && !hasText_tab2) {
                         memoCheckText = true
                         }
-                      else if(_item.memo_config.memo_check_media && !hasImg_tab2){ 
+                      else if(_item.memo_config.memo_check_media && !hasImg_tab2){
                         memoCheckMedia = true
                         }
                     }
@@ -3057,7 +3061,7 @@ export default {
                       if(_item.memo_config.memo_check_text && !hasText_tab3) {
                         memoCheckText = true
                         }
-                      else if(_item.memo_config.memo_check_media && !hasImg_tab3){ 
+                      else if(_item.memo_config.memo_check_media && !hasImg_tab3){
                         memoCheckMedia = true
                         }
                     }
@@ -3070,7 +3074,7 @@ export default {
                       }
                     }
                     break;
-                  
+
                   default:
                     break
                 }
@@ -3120,7 +3124,7 @@ export default {
         self.memoConfigMediaObj.dialogCosed = true;
         return false;
       }
-      
+
 
       if(this.allRemarkItemsFlag && dealCount === 0){
         util.notify(this.$t('remotePatrol.invalidInspection'), 'warning', 3000);
@@ -3304,7 +3308,7 @@ export default {
       }else{
         self.changeStoreObj.dialogCosed = false;
       }
-      
+
     },
     canceldChangeBrand() {
       const self = this;
@@ -3486,7 +3490,7 @@ export default {
 
 
         }
-        
+
         s_item.ignoreCount = count;
         if(s_item.ignoreCount>0&&first){
           this.changeSheet(s_item,sheetIndex)
@@ -3611,7 +3615,7 @@ export default {
       });
     },
     clickStore(item, index, _item, _index) {
-      
+
       const self = this;
       if (!_item.hasInspect && _item.hasInspect != undefined) {
         return false;
@@ -3891,10 +3895,10 @@ export default {
     background-color: #FFF !important
     border-color: none !important
     padding: 7px 70px 7px 7px
-    
+
   .force_white .el-textarea__inner:focus
     border-color: #c0c0c0 !important
-  
+
 </style>
 
 <style lang="sass" scoped>
@@ -3923,8 +3927,8 @@ export default {
   .is_important
     color: #f31d65
 
-  
-    
+
+
 
 </style>
 
@@ -3960,7 +3964,7 @@ export default {
       padding-left: calc(40/1920*100vw);
       color: #006ab7;
       font-size: calc(24/1920*100vw);
-      font-weight: bold; 
+      font-weight: bold;
       &:last-child {
         margin-top: calc(30/1920*100vw);
       }
@@ -4975,7 +4979,7 @@ export default {
             @include point(padding-left,20);
             padding-bottom: 0;
             margin-top: 5px;
-            
+
             .rules{
               margin-left: 20px;
               font-size: 10px;

@@ -53,7 +53,7 @@
       </div>
       <div class="flex-center" style="justify-content: space-between; margin: 20px 0 20px 0px;font-size:calc(16/1920*100vw)">
         <div class="flex-center">
-          <date-time-selector 
+          <date-time-selector
             ref="eventTimePicker"
             :dateTimeValue = dateValue
             @change="dateChange"
@@ -140,7 +140,7 @@
                   <span
                     v-if="scope.row.status === 0"
                     :class="lang.indexOf('ja') !== -1 ? 'ja-icon': 'icon-span'"
-                    style="background-color:#fff2ef;color:#f57848;" 
+                    style="background-color:#fff2ef;color:#f57848;"
                     >
                     {{ $t('eventView.pending') }}
                   </span>
@@ -162,7 +162,7 @@
                     style="background-color:#ffeff5;color:#e22472;" >
                     {{ $t('eventView.returnStatus') }}
                   </span>
-                  
+
                   <el-tooltip v-if="scope.row.status === 4" effect="light" placement="right-end">
                     <div slot="content">{{ $t('eventView.expiredate')+scope.row.updateTs }}</div>
                     <div v-if="scope.row.status === 4" class="expiretag">
@@ -244,12 +244,12 @@
         </el-tab-pane>
       </el-tabs>
     </div>
-    <dialog-vue 
-    :dialog-title="$t('eventView.confirmBachClose')" 
-    :show-info="$t('eventView.closeSelectedEvent')" 
-    :is-warning=true 
-    :dialog-closed="showBachCloseDialog" 
-    @confirmed="confirmBachClose" 
+    <dialog-vue
+    :dialog-title="$t('eventView.confirmBachClose')"
+    :show-info="$t('eventView.closeSelectedEvent')"
+    :is-warning=true
+    :dialog-closed="showBachCloseDialog"
+    @confirmed="confirmBachClose"
     @canceled="showBachCloseDialog = false"/>
   </div>
 </template>
@@ -412,6 +412,8 @@ export default {
       inspectId: [],
       inspectTableList: [],
       inspectCatch:[],
+      storeList:[],
+      selectStoreList:[]
     };
   },
 
@@ -436,7 +438,7 @@ export default {
         self.tableDataList[i].tableData =[];
         self.tableDataList[i].eventCount = 0;
       }
-      
+
       if (val !== 0) {
         window.setTimeout(function() {
           self.$route.meta.keepAlive = true;
@@ -446,7 +448,7 @@ export default {
         self.ifChangeAccount = true;
         self.ifSaveParams = false;
         self.ifSearchData = true;
-        
+
       }
     },
 
@@ -486,7 +488,7 @@ export default {
     }
     self.$route.meta.isBack = false;
     self.isFirstLoad = false;
-  }, 
+  },
   beforeDestroy() {
     //console.log('searchFrom:',this.searchParams['searchFrom']);
     if(this.searchParams['searchFrom']=='PatrolPersonStat'){
@@ -502,7 +504,7 @@ export default {
   },
   deactivated() {
       //console.log('searchFrom:',this.searchParams['searchFrom']);
-      
+
       if(this.searchParams['searchFrom']=='PatrolPersonStat'){
           delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
           this.searchParams['searchFrom'] = '';
@@ -686,7 +688,7 @@ export default {
         this.getRouterData(routeData);
       }else{*/
       await self.getEventListRequestParams(val);
-      
+
       //}
       if ( self.params.clause.storeId && self.params.clause.storeId.length === 0) {
         //return ;
@@ -756,7 +758,7 @@ export default {
         console.log('EventManagement-getEventList:' + err);
       });
     },
-    
+
     getEventListRequestParams(val) {
       const tabIndex = Number(this.activeName);
       let like = {};
@@ -800,7 +802,7 @@ export default {
         }else{
           status = [];
         }
-        
+
       }
       let page = 0;
       if (val === 'currentChange') {
@@ -911,11 +913,23 @@ export default {
     handleSelectionChange(val){
       //console.log("handleSelectionChange:",val);
       this.closingEventId = [];
+      this.selectStoreList = [];
       if(val.length>0){
         this.showCloseBtn = true;
         val.map((item)=>{
+        　console.log(item)
+          let store = this.storeList.find(p=>p.storeId == item.storeId)
+          if(store && store.status == 61){
+            if(this.selectStoreList.indexOf(store.name)<0){
+              this.selectStoreList.push(store.name)
+            }
+          }
+          //this.selectStoreList.push(store.status)
+          //if(store)console.log("Status == " + store.status )
           this.closingEventId.push(item.id);
         })
+
+        console.log(this.selectStoreList)
       }else{
         this.showCloseBtn = false;
       }
@@ -954,7 +968,7 @@ export default {
       //console.log("self.params:",self.params);
       //console.log("self.storeFilterObj:",self.storeFilterObj);
       //let storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds?self.storeFilterObj.filterStoreIds:self.storeFilterObj.curStore : (this.params.hasOwnProperty('clause'))?this.params.clause.storeId:'-1';
-      
+
       //const storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : (self.params.hasOwnProperty('clause') && self.params.clause.hasOwnProperty('storeId'))?self.params.clause.storeId:'-1';
       let storeId = null;
       //if(self.searchParams['searchFrom']=='PatrolPersonStat' || self.searchParams['searchFrom']=="EventStatistics")
@@ -1003,7 +1017,7 @@ export default {
           params.clause['subject'] =  this.searchParams.searchParams.clause.subject;
         }
       }
-      
+
       //delete params.clause['status'];
       if (storeId.length === 0) {
         for (let i = 0; i < 4; i++) {
@@ -1128,8 +1142,8 @@ export default {
       });
     },
 
-    initData() {
-      //console.log('init');
+    async initData() {
+      console.log('init');
       const self = this;
       self.activeName = '0';
       self.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24, this.$moment(new Date()).endOf('day')];
@@ -1140,6 +1154,13 @@ export default {
       if (windowHeight > 800) {
         self.tableHeight = 770 + 'px';
       }
+      console.log("Get Store List")
+      let res  = await this.getBriefStoreData();
+      if(res.errCode ==0){
+        this.storeList = res.data;
+      }
+      console.log(this.storeList)
+      console.log("Get Store List Finish")
       this.tableDataList[Number(this.activeName)].page = 1;
       this.getEventListAndCount() ;
     },
@@ -1181,7 +1202,7 @@ export default {
         params.searchParams = { clause, filter, like, order };
         params.searchParams.clause.storeId = this.storeFilterObj.filterStoreIds;
       }
-      
+
       params.filterStoreIds = this.storeFilterObj.filterStoreIds;
       params.inputSearchValue = this.inputSearchValue;
       params.dateValue = this.dateValue;
@@ -1203,11 +1224,11 @@ export default {
     },
 
     getSearchParams() {
-      
+
         const searchParams = SearchConditionUtil.getSearchCondition('eventManage');
         console.log("EventMange > getSearchParams > searchParams:",searchParams);
         if (Object.keys(searchParams).length > 0) {
-          
+
           if(searchParams['searchFrom']=='PatrolPersonStat'){
             //this.dateValue =[searchParams.];
             this.curReportType = -1;
@@ -1221,7 +1242,7 @@ export default {
             this.params.endTs = searchParams.endTs;
             this.dateValue = [util.getDates(searchParams.beginTs),searchParams.endTs];
             this.params.searchMysteryMode = searchParams.searchMysteryMode;
-            
+
             //console.log("1.EventMange > getSearchParams > dateValue:",this.dateValue);
             //util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
           }else if(searchParams['searchFrom']=="EventStatistics"){
@@ -1259,7 +1280,7 @@ export default {
           this.params = searchParams.searchParams;
           this.searchParams = searchParams;
           this.ifGetParamsFromCash = true;
-          
+
         } else {
           this.searchParams = {};
           this.curState = [0];
@@ -1271,7 +1292,7 @@ export default {
           this.curReportType = -1;
           this.ifGetParamsFromCash = false;
         }
-      
+
     },
 
     onStoreChange(storeObj) {
@@ -1281,6 +1302,16 @@ export default {
       this.ifSearchData = false;
     },
     doBachCloseEvent(){
+      const self = this;
+      if(self.selectStoreList.length>0){
+        let names  = self.selectStoreList +""
+        let msg  = this.$t('route.errorStoreNameNoPerssion').replace("{storeNames}",names);
+        if(self.selectStoreList.length>1){
+          msg = msg.replace("has no service","have no service")
+        }
+        util.notify(msg , 'error', 1000 );
+        return
+      }
       this.showBachCloseDialog = true;
     },
     confirmBachClose(){
@@ -1644,7 +1675,7 @@ $h1:#292e36;
     .el-table
     .el-table__header-wrapper
     .el-table-column--selection
-    .el-checkbox__inner 
+    .el-checkbox__inner
     {
       border-radius: 1px;
       border: solid 1px #acaeb1;
@@ -1658,7 +1689,7 @@ $h1:#292e36;
     .el-table__header-wrapper
     .el-table-column--selection
     .is-checked
-    .el-checkbox__inner 
+    .el-checkbox__inner
     {
       border-radius: 1px;
       border: solid 1px #2c90d9;
@@ -1668,7 +1699,7 @@ $h1:#292e36;
     .el-table
     .el-table__body-wrapper
     .el-table-column--selection
-    .el-checkbox__inner 
+    .el-checkbox__inner
     {
       border-radius: 1px;
       border: solid 1px #acaeb1;
@@ -1679,7 +1710,7 @@ $h1:#292e36;
     .el-table__body-wrapper
     .el-table-column--selection
     .is-checked
-    .el-checkbox__inner 
+    .el-checkbox__inner
     {
       border-radius: 1px;
       border: solid 1px #2c90d9;
@@ -1719,7 +1750,7 @@ $h1:#292e36;
         /*border-radius: 0px !important;*/
         /*border: 0 !important;*/
     }
-    
+
 </style>
 <style>
  @import '../../assets/css/pagination.css';
@@ -1745,7 +1776,7 @@ $h1:#292e36;
    .table-content.el-table__body tr:hover>td{
     background-color: #f2f9fe !important;
   }
-  
+
   /*.el-table__header{
     width:auto !important;
   }*/
@@ -1758,4 +1789,3 @@ $h1:#292e36;
     border-color: #2c90d9;
 }*/
 </style>
-
