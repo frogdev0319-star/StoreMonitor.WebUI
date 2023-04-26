@@ -13,7 +13,7 @@
       </delay-button>
     </div>
     
-
+    
     <!-- 基本訊息 -->
     <div class="page-container report-setting paper" style="margin-bottom: 40px">
       <div class="setting-titles padding flex-center">
@@ -295,6 +295,7 @@
                     <el-select
                       v-model="curTempProvinceList"
                       placeholder="區域一"
+                      multiple
                       style="width: 180px"
                       >
                       <el-option
@@ -313,6 +314,7 @@
                     <el-select
                       v-model="curTempCityList"
                       placeholder="區域二"
+                      multiple
                       style="width: 180px"
                       >
                       <el-option
@@ -457,11 +459,13 @@ import filterString from '@/common/filterString.js';
 export default{
   name: 'PersonalSchedule',
   components: {
+    TableOnly,
+    DialogPop,
     DateTimeSelector,
     DelayButton,
     SettingTable,
-    TableOnly,
-    DialogPop
+    
+    
   },
   data(){
     return {
@@ -930,10 +934,7 @@ export default{
         i.isRemindModeOneHour = i.remindStyle.includes('remindMode_OneHour') ? true : false
         i.isRemindModeOneDay = i.remindStyle.includes('remindMode_OneDay') ? true : false
         var t = i.remindDate + " " + i.remindTimePoint + " " + "GMT+00:00"
-      
-        console.log('t //////////>> ', t)
         var gmt = new Date(t).getTime()
-        console.log('gmt :>> ', gmt);
         i.remindTime = gmt
       })
 
@@ -978,8 +979,6 @@ export default{
       return (n < 10 ? '0' : '') + n;
     },
     getdate(t){
-      
-      console.log('t :>> ', t);
       var date = new Date(t);
       var month = this.pad2(date.getUTCMonth()+1);
       var day = this.pad2(date.getUTCDate());
@@ -1018,10 +1017,12 @@ export default{
       // tag 用
       this.selectStoreTags = val.val
 
-      this.tags = this.selectStoreTags.map(_item => ({
+      this.tags = this.selectStoreTags.map(_item => (
+        {
           name : _item.name,
           type: 'info'
-        }))
+        }
+      ))
       // console.log('this.tags', this.tags)
 
       // 顯示頁面用
@@ -1469,4 +1470,32 @@ export default{
             width: 50px
             margin-left: -28px
             
+  .users
+    .el-checkbox__input.is-indeterminate .el-checkbox__inner
+      background-color: #2c90d9 !important
+      border-color: #2c90d9 !important
+    .el-checkbox__input.is-checked .el-checkbox__inner
+      background: #2c90d9 !important
+      border-color: #2c90d9 !important
+      &:hover
+        border-color: #dcdfe6 !important
+    .is-focus .el-checkbox__inner      
+      border-color: #dcdfe6 !important
+    
+    .el-checkbox__inner:hover
+      border-color: #190 !important
+      
+  .title-status
+    .el-input__count-inner
+      margin-top: 55px
+  
+  .text_limit_notice
+    position: absolute
+    text-align: right
+    margin-left: 5px
+    font-size: 10px
+    margin-top: 2px
+    color: #ff2400
+    display: block
+          
 </style>
