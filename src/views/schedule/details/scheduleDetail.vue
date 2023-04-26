@@ -25,7 +25,7 @@
         <div class="inspect-basic flex-row">
           <div class="setting-config">
             <!-- 排程名稱 -->
-            <div class="flex-row" style="margin-right: 30px">
+            <div class="flex-row" style="margin-right: 30px; position: relative;">
               <div class="title-name"><span style="color: #c60957">* </span>排程名稱</div>
               <div class="title-status"> 
                 <el-input
@@ -33,8 +33,16 @@
                   ref="inputName"
                   class="ppip"
                   style="width: 250px"
+                  @input="(val) => itemInputChanged(val, 20)"
                   />
+                  
               </div>
+
+              <span class="notice" 
+                style="margin-right: 30px; position: absolute; bottom: -20px ; left: 92px" 
+                v-if="showInputLimit"> 最多可輸入20個字元 
+              </span>
+              
             </div>
 
             <!-- 排程名稱 -->
@@ -169,7 +177,6 @@
                 </div>
                 
                 <div class="task_list flex-column">
-                  {{ _item.taskList }}
                   <div class="task_list_store flex-column" v-for="item in _item.taskList" :key="item.id" >
                     <!-- 店名 -->
                     <div class="" style="margin-bottom: 5px">
@@ -194,9 +201,7 @@
                           :disabled="(item.remindTime < Date.now() && item.remindTime !== '' )"
                           placeholder="執行日期">
                         </el-date-picker>
-                        
-                        <div class="notice" v-if="item.hasRemindDate ">請完成執行日期設定 !</div>
-
+                        <div class="notice" v-if="item.hasRemindDate">請完成執行日期設定 !</div>
                       </div>
                       <!-- 提醒時間 -->
                       <div class="remider_setting flex-column">
@@ -211,7 +216,7 @@
                           :disabled="(item.remindTime < Date.now() && item.remindTime !== '')"
                           placeholder="提醒時間">
                         </el-time-select>
-                        <!-- <div class="notice">請完成提醒時間設定 !</div> -->
+                        <div class="notice" v-if="item.hasRemindTime">請完成提醒時間設定 !</div>
                       </div>
 
                       <!-- 提醒方式 -->
@@ -232,7 +237,7 @@
                             :value="_item.value"
                           />
                         </el-select>
-                        <!-- <div class="notice">請完成提醒方式設定 !</div> -->
+                        <div class="notice" v-if="item.hasRemindStyle">請完成提醒方式設定 !</div>
                       </div>
                       <div class="remider_setting flex-column">
                         <div 
@@ -277,7 +282,7 @@
                   <div class="title-status"> 
                     <el-input
                       v-model="inputSearchStore"
-                      placeholder="搜尋門店"
+                      placeholder="搜尋門店或時區"
                       style="width: 200px"
                       clearable
                       />
@@ -447,6 +452,7 @@ import SettingTable from '@/components/SettingTable';
 import DialogPop from '@/components/DialogPop';
 import TableOnly from '@/components/TableOnly';
 import util from '@/common/util';
+import filterString from '@/common/filterString.js';
 
 export default{
   name: 'PersonalSchedule',
@@ -462,7 +468,9 @@ export default{
       ddd: '',
       tempboolean_1: false,
       tempboolean_2: false,
-  
+
+      showInputLimit: false,
+
       templateList:['aaa','bbb','ccc'],
       // ====== !! ======
       edit_isActive: false,
@@ -666,12 +674,12 @@ export default{
 
   methods: {
     filterInputSearchScheduleDataList(data){
-      return data.filter( item => item.storeName.indexOf(this.inputSearchStoreList) > -1)
+      return data.filter( item => (item.storeName.indexOf(this.inputSearchStoreList) > -1))
     },
 
     // dialoge
     filterInputSearchStore(stores){
-        return stores.filter( item => item.name.indexOf(this.inputSearchStore) > -1)
+        return stores.filter( item => (item.name.indexOf(this.inputSearchStore) > -1) ||  (item.timeZone.indexOf(this.inputSearchStore) > -1))
     },
     filterCurTemplateProvince(stores){
         if(this.curTempProvinceList.length == 0 ){
@@ -751,6 +759,7 @@ export default{
         const pppSet = new Set(p)
         this.provinceAry = [...pppSet]
 
+
         var c = this.searchStoreData.map(c => c.city)
         const cccSet = new Set(c)
         this.cityAry = [...cccSet]
@@ -769,7 +778,7 @@ export default{
                   i.storeName = store.name
                   i.city = store.city
                   i.province = store.province
-                  i.remindDate = this.getdate(i.remindTime)
+                  i.remindDate = this.getdate(i.remindTime )
                   i.remindTimePoint = this.getTimePoint(i.remindTime)
                   i.checked = false
                   i.timeZone = store.timeZone
@@ -782,8 +791,9 @@ export default{
               
             });
             this.scheduleDataList = res.data
-            this.inspectionName = this.scheduleStatus.tagName
-            console.log('this.scheduleDataList =========>> ', res.data);
+            this.inspectionName = res.data[0].inspectTagId
+            console.log('this.scheduleStatus =========>> 0000', this.scheduleStatus);
+            console.log('this.scheduleDataList =========>> 0000', res.data);
 
 
             var noRepeat =  this.searchStoreData.filter((item, index, array) => array.findIndex(s => item.city === s.city) === index)
@@ -814,6 +824,17 @@ export default{
       )
     },
 
+    itemInputChanged(val, n){
+      const content = filterString.all(val, n);
+      this.taskName = content
+
+      const length = filterString.getContentLength(val);
+      if(length > n) {
+        this.showInputLimit = true
+      } else {
+        this.showInputLimit = false
+      }
+    },
 
     // SAVE
     saveScheduleData(){
@@ -838,83 +859,97 @@ export default{
         this.isLoadingData = false
         return
       }
-
       // if(this.scheduleDataList.length < 1){
       //   util.notify("請至少設定一筆排程！", 'error', 2000 );
       //   this.isLoadingData = false
       //   return
       // }
 
-    
+  
       var param = {
         taskList: []
       }
       // param.taskList = [...this.scheduleDataList]
+
+      var isEmpty = false
+      console.log('this.showScheduleDataList =======>> 2', this.showScheduleDataList);
       this.showScheduleDataList.forEach( i => {
         i.taskList.forEach(ii => {
+          
+          if(!ii.remindDate) {
+            ii.hasRemindDate = true
+            isEmpty = true
+          } else {
+            ii.hasRemindDate = false
+          }
+
+          if(!ii.remindTimePoint) {
+            ii.hasRemindTime = true
+            isEmpty = true
+          } else {
+            ii.hasRemindTime = false
+          }
+
+          if(ii.remindStyle.length ==0) {
+            ii.hasRemindStyle = true
+            isEmpty = true
+          }else {
+            ii.hasRemindStyle = false
+          }
+
           param.taskList.push(ii)
         })
       })
-      
 
-      var status =  this.allInspectTypeList.find( d => d.name == this.scheduleStatus.tagName)
-      
+      // var isEmpty = param.taskList.findIndex(i => (!i.remindTime ||  i.remindDate == '' || i.remindTimePoint == ''))
+      // console.log('isEmpty :>> ', isEmpty); 
+      if(isEmpty){  
+        util.notify("尚有設定未完成！", 'error', 2000 );
+        this.isLoadingData = false
+        return false
+      }
+
+      var status =  this.allInspectTypeList.find( d => d.id == this.inspectionName)
       if(this.scheduleStatus.action == "addSchedule"){
         console.log('addSchedule')
         param.userId = this.scheduleStatus.userId
-        param.inspectTagId = this.inspectionName
+        param.inspectTagId = status.id
         param.taskName = this.taskName
       } 
       else if(this.scheduleStatus.action == "editSchedule"){
         console.log('editSchedule')
         param.userId = this.scheduleStatus.userId
-        param.inspectTagId = this.inspectionName
+        param.inspectTagId = status.id
         param.taskName = this.taskName
         param.taskGroupUuid = this.scheduleStatus.taskGroupUuid
       }
       
-
       param.taskList.forEach(i => {
         i.taskId = i.hasOwnProperty("id") ? i.id : -999
         i.isRemindModeCurrently = i.remindStyle.includes('remindMode_Currently') ? true : false
         i.isRemindModeOneHour = i.remindStyle.includes('remindMode_OneHour') ? true : false
         i.isRemindModeOneDay = i.remindStyle.includes('remindMode_OneDay') ? true : false
-        var t = i.remindDate + " " + i.remindTimePoint 
-        // var d =  new Date(t)
-        // i.remindTime = d.getTime()
-
-        // utc time
-        i.remindTime = Date.parse(t)
+        var t = i.remindDate + " " + i.remindTimePoint + " " + "GMT+00:00"
+      
+        console.log('t //////////>> ', t)
+        var gmt = new Date(t).getTime()
+        console.log('gmt :>> ', gmt);
+        i.remindTime = gmt
       })
 
       console.log('param for save =======>> ', param)
-
-      var isEmptyIndex = param.taskList.findIndex(i => (!i.remindTime ||  i.remindDate == '' || i.remindTimePoint == ''))
-      console.log('isEmptyIndex :>> ', isEmptyIndex); 
-
-      this.showScheduleDataList[isEmptyIndex].taskList[0].hasRemindDate = true
-      console.log('this.showScheduleDataList :>> ', this.showScheduleDataList);
-
-
-
-
-      this.isLoadingData = false
-      return false
-
-      if(isEmpty){  
-        util.notify("門店排程提執行日期或時間不可為空！", 'error', 2000 );
-        this.isLoadingData = false
-        return false
-      }
-
-
-
-      if(param.taskList.some(i => i.remindStyle.length ==0)){
-        util.notify("提醒方式欄位為必填不可留空！", 'error', 2000 );
-        this.isLoadingData = false
-        return false
-      }
+      // if(param.taskList.some(i => i.remindStyle.length ==0)){
+      //   util.notify("提醒方式欄位為必填不可留空！", 'error', 2000 );
+      //   this.isLoadingData = false
+      //   return false
+      // }
       
+      
+
+      // this.isLoadingData = false
+      // return false
+
+
 
       if(param.taskList.length < 1){
         util.notify("請至少設定一筆排程！", 'error', 2000 );
@@ -924,7 +959,15 @@ export default{
 
       scheduleRESTful.saveScheduleData(param).then(res =>{
         if(res.errCode === 0){
-            console.log("this.scheduleDataList====> 2", this.scheduleDataList)
+          console.log("this.scheduleDataList====> 3", this.scheduleDataList)
+
+          this.showScheduleDataList.forEach( i => {
+            i.taskList.forEach(ii => {
+              ii.hasRemindDate = false
+              ii.hasRemindTime = false
+              ii.hasRemindStyle = false
+            })
+      })
             this.isLoadingData = false
             util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
         }
@@ -935,18 +978,20 @@ export default{
       return (n < 10 ? '0' : '') + n;
     },
     getdate(t){
+      
+      console.log('t :>> ', t);
       var date = new Date(t);
-      var month = this.pad2(date.getMonth()+1);
-      var day = this.pad2(date.getDate());
-      var year= date.getFullYear();
+      var month = this.pad2(date.getUTCMonth()+1);
+      var day = this.pad2(date.getUTCDate());
+      var year= date.getUTCFullYear();
       return year + "-"+ month +"-"+ day 
     },
     getTimePoint(t){
       var date = new Date(t);
-      var hour = this.pad2(date.getHours())
-      var min = this.pad2(date.getMinutes())
-      var sec = this.pad2(date.getSeconds())
-      return hour +":"+ min +":"+ sec
+      var hour = this.pad2(date.getUTCHours())
+      var min = this.pad2(date.getUTCMinutes())
+      var sec = this.pad2(date.getUTCSeconds())
+      return hour +":"+ min
     },
 
     
@@ -1306,13 +1351,13 @@ export default{
       margin-bottom: 30px
       .task_list
         width: calc(100% - 28px)
-        padding: 20px
+        padding: 20px 20px 0 20px
         border-radius: 5px
         border: solid 1px #f5f5f5
         background: #f7f9fa
         margin-left: 28px
         .task_list_store
-          // margin-bottom: 20px
+          margin-bottom: 15px
   .memo_setting
     display: flex
     flex-direction: row
@@ -1386,14 +1431,19 @@ export default{
         flex-direction: row
         justify-content: flex-start
         align-items: center
-        width: fit-content
+        // width: fit-content
         .title-name
           width: 90px
+          // flex: 1 0 auto
         .user_selected
+          max-height: 100px
+          width: calc(100% - 90px)
           display: flex
           flex-wrap: wrap
           flex-direction: row
           justify-content: flex-start
+          
+          overflow: auto
           .el-tag
             margin-right: 5px 
             margin-bottom: 5px
