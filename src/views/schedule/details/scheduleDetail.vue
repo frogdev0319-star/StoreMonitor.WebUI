@@ -169,6 +169,7 @@
                 </div>
                 
                 <div class="task_list flex-column">
+                  {{ _item.taskList }}
                   <div class="task_list_store flex-column" v-for="item in _item.taskList" :key="item.id" >
                     <!-- 店名 -->
                     <div class="" style="margin-bottom: 5px">
@@ -193,6 +194,9 @@
                           :disabled="(item.remindTime < Date.now() && item.remindTime !== '' )"
                           placeholder="執行日期">
                         </el-date-picker>
+                        
+                        <div class="notice" v-if="item.hasRemindDate ">請完成執行日期設定 !</div>
+
                       </div>
                       <!-- 提醒時間 -->
                       <div class="remider_setting flex-column">
@@ -207,6 +211,7 @@
                           :disabled="(item.remindTime < Date.now() && item.remindTime !== '')"
                           placeholder="提醒時間">
                         </el-time-select>
+                        <!-- <div class="notice">請完成提醒時間設定 !</div> -->
                       </div>
 
                       <!-- 提醒方式 -->
@@ -226,8 +231,8 @@
                             :label="_item.label"
                             :value="_item.value"
                           />
-
                         </el-select>
+                        <!-- <div class="notice">請完成提醒方式設定 !</div> -->
                       </div>
                       <div class="remider_setting flex-column">
                         <div 
@@ -238,6 +243,8 @@
                         >重設</div> 
                       </div>
                     </div>
+
+                    <!-- <div class="aaaa">aaaa</div> -->
                   </div>
               </div>
 
@@ -353,7 +360,7 @@
     <!-- Edit Store -->
     <dialog-pop
       ref="dailog"
-      title= "編輯所選門店"
+      title= "排程設定"
       :close-on-click-modal="false"
       :show-close="false"
       :visible="showingEditStore"
@@ -420,6 +427,8 @@
               </div>
             </div>
           </div>
+
+
         </div>
       </div>
     </dialog-pop>
@@ -788,10 +797,14 @@ export default{
             console.log('newArr', newArr)
             newArr.forEach(d => {
               this.scheduleDataList.forEach( g => {
+                g.hasRemindDate = false
+                g.hasRemindTime = false
+                g.hasRemindStyle = false
                 if(d.province == g.province && d.city == g.city){
                   d.taskList.push(g)
                 }
               })
+              
             })
 
             this.showScheduleDataList = newArr
@@ -875,12 +888,27 @@ export default{
       })
 
       console.log('param for save =======>> ', param)
-      var isEmpty = param.taskList.some(i => (!i.remindTime ||  i.remindDate == '' || i.remindTimePoint == ''))
+
+      var isEmptyIndex = param.taskList.findIndex(i => (!i.remindTime ||  i.remindDate == '' || i.remindTimePoint == ''))
+      console.log('isEmptyIndex :>> ', isEmptyIndex); 
+
+      this.showScheduleDataList[isEmptyIndex].taskList[0].hasRemindDate = true
+      console.log('this.showScheduleDataList :>> ', this.showScheduleDataList);
+
+
+
+
+      this.isLoadingData = false
+      return false
+
       if(isEmpty){  
         util.notify("門店排程提執行日期或時間不可為空！", 'error', 2000 );
         this.isLoadingData = false
         return false
       }
+
+
+
       if(param.taskList.some(i => i.remindStyle.length ==0)){
         util.notify("提醒方式欄位為必填不可留空！", 'error', 2000 );
         this.isLoadingData = false
@@ -1284,7 +1312,7 @@ export default{
         background: #f7f9fa
         margin-left: 28px
         .task_list_store
-          margin-bottom: 20px
+          // margin-bottom: 20px
   .memo_setting
     display: flex
     flex-direction: row
@@ -1374,6 +1402,11 @@ export default{
         height: 335px
         overflow: auto
         border-radius: 5px
+  .notice
+    color: red
+    font-size: 12px
+    margin: 5px 0 0 5px
+
 </style>
 <style lang="sass">
   .popup_width

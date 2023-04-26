@@ -1540,7 +1540,7 @@ export default{
     "scheduleExecuted":"排程執行",
     "lastUpdatePerson":"最後更新人",
     "getScheduleSettingFail":"取得排程設定失敗",
-    "schStartDate":"開始執行",
+    "schStartDate":"時間範圍",
     "schName":"排程名稱",
     "incepNum":"巡檢數量",
     "schEndDate":"最後執行",

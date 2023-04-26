@@ -209,7 +209,7 @@ export default{
         },
         {
           'prop': 'porcessMode',
-          'label': this.$t('audit.sendAudit.operation'),
+          'label': this.$t('route.reports'),
           'sortable': false,
           'width': 50,
           'maxWidth': 50,
