@@ -1,7 +1,12 @@
 <template>
     <div class="ScheduleContainer">
         <div class="search-bar">
-            <date-time-selector class="time-selector" :dateRangeTitle="$t('schedule.schStartDate')" :pickFuturerDate="true" @change="dateChange"/>
+            <DateTimeSelectorSchedule
+                class="time-selector" 
+                :dateRangeTitle="$t('schedule.schStartDate')" 
+                :pickFuturerDate="true" 
+                @change="dateChange"
+            />
             <div class='keyword-area'>
                 <div class="search-label">{{$t('remotePatrol.keywords')}}</div>
                 <el-input
@@ -86,7 +91,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import {scheduleRESTful} from '@/api/index';
-import DateTimeSelector from '@/components/DateTimeSelector';
+import DateTimeSelectorSchedule from '@/components/DateTimeSelectorSchedule';
 import TableOnly from '@/components/TableOnly';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
 import DelayButton from '@/components/DelayButton';
@@ -95,9 +100,15 @@ import util from '@/common/util';
 
 export default{
     name: 'PersonalSchedule',
-    components: {DateTimeSelector,TableOnly,TblPaginationOnly,DelayButton,DialogPop},
+    components: {
+        DateTimeSelectorSchedule,
+        TableOnly,
+        TblPaginationOnly,
+        DelayButton,
+        DialogPop
+    },
     data(){
-      return {
+        return {
         firstLoad:true,
         userId:'',
         person:'',
@@ -111,8 +122,8 @@ export default{
             'width': 200,
             'maxWidth': 200,
             'isExpand': false
-          },
-          {
+        },
+        {
             'prop': 'tagNameMode',
             'label': this.$t('statistics.patrolPerson.tagName'),
             'sortable': false,
@@ -123,49 +134,49 @@ export default{
                 icon:require('@/../static/img/table-help.png'),
                 tooltipContent:this.$t('schedule.tagInfo')
             }
-          },
-          {
+        },
+        {
             'prop': 'taskCounts',
             'label': this.$t('schedule.incepNum'),
             'sortable': false,
             'width': 100,
             'maxWidth': 100,
             'isExpand': false
-          },
-          {
+        },
+        {
             'prop': 'taskStartStr',
             'label': this.$t('schedule.schStartDate'),
             'sortable': 'custom',
             'width': 50,
             'maxWidth': 50,
             'isExpand': false
-          },
-          {
+        },
+        {
             'prop': 'taskFinalStr',
             'label': this.$t('schedule.schEndDate'),
             'sortable': 'custom',
             'width': 130,
             'maxWidth': 130,
             'isExpand': false
-          }
+        }
         ],
         tableData:[],
         columnOperationData:{
-          label: this.$t('titleView.operation'),
-          minWidth: '50',
-          align: 'left',
-          operation: [
-              {
-                  lable: '',
-                  icon: 'icon-copy',
-                  methods: 'copy'
-              },
-              {
-                  lable: '',
-                  icon: 'icon-setting',
-                  methods: 'set'
-              }
-          ]
+            label: this.$t('titleView.operation'),
+            minWidth: '50',
+            align: 'left',
+            operation: [
+                {
+                    lable: '',
+                    icon: 'icon-copy',
+                    methods: 'copy'
+                },
+                {
+                    lable: '',
+                    icon: 'icon-setting',
+                    methods: 'set'
+                }
+            ]
         },
         isLoadingData:true,
         total:0,
@@ -176,10 +187,10 @@ export default{
         SelSchedulId:[],
         showConfirmDelete:false,
 
-      }
+        }
     },
     computed: {
-      ...mapGetters({ accountChanged: 'accountChanged' })
+        ...mapGetters({ accountChanged: 'accountChanged' })
     },
     created(){
         this.init();
@@ -212,53 +223,53 @@ export default{
             let beginTs = self.$moment.utc(self.$moment(self.dateValue[0])).valueOf();
             let endTs = self.$moment.utc(self.$moment(self.dateValue[1])).valueOf();
             const params={
-              userId:self.userId,
-              beginTs,
-              endTs,
-              filter:{
-                page:this.curPage-1,
-                size:this.curSizeNum
-              },
-              order:{
-                direction:this.defaultSort.order=='ascending'? 'asc':'desc',
-                property:this.defaultSort.prop=="taskStartStr"?"taskStart":(this.defaultSort.prop=="taskFinalStr"?"taskFinal":this.defaultSort.prop),
-              }
+                userId:self.userId,
+                beginTs,
+                endTs,
+                filter:{
+                    page:this.curPage-1,
+                    size:this.curSizeNum
+                },
+                order:{
+                    direction:this.defaultSort.order=='ascending'? 'asc':'desc',
+                    property:this.defaultSort.prop=="taskStartStr"?"taskStart":(this.defaultSort.prop=="taskFinalStr"?"taskFinal":this.defaultSort.prop),
+                }
             }
             if(self.inputSearchValue.trim()!=""){
-              params["keyword"] = self.inputSearchValue;
+                params["keyword"] = self.inputSearchValue;
             }
             scheduleRESTful.getPersonTaskList(params).then(res=>{
-              var userData = [];
+                var userData = [];
 
-              if(res.errCode == 0){
-                res.data.content.map(item =>{
-                  //const mapUser = self.doMapUser(item.userId);
-                  //console.log("mapUser:",mapUser);
-                  let obj = {...item};
-                  let mode = item.tagMode==0?self.$t('remotePatrol.remotePatrol'):self.$t('remotePatrol.onsitePatrol');
-                  obj['tagNameMode'] = mode+'\n'+item.tagName;
-                  //obj['updateTs']=item.updateTime,
-                  obj['taskStartStr']=(item.taskStart==0)?'-':self.$moment.utc(self.$moment(item.taskStart)).format("YYYY/MM/DD");//util.getDateStr(item.taskStart),
-                  //console.log(">>>taskStartStr:",self.$moment.utc(self.$moment(item.taskStart)).format("YYYY/MM/DD hh:mm:ss"));
-                  obj['taskFinalStr']=(item.taskFinal==0)?'-':self.$moment.utc(self.$moment(item.taskFinal)).format("YYYY/MM/DD");//util.getDateStr(item.taskFinal),
-                  obj['updateUserName']=(item.updateUserName == "NONE")?'-':item.updateUserName,
-                  userData.push(obj);
-                  
-                });
-                self.tableData = [];
-                self.tableData = userData;
-                self.total = res.data.totalPages;
-                self.isLoadingData = false;
+                if(res.errCode == 0){
+                    res.data.content.map(item =>{
+                    //const mapUser = self.doMapUser(item.userId);
+                    //console.log("mapUser:",mapUser);
+                    let obj = {...item};
+                    let mode = item.tagMode==0?self.$t('remotePatrol.remotePatrol'):self.$t('remotePatrol.onsitePatrol');
+                    obj['tagNameMode'] = mode+'\n'+item.tagName;
+                    //obj['updateTs']=item.updateTime,
+                    obj['taskStartStr']=(item.taskStart==0)?'-':self.$moment.utc(self.$moment(item.taskStart)).format("YYYY/MM/DD");//util.getDateStr(item.taskStart),
+                    //console.log(">>>taskStartStr:",self.$moment.utc(self.$moment(item.taskStart)).format("YYYY/MM/DD hh:mm:ss"));
+                    obj['taskFinalStr']=(item.taskFinal==0)?'-':self.$moment.utc(self.$moment(item.taskFinal)).format("YYYY/MM/DD");//util.getDateStr(item.taskFinal),
+                    obj['updateUserName']=(item.updateUserName == "NONE")?'-':item.updateUserName,
+                    userData.push(obj);
+                    
+                    });
+                    self.tableData = [];
+                    self.tableData = userData;
+                    self.total = res.data.totalPages;
+                    self.isLoadingData = false;
                 
                 
-              }else{
-                util.notify(self.$t('schedule.getScheduleSettingFail'), 'error', 3000);
-              }
+                }else{
+                    util.notify(self.$t('schedule.getScheduleSettingFail'), 'error', 3000);
+                }
 
             }).catch(err=>{
-              console.log("getScheduleListFail error",err);
-              util.notify(self.$t('schedule.getScheduleSettingFail')+',error:'+err, 'error', 3000);
-              this.isLoadingData = false;
+                console.log("getScheduleListFail error",err);
+                util.notify(self.$t('schedule.getScheduleSettingFail')+',error:'+err, 'error', 3000);
+                this.isLoadingData = false;
             });
         },
         addNewSchedule(){

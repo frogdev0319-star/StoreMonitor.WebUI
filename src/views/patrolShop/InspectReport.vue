@@ -312,12 +312,15 @@
             </div>
           </div>
         </el-col>
+
+
         <el-col v-if="pageItem.class === 'row-table'">
-          <div class="limit-group-score-tip" >
+          <div class="limit-group-score-tip" v-if="showMaxInfo">
             <div class="limit-img" >
               <img :src="require('../../../static/img/group_score.svg')" width="20" height="20" />
             </div>
-            <div class="limit-text">{{$t('remotePatrol.tipLimitGroupScore')}}</div>
+            <div class="limit-text">{{$t('remotePatrol.tipLimitGroupScore')}} </div>
+            
           </div>
 
           
@@ -657,6 +660,7 @@ export default {
 
       setting_isShowGroupSum: false,
       setting_isShowDistrictSum: false,
+      showMaxInfo: false,
 
       videoSrc: require('../../../static/img/monitor.png'),
       inspectSrc: require('../../../static/img/remote_patrol.png'),
@@ -849,6 +853,7 @@ export default {
         console.log('this.setting_isShowGroupSum  :>> ', this.setting_isShowGroupSum );
         console.log('this.setting_isShowDistrictSum :>> ', this.setting_isShowDistrictSum);
 
+        this.showMaxInfo = results[1].data[0].info.summary[0].isAdvanced
 
 
       }).catch(err => {
@@ -2418,11 +2423,13 @@ export default {
           .pie-label-area{
             cursor: pointer;
             width: calc(300/1440*100vw);
-            height: 40px;
+            // height: 40px;
             display:flex;
             flex-direction: row;
-            align-items: center;
+            align-items: flex-start;
             text-align: left;
+            margin-bottom: 12px;
+
             .pie-color{
               width:18px;
               height: 18px;
@@ -2431,9 +2438,10 @@ export default {
             .pei-item-name{
               margin-left:calc(12/1440*100vw);
               color: #484848;
-              width:calc(167/1440*100vw);
-              height: 18px;
+              width:calc(180/1440*100vw);
+              // height: 18px;
               font-size: 15px;
+              margin-top: -2px;
 
             }
             .pei-item-num{

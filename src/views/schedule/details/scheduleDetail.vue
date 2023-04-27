@@ -198,7 +198,7 @@
                           type="date"
                           value-format="yyyy-MM-dd"
                           :picker-options="pickerOptions"
-                          :disabled="(item.remindTime < Date.now() && item.remindTime !== '' )"
+                          :disabled="(item.remindTime < new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 && item.remindTime !== '' )"
                           placeholder="執行日期">
                         </el-date-picker>
                         <div class="notice" v-if="item.hasRemindDate">請完成執行日期設定 !</div>
@@ -213,7 +213,7 @@
                             step: '01:00',
                             end: '23:00'
                           }"
-                          :disabled="(item.remindTime < Date.now() && item.remindTime !== '')"
+                          :disabled="(item.remindTime < new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 && item.remindTime !== '')"
                           placeholder="提醒時間">
                         </el-time-select>
                         <div class="notice" v-if="item.hasRemindTime">請完成提醒時間設定 !</div>
@@ -227,7 +227,7 @@
                           placeholder="提醒方式"
                           multiple
                           filterable
-                          :disabled="(item.remindTime < Date.now() && item.remindTime !== '')"
+                          :disabled="(item.remindTime < new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 && item.remindTime !== '')"
                           style="width:300px"
                           >
                           <el-option
@@ -241,7 +241,7 @@
                       </div>
                       <div class="remider_setting flex-column">
                         <div 
-                        v-if="(item.remindTime > Date.now())"
+                        v-if="(item.remindTime > new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1)"
                         class="clear_all"
                         @click="resetData(item)"
                         
