@@ -187,7 +187,7 @@
                         @change="handleCheckboxChange(item)"
                         
                         />
-                        <span class="role-name">{{item.storeName}} <span style="color: #999; font-size: 13px">({{item.timeZone}})</span></span>
+                        <span class="role-name">{{item.storeName}} <span style="color: #999; font-size: 13px" v-if="item.timeZone">({{item.timeZone}})</span></span>
                     </div>
                     <div class="memo_setting" >
                       <!-- 執行日期 -->
@@ -240,12 +240,10 @@
                         <div class="notice" v-if="item.hasRemindStyle">請完成提醒方式設定 !</div>
                       </div>
                       <div class="remider_setting flex-column">
-                        <div 
-                        v-if="(item.remindTime > new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1)"
+                        <div v-if="(item.remindTime > new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 ) || !item.remindTime || item.tempId "
                         class="clear_all"
                         @click="resetData(item)"
-                        
-                        >重設</div> 
+                        >重設 </div>
                       </div>
                     </div>
 
@@ -1242,14 +1240,21 @@ export default{
     },
     resetData(val){
       console.log('val', val)
-      this.scheduleDataList.forEach( i => {
-        if(i.id == val.id){
-          i.remindTime = ''
-          i.remindDate = ''
-          i.remindTimePoint = ''
-          i.remindStyle = []
-        }
-      })
+      console.log('this.showScheduleDataList', this.showScheduleDataList)
+      val.remindTime = ''
+      val.remindDate = ''
+      val.remindTimePoint = ''
+      val.remindStyle = []
+      // this.scheduleDataList.forEach( i => {
+      //   if(i.id == val.id ){
+      //     console.log('1')
+      //     i.remindTime = ''
+      //     i.remindDate = ''
+      //     i.remindTimePoint = ''
+      //     i.remindStyle = []
+      //   }
+        
+      // })
     }
   }
 }
