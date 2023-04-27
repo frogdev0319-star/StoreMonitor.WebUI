@@ -193,14 +193,16 @@ export default{
     doSearchScheduleList(){
         this.getScheduleList()
     },
+
     getScheduleList(){
+        console.log('this.curPage -------->> ', this.curPage);
         const self = this;
         self.isLoadingData = true;
         const params={
-          titleList:this.positionIds,
+          titleList: this.positionIds,
           filter:{
-            page:this.curPage-1,
-            size:this.curSizeNum
+            page: this.curPage - 1,
+            size: this.curSizeNum
           },
           order:{
             direction:this.defaultSort.order=='ascending'? 'asc':'desc',
@@ -210,10 +212,16 @@ export default{
         if(self.inputSearchValue.trim()!=""){
           params["keyword"] = self.inputSearchValue;
         }
+
+        console.log('params -------->> ', params);
+
         scheduleRESTful.getSchedulePersonList(params).then(res=>{
           var userData = [];
           
           if(res.errCode == 0){
+
+            console.log('res.data ------->> ', res.data);
+
             res.data.content.map(item =>{
               //const mapUser = self.doMapUser(item.userId);
               //console.log("mapUser:",mapUser);
@@ -229,6 +237,10 @@ export default{
             self.tableData = [];
             self.tableData = userData;
             self.total = res.data.totalPages;
+
+            console.log('self.tableData :>> ', self.tableData);
+            console.log('self.total :>> ', self.total);
+
             self.isLoadingData = false;
           }else{
             util.notify(self.$t('schedule.getScheduleSettingFail'), 'error', 3000);

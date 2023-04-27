@@ -28,7 +28,7 @@
       </div>
       <div v-if="showDateSelector">
         
-        <class="time-selector" @change="dateChange"/>
+        <date-time-selector class="time-selector" @change="dateChange"/>
       </div>
       <div>
         <delay-button

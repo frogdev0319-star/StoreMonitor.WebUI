@@ -10,6 +10,30 @@
     <link rel="icon" type="image/x-icon" href="static/img/favicon.ico">
     <script src="static/azure-storage-blob.min.js"></script>
     <script src="static/shaka-player.js"></script>
+    <script>
+      (function(h,o,u,n,d) {
+        h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}}
+        d=o.createElement(u);d.async=1;d.src=n
+        n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)
+      })(window,document,'script','https://www.datadoghq-browser-agent.com/us5/v4/datadog-rum.js','DD_RUM')
+      window.DD_RUM.onReady(function() {
+        window.DD_RUM.init({
+          clientToken: 'pub44d9121ab3ef3828b73b06dd10880ab4',
+          applicationId: '448b5579-f403-4ab5-924f-500e62744ca7',
+          site: 'us5.datadoghq.com',
+          service: 'aics-inspection',
+          env: 'dev',
+          // Specify a version number to identify the deployed version of your application in Datadog 
+          // version: '1.0.0',
+          sessionSampleRate: 100,
+          premiumSampleRate: 100,
+          trackUserInteractions: true,
+          defaultPrivacyLevel: 'mask-user-input',
+        });
+    
+        window.DD_RUM.startSessionReplayRecording();
+      })
+    </script>
   </head>
   <body style="margin:0px;">
 

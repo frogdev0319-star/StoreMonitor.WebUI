@@ -1556,7 +1556,7 @@ export default{
     "exportAll":"全部匯出",
     "isProcessing":"簽核中",
     "NA":"無",
-    "storeTimeZone":"們墊時區",
+    "storeTimeZone":"門店時區",
     "inceptionMode":"巡檢類型",
     "generated":"已產生",
     "exportScheduleRecordTips":"匯出排程紀錄提示",

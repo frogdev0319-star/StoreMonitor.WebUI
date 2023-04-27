@@ -247,15 +247,17 @@ export default{
   },
   watch: {
     async accountChanged(val) {
+      console.log('val :>> ', val);
       const self = this;
       if (val !== 0) {
+        console.log('XDXDXDXD>> ');
         self.init();
-        /*const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
-        const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
-        self.params.beginTs = start;
-        self.params.endTs = end;
-        self.getSearchCondition();
-        self.curStoreTag = [];*/
+        // const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
+        // const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
+        // self.params.beginTs = start;
+        // self.params.endTs = end;
+        // self.getSearchCondition();
+        // self.curStoreTag = [];
       }
     },
 
@@ -270,6 +272,7 @@ export default{
     init(){
       this.curSchStatus= -1;
       this.inputSearchValue='';
+      this.doSearchScheduleHis()
     },
     dateChange(val) {
         const self = this;
@@ -285,6 +288,7 @@ export default{
     onStatusChanged(val){
       console.log(">>>>onStatusChanged:",this.curSchStatus);
     },
+
     doSearchScheduleHis(){
       const self = this;
       let order = {
@@ -344,14 +348,17 @@ export default{
     },
     onCellClick(row){
       const parsObj = {
-            id : row.reportId,
-            storeName : row.storeName,
+            id : row.row.reportId,
+            storeName : row.row.storeName,
             status : '',
-            ts : row.reportTs,
-            submitterName : row.submitterName,
-            tagName : row.inspectTagName,
-            mode : row.inspectTagMode,
+            ts : row.row.reportTs,
+            submitterName : row.row.submitterName,
+            tagName : row.row.inspectTagName,
+            mode : row.row.inspectTagMode,
           };
+
+      console.log('parsObj :>> ', parsObj);
+      sessionStorage.setItem('report_data', JSON.stringify(parsObj));
       this.$router.push({ name: 'reportDetails', params: { data: parsObj }});
     },
     handleSortChange(order, defaultSort) {
@@ -473,7 +480,7 @@ export default{
       scheduleRESTful.exportScheduleTaskHistory(params).then(res => {
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
-          const filterVal = ['taskName','storeName','storeTimeZone','inspectTagName', 'remindTime', 'inspectTagMode', 'reportTs', 'submitterName',
+          const filterVal = ['taskName','storeName','storeTimeZone','remindTime', 'inspectTagMode', 'inspectTagName', 'reportTs', 'submitterName',
           'taskStatus','reportStatus'];
           const curData = res.data.content;
           const data = self.formatJson(filterVal, curData);
