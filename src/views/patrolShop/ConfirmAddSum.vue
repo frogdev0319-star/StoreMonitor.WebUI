@@ -150,7 +150,7 @@
               <tr>
                 <th v-for="(t_item ,t_index) in s_item.data[0].tHeader" :key="t_index" :style="t_item.width" scope="col">
                   {{ t_item.name }}
-                  <span style="color: #7d8cad; margin-left: 5px;" v-if="t_index == 0 && setting_isShowGroupSum">( 總分: {{ getTotalSum(s_item.data)}} )</span>
+                  <span style="color: #7d8cad; margin-left: 5px;" v-if="t_index == 0 && setting_isShowDistrictSum">( {{$t('remotePatrol.totalScoreUnit')}}: {{ getTotalSum(s_item.data)}} )</span>
                 </th>
               </tr>
             </thead>
@@ -163,7 +163,7 @@
                         <div v-if="inspectItem.weight != -1 && inspectItem.type != 2">{{ inspectItem.weight + '%' }} </div>
                         <div class="sheet_title">
                           {{ inspectItem.label }}
-                          <span style="color: #7d8cad; margin-left: 5px;" v-if="setting_isShowDistrictSum">( 總分:{{getSum(inspectItem.inspectList)}} )</span>
+                          <span style="color: #7d8cad; margin-left: 5px;" v-if="setting_isShowGroupSum">( {{$t('remotePatrol.totalScoreUnits')}}:{{getSum(inspectItem.inspectList)}} )</span>
                         </div>
                       </div>
                       <div class="flex" style="align-items: center">
@@ -214,7 +214,7 @@
                       <div v-for="(categoryItem,categoryIndex) in _item.cateryItems" :key="categoryIndex" class="content-detail">
                         <div class="content-detail-title">
                           <div class="detail-title">
-                            <p class="title1">{{ categoryIndex+1 }}.{{ categoryItem.subject }}</p>
+                            <p class='title1' v-bind:class="{titleImportant: categoryItem.isImportant}"><span class='indexStyle'>{{ categoryIndex+1 }}.</span>{{ categoryItem.subject }}</p>
                             <p class="title2">{{ categoryItem.description }}</p>
                           </div>
                           <div v-if="categoryItem.itemType === 0" class="score-title">
@@ -287,7 +287,7 @@
                         <div v-for="(childItem, childIndex) in child.cateryItems" :key="childIndex" class="content-detail">
                           <div class="content-detail-title">
                             <div class="detail-title">
-                              <p class="title1">{{ childIndex+1 }}.{{ childItem.subject }}</p>
+                              <p class="title1"  v-bind:class="{titleImportant: childItem.isImportant}"><span class='indexStyle'>{{ childIndex+1 }}.</span>{{ childItem.subject }}</p>
                               <p class="title2">{{ childItem.description }}</p>
                             </div>
                             <div v-if="childItem.itemType === 0" class="score-title">
@@ -668,6 +668,11 @@ export default {
 
         })
       })
+
+      if(!isNaN(parseFloat(tableTotalScore))){
+        tableTotalScore = tableTotalScore.toFixed(1)
+      }
+
       return tableTotalScore
 
     },
@@ -679,6 +684,11 @@ export default {
         }
 
       })
+
+      if(!isNaN(parseFloat(totalScore))){
+        totalScore = totalScore.toFixed(1)
+      }
+
       return totalScore
     },
 
@@ -811,7 +821,7 @@ export default {
         return false;
       }
       if(self.totalnumOfPic>120){
-        util.notify(self.$t('remotePatrol.maximumAtt'), 'warning', 3000);
+        util.notify(self.$t('remotePatrol.maximumTotalAttach'), 'warning', 3000);
         return false;
       }
       self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
@@ -2003,7 +2013,7 @@ export default {
       if (!files.length)
         return;
       if(self.auditFileCount == 120){
-        util.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
+        util.notify(self.$t('remotePatrol.maximumTotalAttach'), 'warning', 3000);
         return;
       }
       if(files[0].type.includes("pdf") && files[0].size > maxSize){
@@ -2724,6 +2734,11 @@ export default {
               }
               .detail-title{
                 flex: 1;
+                .indexStyle{
+                  font-size: calc(14 / 1920 * 100vw);
+                  color:#182752;
+                  font-weight: bold;
+                }
                 .title1{
                   font-size: calc(14 / 1920 * 100vw);
                   color:#182752;
@@ -2735,6 +2750,12 @@ export default {
                   color:#7d8cad;
                   margin: 15px 0 0 10px;
                   word-break: break-all;
+                }
+                .titleImportant{
+                  font-size: calc(14 / 1920 * 100vw);
+                  color:#f31d65;
+                  font-weight: bold;
+                  margin:0 0 5px 0;
                 }
               }
               .score-title{

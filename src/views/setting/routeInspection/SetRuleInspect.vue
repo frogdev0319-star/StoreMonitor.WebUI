@@ -127,13 +127,13 @@
 
           <!-- 顯示區域計分(僅支援網頁版) -->
           <p class="rule-item">
-            <el-checkbox class="storevue-checkbox-outlined" v-model="setting_isShowGroupSum">
+            <el-checkbox class="storevue-checkbox-outlined" v-model="setting_isShowDistrictSum">
               顯示區域計分(僅支援網頁版)
             </el-checkbox>
           </p>
           <!-- 顯示巡檢類別計分 -->
           <p class="rule-item">
-            <el-checkbox class="storevue-checkbox-outlined" v-model="setting_isShowDistrictSum">
+            <el-checkbox class="storevue-checkbox-outlined" v-model="setting_isShowGroupSum">
               顯示巡檢類別計分
             </el-checkbox>
           </p>

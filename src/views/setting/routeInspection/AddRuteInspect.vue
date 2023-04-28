@@ -23,12 +23,12 @@
         @click="submitBindTitle">
         {{ $t('remotePatrol.submit') }}
       </el-button>
-    <div v-if="showLengthNameWarning" class="warningtips">{{ $t('insSettingView.enterNameRuletip') }}</div>  
+    <div v-if="showLengthNameWarning" class="warningtips">{{ $t('insSettingView.enterNameRuletip') }}</div>
     </div>
     <hr class="hr-horizontal">
     <div class="flex padding">
       <div class="temp-select-area" :style="{'width':getLangStyleValue(tempSelectAreaWidth)}">
-          <div class="temp-select-label" :style="{'width':getLangStyleValue(tempSelectLabelWidth)}">{{ $t('insSettingView.selecttitle') }}</div> 
+          <div class="temp-select-label" :style="{'width':getLangStyleValue(tempSelectLabelWidth)}">{{ $t('insSettingView.selecttitle') }}</div>
           <multi-select
           class="store-group-select region"
           :selected="ModelPost"
@@ -89,7 +89,7 @@
                         <div class="group-left spacer">
                           <div v-if="activeParentId === item.id && !item.children" class="proper-flag"/>
                           <div :style="activeParentId === item.id?{'color':'#006ab7'}:{}" class="flex" style="flex-direction: column; height: 60px; text-align: left; padding-left: 20px;">
-                            <div v-if="item.weight != -1 && activeSheetName != 2" style="line-height: 30px">{{ `${item.weight} %` }}</div> 
+                            <div v-if="item.weight != -1 && activeSheetName != 2" style="line-height: 30px">{{ `${item.weight} %` }}</div>
                             <div v-if="item.weight != -1 && activeSheetName != 2" class="spacer"></div>
                             <div class="flex">
                               <div style="max-width: 240px; overflow:hidden; white-space: nowrap; text-overflow: ellipsis;" :style="item.weight != -1 && activeSheetName != 2 ? {'line-height': '30px', 'height': '30px'} : {'line-height': '60px', 'height': '60px'}">{{ item.name }}</div>
@@ -100,7 +100,7 @@
                         <div class="group-right">
                           <div class="show-edit">
                             <div class="nape-items-handle" v-if="hoverId === item.id">
-                              
+
                               <img style="margin-top:15px" :src="`./static/img/table-edit.png`" height="26px" @click="editCategory(index,item)"/>
                               <img style="margin-top:15px" :src="`./static/img/table-delete.png`" height="26px" @click="deleteGroup(index, item)"/>
                             </div>
@@ -171,6 +171,7 @@
           <div id="el-menuscrollbar" style="height:100%;">
             <div class="nape-items">
               <draggable-table
+                :showTableHeader="true"
                 :is-score-sheet= "activeSheetName === '1'"
                 :table-header="activeSheetName === '1' ? scoreTableHeader:passFailTableHeader"
                 :table-data="napeList"
@@ -182,7 +183,7 @@
       </div>
     </div>
 
-    
+
     <!-- 新增/編輯巡檢項 -->
     <dialog-pop
       v-if="showAddNape"
@@ -194,7 +195,7 @@
       :is-warning="true"
       @cancelHandler="showAddNape = false"
       @confirmHandler="confirmUpdateNape">
-      
+
       <div class="dialog-content content_padding" style="padding-bottom: 10px">
         <el-form class="NapeForm" label-position="top" size="mini">
           <!-- 巡檢項名稱 -->
@@ -211,7 +212,7 @@
           </el-form-item>
 
           <!-- 必填 -->
-          <el-form-item style="margin-bottom: 20px">  
+          <el-form-item style="margin-bottom: 20px">
             <div class="score_item">
               <span class="sign">*</span>
               <span class="item_label">{{ $t('insSettingView.isRequired') }}</span>
@@ -223,7 +224,7 @@
           </el-form-item>
 
           <!-- 重要巡檢項 -->
-          <el-form-item style="margin-bottom: 20px">  
+          <el-form-item style="margin-bottom: 20px">
             <div class="score_item">
               <span class="sign">*</span>
               <span class="item_label">重要巡檢項</span>
@@ -250,7 +251,7 @@
 
           <!-- 項目分值 -->
           <div class="score-content">
-            
+
             <!-- 1 -->
             <el-form-item v-if="activeSheetName==='1'" style="margin-bottom: 5px">
               <div class="score_item">
@@ -258,7 +259,7 @@
                 <span class="sub_label">{{$t('insSettingView.sheetscore3')}} </span>
                 <span class="item_des">{{$t('insSettingView.sheetscore3_des')}}</span>
               </div>
-              <el-input 
+              <el-input
                 v-model="ItemScoreOption"
                 :disabled="(itemType === 1)"
                 :placeholder="$t('insSettingView.enterScore')"
@@ -276,8 +277,8 @@
                     <span class="sign">*</span>
                     <span class="sub_label">{{$t('insSettingView.sheetscore0')}} </span>
                   </div>
-                  <el-input 
-                    v-model.number="ItemTotalScore" 
+                  <el-input
+                    v-model.number="ItemTotalScore"
                     disabled
                     :placeholder="$t('insSettingView.enterScore')"
                     @input="napeTotalScoreChange"/>
@@ -287,7 +288,7 @@
               </el-col>
               <el-col :span="12" :offset="2">
                 <el-form-item :label="$t('insSettingView.sheetscore1')" >
-                  <el-input 
+                  <el-input
                     v-model.number="ItemMinScore"
                     :disabled="(itemType === 1)"
                     :placeholder="$t('insSettingView.enterScore')"
@@ -313,10 +314,10 @@
 
               <span v-if="PFScoreTip" class="memo_rules">{{ $t('insSettingView.setPassFileRange') }} </span>
               <span v-if="OtherScoreTip" class="memo_rules">{{ $t('insSettingView.setOtherRange') }} </span>
-              <span v-if="OtherScoreTipEmpty" class="memo_rules">{{ $t('insSettingView.setOtherEmpty') }} </span> 
+              <span v-if="OtherScoreTipEmpty" class="memo_rules">{{ $t('insSettingView.setOtherEmpty') }} </span>
             </el-form-item>
           </div>
-          
+
           <!-- 巡檢項目詳細說明  -->
           <el-form-item style="margin-bottom: 20px; margin-top: 20px;">
             <div class="score_item">
@@ -333,7 +334,7 @@
             <div class="score_item">
               <span class="item_label">{{ $t('insSettingView.advanceSetting') }} </span>
             </div>
-            
+
             <el-radio-group class="attribute-group" v-model="memo_is_advanced" @change="getSettingStatus">
               <div style="display: inline-flex">
                 <el-radio label= "true" >{{ $t('insSettingView.advanceSettingOn') }}</el-radio>
@@ -341,7 +342,7 @@
               </div>
             </el-radio-group>
 
-            <div class="score-content" style="margin-bottom: 10px; " v-if="memo_is_advanced == 'true'"> 
+            <div class="score-content" style="margin-bottom: 10px; " v-if="memo_is_advanced == 'true'">
               <el-form-item >
                 <div class="score_item">
                   <!-- <span class="sign">*</span> -->
@@ -353,7 +354,7 @@
                   v-model="memo_option"
                   style="margin-bottom: 5px"
                   placeholder="請輸入備註標籤"
-                  @input="memoOptionsChange" 
+                  @input="memoOptionsChange"
                 />
 
                 <div class="advance_memo_required_type">
@@ -366,17 +367,17 @@
                   </el-radio-group>
                 </div>
                 <div class="advance_memo_check"  style="margin-left: 23px;">
-                  <el-checkbox 
+                  <el-checkbox
                     ref="xxdd"
                     :disabled='((itemRequired == "0" && itemType == 1) || memo_config.memo_required_type == "0")'
-                    class="storevue-checkbox-outlined" 
+                    class="storevue-checkbox-outlined"
                     v-model="memo_config.memo_check_text"
                   >
                     <span class="check_text">{{ $t('insSettingView.memoCheckText') }}</span>
                   </el-checkbox>
-                  <el-checkbox 
+                  <el-checkbox
                     :disabled='((itemRequired == "0" && itemType == 1) || memo_config.memo_required_type == "0")'
-                    class="storevue-checkbox-outlined" 
+                    class="storevue-checkbox-outlined"
                     v-model="memo_config.memo_check_media"
                     >
                     <span class="check_text">{{ $t('insSettingView.memoCheckMedai') }}</span>
@@ -396,7 +397,7 @@
         <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmUpdateNape">{{ $t('insSettingView.confirm') }}</el-button>
       </div>
     </dialog-pop>
-    
+
     <dialog-pop
       :title="$t('insSettingView.confirmDelete')"
       :append-to-body="true"
@@ -730,7 +731,7 @@ export default {
   mounted() {
     this.initData();
     this.getTitleList();
-    
+
     document.getElementById('addInspection').addEventListener('mousedown', this.notShowDragInfo, false);
   },
 
@@ -740,7 +741,7 @@ export default {
 
   watch: {
     memo_config:{
-      immediate: true, 
+      immediate: true,
       deep: true,
       handler (val) {
         console.log("currentPage:",val);
@@ -748,7 +749,7 @@ export default {
         if(val.memo_required_type == "1" || val.memo_required_type == "2"){
           if(val.memo_check_text !== false || val.memo_check_media !== false)  {
             this.memo_configTips = false
-          } 
+          }
         } else if(val.memo_required_type == "0"){
           this.memo_configTips = false
         }
@@ -792,7 +793,7 @@ export default {
       if(this.memo_config.memo_required_type == "0") {
         this.memo_config.memo_check_text = false
         this.memo_config.memo_check_media = false
-      } 
+      }
       else if(this.memo_config.memo_required_type == "1" || this.memo_config.memo_required_type == "2") {
         this.memo_config.memo_check_text = true
         this.memo_config.memo_check_media = false
@@ -805,7 +806,7 @@ export default {
     },
 
 
-    
+
     toItemType(){
       console.log('toItemType  :>> ');
       this.getSettingStatus()
@@ -1240,7 +1241,7 @@ export default {
       this.showAddGroup = true;
       this.activeId = item.id;
       this.getParentCatergoryList();
-      
+
     },
 
     deleteItemData(idArr) {
@@ -1390,7 +1391,7 @@ export default {
       self.memo_option = ''
       self.memo_options = []
       self.memo_is_advanced = "false"
-      
+
     },
 
     deleteNape(item) {
@@ -1731,7 +1732,7 @@ export default {
       this.memo_option = item.memo_options.join("/")
       this.memo_options = item.memo_options
 
-      
+
       console.log('this.memo_config :>> ', this.memo_config);
 
       if(item.memo_config == null){
@@ -1917,12 +1918,12 @@ export default {
       }
 
 
-      
+
     },
 
     getItemsList(index, item) {
       const self = this;
-      
+
       const temp = [];
       item.items.forEach((_item, index) => {
         let availableScoreStr = '';
@@ -1958,7 +1959,7 @@ export default {
           sequence: _item.sequence,
           required: _item.required,
           isImportant: _item.isImportant,
-          
+
           memo_is_advanced: _item.memo_is_advanced,
           memo_options: _item.memo_options,
           memo_config: _item.memo_config,
@@ -2087,8 +2088,8 @@ export default {
       // 刪除重複 & 空字串
       self.memo_options = [...new Set(self.memo_options)].filter(i => i !== "")
       console.log(self.memo_options);
-      
-      
+
+
       // self.ScoreOptionsTips0 = false;
       // if(val===''){
       //   self.ScoreOptionsTips1 = false;
@@ -2222,9 +2223,9 @@ export default {
   .check_text
     font-size: calc(14/1920*100vw)
     color: #606266
-            
-        
-  
+
+
+
 </style>
 
 <style lang="scss" scoped>
@@ -2274,7 +2275,7 @@ export default {
           font-size: 14px;
           color:#424151;
           margin-right:10px;
-          
+
         }
         .item_des{
           font-size: 12px;
@@ -2293,9 +2294,9 @@ export default {
           top: 100%;
           left: 0;
       }
-      
+
     }
-    
+
     .el-addrute{
         width: 100%;
         height: 100%;
@@ -2303,7 +2304,7 @@ export default {
         color: $black;
         font-size: calc(18/1920*100vw);
         position: relative;
-        
+
         .tabName-input{
             width: 210px;
         }
@@ -2387,7 +2388,7 @@ export default {
                 color: #ddd;
                 cursor: pointer;
             }
-            
+
         }
         .warningtips{
             font-size:12px;
@@ -2468,7 +2469,7 @@ export default {
             }
         }
         .temp-select-area{
-                  display:flex; 
+                  display:flex;
                   flex-direction:row;
                   height:30px;
                   width:300px;
@@ -2897,7 +2898,7 @@ export default {
     justify-content: flex-end;
     align-items: center;
   }
-  
+
   .el-radio{
     margin-right: calc(20/1920*100vw);
   }

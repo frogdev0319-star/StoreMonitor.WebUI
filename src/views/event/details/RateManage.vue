@@ -1153,10 +1153,12 @@ export default {
       var fileName = files[0].name;
       if (!files.length)
         return;
+      /*
       if(self.attFileCount==10){
         util.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
         return;
       }
+      */
       if(files[0].type.includes("video") && self.videoAttFileCount==2){
         util.notify(self.$t('eventView.maximumAttVedio'), 'warning', 3000);
         return;

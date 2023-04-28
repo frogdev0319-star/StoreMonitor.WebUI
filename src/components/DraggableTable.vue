@@ -1,6 +1,6 @@
 <template>
   <div :class="showTableHeader ? 'dragable-table-content' : 'dragable-noheader-table-content'">
-    <!-- <div v-if="showTableHeader" class="dragable-table-header">
+    <div v-if="showTableHeader" class="dragable-table-header">
       <div
         v-for="(headerItem, headerIndex) in tableHeader"
         :key="headerIndex"
@@ -8,8 +8,7 @@
         class="table-header-item">
         {{ headerItem.name }}
       </div>
-    </div> -->
-
+    </div>
     <div class="dragable-table-list">
       <draggable v-model="sortableTableData" @update="handleUpdate">
         <div v-for="(contentItem, contentIndex) in sortableTableData" :key="contentItem.sequence" class="table-content-item">
@@ -46,13 +45,13 @@
           <div class="table-operation">
             <!-- btn icon  with svg -->
             <!-- <div class="el-icon-edit" style="font-size: 20px; color: #999"></div> -->
-            <img 
+            <img
               v-if="showEditBtn"
-              :src="`./static/img/table-edit.png`" 
+              :src="`./static/img/table-edit.png`"
               @click="handleEdit(contentIndex,contentItem)"
               height="26px" />
-            <img 
-              :src="`./static/img/table-delete.png`" 
+            <img
+              :src="`./static/img/table-delete.png`"
               @click="handleDelete(contentItem)"
               height="26px" />
           </div>
@@ -202,7 +201,7 @@ export default {
   .dragable-table-header, .table-content-item{
     display: flex;
     justify-content: space-between;
-    
+
     align-items: center;
   }
   .dragable-table-header{
@@ -221,7 +220,7 @@ export default {
     font-family: 'Roboto';
     min-height: 60px;
     height: auto;
-    
+
   }
   .table-checkbox-name{
     display: inline-flex;
@@ -247,7 +246,7 @@ export default {
 
   .table-checkbox-name{
     width: 27%;
-    
+
   }
   .table-description{
     width: 45%;

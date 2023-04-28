@@ -549,7 +549,7 @@ export default{
       "attachments":"类型附件 ",
       "notFinishWithText":"尚有必填项目未完成，备注标签请加入「文字」类型附件 ",
       "notFinishWithMedia":"尚有必填项目未完成，备注标签请加入「图片或影像」类型附件",
-      "maximumAttach":"全表最多允许上传120个附件"
+      "maximumTotalAttach":"全表最多允许上传120个附件"
   },
   "eventView":{
       "ClosedEvent":"已结案事件",

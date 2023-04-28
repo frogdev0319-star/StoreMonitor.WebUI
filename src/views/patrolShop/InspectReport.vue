@@ -20,7 +20,7 @@
           {{ $t('audit.inceptionRpt.auditReport') }}
         </p>
         <div style="display:inline-block">
-          <el-button 
+          <el-button
             v-if="showEditBtn"
             class="confirm-btn"
             size="'mini'" type="primary" @click="goBackRemoteInception">
@@ -32,7 +32,7 @@
             size="'mini'" type="primary" @click="doCancelAudit">
             {{ $t('audit.inceptionRpt.cancelAudit') }}
           </el-button>
-        </div>   
+        </div>
       </div>
       <div class="splitline" v-if="isAuditMode"></div>
       <div class="left-header">
@@ -66,7 +66,7 @@
         </div>
 
 
-        <div 
+        <div
           style="margin-left: calc(20/1440*100vw)"
           class="status-tag"
           :style="{
@@ -85,7 +85,7 @@
           }[report.status]}}
         </div>
 
-        
+
         <div v-if="showTag" style="margin-left: calc(20/1440*100vw)" class="status-tag"
           :style="standard == 1 ? {'color':'#59ab22','background-color':'#e8f6de'}: {'color':'#f57848','background-color':'#ffefeb'}"
         >{{standard == 1 ? $t('remotePatrol.goalAchieved') : $t('remotePatrol.farBehind')}}</div>
@@ -103,9 +103,9 @@
       <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{$t('remotePatrol.aroundDistance')+signInDistance}}</span>
     </div>
     <div class="template-titles" v-if="!isexportPDF">
-      <el-select 
+      <el-select
         class="storevue-select"
-        :value="curTemplateIndex" 
+        :value="curTemplateIndex"
         @change="getTemplateConfig">
         <el-option
           v-for="(item,index) in templateList"
@@ -115,7 +115,7 @@
         />
       </el-select>
     </div>
-    
+
     <!-- 巡檢詳情 -->
     <div class="el-acticle">
       <el-row v-for="(pageItem, pageIndex) in pageData" :class="pageItem.class" :key="pageIndex">
@@ -320,10 +320,10 @@
               <img :src="require('../../../static/img/group_score.svg')" width="20" height="20" />
             </div>
             <div class="limit-text">{{$t('remotePatrol.tipLimitGroupScore')}} </div>
-            
+
           </div>
 
-          
+
           <table v-for="(tableItem, tableIndex) in pageItem.data" :key="tableIndex" class="table table-bordered">
             <thead :class="hasChart ? 'pdf_font_20': 'pdf_font_16'">
               <tr v-if="tableItem[0].type === 0">
@@ -331,8 +331,8 @@
                   v-for="(t_item ,t_index) in theaderPassFail"
                   :key="t_index"
                   :style="isexportPDF ? t_item.pdfWidth: t_item.width"
-                  scope="col">{{ t_item.name }} 
-                  <span v-if="t_index == 0 && setting_isShowGroupSum" > ( 總分:  {{ getTotalSum( pageItem.data[tableIndex]) }} ) </span>
+                  scope="col">{{ t_item.name }}
+                  <span v-if="t_index == 0 && setting_isShowDistrictSum" > ( {{$t('remotePatrol.totalScoreUnit')}}:  {{ getTotalSum( pageItem.data[tableIndex]) }} ) </span>
                 </th>
               </tr>
               <tr v-if="tableItem[0].type === 1">
@@ -340,8 +340,8 @@
                   v-for="(t_item ,t_index) in theaderScore"
                   :key="t_index"
                   :style="isexportPDF ? t_item.pdfWidth: t_item.width"
-                  scope="col">{{ t_item.name }} 
-                  <span v-if="t_index == 0 && setting_isShowGroupSum"> ( 總分: {{ getTotalSum( pageItem.data[tableIndex]) }} ) </span>
+                  scope="col">{{ t_item.name }}
+                  <span v-if="t_index == 0 && setting_isShowDistrictSum"> ( {{$t('remotePatrol.totalScoreUnit')}}: {{ getTotalSum( pageItem.data[tableIndex]) }} ) </span>
                 </th>
               </tr>
               <tr v-if="tableItem[0].type === 2">
@@ -349,13 +349,13 @@
                   v-for="(t_item ,t_index) in theaderOther"
                   :key="t_index"
                   :style="isexportPDF ? t_item.pdfWidth: t_item.width"
-                  scope="col">{{ t_item.name }} 
-                  <span v-if="t_index == 0 && setting_isShowGroupSum"> ( 總分: {{ getTotalSum( pageItem.data[tableIndex]) }} ) </span>
+                  scope="col">{{ t_item.name }}
+                  <span v-if="t_index == 0 && setting_isShowDistrictSum"> ( {{$t('remotePatrol.totalScoreUnit')}}: {{ getTotalSum( pageItem.data[tableIndex]) }} ) </span>
                 </th>
               </tr>
             </thead>
 
-          
+
             <template >
               <!-- <pre> --0-- {{ tableItem[0] }}  </pre> -->
               <!-- <pre> --1-- {{ tableItem[1] }}</pre>
@@ -365,12 +365,12 @@
               <tbody v-for="(categoryItem, categoryIndex) in tableItem" :key="categoryIndex" :class="hasChart ? 'pdf_font_20': 'pdf_font_16'" class="pdf_font_20">
                 <tr style="vertical-align:middle;">
                   <td :rowspan="categoryItem.children.length + 1" style="vertical-align:middle;">
-                    
+
                     <div>
                       <div v-if="categoryItem.weight != -1 && categoryItem.type != 2">{{ categoryItem.weight + '%' }}</div>
                       <div>
-                        {{ categoryItem.groupName }} 
-                        <span style="color: #7d8cad; margin-left: 5px;" v-if="setting_isShowDistrictSum"> ( 總分: {{ getSum(categoryItem.children) }} ) </span>
+                        {{ categoryItem.groupName }}
+                        <span style="color: #7d8cad; margin-left: 5px;" v-if="setting_isShowGroupSum"> ( {{$t('remotePatrol.totalScoreUnit')}}: {{ getSum(categoryItem.children) }} ) </span>
                       </div>
                     </div>
                   </td>
@@ -412,7 +412,7 @@
             class="pie-content">
             <span class="span-4"><span class="pdf_font_18">{{ $t('remotePatrol.scoreU') }}</span></span>
             <div class="pie-area">
-              <div 
+              <div
               :style="isexportPDF ? 'margin-left:250px;' : ''"
               class="pie-div">
                 <div class="pct-panel"
@@ -433,7 +433,7 @@
                       <div class="pei-item-name">{{item.name}}</div>
                       <div class="pei-item-num">{{item.value}}%</div>
                   </div>
-                </div> 
+                </div>
               </div>
             </div>
           </el-col>
@@ -456,12 +456,12 @@
                   class="radar-chart-content"/>
                   </div>
               </div>
-              <div 
+              <div
                 class="radar-label"
                 :style="isexportPDF?{'marginLeft': '175px', 'width':'350px'}:{}"
               >
                 <div style="margin-left:16px;color:#484848;font-size:15px;line-height:20px">{{$t('remotePatrol.category')}}</div>
-                <div 
+                <div
                 v-for="(item,index) in chartLabelArr"
                 :style="isexportPDF?{'width':'100%'}:{}"
                 :key="index">
@@ -469,9 +469,9 @@
                       <div :style="isexportPDF?{'flex': 1}:{}" class="radar-item-name">{{item.name}}</div>
                       <div :style="isexportPDF?{'width': '50px'}:{}" class="radar-item-num">{{item.value}}</div>
                   </div>
-                </div> 
+                </div>
               </div>
-            </div> 
+            </div>
           </el-col>
         </template>
 
@@ -607,7 +607,7 @@
 </template>
 <script>
 import ECharts from 'vue-echarts';
-import { 
+import {
   getInspectReportInfo,
   downLoadInspectReportEntireDetail,
   getInspectStatus,
@@ -809,6 +809,9 @@ export default {
             }
         })
       })
+      if(!isNaN(parseFloat(tableTotalScore))){
+        tableTotalScore = tableTotalScore.toFixed(1)
+      }
       return tableTotalScore
 
     },
@@ -827,13 +830,16 @@ export default {
           }
         }
       })
+      if(!isNaN(parseFloat(totalScore))){
+        totalScore = totalScore.toFixed(1)
+      }
       return totalScore
     },
 
-    
+
     getDoubleNum (num) {
       num = util.isDouble(num,2);
-      return Math.round(num * 100) / 100  
+      return Math.round(num * 100) / 100
     },
     getReportTemplateAndInfo() {
       const templatePromise = ReportSetting.getInspectReportTemplateList({ enable: true });
@@ -849,7 +855,7 @@ export default {
 
         this.setting_isShowGroupSum = (results[1].data[0].inspectSettings.find( i => i.name == "setting_isShowGroupSum")).value
         this.setting_isShowDistrictSum = (results[1].data[0].inspectSettings.find( i => i.name == "setting_isShowDistrictSum")).value
-  
+
         console.log('this.setting_isShowGroupSum  :>> ', this.setting_isShowGroupSum );
         console.log('this.setting_isShowDistrictSum :>> ', this.setting_isShowDistrictSum);
 
@@ -921,13 +927,13 @@ export default {
         this.$t('remotePatrol.signInTime'),
         this.$t('remotePatrol.createRptDT'),
         ];
-      
+
       downLoadInspectReportEntireDetail(params).then(res => {
         console.log("res:",res);
         const that = this;
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
-          const filterVal = ['province','city','storename','code', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 
+          const filterVal = ['province','city','storename','code', 'tagname', 'group', 'item', 'inspectitem','itemscore','result',
           'totlascore','status','submitter', 'detail', 'attachment','comment','singinmap','signints','reportts'];
           const curData = res.data;
           const tagName = this.report.tagName;
@@ -1014,7 +1020,7 @@ export default {
         self.report = obj;
       }
     },
-    
+
     getInspectStatus() {
       return new Promise((resolve, reject) => {
         getInspectStatus().then(res => {
@@ -1022,7 +1028,7 @@ export default {
           this.inspectStatus = res.data.settingContent.general_setting_inspect_status_name
           delete this.inspectStatus.update_time
           delete this.inspectStatus.update_user_id
-          
+
             if(this.inspectStatus.is_customize_2 == false){
             this.inspectStatus.status_2 = this.$t('overview.echartGood')
           }
@@ -1033,13 +1039,13 @@ export default {
             this.inspectStatus.status_0 = this.$t('overview.danger')
           }
           console.log('this.inspectStatus~~~~~ :>> ', this.inspectStatus);
-          
+
         }).catch(err => {
           reject(err);
         });
       });
     },
-    
+
     getIconSrc(status) {
       const statusAndLangAndIconMap = [
         {
@@ -1151,15 +1157,15 @@ export default {
     async getReportInfo(res) {
       const self = this;
       if (res.errCode === 0 && res.data.length > 0) {
-        const data = res.data[0].info; 
-        
+        const data = res.data[0].info;
+
         switch (data.mode) {
           case 0:
             self.report.inspectSrc = self.inspectSrc;
             self.report.inspectType = self.$t('overview.remotePatrol');
             break;
           case 1:
-            console.log("data.mode:",data.mode); 
+            console.log("data.mode:",data.mode);
             self.report.inspectSrc = self.insiteInspectSrc;
             self.isInsiteInspect = true;
             self.report.inspectType = self.$t('overview.onsitePatrol');
@@ -1184,7 +1190,7 @@ export default {
         this.weatherImg = data.weatherInfo ? data.weatherInfo.icon : '';
         this.signaturesList = this.isInsiteInspect && data.signatures ? data.signatures : [];
         this.reportData = data;
-        
+
         this.auditState = data.auditState;
         this.hasSignRecord = res.data[0].inspectSettings.filter(settingItem => settingItem.name === 'checkin')[0].value;
         if(data.checkinRecord && this.hasSignRecord){
@@ -1193,7 +1199,7 @@ export default {
           this.signMapUrl = data.checkinRecord.report_sign_map_url;
           this.signInDistance = data.checkinRecord.execute_sign_distance+this.$i18n.t('remotePatrol.mapDistance3');
         }
-        
+
         this.getGroupsData(data.groups);
         this.getTab1AndTab3BtnName(res.data[0].inspectSettings);
 
@@ -1262,9 +1268,9 @@ export default {
     },
 
     getPageDataBasedOnTemplate(data) {
-      
+
       console.log('data 2:>> ', data);
-      
+
       const map = this.getDetailNameAndHandlerMap(data);
 
       this.sortArrayByKey(this.templateConfig, 'position');
@@ -1457,7 +1463,7 @@ export default {
           summaryItem.actualScore = this.addChildrenDataToParent(summaryItem.children, 'actualScore');
           summaryItem.numOfTotalItems = this.addChildrenDataToParent(summaryItem.children, 'numOfTotalItems');
           summaryItem.numOfCommentItems = this.addChildrenDataToParent(summaryItem.children, 'numOfCommentItems');
-          
+
           if(summaryItem.children[0].weight != summaryItem.weight){
             summaryItem.weight = summaryItem.children[0].weight;
           }
@@ -1474,7 +1480,7 @@ export default {
       if (arr.length > 1) {
         sum = arr.reduce((accumulator, cur) => {
           return accumulator + cur[key];
-        },0); 
+        },0);
       } else {
         sum = arr[0][key];
       }
@@ -1578,27 +1584,27 @@ export default {
       const tempIndicator = [];
       const seriesValue = [];
       let mapArr = []
-      this.chartLabelArr = []; 
+      this.chartLabelArr = [];
       var templabe = [];
-      
+
       summary.forEach((item, index) => {
         const obj = {};
         obj.name = item.groupName;
         obj.max = Number(item.numOfQualifiedItems + item.numOfUnqualifiedItems) === 0
-          ? 1 
+          ? 1
           : Number(item.numOfQualifiedItems + item.numOfUnqualifiedItems);
         //tempIndicator.push(obj);
-        //this.staticalConfig.qualified 
+        //this.staticalConfig.qualified
         //  ? seriesValue.push(item.numOfUnqualifiedItems)
         //  : seriesValue.push(item.numOfQualifiedItems);
         if (index < 2) {
           tempIndicator.push(obj);
-          this.staticalConfig.qualified 
+          this.staticalConfig.qualified
             ? seriesValue.push(item.numOfUnqualifiedItems)
             : seriesValue.push(item.numOfQualifiedItems);
         } else {
           tempIndicator.splice(1, 0, obj);
-          this.staticalConfig.qualified 
+          this.staticalConfig.qualified
             ? seriesValue.splice(1, 0, item.numOfUnqualifiedItems)
             : seriesValue.splice(1, 0, item.numOfQualifiedItems);
         }
@@ -1608,7 +1614,7 @@ export default {
         }
         templabe.push(arrObj);
       });
-      
+
       /*for(var i=0; i<tempIndicator.length;i++){
         let arrObj = {
           name:tempIndicator[i].name,
@@ -1621,7 +1627,7 @@ export default {
       const temp = [];
       const obj = { value: seriesValue };
       temp.push(obj);
-      
+
       options.radar[0].indicator = tempIndicator;
       options.radar[1].indicator = tempIndicator;
       options.series[0].data = temp;
@@ -1730,17 +1736,17 @@ export default {
                 width: 2
               },
               areaStyle: {
-                color: new ECharts.graphic.RadialGradient( //圓圈中心建變色填滿 
+                color: new ECharts.graphic.RadialGradient( //圓圈中心建變色填滿
                   0.5, 0.5, 0.5,
                   [
                     { offset: 1, color: 'rgba(0,106,183, 0.4)' },
                     { offset: 0, color: 'rgba(235,243, 249, 0.4)' }
-                  ]  
+                  ]
                 ),
               }
             }
           },
-          
+
         }
         ]
       };
@@ -1768,7 +1774,7 @@ export default {
         summaryTempArr.push(otherItems);
       }
       const seriesData = [];
-     
+
       let totalItem = 0;
       summaryTempArr.forEach(item => {
         const obj = {};
@@ -1826,7 +1832,7 @@ export default {
               emphasis: {
                 borderWidth:10,
                 borderColor:'#EDF0F2',
-                
+
               },
               normal: {
                 borderWidth:5,
@@ -1981,7 +1987,7 @@ export default {
               }
               obj.sourceList.push(objAtt);
             }
-            
+
           }
           return obj;
         })
@@ -2035,7 +2041,7 @@ export default {
     async goBackRemoteInception(){
       const self = this;
       let isStillBind = await self.getWorkFloBind();
-      
+
       if(!isStillBind){
         console.log(">>>>isStillBind:",isStillBind)
         self.workflowUnbindDialogShow = true;
@@ -2062,7 +2068,7 @@ export default {
           curItemIndex:0,
           curItemId:0
         };
-        
+
         var params = {
           isEdit:true,
           reportComment:this.reportData.comment
@@ -2110,7 +2116,7 @@ export default {
         this.cancelAuditDialogShow=false;
         util.notify(self.$t('audit.inceptionRpt.cancelAuditFail'), 'warning', 3000);
       });
-      
+
     },
     doGetTaskInfo(){
       var resWorkflowTask = GetTaskInfo(self.report.reportId);
@@ -2281,22 +2287,22 @@ export default {
         display: flex;
         height: 25px;
         .font-15 {
-           font-size: calc(15/1440*100vw); 
-           height: calc(32/1440*100vw); 
-          line-height: calc(40/1440*100vw); 
+           font-size: calc(15/1440*100vw);
+           height: calc(32/1440*100vw);
+          line-height: calc(40/1440*100vw);
         }
         .font-score {
-           font-size: calc(32/1440*100vw); 
+           font-size: calc(32/1440*100vw);
            color: #c60957;
         }
         .font-score_count {
-           font-size: calc(12/1440*100vw); 
+           font-size: calc(12/1440*100vw);
            color: #69727c;
         }
       }
-      
+
       .status-tag {
-        border-radius: calc(5/1440*100vw); 
+        border-radius: calc(5/1440*100vw);
         padding: calc(2/1440*100vw) calc(15/1440*100vw);
       }
       .info-content {
@@ -2405,7 +2411,7 @@ export default {
               top:143px;
               border-radius: 50%;
               border-color:#dae4eb;
-              border-style:dashed dashed dashed dashed; 
+              border-style:dashed dashed dashed dashed;
             }
             .pct-panel{
               // width: 290px;
@@ -2413,7 +2419,7 @@ export default {
               /*border-radius: 50%;
               border-color:#dae4eb;
               border-style:dashed dashed dashed dashed; */
-              
+
               .pie-chart-content {
                 width:100%;
                 height:100%;
@@ -2453,7 +2459,7 @@ export default {
               font-weight: bold;
               line-height:18px;
             }
-          } 
+          }
         }
       }
       .radar-content {
@@ -2481,7 +2487,7 @@ export default {
             .pct-panel{
               // width: 290px;
               // height: 350px;
-              
+
               .radar-chart-content {
                 width: 100%;
                 margin:0 auto;
@@ -2525,7 +2531,7 @@ export default {
           }
 
         }
-        
+
       }
       .report-content {
         margin-top: 15px;

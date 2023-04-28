@@ -639,10 +639,12 @@ export default {
         });
       } else {
         self.showCancelContent = false;
+        /*
         if (self.sourceListLength >= 10) {
           self.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
           return false;
         }
+        */
         self.showCutDialog = true;
         this.$nextTick(() => {
           self.canvasEl = document.getElementById('icanvas');

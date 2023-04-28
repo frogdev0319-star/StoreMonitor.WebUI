@@ -1013,7 +1013,7 @@ export default {
         self.showChannelBtns = [];
         self.allChannelBtns = [];
       } else {
-        if (!util.validateLicense(storeData[0].status)) {
+        if (!util.validateLicense(storeData[0].status) && storeData[0].status!=61) {
           return false;
         }
         const obj = {};
