@@ -556,7 +556,8 @@ export default{
       "mediaItem":"「圖片或影片」 ",
       "attachments":"類型附件 ",
       "notFinishWithText":"尚有必填項目未完成，備註標籤請加入「文字」類型附件 ",
-      "notFinishWithMedia":"尚有必填項目未完成，備註標籤請加入「圖片或影像」類型附件 "
+      "notFinishWithMedia":"尚有必填項目未完成，備註標籤請加入「圖片或影像」類型附件 ",
+      "maximumAttach":"全表最多允許上傳120個附件"
   },
   "eventView":{
       "ClosedEvent":"已結案事件",
@@ -608,7 +609,7 @@ export default{
       "closeSelectedEvent":"確認將選擇事件結案?",
       "confirmBachClose":"確認批次結案",
       "expiretag":"逾期",
-      "maximumAttVedio":"僅能上傳2個影片附件檔案"
+      "maximumAttVedio":"僅能上傳2個影片附件檔案",
   },
   "insSettingView":{
       "Addscoreitems":"附加評分項目",

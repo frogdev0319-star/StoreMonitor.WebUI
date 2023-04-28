@@ -548,7 +548,8 @@ export default{
         "mediaItem":"“Image or video”",
         "attachments":"Attachment type",
         "notFinishWithText":"尚有必填項目未完成，備註標籤請加入「文字」類型附件 ",
-        "notFinishWithMedia":"尚有必填項目未完成，備註標籤請加入「圖片或影像」類型附件 "
+        "notFinishWithMedia":"尚有必填項目未完成，備註標籤請加入「圖片或影像」類型附件 ",
+        "maximumAttach": "Up to 120 attachments are allowed in the full table"
 
     },
     "eventView":{

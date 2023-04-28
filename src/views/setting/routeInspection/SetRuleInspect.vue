@@ -127,22 +127,22 @@
 
           <!-- 顯示區域計分(僅支援網頁版) -->
           <p class="rule-item">
-            <el-checkbox class="storevue-checkbox-outlined" v-model="setting_isShowDistrictSum">
+            <el-checkbox class="storevue-checkbox-outlined" v-model="setting_isShowGroupSum">
               顯示區域計分(僅支援網頁版)
             </el-checkbox>
           </p>
           <!-- 顯示巡檢類別計分 -->
           <p class="rule-item">
-            <el-checkbox class="storevue-checkbox-outlined" v-model="setting_isShowGroupSum">
+            <el-checkbox class="storevue-checkbox-outlined" v-model="setting_isShowDistrictSum">
               顯示巡檢類別計分
             </el-checkbox>
           </p>
-          
+
 
         </div>
       </setting-table>
     </el-col>
-    
+
 
     <!-- 巡檢總評選項顯示 -->
     <el-col :span="24" class="el-rute-content storeLevel">
@@ -152,19 +152,19 @@
 
             <div class="overall_row" v-for="(item, index) in defaultDefineName" :key="index">
               <el-radio-group class="storevue-radio radio_item" v-model="item.defineStatus">
-                <el-radio :label="0" style="margin-right: 60px; min-width: 100px;" >{{item.name}}</el-radio> 
-                <el-radio :label="1" style=" width: fit-content;">{{ $t('insSettingView.userDefined')}} </el-radio> 
+                <el-radio :label="0" style="margin-right: 60px; min-width: 100px;" >{{item.name}}</el-radio>
+                <el-radio :label="1" style=" width: fit-content;">{{ $t('insSettingView.userDefined')}} </el-radio>
               </el-radio-group>
               <el-input
                 :ref=item.refName
-                :placeholder="$t('audit.workFlows.defineItem')" 
+                :placeholder="$t('audit.workFlows.defineItem')"
                 v-model="item.newName"
                 :disabled="item.defineStatus == 0"
                 style="width: 200px;  margin: 0 20px ;"
                 @input="(val) => itemInputChanged_overall({ val, item })"
                 />
             </div>
-            
+
             <span class="text_limit_sign" v-if="showInputLimit_overallItem"> {{$t('insSettingView.inputRuletip')}} </span>
           </div>
         </div>
@@ -179,7 +179,7 @@
         <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
           <el-checkbox class="storevue-checkbox-outlined" v-model="setting_isAutoMappingActivate" @change="switchIsAutoMappingActivate">
             <span>
-              {{$t('insSettingView.autoSelectComment')}} 
+              {{$t('insSettingView.autoSelectComment')}}
             </span>
           </el-checkbox>
 
@@ -188,7 +188,7 @@
           <el-radio-group class="storevue-radio suggestvalue" v-model="setting_autoMappingByTotalScore">
             <div class="suggestvalue_section" style="margin-bottom: 3px">
 
-              <el-radio :label="true" style="margin-bottom: 10px">{{$t('insSettingView.selectByScore')}} </el-radio> 
+              <el-radio :label="true" style="margin-bottom: 10px">{{$t('insSettingView.selectByScore')}} </el-radio>
 
                 <div class="for_flex">
                   <div class="suggestvalue_naming">
@@ -200,7 +200,7 @@
                         <div v-if="defaultDefineName[1].newName !== ''">{{defaultDefineName[1].newName}}</div>
                         <div style="color: #c0c0c0" v-if="defaultDefineName[1].newName == ''">{{$t('insSettingView.noUserDefinedName')}}</div>
                       </div>
-                      
+
                       <div class="item_name">
                         <div v-if="defaultDefineName[2].newName !== ''">{{defaultDefineName[2].newName}}</div>
                         <div style="color: #c0c0c0" v-if="defaultDefineName[2].newName == ''">{{$t('insSettingView.noUserDefinedName')}}</div>
@@ -210,8 +210,8 @@
                   <div class="suggestvalue_score">
                     <!-- low score -->
                     <div class="item_score">
-                      <div class="score">{{minScore}} {{$t('statistics.score')}}</div>   
-                      <span style="margin: 0 15px"> ~ </span>  
+                      <div class="score">{{minScore}} {{$t('statistics.score')}}</div>
+                      <span style="margin: 0 15px"> ~ </span>
                       <div class="score"> {{showScoreMin}} {{$t('statistics.score')}}</div>
                     </div>
 
@@ -219,38 +219,38 @@
                     <div class="item_score">
                       <div class="score">
                         <el-input
-                          placeholder="" 
+                          placeholder=""
                           style="width: 90px;"
                           v-model="scoreMiddleLow"
                           :disabled = "!setting_autoMappingByTotalScore"
                           @blur="inputScoreMiddleMin"
-                          
+
                           />
                           {{$t('statistics.score')}}
-                        </div>  
-                      <span style="margin: 0 15px"> ~ </span>  
-                      <div class="score"> 
+                        </div>
+                      <span style="margin: 0 15px"> ~ </span>
+                      <div class="score">
                         <el-input
-                          placeholder="" 
+                          placeholder=""
                           style="width: 90px;"
                           v-model="scoreMiddleHeight"
                           :disabled = "!setting_autoMappingByTotalScore"
                           @blur="inputScoreMiddleMax"/>
-                          {{$t('statistics.score')}} 
+                          {{$t('statistics.score')}}
                       </div>
                       <span v-if="ScoreMsg" class="score_msg" style="margin-left: 20px">
                           * {{$t('insSettingView.needHeighterThan')}}
                       </span>
                     </div>
-                    
+
                     <!-- hight score -->
                     <div class="item_score">
-                      <div class="score">{{showScoreMax}}  {{$t('statistics.score')}}</div>   
-                      <span style="margin: 0 15px"> ~ </span>  
+                      <div class="score">{{showScoreMax}}  {{$t('statistics.score')}}</div>
+                      <span style="margin: 0 15px"> ~ </span>
                       <div class="score"> {{maxScore}}  {{$t('statistics.score')}}</div>
                     </div>
 
-                    
+
                   </div>
                 </div>
 
@@ -259,9 +259,9 @@
             <!-- radio 2 -->
             <div class="suggestvalue_section">
               <el-radio :label="false" v-model="dangerousOnFailedItem">
-                <span  style="font-weight: 400">{{$t('insSettingView.tab1FailedDangeous')}}</span> ： <span style="color: #1375bc; font-weight: 900">{{defaultDefineName[0].newName}}</span></el-radio> 
+                <span  style="font-weight: 400">{{$t('insSettingView.tab1FailedDangeous')}}</span> ： <span style="color: #1375bc; font-weight: 900">{{defaultDefineName[0].newName}}</span></el-radio>
             </div>
-            
+
           </el-radio-group>
           </div>
 
@@ -283,7 +283,7 @@
         </div>
       </setting-table>
     </el-col>
-    
+
 
     <!-- 巡檢簽名 -->
     <el-col v-if="mode === 1" :span="24" class="el-rute-content">
@@ -297,7 +297,7 @@
 
           <div class="signatrue_section" v-if="onSiteSignature">
             <div class="define_sign">
-              <div class="title">{{$t('insSettingView.defineTitle')}}</div> 
+              <div class="title">{{$t('insSettingView.defineTitle')}}</div>
               <el-button
                 @click="addSignature"
                 v-if="signatureData.extra.length < 4"
@@ -309,23 +309,23 @@
             <div class="signatrue_row"  v-for="(item, index) in signatureData.extra" :key="index">
               {{$t('insSettingView.principal')}}
               <el-input
-                :placeholder="$t('insSettingView.inputData')" 
+                :placeholder="$t('insSettingView.inputData')"
                 v-model="item.header"
                 ref="workflowName"
                 style="width: 250px;  margin: 0 20px ;"
                 @input="(val) => itemInputChanged({ val, item })"
                 />
-                
+
               <el-radio-group class="storevue-radio" v-model="item.optional" >
-                <el-radio :label="true">{{$t('insSettingView.mustSignature')}}</el-radio> 
-                <el-radio :label="false" v-if="index !== 0">{{$t('insSettingView.uncertainSignature')}}</el-radio> 
+                <el-radio :label="true">{{$t('insSettingView.mustSignature')}}</el-radio>
+                <el-radio :label="false" v-if="index !== 0">{{$t('insSettingView.uncertainSignature')}}</el-radio>
               </el-radio-group>
               <div class="delete_sign">
-                <img 
+                <img
                   v-if="index !== 0"
                   :key="index"
                   class="child-space"
-                  :src="`./static/img/table-delete.png`" 
+                  :src="`./static/img/table-delete.png`"
                   height="24px"
                   width="24px"
                   @click="deleteSign(index)"
@@ -460,12 +460,12 @@
         </div>
       </setting-table>
     </el-col>
-    
+
     <!-- binding workflow -->
     <el-col :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.bindWorkFLow')">
         <div slot="tableDetail" class="setting-config rule-item">
-          <span style="margin-right: 20px"> {{ $t('insSettingView.bindWorkflow') }}</span>  
+          <span style="margin-right: 20px"> {{ $t('insSettingView.bindWorkflow') }}</span>
           <el-select v-model="workFlowToBind" :placeholder="$t('insSettingView.select') ">
               <el-option
                 v-for="item in workFlowList"
@@ -473,7 +473,7 @@
                 :label="item.name"
                 :value="item.processDefinitionKey"
                 >
-                
+
               </el-option>
             </el-select>
         </div>
@@ -598,14 +598,14 @@ export default {
       // console.log('this.workFlowToBind ~~~~>> ', this.workFlowToBind);
     },
 
-    
+
     enableDelay(val){
       if(val == true && this.delayDay == undefined)  this.delayDay = 1
     },
 
 
     onSiteSignature:{
-      immediate: false, 
+      immediate: false,
       deep: true,
       handler (val,old ) {
         const self = this;
@@ -634,11 +634,11 @@ export default {
       if(this.setting_isAutoMappingActivate) {
         this.dangerousOnFailedItem = !val
         this.settingStatus = val
-      }     
+      }
     },
 
     defaultDefineName:{
-      immediate: false, 
+      immediate: false,
       deep: true,
       handler (val, old ) {
         // if(val[0].defineStatus == 0) val[0].newName = val[0].name
@@ -649,7 +649,7 @@ export default {
           } else if(i.defineStatus == 1){
             i.is_customize = true
           }
-          
+
         }
         console.log('val :>> ', val);
       }
@@ -668,7 +668,7 @@ export default {
   },
 
   async mounted() {
-    
+
     await this.getRule();
     await this.workflowItems()
     await this.getInspectStatus()
@@ -683,7 +683,7 @@ export default {
           this.defaultDefineName[i].defineStatus = 1
           this.defaultDefineName[i].newName = this.inspectStatus["status_"+ i]
       }
-      
+
       // if(this.defaultDefineName[i].name !== this.inspectStatus["status_" + i]) {
       //     this.defaultDefineName[i].defineStatus = 1
       //     this.defaultDefineName[i].newName = this.inspectStatus["status_"+ i]
@@ -692,7 +692,7 @@ export default {
       //     this.defaultDefineName[i].newName = this.defaultDefineName[i].name
       //   }
     }
-    
+
     // console.log('this.inspectStatus  mounted:>> ', this.inspectStatus);
     // console.log('this.defaultDefineName  mounted:>> ', this.defaultDefineName);
     // console.log('this.setting_autoMappingByTotalScore  mounted >>>>>>>----->> ', this.setting_autoMappingByTotalScore);
@@ -726,7 +726,7 @@ export default {
       var middleHeight = (((maxScore - minScore) * .8) + minScore)
       this.scoreMiddleHeight = Number.isInteger(middleHeight) ? middleHeight.toFixed(0) : middleHeight.toFixed(1)
     },
-    
+
 
 
     async submitRule() {
@@ -734,8 +734,8 @@ export default {
       if(this.enableDelay && this.delayDay == undefined){
         util.notify(this.$t('audit.workFlows.cantEmptyDays'), 'error', 2000 );
         this.$refs.delay_day.focus()
-        return 
-      } 
+        return
+      }
       else if(this.delayDay > 365){
         util.notify(this.$t('audit.workFlows.cantTooMuchDays'), 'error', 2000 );
         this.$refs.delay_day.focus()
@@ -744,7 +744,7 @@ export default {
 
        // handle bind workflow
       if( !!this.workFlowToBind ){
-        if(this.bindWorkFlowData.processDefinitionKey == -1){   
+        if(this.bindWorkFlowData.processDefinitionKey == -1){
           this.bindWorkFlowData.processDefinitionKey = this.workFlowInfoValue.processDefinitionKey
           await this.unbindWorkflow(this.bindWorkFlowData)
         }else {
@@ -756,10 +756,10 @@ export default {
         if(this.defaultDefineName[i].defineStatus == 1 && this.defaultDefineName[i].newName == "") {
           // this.$refs.stayOver.focus()
           util.notify(this.defaultDefineName[i].name + ", "+ this.$t('audit.workFlows.cantEmptyInspectStatus'), 'error', 2000)
-          return 
-          } 
+          return
+          }
       }
-  
+
       if ((this.passFailBtnAttr === 'userDefined' && !this.validateUserDefinedPassFailBtnValue()) ||
           (this.otherBtnAttr === 'userDefined' && !this.validateUserDefinedOtherBtnValue())) {
         util.notify(this.$t('insSettingView.enterBtnAttr'), 'warning', 3000);
@@ -782,13 +782,13 @@ export default {
             { name: 'maxScore', value: parseFloat(self.maxScore) },
             { name: 'baseScore', value: parseFloat(self.baseScore) },
             { name: 'standardScore', value: parseFloat(self.standardScore) },
-            
 
-            { name: 'setting_isAutoMappingActivate', 
+
+            { name: 'setting_isAutoMappingActivate',
               category: "generalRule",
-              value: self.setting_isAutoMappingActivate 
+              value: self.setting_isAutoMappingActivate
             },
-            
+
             {
               name: "setting_autoMappingByTotalScore", // 依分數條件自動選取
               category: "generalRule",
@@ -827,10 +827,10 @@ export default {
             }
           ]
         };
-    
+
       if(this.onSiteSignature) params.ruleItems.push(this.signatureData)
         console.log('params', params)
-        
+
       if(this.minScore === undefined || this.minScore === '') {
         util.notify(this.$t('insSettingView.cantEmptyScoreLow'), 'error', 2000 );
         this.$refs.min_score.focus()
@@ -949,7 +949,7 @@ export default {
       return new Promise((resolve, reject) => {
         inpectRESTful.UpdateInspectRuleSettings(params).then(res => {
           resolve(res);
-          
+
         }).catch(err => {
           reject(err);
         });
@@ -960,14 +960,14 @@ export default {
       return new Promise((resolve, reject) => {
         inpectRESTful.GetInspectRuleSettings(params).then(res => {
           resolve(res);
-          
-          
+
+
           var tempSign = res.data.filter(i => i.name == "onSiteSignature");
           if(tempSign[0].value == true && !tempSign[0].hasOwnProperty('extra')){
             tempSign[0]['extra'] = [];
           }
           self.signatureData = tempSign[0];
-          
+
           if(self.signatureData.value == true && self.signatureData.extra.length == 0)  {
             self.signatureData.extra.push(
               {
@@ -1021,7 +1021,7 @@ export default {
       return new Promise((resolve, reject) => {
         inpectRESTful.updateInspectStatus(status).then(res => {
           resolve(res);
-          
+
         }).catch(err => {
           reject(err);
         });
@@ -1041,7 +1041,7 @@ export default {
       self.ScoreMsg = parseFloat(self.minScore) > parseFloat(self.maxScore);
       self.MinScoreMsg = (self.hundredMarkType=='1' && self.baseScore.toString()=="");
     },
-    
+
     inputChangeMax(e) {
       let maxScore = this.getUtilScore(e.target.value);
       // if(maxScore < 1) maxScore = 1
@@ -1059,14 +1059,14 @@ export default {
       this.ScoreMsg = parseFloat(this.minScore) >= parseFloat(this.maxScore);
     },
 
-    
+
 
 
 
     inputScoreMiddleMin(e){
       const self = this;
       // self.scoreMiddleHeight = parseInt(self.scoreMiddleHeight)
-      
+
       var scoreMiddleLow = self.getUtilScore(e.target.value);
       self.scoreMiddleLow = parseFloat(scoreMiddleLow)
       self.minScore = parseFloat(self.minScore)
@@ -1082,7 +1082,7 @@ export default {
       }
       else if(self.scoreMiddleLow <= self.minScore + 0.1) {
         self.scoreMiddleLow = (self.minScore + 0.2).toFixed(1)
-      } 
+      }
       else if(self.scoreMiddleLow >= self.scoreMiddleHeight){
         this.countNumMin()
       }
@@ -1109,7 +1109,7 @@ export default {
       else if(self.scoreMiddleLow >= self.scoreMiddleHeight){
         this.countNumMax()
       }
-  
+
     },
 
 
@@ -1187,7 +1187,7 @@ export default {
           this.workFlowList = [firstObj, ...res.data]
           this.workFlowToBind = this.workFlowInfoValue.processDefinitionKey
         }
-        
+
       }).catch(err => {
         console.log('error' + err);
       });
@@ -1197,13 +1197,13 @@ export default {
       console.log('param :>> ', param);
       await bindWorkflow(param).then(res=>{
         console.log('bind ~~~~~~>> ', res);
-        
+
         // const firstObj = {
         //   processDefinitionKey: -1,
         //   name: "無",
         // }
         // this.workFlowList = [firstObj, ...this.workFlowList]
-        
+
       }).catch(err => {
         console.log('error' + err);
       });
@@ -1234,7 +1234,7 @@ export default {
       // this.n--;
       // let tempN = this.n;
       // for(var i=this.signatureData.extra.length-1; tempN >1; i--){
-      //   tempN--; 
+      //   tempN--;
       //   this.signatureData.extra[i].header = this.$t('audit.auditStatus.sign')+tempN;
       // }
     },
@@ -1263,7 +1263,7 @@ export default {
       }
     },
 
- 
+
 
 
 
@@ -1347,7 +1347,7 @@ $itemHeight:50px;
       // .el-radio{
       //   width: 60px !important;
       // }
-    }  
+    }
   }
 
 
@@ -1497,7 +1497,7 @@ $itemHeight:50px;
       margin-bottom: 20px
       padding: 20px 20px
       font-size: 15px
-    
+
       .for_flex
         margin-top: 10px
         display: flex
@@ -1514,7 +1514,7 @@ $itemHeight:50px;
             flex-direction: row
             justify-content: flex-start
             align-items: center
-          
+
         .suggestvalue_score
           .item_score
             height: 45px
@@ -1531,20 +1531,20 @@ $itemHeight:50px;
               .el-input--medium
                 margin-right: 5px
 
-              
-  
+
+
 
 </style>
 
 <style lang="sass">
 .suggestvalue_score
-  .item_score 
+  .item_score
     .score
       .el-input--medium .el-input__inner
         text-align: right
 .score
   input::-webkit-outer-spin-button,
-  input::-webkit-inner-spin-button 
+  input::-webkit-inner-spin-button
     -webkit-appearance: none
     margin: 0
 

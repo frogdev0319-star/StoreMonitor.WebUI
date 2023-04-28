@@ -6,10 +6,10 @@
         <div class="spacer"></div>
         <div v-if="isEditReport"><!--isEditReport-->
           <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="confirm-btn" type="primary" @click="submit(false)">
-            {{ $t('audit.inceptionRpt.saveReport') }} 
+            {{ $t('audit.inceptionRpt.saveReport') }}
           </el-button>
           <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="storevue-button-filled" type="primary" @click="showConfirmSubmitMsg=true">
-            {{ $t('audit.inceptionRpt.submitReport') }} 
+            {{ $t('audit.inceptionRpt.submitReport') }}
           </el-button>
         </div>
         <div v-else>
@@ -149,7 +149,7 @@
             <thead>
               <tr>
                 <th v-for="(t_item ,t_index) in s_item.data[0].tHeader" :key="t_index" :style="t_item.width" scope="col">
-                  {{ t_item.name }} 
+                  {{ t_item.name }}
                   <span style="color: #7d8cad; margin-left: 5px;" v-if="t_index == 0 && setting_isShowGroupSum">( 總分: {{ getTotalSum(s_item.data)}} )</span>
                 </th>
               </tr>
@@ -162,7 +162,7 @@
                       <div class="spacer">
                         <div v-if="inspectItem.weight != -1 && inspectItem.type != 2">{{ inspectItem.weight + '%' }} </div>
                         <div class="sheet_title">
-                          {{ inspectItem.label }} 
+                          {{ inspectItem.label }}
                           <span style="color: #7d8cad; margin-left: 5px;" v-if="setting_isShowDistrictSum">( 總分:{{getSum(inspectItem.inspectList)}} )</span>
                         </div>
                       </div>
@@ -196,7 +196,7 @@
           </table>
         </div>
 
-     
+
         <el-row v-for="(item,index) in tempList" :key="index" class="row-detail">
           <el-col v-if="item.data.length!=0">
             <div class="item-header">
@@ -249,7 +249,7 @@
                           class="content-detail-main"
                           style="padding-bottom: 20px;">
                           <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
-                          
+
                           <div v-if="categoryItem.sourceList!=null&&categoryItem.sourceList.length!=0" class="cdm-pic">
                             <div
                               v-for="(sourceitem,sourceindex) in categoryItem.sourceList"
@@ -280,7 +280,7 @@
                     </template>
                     <template v-else>
                       <div v-for="(child, childIndex) in _item.children" :key="childIndex">
-                        <div class="content-title flex-center"> 
+                        <div class="content-title flex-center">
                           <div>{{ `【${_item.groupName}】 — 【${child.groupName}】` }}</div>
                         </div>
                         <hr class="hr-horizontal"/>
@@ -311,7 +311,7 @@
                               </div>
                             </div>
                           </div>
-                          <p 
+                          <p
                             v-if="childItem.sourceList!= null && childItem.sourceList.length !== 0
                             || childItem.inspectText != null&&childItem.inspectText !== ''"
                           class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
@@ -401,7 +401,7 @@
                       </div>
                     </div>
                     <div v-if="_item.sourceList!=null||item.description!=null&&item.description!=''" class="content-detail-main">
-                      
+
                       <div v-if="_item.sourceList!=null&&_item.sourceList.length!=0" class="cdm-pic">
                         <div v-for="(sourceitem,index) in _item.sourceList" :key="index" :height="imgHeight+'px'" :class="{'source-details': sourceitem.mediaType!=3}">
                           <template v-if="sourceitem.mediaType==3">
@@ -652,9 +652,9 @@ export default {
     await self.getUpLoadBucketInfo();
     await self.getOssInfo();
 
-    
 
-    
+
+
   },
   methods: {
     // 加總
@@ -662,7 +662,10 @@ export default {
       var tableTotalScore = 0
       Array.forEach(i => {
         i.inspectList.forEach( ii => {
-          tableTotalScore = tableTotalScore + ii.itemgetScore
+          if(ii.itemgetScore!='--' && ii.itemgetScore!='-'){
+            tableTotalScore = tableTotalScore + ii.itemgetScore
+          }
+
         })
       })
       return tableTotalScore
@@ -671,14 +674,17 @@ export default {
     getSum(Array){
       var totalScore = 0
       Array.forEach(i => {
-        totalScore = totalScore + i.itemgetScore
+        if(i.itemgetScore!='--' && i.itemgetScore!='-'){
+          totalScore = totalScore + i.itemgetScore
+        }
+
       })
       return totalScore
     },
 
-    // 四捨五入 
+    // 四捨五入
     getDoubleNum (num) {
-      return Math.round(num * 100) / 100  
+      return Math.round(num * 100) / 100
     },
     stopCommentVideo() {
       var video = document.getElementById('previewVideo');
@@ -707,7 +713,7 @@ export default {
       }
       return arr.filter(source => source.mediaType === 2).map(source => source.src);
     },
-    
+
     getFileUrl(fileName) {
       const self = this;
       const bucketName = self.oss.ossBucketName;
@@ -766,7 +772,7 @@ export default {
       }
     },
 
-    
+
     clickSum(item, index) {
       const self = this;
       item.isActive = true;
@@ -794,7 +800,7 @@ export default {
       let status = 0;
       let flag = false;
       self.uploadingnumOfPic = 0;
-      self.totalnumOfPic += self.imgFileList.length + self.pdfFileList.length; 
+      self.totalnumOfPic += self.imgFileList.length + self.pdfFileList.length;
       self.resultList.forEach(item => {
         if (item.isActive) {
           flag = true;
@@ -802,6 +808,10 @@ export default {
       });
       if (!flag) {
         util.notify(self.$t('remotePatrol.summaryInfo'), 'warning', 3000);
+        return false;
+      }
+      if(self.totalnumOfPic>120){
+        util.notify(self.$t('remotePatrol.maximumAtt'), 'warning', 3000);
         return false;
       }
       self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
@@ -832,7 +842,7 @@ export default {
                 objItem.grade = objItem.score = inspect[i].inspectList[g].items[j].isIgnore ||
                   inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2, 31) : (inspect[i].inspectList[g].items[j].isQualified ? 1 : 0);
               } else {
-                objItem.grade = objItem.score = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore 
+                objItem.grade = objItem.score = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore
                   ? Math.pow(-2, 31)
                   : inspect[i].inspectList[g].items[j].itemgetScore;
               }
@@ -909,7 +919,7 @@ export default {
               commentTemp.push(obj);
             }
           })
-          
+
         }else{
           console.log("***self.eventList[i]:",self.eventList[i]);
           let obj = {};
@@ -917,7 +927,7 @@ export default {
             obj.url = self.eventList[i].eventDes;
             commentTemp.push(obj);
         }
-        if (self.eventList[i].sourceObj != null) { 
+        if (self.eventList[i].sourceObj != null) {
           if(self.eventList[i].sourceObj.hasUrl){
             self.uploadingnumOfPic++;
             const commentObj = {
@@ -951,7 +961,7 @@ export default {
         obj.attachment = commentTemp;
         feedEventList.push(obj);
       }
-      //上傳簽核附件 
+      //上傳簽核附件
       var auditAttachment = [];
       //upload audit image
       for(let idx=0; idx<self.imgFileList.length;idx++){
@@ -1010,7 +1020,7 @@ export default {
           util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
           return false;
       }
-      
+
       let curSumIndex = [];
       curSumIndex = self.resultList.filter(x => x.isActive);
       status = curSumIndex[0].label;
@@ -1024,11 +1034,11 @@ export default {
         isMysteryMode:PermissionHelper.enableMimicMode,
         isCreateEvent:sendEvent
       };
-      
+
       console.log('params ::::::::::>> ', params);
 
-      
-      
+
+
       let routeData = null;
       if(self.reportId!=-1 && self.isEditReport){
         params['reportId']=this.reportId;
@@ -1085,7 +1095,7 @@ export default {
                 isBindWorkflow:false
               };
             }
-            
+
           } else {
             self.reportSubmitting = false;
             util.notify(res.errMsg, 'error', 3000);
@@ -1116,7 +1126,7 @@ export default {
       var routeData = {
         isSuccess: false,
         reLoadData: self.$route.params,
-        isBindWorkflow:!!PermissionHelper.enableSendAudit() 
+        isBindWorkflow:!!PermissionHelper.enableSendAudit()
       };
       self.reportSubmitting = true;
       var resReportModify = modifyReportWorkflow(params);
@@ -1137,8 +1147,8 @@ export default {
         }
         if(!sendEvent){//儲存，非送出報告，不用submit簽核
           routeData = {
-            reportId: self.reportId, 
-            isAuditMode: true, 
+            reportId: self.reportId,
+            isAuditMode: true,
             canEdit: true,
             canCancel: this.auditCancelable,
             auditCancelable:this.auditCancelable
@@ -1212,7 +1222,7 @@ export default {
             self.$store.dispatch('setEditCount', 0);
             var routeData = {
                 isSuccess: true,
-                isBindWorkflow:!!PermissionHelper.enableSendAudit() 
+                isBindWorkflow:!!PermissionHelper.enableSendAudit()
             };
             Database.removeDataFromDB('rpt'+self.reportId);
             self.reportSubmitting = false;
@@ -1286,7 +1296,7 @@ export default {
       this.$store.dispatch('setEditCount', 0);
       var routeData = {
           isSuccess: true,
-          isBindWorkflow:!!PermissionHelper.enableSendAudit() 
+          isBindWorkflow:!!PermissionHelper.enableSendAudit()
       };
       this.$router.push({ name: 'submitEvent', params: { data: routeData}});
     },
@@ -1368,7 +1378,7 @@ export default {
             item.unqualifiedItems = [];
             item.numOfCommentItem = 0;
             item.numOfTotalItems = 0;
-            item.items.forEach(s_item => {//子項 
+            item.items.forEach(s_item => {//子項
               item.numOfTotalItems++;
               if (s_item.itemType === 1) {
                 item.numOfCommentItem++;
@@ -1453,7 +1463,7 @@ export default {
             item['numOfQualified'] = QualifiedArr.length;
             item['numOfUnqualified'] = UnqualifiedArr.length;
             item['numIgnore'] = IgnoredArr.length;
-            
+
             let tempWeight = (p_item.weight == -1 ? 1 : (p_item.weight/100));
             if (p_item.type === 0) {
               let ts = PassFileTS;
@@ -1468,14 +1478,14 @@ export default {
                     xn = (xn<item.groupScore?item.groupScore:xn);
                     //ts0 = (ts0<item.groupScore?item.groupScore:ts0);
                     //tsX = (tsX<item.groupScore?item.groupScore:tsX);
-                    
+
                   }else{
                     ts = (ts>item.groupScore?item.groupScore:ts);
                     xs = (xs>item.groupScore?item.groupScore:xs);
                     xn = (xn>item.groupScore?item.groupScore:xn);
                     //ts0 = (ts0>item.groupScore?item.groupScore:ts0);
                     //tsX = (tsX>item.groupScore?item.groupScore:tsX);
-                    
+
                   }
                   ts0 = item.groupScore;
                   tsX = item.groupScore;
@@ -1486,15 +1496,15 @@ export default {
                   PassFileTotalScore += ts0*(p_item.weight == -1 ? 1 : (p_item.weight/100));
                   PassFileTotalScoreX += tsX*(p_item.weight == -1 ? 1 : (p_item.weight/100));*/
               }
-              
-                
+
+
                 console.log("tempWeight:",tempWeight);
                 PassFileTotalScoreSystem += util.accMul(ts,tempWeight);
                 PassFileXS += util.accMul(xs,tempWeight);
                 PassFileXN += util.accMul(xn,tempWeight);
                 PassFileTotalScore += util.accMul(ts0,tempWeight);
                 PassFileTotalScoreX += util.accMul(tsX,tempWeight);
-            
+
               console.log("ts:",ts);
               console.log("PassFileTotalScoreSystem:",PassFileTotalScoreSystem);
             }
@@ -1519,7 +1529,7 @@ export default {
                     //type1tsX = (type1tsX>item.groupScore)?item.groupScore:type1tsX;
                   }
                   //比例制，分母取上限分值，不分正負
-                  if(inspectSettings.hundredMarkType!='0' && item.groupScore<=0){ 
+                  if(inspectSettings.hundredMarkType!='0' && item.groupScore<=0){
                     type1ts = (type1ts <item.groupScore)?item.groupScore:type1ts ;
                     type1tsX = (type1tsX<item.groupScore)?item.groupScore:type1tsX;
                   }else{
@@ -1532,13 +1542,13 @@ export default {
                   ScoreTotalScoreSystem += util.accMul(type1Score,tempWeight);
                   ScoreXN += util.accMul(type1XN,tempWeight);
                   ScoreTotalScoreX += util.accMul(type1tsX,tempWeight);
-              
-              
+
+
               console.log("type 1 allScoreB:",allScoreB);
               console.log("type 1 ScoreTotalScoreSystem:",ScoreTotalScoreSystem);
               console.log("type 1 ScoreXN:",ScoreXN);
               console.log("type 1 ScoreTotalScoreX:",ScoreTotalScoreX);
-              
+
             }
             if (p_item.type === 2) {
               if(item.isAdvanced){
@@ -1549,7 +1559,7 @@ export default {
                     CurOtherTotalScore += (totalGetscore>item.groupScore)?item.groupScore:totalGetscore;
                     OtherTotalScoreSystem += (OtherTS>item.groupScore)?item.groupScore:OtherTS;
                   }
-                
+
               }else{
                 CurOtherTotalScore += totalGetscore;
                 OtherTotalScoreSystem += OtherTS
@@ -1559,7 +1569,7 @@ export default {
               console.log("type 2 OtherTotalScoreSystem:",OtherTotalScoreSystem);
             }
             //顯示後放
-            
+
             //判斷顯示值 是否碰到上限
             console.log('item.isAdvanced:',item.isAdvanced);
             if(item.isAdvanced){
@@ -1610,13 +1620,13 @@ export default {
                 }else{
                   tab1GetScoreNoContainedIngored = util.accMul(tab1GetScoreNoContainedIngored,tempWeight);
                 }
-                
+
                 if(inspectSettings.qualifiedForIgnoredWithType2 && p_item.type == 1){
                   tab2IgnoredItemsGetScore = util.accMul((tab2IgnoredItemsGetScore+tab2NotIgnoredItemsGetScore),tempWeight);
                 }else{
                   tab2NotIgnoredItemsGetScore = util.accMul(tab2NotIgnoredItemsGetScore,tempWeight);
                 }
-                
+
                 /*console.log('(p_item.weight/100):',(p_item.weight/100));
                 tab1GetScoreNoContainedIngored = tab1GetScoreNoContainedIngored*(p_item.weight == -1 ? 1 : (p_item.weight/100));
 
@@ -1674,7 +1684,7 @@ export default {
                 item['numIgnore'] = 0;
               }
             }
-            
+
           });//end for 一個類別
           if (p_item.type === 0) {
             p_item['tHeader'] = self.theaderPassFail;
@@ -1787,7 +1797,7 @@ export default {
         if(typeof inspectSettings.minScore != 'undefined' && s_count < inspectSettings.minScore ){
           self.scorecount = inspectSettings.minScore;
         }
-        
+
         self.summary = this.groupbyKey(inspect, 'type');
         eventList.forEach((item, index) => {
           const objFeedBack = {};
@@ -1815,7 +1825,7 @@ export default {
           data: this.getGroupsItems('ignoreItems'),
           detailType: 1
         };
-        
+
         // 問題回饋
         tempList[2] = {
           itemTitleName: self.$t('remotePatrol.feedbacks'),
@@ -1969,7 +1979,7 @@ export default {
         { name: this.$t('remotePatrol.TableGet'), width: 'width:12%;' }
       ];
     },
-    
+
     auditNoteChanged(val) {
       const self = this;
       const content = filterString.all(val, 600);
@@ -2073,7 +2083,7 @@ export default {
           else if(auditType == 1) //audit by group
             wfi.nextAuditUser = this.getUserPositionList(data.nextAuditNode.nextAuditNode.auditByGroups);
         }
-        
+
         //console.log('*wfi:',wfi);
         this.workflowInfo = wfi;
         //return wfi;
@@ -2123,7 +2133,7 @@ export default {
           this.isAutoMappingActivate = res.data.find(i => {
             return i.name == "setting_isAutoMappingActivate"
           })
-          
+
           this.scoreMiddleLow = this.autoMappingByTotalScore.extra.find(i => i.key === "mappingScore_bottom").value
           this.scoreMiddleHeight = this.autoMappingByTotalScore.extra.find(i => i.key === "mappingScore_top").value
 
@@ -2132,11 +2142,11 @@ export default {
           console.log('this.setting_isShowGroupSum  :>> ', this.setting_isShowGroupSum );
           console.log('this.setting_isShowDistrictSum :>> ', this.setting_isShowDistrictSum);
 
-          
+
           this.resultList[0].name =this.inspectStatus.status_2
           this.resultList[1].name =this.inspectStatus.status_1
           this.resultList[2].name =this.inspectStatus.status_0
-          
+
           if(this.isAutoMappingActivate.value) this.determineResultList()
 
         }).catch(err => {
@@ -2161,7 +2171,7 @@ export default {
       });
     },
 
-    
+
     determineResultList(){
       if(this.unqualifiedStatus){
         this.resultList[0].isShow = false;
@@ -2178,13 +2188,13 @@ export default {
           console.log('n 2 :>> ', n);
           this.resultList[n].isActive = true
           this.resultList[n].isShow = true
-        } 
+        }
         else if(  this.scorecount <= this.scoreMiddleHeight && this.scorecount >= this.scoreMiddleLow){
           var n = this.resultList.findIndex(i=>i.label === 1)
           console.log('n 1:>> ', n);
           this.resultList[n].isActive = true
           this.resultList[n].isShow = true
-        } 
+        }
         else if( this.scorecount <= this.scoreMiddleLow - 0.1){
           var n = this.resultList.findIndex(i=>i.label === 0)
           console.log('n 0:>> ', n);
@@ -2197,7 +2207,7 @@ export default {
           this.resultList[1].isActive = false;
           this.resultList[2].isShow = true;
           this.resultList[2].isActive = false;
-          
+
         }
       }
     }
@@ -2413,7 +2423,7 @@ export default {
           }
         }
       }
-      
+
       /*簽核*/
       .audit-content{
         .sug-label{
@@ -2496,11 +2506,11 @@ export default {
                 font-size:12px;
               }
             }
-          
+
           }
         }
         .next-audit{
-          display:flex; 
+          display:flex;
           flex-direction:row;
           justify-content:space-between;
           align-content:stretch;
@@ -2885,7 +2895,7 @@ export default {
     color: $black;
     margin-top: 4px;
   }
-  
+
 </style>
 <style>
   .AddSumupLoad .el-dialog__header{
