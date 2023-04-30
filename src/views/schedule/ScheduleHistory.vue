@@ -289,6 +289,31 @@ export default{
       console.log(">>>>onStatusChanged:",this.curSchStatus);
     },
 
+
+    pad2(n){
+      return (n < 10 ? '0' : '') + n;
+    },
+    getdate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return year + "-"+ month +"-"+ day +" "+ hour +":"+ min +":"+ sec
+    },
+
+    getdateOnlyDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      return year + "-"+ month +"-"+ day 
+    },
+
+
+  
     doSearchScheduleHis(){
       const self = this;
       let order = {
@@ -321,8 +346,11 @@ export default{
             obj['squence'] = idx;
             obj['store']= item.storeName+'\n'+item.storeTimeZone;
             obj['tagNameMode'] = mode+'\n'+item.inspectTagName;
-            obj['remindTimeStr']=(item.remindTime==0)?'-':self.$moment.utc(self.$moment(item.remindTime)).format("YYYY/MM/DD");//util.getDateStr(item.taskStart),
-            obj['reportTsStr']=(item.reportTs==0)?'-':self.$moment.utc(self.$moment(item.reportTsStr)).format("YYYY/MM/DD hh:mm:ss");//util.getDateStr(item.taskFinal),
+            // obj['remindTimeStr']=(item.remindTime==0) ?' -' : self.$moment.utc(self.$moment(item.remindTime)).format("YYYY/MM/DD");//util.getDateStr(item.taskStart),
+            obj['remindTimeStr']=(item.remindTime==0) ?' -' : this.getdateOnlyDate(item.remindTime)
+            // obj['reportTsStr']=(item.reportTs==0) ?'-' : self.$moment.utc(self.$moment(item.reportTs)).format("YYYY/MM/DD hh:mm:ss");//util.getDateStr(item.taskFinal),
+            obj['reportTsStr'] = (item.reportTs==0) ?'-' : this.getdate(item.reportTs),
+            
             obj['submitterName']=(item.submitterName == "NONE")?'--':item.submitterName;
             obj['status'] = item.isDelete ? '2': (item.isExecute ? 0:1);
             if(item.isProcessing){//簽核中

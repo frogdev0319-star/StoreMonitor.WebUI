@@ -43,6 +43,7 @@
             :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
             :tableHeight = "760"
             :cellStyle="{backgroundColor: '#fff !important'}"
+            
             @handleOperation="handleOperation"  
             @sortChange="handleSortChange"                                
         />
