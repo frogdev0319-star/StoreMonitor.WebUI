@@ -29,7 +29,7 @@
             :disabled="elTableData[Number(activeName)].data.length === 0"
             @click="bindStore"
           >
-            {{ $t('insSettingView.bindList') }} 
+            {{ $t('insSettingView.bindList') }}
           </el-button>
       </el-col>
       <el-col
@@ -49,7 +49,7 @@
             :label="index < 2 ? getLang(index) : item.label"
             :name="index.toString()"
             :closable ="index !== 0 && index !== 1 ? true : false">
-            
+
             <el-tabs
               v-if="item.data.length !== 0 && !isLoading"
               id="patrltabs-content"
@@ -59,11 +59,11 @@
               <el-tab-pane v-for="(_item,_index) in item.data" :key="_item.id" :name="_index.toString()">
                 <div class="flex-center" style="color: #acaeb1; font-size: 15px; margin: 15px 0">
                   <div class="temp-select-area" :style="lang.indexOf('zh') === -1 ? {'width':'250px'}:{}">
-                    <div class="temp-select-label" :style="lang.indexOf('zh') === -1 ? {'width':'105px'}:{}">{{ $t('overview.patrolLists') }}</div> 
+                    <div class="temp-select-label" :style="lang.indexOf('zh') === -1 ? {'width':'105px'}:{}">{{ $t('overview.patrolLists') }}</div>
                     <el-select
                       v-model="patrolActive"
                       class="device-select"
-                      
+
                       size="mini"
                       @change="handleClickPatrol"
                       placeholder="">
@@ -78,7 +78,7 @@
                   </div>
                   <span style="font-size:15px;margin-left:16px" :class="lang.indexOf('zh') === -1 ? 'en-bind-title': 'bind-title'">
                     {{ $t('insSettingView.bindWith') }}{{ storeNum }} {{ $t('insSettingView.bindStore') }}
-                  </span> 
+                  </span>
                   <div class="spacer"></div>
                   <div
                     style="display:flex;flex-direction:row;margin-right: 16px; line-height: 24px;cursor:pointer;"
@@ -113,7 +113,7 @@
                   <img :src="loadingGif" class="loading_rotate">
                   <span class="empty-text">{{ $t('insSettingView.loadingbindstore') }}</span>
                 </div>
-                
+
               </el-tab-pane>
             </el-tabs>
             <div v-if="item.data.length === 0 && !isLoading" :style="{'min-height':varyWindowWidth*0.52+'px'}" class="data-empty">
@@ -231,7 +231,7 @@
         <span>{{ $t('insSettingView.confirmToSetRule') }}</span>
       </div>
     </dialog-pop>
-                
+
     <dialog-pop
       :title="$t('insSettingView.weightSetting')"
       :append-to-body="true"
@@ -283,7 +283,7 @@
         </div>
       </div>
     </dialog-pop>
-    
+
   </el-row>
 </template>
 <script>
@@ -497,7 +497,7 @@ export default {
         id: group.id,
         weight: Number(group.weight)
       }))
-      let count = 0 
+      let count = 0
       groups.forEach(group => {
         if (group.weight != -1) count += group.weight
       })
@@ -700,6 +700,7 @@ export default {
             objChild.id = itemChild.id;
             objChild.checked = false;
             objChild.name = itemChild.subject;
+            objChild.isImportant = itemChild.isImportant;
             objChild.description = (itemChild.description == undefined || itemChild.length == 0) ? '--' : itemChild.description;
             objChild.score = itemChild.itemScore;
             objChild.qualifiedScore = itemChild.qualifiedScore;
@@ -972,7 +973,7 @@ export default {
     async resolveSheetData(sheet, type) {
       const range = XLSX.utils.decode_range(sheet['!ref']);
       sheet.$$type = type;
-      
+
       this.formatSheetCells({ sheet, range });
       let primaryColumnCells = this.getSheetCells({
         sheet,
@@ -1008,9 +1009,9 @@ export default {
             primaryGroupCelss.push({ ...cell, weight: sheet['B' + cell.cellRef.slice(1)].v });
           }
         }
-        
+
         let next, current = sheet[cell.cellRef];
-        
+
         if (primaryColumnCells.filter(cell => cell.v)[i + 1]) {
           next = sheet[primaryColumnCells.filter(cell => cell.v)[i + 1].cellRef];
           sheet[cell.cellRef].next = sheet[primaryColumnCells.filter(cell => cell.v)[i + 1].cellRef];
@@ -1322,7 +1323,7 @@ export default {
                 if(!isNaN(Number(item))){
                   score.push( Number(item));
                 }
-                
+
               })
               console.log(">>>>score:",score);
             }
@@ -1781,7 +1782,7 @@ export default {
           outdata.PassFail = _this.getPassAndFailSheetJsonData(wb, PassFail, tableVersion);
           outdata.Score = _this.getScoreSheetJsonData(wb, Score, tableVersion);
           outdata.Others = _this.getOthersSheetJsonData(wb, Others, tableVersion);
-          
+
           if (outdata.PassFail.length > 0) {
             if (!outdata.PassFail[0].catergyName) {
               PassFailCopy.A2 = {
@@ -1812,7 +1813,7 @@ export default {
           var passFailSheetFlagObj = _this.validatePassFailData(outdata.PassFail);
           var scoreSheetFlagObj = _this.validateScoreData(outdata.Score, tableVersion);
           var otherSheetFlagObj = _this.validateOtherData(outdata.Others);
-          
+
           passFailSheetFlagObj.flags.flagGroupWeightTotal = false;
           scoreSheetFlagObj.flags.flagGroupWeightTotal = false;
           if (_this.importCount === 100) {
@@ -1824,7 +1825,7 @@ export default {
               scoreSheetFlagObj.flags.flagGroupWeightTotal = true;
             }
           }
-          
+
           const flagTempError = !!(outdata.PassFail == undefined && outdata.Score == undefined && outdata.Others == undefined);
 
           _this.FileInfo = _this.getWarningInfo(passFailSheetFlagObj.flags, scoreSheetFlagObj.flags,
@@ -1836,7 +1837,7 @@ export default {
             _this.$refs.loadFileEx.value = '';
             return false;
           }
-          
+
           const arrSheet1 = _this.getPassAndFailArrData(outdata.PassFail, passFailSheetFlagObj.indexArrPassFail);
           const arrSheet2 = _this.getScoreArrData(outdata.Score, scoreSheetFlagObj.indexArrScore);
           const arrSheet3 = _this.getOtherArrData(outdata.Others, otherSheetFlagObj.indexArrOthers);
@@ -2058,7 +2059,7 @@ export default {
       return passFailFlagObj;
     },
 
-    
+
     validateScoreData(scoreArr, tableVersion) {
       const ITEMSLENGTH = 250;
       const _this = this;
@@ -2110,7 +2111,7 @@ export default {
         }
         let maxScore = 0;
         if (tableVersion === 1) {
-          
+
           if (item.score != undefined) {
             if (typeof item.score !== 'number' && item.score.indexOf('/') !== -1) {
               const f_Score = item.score.split('/');
@@ -2614,7 +2615,7 @@ export default {
                   if(type==2){
                     obj[tableHeader[0]] = item.groupName;
                     obj[tableHeader[1]] = child.groupName;
-                  } 
+                  }
                   else{
                     obj[tableHeader[0]] = item.groupName;
                     obj[tableHeader[1]] = item.weight == -1 ? '' : item.weight;
@@ -2659,30 +2660,30 @@ export default {
 
     getExcelTableHeader(type) {
       const sheet1TableHeader = [
-        this.$t('insSettingView.tHeaderA'), 
+        this.$t('insSettingView.tHeaderA'),
         this.$t('insSettingView.tHeaderI'),
         this.$t('insSettingView.subCategoryHeader'),
-        this.$t('insSettingView.tHeaderB'), 
+        this.$t('insSettingView.tHeaderB'),
         this.$t('insSettingView.tHeaderE'),
         this.$t('insSettingView.tHeaderD'),
         this.$t('insSettingView.tHeaderH')
       ];
 
       const sheet2TableHeader = [
-        this.$t('insSettingView.tHeaderA2'), 
+        this.$t('insSettingView.tHeaderA2'),
         this.$t('insSettingView.tHeaderI'),
         this.$t('insSettingView.subCategoryHeader'),
-        this.$t('insSettingView.tHeaderB'), 
+        this.$t('insSettingView.tHeaderB'),
         this.$t('insSettingView.tHeaderG'),
-        this.$t('insSettingView.tHeaderF'), 
+        this.$t('insSettingView.tHeaderF'),
         this.$t('insSettingView.tHeaderD'),
         this.$t('insSettingView.tHeaderH')
       ];
 
       const sheet3TableHeader = [
-        this.$t('insSettingView.tHeaderA'), 
+        this.$t('insSettingView.tHeaderA'),
         this.$t('insSettingView.subCategoryHeader'),
-        this.$t('insSettingView.tHeaderB'), 
+        this.$t('insSettingView.tHeaderB'),
         this.$t('insSettingView.sheetscore2'),
         this.$t('insSettingView.tHeaderD'),
         this.$t('insSettingView.tHeaderH')
@@ -2815,7 +2816,7 @@ export default {
                     }
                 }
                 .temp-select-area{
-                  display:flex; 
+                  display:flex;
                   flex-direction:row;
                   height:30px;
                   min-width:220px;
@@ -2913,7 +2914,7 @@ export default {
           width: calc(130/1920*100vw);
         }
       }
-      
+
     }
   }
 

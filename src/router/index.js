@@ -85,7 +85,7 @@ export const navbarRoute = {
     }) && primaryPathesList.push('/eventOverview');
     return overviewRoute;
   },
-  
+
   getPatrolRoute() {
     console.log("PermissionHelper.enableInspectReport()",PermissionHelper.enableInspectReport());
     const patrolRoute = {
@@ -441,7 +441,7 @@ export const navbarRoute = {
         }
       }
     ) && primaryPathesList.push('/eventStat');
-    !PermissionHelper.enableMimicMode && PermissionHelper.enableEventStatistics() && statisticsRoute.children.push(
+    !PermissionHelper.enableMimicMode && PermissionHelper.enableAppraisalCompareStatistics() && statisticsRoute.children.push(
       {
         path: '/patrolCompareStat',
         name: 'patrolCompareStat',
@@ -638,7 +638,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/workflow/NodeSetting'], resolve),
         hidden: true,
       }
-      
+
     ) && primaryPathesList.push('/workflows', '/workflowDetail', '/createWorkflownode', '/workflownode', '/createWorkflow','/createEditWorkflownode');
     (store.getters.roleId==1) && !PermissionHelper.enableMimicMode && systemSettingRoute.children.push(
       {

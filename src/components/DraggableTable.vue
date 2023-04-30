@@ -21,7 +21,7 @@
             </div>
             <div class="table-name" style="position: relative">
               <span v-if="contentItem.required" style="color: #c60957; position: absolute">*</span>
-              <span style="margin-left: 10px">{{ contentItem.name }}</span></div>
+              <span  v-bind:class="{titleImportant: contentItem.isImportant}" style="margin-left: 10px">{{ contentItem.name }}</span></div>
           </div>
           <div :class="isScoreSheet? 'table-score-description': 'table-description'">
             {{ contentItem.description }}
@@ -271,7 +271,9 @@ export default {
       color: #7d8cad;
     }
   }
-
+  .titleImportant{
+    color:#f31d65;
+  }
   .sortable-ghost{
     color: #424151 !important;
     background: rgba(243, 19, 101, 0.1) !important;

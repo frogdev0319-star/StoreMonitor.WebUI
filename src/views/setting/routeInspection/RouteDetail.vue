@@ -6,7 +6,7 @@
           <p :style="item.isClick?'background-color: #fff;color:#006ab7;':''" class="item_title">{{ item.label }}</p>
         </div>
         <div class="spacer"></div>
-        <div 
+        <div
           class="flex-center"
           style="margin-right:20px">
           <div
@@ -435,6 +435,7 @@ export default {
               const objChild = {};
               objChild.id = itemChild.id;
               objChild.checked = false;
+              objChild.isImportant = itemChild.isImportant;
               objChild.name = itemChild.subject;
               objChild.description = (itemChild.description === undefined || itemChild.length === 0) ? '--' : itemChild.description;
               objChild.score = itemChild.itemScore + '分';
@@ -964,4 +965,3 @@ export default {
     padding: 0px;
 }
 </style>
-
