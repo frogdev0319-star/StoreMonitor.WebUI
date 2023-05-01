@@ -184,6 +184,7 @@
                         class="storevue-checkbox-outlined"
                         v-model="item.checked"
                         style="margin-right: 8px"
+                        :disabled="(item.remindTime < new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 && item.remindTime !== '' )"
                         @change="handleCheckboxChange(item)"
                         
                         />
@@ -295,6 +296,7 @@
                       placeholder="區域一"
                       multiple
                       style="width: 180px"
+                      @change="onselect"
                       >
                       <el-option
                         v-for="(item, index) in provinceAry"
@@ -622,12 +624,14 @@ export default{
   },
   watch:{
     handleSchedule(val){
+
+      console.log('val', val)
       this.edit_isActive = val.length == 0 ? false : true
       this.del_isActive = val.length == 0 ? false : true
       if(val.length == 0) this.seleAllSchedule = false
 
-      var isBeforeToday = this.handleSchedule.some(t => t.remindTime  < Date.now())
-      if(isBeforeToday) this.edit_isActive = false
+      // var isBeforeToday = this.handleSchedule.some(t => (t.remindTime  < Date.now()))
+      // if(isBeforeToday ) this.edit_isActive = false
     },
 
     inspectionMode(val){
@@ -690,19 +694,32 @@ export default{
         return stores.filter( item => (item.name.indexOf(this.inputSearchStore) > -1) ||  (item.timeZone.indexOf(this.inputSearchStore) > -1))
     },
     filterCurTemplateProvince(stores){
+        
+        console.log('this.curTempProvinceList', this.curTempProvinceList)
         if(this.curTempProvinceList.length == 0 ){
           return stores
         }else{
-          return stores.filter(item => item.province.includes(this.curTempProvinceList))
+          
+          // return stores.filter(item => item.province.includes(this.curTempProvinceList))
+          return stores.filter(item => this.curTempProvinceList.includes(item.province))
         }
     },
     filterCurTemplateCity(stores){
       if(this.curTempCityList.length == 0){
         return stores
       }else{
-        return stores.filter(item => item.city == this.curTempCityList )
+        // return stores.filter(item => item.city == this.curTempCityList )
+        return stores.filter(item => this.curTempCityList.includes(item.city))
       }
     }, 
+
+    
+    onselect(val){
+      var c = this.showSearchStoreData.map(c => c.city)
+      const cccSet = new Set(c)
+      this.cityAry = [...cccSet]
+    },
+
 
     async init(){
       await this.getBriefStoreList();
