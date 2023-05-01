@@ -1,10 +1,10 @@
 <template>
     <div class="ScheduleContainer">
+        
         <div class="search-bar">
             <DateTimeSelectorSchedule
                 class="time-selector" 
                 :dateRangeTitle="$t('schedule.schStartDate')" 
-                :pickFuturerDate="true" 
                 @change="dateChange"
             />
             <div class='keyword-area'>

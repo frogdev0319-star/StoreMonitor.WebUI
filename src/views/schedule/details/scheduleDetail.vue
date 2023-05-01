@@ -131,7 +131,7 @@
             size="mini"
             :class="{ btn_disable: !del_isActive }"
             :disable="!del_isActive"
-            @click="deleteSchedule"
+            @click="showConfirmDelete = true"
             >
             <span>刪除</span>
           </delay-button>
@@ -437,6 +437,17 @@
         </div>
       </div>
     </dialog-pop>
+    <dialog-pop
+      :title="$t('schedule.deleteSchedule')"
+      :isWarning="true"
+      :visible="showConfirmDelete"
+      @cancelHandler = "showConfirmDelete=false"
+      @confirmHandler="deleteSchedule"
+      >
+      <div class="dialog-slot">
+        是否需要刪除已選擇的門店？
+      </div>
+    </dialog-pop>
 
   </div>
 </template>
@@ -467,14 +478,9 @@ export default{
   },
   data(){
     return {
-      ddd: '',
-      tempboolean_1: false,
-      tempboolean_2: false,
-
+      showConfirmDelete:  false,
       showInputLimit: false,
-
-      templateList:['aaa','bbb','ccc'],
-      // ====== !! ======
+    
       edit_isActive: false,
       del_isActive: false,
 
@@ -1237,6 +1243,8 @@ export default{
       }
       
       this.handleSchedule = []
+      this.showConfirmDelete = false
+      
     },
     resetData(val){
       console.log('val', val)
