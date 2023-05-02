@@ -1534,7 +1534,7 @@ export default{
         &:first-child
           .cell
             width: 50px
-            // margin-left: -28px
+            margin-left: -3px !important
             
   .users
     .el-checkbox__input.is-indeterminate .el-checkbox__inner
