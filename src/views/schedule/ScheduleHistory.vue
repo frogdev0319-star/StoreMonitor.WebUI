@@ -1,7 +1,11 @@
 <template>
     <div class="ScheduleContainer">
       <div class="search-bar">
-          <date-time-selector class="time-selector" :dateRangeTitle="$t('schedule.schStartDate')" @change="dateChange"/>
+          <date-time-selector 
+            class="time-selector" 
+            :dateRangeTitle="$t('schedule.schStartDate')" 
+            @change="dateChange"
+            />
           <div class='status-area'>
             <div class="search-label">{{$t('audit.workFlows.workFlowsStauts')}}</div>
             <el-select
