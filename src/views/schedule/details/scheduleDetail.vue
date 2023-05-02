@@ -1057,9 +1057,15 @@ export default{
     handleClose(tag){
       console.log('tag--->', tag)
       this.tags.splice(this.tags.indexOf(tag), 1);
-      this.$refs.storeDataList.toggleChecked_store(tag)
+
+      var row = this.showSearchStoreData.filter(element => 
+          element.name == tag.name
+      );
+
+      this.$refs.storeDataList.toggleRowSelection(row[0])
     },
     
+
     handleSelectionChange(val){
       console.log('handleSelectionChange val :>> ', val);
       
@@ -1140,8 +1146,7 @@ export default{
         })
       }
       console.log('this.showScheduleDataList end', this.showScheduleDataList)
-      // this.$refs.storeDataList.clear()
-      console.log('this.$refs.storeDataList. :>> ', this.$refs.storeDataList);
+      this.$refs.storeDataList.clearSelection()
       this.hasScheduleData = true
     },
 
