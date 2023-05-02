@@ -1121,6 +1121,10 @@ export default {
 
     playCommentVideo(item, index) {
       const self = this;
+      if(item.isH265){
+          util.notify(this.$t('eventView.videoFormatNotSupoort'), 'warning', 3 * 1000);
+          return;
+      }
       self.dialogCommentVideo = true;
       self.$nextTick(function() {
         var video = document.getElementById('previewVideo');

@@ -602,7 +602,8 @@ export default{
         "closeSelectedEvent":"Confirm close choosed event?",
         "confirmBachClose":"Confirm bach close events",
         "expiretag":"Expired",
-        "maximumAttVedio":"Only 2 video attachments can be uploaded"
+        "maximumAttVedio":"Only 2 video attachments can be uploaded",
+        "videoFormatNotSupoort":"The browser does not support this video format, please use the StoreVue app to view"
     },
     "insSettingView":{
         "Addscoreitems":"Additional scoring items",

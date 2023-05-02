@@ -610,6 +610,7 @@ export default{
       "confirmBachClose":"確認批次結案",
       "expiretag":"逾期",
       "maximumAttVedio":"僅能上傳2個影片附件檔案",
+      "videoFormatNotSupoort":"該瀏覽器不支援此影片格式，請至 StoreVue app 查看"
   },
   "insSettingView":{
       "Addscoreitems":"附加評分項目",

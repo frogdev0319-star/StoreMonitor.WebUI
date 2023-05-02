@@ -601,7 +601,8 @@ export default{
       "closeSelectedEvent":"确认将选择事件结案?",
       "confirmBachClose":"确认批量结案",
       "expiretag":"逾期",
-      "maximumAttVedio":"仅能上传2个影片附件档案"
+      "maximumAttVedio":"仅能上传2个影片附件档案",
+      "videoFormatNotSupoort":"该浏览器不支援此影片格式，请至 StoreVue app 查看"
   },
   "insSettingView":{
       "Addscoreitems":"附加评分项目",
