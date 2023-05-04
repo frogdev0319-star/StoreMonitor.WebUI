@@ -1414,8 +1414,10 @@ export default {
 
   methods: {
     changeStore_(_item) {
+      console.log("CHange STore")
+      console.log(_item)
       const self = this;
-      self.storeStatus = _item.status;
+
       self.patrolstore = '';
       self.curSheetIndex = 0;
       self.curSheet = {};
@@ -1443,6 +1445,7 @@ export default {
       self.showGuide = true;
       self.channel = null;
       self.store = {};
+      self.storeStatus = _item?_item.status:-1;
       if(typeof _item!='undefined'){
         _item.authorizedInspect.forEach(au_item => {
           if (au_item.mode === 0) {
@@ -1473,6 +1476,15 @@ export default {
         if(self.backSheetGroup !=null){
           self.changeInspectList(self.curInspectId); //抓整個全新的巡檢項目,在做分數、附件更新
         }
+      }
+      else{
+        const obj = {};
+        obj.storeId = "";
+        obj.storeName ="";
+        obj.storeTitle = "";
+        obj.storeUp = "";
+        obj.device = [];
+        self.saveStoreObj(storeObj);
       }
 
     },
