@@ -682,35 +682,39 @@ export default{
     inputSearchStoreList(val){
       console.log('val :>> ', val);
       
-      // if(val.trim()!=""){
-      //   var stores = []
-      //   stores = this.showScheduleDataList.filter(item => (
-      //     item.city.indexOf(val.toLowerCase()) > -1  || item.province.indexOf(val.toLowerCase()) > -1
-      //   ))
-      //   if(stores.length > 0){
-      //     this.showScheduleDataList = stores
-      //     return
-      //   } else {
-      //     this.showScheduleDataList = this.ori_showScheduleDataList
-      //     const results = [];
+      if(val.trim()!=""){
+        var stores = []
+        stores = this.showScheduleDataList.filter(item => (
+          item.city.indexOf(val.toLowerCase()) > -1  || item.province.indexOf(val.toLowerCase()) > -1
+        ))
 
-      //     this.showScheduleDataList.forEach((c) => {
-      //       console.log('c :>> ', c);
-      //       const match_stores = c.stores.filter((s) => s.name.toLowerCase().indexOf(val.toLowerCase()) !== -1);
-      //       console.log('match_stores.length', match_stores.length)
-      //       if (!match_stores.length) return;
+        console.log('stores', stores)
+
+        if(stores.length > 0){
+          this.showScheduleDataList = stores
+          return
+        } else {
+          
+          // this.showScheduleDataList = this.ori_showScheduleDataList
+          const results = [];
+
+          this.showScheduleDataList.forEach((c) => {
+            console.log('c :>> ', c);
+            const match_stores = c.taskList.filter((s) => s.storeName.toLowerCase().indexOf(val.toLowerCase()) !== -1);
+            console.log('match_stores.length', match_stores.length)
+            if (!match_stores.length) return;
             
-      //       results.push({
-      //         ...c,
-      //         stores: match_stores,
-      //       });
-      //     });
-      //     this.showScheduleDataList = results
-      //   }
-      // } 
-      //   else {
-      //   this.showScheduleDataList = this.ori_showScheduleDataList
-      // }
+            results.push({
+              ...c,
+              stores: match_stores,
+            });
+          });
+          this.showScheduleDataList = results
+        }
+      } 
+        else {
+        this.showScheduleDataList = this.ori_showScheduleDataList
+      }
     }
   
   },
