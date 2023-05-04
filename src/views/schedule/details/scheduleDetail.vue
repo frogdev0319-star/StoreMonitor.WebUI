@@ -519,6 +519,7 @@ export default{
       scheduleDataList:[],
 
       showScheduleDataList:[],
+      ori_showScheduleDataList: [],
       selectRemiderStyle:[
         {
           value: 'remindMode_Currently',
@@ -678,6 +679,39 @@ export default{
       deep:true
     },
 
+    inputSearchStoreList(val){
+      console.log('val :>> ', val);
+      
+      // if(val.trim()!=""){
+      //   var stores = []
+      //   stores = this.showScheduleDataList.filter(item => (
+      //     item.city.indexOf(val.toLowerCase()) > -1  || item.province.indexOf(val.toLowerCase()) > -1
+      //   ))
+      //   if(stores.length > 0){
+      //     this.showScheduleDataList = stores
+      //     return
+      //   } else {
+      //     this.showScheduleDataList = this.ori_showScheduleDataList
+      //     const results = [];
+
+      //     this.showScheduleDataList.forEach((c) => {
+      //       console.log('c :>> ', c);
+      //       const match_stores = c.stores.filter((s) => s.name.toLowerCase().indexOf(val.toLowerCase()) !== -1);
+      //       console.log('match_stores.length', match_stores.length)
+      //       if (!match_stores.length) return;
+            
+      //       results.push({
+      //         ...c,
+      //         stores: match_stores,
+      //       });
+      //     });
+      //     this.showScheduleDataList = results
+      //   }
+      // } 
+      //   else {
+      //   this.showScheduleDataList = this.ori_showScheduleDataList
+      // }
+    }
   
   },
   mounted() {
@@ -686,14 +720,14 @@ export default{
   },
 
   computed: {
-    searchSheduleDataList :{
-      get(){
-        return this.filterInputSearchScheduleDataList(this.scheduleDataList)
-      },
-      set(val){
-        console.log('val', val)
-			}
-    },
+    // searchSheduleDataList :{
+    //   get(){
+    //     return this.filterInputSearchScheduleDataList(this.scheduleDataList)
+    //   },
+    //   set(val){
+    //     console.log('val', val)
+		// 	}
+    // },
 
     showSearchStoreData :{
       get(){
@@ -710,9 +744,12 @@ export default{
   },
 
   methods: {
-    filterInputSearchScheduleDataList(data){
-      return data.filter( item => (item.storeName.indexOf(this.inputSearchStoreList) > -1))
-    },
+    // filterInputSearchScheduleDataList(data){
+    //   return data.filter( item => (item.storeName.indexOf(this.inputSearchStoreList) > -1))
+    // },
+
+
+
 
     // dialoge
     filterInputSearchStore(stores){
@@ -868,6 +905,7 @@ export default{
             })
 
             this.showScheduleDataList = newArr
+            this.ori_showScheduleDataList = newArr
             console.log('this.showScheduleDataList', this.showScheduleDataList)
           }
         }
