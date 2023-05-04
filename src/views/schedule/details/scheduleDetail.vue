@@ -85,6 +85,7 @@
 
     <!-- 巡檢門店 -->
     <div class="page-container report-setting paper" >
+
       <div class="setting-titles padding flex-center">
         巡檢門店（請設定為當地時間）
         <div class="spacer"></div>
@@ -340,7 +341,29 @@
                 </el-tag>
               </div>
             </div>
-            <div class="users">
+
+
+            <div class="users" style="width: 100%">
+              <el-table
+                ref="storeDataList"
+                :data="showSearchStoreData"
+                style="width: 100%"
+                class="table-white"
+                @selection-change="handleSelectionChange">
+                <el-table-column
+                  type="selection"
+                  width="55">
+                </el-table-column>
+                <el-table-column v-for="(_item,_index) in storeColumnData"
+                  :key="_item.label"
+                  :prop="_item.prop"
+                  :label="_item.label"
+                />
+                
+              </el-table>
+            </div>
+
+            <!-- <div class="users">
               <table-only
                 ref="storeDataList"
                 class="table-white"
@@ -356,7 +379,7 @@
                 :cellStyle ="{backgroundColor: '#fff !important'}"
                 @handleSelectionChange = "handleSelectionChange "
               />
-            </div>
+            </div> -->
           
           </div>
         </div>
@@ -480,6 +503,9 @@ export default{
   },
   data(){
     return {
+
+      multipleSelection: [],
+      
       showConfirmDelete:  false,
       showInputLimit: false,
     
@@ -570,7 +596,6 @@ export default{
       
       inputSearchValue:'',
       dateValue:[],
-      tableData:[{schName:'1',tagName:'test',incepNum:3,startDate:'2023/01/01',endDate:'2023/01/02'}],
       scheduleList:[],
       columnOperationData:{
         label: this.$t('titleView.operation'),
@@ -1022,21 +1047,30 @@ export default{
       this.inputSearchStore = ''
       this.curTempProvinceList = ''
       this.curTempCityList = ''
+      
       // 清除所有勾選
-      this.$refs.storeDataList.clear()
+      console.log('this.$refs.storeDataList. :>> ', this.$refs.storeDataList);
+      this.$refs.storeDataList.clearSelection()
     },
 
     // 刪除 tag
     handleClose(tag){
       console.log('tag--->', tag)
       this.tags.splice(this.tags.indexOf(tag), 1);
-      this.$refs.storeDataList.toggleChecked_store(tag)
+
+      var row = this.showSearchStoreData.filter(element => 
+          element.name == tag.name
+      );
+
+      this.$refs.storeDataList.toggleRowSelection(row[0])
     },
     
+
     handleSelectionChange(val){
-      console.log('handleSelectionChange val :>> ', val.val);
+      console.log('handleSelectionChange val :>> ', val);
+      
       // tag 用
-      this.selectStoreTags = val.val
+      this.selectStoreTags = val
 
       this.tags = this.selectStoreTags.map(_item => (
         {
@@ -1047,7 +1081,7 @@ export default{
       // console.log('this.tags', this.tags)
 
       // 顯示頁面用
-      this.addStoreTemp = val.val.map((_item, index, array) => (
+      this.addStoreTemp = val.map((_item, index, array) => (
         {
           taskId: -999,
           storeId: _item.storeId,
@@ -1112,9 +1146,11 @@ export default{
         })
       }
       console.log('this.showScheduleDataList end', this.showScheduleDataList)
-      this.$refs.storeDataList.clear()
+      this.$refs.storeDataList.clearSelection()
       this.hasScheduleData = true
     },
+
+
 
     confirmEditStoreDialog(){
       console.log('this.editSchedule :>> ', this.editSchedule);
@@ -1498,7 +1534,7 @@ export default{
         &:first-child
           .cell
             width: 50px
-            margin-left: -28px
+            margin-left: -3px !important
             
   .users
     .el-checkbox__input.is-indeterminate .el-checkbox__inner

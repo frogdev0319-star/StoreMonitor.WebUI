@@ -30,6 +30,7 @@
                   class="search-input shadow-light"
                   clearable/>
           </div>
+          <!-- 查詢 -->
           <delay-button
             class="search-button"
             type="primary"
@@ -326,18 +327,34 @@ export default{
       };
       if(self.defaultSort.prop=="reportTsStr") order.property = "reportTs";
       else if(self.defaultSort.prop=="remindTimeStr") order.property = "remindTime";
+
+
       let beginTs = self.$moment.utc(self.$moment(self.dateValue[0])).valueOf();
       let endTs = self.$moment.utc(self.$moment(self.dateValue[1])).valueOf();
+
+      var ts = this.getdate(beginTs) + " " + "GMT+00:00"
+      var te = this.getdate(endTs) + " " + "GMT+00:00"
+      var gmt_beginTs = new Date(ts).getTime()
+      var gmt_endTs= new Date(te).getTime()
+
+      // console.log('gmt_beginTs :>> ', gmt_beginTs);
+      // console.log('gmt_endTs :>> ', gmt_endTs);
+
       const params={
-        status:this.curSchStatus,
-        beginTs,
-        endTs,
+        status: this.curSchStatus,
+        beginTs: gmt_beginTs,
+        endTs: gmt_endTs,
         filter:{
           page:this.curPage-1,
           size:this.curSizeNum
         },
         order
       };
+
+
+      console.log('params :>> ', params);
+
+
       if(this.inputSearchValue.trim()!=""){
         params['keyword']=this.inputSearchValue;
       }
@@ -350,8 +367,8 @@ export default{
             obj['squence'] = idx;
             obj['store']= item.storeName+'\n'+item.storeTimeZone;
             obj['tagNameMode'] = mode+'\n'+item.inspectTagName;
-            // obj['remindTimeStr']=(item.remindTime==0) ?' -' : self.$moment.utc(self.$moment(item.remindTime)).format("YYYY/MM/DD");//util.getDateStr(item.taskStart),
-            obj['remindTimeStr']=(item.remindTime==0) ?' -' : this.getdateOnlyDate(item.remindTime)
+            obj['remindTimeStr']=(item.remindTime==0) ?' -' : self.$moment.utc(self.$moment(item.remindTime)).format("YYYY/MM/DD");//util.getDateStr(item.taskStart),
+            // obj['remindTimeStr']=(item.remindTime==0) ?' -' : this.getdateOnlyDate(item.remindTime)
             // obj['reportTsStr']=(item.reportTs==0) ?'-' : self.$moment.utc(self.$moment(item.reportTs)).format("YYYY/MM/DD hh:mm:ss");//util.getDateStr(item.taskFinal),
             obj['reportTsStr'] = (item.reportTs==0) ?'-' : this.getdate(item.reportTs),
             
