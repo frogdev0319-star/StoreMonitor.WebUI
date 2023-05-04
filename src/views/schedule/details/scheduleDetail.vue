@@ -680,7 +680,6 @@ export default{
     },
 
     inputSearchStoreList(val){
-      console.log('val :>> ', val);
       
       if(val.trim()!=""){
         var stores = []
@@ -706,7 +705,7 @@ export default{
             
             results.push({
               ...c,
-              stores: match_stores,
+              taskList: match_stores,
             });
           });
           this.showScheduleDataList = results
