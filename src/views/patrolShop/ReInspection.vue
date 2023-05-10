@@ -440,7 +440,8 @@
             :is="currentVideoComponent"
             ref="vendorVideo"
             :channel-info="channel"
-            :source-list-length= "sourceListLength"
+            :source-list-length= "totalSourceList"
+            :is-remote="true"
             :show-feed-back="showFeedBack"
             :store-id="store.storeId"
             :video-authority="videoAuthority"
@@ -1213,6 +1214,37 @@ export default {
         'storeUp-content': this.lang.indexOf('ja') === -1,
         'ja-storeUp-content': this.lang.indexOf('ja') !== -1
       }
+    },
+    totalSourceList(){
+        const self = this;
+        let total = 0;
+        self.sheetName.forEach((inspectItem, index1) => {
+          //  console.log(inspectItem.inspectList)
+            if(inspectItem.inspectList){
+            inspectItem.inspectList.forEach((group, index2) => {
+                if(group.items){
+                  group.items.forEach((item, index3) => {
+                    item.sourceList.forEach((source, index4) => {
+                       console.log("Add source type="+source.mediaType)
+                       if(source.mediaType!=3){
+                         total = total+1;
+                       }
+                    });
+                  });
+                }
+            });
+
+            }
+
+        });
+
+        this.eventList.forEach((event, index1) => {
+           if(event.sourceObj){
+              total = total +1;
+           }
+        });
+        console.log("Total Source="+total)
+        return total;
     }
   },
   watch: {
@@ -1484,7 +1516,7 @@ export default {
         obj.storeTitle = "";
         obj.storeUp = "";
         obj.device = [];
-        self.saveStoreObj(storeObj);
+        self.saveStoreObj(obj);
       }
 
     },
@@ -2817,6 +2849,36 @@ export default {
 
       self.sourceList = [];
       self.sourceListLength = item.sourceList.length;
+      console.log("ClickItem")
+      console.log(this.sheetName);
+      let total = 0;
+      self.sheetName.forEach((inspectItem, index1) => {
+        //  console.log(inspectItem.inspectList)
+          if(inspectItem.inspectList){
+          inspectItem.inspectList.forEach((group, index2) => {
+              if(group.items){
+                group.items.forEach((item, index3) => {
+                  item.sourceList.forEach((source, index4) => {
+                     if(source.mediaType>=2 &&  source.mediaType<=4){
+                       total = total+1;
+                     }
+                  });
+                });
+              }
+          });
+
+          }
+
+      });
+      console.log(this.eventList)
+
+      this.eventList.forEach((event, index1) => {
+         if(event.sourceObj){
+            total = total +1;
+         }
+      });
+      self.sourceListLength = total;
+      console.log("Source = "+self.sourceListLength)
       self.curDeviceId = item.deviceId[0];
       self.curItem = item;
       self.curItemIndex = index;
