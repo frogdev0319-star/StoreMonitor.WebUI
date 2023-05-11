@@ -232,7 +232,7 @@ export default{
               obj['position'] = (position)? position.label:"";
               //obj['updateTs']=item.updateTime,
               obj['updateTsStr']=(item.updateTime==0)?'--':util.getDateStr(item.updateTime),
-              obj['updateUserName']=(item.updateUserName == "NONE")?'-':item.updateUserName,
+              obj['updateUserName']=(item.updateUserName == "NONE")?'--':item.updateUserName,
               userData.push(obj);
             });
             self.tableData = [];

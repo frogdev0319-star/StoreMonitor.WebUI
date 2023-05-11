@@ -1133,6 +1133,7 @@ export default{
           isRemindModeOneHour: false,
           isRemindModeCurrently: false,
           remindTime: '',
+          timeZone: _item.timeZone,
           tempId: Math.random().toString(36).slice(2)
         }
       ))
@@ -1271,6 +1272,7 @@ export default{
     },
 
     selectProvince(val){
+      console.log('val selectProvince:>> ', val);
       if(val.checked){
         this.showScheduleDataList.forEach( i => {
           i.taskList.forEach(t => {

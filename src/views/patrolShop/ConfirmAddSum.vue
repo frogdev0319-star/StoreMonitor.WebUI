@@ -138,7 +138,9 @@
             </div>
           </div>
           <hr class="hr-horizontal"/>
-          <div class="limit-group-score-tip" >
+
+  
+          <div class="limit-group-score-tip" v-if="showMaxInfo"> 
             <div class="limit-img" >
               <img :src="require('../../../static/img/group_score.svg')" width="20" height="20" />
             </div>
@@ -150,7 +152,7 @@
               <tr>
                 <th v-for="(t_item ,t_index) in s_item.data[0].tHeader" :key="t_index" :style="t_item.width" scope="col">
                   {{ t_item.name }}
-                  <span style="color: #7d8cad; margin-left: 5px;" v-if="t_index == 0 && setting_isShowDistrictSum">( {{$t('remotePatrol.totalScoreUnit')}}: {{ getTotalSum(s_item.data)}} )</span>
+                  <span style="color: #7d8cad; margin-left: 5px;" v-if="t_index == 0 && setting_isShowDistrictSum">( {{$t('remotePatrol.totalScoreUnit')}} : {{ getTotalSum(s_item.data)}} )</span>
                 </th>
               </tr>
             </thead>
@@ -163,7 +165,7 @@
                         <div v-if="inspectItem.weight != -1 && inspectItem.type != 2">{{ inspectItem.weight + '%' }} </div>
                         <div class="sheet_title">
                           {{ inspectItem.label }}
-                          <span style="color: #7d8cad; margin-left: 5px;" v-if="setting_isShowGroupSum">( {{$t('remotePatrol.totalScoreUnits')}}:{{getSum(inspectItem.inspectList)}} )</span>
+                          <span style="color: #7d8cad; margin-left: 5px;" v-if="setting_isShowGroupSum">( {{$t('remotePatrol.totalScoreUnit')}} : {{getSum(inspectItem.inspectList)}} )</span>
                         </div>
                       </div>
                       <div class="flex" style="align-items: center">
@@ -194,6 +196,7 @@
               </tbody>
             </template>
           </table>
+          <br>
         </div>
 
 
@@ -595,6 +598,7 @@ export default {
       unqualifiedStatus:  false,
       scoreMiddleLow: 0,
       scoreMiddleHeight: 0,
+      showMaxInfo: false,
     };
   },
   computed: {
@@ -1809,6 +1813,18 @@ export default {
         }
 
         self.summary = this.groupbyKey(inspect, 'type');
+
+        
+        var ary = []
+        self.summary.forEach(i => {
+          i.data.forEach(ii => {
+            ii.inspectList.forEach( iii => {
+              ary.push(iii.isAdvanced)
+            })
+          })
+        })
+        this.showMaxInfo = ary.some( d => d == true)
+    
         eventList.forEach((item, index) => {
           const objFeedBack = {};
           objFeedBack.subject = item.eventName;

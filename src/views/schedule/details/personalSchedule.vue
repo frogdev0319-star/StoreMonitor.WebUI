@@ -4,7 +4,7 @@
         <div class="search-bar">
             <DateTimeSelectorSchedule
                 class="time-selector" 
-                :dateRangeTitle="$t('schedule.schStartDate')" 
+                :dateRangeTitle="$t('overview.date')" 
                 @change="dateChange"
             />
             <div class='keyword-area'>
@@ -25,23 +25,34 @@
             </delay-button>
         </div>
         <div class="scheduleLlist-area">
+                
+
+            
             <div class="buttons">
-                <delay-button @click="addNewSchedule">
+
+                <delay-button
+                    class="storevue-button-empty add_button" 
+                    @click="addNewSchedule">
                     <div class="button-area">
                         <i class="iconfont el-icon-plus" />
                         <span>{{$t('schedule.addSchedule')}}</span>
                     </div>
                 </delay-button>
 
-                <el-button class="storevue-button-empty" 
+            
+                <delay-button
+                    class="storevue-button-empty del_button" 
                     :disabled="!enableDeleteBtn" 
-                    style="min-height:31px; padding-top: 4px;"
                     @click="deleteSchedule" >
                     <div class="button-area ">
                         <span>{{$t('scheduleView.delete')}}</span>
                     </div>
-                </el-button>
+                </delay-button>
+
+
             </div>
+
+
             <table-only
                 ref="elTP"
                 class="table-white tbl-schedule"
@@ -51,7 +62,9 @@
                 :table-data="tableData"
                 :table-operation ="columnOperationData"
                 :highlight-current-row= "false"
-                :is-loading-data="isLoadingData"
+
+                v-loading="isLoadingData" 
+
                 :allowRowExpand = "false"
                 :showBorder = "false"
                 :default-sort = "defaultSort"
@@ -178,7 +191,7 @@ export default{
                 }
             ]
         },
-        isLoadingData:true,
+        isLoadingData : true,
         total:0,
         curPage:1,
         curSizeNum:10,
@@ -352,6 +365,7 @@ export default{
             self.doSearchScheduleList();
         },
         doCopyScheduleTask(taskGroupUuid){
+            this.isLoadingData = true
             scheduleRESTful.CopySchedulePersonSchedule({taskGroupUuid}).then(res => {
                 if(res.errCode==0){
                     this.doSearchScheduleList();
@@ -368,6 +382,27 @@ export default{
         flex-direction: row
         justify-content: center
         align-items: center
+    .add_button
+        height: 35px
+        padding: 5px 20px !important
+        background: #fff
+        border-color: #c60957
+        color: #c60957
+        &:hover
+            background: #fdf1f6
+            opacity: 1
+            
+    .del_button
+        height: 35px
+        padding: 5px 20px !important
+        background: #fff
+        border-color: #999
+        color: #999
+        &:hover
+            border-color: #999
+            color: #999
+            background: #f1f1f1
+
 
 </style>
 

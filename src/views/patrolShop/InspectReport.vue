@@ -332,7 +332,7 @@
                   :key="t_index"
                   :style="isexportPDF ? t_item.pdfWidth: t_item.width"
                   scope="col">{{ t_item.name }}
-                  <span v-if="t_index == 0 && setting_isShowDistrictSum" > ( {{$t('remotePatrol.totalScoreUnit')}}:  {{ getTotalSum( pageItem.data[tableIndex]) }} ) </span>
+                  <span v-if="t_index == 0 && setting_isShowDistrictSum" > ( {{$t('remotePatrol.totalScoreUnit')}} :  {{ getTotalSum( pageItem.data[tableIndex]) }} ) </span>
                 </th>
               </tr>
               <tr v-if="tableItem[0].type === 1">
@@ -341,7 +341,7 @@
                   :key="t_index"
                   :style="isexportPDF ? t_item.pdfWidth: t_item.width"
                   scope="col">{{ t_item.name }}
-                  <span v-if="t_index == 0 && setting_isShowDistrictSum"> ( {{$t('remotePatrol.totalScoreUnit')}}: {{ getTotalSum( pageItem.data[tableIndex]) }} ) </span>
+                  <span v-if="t_index == 0 && setting_isShowDistrictSum"> ( {{$t('remotePatrol.totalScoreUnit')}} : {{ getTotalSum( pageItem.data[tableIndex]) }} ) </span>
                 </th>
               </tr>
               <tr v-if="tableItem[0].type === 2">
@@ -350,7 +350,7 @@
                   :key="t_index"
                   :style="isexportPDF ? t_item.pdfWidth: t_item.width"
                   scope="col">{{ t_item.name }}
-                  <span v-if="t_index == 0 && setting_isShowDistrictSum"> ( {{$t('remotePatrol.totalScoreUnit')}}: {{ getTotalSum( pageItem.data[tableIndex]) }} ) </span>
+                  <span v-if="t_index == 0 && setting_isShowDistrictSum"> ( {{$t('remotePatrol.totalScoreUnit')}} : {{ getTotalSum( pageItem.data[tableIndex]) }} ) </span>
                 </th>
               </tr>
             </thead>
@@ -370,7 +370,7 @@
                       <div v-if="categoryItem.weight != -1 && categoryItem.type != 2">{{ categoryItem.weight + '%' }}</div>
                       <div>
                         {{ categoryItem.groupName }}
-                        <span style="color: #7d8cad; margin-left: 5px;" v-if="setting_isShowGroupSum"> ( {{$t('remotePatrol.totalScoreUnit')}}: {{ getSum(categoryItem.children) }} ) </span>
+                        <span style="color: #7d8cad; margin-left: 5px;" v-if="setting_isShowGroupSum"> ( {{$t('remotePatrol.totalScoreUnit')}} : {{ getSum(categoryItem.children) }} ) </span>
                       </div>
                     </div>
                   </td>
@@ -859,7 +859,7 @@ export default {
         console.log('this.setting_isShowGroupSum  :>> ', this.setting_isShowGroupSum );
         console.log('this.setting_isShowDistrictSum :>> ', this.setting_isShowDistrictSum);
 
-        this.showMaxInfo = results[1].data[0].info.summary[0].isAdvanced
+        this.showMaxInfo = results[1].data[0].info.summary.some(i => i.isAdvanced == true)
 
 
       }).catch(err => {

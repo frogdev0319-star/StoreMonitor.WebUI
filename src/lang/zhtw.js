@@ -498,7 +498,7 @@ export default{
       "title":"問題名稱",
       "total":"個問題",
       "totalScore":"單項總分值",
-      "totalScoreUnit":"總分：",
+      "totalScoreUnit":"總分",
       "tryAgain":"重新嘗試",
       "unit":"個",
       "unknownErr":"未知錯誤",
@@ -1542,7 +1542,7 @@ export default{
     "scheduleExecuted":"排程執行",
     "lastUpdatePerson":"最後更新人",
     "getScheduleSettingFail":"取得排程設定失敗",
-    "schStartDate":"時間範圍",
+    "schStartDate":"開始執行",
     "schName":"排程名稱",
     "incepNum":"巡檢數量",
     "schEndDate":"最後執行",
@@ -1566,7 +1566,9 @@ export default{
     "exportScheduleRecordMsg2":"於執行時間您仍可繼續操作系統功能",
     "exportScheduleRecordWarn":"請選擇匯出項目",
     "deletePersonSchError":"個人排程刪除失敗",
-    "deleted":"已刪除"
+    "deleted":"已刪除",
+
+    
   },
 
 }
