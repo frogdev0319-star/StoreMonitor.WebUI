@@ -395,13 +395,13 @@ export default{
     .del_button
         height: 35px
         padding: 5px 20px !important
-        background: #fff
-        border-color: #999
-        color: #999
+        background: #fff !important
+        border-color: #999 !important
+        color: #999 !important
         &:hover
-            border-color: #999
-            color: #999
-            background: #f1f1f1
+            border-color: #999 !important
+            color: #999 !important
+            background: #f1f1f1 !important
 
 
 </style>
