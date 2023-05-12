@@ -139,8 +139,8 @@
           </div>
           <hr class="hr-horizontal"/>
 
-  
-          <div class="limit-group-score-tip" v-if="showMaxInfo"> 
+
+          <div class="limit-group-score-tip" v-if="showMaxInfo">
             <div class="limit-img" >
               <img :src="require('../../../static/img/group_score.svg')" width="20" height="20" />
             </div>
@@ -1527,9 +1527,11 @@ export default {
               let type1Score = ScoreTS;
               let type1XN = (ScoreX + ScoreN);
               let type1tsX = Score_totalScoreX;
+              console.log("1******item.groupScor="+type1ts,ScoreTS, type1XN , type1tsX)
               if(item.isAdvanced){
                 //if(inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1'){
                   //console.log("PassFileTtotalScoreS:",totalScore);
+
                   if(item.groupScore<=0)
                   {
                     //type1ts = (type1ts <item.groupScore)?item.groupScore:type1ts ;
@@ -1545,22 +1547,24 @@ export default {
                   //比例制，分母取上限分值，不分正負
                   if(inspectSettings.hundredMarkType!='0' && item.groupScore<=0){
                     type1ts = (type1ts <item.groupScore)?item.groupScore:type1ts ;
-                    type1tsX = (type1tsX<item.groupScore)?item.groupScore:type1tsX;
+                    type1tsX = (type1tsX<item.groupScore)?type1tsX:item.groupScore;
                   }else{
                     type1ts = item.groupScore;//(Math.abs(type1ts) >Math.abs(item.groupScore))?item.groupScore:type1ts ;
-                    type1tsX = item.groupScore;//(Math.abs(type1tsX)>Math.abs(item.groupScore))?item.groupScore:type1tsX;
+                    type1tsX =(type1tsX<item.groupScore)?type1tsX:item.groupScore;//(Math.abs(type1tsX)>Math.abs(item.groupScore))?item.groupScore:type1tsX;
                   }
+                //  type1tsX = Math.min(type1tsX,
               }
                   CurAddScoreB += util.accMul(type1ts,tempWeight);
                   allScoreB = CurAddScoreB;
+
                   ScoreTotalScoreSystem += util.accMul(type1Score,tempWeight);
                   ScoreXN += util.accMul(type1XN,tempWeight);
                   ScoreTotalScoreX += util.accMul(type1tsX,tempWeight);
+                  console.log("2******item.groupScor="+type1ts,ScoreTS, type1XN , type1tsX)
 
-
-              console.log("type 1 allScoreB:",allScoreB);
-              console.log("type 1 ScoreTotalScoreSystem:",ScoreTotalScoreSystem);
-              console.log("type 1 ScoreXN:",ScoreXN);
+            //  console.log("type 1 allScoreB:",allScoreB);
+            //  console.log("type 1 ScoreTotalScoreSystem:",ScoreTotalScoreSystem);
+          //    console.log("type 1 ScoreXN:",ScoreXN);
               console.log("type 1 ScoreTotalScoreX:",ScoreTotalScoreX);
 
             }
@@ -1719,6 +1723,7 @@ export default {
           }
         });
         let s_count = 0;
+        console.log("***********Get Count**************",inspect.length,inspect[0].type,inspectSettings.hundredMarkType)
         if (inspect.length === 1 && inspect[0].type === 0) {
           // console.log(1)
           if (inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1') {//加分 or 扣分制
@@ -1774,6 +1779,7 @@ export default {
                 console.log('*ScoreTotalScoreX:',ScoreTotalScoreX);
               }
               total_c = total_a === 0 || total_b === 0 ? 0 : (util.accDiv(total_a , total_b) * 100);
+              console.log(total_a , total_b)
               console.log('total_c:',total_c);
               s_count = total_c + otherGetscoreTotal;
               // console.log(s_count)
@@ -1786,12 +1792,14 @@ export default {
                 s_count = ScoreTotalScoreSystem + OtherTotalScoreSystem;
               }
             } else {
+
               let total_a = 0;
               if (inspectSettings.qualifiedForIgnoredWithType2) {
                 total_a = allScoreB === 0 || ScoreXN === 0 ? 0 : (util.accDiv(ScoreXN , allScoreB) * 100);
               } else {
                 total_a = ScoreTotalScoreX === 0 || ScoreTotalScoreSystem === 0 ? 0 : (util.accDiv(ScoreTotalScoreSystem , ScoreTotalScoreX) * 100);
               }
+              console.log("比例制",ScoreTotalScoreSystem , ScoreTotalScoreX)
               s_count = total_a + otherGetscoreTotal;
             }
           }
@@ -1814,7 +1822,7 @@ export default {
 
         self.summary = this.groupbyKey(inspect, 'type');
 
-        
+
         var ary = []
         self.summary.forEach(i => {
           i.data.forEach(ii => {
@@ -1824,7 +1832,7 @@ export default {
           })
         })
         this.showMaxInfo = ary.some( d => d == true)
-    
+
         eventList.forEach((item, index) => {
           const objFeedBack = {};
           objFeedBack.subject = item.eventName;
