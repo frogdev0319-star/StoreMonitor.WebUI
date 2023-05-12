@@ -65,7 +65,7 @@ setURL();
 router.beforeEach(async(to, from, next) => {
   if (!to.name) {
     const brandList = await getAccountList();
-    console.log(brandList)
+    console.log('brandList', brandList)
     getBrandList(brandList.data);
     await store.dispatch('GetUserAuthorities');
     const accessRoutes = await store.dispatch('generateRoutes');
@@ -94,7 +94,7 @@ function getBrandList(brandList) {
   const tempAccount = [];
   brandList.forEach((accountItem) => {
     const res = accountItem['srp'].filter((srpItem) =>
-      srpItem.type === 'Custom_iQM_Inspection' && srpItem.enable && srpItem.visible);
+      srpItem.type === 'custom_iqm_inspection' && srpItem.enable && srpItem.visible);
     //  console.log(res)
     if (res && res.length) {
       accountItem['srp'] = res;

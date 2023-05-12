@@ -245,6 +245,8 @@
           </div>
 
         </aside>
+
+        
         <section :class="secClass">
           <el-col
             v-if="!showHeader"
@@ -990,7 +992,7 @@ export default {
         .indexOf(accountId);
       let data = null;
       if(idIndex !== -1)
-        data = this.brandList[idIndex].srp.find(item=>item.type == "Custom_iQM_Inspection");
+        data = this.brandList[idIndex].srp.find(item=>item.type == "custom_iqm_inspection");
       console.log("Change Account")
       console.log(this.brandList[idIndex])
 
@@ -1030,6 +1032,9 @@ export default {
         await self.$store.dispatch("generateRoutes");
         self.getUserName(result.data);
         const availablePathesList = this.availabePathList;
+
+        console.log('availablePathesList :>> ', availablePathesList);
+
         if (availablePathesList.includes("/noRight")) {
           this.$router.push("/noRight");
         } else if (!availablePathesList.includes(this.$route.path)) {
