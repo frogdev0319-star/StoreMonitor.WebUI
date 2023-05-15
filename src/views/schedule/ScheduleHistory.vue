@@ -157,7 +157,8 @@ export default{
         {
           'prop': 'remindTimeStr',
           'label': this.$t('schedule.schExeDate'),
-          'sortable': 'custom',
+          // 'sortable': 'custom',
+          'sortable': true,
           'width': 50,
           'maxWidth': 50,
           'isExpand': false

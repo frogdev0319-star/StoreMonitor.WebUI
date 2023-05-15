@@ -127,7 +127,7 @@ export default {
       login: {
         username: 'username',
         password: 'password',
-        loginBtnTitle: '登录'
+        loginBtnTitle: '登錄'
       },
       logoSrc: './static/img/imgLogin/storevue_logo.png',
       imgList: [

@@ -149,7 +149,6 @@
           <p style="color: #b7c7df">暫無數據</p>
         </div>
         
-
         <!-- 有數據 -->
         <div class="inspect-basic flex-column" v-else>
           <!-- 全部門店 -->
@@ -176,10 +175,10 @@
                   />
                   <span class="group-name">{{_item.province}} - {{_item.city}}</span>
                 </div>
-                
                 <div class="task_list flex-column">
                   <div class="task_list_store flex-column" v-for="item in _item.taskList" :key="item.id" >
                     <!-- 店名 -->
+                    <!-- <pre style="font-size: 12px; color: #c60957; text-align: left;"> {{ item }}</pre>  -->
                     <div class="" style="margin-bottom: 5px">
                       <el-checkbox
                         class="storevue-checkbox-outlined"
@@ -194,7 +193,7 @@
                     <div class="memo_setting" >
                       <!-- 執行日期 -->
                       <div class="remider_setting flex-column">
-                        <p>執行日期  <span style="color: brown">{{ item.remindDate }}</span> </p> 
+                        <p>執行日期  </p> 
                         <el-date-picker
                           v-model="item.remindDate"
                           type="date"
@@ -242,14 +241,14 @@
                         <div class="notice" v-if="item.hasRemindStyle">請完成提醒方式設定 !</div>
                       </div>
                       <div class="remider_setting flex-column">
-                        <div v-if="(item.remindTime > new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 ) || !item.remindTime || item.tempId "
-                        class="clear_all"
-                        @click="resetData(item)"
+                        <div 
+                          v-if="(item.remindTime > new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 ) || item.taskId == -999 "
+                          class="clear_all"
+                          @click="resetData(item)"
                         >重設 </div>
                       </div>
                     </div>
 
-                    <!-- <div class="aaaa">aaaa</div> -->
                   </div>
               </div>
 
@@ -1179,10 +1178,16 @@ export default{
         }
       } 
       else if(this.scheduleStatus.action == "editSchedule"){
+        console.log('editSchedule :>> ');
         this.showScheduleDataList.forEach( i =>{
           this.addStoreTemp.forEach(t => {
             if(i.city == t.city && i.province == t.province){
               i.taskList.unshift(t)
+
+              // console.log('i :>> ', i);
+              // i.taskList[0].remindDate = ''
+              // i.taskList[0].remindTimePoint = ''
+
             }
           })
         })
@@ -1198,13 +1203,13 @@ export default{
       console.log('this.editSchedule :>> ', this.editSchedule);
       console.log('this.handleSchedule :>> ', this.handleSchedule);
 
-      let needEditId = this.handleSchedule.map(_item => _item.storeId)
+      let needEditId = this.handleSchedule.map(_item => _item.id)
       console.log('needEditId :>> ', needEditId);
 
       this.showScheduleDataList.forEach(_item => {
         _item.taskList.forEach(l => {
           needEditId.forEach(id => {
-          if(l.storeId == id){
+          if(l.id == id){
             l.checked = false
             l.remindDate = this.editSchedule.remindDate
             l.remindTimePoint = this.editSchedule.remindTimePoint
@@ -1215,7 +1220,6 @@ export default{
       })
       this.handleSchedule = []
       this.showingEditStore = false
-
       this.seleAllSchedule = false
       
       this.showScheduleDataList.forEach(_item => {
@@ -1227,8 +1231,9 @@ export default{
       this.editSchedule.remindDate = ''
       this.editSchedule.remindTimePoint = ''
       this.editSchedule.remindStyle = []
-
     },
+
+
 
     hideEditStoreDialog(key){
       this[key] = false;
@@ -1343,11 +1348,13 @@ export default{
       
     },
     resetData(val){
+      if(val.remindTime) val.remindTime = ''
+      if(val.remindDate) val.remindDate = ''
+      if(val.remindTimePoint) val.remindTimePoint = ''
+      if(val.remindStyle) val.remindStyle = []
+      
       console.log('val', val)
       console.log('this.showScheduleDataList', this.showScheduleDataList)
-      val.remindTime = ''
-      val.remindDate = ''
-      val.remindTimePoint = ''
       // val.remindStyle = []
       // this.scheduleDataList.forEach( i => {
       //   if(i.id == val.id ){
