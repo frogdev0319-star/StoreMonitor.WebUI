@@ -1260,8 +1260,13 @@ export default{
         this.showScheduleDataList.forEach(i =>{
           i.checked = true
           i.taskList.forEach(t =>{
-            t.checked = true
-            this.handleSchedule.push(t)
+            var isExpired = t.remindTime < new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 && t.remindTime !== ''
+            if(!isExpired) {
+              t.checked = true
+              this.handleSchedule.push(t)
+            }
+          
+            
           })
         })
       } else {
@@ -1278,10 +1283,14 @@ export default{
 
     selectProvince(val){
       console.log('val selectProvince:>> ', val);
+
+      // var isExpired = item.remindTime < new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 && item.remindTime !== '' 
       if(val.checked){
         this.showScheduleDataList.forEach( i => {
+          
           i.taskList.forEach(t => {
-            if(t.city === val.city) {
+            var isExpired = t.remindTime < new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 && t.remindTime !== ''
+            if(t.city === val.city && !isExpired) {
               t.checked = true
               this.handleSchedule.push(t)
             }
