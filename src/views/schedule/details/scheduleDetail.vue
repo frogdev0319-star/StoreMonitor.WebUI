@@ -194,7 +194,7 @@
                     <div class="memo_setting" >
                       <!-- 執行日期 -->
                       <div class="remider_setting flex-column">
-                        <p>執行日期</p>
+                        <p>執行日期  <span style="color: brown">{{ item.remindDate }}</span> </p> 
                         <el-date-picker
                           v-model="item.remindDate"
                           type="date"
@@ -1348,7 +1348,7 @@ export default{
       val.remindTime = ''
       val.remindDate = ''
       val.remindTimePoint = ''
-      val.remindStyle = []
+      // val.remindStyle = []
       // this.scheduleDataList.forEach( i => {
       //   if(i.id == val.id ){
       //     console.log('1')
