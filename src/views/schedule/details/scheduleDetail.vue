@@ -53,6 +53,7 @@
                   v-model="inspectionMode" 
                   placeholder="巡檢表"
                   style="width: 250px"
+                  :disabled="canEditInspection"
                   >
                   <el-option
                     v-for="(_item, index) in inspectionStyle"
@@ -67,6 +68,7 @@
                   v-model="inspectionName" 
                   placeholder="巡檢表名稱"
                   style="width: 250px"
+                  :disabled="canEditInspection"
                   >
                   <el-option
                     v-for="(_item, index) in inspectTypeList"
@@ -593,7 +595,7 @@ export default{
       inputSearchStoreList:'',
       showSelectionColumn: true,
     // ======
-      
+      canEditInspection: true,
       inputSearchValue:'',
       dateValue:[],
       scheduleList:[],
@@ -796,6 +798,8 @@ export default{
       console.log('this.inspectionName', this.inspectionName)
       
       if(this.scheduleStatus.action == "editSchedule"){
+
+        this.canEditInspection = true
         this.hasScheduleData = true
         this.taskName = this.scheduleStatus.taskName
         
@@ -805,6 +809,8 @@ export default{
         await this.getPersonScheduleData();
       }
       else if(this.scheduleStatus.action == "addSchedule"){
+        this.canEditInspection = false
+
         this.hasScheduleData = false
         this.inspectionMode = 1
         var tempN = this.allInspectTypeList.filter( i => i.mode === 1)
@@ -1031,12 +1037,8 @@ export default{
       //   return false
       // }
       
-      
-
       // this.isLoadingData = false
       // return false
-
-
 
       if(param.taskList.length < 1){
         util.notify("請至少設定一筆排程！", 'error', 2000 );
@@ -1059,6 +1061,9 @@ export default{
             util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
         }
       })
+
+      this.$router.push({name: 'PersonalSchedule'});
+
     },
 
     pad2(n){
@@ -1203,21 +1208,51 @@ export default{
       console.log('this.editSchedule :>> ', this.editSchedule);
       console.log('this.handleSchedule :>> ', this.handleSchedule);
 
-      let needEditId = this.handleSchedule.map(_item => _item.id)
+      var status = sessionStorage.getItem('scheduleParams');
+      this.scheduleStatus = JSON.parse(status)
+      let needEditId = ''
+      if(this.scheduleStatus.action == "editSchedule"){
+        needEditId = this.handleSchedule.map(_item => _item.id)
+      } else if(this.scheduleStatus.action == "addSchedule"){
+        needEditId = this.handleSchedule.map(_item => _item.tempId)
+      }
+
       console.log('needEditId :>> ', needEditId);
 
       this.showScheduleDataList.forEach(_item => {
         _item.taskList.forEach(l => {
-          needEditId.forEach(id => {
-          if(l.id == id){
-            l.checked = false
-            l.remindDate = this.editSchedule.remindDate
-            l.remindTimePoint = this.editSchedule.remindTimePoint
-            l.remindStyle = this.editSchedule.remindStyle
+
+          if(this.scheduleStatus.action == "editSchedule"){
+            needEditId.forEach(id => {
+              if(l.id == id){
+                l.checked = false
+                l.remindDate = this.editSchedule.remindDate
+                l.remindTimePoint = this.editSchedule.remindTimePoint
+                l.remindStyle = this.editSchedule.remindStyle
+              }
+            })
+          } else if(this.scheduleStatus.action == "addSchedule") {
+            needEditId.forEach(id => {
+              if(l.tempId == id){
+                l.checked = false
+                l.remindDate = this.editSchedule.remindDate
+                l.remindTimePoint = this.editSchedule.remindTimePoint
+                l.remindStyle = this.editSchedule.remindStyle
+              }
+            })
+
           }
-        })
+          
+
+
+
+
         })
       })
+
+
+      
+
       this.handleSchedule = []
       this.showingEditStore = false
       this.seleAllSchedule = false
