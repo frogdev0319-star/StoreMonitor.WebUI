@@ -1583,7 +1583,7 @@ export default {
           util.notify(self.$t('remotePatrol.maximumTotalAttach'), 'warning', 3000);
           return false;
         }
-        if (self.sourceListLength >= 10) {
+        if (!self.isRemote && self.sourceListLength >= 10) {
           const msg = self.isStoreMonitor ? self.$t('remotePatrol.storeMaxAttach') : self.$t('remotePatrol.maximumAttach');
           util.notify(msg, 'warning', 3000);
           return false;
