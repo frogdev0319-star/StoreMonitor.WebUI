@@ -178,7 +178,8 @@ export default{
         {
           'prop': 'reportTsStr',
           'label': this.$t('schedule.reportUploadDate'),
-          'sortable': 'custom',
+          // 'sortable': 'custom',
+          'sortable': true,
           'width': 130,
           'maxWidth': 130,
           'isExpand': false
@@ -229,7 +230,7 @@ export default{
       total:0,
       curPage:1,
       curSizeNum:10,
-      defaultSort:{prop: 'reportTsStr', order: 'descending'},
+      defaultSort :{prop: 'remindTimeStr', order: 'descending'},
       SelScheduleTask:[],
       curSchStatus:-1,
       schStatusList:[
@@ -324,12 +325,20 @@ export default{
       this.isLoadingData = true
       const self = this;
       let order = {
-        direction:this.defaultSort.order=='ascending'? 'asc':'desc',
-        property:self.defaultSort.prop
+        // direction:this.defaultSort.order=='ascending'? 'asc':'desc',
+        direction: 'desc',
+        // property: self.defaultSort.prop
+        property: "remindTs"
+        
       };
-      if(self.defaultSort.prop=="reportTsStr") order.property = "reportTs";
-      else if(self.defaultSort.prop=="remindTimeStr") order.property = "remindTime";
 
+      if(self.defaultSort.prop=="remindTimeStr") order.property = "remindTs";
+      else if(self.defaultSort.prop=="reportTsStr") order.property = "reportTs";
+       
+
+
+
+      console.log('order :>> ', order);
 
       let beginTs = self.$moment.utc(self.$moment(self.dateValue[0])).valueOf();
       let endTs = self.$moment.utc(self.$moment(self.dateValue[1])).valueOf();
