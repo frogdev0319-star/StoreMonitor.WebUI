@@ -53,6 +53,7 @@
                   v-model="inspectionMode" 
                   placeholder="巡檢表"
                   style="width: 250px"
+                  :disabled="canEditInspection"
                   >
                   <el-option
                     v-for="(_item, index) in inspectionStyle"
@@ -67,6 +68,7 @@
                   v-model="inspectionName" 
                   placeholder="巡檢表名稱"
                   style="width: 250px"
+                  :disabled="canEditInspection"
                   >
                   <el-option
                     v-for="(_item, index) in inspectTypeList"
@@ -149,7 +151,6 @@
           <p style="color: #b7c7df">暫無數據</p>
         </div>
         
-
         <!-- 有數據 -->
         <div class="inspect-basic flex-column" v-else>
           <!-- 全部門店 -->
@@ -176,10 +177,10 @@
                   />
                   <span class="group-name">{{_item.province}} - {{_item.city}}</span>
                 </div>
-                
                 <div class="task_list flex-column">
                   <div class="task_list_store flex-column" v-for="item in _item.taskList" :key="item.id" >
                     <!-- 店名 -->
+                    <!-- <pre style="font-size: 12px; color: #c60957; text-align: left;"> {{ item }}</pre>  -->
                     <div class="" style="margin-bottom: 5px">
                       <el-checkbox
                         class="storevue-checkbox-outlined"
@@ -194,7 +195,7 @@
                     <div class="memo_setting" >
                       <!-- 執行日期 -->
                       <div class="remider_setting flex-column">
-                        <p>執行日期</p>
+                        <p>執行日期  </p> 
                         <el-date-picker
                           v-model="item.remindDate"
                           type="date"
@@ -242,14 +243,14 @@
                         <div class="notice" v-if="item.hasRemindStyle">請完成提醒方式設定 !</div>
                       </div>
                       <div class="remider_setting flex-column">
-                        <div v-if="(item.remindTime > new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 ) || !item.remindTime || item.tempId "
-                        class="clear_all"
-                        @click="resetData(item)"
+                        <div 
+                          v-if="(item.remindTime > new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 ) || item.taskId == -999 "
+                          class="clear_all"
+                          @click="resetData(item)"
                         >重設 </div>
                       </div>
                     </div>
 
-                    <!-- <div class="aaaa">aaaa</div> -->
                   </div>
               </div>
 
@@ -594,7 +595,7 @@ export default{
       inputSearchStoreList:'',
       showSelectionColumn: true,
     // ======
-      
+      canEditInspection: true,
       inputSearchValue:'',
       dateValue:[],
       scheduleList:[],
@@ -797,6 +798,8 @@ export default{
       console.log('this.inspectionName', this.inspectionName)
       
       if(this.scheduleStatus.action == "editSchedule"){
+
+        this.canEditInspection = true
         this.hasScheduleData = true
         this.taskName = this.scheduleStatus.taskName
         
@@ -806,6 +809,8 @@ export default{
         await this.getPersonScheduleData();
       }
       else if(this.scheduleStatus.action == "addSchedule"){
+        this.canEditInspection = false
+
         this.hasScheduleData = false
         this.inspectionMode = 1
         var tempN = this.allInspectTypeList.filter( i => i.mode === 1)
@@ -1032,12 +1037,8 @@ export default{
       //   return false
       // }
       
-      
-
       // this.isLoadingData = false
       // return false
-
-
 
       if(param.taskList.length < 1){
         util.notify("請至少設定一筆排程！", 'error', 2000 );
@@ -1060,6 +1061,9 @@ export default{
             util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
         }
       })
+
+      this.$router.push({name: 'PersonalSchedule'});
+
     },
 
     pad2(n){
@@ -1179,10 +1183,16 @@ export default{
         }
       } 
       else if(this.scheduleStatus.action == "editSchedule"){
+        console.log('editSchedule :>> ');
         this.showScheduleDataList.forEach( i =>{
           this.addStoreTemp.forEach(t => {
             if(i.city == t.city && i.province == t.province){
               i.taskList.unshift(t)
+
+              // console.log('i :>> ', i);
+              // i.taskList[0].remindDate = ''
+              // i.taskList[0].remindTimePoint = ''
+
             }
           })
         })
@@ -1198,24 +1208,53 @@ export default{
       console.log('this.editSchedule :>> ', this.editSchedule);
       console.log('this.handleSchedule :>> ', this.handleSchedule);
 
-      let needEditId = this.handleSchedule.map(_item => _item.storeId)
+      var status = sessionStorage.getItem('scheduleParams');
+      this.scheduleStatus = JSON.parse(status)
+      let needEditId = ''
+      if(this.scheduleStatus.action == "editSchedule"){
+        needEditId = this.handleSchedule.map(_item => _item.id)
+      } else if(this.scheduleStatus.action == "addSchedule"){
+        needEditId = this.handleSchedule.map(_item => _item.tempId)
+      }
+
       console.log('needEditId :>> ', needEditId);
 
       this.showScheduleDataList.forEach(_item => {
         _item.taskList.forEach(l => {
-          needEditId.forEach(id => {
-          if(l.storeId == id){
-            l.checked = false
-            l.remindDate = this.editSchedule.remindDate
-            l.remindTimePoint = this.editSchedule.remindTimePoint
-            l.remindStyle = this.editSchedule.remindStyle
+
+          if(this.scheduleStatus.action == "editSchedule"){
+            needEditId.forEach(id => {
+              if(l.id == id){
+                l.checked = false
+                l.remindDate = this.editSchedule.remindDate
+                l.remindTimePoint = this.editSchedule.remindTimePoint
+                l.remindStyle = this.editSchedule.remindStyle
+              }
+            })
+          } else if(this.scheduleStatus.action == "addSchedule") {
+            needEditId.forEach(id => {
+              if(l.tempId == id){
+                l.checked = false
+                l.remindDate = this.editSchedule.remindDate
+                l.remindTimePoint = this.editSchedule.remindTimePoint
+                l.remindStyle = this.editSchedule.remindStyle
+              }
+            })
+
           }
-        })
+          
+
+
+
+
         })
       })
+
+
+      
+
       this.handleSchedule = []
       this.showingEditStore = false
-
       this.seleAllSchedule = false
       
       this.showScheduleDataList.forEach(_item => {
@@ -1227,8 +1266,9 @@ export default{
       this.editSchedule.remindDate = ''
       this.editSchedule.remindTimePoint = ''
       this.editSchedule.remindStyle = []
-
     },
+
+
 
     hideEditStoreDialog(key){
       this[key] = false;
@@ -1255,8 +1295,13 @@ export default{
         this.showScheduleDataList.forEach(i =>{
           i.checked = true
           i.taskList.forEach(t =>{
-            t.checked = true
-            this.handleSchedule.push(t)
+            var isExpired = t.remindTime < new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 && t.remindTime !== ''
+            if(!isExpired) {
+              t.checked = true
+              this.handleSchedule.push(t)
+            }
+          
+            
           })
         })
       } else {
@@ -1273,10 +1318,14 @@ export default{
 
     selectProvince(val){
       console.log('val selectProvince:>> ', val);
+
+      // var isExpired = item.remindTime < new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 && item.remindTime !== '' 
       if(val.checked){
         this.showScheduleDataList.forEach( i => {
+          
           i.taskList.forEach(t => {
-            if(t.city === val.city) {
+            var isExpired = t.remindTime < new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 && t.remindTime !== ''
+            if(t.city === val.city && !isExpired) {
               t.checked = true
               this.handleSchedule.push(t)
             }
@@ -1343,12 +1392,14 @@ export default{
       
     },
     resetData(val){
+      if(val.remindTime) val.remindTime = ''
+      if(val.remindDate) val.remindDate = ''
+      if(val.remindTimePoint) val.remindTimePoint = ''
+      if(val.remindStyle) val.remindStyle = []
+      
       console.log('val', val)
       console.log('this.showScheduleDataList', this.showScheduleDataList)
-      val.remindTime = ''
-      val.remindDate = ''
-      val.remindTimePoint = ''
-      val.remindStyle = []
+      // val.remindStyle = []
       // this.scheduleDataList.forEach( i => {
       //   if(i.id == val.id ){
       //     console.log('1')

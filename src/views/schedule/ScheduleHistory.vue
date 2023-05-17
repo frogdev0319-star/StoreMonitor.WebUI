@@ -68,11 +68,11 @@
             ref="elTP"
             class="table-white tbl-schedule"
             table-themes="white"
+            v-loading="isLoadingData"
             :showSelectionColumn="true"
             :column-data="columnData"
             :table-data="tableData"
             :highlight-current-row= "false"
-            :is-loading-data="isLoadingData"
             :allowRowExpand = "false"
             :showBorder = "false"
             :default-sort = "defaultSort"
@@ -157,7 +157,8 @@ export default{
         {
           'prop': 'remindTimeStr',
           'label': this.$t('schedule.schExeDate'),
-          'sortable': 'custom',
+          // 'sortable': 'custom',
+          'sortable': true,
           'width': 50,
           'maxWidth': 50,
           'isExpand': false
@@ -224,7 +225,7 @@ export default{
         }
       ],
       tableData:[],
-      isLoadingData:true,
+      isLoadingData : false,
       total:0,
       curPage:1,
       curSizeNum:10,
@@ -320,6 +321,7 @@ export default{
 
   
     doSearchScheduleHis(){
+      this.isLoadingData = true
       const self = this;
       let order = {
         direction:this.defaultSort.order=='ascending'? 'asc':'desc',
@@ -354,12 +356,11 @@ export default{
 
       console.log('params :>> ', params);
 
-
       if(this.inputSearchValue.trim()!=""){
         params['keyword']=this.inputSearchValue;
       }
       scheduleRESTful.getScheduleTaskHistory(params).then(res=>{
-        var hisData = [];
+        var thisData = [];
         if(res.errCode == 0){
           res.data.content.map((item,idx )=>{
             let obj = {...item};
@@ -383,15 +384,16 @@ export default{
                 obj['porcessMode'] = {isCellClick:true,value:this.$t('eventView.view')};
               }
             }
-            hisData.push(obj);
+            thisData.push(obj);
           });
           self.tableData = [];
-          self.tableData = hisData;
+          self.tableData = thisData;
           self.total = res.data.totalPages;
           self.isLoadingData = false;
         }else{
           util.notify(self.$t('schedule.getScheduleSettingFail'), 'error', 3000);
         }
+    
       })
 
     },
