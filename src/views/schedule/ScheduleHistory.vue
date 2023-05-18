@@ -229,7 +229,8 @@ export default{
       isLoadingData : false,
       total:0,
       curPage:1,
-      curSizeNum:10,
+      curSizeNum: 10,
+      totalElements : 0,
       defaultSort :{prop: 'remindTimeStr', order: 'descending'},
       SelScheduleTask:[],
       curSchStatus:-1,
@@ -334,10 +335,7 @@ export default{
 
       if(self.defaultSort.prop=="remindTimeStr") order.property = "remindTs";
       else if(self.defaultSort.prop=="reportTsStr") order.property = "reportTs";
-       
-
-
-
+      
       console.log('order :>> ', order);
 
       let beginTs = self.$moment.utc(self.$moment(self.dateValue[0])).valueOf();
@@ -352,12 +350,12 @@ export default{
       // console.log('gmt_endTs :>> ', gmt_endTs);
 
       const params={
-        status: this.curSchStatus,
+        status: -1,
         beginTs: gmt_beginTs,
         endTs: gmt_endTs,
         filter:{
-          page:this.curPage-1,
-          size:this.curSizeNum
+          page: this.curPage - 1,
+          size: this.curSizeNum
         },
         order
       };
@@ -365,9 +363,21 @@ export default{
 
       console.log('params :>> ', params);
 
-      if(this.inputSearchValue.trim()!=""){
-        params['keyword']=this.inputSearchValue;
+      if(this.curSchStatus !== -1 ){
+        params.status = this.curSchStatus
+        if(self.totalElements < self.curSizeNum){
+          params.filter.page = 0
+          this.curPage = 1
+        }
+        
       }
+
+      if(this.inputSearchValue.trim()!=""){
+        params['keyword'] = this.inputSearchValue;
+        params.filter.page = 0
+        // this.curPage = 1
+      }
+
       scheduleRESTful.getScheduleTaskHistory(params).then(res=>{
         var thisData = [];
         if(res.errCode == 0){
@@ -398,6 +408,14 @@ export default{
           self.tableData = [];
           self.tableData = thisData;
           self.total = res.data.totalPages;
+
+          self.totalElements = res.data.totalElements;
+          console.log('self.totalElements :>> ', self.totalElements);
+          // console.log('this.curSizeNum :>> ', this.curSizeNum);
+          // if(self.totalElements < this.curSizeNum){
+          //   this.curPage = 1
+          // }
+
           self.isLoadingData = false;
         }else{
           util.notify(self.$t('schedule.getScheduleSettingFail'), 'error', 3000);

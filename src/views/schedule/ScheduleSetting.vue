@@ -138,6 +138,7 @@ export default{
       total:0,
       curPage:1,
       curSizeNum:10,
+      totalElements : 10,
       defaultSort:{prop: 'updateTsStr', order: 'descending'},
     }
   },
@@ -210,8 +211,21 @@ export default{
             property:this.defaultSort.prop=="updateTsStr"?"updateTime":this.defaultSort.prop,
           }
         }
-        if(self.inputSearchValue.trim()!=""){
+
+        console.log('params.titleList :>> ', params.titleList);
+        
+        if(params.titleList[0] !== "-1" ){
+          if(self.totalElements < this.curSizeNum){
+            params.filter.page = 0
+            this.curPage = 1
+          }
+          
+        }
+
+        if(self.inputSearchValue.trim()!="" ){
           params["keyword"] = self.inputSearchValue;
+          params.filter.page = 0
+          this.curPage = 1
         }
 
         console.log('params -------->> ', params);
@@ -239,8 +253,17 @@ export default{
             self.tableData = userData;
             self.total = res.data.totalPages;
 
-            console.log('self.tableData :>> ', self.tableData);
-            console.log('self.total :>> ', self.total);
+          
+            self.totalElements = res.data.totalElements;
+            // console.log('self.totalElements :>> ', self.totalElements);
+            // console.log('this.curSizeNum :>> ', this.curSizeNum);
+            // console.log('this.curPage :>> ', this.curPage);
+            // if(self.totalElements < this.curSizeNum ){
+            //   this.curPage = 1
+            // } 
+
+            // console.log('self.tableData :>> ', self.tableData);
+            // console.log('self.total :>> ', self.total);
 
             self.isLoadingData = false;
           }else{
