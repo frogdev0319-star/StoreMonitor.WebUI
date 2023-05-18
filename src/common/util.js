@@ -532,6 +532,7 @@ export default {
     if (sum === 0) {
       return 0;
     }
+    console.log("Sum="+sum+" Value="+valueList[idx] )
     let digits = Math.pow(10, precision);
     let votesPerQuota = valueList.map(function(val) {
       return (isNaN(val) ? 0 : val) / sum * digits * 100;
