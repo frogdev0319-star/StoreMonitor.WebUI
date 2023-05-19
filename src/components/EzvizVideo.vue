@@ -1547,6 +1547,10 @@ export default {
       self.imageCanvasList = [];
       self.sourceList = [];
       self.inspectInput = '';
+      if (self.isRemote && self.sourceListLength >= 120) {
+        util.notify(self.$t('remotePatrol.maximumTotalAttach'), 'warning', 3000);
+        return false;
+      }
       if (self.showFeedBack) {
         self.showSnapshotFeedbackDialog = true;
 
@@ -1579,10 +1583,7 @@ export default {
         self.showCancelContent = false;
         console.log("Get Content "+ self.isRemote  + " len="+self.sourceListLength)
 
-        if (self.isRemote && self.sourceListLength >= 120) {
-          util.notify(self.$t('remotePatrol.maximumTotalAttach'), 'warning', 3000);
-          return false;
-        }
+
         if (!self.isRemote && self.sourceListLength >= 10) {
           const msg = self.isStoreMonitor ? self.$t('remotePatrol.storeMaxAttach') : self.$t('remotePatrol.maximumAttach');
           util.notify(msg, 'warning', 3000);

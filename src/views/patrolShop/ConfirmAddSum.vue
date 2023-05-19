@@ -824,10 +824,12 @@ export default {
         util.notify(self.$t('remotePatrol.summaryInfo'), 'warning', 3000);
         return false;
       }
-      if(self.totalnumOfPic>120){
-        util.notify(self.$t('remotePatrol.maximumTotalAttach'), 'warning', 3000);
+      console.log("image file="+self.imgFileList.length + " " + self.pdfFileList.length)
+      if((self.imgFileList.length  + self.pdfFileList.length)>10){
+        util.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
         return false;
       }
+
       self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
       const storageParams = {};
       storageParams.storeId = self.store.storeId;

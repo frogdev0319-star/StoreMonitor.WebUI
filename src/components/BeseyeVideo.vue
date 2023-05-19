@@ -244,6 +244,7 @@ import { getBeseyeAccessToken, getPlaylistInfo, getStreamInfo } from '../api/bes
 import filterString from '../common/filterString';
 import { mapGetters } from 'vuex';
 import DialogPop from '@/components/DialogPop.vue';
+import util from '@/common/util';
 
 export default {
   name: 'BeseyeVue',
@@ -265,6 +266,10 @@ export default {
     },
     isEvent: {
       type: Boolean
+    },
+    isRemote: {
+      type: Boolean,
+      default: false
     },
     isStoreMonitor: {
       type: Boolean
@@ -622,6 +627,10 @@ export default {
         self.exitFullscreen();
         self.fullScreen = false;
       }
+      if (self.isRemote && self.sourceListLength >= 120) {
+        util.notify(self.$t('remotePatrol.maximumTotalAttach'), 'warning', 3000);
+        return false;
+      }
       if (self.showFeedBack) {
         self.showFeedDialog2 = true;
         self.eventName = '';
@@ -639,10 +648,13 @@ export default {
         });
       } else {
         self.showCancelContent = false;
-        if (self.sourceListLength >= 120) {
-          util.notify(self.$t('remotePatrol.maximumTotalAttach'), 'warning', 3000);
+
+        if (!self.isRemote && self.sourceListLength >= 10) {
+          const msg = self.isStoreMonitor ? self.$t('remotePatrol.storeMaxAttach') : self.$t('remotePatrol.maximumAttach');
+          util.notify(msg, 'warning', 3000);
           return false;
         }
+
         self.showCutDialog = true;
         this.$nextTick(() => {
           self.canvasEl = document.getElementById('icanvas');
