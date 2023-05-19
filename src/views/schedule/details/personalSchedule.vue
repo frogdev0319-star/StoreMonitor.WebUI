@@ -230,15 +230,45 @@ export default{
                 this.firstLoad = false;
             }
         },
+        pad2(n){
+            return (n < 10 ? '0' : '') + n;
+            },
+        getdate(t){
+            var date = new Date(t);
+            var month = this.pad2(date.getMonth()+1);
+            var day = this.pad2(date.getDate());
+            var year= date.getFullYear();
+            var hour = this.pad2(date.getHours())
+            var min = this.pad2(date.getMinutes())
+            var sec = this.pad2(date.getSeconds())
+            return year + "-"+ month +"-"+ day +" "+ hour +":"+ min +":"+ sec
+            },
+
+        getdateOnlyDate(t){
+            var date = new Date(t);
+            var month = this.pad2(date.getMonth()+1);
+            var day = this.pad2(date.getDate());
+            var year= date.getFullYear();
+            return year + "-"+ month +"-"+ day 
+            },
+
+
         doSearchScheduleList(){
             const self = this;
             self.isLoadingData = true;
             let beginTs = self.$moment.utc(self.$moment(self.dateValue[0])).valueOf();
             let endTs = self.$moment.utc(self.$moment(self.dateValue[1])).valueOf();
+
+            var ts = this.getdate(beginTs) + " " + "GMT+00:00"
+            var te = this.getdate(endTs) + " " + "GMT+00:00"
+            var gmt_beginTs = new Date(ts).getTime()
+            var gmt_endTs= new Date(te).getTime()
+
+
             const params={
                 userId:self.userId,
-                beginTs,
-                endTs,
+                beginTs: gmt_beginTs,
+                endTs: gmt_endTs,
                 filter:{
                     page:this.curPage-1,
                     size:this.curSizeNum

@@ -298,7 +298,7 @@
                       placeholder="區域一"
                       multiple
                       style="width: 180px"
-                      @change="onselect"
+                      @change="onselectSec1"
                       >
                       <el-option
                         v-for="(item, index) in provinceAry"
@@ -318,6 +318,7 @@
                       placeholder="區域二"
                       multiple
                       style="width: 180px"
+                      @change="onselectSec2"
                       >
                       <el-option
                         v-for="(item, index) in cityAry"
@@ -754,14 +755,15 @@ export default{
 
 
 
-
     // dialoge
     filterInputSearchStore(stores){
         return stores.filter( item => (item.name.indexOf(this.inputSearchStore) > -1) ||  (item.timeZone.indexOf(this.inputSearchStore) > -1))
     },
+
+
     filterCurTemplateProvince(stores){
-        
         console.log('this.curTempProvinceList', this.curTempProvinceList)
+        
         if(this.curTempProvinceList.length == 0 ){
           return stores
         }else{
@@ -771,6 +773,7 @@ export default{
         }
     },
     filterCurTemplateCity(stores){
+      console.log('this.curTempCityList', this.curTempCityList)
       if(this.curTempCityList.length == 0){
         return stores
       }else{
@@ -779,13 +782,23 @@ export default{
       }
     }, 
 
-    
-    onselect(val){
+
+    onselectSec1(val){
       var c = this.showSearchStoreData.map(c => c.city)
       const cccSet = new Set(c)
       this.cityAry = [...cccSet]
+
     },
 
+    onselectSec2(val){
+      console.log('val', val)
+      var p = this.showSearchStoreData.map(p => p.province)
+      const pppSet = new Set(p)
+      this.provinceAry = [...pppSet]
+
+      
+
+    },
 
     async init(){
       await this.getBriefStoreList();
@@ -1096,6 +1109,8 @@ export default{
       // 清除所有勾選
       console.log('this.$refs.storeDataList. :>> ', this.$refs.storeDataList);
       this.$refs.storeDataList.clearSelection()
+
+      this.getBriefStoreList()
     },
 
     // 刪除 tag
@@ -1199,6 +1214,8 @@ export default{
       }
       console.log('this.showScheduleDataList end', this.showScheduleDataList)
       this.$refs.storeDataList.clearSelection()
+      this.curTempProvinceList = []
+      this.curTempCityList = []
       this.hasScheduleData = true
     },
 
