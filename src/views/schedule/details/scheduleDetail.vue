@@ -1072,11 +1072,9 @@ export default{
       })
             this.isLoadingData = false
             util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
+            this.$router.push({name: 'PersonalSchedule'});
         }
       })
-
-      this.$router.push({name: 'PersonalSchedule'});
-
     },
 
     pad2(n){
@@ -1176,7 +1174,6 @@ export default{
               taskList: [],
               
             }))
-
             console.log('newArr', newArr)
             newArr.forEach(d => {
               this.addStoreTemp.forEach( g => {
@@ -1228,28 +1225,52 @@ export default{
       var status = sessionStorage.getItem('scheduleParams');
       this.scheduleStatus = JSON.parse(status)
       let needEditId = ''
+      let needTempId = ''
       if(this.scheduleStatus.action == "editSchedule"){
+        
         needEditId = this.handleSchedule.map(_item => _item.id)
+        needTempId = this.handleSchedule.map(_item => _item.tempId)
+
       } else if(this.scheduleStatus.action == "addSchedule"){
-        needEditId = this.handleSchedule.map(_item => _item.tempId)
+        needTempId = this.handleSchedule.map(_item => _item.tempId)
       }
 
       console.log('needEditId :>> ', needEditId);
+      console.log('needTempId :>> ', needTempId);
+      console.log('this.showScheduleDataList :>> ', this.showScheduleDataList);
 
       this.showScheduleDataList.forEach(_item => {
         _item.taskList.forEach(l => {
-
           if(this.scheduleStatus.action == "editSchedule"){
-            needEditId.forEach(id => {
-              if(l.id == id){
-                l.checked = false
-                l.remindDate = this.editSchedule.remindDate
-                l.remindTimePoint = this.editSchedule.remindTimePoint
-                l.remindStyle = this.editSchedule.remindStyle
-              }
-            })
+            console.log('editSchedule ~~~~~~~ ');
+
+            if(l.tempId){
+              needTempId.forEach(id => {
+                if(l.tempId == id){
+                  l.checked = false
+                  l.remindDate = this.editSchedule.remindDate
+                  l.remindTimePoint = this.editSchedule.remindTimePoint
+                  l.remindStyle = this.editSchedule.remindStyle
+                }
+              })
+
+            } else {
+              needEditId.forEach(id => {
+                if(l.id == id){
+                  l.checked = false
+                  l.remindDate = this.editSchedule.remindDate
+                  l.remindTimePoint = this.editSchedule.remindTimePoint
+                  l.remindStyle = this.editSchedule.remindStyle
+                }
+              })
+            }
+
+            
+
+
+            
           } else if(this.scheduleStatus.action == "addSchedule") {
-            needEditId.forEach(id => {
+            needTempId.forEach(id => {
               if(l.tempId == id){
                 l.checked = false
                 l.remindDate = this.editSchedule.remindDate
@@ -1257,13 +1278,8 @@ export default{
                 l.remindStyle = this.editSchedule.remindStyle
               }
             })
-
           }
           
-
-
-
-
         })
       })
 

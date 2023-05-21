@@ -590,7 +590,11 @@ export default {
     handleSortChange(col) {
       const self = this;
       const order = col.order;
+
+      console.log("col",col);
       console.log("col.order:",col.order);
+
+      
       if (!order) {
         self.getOrderBasedOnDefaultSort();
       } else {

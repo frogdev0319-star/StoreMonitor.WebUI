@@ -35,7 +35,7 @@
             class="search-button"
             type="primary"
             size="mini"
-            @click="doSearchScheduleHis">
+            @click="searchKeyWords">
             <span>{{ $t('remotePatrol.search') }}</span>
           </delay-button>
       </div>
@@ -157,8 +157,8 @@ export default{
         {
           'prop': 'remindTimeStr',
           'label': this.$t('schedule.schExeDate'),
-          // 'sortable': 'custom',
-          'sortable': true,
+          'sortable': 'custom',
+          // 'sortable': true,
           'width': 50,
           'maxWidth': 50,
           'isExpand': false
@@ -178,8 +178,8 @@ export default{
         {
           'prop': 'reportTsStr',
           'label': this.$t('schedule.reportUploadDate'),
-          // 'sortable': 'custom',
-          'sortable': true,
+          'sortable': 'custom',
+          // 'sortable': true,
           'width': 130,
           'maxWidth': 130,
           'isExpand': false
@@ -231,14 +231,14 @@ export default{
       curPage:1,
       curSizeNum: 10,
       totalElements : 0,
-      defaultSort :{prop: 'remindTimeStr', order: 'descending'},
+      defaultSort :{ prop: 'remindTimeStr', order: 'descending'},
       SelScheduleTask:[],
       curSchStatus:-1,
       schStatusList:[
         { 'mode': -1, 'label': this.$t('remotePatrol.all') },
         { 'mode': 0, 'label': this.$t('audit.sendAudit.completed') },
         { 'mode': 1, 'label': this.$t('schedule.inCompleted') },
-        { 'mode': 2, 'label': this.$t('schedule.deleted') }
+        // { 'mode': 2, 'label': this.$t('schedule.deleted') }
       ],
       exportPng: require('../../../static/img/excel.png'),
       exportBtnClass:[
@@ -320,14 +320,17 @@ export default{
       return year + "-"+ month +"-"+ day 
     },
 
-
+    searchKeyWords(){
+      this.curPage = 1;
+      this.doSearchScheduleHis()
+    },
   
     doSearchScheduleHis(){
       this.isLoadingData = true
       const self = this;
       let order = {
-        // direction:this.defaultSort.order=='ascending'? 'asc':'desc',
-        direction: 'desc',
+        direction: this.defaultSort.order=='ascending'? 'asc':'desc',
+        // direction: 'desc',
         // property: self.defaultSort.prop
         property: "remindTs"
         
@@ -348,6 +351,7 @@ export default{
 
       // console.log('gmt_beginTs :>> ', gmt_beginTs);
       // console.log('gmt_endTs :>> ', gmt_endTs);
+      
 
       const params={
         status: -1,
@@ -365,17 +369,19 @@ export default{
 
       if(this.curSchStatus !== -1 ){
         params.status = this.curSchStatus
-        if(self.totalElements < self.curSizeNum){
-          params.filter.page = 0
-          this.curPage = 1
-        }
-        
+        // if(self.totalElements < self.curSizeNum){
+        //   params.filter.page = 0
+        //   this.curPage = 1
+        // } 
       }
 
       if(this.inputSearchValue.trim()!=""){
         params['keyword'] = this.inputSearchValue;
-        params.filter.page = 0
-        // this.curPage = 1
+        // if(self.totalElements < self.curSizeNum){
+        //   params.filter.page = 0
+        //   this.curPage = 1
+        // } 
+
       }
 
       scheduleRESTful.getScheduleTaskHistory(params).then(res=>{
@@ -413,9 +419,10 @@ export default{
           console.log('self.totalElements :>> ', self.totalElements);
           // console.log('this.curSizeNum :>> ', this.curSizeNum);
           // if(self.totalElements < this.curSizeNum){
-          //   this.curPage = 1
+          //   this.curPage = self.total - 1
           // }
-
+          
+          
           self.isLoadingData = false;
         }else{
           util.notify(self.$t('schedule.getScheduleSettingFail'), 'error', 3000);
@@ -439,11 +446,19 @@ export default{
       sessionStorage.setItem('report_data', JSON.stringify(parsObj));
       this.$router.push({ name: 'reportDetails', params: { data: parsObj }});
     },
+
+
     handleSortChange(order, defaultSort) {
-        this.defaultSort = { ...defaultSort };
         
+        this.defaultSort = { ...defaultSort };
+        console.log('this.defaultSort :>> ', this.defaultSort);
         this.doSearchScheduleHis();
+
+
+        
     },
+
+
     currentChange(val) {
         const self = this;
         self.curPage = val.page;
