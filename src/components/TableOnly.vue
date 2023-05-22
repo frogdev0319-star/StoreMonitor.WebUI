@@ -588,12 +588,15 @@ export default {
     },
 
     handleSortChange(col) {
+
+      
+
+      if(col.order == null) col.order = "ascending"
+      console.log("col",col);
+      console.log("col.order:", col.order);
+      
       const self = this;
       const order = col.order;
-
-      console.log("col",col);
-      console.log("col.order:",col.order);
-
       
       if (!order) {
         self.getOrderBasedOnDefaultSort();
