@@ -326,7 +326,7 @@ export default {
     return {
       showTag: false,
       exportPdf: require('../../../static/img/export-pdf.png'),
-      imgSrc: require("../../../static/img/logo.svg"),
+      imgSrc: require("../../../static/img/inspection.svg"),
       miniImgSrc: require("../../../static/img/logo_title-mini.png"),
       arrowRightIcon: require("../../../static/img/arrow-right.png"),
       arrowLeftIcon: require("../../../static/img/arrow-left.png"),
