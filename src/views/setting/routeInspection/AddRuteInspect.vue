@@ -23,12 +23,12 @@
         @click="submitBindTitle">
         {{ $t('remotePatrol.submit') }}
       </el-button>
-    <div v-if="showLengthNameWarning" class="warningtips">{{ $t('insSettingView.enterNameRuletip') }}</div>  
+    <div v-if="showLengthNameWarning" class="warningtips">{{ $t('insSettingView.enterNameRuletip') }}</div>
     </div>
     <hr class="hr-horizontal">
     <div class="flex padding">
       <div class="temp-select-area" :style="{'width':getLangStyleValue(tempSelectAreaWidth)}">
-          <div class="temp-select-label" :style="{'width':getLangStyleValue(tempSelectLabelWidth)}">{{ $t('insSettingView.selecttitle') }}</div> 
+          <div class="temp-select-label" :style="{'width':getLangStyleValue(tempSelectLabelWidth)}">{{ $t('insSettingView.selecttitle') }}</div>
           <multi-select
           class="store-group-select region"
           :selected="ModelPost"
@@ -80,8 +80,8 @@
                 </div>
               </div>
               <draggable class="spacer" style="background-color: #f7f9fa;" v-model="groupList" @update="handleUpdateCategorySequence">
-                <template v-for="(item,index) in groupList">
-                  <div :key="index" :class="item.id === activeParentId?'noraml-color':'noraml-groupColor'"
+                <template >
+                  <div v-for="(item,index) in groupList" :key="index" :class="item.id === activeParentId?'noraml-color':'noraml-groupColor'"
                       class="groupItem" @click="clickCategory(index,item)"
                       @mouseenter="onShowCategoryEditBtn(index,item)">
                     <div class="category-list">
@@ -89,7 +89,7 @@
                         <div class="group-left spacer">
                           <div v-if="activeParentId === item.id && !item.children" class="proper-flag"/>
                           <div :style="activeParentId === item.id?{'color':'#006ab7'}:{}" class="flex" style="flex-direction: column; height: 60px; text-align: left; padding-left: 20px;">
-                            <div v-if="item.weight != -1 && activeSheetName != 2" style="line-height: 30px">{{ `${item.weight} %` }}</div> 
+                            <div v-if="item.weight != -1 && activeSheetName != 2" style="line-height: 30px">{{ `${item.weight} %` }}</div>
                             <div v-if="item.weight != -1 && activeSheetName != 2" class="spacer"></div>
                             <div class="flex">
                               <div style="max-width: 240px; overflow:hidden; white-space: nowrap; text-overflow: ellipsis;" :style="item.weight != -1 && activeSheetName != 2 ? {'line-height': '30px', 'height': '30px'} : {'line-height': '60px', 'height': '60px'}">{{ item.name }}</div>
@@ -100,6 +100,7 @@
                         <div class="group-right">
                           <div class="show-edit">
                             <div class="nape-items-handle" v-if="hoverId === item.id">
+
                               <img style="margin-top:15px" :src="`./static/img/table-edit.png`" height="26px" @click="editCategory(index,item)"/>
                               <img style="margin-top:15px" :src="`./static/img/table-delete.png`" height="26px" @click="deleteGroup(index, item)"/>
                             </div>
@@ -170,6 +171,7 @@
           <div id="el-menuscrollbar" style="height:100%;">
             <div class="nape-items">
               <draggable-table
+                :showTableHeader="true"
                 :is-score-sheet= "activeSheetName === '1'"
                 :table-header="activeSheetName === '1' ? scoreTableHeader:passFailTableHeader"
                 :table-data="napeList"
@@ -180,18 +182,23 @@
         </div>
       </div>
     </div>
+
+
+    <!-- 新增/編輯巡檢項 -->
     <dialog-pop
       v-if="showAddNape"
-      :title="updateType.type===0?$t('insSettingView.addTitleItem'):$t('insSettingView.editTitleItem')"
       :visible.sync="showAddNape"
+      :title="updateType.type===0?$t('insSettingView.addTitleItem'):$t('insSettingView.editTitleItem')"
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
       :is-warning="true"
       @cancelHandler="showAddNape = false"
       @confirmHandler="confirmUpdateNape">
-      <div class="dialog-content padding">
+
+      <div class="dialog-content content_padding" style="padding-bottom: 10px">
         <el-form class="NapeForm" label-position="top" size="mini">
+          <!-- 巡檢項名稱 -->
           <el-form-item style="margin-bottom: 20px">
             <div class="score_item">
               <span class="sign">*</span>
@@ -203,89 +210,194 @@
             <span v-if="enterListNameRuletip" class="rules">{{ $t('insSettingView.enterListNameRuletip') }}</span>
             <span v-if="enterItemNameTip" class="rules">{{ $t('insSettingView.itemTitleEmpty') }}</span>
           </el-form-item>
-          <el-form-item>
+
+          <!-- 必填 -->
+          <el-form-item style="margin-bottom: 20px">
             <div class="score_item">
               <span class="sign">*</span>
               <span class="item_label">{{ $t('insSettingView.isRequired') }}</span>
             </div>
-            <el-radio-group class="attribute-group" v-model="itemRequired">
-              <el-radio label="0">{{ $t('insSettingView.notRequired') }}</el-radio>
+            <el-radio-group class="attribute-group" v-model="itemRequired" @change="toItemRequired">
               <el-radio label="1">{{ $t('insSettingView.isRequired') }}</el-radio>
+              <el-radio label="0">{{ $t('insSettingView.notRequired') }}</el-radio>
             </el-radio-group>
           </el-form-item>
+
+          <!-- 重要巡檢項 -->
+          <el-form-item style="margin-bottom: 20px">
+            <div class="score_item">
+              <span class="sign">*</span>
+              <span class="item_label">重要巡檢項</span>
+            </div>
+            <el-radio-group class="attribute-group" v-model="isImportant" >
+              <el-radio label="1">開啟</el-radio>
+              <el-radio label="0">關閉</el-radio>
+            </el-radio-group>
+          </el-form-item>
+
+
+          <!-- 巡檢項類型 -->
           <el-form-item>
             <div class="score_item">
               <span class="sign">*</span>
               <span class="item_label">{{$t('insSettingView.inspectItemType')}}</span>
             </div>
-            <el-radio-group class="attribute-group" v-model="itemType">
+            <el-radio-group class="attribute-group" v-model="itemType" @change="toItemType">
               <div v-for="(typeItem, typeIndex) in itemsTypeList" :key="typeItem.value" style="display: inline-flex">
                 <el-radio :label="typeItem.value" :key="typeIndex">{{typeItem.label}}</el-radio>
               </div>
             </el-radio-group>
           </el-form-item>
-          <div v-if="itemType === 0" class="score-content">
-            <el-form-item v-if="activeSheetName==='1'" style="margin-bottom: 20px">
+
+          <!-- 項目分值 -->
+          <div class="score-content">
+
+            <!-- 1 -->
+            <el-form-item v-if="activeSheetName==='1'" style="margin-bottom: 5px">
               <div class="score_item">
                 <span class="sign">*</span>
-                <span class="item_label">{{$t('insSettingView.sheetscore3')}}</span>
+                <span class="sub_label">{{$t('insSettingView.sheetscore3')}} </span>
                 <span class="item_des">{{$t('insSettingView.sheetscore3_des')}}</span>
               </div>
-              <el-input v-model="ItemScoreOption"
-                        :placeholder="$t('insSettingView.enterScore')"
-                        @input="napeScoreOptionsChange"></el-input>
+              <el-input
+                v-model="ItemScoreOption"
+                :disabled="(itemType === 1)"
+                :placeholder="$t('insSettingView.enterScore')"
+                @input="napeScoreOptionsChange"
+              />
               <span v-if="ScoreOptionsTips0" class="rules">{{ $t('insSettingView.excelScoreItemEmpty') }}</span>
               <span v-if="ScoreOptionsTips1" class="rules">{{ $t('insSettingView.setScoreItemRange') }}</span>
             </el-form-item>
-            <el-form-item v-if="activeSheetName==='1'" style="margin-bottom: 20px">
+
+            <!-- 2 -->
+            <el-form-item v-if="activeSheetName==='1'" style="margin-bottom: 5px">
               <el-col :span="10">
-                <el-form-item style="margin-bottom: 20px;">
+                <el-form-item >
                   <div class="score_item">
                     <span class="sign">*</span>
-                    <span class="item_label">{{$t('insSettingView.sheetscore0')}}</span>
+                    <span class="sub_label">{{$t('insSettingView.sheetscore0')}} </span>
                   </div>
-                  <el-input v-model.number="ItemTotalScore" disabled
-                            :placeholder="$t('insSettingView.enterScore')"
-                            @input="napeTotalScoreChange"/>
-                  <span v-if="ItemTotalScoreTip0" class="rules">{{ $t('insSettingView.setFullScoreEmpty') }}</span>
+                  <el-input
+                    v-model.number="ItemTotalScore"
+                    disabled
+                    :placeholder="$t('insSettingView.enterScore')"
+                    @input="napeTotalScoreChange"/>
+                  <span v-if="ItemTotalScoreTip0" class="rules">{{ $t('insSettingView.setFullScoreEmpty') }} </span>
                   <span v-if="ItemTotalScoreTip1" class="rules">{{ $t('insSettingView.setFullScoreRange') }}</span>
                 </el-form-item>
               </el-col>
               <el-col :span="12" :offset="2">
-                <el-form-item :label="$t('insSettingView.sheetscore1')" style="margin-bottom: 20px;">
-                  <el-input v-model.number="ItemMinScore"
-                            :placeholder="$t('insSettingView.enterScore')"
-                            @input="napeMinScoreChange"/>
-                  <span v-if="ItemMinScoreTip" class="rules">{{ $t('insSettingView.setMinScoreRange') }}</span>
+                <el-form-item :label="$t('insSettingView.sheetscore1')" >
+                  <el-input
+                    v-model.number="ItemMinScore"
+                    :disabled="(itemType === 1)"
+                    :placeholder="$t('insSettingView.enterScore')"
+                    @input="napeMinScoreChange"
+                    />
+                  <span v-if="ItemMinScoreTip" class="rules">{{ $t('insSettingView.setMinScoreRange') }} </span>
                 </el-form-item>
               </el-col>
             </el-form-item>
+
+            <!-- 3 -->
             <el-form-item v-if="activeSheetName!=='1'">
               <div class="score_item">
                 <span v-if="activeSheetName==='2'" class="sign">*</span>
-                <span class="item_label">{{$t('insSettingView.score')}}</span>
+                <span class="sub_label">{{$t('insSettingView.score')}} </span>
               </div>
-              <el-input v-model.number="ItemSheetScore"
-                        :placeholder="$t('insSettingView.enterScore')"
-                        @input="napeSheetScoreChange"/>
-              <span v-if="PFScoreTip" class="rules">{{ $t('insSettingView.setPassFileRange') }}</span>
-              <span v-if="OtherScoreTip" class="rules">{{ $t('insSettingView.setOtherRange') }}</span>
-              <span v-if="OtherScoreTipEmpty" class="rules">{{ $t('insSettingView.setOtherEmpty') }}</span>
+              <el-input
+                ref="itemsheet_score"
+                :disabled="(itemType === 1)"
+                v-model.number="ItemSheetScore"
+                :placeholder="$t('insSettingView.enterScore')"
+                @input="napeSheetScoreChange"/>
+
+              <span v-if="PFScoreTip" class="memo_rules">{{ $t('insSettingView.setPassFileRange') }} </span>
+              <span v-if="OtherScoreTip" class="memo_rules">{{ $t('insSettingView.setOtherRange') }} </span>
+              <span v-if="OtherScoreTipEmpty" class="memo_rules">{{ $t('insSettingView.setOtherEmpty') }} </span>
             </el-form-item>
           </div>
-          <el-form-item :label="$t('insSettingView.inspectionDescp')">
+
+          <!-- 巡檢項目詳細說明  -->
+          <el-form-item style="margin-bottom: 20px; margin-top: 20px;">
+            <div class="score_item">
+              <span class="item_label">{{$t('insSettingView.inspectionDescp')}}</span>
+            </div>
             <el-input type="textarea" v-model="ItemDescription"
-                      :placeholder="$t('insSettingView.description')"
-                      @input="napeDepChange"></el-input>
+                :placeholder="$t('insSettingView.description')"
+                @input="napeDepChange"></el-input>
             <span v-if="descriptionRuletip" class="rules">{{ $t('insSettingView.descriptionRuletip') }}</span>
+          </el-form-item>
+
+          <!-- 進階設定 -->
+          <el-form-item >
+            <div class="score_item">
+              <span class="item_label">{{ $t('insSettingView.advanceSetting') }} </span>
+            </div>
+
+            <el-radio-group class="attribute-group" v-model="memo_is_advanced" @change="getSettingStatus">
+              <div style="display: inline-flex">
+                <el-radio label= "true" >{{ $t('insSettingView.advanceSettingOn') }}</el-radio>
+                <el-radio label= "false" :disabled='(itemRequired == "1" && itemType == 1)'>{{ $t('insSettingView.advanceSettingOff') }}</el-radio>
+              </div>
+            </el-radio-group>
+
+            <div class="score-content" style="margin-bottom: 10px; " v-if="memo_is_advanced == 'true'">
+              <el-form-item >
+                <div class="score_item">
+                  <!-- <span class="sign">*</span> -->
+                  <span class="sub_label">{{ $t('insSettingView.memoAdvanced') }}</span>
+                  <span class="item_des">{{ $t('insSettingView.memoSeparate') }}</span>
+                </div>
+                <el-input
+                  ref="memo_tag"
+                  v-model="memo_option"
+                  style="margin-bottom: 5px"
+                  placeholder="請輸入備註標籤"
+                  @input="memoOptionsChange"
+                />
+
+                <div class="advance_memo_required_type">
+                  <el-radio-group class="attribute-group" v-model="memo_config.memo_required_type" @change="getADvanceSettingStatus">
+                    <div style="display: inline-flex">
+                      <el-radio label="1" :disabled='(itemRequired == "0" && itemType == 1)' >{{ $t('insSettingView.isRequired') }}</el-radio>
+                      <el-radio label="0" :disabled='(itemRequired == "1" && itemType == 1)'>{{ $t('insSettingView.notRequired') }}</el-radio>
+                      <el-radio label="2" :disabled='(itemRequired == "0" && itemType == 1) || (itemRequired == "1" && itemType == 1)'>{{ $t('insSettingView.notQualifyIsRequired') }}</el-radio>
+                    </div>
+                  </el-radio-group>
+                </div>
+                <div class="advance_memo_check"  style="margin-left: 23px;">
+                  <el-checkbox
+                    ref="xxdd"
+                    :disabled='((itemRequired == "0" && itemType == 1) || memo_config.memo_required_type == "0")'
+                    class="storevue-checkbox-outlined"
+                    v-model="memo_config.memo_check_text"
+                  >
+                    <span class="check_text">{{ $t('insSettingView.memoCheckText') }}</span>
+                  </el-checkbox>
+                  <el-checkbox
+                    :disabled='((itemRequired == "0" && itemType == 1) || memo_config.memo_required_type == "0")'
+                    class="storevue-checkbox-outlined"
+                    v-model="memo_config.memo_check_media"
+                    >
+                    <span class="check_text">{{ $t('insSettingView.memoCheckMedai') }}</span>
+                  </el-checkbox>
+                  <span v-if="memo_configTips" class="memo_rules"> {{ $t('insSettingView.selectAtLeastOne') }}）</span>
+
+                </div>
+              </el-form-item>
+
+            </div>
           </el-form-item>
         </el-form>
       </div>
+
       <div slot="footer" class="dialog-footer">
         <el-button class="file-cancel-btn" size="mini" style="" @click="showAddNape = false">{{ $t('insSettingView.cancel') }}</el-button>
         <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmUpdateNape">{{ $t('insSettingView.confirm') }}</el-button>
       </div>
     </dialog-pop>
+
     <dialog-pop
       :title="$t('insSettingView.confirmDelete')"
       :append-to-body="true"
@@ -301,6 +413,8 @@
         <div class="dialog-content">{{ $t('insSettingView.confirmCurDel') }}</div>
       </div>
     </dialog-pop>
+
+    <!-- 確認刪除 -->
     <dialog-pop
       :title="$t('insSettingView.confirmDelete')"
       :append-to-body="true"
@@ -319,6 +433,8 @@
         </div>
       </div>
     </dialog-pop>
+
+    <!-- 添加巡檢類別 -->
     <dialog-pop
       v-if="showAddGroup"
       :title="isEditCategory ? $t('insSettingView.updateCategory') : $t('insSettingView.addCategory')"
@@ -353,13 +469,13 @@
           </div>
           <el-select v-model="parentId" style="width:100%" size="mini" :disabled="notAllowedChangeParentId">
             <el-option v-for="(catergy, index) in parentCatergoryList"
-                       :key="index"
-                       :label="catergy.label" :value="catergy.value"></el-option>
+              :key="index"
+              :label="catergy.label" :value="catergy.value"></el-option>
           </el-select>
         </div>
         <div v-if="showGroupScoreSetting">
           <div class="dialog-form-item-name">
-            <span>{{ $t('insSettingView.advanceSetting') }}</span>
+            <span>{{$t('insSettingView.advanceSetting') }}</span>
           </div>
           <div style="line-height:28px;">
             <el-radio-group class="attribute-group" v-model="itemAdvanceSetting">
@@ -563,6 +679,7 @@ export default {
       notAllowedChangeParentId: false,
       ifClickSubCategory: false,
       itemRequired: '0',
+      isImportant: '0',
       itemType: 0,
       childIndex: -1,
       oldGroupSequence: [],
@@ -584,6 +701,19 @@ export default {
       itemAdvanceSetting:'0',
       itemGroupScore:0,
       GroupScoreTip:false,
+
+      memo_is_advanced: "false",
+      memo_option: "",
+      memo_options: [],
+      memo_config: {
+          memo_required_type: "0",
+          memo_check_text: true,
+          memo_check_media: false
+      },
+
+      memo_optionsTips0: false,
+      memo_configTips : false
+
     };
   },
   computed: {
@@ -601,6 +731,7 @@ export default {
   mounted() {
     this.initData();
     this.getTitleList();
+
     document.getElementById('addInspection').addEventListener('mousedown', this.notShowDragInfo, false);
   },
 
@@ -608,7 +739,79 @@ export default {
     sessionStorage.removeItem('itemSettingData');
   },
 
+  watch: {
+    memo_config:{
+      immediate: true,
+      deep: true,
+      handler (val) {
+        console.log("currentPage:",val);
+
+        if(val.memo_required_type == "1" || val.memo_required_type == "2"){
+          if(val.memo_check_text !== false || val.memo_check_media !== false)  {
+            this.memo_configTips = false
+          }
+        } else if(val.memo_required_type == "0"){
+          this.memo_configTips = false
+        }
+      }
+    }
+  },
+
   methods: {
+    getSettingStatus(){
+      console.log('this.itemRequired :>> ', this.itemRequired);
+      console.log('this.itemType :>> ', this.itemType);
+
+      // rule 1
+      if(this.itemRequired == "0" && this.itemType == 1 && this.memo_is_advanced == "true"){
+        this.memo_config.memo_required_type = "0"
+        this.memo_config.memo_check_text = false
+        this.memo_config.memo_check_media = false
+      }
+      // rule 2
+      else if(this.itemType == 0 && this.memo_is_advanced == "true"){
+        this.memo_config.memo_required_type = "0"
+        this.memo_config.memo_check_text = false
+        this.memo_config.memo_check_media = false
+      }
+      // rule 3
+      else if(this.itemRequired == "1" && this.itemType == 1 && this.memo_is_advanced == "true"){
+        this.memo_config.memo_required_type = "1"
+        this.memo_config.memo_check_text = true
+        this.memo_config.memo_check_media = false
+      }
+      // 關閉不傳入 api
+      if(this.memo_is_advanced == 'false'){
+        this.memo_options.length = 0
+        this.memo_config.memo_required_type = "0"
+        this.memo_config.memo_check_text = false
+        this.memo_config.memo_check_media = false
+      }
+    },
+
+    getADvanceSettingStatus(){
+      if(this.memo_config.memo_required_type == "0") {
+        this.memo_config.memo_check_text = false
+        this.memo_config.memo_check_media = false
+      }
+      else if(this.memo_config.memo_required_type == "1" || this.memo_config.memo_required_type == "2") {
+        this.memo_config.memo_check_text = true
+        this.memo_config.memo_check_media = false
+      }
+    },
+
+    toItemRequired(){
+      console.log('toItemRequired  :>> ');
+      this.getSettingStatus()
+    },
+
+
+
+    toItemType(){
+      console.log('toItemType  :>> ');
+      this.getSettingStatus()
+    },
+
     getLangStyleValue(langArray){
       return util.getLangStyleValue(langArray);
     },
@@ -1038,6 +1241,7 @@ export default {
       this.showAddGroup = true;
       this.activeId = item.id;
       this.getParentCatergoryList();
+
     },
 
     deleteItemData(idArr) {
@@ -1179,9 +1383,15 @@ export default {
       const self = this;
       self.showAddNape = true;
       this.itemRequired = '0';
+      this.isImportant = '0'
       self.updateType = {type:0};
       self.setDialogContent();
       self.ItemSheetScore = self.activeSheetName === '0' ? '' : 0;
+
+      self.memo_option = ''
+      self.memo_options = []
+      self.memo_is_advanced = "false"
+
     },
 
     deleteNape(item) {
@@ -1252,6 +1462,7 @@ export default {
       self.ScoreOptionsTips0 = false;
       self.ScoreOptionsTips1 = false;
       self.GroupScoreTip = false;
+      self.memo_configTips = false;
       this.itemType = 0;
     },
 
@@ -1277,6 +1488,19 @@ export default {
     },
 
     confirmUpdateNape() {
+      console.log('memo_is_advanced :>> ', this.memo_is_advanced);
+      console.log('memo_options :>> ', this.memo_options);
+      console.log('memo_config :>> ', this.memo_config);
+
+      console.log('this.memo_options.length :>> ', this.memo_options.length);
+
+      // if(this.memo_options.length === 0 && this.memo_is_advanced == "true"){
+      //   console.log('XDXDXD :>> ');
+      //   this.$refs.memo_tag.focus()
+      //   this.memo_optionsTips0 = true
+      //   return
+      // }
+
       const self = this;
       if (self.ItemName.trim().length === 0) {
         self.enterItemNameTip = true;
@@ -1291,6 +1515,7 @@ export default {
       if (self.activeSheetName == '0') {
         if (self.ItemSheetScore === '') {
           if(self.itemType === 0 ) {
+            this.$refs.itemsheet_score.focus()
             self.OtherScoreTipEmpty = true;
           }
           qualifiedScore = null;
@@ -1343,6 +1568,7 @@ export default {
         }
       } else if (self.activeSheetName == '2') {
         if (self.ItemSheetScore === '') {
+          this.$refs.itemsheet_score.focus()
           self.OtherScoreTipEmpty = true;
         }else if(parseFloat(self.ItemSheetScore) > 100 || parseFloat(self.ItemSheetScore) < -100){
           self.OtherScoreTip = true;
@@ -1351,11 +1577,28 @@ export default {
           qualifiedScore = null;
         }
       }
+
+      if(this.memo_config.memo_required_type == "1" || this.memo_config.memo_required_type == "2"){
+        if(this.memo_config.memo_check_text == false && this.memo_config.memo_check_media == false)  {
+          this.memo_configTips = true
+        } else {
+          this.memo_configTips = false
+        }
+      } else if(this.memo_config.memo_required_type == "0"){
+        this.memo_configTips = false
+      }
+
+
       if(self.enterItemNameTip || self.PFScoreTip || self.ItemTotalScoreTip0 || self.ItemTotalScoreTip1 ||
           self.ItemMinScoreTip || self.OtherScoreTip || self.enterListNameRuletip || self.OtherScoreTipEmpty ||
-          self.descriptionRuletip || self.ScoreOptionsTips0 || self.ScoreOptionsTips1){
+          self.descriptionRuletip || self.ScoreOptionsTips0 || self.ScoreOptionsTips1 || self.memo_configTips){
         return false;
       }
+
+      const memoRequiredType = parseInt(this.memo_config.memo_required_type)
+      this.memo_config.memo_required_type = memoRequiredType
+
+      // call API
       if(self.updateType.type===0){
         self.addItem(itemScore,qualifiedScore,selectAvailable);
 
@@ -1374,7 +1617,12 @@ export default {
         qualifiedScore: qualifiedScore,
         availableScores: selectAvailable,
         type: this.itemType,
-        required: this.itemRequired === '1'
+        required: this.itemRequired === '1',
+        isImportant: this.isImportant === '1',
+
+        memo_is_advanced: this.memo_is_advanced,
+        memo_options: [...this.memo_options],
+        memo_config: {...this.memo_config}
       };
         temp.push(objItem);
         const obj = {
@@ -1386,6 +1634,8 @@ export default {
         const params = {
           'request': tempParam
         };
+
+        console.log('params ~~~~~>> ', params);
         inpectRESTful.addInspectItem(params).then((res) => {
           const codeMsg = res.errMsg;
           if (codeMsg != undefined && codeMsg == 'Success') {
@@ -1413,12 +1663,6 @@ export default {
                 const res = resApply;
               });
             }
-            /*setTimeout(function() {
-              if (self.routeName == '远程巡检') {
-                console.log("in tabName = ",self.tabName);
-                PubSub.publish('change-color', { showTag: true });
-              }
-            }, 1000);*/
           } else {
             util.notify(self.$t('insSettingView.addFail'), 'warning', 3000);
             return false;
@@ -1429,6 +1673,7 @@ export default {
     },
 
     editItem(itemScore,qualifiedScore,selectAvailable){
+
       const self = this;
       const temp = [];
       const obj = {
@@ -1439,12 +1684,19 @@ export default {
           qualifiedScore: qualifiedScore,
           availableScores: selectAvailable,
           type: this.itemType,
-          required: this.itemRequired === '1'
+          required: this.itemRequired === '1',
+          isImportant: this.isImportant === '1',
+
+          memo_is_advanced: this.memo_is_advanced,
+          memo_options: [...this.memo_options],
+          memo_config: {...this.memo_config}
         };
         temp.push(obj);
         const params = {
           'items': temp
         };
+
+        console.log('params ~~~~~>> ', params);
         inpectRESTful.updateInspectItem(params).then(res => {
           const codeMsg = res.errMsg;
           if (codeMsg != undefined && codeMsg == 'Success') {
@@ -1461,6 +1713,8 @@ export default {
     },
 
     handleEdit(index, item) {
+
+      console.log('item ++++++++++:>> ', item);
       this.showAddNape = true;
       this.updateType = {type:1,id:item.id};
       this.setDialogContent();
@@ -1471,7 +1725,26 @@ export default {
       this.ItemScoreOption = item.availableScoreStr;
       this.ItemDescription = item.napeDep;
       this.itemType = item.type;
-      this.itemRequired = item.required ? '1' : '0'
+      this.itemRequired = item.required ? '1' : '0';
+      this.isImportant = item.isImportant ? '1' : '0';
+
+      this.memo_is_advanced = item.memo_is_advanced.toString()
+      this.memo_option = item.memo_options.join("/")
+      this.memo_options = item.memo_options
+
+
+      console.log('this.memo_config :>> ', this.memo_config);
+
+      if(item.memo_config == null){
+        this.memo_config.memo_required_type = "0"
+        this.memo_config.memo_check_text = true
+        this.memo_config.memo_check_media = false
+      } else {
+        this.memo_config = item.memo_config
+        this.memo_config.memo_required_type = this.memo_config.memo_required_type.toString()
+      }
+      // this.getSettingStatus()
+      // this.getADvanceSettingStatus()
     },
 
     handleDelete(item) {
@@ -1643,10 +1916,14 @@ export default {
         self.napeList = [];
         self.setItemTitle('');
       }
+
+
+
     },
 
     getItemsList(index, item) {
       const self = this;
+
       const temp = [];
       item.items.forEach((_item, index) => {
         let availableScoreStr = '';
@@ -1680,8 +1957,16 @@ export default {
           checked: false,
           type: _item.type,
           sequence: _item.sequence,
-          required: _item.required
+          required: _item.required,
+          isImportant: _item.isImportant,
+
+          memo_is_advanced: _item.memo_is_advanced,
+          memo_options: _item.memo_options,
+          memo_config: _item.memo_config,
+
         };
+
+        console.log('obj :+++++++++++>> ', obj);
         temp.push(obj);
       });
       self.napeList = temp;
@@ -1739,6 +2024,7 @@ export default {
           self.OtherScoreTip=false;
         }
       }
+      if(val !=='') this.OtherScoreTipEmpty = false
     },
 
     napeScoreOptionsChange(val){
@@ -1762,6 +2048,7 @@ export default {
         })
       }
     },
+
 
     napeNameChange(val) {
       const self = this;
@@ -1792,6 +2079,33 @@ export default {
         self.descriptionRuletip = false;
       }
     },
+
+
+    memoOptionsChange(val){
+      const self = this;
+      if(val !== "") self.memo_optionsTips0 = false
+      self.memo_options = self.memo_option.split('/');
+      // 刪除重複 & 空字串
+      self.memo_options = [...new Set(self.memo_options)].filter(i => i !== "")
+      console.log(self.memo_options);
+
+
+      // self.ScoreOptionsTips0 = false;
+      // if(val===''){
+      //   self.ScoreOptionsTips1 = false;
+      // }else{
+      //   self.ItemScoreOptions.forEach(item=>{
+      //     if(!isNaN(parseFloat(item)) && parseFloat(item) >= -50 && parseFloat(item) <= 50){
+      //       self.ItemTotalScore = self.ItemScoreOptions[self.ItemScoreOptions.length - 1];
+      //       self.ItemMinScore = self.ItemTotalScore;
+      //       self.ScoreOptionsTips1 = false;
+      //     }else{
+      //       self.ScoreOptionsTips1 = true;
+      //     }
+      //   })
+      // }
+    },
+
 
     notShowInputRuleTips(e) {
       if (e === 'enterName') {
@@ -1883,6 +2197,37 @@ export default {
   }
 };
 </script>
+
+<style lang="sass" scoped>
+  .checkbox_outlined
+    color: #333
+  .score_item
+    color: #f31d65
+    font-weight: 900
+    .item_label
+      font-size: 14px
+      color:#424151
+      margin-right: 10px
+      color: #222
+      font-weight: 900
+      line-height: 20px
+    .sub_label
+      color: #606266
+      font-weight: 400
+    .item_des
+      color: #f31d65 !important
+      font-weight: 400 !important
+
+  .content_padding
+    padding: 0 calc(20/1920*100vw)
+  .check_text
+    font-size: calc(14/1920*100vw)
+    color: #606266
+
+
+
+</style>
+
 <style lang="scss" scoped>
 @import '../../../assets/css/importfile.css';
 @import '../../../assets/css/textstyle.css';
@@ -1925,10 +2270,12 @@ export default {
       .score_item{
         display: inline;
         margin:0;
+        color: #290 !important;
         .item_label{
           font-size: 14px;
           color:#424151;
           margin-right:10px;
+
         }
         .item_des{
           font-size: 12px;
@@ -1947,7 +2294,9 @@ export default {
           top: 100%;
           left: 0;
       }
+
     }
+
     .el-addrute{
         width: 100%;
         height: 100%;
@@ -1955,7 +2304,7 @@ export default {
         color: $black;
         font-size: calc(18/1920*100vw);
         position: relative;
-        
+
         .tabName-input{
             width: 210px;
         }
@@ -2039,7 +2388,7 @@ export default {
                 color: #ddd;
                 cursor: pointer;
             }
-            
+
         }
         .warningtips{
             font-size:12px;
@@ -2120,7 +2469,7 @@ export default {
             }
         }
         .temp-select-area{
-                  display:flex; 
+                  display:flex;
                   flex-direction:row;
                   height:30px;
                   width:300px;
@@ -2531,13 +2880,25 @@ export default {
 
   .score-content{
     background-color: #edf0f2;
-    padding: 20px calc(20/1920*100vw);
+    padding: 10px calc(15/1920*100vw);
+    padding-top: 5px;
     /*border: 1px solid #acaeb1;*/
     height: auto;
     position: relative;
-    margin-bottom: 20px;
+    // margin-bottom: 20px;
     border-radius: 5px;
   }
+  .memo_rules{
+    display: block;
+    color: #ff2400;
+    font-size: 12px;
+    margin-top: 0px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
   .el-radio{
     margin-right: calc(20/1920*100vw);
   }
@@ -2587,8 +2948,7 @@ export default {
 .el-dialog__body{
     padding: 0px !important;
 }
-.addNape .el-dialog__body .dialog-content .NapeForm{
-}
+
 #el-menuscrollbar .el-scrollbar__wrap {
   overflow-x: hidden;
 }

@@ -278,7 +278,8 @@ export default{
       "daysww":"XX",
       "weeks":"minggu",
       "pageSize":"Tampilkan per halaman",
-      "pageSizeUnit":"entri"
+      "pageSizeUnit":"entri",
+      "rate":" Tingkat"
   },
   "remotePatrol":{
       "InspectionDetail":"Laporan Ekspor",
@@ -365,6 +366,10 @@ export default{
       "fluency":"SD",
       "fullScreenMode":"Mode Layar Penuh",
       "generateTime":"Waktu Dibuat:",
+      "signInTime":"Waktu check in",
+      "patrolTime":"Waktu digunakan untuk inspeksi",
+      "signInDistance":"Jarak check in",
+      "aroundDistance":"Kira-kira ",
       "getAccessTokenError":"Gagal mendapatkan Token Akses",
       "getBeseyeStreamError":"Gagal mendapatkan info stream beseye!",
       "getscore":"Nilai inspeksi",
@@ -521,7 +526,27 @@ export default{
       "resubmiteRpt":"Konfirmasi kirim laporan",
       "systemReject":"Penarikan sistem",
       "systemRejectMsg":"Tidak ada staf penutup; konfirmasi ulang",
-      "cannotSwitchMimicMode":"Sedang mengedit laporan, tidak bisa beralih mode"
+      "cannotSwitchMimicMode":"Sedang mengedit laporan, tidak bisa beralih mode",
+      "tipLimitGroupScore":"Hitung total skor menggunakan batas atas jika skor melebihi batas atas kategori",
+      "signatureInfo":"Informasi check in",
+      "mapDistance1":" Dan ",
+      "mapDistance2":" Jarak kira-kira ",
+      "mapDistance3":" Meter ",
+      "hour":"Jam",
+      "seconds":"Detik",
+      "minute":"Menit",
+      "reportSubmitting":"Report submitting...",
+      "storeCode":"Kode toko",
+      "inspectSummary":"Rangkuman inspeksi",
+      "pleaseAdd":"* Mohon diisi",
+      "notQualifyAdd":"* Perlu ditambahkan jika tidak berkualifikasi",
+      "lowerThan":"* Di bawah ",
+      "lowScoreAdd":"skor, perlu ditambahkan ",
+      "textItem":"“Teks”",
+      "mediaItem":"「“Gambar atau video”",
+      "attachments":"Jenis lampiran",
+      "notFinishWithText":"Ada kolom wajib yang belum diisi; gunakan lampiran jenis “Teks” sebagai label keterangan",
+      "notFinishWithMedia":"Ada kolom wajib yang belum diisi; gunakan lampiran jenis “Gambar atau video” sebagai label keterangan"
   },
   "eventView":{
       "ClosedEvent":"Kejadian Ditutup",
@@ -530,6 +555,7 @@ export default{
       "ReturnEvent":"Kejadian Ditolak",
       "Returned":"Dikembalikan",
       "addDetails":"Tambah Rincian Penanganan",
+      "addAttchement":"Tambahkan lampiran",
       "adding":"Tambah",
       "all":"Semua",
       "allEvents":"Semua Kejadian",
@@ -571,7 +597,8 @@ export default{
       "expiredate":"Waktu menutup",
       "closeSelectedEvent":"Konfirmasi tutup kejadian yang dipilih?",
       "confirmBachClose":"Konfirmasi tutup banyak kejadian sekaligus",
-      "expiretag":"Kedaluwarsa"
+      "expiretag":"Kedaluwarsa",
+      "maximumAttVedio":"Hanya 2 lampiran video yang bisa diunggah"
   },
   "insSettingView":{
       "Addscoreitems":"Item nilai tambahan",
@@ -662,6 +689,7 @@ export default{
       "excelPassFailScoreType":"Nilai: Opsional, 0,5~50poin",
       "excelScoreItemEmpty":"Opsi nilai tidak boleh kosong!",
       "excelScoreItemType":"Opsi Nilai: Wajib diisi, -50~50",
+      "excelScoreInvalidType":"Error input kolom nilai (misalnya: Kurang '/’ atau nilai ilegal dimasukkan)",
       "export":"Ekspor",
       "exportFailTitle":"Gagal mengekspor",
       "group":"grup",
@@ -693,7 +721,6 @@ export default{
       "mustSignature":"Tanda tangan wajib diisi",
       "uncertainSignature":"Tanda tangan opsional",
       "inputData":"Tulis nama penanggung jawab",
-      "signatureOne":"Sign 1",
       "bindWorkflow":"Pilih proses pengikatan",
       "select":"Mohon pilih",
       "no":"Tidak",
@@ -785,11 +812,32 @@ export default{
       "minScoreEmpty":"Nilai total tidak boleh kosong!",
       "weight":"bobot%",
       "weightSetting":"Pengaturan Bobot",
-      "weightTotalError":"Weight cannot be greater or less than 100%",
+      "weightTotalError":"Berat tidak boleh di atas atau di bawah 100%",
       "bindWorkFLow":"WorkFLow Mengikat",
       "isRequired":"Wajib diisi",
-      "notRequired":"Not Required",
-      "selectStoreTag":"Pilih cepat"
+      "notRequired":"Tidak Wajib",
+      "selectStoreTag":"Pilih cepat",
+      "groupScore":"Skor kategori",
+      "advanceSetting":"Pengaturan Lanjutan",
+      "advanceSettingOn":"AKTIF",
+      "advanceSettingOff":"MATI",
+      "setGroupScoreRange0":"Batas atas rentang input skor kategori 0 ~ 9999",
+      "setGroupScoreRange":"Batas atas rentang input skor kategori -9999 ~ 9999",
+      "groupScoreLimit":"Batas atas skor kategori",
+      "commentStatus":"Tampilan opsi rangkuman inspeksi (pengaturan ini hanya memengaruhi tampilan yang terkait rangkuman inspeksi merek)",
+      "autoSelectComment":"Aktifkan seleksi rangkuman inspeksi otomatis berdasarkan kondisi",
+      "selectByScore":"Seleksi otomatis berdasarkan kondisi skor",
+      "noUserDefinedName":"Belum ada nama kustom",
+      "needHeighterThan":"Nilai maksimum rentang evaluasi harus lebih tinggi daripada nilai minimum!",
+      "cantEmptyScoreLow":"Rentang minimum total skor evaluasi tidak boleh kosong! ",
+      "cantEmptyScoreHeight":"Rentang maksimum total skor evaluasi tidak boleh kosong! ",
+      "memoAdvanced":"Label keterangan",
+      "memoSeparate":"(Gunakan \"/\" untuk memisahkan beberapa item)",
+      "inputMemoAdvanced":"Tulis label keterangan ",
+      "memoCheckText":"Teks",
+      "memoCheckMedai":"Gambar atau video",
+      "notQualifyIsRequired":"Hanya wajib jika tidak berkualifikasi",
+      "selectAtLeastOne":"Pilih minimal satu kategori keterangan (teks, gambar atau video)"
   },
   "deviceView":{
       "EzvizAccount":"Akun Layanan Streaming",
@@ -1303,8 +1351,8 @@ export default{
         "addAttachment":"Tambahkan lampiran",
         "pleaseSign":"Tanda tangan",
         "needSign":"Penutup ini memerlukan lampiran file tanda tangan",
-        "selectComment":"Please choose to sign-off on comments!",
-        "rejectReason":"Please fill in the reason for rejection!",
+        "selectComment":"Pilih untuk mengakhiri komentar!",
+        "rejectReason":"Tulis alasan penolakan!"
     },
     "sendAudit":{
         "all":"Semua",
@@ -1336,8 +1384,8 @@ export default{
         "comfirmDelete":"Konfirmasi penghapusan proses penutup saat ini?",
         "comfirmDeleteNode":"Konfirmasi penghapusan node proses penutup saat ini?",
         "canNotDelete":"” Proses penutup ini tidak dapat dihapus",
-        "isBind":"Terikat dengan tabel pemeriksaan “",
-        "cantClose":"” Tidak dapat dimatikan",
+        "canNotClose":"Proses ini tidak dapat ditutup.",
+        "makeSureUsign":"Mohon konfirmasi apakah tabel inspeksi berikut sedang digunakan:",
         "dulplicateScuccess":"Berhasil menyalin proses",
         "deleteScuccess":"Berhasil menghapus",
         "deleteFail":"Gagal menghapus",
@@ -1417,10 +1465,9 @@ export default{
         "tooltipListcan4":"Laporan pemeriksaan hanya dapat dilihat setelah penutup lolos",
         "auditFlow":"Proses penutup",
         "nodeOrder":"Nomor seri node",
-
-        "cantEmptyDays" : "The number of days to stay cannot be empty. ",
-        "cantTooMuchDays" : "The length of stay cannot exceed 365 days. "
-
+        "cantEmptyDays" : "Jumlah hari menginap tidak boleh kosong.",
+        "cantTooMuchDays" : "Lama menginap tidak boleh melebihi 365 hari.",
+        "cantEmptyInspectStatus" : "Nama kustom opsi rangkuman inspeksi tidak boleh kosong"
     },
     "inceptionRpt":{
         "sendAudit":"Kumpulkan penutup",
@@ -1442,7 +1489,9 @@ export default{
         "editAuditFail":"Gagal mengirim ulang penutup",
         "auditReport":"Catatan penutup",
         "saveReport":"Simpan",
-        "submitReport":"Simpan dan kirim"
+        "submitReport":"Simpan dan kirim",
+        "warnWorkflowUnbind":"Proses pengikatan formulir inspeksi ini dibatalkan, lengkapi pengaturan proses pengikatan formulir inspeksi sebelum melanjutkan operasi ini",
+        "errorEditReport":"Error Edit Laporan"
     }
   },
   "mysterio":{
@@ -1466,11 +1515,12 @@ export default{
       "pleaseChooseTag":"Pilih Inspeksi",
       "comfirmDelMysterio":"Konfirmasi penghapusan anggota pembeli misterius ini",
       "saveMysterioSettingFail":"Gagal menyimpan kelompok izin",
-      "nickName":"Nick Name",
-      "nickNameTip":"The nick name of sub-category supports up to 50 characters",
-      "pleaseInputNickName":"Please enter the nick name of the mystery",
-      "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name.",
-      "mystery":"Mystery Shopper"
+      "nickName":"Nickname",
+      "nickNameTip":"Nickname subkategori bisa diisi maks 50 karakter",
+      "pleaseInputNickName":"Tulis nickname misteri.",
+      "duplicateNickName":"Nickname misteri sudah ada, tulis lagi yang lain.",
+      "mysterio":"Pembeli Misterius",
+      "allMysterio":"Semua Pembeli Misterius"
   }
 
 }

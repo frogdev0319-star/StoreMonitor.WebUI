@@ -8,12 +8,12 @@
 				<!-- audit-header -->
 				<div class="audit-header">
 					<h3>{{auditDetail.reportName}}</h3>
-					<div class="goto-report" 
-            @click="goToReportdetails" 
+					<div class="goto-report"
+            @click="goToReportdetails"
             v-if="showingBtn "
             > {{$t('route.reportDetails')}}</div>
 				</div>
-      
+
 				<!-- audit body -->
 				<div class="audit-flow-body">
 					<div class="audit-flow-ownerhandling" style="margin-bottom: 20px">
@@ -26,14 +26,14 @@
 					</div>
 
           <!-- task -->
-          <AuditUnit 
+          <AuditUnit
             :taskInfo = "taskInfo"
             :auditStates = auditStates
             :isMysteryMode = isMysteryMode
             />
 
 				</div>
-			</div> 
+			</div>
 		</div>
 
 		<!-- edit and comment -->
@@ -75,7 +75,7 @@
           <!-- 加入檔案 & 簽名 -->
           <div class="audit-add-files">
             <p style="margin-bottom: 10px"><span style="color: #c60957" v-if="isSignature">* </span> {{$t('audit.auditStatus.addSign')}}</p>
-      
+
             <div class="attach-area" >
               <div v-for="(imgItem,index) in signatureFileList" :key="'img'+index" class="source-details" >
                 <div class="img-content">
@@ -120,7 +120,7 @@
 
 
 				</div>
-			</div> 
+			</div>
 		</div>
 
     <!-- popup -->
@@ -134,7 +134,7 @@
       @confirmHandler="signSave"
     >
       <div style="padding: 0 20px; height: 300px">
-        <VueSignaturePad 
+        <VueSignaturePad
           id="signature"
           ref="signaturePad" />
       </div>
@@ -183,7 +183,7 @@
         <div class="dialog-content">{{ $t('remotePatrol.systemRejectMsg') }} </div>
       </div>
     </dialog-pop>
-    
+
   </div>
 	</div>
 
@@ -230,7 +230,7 @@ export default {
       imgFileList:[],
       signatureFileList:[],
       showingBtn: true,
-      
+
       auditFileCount:0,
       oss: null,
       totalnumOfPic: 0,
@@ -300,13 +300,13 @@ export default {
       console.log('this.signatureFileList :>> ', this.signatureFileList);
     },
 
-    
+
   },
   methods: {
     async init(){
       await this.getWorkflowInfo()
       await this.getTaskInfo(this.auditDetail.inspectReportId)
-      await this.getNodeList(this.auditDetail.processDefinitionKey) 
+      await this.getNodeList(this.auditDetail.processDefinitionKey)
 
       await this.getOssInfo();
     },
@@ -341,7 +341,7 @@ export default {
           }
         })
 
-        
+
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;
@@ -374,7 +374,7 @@ export default {
           })
         })
         console.log(' this.customButton ------>> ',  this.customButton);
-      
+
       }).catch(err => {
         console.log('error' + err);
       });
@@ -390,7 +390,7 @@ export default {
         return this.flatNodeData;
       }
     },
-    
+
     agreeNode(){
       this.agree = true
       this.commentsToApi.result = 0
@@ -434,11 +434,11 @@ export default {
         var reportId = this.auditDetail.inspectReportId
         this.$router.push({name: "SendAuditManage"})
         // this.$router.push(
-        //   { 
-        //     name: 'auditReportdetails', 
+        //   {
+        //     name: 'auditReportdetails',
         //     params: {
-        //       reportId: reportId, 
-        //       isAuditMode: true, 
+        //       reportId: reportId,
+        //       isAuditMode: true,
         //       canEdit: true,
         //       canCancel: this.auditDetail.cancelable && (this.auditDetail.auditState==2 ||this.auditDetail.auditState==3 || this.auditDetail.auditState==6)
         //       }
@@ -481,11 +481,11 @@ export default {
       var reportId = this.auditDetail.inspectReportId
       var canCancel = (this.auditDetail.submitter == this.currentUserInfo) && this.auditDetail.cancelable && (this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7);
         this.$router.push(
-          { 
-            name: 'handlingReportdetails', 
+          {
+            name: 'handlingReportdetails',
             params: {
-              reportId: reportId, 
-              isAuditMode: true, 
+              reportId: reportId,
+              isAuditMode: true,
               canEdit: (this.auditDetail.auditState==3 || this.auditDetail.auditState==6),
               canCancel: canCancel,//this.auditDetail.cancelable && (this.auditDetail.auditState==2 ||this.auditDetail.auditState==3 || this.auditDetail.auditState==6),
               auditCancelable:this.auditDetail.cancelable
@@ -509,7 +509,7 @@ export default {
         };
         // self.createFile(files[0],objSignature);
         self.signatureFileList.push(objSignature);
-        
+
       }
       console.log('self.signatureFileList :>> ', self.signatureFileList);
       self.showSignaturePad = false
@@ -523,7 +523,7 @@ export default {
       this.showSignaturePad = false
       this.signatureFileList = []
     },
-    
+
 
     async taskSummit(){
       this.isLoadingData = true
@@ -668,10 +668,12 @@ export default {
       console.log("choose file:",files);
       if (!files.length)
         return;
+      /*
       if(self.auditFileCount==11){
         util.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
         return;
       }
+      */
       if(files[0].type.includes("pdf") && files[0].size > maxSize){
         util.notify(self.$t('audit.inceptionRpt.maxFileSizeAlert'), 'warning', 3000);
         return;
@@ -720,7 +722,7 @@ export default {
       const self = this;
       self.signatureFileList = []
       this.$refs.signaturePad.clearSignature()
-    
+
     },
 
 
@@ -747,7 +749,7 @@ export default {
       }
       return arr.filter(source => source.mediaType === 2).map(source => source.src);
     },
-    
+
     getFileUrl(fileName) {
       const self = this;
       const bucketName = self.oss.ossBucketName;
@@ -814,14 +816,14 @@ export default {
 <style lang="sass" scoped>
   .not__yet
     color: #c0c0c0 !important
-  .iconbangzhu 
+  .iconbangzhu
     color: #556679
     font-size: 23px
   .l--l
     height: 1px
     background: #ddd
     margin: 30px 0
-  h3 
+  h3
     margin: 0
     font-size: calc(18/1920*100vw)
   p
@@ -835,11 +837,11 @@ export default {
   .for-flex
     display: flex
     flex-direction: row
-    justify-content: flex-start 
-    align-items: flex-start 
+    justify-content: flex-start
+    align-items: flex-start
   .justify-content_space-between
     justify-content: space-between
-  
+
   .report-setting
     height: 100%
     position: relative
@@ -908,10 +910,10 @@ export default {
           margin-bottom: 30px
           border: 1px solid #fff
           border-radius: 6px
-         
+
       .audit-add-files
         margin-left: 10px
-        p 
+        p
           font-weight: 900
         .upload-data
           height: 100px
@@ -922,7 +924,7 @@ export default {
           justify-content: center
           align-items: center
           cursor: pointer
-          
+
           font-size: 13px
           color: #006ab7
           display: flex
@@ -931,7 +933,7 @@ export default {
           align-items: center
           box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.2)
           cursor: pointer
-          i 
+          i
             color: #006ab7
             font-size: 15px
             margin-right: 3px
@@ -989,12 +991,12 @@ export default {
         cursor: pointer
         background-color: rgba(0,0,0, 0.8)
         border-radius: 50%
-      
+
       .img-content
         width: 100%
         height: 100%
         position: relative
-      
+
       .pdf-content
         width: 140px
         height: 30px
@@ -1035,5 +1037,3 @@ export default {
 
 
 </style>
-
-

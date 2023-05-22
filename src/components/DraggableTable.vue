@@ -9,7 +9,6 @@
         {{ headerItem.name }}
       </div>
     </div>
-    <slot/>
     <div class="dragable-table-list">
       <draggable v-model="sortableTableData" @update="handleUpdate">
         <div v-for="(contentItem, contentIndex) in sortableTableData" :key="contentItem.sequence" class="table-content-item">
@@ -22,7 +21,7 @@
             </div>
             <div class="table-name" style="position: relative">
               <span v-if="contentItem.required" style="color: #c60957; position: absolute">*</span>
-              <span style="margin-left: 10px">{{ contentItem.name }}</span></div>
+              <span  v-bind:class="{titleImportant: contentItem.isImportant}" style="margin-left: 10px">{{ contentItem.name }}</span></div>
           </div>
           <div :class="isScoreSheet? 'table-score-description': 'table-description'">
             {{ contentItem.description }}
@@ -44,13 +43,15 @@
             </div>
           </template>
           <div class="table-operation">
-            <img 
+            <!-- btn icon  with svg -->
+            <!-- <div class="el-icon-edit" style="font-size: 20px; color: #999"></div> -->
+            <img
               v-if="showEditBtn"
-              :src="`./static/img/table-edit.png`" 
+              :src="`./static/img/table-edit.png`"
               @click="handleEdit(contentIndex,contentItem)"
               height="26px" />
-            <img 
-              :src="`./static/img/table-delete.png`" 
+            <img
+              :src="`./static/img/table-delete.png`"
               @click="handleDelete(contentItem)"
               height="26px" />
           </div>
@@ -109,9 +110,9 @@ export default {
   },
 
   mounted() {
+    //console.log("this.sortableTableData:",this.sortableTableData);
     this.getSequenceList();
   },
-
   methods: {
     getSequenceList() {
       this.oldSequenceList = this.sortableTableData.map(value => value.sequence);
@@ -178,7 +179,9 @@ export default {
     .table-checkbox-name{
       width: 27%;
       .table-name{
+        width: 250px;
         margin-left: 0;
+        margin-right: 40px;
         padding-left: calc(38/1920*100vw);
       }
     }
@@ -198,7 +201,7 @@ export default {
   .dragable-table-header, .table-content-item{
     display: flex;
     justify-content: space-between;
-    
+
     align-items: center;
   }
   .dragable-table-header{
@@ -217,7 +220,7 @@ export default {
     font-family: 'Roboto';
     min-height: 60px;
     height: auto;
-    
+
   }
   .table-checkbox-name{
     display: inline-flex;
@@ -243,7 +246,7 @@ export default {
 
   .table-checkbox-name{
     width: 27%;
-    
+
   }
   .table-description{
     width: 45%;
@@ -268,7 +271,9 @@ export default {
       color: #7d8cad;
     }
   }
-
+  .titleImportant{
+    color:#f31d65;
+  }
   .sortable-ghost{
     color: #424151 !important;
     background: rgba(243, 19, 101, 0.1) !important;

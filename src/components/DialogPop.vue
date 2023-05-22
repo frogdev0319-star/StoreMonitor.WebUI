@@ -13,7 +13,8 @@
     <div slot="title" class="flex-center title" :style="isForm ?{'width':'100%'}:{'width':dialogWidth}">
       <div>{{title}}</div>
       <div  class="flex-center">
-        <img v-if="isWarning" :src="headerIcon" height="40px">
+        <!-- <img v-if="isWarning" :src="headerIcon" height="40px"> -->
+        <div class="el-icon-warning" style="color: #999; font-size: 30px; margin-left: 10px;"></div>
       </div>
     </div>
   </template>

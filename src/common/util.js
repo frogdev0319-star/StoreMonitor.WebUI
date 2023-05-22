@@ -307,6 +307,19 @@ export default {
     return str;
   },
 
+  getDiffTimeStr(startDate, endDate) {
+    //console.log(">>>>>startDate:",startDate);
+    //console.log(">>>>>endDate:",endDate);
+    var diff = (new Date(startDate)).getTime() - (new Date(endDate)).getTime();
+    var hours = Math.floor(diff / 1000 / 60 / 60);
+    diff -= hours * 1000 * 60 * 60;
+    var minutes = Math.floor(diff / 1000 / 60);
+    diff -= minutes * 1000 * 60;
+    var seconds = Math.round(diff / 1000);
+    const resultTime = hours + i18n.t('remotePatrol.hour') + minutes +  i18n.t('remotePatrol.minute') + seconds+i18n.t('remotePatrol.seconds');
+    return resultTime;
+  },
+
   base64ToBlob(urlData) {
     let arr = urlData.split(',');
     let mime = arr[0].match(/:(.*?);/)[1] || 'image/jpeg';
@@ -625,7 +638,7 @@ export default {
               return ((x < y) ? -1 : ((x > y) ? 1 : 0));
           });
       }
-      
+
   },
   handleInspctionCatergyTree(arr, key='id') {
     let cloneData = JSON.parse(JSON.stringify(arr));
@@ -655,7 +668,7 @@ export default {
   },
 
   getIntersectionOfArrs(arr1, arr2) {
-    const arr1Set = new Set(arr1); 
+    const arr1Set = new Set(arr1);
     const uniqueArr1 = [...arr1Set];
     //console.log("uniqueArr1:",uniqueArr1)
     //console.log("arr2:",arr2)
@@ -673,7 +686,7 @@ export default {
   },
 
   validateLicense(status) {
-    if (![20, 21, 60].includes(status)) {
+    if (![20, 21, 60,61].includes(status)) {
       this.notify(i18n.t('deviceView.licenseOverdue'), 'warning', 3000);
       return false;
     } else {
@@ -773,30 +786,30 @@ export default {
     }
   },
   //乘法
-  accMul(arg1,arg2) 
-  { 
-      var m=0,s1=arg1.toString(),s2=arg2.toString(); 
+  accMul(arg1,arg2)
+  {
+      var m=0,s1=arg1.toString(),s2=arg2.toString();
       try {
           m+=s1.split(".")[1].length;
-      } catch(e){} 
+      } catch(e){}
       try {
           m+=s2.split(".")[1].length;
-      } catch(e){} 
+      } catch(e){}
       return Number(s1.replace(".",""))*Number(s2.replace(".",""))/Math.pow(10,m);
   },
   //除法
-  accDiv(arg1,arg2){ 
-    var t1=0,t2=0,r1,r2; 
+  accDiv(arg1,arg2){
+    var t1=0,t2=0,r1,r2;
     try {
         t1=arg1.toString().split(".")[1].length;
-    } catch(e){} 
+    } catch(e){}
     try {
         t2=arg2.toString().split(".")[1].length;
-    } catch(e){} 
-    
+    } catch(e){}
+
     r1=Number(arg1.toString().replace(".",""));
     r2=Number(arg2.toString().replace(".",""));
-    return (r1/r2)*Math.pow(10,t2-t1); 
+    return (r1/r2)*Math.pow(10,t2-t1);
   }
 
 };
@@ -846,7 +859,7 @@ class indexedDB {
     });
   }
 
-  
+
 
 }
 export { indexedDB };

@@ -67,11 +67,11 @@
               <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
               <el-image
                 :src="imgItem.src"
-                style="width:140px;height:100px"
+                style="height:100px"
                 :preview-src-list="getAuditImgList(index)"/>
             </div>
           </div>
-          <div v-if="auditFileCount<10" class="attach-add" @click="$refs.auditfile.click()">
+          <div v-if="auditFileCount < 120" class="attach-add" @click="$refs.auditfile.click()">
             <input type="file" style="display: none" accept="image/png,image/jpeg,application/pdf" max-size="2" @change="doAddAttachment" ref="auditfile" />
             <div style="height:16px;display: flex;flex-direction: row;align-items: center;">
               <img src="../../../static/img/icon_attachment.svg" widht="16px" height="16px" style="border-radius:10px;"/>
@@ -119,6 +119,7 @@
       </div>
     </el-col>
 
+
     <!-- 巡檢預覽 -->
     <el-col v-if="!allRemarkItemsFlag" :span="24" class="sum-data">
       <span style="font-size: 18px; font-weight: bold">{{ $t('remotePatrol.preview') }}</span>
@@ -137,28 +138,35 @@
             </div>
           </div>
           <hr class="hr-horizontal"/>
-          <div class="limit-group-score-tip" >
+
+
+          <div class="limit-group-score-tip" v-if="showMaxInfo">
             <div class="limit-img" >
               <img :src="require('../../../static/img/group_score.svg')" width="20" height="20" />
             </div>
             <div class="limit-text">{{$t('remotePatrol.tipLimitGroupScore')}}</div>
           </div>
+
           <table v-for="(s_item,s_index) in summary" :key="s_index" class="table table-bordered" style="margin-top:10px;">
             <thead>
               <tr>
                 <th v-for="(t_item ,t_index) in s_item.data[0].tHeader" :key="t_index" :style="t_item.width" scope="col">
                   {{ t_item.name }}
+                  <span style="color: #7d8cad; margin-left: 5px;" v-if="t_index == 0 && setting_isShowDistrictSum">( {{$t('remotePatrol.totalScoreUnit')}} : {{ getTotalSum(s_item.data)}} )</span>
                 </th>
               </tr>
             </thead>
-            <template v-for="(inspectItem, inspectIndex) in s_item.data">
-              <tbody :key="inspectIndex">
+            <template>
+              <tbody v-for="(inspectItem, inspectIndex) in s_item.data" :key="inspectIndex">
                 <tr style="vertical-align:middle;">
                   <td :rowspan="inspectItem.inspectList.length+1" style="vertical-align:middle;">
                     <div class="flex">
                       <div class="spacer">
                         <div v-if="inspectItem.weight != -1 && inspectItem.type != 2">{{ inspectItem.weight + '%' }} </div>
-                        <div class="sheet_title">{{ inspectItem.label }}</div>
+                        <div class="sheet_title">
+                          {{ inspectItem.label }}
+                          <span style="color: #7d8cad; margin-left: 5px;" v-if="setting_isShowGroupSum">( {{$t('remotePatrol.totalScoreUnit')}} : {{getSum(inspectItem.inspectList)}} )</span>
+                        </div>
                       </div>
                       <div class="flex" style="align-items: center">
                         <span>{{$t('')}}</span>
@@ -172,15 +180,15 @@
                     <span class="item-name">{{ inspectItem.isCategory ? item.groupName : '--' }}</span>
                     <span v-if="inspectItem.isCategory" class="count-blag">{{ item.items.length }}</span>
                   </td>
-                  <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfQualified }}</span></td>
-                  <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfUnqualified }}</span></td>
-                  <td v-if="inspectItem.type === 1"><span>{{ getDoubleNum(item.itemScore) }}</span></td>
+                  <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfQualified }} </span></td>
+                  <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfUnqualified }} </span></td>
+                  <td v-if="inspectItem.type === 1"><span>{{ getDoubleNum(item.itemScore) }} </span></td>
                   <td>
                     <div style="display:flex;flex-direction:row;justify-content:space-between;">
                       <div style="flex:2;">{{ item.itemgetScore == '--' ? '--' : getDoubleNum(item.itemgetScore) }}</div>
                       <div style="display:flex;flex:1;flex-direction:row;align-content:center;">
                         <img v-if="item.groupScore != '-99999'" style="margin-right:4px;" :src="require('../../../static/img/group_score.svg')" width="15" height="15" />
-                        <div style="color:#9EACB6;font-size:10px;font-weight:normal;">{{ item.groupScore != '-99999'? item.groupScore:''}}</div>
+                        <div style="color:#9EACB6;font-size:10px;font-weight:normal;">{{ item.groupScore != '-99999'? item.groupScore:''}} </div>
                       </div>
                     </div>
                   </td>
@@ -188,7 +196,10 @@
               </tbody>
             </template>
           </table>
+          <br>
         </div>
+
+
         <el-row v-for="(item,index) in tempList" :key="index" class="row-detail">
           <el-col v-if="item.data.length!=0">
             <div class="item-header">
@@ -206,7 +217,7 @@
                       <div v-for="(categoryItem,categoryIndex) in _item.cateryItems" :key="categoryIndex" class="content-detail">
                         <div class="content-detail-title">
                           <div class="detail-title">
-                            <p class="title1">{{ categoryIndex+1 }}.{{ categoryItem.subject }}</p>
+                            <p class='title1' v-bind:class="{titleImportant: categoryItem.isImportant}"><span class='indexStyle'>{{ categoryIndex+1 }}.</span>{{ categoryItem.subject }}</p>
                             <p class="title2">{{ categoryItem.description }}</p>
                           </div>
                           <div v-if="categoryItem.itemType === 0" class="score-title">
@@ -241,7 +252,7 @@
                           class="content-detail-main"
                           style="padding-bottom: 20px;">
                           <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
-                          
+
                           <div v-if="categoryItem.sourceList!=null&&categoryItem.sourceList.length!=0" class="cdm-pic">
                             <div
                               v-for="(sourceitem,sourceindex) in categoryItem.sourceList"
@@ -272,14 +283,14 @@
                     </template>
                     <template v-else>
                       <div v-for="(child, childIndex) in _item.children" :key="childIndex">
-                        <div class="content-title flex-center"> 
+                        <div class="content-title flex-center">
                           <div>{{ `【${_item.groupName}】 — 【${child.groupName}】` }}</div>
                         </div>
                         <hr class="hr-horizontal"/>
                         <div v-for="(childItem, childIndex) in child.cateryItems" :key="childIndex" class="content-detail">
                           <div class="content-detail-title">
                             <div class="detail-title">
-                              <p class="title1">{{ childIndex+1 }}.{{ childItem.subject }}</p>
+                              <p class="title1"  v-bind:class="{titleImportant: childItem.isImportant}"><span class='indexStyle'>{{ childIndex+1 }}.</span>{{ childItem.subject }}</p>
                               <p class="title2">{{ childItem.description }}</p>
                             </div>
                             <div v-if="childItem.itemType === 0" class="score-title">
@@ -303,7 +314,7 @@
                               </div>
                             </div>
                           </div>
-                          <p 
+                          <p
                             v-if="childItem.sourceList!= null && childItem.sourceList.length !== 0
                             || childItem.inspectText != null&&childItem.inspectText !== ''"
                           class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
@@ -393,7 +404,7 @@
                       </div>
                     </div>
                     <div v-if="_item.sourceList!=null||item.description!=null&&item.description!=''" class="content-detail-main">
-                      
+
                       <div v-if="_item.sourceList!=null&&_item.sourceList.length!=0" class="cdm-pic">
                         <div v-for="(sourceitem,index) in _item.sourceList" :key="index" :height="imgHeight+'px'" :class="{'source-details': sourceitem.mediaType!=3}">
                           <template v-if="sourceitem.mediaType==3">
@@ -452,6 +463,14 @@
         <el-progress :percentage="Math.round(uploadingnumOfPic/totalnumOfPic*100)"/>
       </div>
     </el-dialog>
+    <el-dialog :visible="reportSubmitting" :close-on-click-modal="false" width="510px" top="35vh" left="40vh" class="AddSumupLoad">
+      <div class="body-content">
+        <div class="empty-content">
+          <img :src="loadingGif" class="loading_rotate">
+          <span class="empty-text">{{ $t('remotePatrol.reportSubmitting') }}</span>
+        </div>
+      </div>
+    </el-dialog>
     <dialog-pop
       :title="$t('remotePatrol.resubmiteRpt')"
       :isWarning="true"
@@ -494,6 +513,8 @@ export default {
   components: {DialogPop},
   data() {
     return {
+      loadingGif: require('../../../static/img/loading.svg'),
+      reportSubmitting:false,
       dialogCommentVideo: false,
       uploadProgress: false,
       totalnumOfPic: 0,
@@ -571,9 +592,13 @@ export default {
       isAutoMappingActivate: "",
       dangerousOnFailedItem:"",
 
+      setting_isShowGroupSum: false,
+      setting_isShowDistrictSum: false,
+
       unqualifiedStatus:  false,
       scoreMiddleLow: 0,
       scoreMiddleHeight: 0,
+      showMaxInfo: false,
     };
   },
   computed: {
@@ -621,20 +646,59 @@ export default {
       next();
     }
   },
-  mounted() {
+  async mounted() {
     const self = this;
-    self.getInspectStatus();
-    self.getInspectRule();
+    await self.getInspectStatus();
+    await self.getRouteData();
 
-    self.getRouteData();
-    self.getUpLoadBucketInfo();
-    self.getOssInfo();
+    await self.getInspectRule();
 
-    
+    await self.getUpLoadBucketInfo();
+    await self.getOssInfo();
+
+
+
+
   },
   methods: {
+    // 加總
+    getTotalSum(Array){
+      var tableTotalScore = 0
+      Array.forEach(i => {
+        i.inspectList.forEach( ii => {
+          if(ii.itemgetScore!='--' && ii.itemgetScore!='-'){
+            tableTotalScore = tableTotalScore + ii.itemgetScore
+          }
+
+        })
+      })
+
+      if(!isNaN(parseFloat(tableTotalScore))){
+        tableTotalScore = tableTotalScore.toFixed(1)
+      }
+
+      return tableTotalScore
+
+    },
+    getSum(Array){
+      var totalScore = 0
+      Array.forEach(i => {
+        if(i.itemgetScore!='--' && i.itemgetScore!='-'){
+          totalScore = totalScore + i.itemgetScore
+        }
+
+      })
+
+      if(!isNaN(parseFloat(totalScore))){
+        totalScore = totalScore.toFixed(1)
+      }
+
+      return totalScore
+    },
+
+    // 四捨五入
     getDoubleNum (num) {
-      return Math.round(num * 100) / 100  
+      return Math.round(num * 100) / 100
     },
     stopCommentVideo() {
       var video = document.getElementById('previewVideo');
@@ -663,7 +727,7 @@ export default {
       }
       return arr.filter(source => source.mediaType === 2).map(source => source.src);
     },
-    
+
     getFileUrl(fileName) {
       const self = this;
       const bucketName = self.oss.ossBucketName;
@@ -722,7 +786,7 @@ export default {
       }
     },
 
-    
+
     clickSum(item, index) {
       const self = this;
       item.isActive = true;
@@ -741,6 +805,7 @@ export default {
       this.submit(true);
     },
 
+
     async submit(sendEvent) {
       const self = this;
       let upload = 0;
@@ -749,7 +814,7 @@ export default {
       let status = 0;
       let flag = false;
       self.uploadingnumOfPic = 0;
-      self.totalnumOfPic += self.imgFileList.length + self.pdfFileList.length; 
+      self.totalnumOfPic += self.imgFileList.length + self.pdfFileList.length;
       self.resultList.forEach(item => {
         if (item.isActive) {
           flag = true;
@@ -759,6 +824,12 @@ export default {
         util.notify(self.$t('remotePatrol.summaryInfo'), 'warning', 3000);
         return false;
       }
+      console.log("image file="+self.imgFileList.length + " " + self.pdfFileList.length)
+      if((self.imgFileList.length  + self.pdfFileList.length)>10){
+        util.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
+        return false;
+      }
+
       self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
       const storageParams = {};
       storageParams.storeId = self.store.storeId;
@@ -767,6 +838,9 @@ export default {
           self.oss = res.data;
         }
       });
+
+      console.log('inspect ::::::::::>> ', inspect);
+
       const temp = [];
       for (const i in inspect) {
         for (const g in inspect[i].inspectList) {
@@ -784,7 +858,7 @@ export default {
                 objItem.grade = objItem.score = inspect[i].inspectList[g].items[j].isIgnore ||
                   inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2, 31) : (inspect[i].inspectList[g].items[j].isQualified ? 1 : 0);
               } else {
-                objItem.grade = objItem.score = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore 
+                objItem.grade = objItem.score = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore
                   ? Math.pow(-2, 31)
                   : inspect[i].inspectList[g].items[j].itemgetScore;
               }
@@ -792,7 +866,7 @@ export default {
             objItem.storeId = self.store.storeId;
             objItem.inspectItemId = inspect[i].inspectList[g].items[j].id;
             const tempFileUrl = [];
-            if (!inspect[i].inspectList[g].items[j].isIgnore) {
+            // if (!inspect[i].inspectList[g].items[j].isIgnore) {
               for (const k in inspect[i].inspectList[g].items[j].sourceList) {
                 const obj = {};
                 if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 2 || inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 1) {
@@ -828,13 +902,17 @@ export default {
                 }
                 tempFileUrl.push(obj);
               }
-            }
+            // }
             objItem.attachment = tempFileUrl;
+
+            console.log('objItem ::::::::::>> ', objItem);
             temp.push(objItem);
           }
         }
       }
+
       //feedBack
+      console.log('self.eventList ::::::::::>> ', self.eventList);
       const feedEventList = [];
       for (const i in self.eventList) {
         const obj = {};
@@ -857,7 +935,7 @@ export default {
               commentTemp.push(obj);
             }
           })
-          
+
         }else{
           console.log("***self.eventList[i]:",self.eventList[i]);
           let obj = {};
@@ -865,7 +943,7 @@ export default {
             obj.url = self.eventList[i].eventDes;
             commentTemp.push(obj);
         }
-        if (self.eventList[i].sourceObj != null) { 
+        if (self.eventList[i].sourceObj != null) {
           if(self.eventList[i].sourceObj.hasUrl){
             self.uploadingnumOfPic++;
             const commentObj = {
@@ -899,7 +977,7 @@ export default {
         obj.attachment = commentTemp;
         feedEventList.push(obj);
       }
-      //上傳簽核附件 
+      //上傳簽核附件
       var auditAttachment = [];
       //upload audit image
       for(let idx=0; idx<self.imgFileList.length;idx++){
@@ -958,6 +1036,7 @@ export default {
           util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
           return false;
       }
+
       let curSumIndex = [];
       curSumIndex = self.resultList.filter(x => x.isActive);
       status = curSumIndex[0].label;
@@ -971,12 +1050,17 @@ export default {
         isMysteryMode:PermissionHelper.enableMimicMode,
         isCreateEvent:sendEvent
       };
-      
+
+      console.log('params ::::::::::>> ', params);
+
+
+
       let routeData = null;
       if(self.reportId!=-1 && self.isEditReport){
         params['reportId']=this.reportId;
         upload === 0 && self.doModifyReportSubmit(params,auditAttachment,sendEvent);
       } else{
+        self.reportSubmitting = true;
         upload === 0 && submitInspectItem1(params).then(res => {
           if (res.errCode === 0) {
             const data = res.data;
@@ -1011,10 +1095,11 @@ export default {
                     isBindWorkflow:!!PermissionHelper.enableSendAudit() || !!PermissionHelper.enableMimicMode
                   };
                 }
-                
+                self.reportSubmitting = false;
                 self.$router.push({ name: 'submitEvent', params: { data: routeData }});
               }).catch(err=>{
                   console.log("err:",err);
+                  self.reportSubmitting = false;
                   util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
                   return false;
                 }
@@ -1026,8 +1111,9 @@ export default {
                 isBindWorkflow:false
               };
             }
-            
+
           } else {
+            self.reportSubmitting = false;
             util.notify(res.errMsg, 'error', 3000);
             routeData = {
               isSuccess: false,
@@ -1038,6 +1124,7 @@ export default {
           if(!self.isBindWorkflow)
             self.$router.push({ name: 'submitEvent', params: { data: routeData}});
         }).catch(err => {
+          self.reportSubmitting = false;
           util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
           return false;
         });
@@ -1045,14 +1132,19 @@ export default {
       self.uploadProgress = false;
     },
 
+
+
+
+
     doModifyReportSubmit(params,auditAttachment,sendEvent){
       const self = this;
       console.log("submit report params:",params);
       var routeData = {
         isSuccess: false,
         reLoadData: self.$route.params,
-        isBindWorkflow:!!PermissionHelper.enableSendAudit() 
+        isBindWorkflow:!!PermissionHelper.enableSendAudit()
       };
+      self.reportSubmitting = true;
       var resReportModify = modifyReportWorkflow(params);
       var resWorkflowTask = getReportWorkflowTask({type:0,inspectReportId:self.reportId});
       Promise.all([resReportModify,resWorkflowTask]).then( async (result) =>{
@@ -1071,8 +1163,8 @@ export default {
         }
         if(!sendEvent){//儲存，非送出報告，不用submit簽核
           routeData = {
-            reportId: self.reportId, 
-            isAuditMode: true, 
+            reportId: self.reportId,
+            isAuditMode: true,
             canEdit: true,
             canCancel: this.auditCancelable,
             auditCancelable:this.auditCancelable
@@ -1085,6 +1177,7 @@ export default {
           console.log("save db:",workflowParams);
           await Database.addDataToDB('rpt'+self.reportId, workflowParams);
           console.log("routeData:",routeData);
+          self.reportSubmitting = false;
           self.$router.push({ name: 'auditReportdetails', params: routeData});
         }else{
           //if(self.auditState==7){ **3.0.4.2 不用判斷都使用reSubmit//系統撤回重送
@@ -1145,14 +1238,16 @@ export default {
             self.$store.dispatch('setEditCount', 0);
             var routeData = {
                 isSuccess: true,
-                isBindWorkflow:!!PermissionHelper.enableSendAudit() 
+                isBindWorkflow:!!PermissionHelper.enableSendAudit()
             };
             Database.removeDataFromDB('rpt'+self.reportId);
+            self.reportSubmitting = false;
             self.$router.push({ name: 'submitEvent', params: { data: routeData}});
           }else{
             util.notify(wfRes.errMsg, 'error', 3000);
           }
         }).catch(err=>{
+            self.reportSubmitting = false;
             console.log("ReSubmitWorkflow err:",err);
             util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
             return false;
@@ -1217,7 +1312,7 @@ export default {
       this.$store.dispatch('setEditCount', 0);
       var routeData = {
           isSuccess: true,
-          isBindWorkflow:!!PermissionHelper.enableSendAudit() 
+          isBindWorkflow:!!PermissionHelper.enableSendAudit()
       };
       this.$router.push({ name: 'submitEvent', params: { data: routeData}});
     },
@@ -1233,9 +1328,7 @@ export default {
             if(x.label==self.curSumIndex) x.isActive=true;
           });
       }
-      console.log()
       self.userId = getCookie('UserId');
-      
       Database.getDataFromDB(getCookie('UserId')).then(res => {
         const inpectResult = res;
         console.log("***inspect:",inpectResult);
@@ -1251,6 +1344,9 @@ export default {
         self.isBindWorkflow = routeData.isBindWorkflow;
         self.isEditReport = routeData.isEditReport;
         self.auditCancelable = routeData.auditCancelable;
+
+
+        console.log('self.inspectList :::::::>> ', self.inspectList);
 
         if(self.isEditReport) {
           self.reportId = routeData.reportId;
@@ -1298,7 +1394,7 @@ export default {
             item.unqualifiedItems = [];
             item.numOfCommentItem = 0;
             item.numOfTotalItems = 0;
-            item.items.forEach(s_item => {//子項 
+            item.items.forEach(s_item => {//子項
               item.numOfTotalItems++;
               if (s_item.itemType === 1) {
                 item.numOfCommentItem++;
@@ -1383,7 +1479,7 @@ export default {
             item['numOfQualified'] = QualifiedArr.length;
             item['numOfUnqualified'] = UnqualifiedArr.length;
             item['numIgnore'] = IgnoredArr.length;
-            
+
             let tempWeight = (p_item.weight == -1 ? 1 : (p_item.weight/100));
             if (p_item.type === 0) {
               let ts = PassFileTS;
@@ -1398,14 +1494,14 @@ export default {
                     xn = (xn<item.groupScore?item.groupScore:xn);
                     //ts0 = (ts0<item.groupScore?item.groupScore:ts0);
                     //tsX = (tsX<item.groupScore?item.groupScore:tsX);
-                    
+
                   }else{
                     ts = (ts>item.groupScore?item.groupScore:ts);
                     xs = (xs>item.groupScore?item.groupScore:xs);
                     xn = (xn>item.groupScore?item.groupScore:xn);
                     //ts0 = (ts0>item.groupScore?item.groupScore:ts0);
                     //tsX = (tsX>item.groupScore?item.groupScore:tsX);
-                    
+
                   }
                   ts0 = item.groupScore;
                   tsX = item.groupScore;
@@ -1416,15 +1512,15 @@ export default {
                   PassFileTotalScore += ts0*(p_item.weight == -1 ? 1 : (p_item.weight/100));
                   PassFileTotalScoreX += tsX*(p_item.weight == -1 ? 1 : (p_item.weight/100));*/
               }
-              
-                
+
+
                 console.log("tempWeight:",tempWeight);
                 PassFileTotalScoreSystem += util.accMul(ts,tempWeight);
                 PassFileXS += util.accMul(xs,tempWeight);
                 PassFileXN += util.accMul(xn,tempWeight);
                 PassFileTotalScore += util.accMul(ts0,tempWeight);
                 PassFileTotalScoreX += util.accMul(tsX,tempWeight);
-            
+
               console.log("ts:",ts);
               console.log("PassFileTotalScoreSystem:",PassFileTotalScoreSystem);
             }
@@ -1433,9 +1529,11 @@ export default {
               let type1Score = ScoreTS;
               let type1XN = (ScoreX + ScoreN);
               let type1tsX = Score_totalScoreX;
+              console.log("1******item.groupScor="+type1ts,ScoreTS, type1XN , type1tsX)
               if(item.isAdvanced){
                 //if(inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1'){
                   //console.log("PassFileTtotalScoreS:",totalScore);
+
                   if(item.groupScore<=0)
                   {
                     //type1ts = (type1ts <item.groupScore)?item.groupScore:type1ts ;
@@ -1449,26 +1547,28 @@ export default {
                     //type1tsX = (type1tsX>item.groupScore)?item.groupScore:type1tsX;
                   }
                   //比例制，分母取上限分值，不分正負
-                  if(inspectSettings.hundredMarkType!='0' && item.groupScore<=0){ 
+                  if(inspectSettings.hundredMarkType!='0' && item.groupScore<=0){
                     type1ts = (type1ts <item.groupScore)?item.groupScore:type1ts ;
-                    type1tsX = (type1tsX<item.groupScore)?item.groupScore:type1tsX;
+                    type1tsX = (type1tsX<item.groupScore)?type1tsX:item.groupScore;
                   }else{
                     type1ts = item.groupScore;//(Math.abs(type1ts) >Math.abs(item.groupScore))?item.groupScore:type1ts ;
-                    type1tsX = item.groupScore;//(Math.abs(type1tsX)>Math.abs(item.groupScore))?item.groupScore:type1tsX;
+                    type1tsX =(type1tsX<item.groupScore)?type1tsX:item.groupScore;//(Math.abs(type1tsX)>Math.abs(item.groupScore))?item.groupScore:type1tsX;
                   }
+                //  type1tsX = Math.min(type1tsX,
               }
                   CurAddScoreB += util.accMul(type1ts,tempWeight);
                   allScoreB = CurAddScoreB;
+
                   ScoreTotalScoreSystem += util.accMul(type1Score,tempWeight);
                   ScoreXN += util.accMul(type1XN,tempWeight);
                   ScoreTotalScoreX += util.accMul(type1tsX,tempWeight);
-              
-              
-              console.log("type 1 allScoreB:",allScoreB);
-              console.log("type 1 ScoreTotalScoreSystem:",ScoreTotalScoreSystem);
-              console.log("type 1 ScoreXN:",ScoreXN);
+                  console.log("2******item.groupScor="+type1ts,ScoreTS, type1XN , type1tsX)
+
+            //  console.log("type 1 allScoreB:",allScoreB);
+            //  console.log("type 1 ScoreTotalScoreSystem:",ScoreTotalScoreSystem);
+          //    console.log("type 1 ScoreXN:",ScoreXN);
               console.log("type 1 ScoreTotalScoreX:",ScoreTotalScoreX);
-              
+
             }
             if (p_item.type === 2) {
               if(item.isAdvanced){
@@ -1479,7 +1579,7 @@ export default {
                     CurOtherTotalScore += (totalGetscore>item.groupScore)?item.groupScore:totalGetscore;
                     OtherTotalScoreSystem += (OtherTS>item.groupScore)?item.groupScore:OtherTS;
                   }
-                
+
               }else{
                 CurOtherTotalScore += totalGetscore;
                 OtherTotalScoreSystem += OtherTS
@@ -1489,7 +1589,7 @@ export default {
               console.log("type 2 OtherTotalScoreSystem:",OtherTotalScoreSystem);
             }
             //顯示後放
-            
+
             //判斷顯示值 是否碰到上限
             console.log('item.isAdvanced:',item.isAdvanced);
             if(item.isAdvanced){
@@ -1540,13 +1640,13 @@ export default {
                 }else{
                   tab1GetScoreNoContainedIngored = util.accMul(tab1GetScoreNoContainedIngored,tempWeight);
                 }
-                
+
                 if(inspectSettings.qualifiedForIgnoredWithType2 && p_item.type == 1){
                   tab2IgnoredItemsGetScore = util.accMul((tab2IgnoredItemsGetScore+tab2NotIgnoredItemsGetScore),tempWeight);
                 }else{
                   tab2NotIgnoredItemsGetScore = util.accMul(tab2NotIgnoredItemsGetScore,tempWeight);
                 }
-                
+
                 /*console.log('(p_item.weight/100):',(p_item.weight/100));
                 tab1GetScoreNoContainedIngored = tab1GetScoreNoContainedIngored*(p_item.weight == -1 ? 1 : (p_item.weight/100));
 
@@ -1604,7 +1704,7 @@ export default {
                 item['numIgnore'] = 0;
               }
             }
-            
+
           });//end for 一個類別
           if (p_item.type === 0) {
             p_item['tHeader'] = self.theaderPassFail;
@@ -1625,6 +1725,7 @@ export default {
           }
         });
         let s_count = 0;
+        console.log("***********Get Count**************",inspect.length,inspect[0].type,inspectSettings.hundredMarkType)
         if (inspect.length === 1 && inspect[0].type === 0) {
           // console.log(1)
           if (inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1') {//加分 or 扣分制
@@ -1680,6 +1781,7 @@ export default {
                 console.log('*ScoreTotalScoreX:',ScoreTotalScoreX);
               }
               total_c = total_a === 0 || total_b === 0 ? 0 : (util.accDiv(total_a , total_b) * 100);
+              console.log(total_a , total_b)
               console.log('total_c:',total_c);
               s_count = total_c + otherGetscoreTotal;
               // console.log(s_count)
@@ -1692,12 +1794,14 @@ export default {
                 s_count = ScoreTotalScoreSystem + OtherTotalScoreSystem;
               }
             } else {
+
               let total_a = 0;
               if (inspectSettings.qualifiedForIgnoredWithType2) {
                 total_a = allScoreB === 0 || ScoreXN === 0 ? 0 : (util.accDiv(ScoreXN , allScoreB) * 100);
               } else {
                 total_a = ScoreTotalScoreX === 0 || ScoreTotalScoreSystem === 0 ? 0 : (util.accDiv(ScoreTotalScoreSystem , ScoreTotalScoreX) * 100);
               }
+              console.log("比例制",ScoreTotalScoreSystem , ScoreTotalScoreX)
               s_count = total_a + otherGetscoreTotal;
             }
           }
@@ -1717,8 +1821,20 @@ export default {
         if(typeof inspectSettings.minScore != 'undefined' && s_count < inspectSettings.minScore ){
           self.scorecount = inspectSettings.minScore;
         }
-        
+
         self.summary = this.groupbyKey(inspect, 'type');
+
+
+        var ary = []
+        self.summary.forEach(i => {
+          i.data.forEach(ii => {
+            ii.inspectList.forEach( iii => {
+              ary.push(iii.isAdvanced)
+            })
+          })
+        })
+        this.showMaxInfo = ary.some( d => d == true)
+
         eventList.forEach((item, index) => {
           const objFeedBack = {};
           objFeedBack.subject = item.eventName;
@@ -1729,6 +1845,7 @@ export default {
         });
         const eventpic = eventList.filter(x => x.sourceObj != null);
         self.totalnumOfPic = Number(inspectPic) + Number(eventpic.length);
+        // 缺失項
         tempList[0] = {
           itemTitleName: self.$t('remotePatrol.notableItem'),
           iconSrc: 'icon-zhongxindingwei',
@@ -1736,6 +1853,7 @@ export default {
           data: this.getGroupsItems('unqualifiedItems'),
           detailType: 0
         };
+        // 不適用項
         tempList[1] = {
           itemTitleName: self.$t('remotePatrol.ignoreds'),
           iconSrc: 'icon-hulve',
@@ -1743,6 +1861,8 @@ export default {
           data: this.getGroupsItems('ignoreItems'),
           detailType: 1
         };
+
+        // 問題回饋
         tempList[2] = {
           itemTitleName: self.$t('remotePatrol.feedbacks'),
           iconSrc: 'icon-fankui',
@@ -1751,6 +1871,7 @@ export default {
           detailType: 2
         };
         self.tempList = tempList;
+        console.log('self.tempList ::::::::::::::>> ', self.tempList);
       }).catch(err => {
         console.log(err);
       });
@@ -1894,7 +2015,7 @@ export default {
         { name: this.$t('remotePatrol.TableGet'), width: 'width:12%;' }
       ];
     },
-    
+
     auditNoteChanged(val) {
       const self = this;
       const content = filterString.all(val, 600);
@@ -1917,8 +2038,8 @@ export default {
       var fileName = files[0].name;
       if (!files.length)
         return;
-      if(self.auditFileCount==10){
-        util.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
+      if(self.auditFileCount == 120){
+        util.notify(self.$t('remotePatrol.maximumTotalAttach'), 'warning', 3000);
         return;
       }
       if(files[0].type.includes("pdf") && files[0].size > maxSize){
@@ -1998,7 +2119,7 @@ export default {
           else if(auditType == 1) //audit by group
             wfi.nextAuditUser = this.getUserPositionList(data.nextAuditNode.nextAuditNode.auditByGroups);
         }
-        
+
         //console.log('*wfi:',wfi);
         this.workflowInfo = wfi;
         //return wfi;
@@ -2048,22 +2169,20 @@ export default {
           this.isAutoMappingActivate = res.data.find(i => {
             return i.name == "setting_isAutoMappingActivate"
           })
-          
-
-          console.log('this.dangerousOnFailedItem ~~~~~>>>> ', this.dangerousOnFailedItem);
-          console.log('this.autoMappingByTotalScore ~~~~~>>>> ', this.autoMappingByTotalScore);
-          console.log('this.isAutoMappingActivate ~~~~~>>>> ', this.isAutoMappingActivate);
-
-          console.log('this.scorecount ~~~~~>>>> ', this.scorecount);
-          console.log('this.resultList ~~~~~>>>> ', this.resultList);
 
           this.scoreMiddleLow = this.autoMappingByTotalScore.extra.find(i => i.key === "mappingScore_bottom").value
           this.scoreMiddleHeight = this.autoMappingByTotalScore.extra.find(i => i.key === "mappingScore_top").value
-          
+
+          this.setting_isShowGroupSum = ( this.getInspectRuleSettings.find( i => i.name == "setting_isShowGroupSum")).value
+          this.setting_isShowDistrictSum = ( this.getInspectRuleSettings.find( i => i.name == "setting_isShowDistrictSum")).value
+          console.log('this.setting_isShowGroupSum  :>> ', this.setting_isShowGroupSum );
+          console.log('this.setting_isShowDistrictSum :>> ', this.setting_isShowDistrictSum);
+
+
           this.resultList[0].name =this.inspectStatus.status_2
           this.resultList[1].name =this.inspectStatus.status_1
           this.resultList[2].name =this.inspectStatus.status_0
-          
+
           if(this.isAutoMappingActivate.value) this.determineResultList()
 
         }).catch(err => {
@@ -2088,7 +2207,7 @@ export default {
       });
     },
 
-    
+
     determineResultList(){
       if(this.unqualifiedStatus){
         this.resultList[0].isShow = false;
@@ -2105,13 +2224,13 @@ export default {
           console.log('n 2 :>> ', n);
           this.resultList[n].isActive = true
           this.resultList[n].isShow = true
-        } 
+        }
         else if(  this.scorecount <= this.scoreMiddleHeight && this.scorecount >= this.scoreMiddleLow){
           var n = this.resultList.findIndex(i=>i.label === 1)
           console.log('n 1:>> ', n);
           this.resultList[n].isActive = true
           this.resultList[n].isShow = true
-        } 
+        }
         else if( this.scorecount <= this.scoreMiddleLow - 0.1){
           var n = this.resultList.findIndex(i=>i.label === 0)
           console.log('n 0:>> ', n);
@@ -2124,7 +2243,7 @@ export default {
           this.resultList[1].isActive = false;
           this.resultList[2].isShow = true;
           this.resultList[2].isActive = false;
-          
+
         }
       }
     }
@@ -2340,7 +2459,7 @@ export default {
           }
         }
       }
-      
+
       /*簽核*/
       .audit-content{
         .sug-label{
@@ -2384,7 +2503,8 @@ export default {
           }
           .source-details{
             display: inline-block;
-            margin-right: 15px;
+            margin-right: 9px;
+            margin-bottom: 3px;
             position: relative;
             .icondelete{
               position: absolute;
@@ -2422,11 +2542,11 @@ export default {
                 font-size:12px;
               }
             }
-          
+
           }
         }
         .next-audit{
-          display:flex; 
+          display:flex;
           flex-direction:row;
           justify-content:space-between;
           align-content:stretch;
@@ -2640,6 +2760,11 @@ export default {
               }
               .detail-title{
                 flex: 1;
+                .indexStyle{
+                  font-size: calc(14 / 1920 * 100vw);
+                  color:#182752;
+                  font-weight: bold;
+                }
                 .title1{
                   font-size: calc(14 / 1920 * 100vw);
                   color:#182752;
@@ -2651,6 +2776,12 @@ export default {
                   color:#7d8cad;
                   margin: 15px 0 0 10px;
                   word-break: break-all;
+                }
+                .titleImportant{
+                  font-size: calc(14 / 1920 * 100vw);
+                  color:#f31d65;
+                  font-weight: bold;
+                  margin:0 0 5px 0;
                 }
               }
               .score-title{
@@ -2811,7 +2942,7 @@ export default {
     color: $black;
     margin-top: 4px;
   }
-  
+
 </style>
 <style>
   .AddSumupLoad .el-dialog__header{

@@ -278,7 +278,8 @@ export default{
       "daysww":"XX",
       "weeks":"สัปดาห์",
       "pageSize":"การแสดงผลต่อหน้า",
-      "pageSizeUnit":"รายการ"
+      "pageSizeUnit":"รายการ",
+      "rate":" อัตรา"
   },
   "remotePatrol":{
       "InspectionDetail":"ส่งออกรายงาน",
@@ -365,6 +366,10 @@ export default{
       "fluency":"SD",
       "fullScreenMode":"โหมดเต็มหน้าจอ",
       "generateTime":"เวลาที่สร้าง:",
+      "signInTime":"เวลาการเช็คอิน",
+      "patrolTime":"เวลาที่ใช้สำหรับการตรวจสอบ",
+      "signInDistance":"ระยะห่างการเช็คอิน",
+      "aroundDistance":"โดยประมาณ ",
       "getAccessTokenError":"ไม่สามารถรับโทเค็นในการเข้าถึง",
       "getBeseyeStreamError":"ไม่สามารถรับข้อมูลสตรีม beseye!",
       "getscore":"คะแนนการตรวจสอบ",
@@ -521,7 +526,27 @@ export default{
       "resubmiteRpt":"ยืนยันส่งรายงาน",
       "systemReject":"การถอนของระบบ",
       "systemRejectMsg":"ไม่มีพนักงานลงนาม โปรดยืนยันใหม่",
-      "cannotSwitchMimicMode":"กำลังแก้ไขรายงาน ไม่สามารถสลับโหมดได้"
+      "cannotSwitchMimicMode":"กำลังแก้ไขรายงาน ไม่สามารถสลับโหมดได้",
+      "tipLimitGroupScore":"คำนวณคะแนนรวมโดยใช้ขีดจำกัดสูงสุดเมื่อคะแนนเกินขีดจำกัดสูงสุดของหมวดหมู่",
+      "signatureInfo":"ข้อมูลการเช็คอิน",
+      "mapDistance1":"และ",
+      "mapDistance2":"ระยะห่างโดยประมาณ",
+      "mapDistance3":"เมตร",
+      "hour":"ชั่วโมง",
+      "seconds":"วินาที",
+      "minute":"นาที",
+      "reportSubmitting":"Report submitting...",
+      "storeCode":"รหัสร้านค้า",
+      "inspectSummary":"สรุปการตรวจสอบ",
+      "pleaseAdd":"* โปรดเพิ่ม",
+      "notQualifyAdd":"* จะต้องเพิ่มเมื่อไม่ผ่านคุณสมบัติ",
+      "lowerThan":"* ต่ำกว่า ",
+      "lowScoreAdd":"คะแนน จำเป็นต้องเพิ่ม  ",
+      "textItem":"“ข้อความ”",
+      "mediaItem":"“ภาพหรือวิดีโอ”",
+      "attachments":"ประเภทไฟล์แนบ",
+      "notFinishWithText":"มีรายการที่จำเป็นที่ยังไม่เสร็จสมบูรณ์ โปรดเพิ่มไฟล์แนบประเภท “ข้อความ” เป็นป้ายกำกับหมายเหตุ",
+      "notFinishWithMedia":"มีรายการที่จำเป็นที่ยังไม่เสร็จสมบูรณ์ โปรดเพิ่มไฟล์แนบประเภท “ภาพหรือวิดีโอ” เป็นป้ายกำกับหมายเหตุ"
   },
   "eventView":{
       "ClosedEvent":"เหตุการณ์ที่ปิดแล้ว",
@@ -530,6 +555,7 @@ export default{
       "ReturnEvent":"เหตุการณ์ที่ปฏิเสธ",
       "Returned":"ส่งคืนแล้ว",
       "addDetails":"เพิ่มรายละเอียดการจัดการ",
+      "addAttchement":"เพิ่มไฟล์แนบ",
       "adding":"เพิ่ม",
       "all":"ทั้งหมด",
       "allEvents":"เหตุการณ์ทั้งหมด",
@@ -571,7 +597,8 @@ export default{
       "expiredate":"เวลาปิด",
       "closeSelectedEvent":"ยืนยันปิดเหตุการณ์ที่เลือกหรือไม่",
       "confirmBachClose":"ยืนยันปิดเหตุการณ์เป็นกลุ่ม",
-      "expiretag":"หมดอายุแล้ว"
+      "expiretag":"หมดอายุแล้ว",
+      "maximumAttVedio":"สามารถอัปโหลดไฟล์แนบวิดีโอสูงสุด 2 รายการเท่านั้น"
   },
   "insSettingView":{
       "Addscoreitems":"รายการการให้คะแนนเพิ่มเติม",
@@ -661,6 +688,7 @@ export default{
       "excelPassFailScoreType":"คะแนน:ทางเลือก, 0.5~50 คะแนน",
       "excelScoreItemEmpty":"ตัวเลือกคะแนนไม่สามารถว่างเปล่า!",
       "excelScoreItemType":"ตัวเลือกคะแนน: จำเป็น, -50~50",
+      "excelScoreInvalidType":"ข้อผิดพลาดการป้อนฟิลด์ค่า (เช่น: ไม่มี '/’ หรือมีค่าที่ไม่ถูกต้อง)",
       "export":"ส่งออก",
       "exportFailTitle":"ไม่สามารถส่งออก",
       "group":"กลุ่ม",
@@ -692,7 +720,6 @@ export default{
       "mustSignature":"ต้องมีลายเซ็น",
       "uncertainSignature":"ไม่บังคับลายเซ็น",
       "inputData":"โปรดป้อนชื่อผู้รับผิดชอบ",
-      "signatureOne":"Sign 1",
       "bindWorkflow":"เลือกกระบวนการเชื่อมโยง",
       "select":"โปรดเลือก",
       "no":"ไม่",
@@ -784,11 +811,32 @@ export default{
       "minScoreEmpty":"คะแนนรวมไม่สามารถว่างเปล่า!",
       "weight":"น้ำหนัก%",
       "weightSetting":"การตั้งค่าน้ำหนัก",
-      "weightTotalError":"Weight cannot be greater or less than 100%",
+      "weightTotalError":"น้ำหนักไม่สามารถมากกว่าหรือน้อยกว่า 100%",
       "bindWorkFLow":"ผูกโยงลำดับงาน",
       "isRequired":"จำเป็น",
-      "notRequired":"Not Required",
-      "selectStoreTag":"เลือกด่วน"
+      "notRequired":"ไม่จำเป็น",
+      "selectStoreTag":"เลือกด่วน",
+      "groupScore":"คะแนนหมวดหมู่",
+      "advanceSetting":"การตั้งค่าขั้นสูง",
+      "advanceSettingOn":"เปิด",
+      "advanceSettingOff":"ปิด",
+      "setGroupScoreRange0":"ขีดจำกัดสูงสุดของช่วงการป้อนคะแนนหมวดหมู่คือ 0 ~ 9999",
+      "setGroupScoreRange":"ขีดจำกัดสูงสุดของช่วงการป้อนคะแนนหมวดหมู่คือ -9999 ~ 9999",
+      "groupScoreLimit":"ขีดจำกัดสูงสุดของคะแนนหมวดหมู่",
+      "commentStatus":"การแสดงตัวเลือกสรุปการตรวจสอบ (การตั้งค่านี้จะมีผลต่อการแสดงผลที่เกี่ยวข้องกับสรุปการตรวจสอบของแบรนด์)",
+      "autoSelectComment":"เปิดใช้งานการเลือกสรุปการตรวจสอบตามเงื่อนไขโดยอัตโนมัติ",
+      "selectByScore":"การเลือกอัตโนมัติตามเงื่อนไขคะแนน",
+      "noUserDefinedName":"ไม่มีชื่อแบบกำหนดเอง",
+      "needHeighterThan":"ค่าสูงสุดของช่วงการประเมินจะต้องสูงกว่าค่าต่ำสุด!",
+      "cantEmptyScoreLow":"ช่วงต่ำสุดสำหรับคะแนนการประเมินรวมไม่สามารถว่างเปล่า! ",
+      "cantEmptyScoreHeight":"ช่วงสูงสุดสำหรับคะแนนการประเมินรวมไม่สามารถว่างเปล่า! ",
+      "memoAdvanced":"ป้ายกำกับหมายเหตุ",
+      "memoSeparate":"(โปรดใช้ \"/\" เพื่อคั่นรายการหลายรายการ)",
+      "inputMemoAdvanced":"โปรดป้อนป้ายกำกับหมายเหตุ ",
+      "memoCheckText":"ข้อความ",
+      "memoCheckMedai":"ภาพหรือวิดีโอ",
+      "notQualifyIsRequired":"จำเป็นก็ต่อเมื่อไม่ผ่านคุณสมบัติ",
+      "selectAtLeastOne":"เลือกอย่างน้อยหนึ่งหมวดหมู่หมายเหตุ (ข้อความ ภาพ หรือวิดีโอ)"
   },
   "deviceView":{
       "EzvizAccount":"บัญชีบริการสตรีมมิ่ง",
@@ -1302,8 +1350,8 @@ export default{
         "addAttachment":"เพิ่มไฟล์แนบ",
         "pleaseSign":"โปรดลงนาม",
         "needSign":"การลงนามนี้ต้องแนบไฟล์ลายเซ็น",
-        "selectComment":"Please choose to sign-off on comments!",
-        "rejectReason":"Please fill in the reason for rejection!",
+        "selectComment":"โปรดเลือกการลงนามบนข้อคิดเห็น!",
+        "rejectReason":"โปรดกรอกเหตุผลสำหรับการปฏิเสธ!"
     },
     "sendAudit":{
         "all":"ทั้งหมด",
@@ -1335,8 +1383,8 @@ export default{
         "comfirmDelete":"ยืนยันการลบกระบวนการลงนามปัจจุบันหรือไม่",
         "comfirmDeleteNode":"ยืนยันการลบโหนดกระบวนการลงนามปัจจุบันหรือไม่",
         "canNotDelete":"” ไม่สามารถลบกระบวนการลงนามนี้",
-        "isBind":"มีตารางการตรวจสอบผูกโยง “",
-        "cantClose":"” ไม่สามารถปิดใช้งาน",
+        "canNotClose":"กระบวนการนี้ไม่สามารถปิดได้",
+        "makeSureUsign":"โปรดยืนยันว่าตารางการตรวจสอบต่อไปนี้กำลังใช้งานอยู่:",
         "dulplicateScuccess":"คัดลอกกระบวนการสำเร็จ",
         "deleteScuccess":"ลบสำเร็จ",
         "deleteFail":"การลบล้มเหลว",
@@ -1416,9 +1464,9 @@ export default{
         "tooltipListcan4":"สามารถดูรายงานการตรวจสอบเฉพาะหลังจากการลงนามผ่านแล้วเท่านั้น",
         "auditFlow":"กระบวนการลงนาม",
         "nodeOrder":"หมายเลขซีเรียลโหนด",
-
-        "cantEmptyDays" : "The number of days to stay cannot be empty. ",
-        "cantTooMuchDays" : "The length of stay cannot exceed 365 days. "
+        "cantEmptyDays" : "จำนวนวันที่คงอยู่ไม่สามารถว่างเปล่า",
+        "cantTooMuchDays" : "ระยะเวลาการคงที่ไม่สามารถเกิน 365 วัน",
+        "cantEmptyInspectStatus" : "ชื่อแบบกำหนดเองของตัวเลือกสรุปการตรวจสอบไม่สามารถว่างเปล่า"
     },
     "inceptionRpt":{
         "sendAudit":"ส่งการลงนาม",
@@ -1440,7 +1488,9 @@ export default{
         "editAuditFail":"ไม่สามารถส่งการลงนามใหม่",
         "auditReport":"บันทึกการลงนาม",
         "saveReport":"บันทึก",
-        "submitReport":"บันทึกและส่ง"
+        "submitReport":"บันทึกและส่ง",
+        "warnWorkflowUnbind":"กระบวนการการเชื่อมโยงของแบบฟอร์มการตรวจสอบถูกยกเลิก โปรดทำการตั้งค่าของกระบวนการการเชื่อมโยงของแบบฟอร์มการตรวจสอบให้เสร็จสิ้นก่อนดำเนินการต่อนี้",
+        "errorEditReport":"ข้อผิดพลาด แก้ไขรายงาน"
     }
   },
   "mysterio":{
@@ -1464,11 +1514,12 @@ export default{
       "pleaseChooseTag":"เลือกการตรวจสอบ",
       "comfirmDelMysterio":"ยืนยันการลบสมาชิกนักช็อปปริศนานี้",
       "saveMysterioSettingFail":"ไม่สามารถบันทึกกลุ่มสิทธิ์",
-      "nickName":"Nick Name",
-      "nickNameTip":"The nick name of sub-category supports up to 50 characters",
-      "pleaseInputNickName":"Please enter the nick name of the mystery",
-      "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name.",
-      "mystery":"Mystery Shopper"
+      "nickName":"ชื่อเล่น",
+      "nickNameTip":"ชื่อเล่นของหมวดหมู่ย่อยจะต้องไม่เกิน 50 อักขระ",
+      "pleaseInputNickName":"โปรดป้อนชื่อเล่นของนักช็อปปริศนา",
+      "duplicateNickName":"ชื่อเล่นนักช็อปปริศนาเดียวกันมีอยู่แล้ว โปรดป้อนชื่อเล่นอื่น",
+      "mysterio":"นักช็อปปริศนา",
+      "allMysterio":"นักช็อปปริศนาทั้่งหมด"
   }
 
 }

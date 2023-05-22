@@ -58,10 +58,12 @@ export default {
   },
   data() {
     return {
-      dateRangeItems:[{value:3,label:this.$t('overview.last3Days')},{value:7,label:this.$t('overview.last7Days')},
-                      {value:30,label:this.$t('overview.last30Days')},{value:90,label:this.$t('overview.last90Days')},
-                      {value:0,label:this.$t('overview.thisMonth')},{value:1,label:this.$t('overview.lastMonth')},
-                      {value:2,label:this.$t('overview.thisQuarter')},{value:4,label:this.$t('overview.customDate')}],
+      dateRangeItems:[
+        {value:3,label:this.$t('overview.last3Days')},{value:7,label:this.$t('overview.last7Days')},
+        {value:30,label:this.$t('overview.last30Days')},{value:90,label:this.$t('overview.last90Days')},
+        {value:0,label:this.$t('overview.thisMonth')},{value:1,label:this.$t('overview.lastMonth')},
+        {value:2,label:this.$t('overview.thisQuarter')},{value:4,label:this.$t('overview.customDate')}
+      ],
       dateRangevalue:-1,
       diablePick:false,
       contentWidth:[{key:'en',value:'calc(402/1440*100vw)'},{key:'zh',value:'calc(402/1440*100vw)'},{key:'zhtw',value:'calc(402/1440*100vw)'},
@@ -88,7 +90,7 @@ export default {
     async accountChanged(val) {
       if (val !== 0) {
         this.dateRange = 4;
-        this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
+        this.dateTimeValue = [this.$moment(), this.$moment().subtract(-30, 'days')];
       }
     },
   },
@@ -100,7 +102,7 @@ export default {
   },
   created(){
     if(this.dateTimeValue==[]){
-      this.dateTimeValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+      this.dateTimeValue = [this.$moment().endOf('d').toDate(), this.$moment().subtract(-30, 'days').startOf('d').toDate()];
     }
   },
   activated(){
@@ -118,7 +120,7 @@ export default {
     getDefaultTimeList() {
       //console.log("2.dateTimeValue:",this.dateTimeValue);
       if(this.dateTimeValue.length==0){
-        this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
+        this.dateTimeValue = [this.$moment() , this.$moment().subtract(-30, 'days')];
       //this.dateTimeValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
       }
     },
@@ -186,7 +188,7 @@ export default {
     width: calc(125/1440*100vw);
   }
   .rangeSel-vi.el-select .el-input--medium .el-input__inner {
-     @media screen and (max-width:1367px) { 
+    @media screen and (max-width:1367px) { 
       width: calc(150/1440*100vw);
     }
     @media screen and(min-width: 1367px){

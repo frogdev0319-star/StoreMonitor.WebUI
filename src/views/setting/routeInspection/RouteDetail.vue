@@ -6,7 +6,7 @@
           <p :style="item.isClick?'background-color: #fff;color:#006ab7;':''" class="item_title">{{ item.label }}</p>
         </div>
         <div class="spacer"></div>
-        <div 
+        <div
           class="flex-center"
           style="margin-right:20px">
           <div
@@ -39,7 +39,8 @@
         </div>
       </div>
       <div v-if="routeData.length !== 0" :style="{'min-height':varyWindowWidth*0.52+'px'}">
-        <div v-for="(item,index) in inspectCategoryList" :key="index" class="data-content">
+        <div v-for="(item,index) in showTable" :key="item.id">
+          <observer @on-change="onChange"  class="data-content">
           <div class="prompt-content" v-if="sheetIndex === 0 && index === 0 && showDragInfo">
             <div class="prompt-info">
               <img :src="dragImgSrc" class="prompt-image" alt="">
@@ -63,7 +64,7 @@
             <div v-if="!item.children" style="width:16%;font-size: 14px;font-weight: bold;color: #424151; text-align:center;">{{ item.groupScore==-99999?'': item.groupScore}}</div>
           </div>
           <template v-if="!item.children">
-            <div v-if="item.itemData.length !== 0" class="table-class">
+            <div v-if="item.itemData.length !== 0" class="table-class" :key="`item-`+index">
               <draggable-table
                 :is-score-sheet= "isScoreItemActive"
                 :table-header="isScoreItemActive ? scoreTableHeader:passFailTableHeader"
@@ -77,8 +78,8 @@
             </div>
           </template>
           <template v-else>
-            <template v-for="(child,childIndex) in item.children">
-              <div class="catergy-title subcatergy" :key="childIndex">
+            <template v-for="(child,childIndex) in item.children" >
+              <div class="catergy-title subcatergy" :key="child.id">
                 <div :style="isScoreItemActive?{'width':'46%'}:{'width':'72%'}">
                   <el-checkbox v-model="child.checked" class="storevue-checkbox-outlined" @change="checkSubcatergy(child, item)"/>
                   <span class="table-title">{{ child.groupName }}</span>
@@ -87,6 +88,7 @@
               </div>
               <div v-if="child.itemData.length !== 0" class="table-class" :key="`item-`+childIndex">
                 <draggable-table
+                  :key="`draggable_`+child.id"
                   :is-score-sheet= "isScoreItemActive"
                   :table-header="isScoreItemActive ? scoreTableHeader:passFailTableHeader"
                   :table-data="child.itemData"
@@ -99,6 +101,7 @@
               </div>
             </template>
           </template>
+          </observer>
         </div>
       </div>
     </div>
@@ -145,10 +148,11 @@ import util from '@/common/util';
 import DialogPop from '@/components/DialogPop';
 import draggable from 'vuedraggable';
 import DraggableTable from "@/components/DraggableTable";
+import Observer from 'vue-intersection-observer';
 
 export default {
   name: 'RouteDetail',
-  components: {DraggableTable, DialogPop, DelayButton , draggable},
+  components: {DraggableTable, DialogPop, DelayButton , draggable,Observer},
   props: {
     routeData: Array,
     tabName: String,
@@ -286,7 +290,9 @@ export default {
       categoryIndex: -1,
       subcategoryIndex: -1,
       dragImgSrc: require('../../../../static/img/arrows_down.png'),
-      sheetIndex: 0
+      sheetIndex: 0,
+      tableSlice:3,
+      showTable:[],
     };
   },
 
@@ -301,16 +307,37 @@ export default {
   watch:{
     routeData:{
       handler(newValue){
+        this.tableSlice = 3;
         this.inspectCategoryList = util.handleInspctionCatergyTree(newValue);
+        if(this.inspectCategoryList.length >= this.tableSlice)
+          this.showTable = this.inspectCategoryList.slice(0,this.tableSlice);
+        else this.showTable = this.inspectCategoryList;
       },
       deep:true
     },
   },
   mounted() {
+    //console.log("inspectCategoryList:",this.inspectCategoryList);
+    if(this.inspectCategoryList.length >= this.tableSlice)
+      this.showTable = this.inspectCategoryList.slice(0,this.tableSlice);
+    else this.showTable = this.inspectCategoryList;
     this.getNum();
   },
 
   methods: {
+    onChange(entry, unobserve) {
+      // After loading Cancel monitoring, optimise performance
+      if (entry.isIntersecting) {
+        this.tableSlice+=3;
+        if(this.inspectCategoryList.length >= this.tableSlice)
+          this.showTable = this.inspectCategoryList.slice(0,this.tableSlice);
+        else this.showTable = this.inspectCategoryList;
+        unobserve()
+      }
+      //this.show =  entry.isIntersecting;
+      //this.currentInfo = entry.isIntersecting ? this.imageSrc : 'https://avatars2.githubusercontent.com/u/20992106?s=460&v=4'
+    },
+
     getNum() {
       const self = this;
       self.typeNum = self.routeData.length;
@@ -408,6 +435,7 @@ export default {
               const objChild = {};
               objChild.id = itemChild.id;
               objChild.checked = false;
+              objChild.isImportant = itemChild.isImportant;
               objChild.name = itemChild.subject;
               objChild.description = (itemChild.description === undefined || itemChild.length === 0) ? '--' : itemChild.description;
               objChild.score = itemChild.itemScore + '分';
@@ -937,4 +965,3 @@ export default {
     padding: 0px;
 }
 </style>
-

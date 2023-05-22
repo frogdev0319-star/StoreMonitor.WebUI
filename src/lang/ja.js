@@ -278,7 +278,8 @@ export default{
       "daysww":"日",
       "weeks":"週",
       "pageSize":"ページあたりの表示数",
-      "pageSizeUnit":"エントリ"
+      "pageSizeUnit":"エントリ",
+      "rate":" レート"
   },
   "remotePatrol":{
       "InspectionDetail":"レポートのエクスポート",
@@ -365,6 +366,10 @@ export default{
       "fluency":"SD",
       "fullScreenMode":"フルスクリーンモード",
       "generateTime":"生成時間",
+      "signInTime":"チェックイン時間",
+      "patrolTime":"検査にかかる時間",
+      "signInDistance":"チェックイン距離",
+      "aroundDistance":"おおよそ ",
       "getAccessTokenError":"アクセストークンを取得できませんでした",
       "getBeseyeStreamError":"beseyeストリーム情報の取得に失敗しました！",
       "getscore":"インスペクションスコア",
@@ -521,7 +526,27 @@ export default{
       "resubmiteRpt":"レポート提出の確認",
       "systemReject":"システムの取り消し",
       "systemRejectMsg":"承認スタッフはいません。再確認してください。",
-      "cannotSwitchMimicMode":"現在レポートを編集中のため、モードを切り替えることはできません"
+      "cannotSwitchMimicMode":"現在レポートを編集中のため、モードを切り替えることはできません",
+      "tipLimitGroupScore":"得スコアがカテゴリーの上限を超える場合は、上限を使用して合計スコアを計算します",
+      "signatureInfo":"チェックイン情報",
+      "mapDistance1":"および",
+      "mapDistance2":"おおよその距離",
+      "mapDistance3":"メートル",
+      "hour":"時",
+      "seconds":"秒",
+      "minute":"分",
+      "reportSubmitting":"Report submitting...",
+      "storeCode":"店舗コード",
+      "inspectSummary":"検査概要",
+      "pleaseAdd":"* 追加してください",
+      "notQualifyAdd":"* 無資格の場合は追加が必要です",
+      "lowerThan":"* 未満",
+      "lowScoreAdd":"スコア、追加する必要があります",
+      "textItem":"「テキスト」",
+      "mediaItem":"「画像または動画」",
+      "attachments":"添付ファイルの種類",
+      "notFinishWithText":"まだ完了していない必須項目があります。「テキスト」タイプの添付ファイルを備考ラベルとして追加してください。",
+      "notFinishWithMedia":"まだ完了していない必須項目があります。「画像または動画」タイプの添付ファイルを備考ラベルとして追加してください。"
   },
   "eventView":{
       "ClosedEvent":"クローズドイベント",
@@ -530,6 +555,7 @@ export default{
       "ReturnEvent":"拒否されたイベント",
       "Returned":"拒否する",
       "addDetails":"処理の詳細を追加します",
+      "addAttchement":"添付ファイルの追加",
       "adding":"追加",
       "all":"オール",
       "allEvents":"すべてのイベント",
@@ -571,7 +597,8 @@ export default{
       "expiredate":"終了時間",
       "closeSelectedEvent":"選択したイベントの終了を確認しますか？",
       "confirmBachClose":"イベントの一括終了を確認する",
-      "expiretag":"期限切れ"
+      "expiretag":"期限切れ",
+      "maximumAttVedio":"アップロードできる動画の添付ファイルは2つだけです"
   },
   "insSettingView":{
       "Addscoreitems":"追加のスコアリングアイテム",
@@ -662,6 +689,7 @@ export default{
       "excelPassFailScoreType":"スコア：オプション、0.5～50ポイント",
       "excelScoreItemEmpty":"スコアオプションをエンプティーにすることはできません！",
       "excelScoreItemType":"スコアオプション：必須、-50〜満点",
+      "excelScoreInvalidType":"値フィールドの入力エラー（例：「/」が欠落しているか、不正な値が存在します）",
       "export":"エクスポート",
       "exportFailTitle":"エクスポートできませんでした",
       "group":"グループ",
@@ -693,7 +721,6 @@ export default{
       "mustSignature":"署名は必須",
       "uncertainSignature":"署名は任意",
       "inputData":"担当者名を入力して",
-      "signatureOne":"Sign 1",
       "bindWorkflow":"結合過程を選択して",
       "select":"選択して",
       "no":"いいえ",
@@ -785,11 +812,32 @@ export default{
       "minScoreEmpty":"合計スコアを空にできません！",
       "weight":"重み%",
       "weightSetting":"重み設定",
-      "weightTotalError":"Weight cannot be greater or less than 100%",
+      "weightTotalError":"重みは100%より大きくも小さくもできません",
       "bindWorkFLow":"ワークフローのバインディング",
       "isRequired":"必須",
-      "notRequired":"非必須",
-      "selectStoreTag":"クイックセレクト"
+      "notRequired":"不要",
+      "selectStoreTag":"クイックセレクト",
+      "groupScore":"カテゴリースコア",
+      "advanceSetting":"詳細設定",
+      "advanceSettingOn":"オン",
+      "advanceSettingOff":"オフ",
+      "setGroupScoreRange0":"カテゴリースコア上限：入力範囲 0～9999",
+      "setGroupScoreRange":"カテゴリースコア上限：入力範囲 -9999～9999",
+      "groupScoreLimit":"カテゴリースコアの上限",
+      "commentStatus":"検査概要オプション表示（この設定はブランドの検査概要に関する表示に影響します）",
+      "autoSelectComment":"条件による検査概要の自動選択を有効にする ",
+      "selectByScore":"スコア条件による自動選択",
+      "noUserDefinedName":"カスタム名なし",
+      "needHeighterThan":"評価範囲の最大値は、最小値よりも高くなければなりません！",
+      "cantEmptyScoreLow":"最低考評總分範圍不可為合計評価スコアの最小範囲を空にすることはできません! ",
+      "cantEmptyScoreHeight":"合計評価スコアの最大範囲を空にすることはできません! ",
+      "memoAdvanced":"備考ラベル",
+      "memoSeparate":"（複数の項目は「/」で区切ってください）",
+      "inputMemoAdvanced":"備考ラベルを入力してください ",
+      "memoCheckText":"テキスト",
+      "memoCheckMedai":"画像または動画",
+      "notQualifyIsRequired":"無資格の場合のみ必須",
+      "selectAtLeastOne":"少なくとも1つのコメントカテゴリー（テキスト、画像、または動画）を選択します"
   },
   "deviceView":{
       "EzvizAccount":"アカウント",
@@ -1303,8 +1351,8 @@ export default{
         "addAttachment":"添付ファイルの追加",
         "pleaseSign":"署名してください",
         "needSign":"この承認には、署名ファイルを添付する必要があります",
-        "selectComment":"Please choose to sign-off on comments!",
-        "rejectReason":"Please fill in the reason for rejection!",
+        "selectComment":"コメントでサインオフを選択してください！",
+        "rejectReason":"却下理由を記入してください！"
     },
     "sendAudit":{
         "all":"オール",
@@ -1336,8 +1384,8 @@ export default{
         "comfirmDelete":"現在の承認プロセスの削除を確認しますか？",
         "comfirmDeleteNode":"現在の承認プロセスノードの削除を確認しますか？",
         "canNotDelete":"「この承認プロセスは削除できません",
-        "isBind":"検査テーブル名がバインドされています」",
-        "cantClose":"「無効化できません",
+        "canNotClose":"このプロセスを閉じることはできません。",
+        "makeSureUsign":"次の検査表が使用されているかどうかを確認してください:",
         "dulplicateScuccess":"プロセスが正常にコピーされました",
         "deleteScuccess":"正常に削除されました",
         "deleteFail":"削除に失敗しました",
@@ -1417,9 +1465,9 @@ export default{
         "tooltipListcan4":"検査レポートは、承認が合格した後にのみ表示できます",
         "auditFlow":"承認プロセス",
         "nodeOrder":"ノードの通し番号",
-        
-        "cantEmptyDays" : "The number of days to stay cannot be empty. ",
-        "cantTooMuchDays" : "The length of stay cannot exceed 365 days. "
+        "cantEmptyDays" : "滞在日数を空にすることはできません。",
+        "cantTooMuchDays" : "滞在期間は365日を超えることはできません。",
+        "cantEmptyInspectStatus" : "検査概要オプションのカスタム名を空にすることはできません"
     },
     "inceptionRpt":{
         "sendAudit":"承認の送信",
@@ -1441,7 +1489,9 @@ export default{
         "editAuditFail":"承認の再送信に失敗しました",
         "auditReport":"承認記録",
         "saveReport":"セーブ",
-        "submitReport":"保存して送信"
+        "submitReport":"保存して送信",
+        "warnWorkflowUnbind":"検査票の製本処理がキャンセルされました。この操作を続行する前に、検査票の製本処理の設定を完了してください。",
+        "errorEditReport":"レポートの編集エラー"
     }
   },
   "mysterio":{
@@ -1465,11 +1515,12 @@ export default{
       "pleaseChooseTag":"検査を選択する",
       "comfirmDelMysterio":"このミステリーショッパーメンバーの削除を確認します",
       "saveMysterioSettingFail":"アクセス許可グループの保存に失敗しました",
-      "nickName":"Nick Name",
-      "nickNameTip":"The nick name of sub-category supports up to 50 characters",
-      "pleaseInputNickName":"Please enter the nick name of the mystery",
-      "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name.",
-      "mystery":"Mystery Shopper"
+      "nickName":"ニックネーム",
+      "nickNameTip":"サブカテゴリのニックネームは最大50文字をサポートします",
+      "pleaseInputNickName":"ミステリーのニックネームを入力してください。",
+      "duplicateNickName":"同じミステリーニックネームが既に存在します。ニックネームを再入力してください。",
+      "mysterio":"ミステリーショッパー",
+      "allMysterio":"ミステリーショッパーのすべて"
   }
 
 }

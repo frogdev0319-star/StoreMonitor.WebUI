@@ -73,7 +73,7 @@ export default {
       type:Array,
       default: () => [],
       required: false
-    }
+    },
   },
   computed:{
     pageSizeOption(){
@@ -105,7 +105,6 @@ export default {
       immediate: false, 
       deep: true,
       handler (val) {
-        console.log("currentPage:",val);
         if(val>0)this.currentPage = val;
         else this.currentPage =1;
       }

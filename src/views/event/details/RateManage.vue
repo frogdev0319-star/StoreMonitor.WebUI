@@ -10,7 +10,7 @@
         <span
             v-if="event.status === 0"
             class="event-status"
-            style="background-color:#fff2ef;color:#f57848;" 
+            style="background-color:#fff2ef;color:#f57848;"
             >
             {{ $t('eventView.pending') }}
           </span>
@@ -80,6 +80,31 @@
               width="90%"
               prload
               controls
+              class="video-js vjs-fill"/>
+          </div>
+        </div>
+      </el-dialog>
+      <el-dialog
+        v-if="dialogAttachVideo"
+        :title="$t('eventView.view')"
+        :visible.sync="dialogAttachVideo"
+        :close-on-click-modal="false"
+        width="850px"
+        height="834px"
+        top="12%"
+        class="rate-video-dialog"
+        @close="stopCommentVideo">
+        <div slot="title" class="dialog-title">{{$t('eventView.view')}}</div>
+        <div class="video-dialog-content" style="overflow:hidden;">
+          <hr class="dialog-hr">
+          <div class="video-content" >
+            <video
+              id="previewAttVideo"
+              height="83%"
+              width="90%"
+              prload
+              controls
+              autoplay
               class="video-js vjs-fill"/>
           </div>
         </div>
@@ -236,7 +261,7 @@
               </div>
               </div>
             </div>
-            
+
           </div>
           <!--<div v-if="event.sourceType !== 1" class="viedo-info">
             <div v-if="showCheckVideo" @click="checkVideo">
@@ -246,7 +271,7 @@
           </div>-->
         </div>
       </div>
-      
+
     </el-col>
     <el-col :span="12" class="rside" :style="{'height':windowHeight*0.82+'px','background-color':'#edf0f2'}">
       <div class="title">
@@ -274,48 +299,97 @@
           </div>
         </div>
       </div>
+
       <div class="submit-content">
-        <span style="display:block;"><span style="color:red;">* </span>{{ $t('eventView.addDetails') }}</span>
-        <div class="description" v-for="(des, idx) in addDescriptionList" :key="idx">
-            <img :src="delDesImg" style="widht:16px;height:16px;align-self:start;margin-top:10px;" :key="'img_'+idx" @click="onDeleteDescription(idx)" />
-            <div class="edit-description">
-              <div class="edit-input">
-                
-                <el-input 
-                  class="edit-event-input"
-                  v-model="addDescriptionList[idx]"
-                  type="textarea"
-                  resize="none"
-                  :readonly="!isEdit"
-                  @input="(val)=>editDesChang(val,idx)"
-                />
-                <span v-if="editDesRuletip[idx]" class="rules">{{ $t('eventView.RateRuletip') }}</span>
+        <el-scrollbar class="submit-content-scroll">
+        <div>
+          <span style="display:block;"><span style="color:red;">* </span>{{ $t('eventView.addDetails') }}</span>
+          <div class="description" v-for="(des, idx) in addDescriptionList" :key="idx">
+              <!-- <img :src="delDesImg" style="widht:16px;height:16px;align-self:start;margin-top:10px;" :key="'img_'+idx" @click="onDeleteDescription(idx)" /> -->
+              <div class="edit-description">
+                <div class="edit-input">
+
+                  <el-input
+                    class="edit-event-input"
+                    v-model="addDescriptionList[idx]"
+                    type="textarea"
+                    resize="none"
+                    :readonly="!isEdit"
+                    @input="(val)=>editDesChang(val,idx)"
+                  />
+
+                  <span v-if="editDesRuletip[idx]" class="rules">{{ $t('eventView.RateRuletip') }}</span>
+                </div>
+                <div class="edit-icon-div" >
+                  <img :src="editDesImg" style="width:20px;height:20px;align-self:center;cursor:pointer;" @click="onEditDescription"/>
+                </div>
               </div>
-              <div class="edit-icon-div" >
-                <img :src="editDesImg" style="width:20px;height:20px;align-self:center;cursor:pointer;" @click="onEditDescription"/>
+               <!-- 刪除 -->
+                          <img
+                            :key="'img_'+idx"
+                            :src="deleteInspectIcon_new"
+                            alt="delete"
+                            class="to_delete"
+                            @click="onDeleteDescription(idx)"
+                          />
+          </div>
+          <div v-if="curDeslistNum<5" class="des-input">
+            <div style="min-height:36px;height:auto;">
+            <el-input
+              :autosize="{ minRows: 2}"
+              v-model="eventDes"
+              :placeholder="$t('eventView.describe')"
+              size="mini"
+              type="textarea"
+              resize="none"
+              class="input-area"
+              :disabled="curStatus==2 || curStatus==4 || curDeslistNum>=5"
+              @input="(val)=>ivsIdChange(val)"
+              @blur="notShowInputRuleTips"/>
+              <span v-if="ivsIdRuletip" class="rules">{{ $t('eventView.RateRuletip') }}</span>
+            </div>
+            <div  class="btn-content">
+              <div class="btn-des-confirm" @click="comfirmAddDes">{{ $t('remotePatrol.confirm') }}</div>
+            </div>
+          </div>
+          <div style="margin-top:24px;margin-left:16px;margin-bottom:15px">{{ $t('eventView.addAttchement') }}</div>
+          <div class="attach-area">
+            <div v-for="(imgItem,index) in attachFileList" :key="'img'+index" class="source-details" >
+              <!--video-->
+                <div v-if="imgItem.type===1" class="img-content">
+                  <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
+                  <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon" @click="playAttachVideo(imgItem,index)">
+                  <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
+                </div>
+              <div v-else-if="imgItem.type===2" class="img-content">
+                <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
+                <el-image
+                  :src="imgItem.src"
+                  class="imgLittle"
+                  :preview-src-list="getAuditImgList(index)"/>
               </div>
             </div>
-        </div>
-        <div v-if="curDeslistNum<5" class="des-input"> 
-          <div style="min-height:36px;height:auto;"> 
-          <el-input
-            :autosize="{ minRows: 2}"
-            v-model="eventDes"
-            :placeholder="$t('eventView.describe')"
-            size="mini"
-            type="textarea"
-            resize="none"
-            class="input-area"
-            :disabled="curStatus==2 || curStatus==4 || curDeslistNum>=5"
-            @input="(val)=>ivsIdChange(val)"
-            @blur="notShowInputRuleTips"/>
-            <span v-if="ivsIdRuletip" class="rules">{{ $t('eventView.RateRuletip') }}</span>
-          </div>
-          <div  class="btn-content">
-            <div class="btn-des-confirm" @click="comfirmAddDes">{{ $t('remotePatrol.confirm') }}</div>
+            <div v-if="attFileCount<10" class="attach-add" @click="$refs.auditfile.click()">
+              <input type="file" style="display: none" accept="image/png,image/jpeg,video/mp4" max-size="2" @change="doAddAttachment" ref="auditfile" />
+              <div style="height:16px;display: flex;flex-direction: row;align-items: center;">
+                <img :src="addAttIcon" widht="16px" height="16px" style="border-radius:10px;"/>
+                <div class="att-txt">{{ $t('audit.inceptionRpt.attachment') }}</div>
+              </div>
+            </div>
           </div>
         </div>
+        </el-scrollbar>
       </div>
+
+      <el-dialog :visible.sync="uploadProgress" :close-on-click-modal="false" width="510px" top="35vh" left="40vh" class="AddSumupLoad">
+        <div class="body-content">
+          <p>{{ $t('remotePatrol.uploading') }}</p>
+          <p style="margin-bottom:15px;">
+            {{ $t('remotePatrol.uploadInfo', {totalNum: totalnumOfPic, uploadedNum: uploadingnumOfPic}) }}
+          </p>
+          <el-progress :percentage="Math.round(uploadingnumOfPic/totalnumOfPic*100)"/>
+        </div>
+      </el-dialog>
     </el-col>
   </el-row>
 </template>
@@ -325,6 +399,7 @@ import videojs from '../../../../static/video.js';
 import 'videojs-contrib-hls';
 import { eventRESTful } from '@/api/index';
 import { getDetailedStoreInfo } from '@/api/store';
+import { getStorageInfo } from '@/api/event';
 import PermissionHelper from '@/api/PermissionHelper';
 import filterString from '@/common/filterString';
 import { mapGetters } from 'vuex';
@@ -401,12 +476,28 @@ export default {
       delDesImg: require('../../../../static/img/del_description.svg'),
       editDesImg: require('../../../../static/img/event-pen.svg'),
       isEdit:false,
-      editDesRuletip:[false,false,false,false,false]
+      editDesRuletip:[false,false,false,false,false],
+      attFileCount:0,
+      videoAttFileCount:0,
+      addAttIcon: require('../../../../static/img/icon_attachment.svg'),
+      deleteInspectIcon_new: require('../../../../static/img/table-delete.png'),
+      attachFileList:[],
+      bucketVideo: '',
+      bucketImage: '',
+      uploadProgress:false,
+      totalnumOfPic:0,
+      uploadingnumOfPic:0,
+      dialogAttachVideo:false,
+      oss: null,
     };
   },
   watch:{
      vendor(){
       this.currentVideoComponent = ['DashVideo', 'EzvizVideo', 'BeseyeVideo', 'SkywatchVideo'][this.vendor];
+    },
+    attachFileList(){
+      this.attFileCount = this.attachFileList.length;
+      this.videoAttFileCount = this.attachFileList.filter(item=>item.type==1).length;
     }
   },
 
@@ -459,6 +550,7 @@ export default {
 
   mounted() {
     const self = this;
+    self.getUpLoadBucketInfo();
     self.getBtnList();
     self.getSessionData();
     self.getCommentList(0);
@@ -495,6 +587,15 @@ export default {
         this.previewplayer = videojs(video);
         this.previewplayer.src({ src: item.url });
         this.previewplayer.play();
+      });
+    },
+
+    playAttachVideo(item, index) {
+      const self = this;
+      self.dialogAttachVideo = true;
+      self.$nextTick(function() {
+        var video = document.getElementById('previewAttVideo');
+        video.setAttribute("src",item.url);
       });
     },
 
@@ -608,7 +709,7 @@ export default {
       if(event.relatedDeviceIds.length > 0){
         const relatedDeviceIds = event.relatedDeviceIds.sort();
         self.relatedChannels = [];
-        
+
         relatedDeviceIds.forEach(item => {
           deviceList.forEach(_item => {
             if (_item.id === item) {
@@ -669,22 +770,22 @@ export default {
           // 1 handled：add、closed、reject
           // 2 closed：
           // 3 reject：handle、add、closed
-          // 4 
+          // 4
           self.subBtnList.forEach(item => {
             console.log("item:",item);
             if (self.curStatus === 0 || self.curStatus === 3) {
               //if (item.order === 0 && !!PermissionHelper.enableEventHandle()) item.isShow = true;
-              //else if(item.order === 1 && !!PermissionHelper.enableEventAdd())  item.isShow = true; 
-              //else if(item.order === 2 && !!PermissionHelper.enableEventClose()) item.isShow = true; 
+              //else if(item.order === 1 && !!PermissionHelper.enableEventAdd())  item.isShow = true;
+              //else if(item.order === 2 && !!PermissionHelper.enableEventClose()) item.isShow = true;
               //else item.isShow = false;
               item.order === 0 || item.order === 1 || item.order === 2 ? item.isShow = true : item.isShow = false;
               item.order === 0 ? item.isActive = true : item.isActive = false;
             }
             if (self.curStatus === 1) {
-              
-              //if(item.order === 1 && !!PermissionHelper.enableEventAdd())  item.isShow = true; 
+
+              //if(item.order === 1 && !!PermissionHelper.enableEventAdd())  item.isShow = true;
               //else if(item.order === 2 && !!PermissionHelper.enableEventClose()) item.isShow = true;
-              //else if (item.order === 3 && !!PermissionHelper.enableEventReturn()) item.isShow = true; 
+              //else if (item.order === 3 && !!PermissionHelper.enableEventReturn()) item.isShow = true;
               //else item.isShow = false;
               item.order === 1 || item.order === 2 || item.order === 3 ? item.isShow = true : item.isShow = false;
               item.order === 1 ? item.isActive = true : item.isActive = false;
@@ -715,7 +816,7 @@ export default {
             if (self.curStatus === 2 || self.curStatus === 4) {
               self.showWinpBtn = false;
             }
-            
+
             obj.showContent = index === 0;
             obj.audioList = [];
             obj.sourceList = [];
@@ -783,7 +884,10 @@ export default {
           self.getCommentList(1);
           self.event.status = status;
 
+          self.uploadProgress = false;
           self.eventDes = '';
+          self.attFileCount=0;
+          self.attachFileList=[];
           setTimeout(() => {
             self.commentList.forEach((_item, _index) => {
               self.getCommentDuration(_item);
@@ -798,7 +902,11 @@ export default {
       });
     },
 
-    submit() {
+    async submit() {
+      if(this.licenseStatus == 61 ){
+        util.notify(this.$t('route.errorStoreNoPermission'), 'error', 1000 );
+        return;
+      }
       if (!util.validateLicense(this.licenseStatus)) {
         return;
       }
@@ -812,6 +920,32 @@ export default {
       this.addDescriptionList.forEach(att=>{
         attachment_des.push({mediaType:3,url:att});
       })
+
+      //上傳附件
+      self.uploadingnumOfPic = 0;
+      self.totalnumOfPic = self.attachFileList.length;
+      self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
+      const storageParams = {};
+      storageParams.storeId = this.event.storeId;
+      await getStorageInfo(storageParams).then(res => {
+        if (res.errCode === 0) {
+          self.oss = res.data;
+        }
+      });
+      for(let idx=0; idx<self.attachFileList.length;idx++){
+        await self.upLoadFile(self.attachFileList[idx]).then((url) => {
+          self.uploadingnumOfPic++;
+          const auditImgObj = {
+            mediaType: self.attachFileList[idx].type,
+            url: url,
+            ts: Date.now()
+          };
+          attachment_des.push(auditImgObj);
+        }).catch((err) => {
+          console.log("uploade file error:",err)
+          upload++;
+        });
+      }
       var activeBtn = self.subBtnList.filter(btn=> btn.isActive);
       //console.log("activBtn:",activeBtn);
       if (activeBtn[0].order === 0) {
@@ -933,7 +1067,141 @@ export default {
       } else {
         self.editDesRuletip[idx] = false;
       }
-    }
+    },
+    deleteImg({item, index}) {
+      const self = this;
+      self.attachFileList.splice(index, 1);
+    },
+    getAuditImgList(index) {
+      const arr = [];
+      let i = 0;
+      for (i; i < this.attachFileList.length; i++) {
+        arr.push(this.attachFileList[i + index]);
+        if (i + index >= this.attachFileList.length - 1) {
+          index = 0 - (i + 1);
+        }
+      }
+      return arr.map(source => source.src);
+    },
+    getFileUrl(fileName) {
+      const self = this;
+      const bucketName = self.oss.ossBucketName;
+      const endpoint = self.oss.ossEndPoint;
+      const key = fileName;
+      if (self.oss.ossVendor === 2) {
+        return `https://${endpoint}/${bucketName}/${fileName}`;
+      } else {
+        return `http://${bucketName}.${endpoint}/${fileName}`;
+      }
+    },
+    upLoadFile(fileItem) {
+      const self = this;
+      self.percentage = 0;
+      if (self.oss.ossVendor === null) {
+        self.oss.ossVendor = 1; // 1 -aliyun  2-azure
+      }
+      if (self.oss.ossVendor === 1) {
+        const OSS = require('ali-oss');
+        const client = new OSS({
+          region: self.oss.ossEndPoint.slice(0, self.oss.ossEndPoint.indexOf('.')),
+          accessKeyId: self.oss.ossAccessKeyId,
+          accessKeySecret: self.oss.ossAccessKeySecret,
+          // bucket: 'viumo-'+self.accountId,
+          bucket: self.oss.ossBucketName
+        });
+        const name = fileItem.fileName;
+        return new Promise((resolve, reject) => {
+          client.put(name, fileItem.file, {
+            progress: function * (percentage, cpt) {
+              self.percentage = percentage;
+            }
+          })
+            .then((results) => {
+              const url = self.getFileUrl(results.name);
+              resolve(url);
+            })
+            .catch((err) => {
+              reject(err);
+            });
+        });
+      } else {
+        const url = `https://${self.oss.ossEndPoint}/${self.oss.ossBucketName}${self.oss.ossAccessKeySecret}`;
+        const containerURL = new azblob.ContainerURL(url, azblob.StorageURL.newPipeline(new azblob.AnonymousCredential()));
+        const blockBlobURL = azblob.BlockBlobURL.fromContainerURL(containerURL, fileItem.fileName);
+        return new Promise((resolve, reject) => {
+          azblob.uploadBrowserDataToBlockBlob(azblob.Aborter.none, fileItem.file, blockBlobURL)
+            .then((results) => {
+              const url = self.getFileUrl(fileItem.fileName);
+              resolve(url);
+            })
+            .catch((error) => {
+              reject(error);
+            });
+        });
+      }
+    },
+    getUpLoadBucketInfo() {
+      const self = this;
+      self.bucketVideo = 'video' + '/' + util.getCurDate2Str();
+      self.bucketImage = 'image' + '/' + util.getCurDate2Str();
+    },
+    doAddAttachment(e){
+      const self = this;
+      const maxSize = 4*1024*1024; //不能超過4MB
+      var files = e.target.files || e.dataTransfer.files;
+      console.log("choose file:",files);
+      var fileName = files[0].name;
+      if (!files.length)
+        return;
+      /*
+      if(self.attFileCount==10){
+        util.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
+        return;
+      }
+      */
+      if(files[0].type.includes("video") && self.videoAttFileCount==2){
+        util.notify(self.$t('eventView.maximumAttVedio'), 'warning', 3000);
+        return;
+      }
+      if(files[0].type.includes("image")){
+        var objImg={
+          fileName:`${self.bucketImage}/inspect_${util.getCurTimeStr()}_${this.event.storeId}_${files[0].name}`,
+          src:'',
+          url:'',
+          file:'',
+          type:2,
+          size:files[0].size
+        };
+        self.createFile(files[0],objImg);
+        self.attachFileList.push(objImg);
+      }else if(files[0].type.includes("video")){
+        console.log("choose file:",fileName);
+        var objvideo={
+          fileName:`${self.bucketVideo}/inspect_${util.getCurTimeStr()}_${this.event.storeId}_${files[0].name}`,
+          src:'',
+          url:URL.createObjectURL(files[0]),
+          type:1,
+          size:files[0].size,
+        }
+        self.createFile(files[0],objvideo);
+        self.attachFileList.push(objvideo);
+      }
+      self.$refs.auditfile.value = '';
+    },
+    createFile(file, objFile) {
+      //var image = new Image();
+      console.log(objFile);
+      var reader = new FileReader();
+      console.log()
+      reader.onload = (e) => {
+        console.log("e:",e);
+        objFile.src = e.target.result;
+
+        objFile.file = util.base64ToBlob(e.target.result);
+        console.log(objFile.file);
+      };
+      reader.readAsDataURL(file);
+    },
   }
 };
 </script>
@@ -967,6 +1235,24 @@ $h1:#292e36;
     @include point(padding-right,20);
     display: flex;
     align-items: center;
+}
+.to_delete{
+    margin-bottom: 5px;
+    transition: all .3s;
+    cursor: pointer;
+    margin-left: 5px;
+  }
+
+.AddSumupLoad >>> .el-dialog__body{
+  padding:30px 40px !important;
+  text-align: left;
+  .body-content{
+    p{
+      margin-bottom:0;
+      color:#182752;
+      font-size: calc(14/1920*100vw);
+    }
+  }
 }
 #outerdiv{
     position:fixed;
@@ -1116,7 +1402,7 @@ $h1:#292e36;
             .rate-video-dialog{
               border-radius: 5px;
             }
-            
+
             .dialog-hr{
                 border: none;
                 margin-bottom:10px;
@@ -1373,7 +1659,7 @@ $h1:#292e36;
               }
             }
         }
-        
+
         .eventInfo-content{
             text-align: left;
             @include point(margin-top,15);
@@ -1392,7 +1678,7 @@ $h1:#292e36;
                 @include point(min-height,50);
                 /*@include point(min-width,260);*/
                 width:calc(492/1440*100vw);
-                
+
             }
             .description{
                 text-align: left;
@@ -1520,7 +1806,7 @@ $h1:#292e36;
                       font-size: 14px;
                       color:#484848;
                       word-break:keep-all;
-                      
+
                   }
                   .description{
                       float: left;
@@ -1619,7 +1905,7 @@ $h1:#292e36;
               }
             }
           }
-        
+
           .btn-content{
             background-color: #FFF;
             display: flex;
@@ -1655,7 +1941,13 @@ $h1:#292e36;
               }
             }
         }
-        
+        .submit-content-scroll{
+          @include point(height,545);
+          /deep/
+          .el-scrollbar__wrap{
+              overflow: auto;
+            }
+        }
         .submit-content{
             background-color: #FFF;
             border: solid 1px #f0f0f0;
@@ -1665,25 +1957,27 @@ $h1:#292e36;
             text-align: left;
             font-size: 15px;
             margin-top: 23px;
-            padding-bottom:15px;
+            /*padding-bottom:15px;*/
             padding-left: 16px;
             color: $black;
+            overflow: hidden;
             width: calc(520/1440*100vw);
-            @include point(height,535);
             @include point(padding-top,20);
+            @include point(height,570);
             .dealInfo-label{
                 font-weight: bold;
                 margin-bottom: 25px;
                 display: block;
             }
+
             .description{
               margin:16px 19px 0px 16px;
               display:flex;
               flex-direction:row;
               align-items: center;
               .edit-description{
-                margin-left:14px;
-                padding: 6px 9px 6px 16px;
+                // margin-left:14px;
+                padding: 6px 9px 6px 6px;
                 box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
                 border: solid 1px #e6e6e6;
                 border-radius: 5px;
@@ -1748,16 +2042,82 @@ $h1:#292e36;
                 }
               }
             }
-            
+
             .rules{
                 font-size: 10px;
                 color:#ff2400;
                 margin-top: 3px;
                 display: block;
             }
-            
+            .attach-area{
+              display:flex;
+              flex-wrap:wrap;
+              align-content:flex-start;
+              align-self: flex-start;
+              width: calc(478/1440*100vw);
+              margin-top: 15px;
+              margin-left: 16px;
+              margin-right: 19px;
+              margin-bottom:10px;
+              .attach-add{
+                height:calc(64/900*100vh);
+                width:calc(86/1440*100vw);
+                border-radius: 5px;
+                box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1);
+                display:flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                .att-txt{
+                  font-size: 12px;
+                  color: #006ab7;
+                  margin-left: 3px;
+                }
+              }
+              .source-details{
+                display: inline-block;
+                margin-right: 12px;
+                position: relative;
+                .icondelete{
+                  position: absolute;
+                  font-size: 14px;
+                  right: 4px;
+                  margin-top: 4px;
+                  z-index: 2;
+                  color: #fff;
+                  cursor: pointer;
+                  background-color: rgba($color: $black, $alpha: 0.8);
+                  border-radius: 50%;
+                }
+                .img-content{
+                  width: 100%;
+                  height: 100%;
+                  position: relative;
+                  cursor: pointer;
+                  .start-icon{
+                    position: absolute;
+                    left: 35%;
+                    top: 30%;
+                  }
+                }
+                .imgLittle{
+                  height:calc(64/900*100vh);
+                  width:calc(86/1440*100vw);
+                  border-radius: 5px;
+                }
+                .icon-video{
+                  font-size: 18px;
+                  color: $red;
+                  /*position: relative;*/
+                  /*top: 2px;*/
+                  margin-right: 5px;
+                  display: inline-block;
+                  vertical-align: middle;
+                }
+              }
+            }
         }
-        
         .deal-content{
             position: relative;
             .circle-content{

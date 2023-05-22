@@ -3,11 +3,13 @@
     <div v-for="(_item,_index) in reportDetailData" :key="_index" class="content-detail">
       <div class="content-detail-title">
         <div class="detail-title">
-          <p class="title1"><span class="pdf_font_20">{{ _index+1 }}.{{ _item.subject }}</span>
-          <span 
+          <p class="title1" ><span class="pdf_font_20" :class= "{ is_important : _item.isImportant}" >{{ _index+1 }}.{{ _item.subject }}  </span>
+          <span
             style="color: #85898e; font-size: 12px"
-            v-if="_item.itemScore !== Number.MAX_VALUE" 
-            class="pdf_font_18">
+            v-if="_item.itemScore !== Number.MAX_VALUE"
+            class="pdf_font_18"
+            :class= "{ is_important_s  : _item.isImportant}"
+            >
             {{ `( ${$t('remotePatrol.totalScoreUnit')}${_item.itemScore} )` }}</span></p>
           <p class="title2"><span class="pdf_font_18 title2_pdf">{{ _item.description }}</span></p>
         </div>
@@ -64,7 +66,7 @@
           <!--<div v-if="_item.comment != null && _item.comment !== ''" class="cdm-word">-->
             <!--<span class="pdf_font_24">{{ _item.comment }}</span>-->
           <!--</div>-->
-          
+
             <description-text
               v-if="_item.descriptionList.length > 0"
               :discription-list = "_item.descriptionList"
@@ -134,7 +136,7 @@ import videojs from '../../static/video.js';
 import 'videojs-contrib-hls';
 import AudioVue from './AudioVue';
 import DescriptionText from "./DescriptionText";
-
+import util from '@/common/util.js';
 export default {
   name: 'ReportDetail',
   components: {DescriptionText, AudioVue },
@@ -204,6 +206,11 @@ export default {
   methods: {
     playCommentVideo(item, index) {
       const self = this;
+      console.log("Is H265="+item.isH265)
+      if(item.isH265){
+          util.notify(this.$t('eventView.videoFormatNotSupoort'), 'warning', 3 * 1000);
+          return;
+      }
       self.dialogCommentVideo = true;
       self.$nextTick(function() {
         var video = document.getElementById('previewVideo');
@@ -254,6 +261,12 @@ export default {
   }
   @mixin point($poi,$val){
     #{$poi}:checkRem($val);
+  }
+  .is_important {
+    color: #f31d65 !important
+  }
+  .is_important_s {
+    color: #fb6093 !important
   }
   .content-detail{
     margin-top: 10px;

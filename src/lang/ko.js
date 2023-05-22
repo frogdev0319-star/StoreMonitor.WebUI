@@ -278,7 +278,8 @@ export default{
       "daysww":"해",
       "weeks":"주",
       "pageSize":"페이지별 디스플레이",
-      "pageSizeUnit":"개의 항목"
+      "pageSizeUnit":"개의 항목",
+      "rate":" 요율"
   },
   "remotePatrol":{
       "InspectionDetail":"보고사 내보내기",
@@ -365,6 +366,10 @@ export default{
       "fluency":"SD",
       "fullScreenMode":"전체 화면 모드",
       "generateTime":"생성 시간",
+      "signInTime":"체크인 시간",
+      "patrolTime":"검사에 소요된 시간",
+      "signInDistance":"체크인 거리",
+      "aroundDistance":"약 ",
       "getAccessTokenError":"액세스 토큰을 가져오지 못했습니다.",
       "getBeseyeStreamError":"beseye 스트림 정보 불러오기 실패!",
       "getscore":"검사 점수",
@@ -521,7 +526,27 @@ export default{
       "resubmiteRpt":"보고서 제출 확인",
       "systemReject":"시스템 중단",
       "systemRejectMsg":"최종 서명 직원이 없습니다. 다시 확인하십시오",
-      "cannotSwitchMimicMode":"현재 보고서를 편집하는 중이어서 모드를 전환할 수 없습니다."
+      "cannotSwitchMimicMode":"현재 보고서를 편집하는 중이어서 모드를 전환할 수 없습니다.",
+      "tipLimitGroupScore":"점수가 카테고리 상한을 초과하면 상한값을 사용하여 총 점수를 계산합니다.",
+      "signatureInfo":"체크인 정보",
+      "mapDistance1":"그리고",
+      "mapDistance2":"대략적인 거리",
+      "mapDistance3":"미터",
+      "hour":"시간",
+      "seconds":"초",
+      "minute":"분",
+      "reportSubmitting":"Report submitting...",
+      "storeCode":"스토어 코드",
+      "inspectSummary":"검사 요약",
+      "pleaseAdd":"* 추가하십시오.",
+      "notQualifyAdd":"* 부적격일 경우 추가해야 합니다.",
+      "lowerThan":"* 점 미만이면",
+      "lowScoreAdd":"추가해야 합니다",
+      "textItem":"“텍스트”",
+      "mediaItem":"“이미지 또는 비디오”",
+      "attachments":"첨부파일 유형 ",
+      "notFinishWithText":"아직 작성되지 않은 필수 항목이 있습니다. 비고 라벨로 “텍스트” 유형의 첨부파일을 추가하십시오.",
+      "notFinishWithMedia":"아직 작성되지 않은 필수 항목이 있습니다. 비고 라벨로 “이미지 또는 비디오” 유형의 첨부파일을 추가하십시오."
   },
   "eventView":{
       "ClosedEvent":"종료된 이벤트",
@@ -530,6 +555,7 @@ export default{
       "ReturnEvent":"거절한 이벤트",
       "Returned":"거절",
       "addDetails":"처리 세부 추가",
+      "addAttchement":"첨부 파일 추가",
       "adding":"추가",
       "all":"전부",
       "allEvents":"모든 이벤트",
@@ -571,7 +597,8 @@ export default{
       "expiredate":"마감 시간",
       "closeSelectedEvent":"선택한 이벤트 마감을 확인하시겠습니까?",
       "confirmBachClose":"이벤트 일괄 마감 확인",
-      "expiretag":"만료됨"
+      "expiretag":"만료됨",
+      "maximumAttVedio":"2개의 비디오 첨부파일만 업로드할 수 있습니다."
   },
   "insSettingView":{
       "Addscoreitems":"추가한 득점 항목",
@@ -662,6 +689,7 @@ export default{
       "excelPassFailScoreType":"점수: 선택 사항, 0.5-50점",
       "excelScoreItemEmpty":"점수 선택이 비어있으면 안된다!",
       "excelScoreItemType":"득점 선택: 필수-50~만점",
+      "excelScoreInvalidType":"값 필드 입력 오류(예: '/’ 누락 또는 잘못된 값이 있음)",
       "export":"내보내기",
       "exportFailTitle":"내보내기 실패",
       "group":"그룹",
@@ -693,7 +721,6 @@ export default{
       "mustSignature":"서명 필수",
       "uncertainSignature":"서명 미필수",
       "inputData":"담당자를 입력하세요",
-      "signatureOne":"Sign 1",
       "bindWorkflow":"바인딩 프로세스를 선택합니다",
       "select":"선택하십시오",
       "no":"아니요",
@@ -785,11 +812,32 @@ export default{
       "minScoreEmpty":"총점은 비워 둘 수 없습니다!",
       "weight":"가중치%",
       "weightSetting":"가중치 설정",
-      "weightTotalError":"Weight cannot be greater or less than 100%",
+      "weightTotalError":"무게는 100%보다 크거나 작을 수 없습니다.",
       "bindWorkFLow":"바인딩 워크플로우",
       "isRequired":"필수",
-      "notRequired":"Not Required",
-      "selectStoreTag":"빠른 선택"
+      "notRequired":"필요하지 않음",
+      "selectStoreTag":"빠른 선택",
+      "groupScore":"카테고리 점수",
+      "advanceSetting":"고급 설정",
+      "advanceSettingOn":"켜짐",
+      "advanceSettingOff":"꺼짐",
+      "setGroupScoreRange0":"카테고리 상한 점수 입력 범위 0 ~ 9999",
+      "setGroupScoreRange":"카테고리 상한 점수 입력 범위 -9999 ~ 9999",
+      "groupScoreLimit":"카테고리 상한 점수",
+      "commentStatus":"검사 요약 옵션 표시(이 설정은 브랜드의 검사 요약과 관련된 표시에 영향을 줌)",
+      "autoSelectComment":"조건에 따라 검사 요약 자동 선택을 활성화합니다",
+      "selectByScore":"점수 조건을 기준으로 자동 선택",
+      "noUserDefinedName":"사용자 정의 이름 없음",
+      "needHeighterThan":"평가 범위의 최대값은 최소값보다 높아야 합니다!",
+      "cantEmptyScoreLow":"총 평가 점수의 최소 범위는 비워 둘 수 없습니다! ",
+      "cantEmptyScoreHeight":"총 평가 점수의 최대 범위는 비워 둘 수 없습니다! ",
+      "memoAdvanced":"비고 라벨",
+      "memoSeparate":"(여러 항목을 구분하는 데 \"/\"를 사용하십시오.)",
+      "inputMemoAdvanced":"비고 라벨을 입력하십시오. ",
+      "memoCheckText":"텍스트",
+      "memoCheckMedai":"이미지 또는 비디오",
+      "notQualifyIsRequired":"부적격할 경우에만 필요함",
+      "selectAtLeastOne":"최소 하나의 비고 카테고리를 선택하십시오(텍스트, 이미지, 또는 비디오)."
   },
   "deviceView":{
       "EzvizAccount":"장부",
@@ -1303,8 +1351,8 @@ export default{
         "addAttachment":"첨부 파일 추가",
         "pleaseSign":"서명하십시오",
         "needSign":"이 최종 서명에는 서명 파일을 첨부해야 합니다",
-        "selectComment":"Please choose to sign-off on comments!",
-        "rejectReason":"Please fill in the reason for rejection!",
+        "selectComment":"댓글에 대해 최종 서명을 해 주십시오!",
+        "rejectReason":"거부 사유를 작성해 주십시오!"
     },
     "sendAudit":{
         "all":"전부",
@@ -1336,8 +1384,8 @@ export default{
         "comfirmDelete":"현재 최종 서명 프로세스를 삭제하시겠습니까?",
         "comfirmDeleteNode":"현재 최종 서명 프로세스 노드를 삭제하시겠습니까?",
         "canNotDelete":"“이 최종 서명 프로세스는 삭제할 수 없습니다",
-        "isBind":"검사표가 바인딩됨”",
-        "cantClose":"“중단할 수 없음",
+        "canNotClose":"이 프로세스는 닫을 수 없습니다.",
+        "makeSureUsign":"다음 검사 표가 사용 중인지 확인하십시오:",
         "dulplicateScuccess":"프로세스가 성공적으로 복사되었습니다",
         "deleteScuccess":"삭제됨",
         "deleteFail":"삭제 실패",
@@ -1417,9 +1465,9 @@ export default{
         "tooltipListcan4":"검사 보고서는 최종 서명이 완료된 후에만 볼 수 있습니다",
         "auditFlow":"최종 서명 프로세스",
         "nodeOrder":"노드 일련 번호",
-
-        "cantEmptyDays" : "The number of days to stay cannot be empty. ",
-        "cantTooMuchDays" : "The length of stay cannot exceed 365 days. "
+        "cantEmptyDays" : "머무른 일 수는 비워 둘 수 없습니다.",
+        "cantTooMuchDays" : "머무른 일 수가 365일을 초과해서는 안 됩니다.",
+        "cantEmptyInspectStatus" : "검사 요약 옵션의 사용자 정의 이름은 비워 둘 수 없습니다."
     },
     "inceptionRpt":{
         "sendAudit":"최종 서명 제출",
@@ -1441,7 +1489,9 @@ export default{
         "editAuditFail":"최종 서명을 다시 제출하지 못했습니다",
         "auditReport":"최종 서명 기록",
         "saveReport":"저장",
-        "submitReport":"저장 후 제출"
+        "submitReport":"저장 후 제출",
+        "warnWorkflowUnbind":"검사 양식 바인딩 프로세스가 취소되었습니다. 이 작업을 계속하기 전에 검사 양식 바인딩 프로세스 설정을 완료하십시오.",
+        "errorEditReport":"보고서 편집 오류"
     }
   },
   "mysterio":{
@@ -1465,11 +1515,12 @@ export default{
       "pleaseChooseTag":"검사 선택",
       "comfirmDelMysterio":"이 미스터리 쇼퍼 멤버 삭제 확인",
       "saveMysterioSettingFail":"권한 그룹을 저장하지 못했습니다",
-      "nickName":"Nick Name",
-      "nickNameTip":"The nick name of sub-category supports up to 50 characters",
-      "pleaseInputNickName":"Please enter the nick name of the mystery",
-      "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name.",
-      "mystery":"Mystery Shopper"
+      "nickName":"별명",
+      "nickNameTip":"하위 범주의 별명은 최대 50자까지 지원합니다.",
+      "pleaseInputNickName":"미스터리의 별명을 입력하십시오.",
+      "duplicateNickName":"동일한 미스터리 별명이 이미 있습니다. 별명을 다시 입력해 주십시오.",
+      "mysterio":"미스터리 쇼퍼",
+      "allMysterio":"모든 미스터리 쇼퍼"
   }
 
 }

@@ -71,6 +71,10 @@ export default {
             type: Boolean,
             default: false
         },
+        inspectTagIds:{
+            type:Array,
+            required: true
+        }
     },
     data(){
         return{
@@ -137,7 +141,7 @@ export default {
             });
         },
         async getEventDataList(){
-            let params={beginTs:this.beginTs,endTs:this.endTs,clause:this.clause,order:this.order};
+            let params={beginTs:this.beginTs,endTs:this.endTs,clause:this.clause,order:this.order,inspectTagIds:this.inspectTagIds};
             const result = await this.doGetEventList(params);
             //console.log("result:",result);
             this.eventData = result.data.content;
@@ -213,6 +217,7 @@ export default {
             params.activeName = '4';
             params.beginTs=this.beginTs;
             params.endTs=this.endTs;
+            params.inspectTagId = this.inspectTagIds;
             params.searchFrom='EventStatistics';
             const searchConditon = {
                 path: 'eventManage',

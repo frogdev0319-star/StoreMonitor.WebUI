@@ -113,7 +113,9 @@ export default{
       "generalMode":"一般模式",
       "mimicMode":"神秘客模式",
       "MysterioManage":"神秘客权限",
-      "MysterioSetting":"门店权限设定"
+      "MysterioSetting":"门店权限设定",
+      "errorStoreNoPermission":"门店无服务权限，请联系管理员",
+      "errorStoreNameNoPerssion":"因{storeNames}无服务权限无法操作，请重新确认",
   },
   "overview":{
       "DangerousLess":"立即督导＜60%",
@@ -366,6 +368,10 @@ export default{
       "fluency":"流畅",
       "fullScreenMode":"宽萤幕模式",
       "generateTime":"报告产生时间：",
+      "signInTime":"签到时间",
+      "patrolTime":"巡检花费时间",
+      "signInDistance":"签到距离",
+      "aroundDistance":"约",
       "getAccessTokenError":"获取Access Token失败",
       "getBeseyeStreamError":"获取Beseye视频流信息失败！",
       "getscore":"本次得分",
@@ -524,6 +530,26 @@ export default{
       "systemRejectMsg":"无可签核人员，请重新确认",
       "cannotSwitchMimicMode":"正在编辑报告，不能切换模式",
       "tipLimitGroupScore":"得分超过类别上限时以上限计算总分",
+      "signatureInfo":"签到资讯",
+      "mapDistance1":"与",
+      "mapDistance2":"距离约",
+      "mapDistance3":"公尺",
+      "hour":"时",
+      "seconds":"秒",
+      "minute":"分",
+      "reportSubmitting":"报告送出中...",
+      "storeCode":"门店代码",
+      "inspectSummary":"巡检总评",
+      "pleaseAdd":"* 请加入 ",
+      "notQualifyAdd":"* 不合格时需加入 ",
+      "lowerThan":"* 低于 ",
+      "lowScoreAdd":"分时，需加入",
+      "textItem":"「文字」 ",
+      "mediaItem":"「图片或影片」 ",
+      "attachments":"类型附件 ",
+      "notFinishWithText":"尚有必填项目未完成，备注标签请加入「文字」类型附件 ",
+      "notFinishWithMedia":"尚有必填项目未完成，备注标签请加入「图片或影像」类型附件",
+      "maximumTotalAttach":"全表最多允许上传120个附件"
   },
   "eventView":{
       "ClosedEvent":"已结案事件",
@@ -532,6 +558,7 @@ export default{
       "ReturnEvent":"退回事件",
       "Returned":"已退回",
       "addDetails":"添加处理信息",
+      "addDetails":"添加附件",
       "adding":"追加",
       "all":"全部",
       "allEvents":"全部事件",
@@ -573,7 +600,9 @@ export default{
       "expiredate":" 结案时间",
       "closeSelectedEvent":"确认将选择事件结案?",
       "confirmBachClose":"确认批量结案",
-      "expiretag":"逾期"
+      "expiretag":"逾期",
+      "maximumAttVedio":"仅能上传2个影片附件档案",
+      "videoFormatNotSupoort":"该浏览器不支援此影片格式，请至 StoreVue app 查看"
   },
   "insSettingView":{
       "Addscoreitems":"附加评分项目",
@@ -664,6 +693,7 @@ export default{
       "excelPassFailScoreType":"项目分值选填，取值范围为0.5~50",
       "excelScoreItemEmpty":"评分选项不能为空！",
       "excelScoreItemType":"评分选项必填，取值范围为-50~50",
+      "excelScoreInvalidType":"数值栏位输入错误(如: 遗漏'/'或存在非合法数值)",
       "export":"导出",
       "exportFailTitle":"导出失败",
       "group":"大类",
@@ -694,7 +724,6 @@ export default{
       "mustSignature":"必签",
       "uncertainSignature":"非必签",
       "inputData":"请输入负责人",
-      "signatureOne":"签名 1",
       "bindWorkflow":"选择绑定流程",
       "select":"请选择",
       "no":"无",
@@ -804,7 +833,14 @@ export default{
       "noUserDefinedName":"无自定义名称 ",
       "needHeighterThan":"考评范围最高值需高于最低值! ",
       "cantEmptyScoreLow":"最低考评总分范围不可为空! ",
-      "cantEmptyScoreHeight":"最高考评总分范围不可为空! "
+      "cantEmptyScoreHeight":"最高考评总分范围不可为空! ",
+      "memoAdvanced":"备注标签",
+      "memoSeparate":'(多项请以"/"隔开)',
+      "inputMemoAdvanced":"请输入备注标签 ",
+      "memoCheckText":"文字",
+      "memoCheckMedai":"图片或影片 ",
+      "notQualifyIsRequired":"仅不合格必填 ",
+      "selectAtLeastOne":"至少选择一项备注类别（文字、图片或影片)"
   },
   "deviceView":{
       "EzvizAccount":"串流服务账号",
@@ -1456,7 +1492,9 @@ export default{
         "editAuditFail":"重送签核失败",
         "auditReport":"签核纪录表",
         "saveReport":"保存",
-        "submitReport":"储存并送出"
+        "submitReport":"储存并送出",
+        "warnWorkflowUnbind":"巡检表绑定流程已被取消，请完成巡检表绑定流程设定后再继续此操作",
+        "errorEditReport":"编辑报告错误"
     }
   },
   "mysterio":{

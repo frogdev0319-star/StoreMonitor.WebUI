@@ -267,6 +267,7 @@
           class="card-content self-loading">
           <div class="empty-content">{{ noData }}</div>
         </div>
+        
         <div class="el-pat">
             <!--<el-pagination
               :page-size="sizeNum"
@@ -279,6 +280,8 @@
               class="el-pag"
               @current-change="currentChange"
               @size-change="sizeChange"/>-->
+              <div class="pageSizeTitle" style="color: #666">巡檢報告共有 <b style="font-size: 16px">{{totalElements}} </b> 筆</div>
+
               <tbl-pagination-only
               :btn-style="{backgroundColor:'transparent'}"
               :total="total"
@@ -288,6 +291,7 @@
               @sizeChange="sizeChange"
               @currentChange="currentChange"
             />
+            
           </div>
       </div>
     </div>
@@ -553,7 +557,8 @@ export default {
       showExportAllWarn:false,
       showExportAllNotice:false,
 
-      inspectStatus:''
+      inspectStatus:'',
+      totalElements: 0
     };
   },
 
@@ -687,26 +692,34 @@ export default {
         reportIds:reportIds
       };
       const tHeader = [
+        this.$t('remotePatrol.regionI'),
+        this.$t('remotePatrol.regionII'),
         this.$t('remotePatrol.storeName'),
+        this.$t('remotePatrol.storeCode'),
         this.$t('remotePatrol.inspectName'),//巡檢表名稱
         this.$t('remotePatrol.category'),
         this.$t('insSettingView.subCategory'),
         this.$t('overview.items'),
         this.$t('remotePatrol.inspectItemScore'),
         this.$t('remotePatrol.patrolResult'),
-        this.$t('remotePatrol.inspectTotalScore'),
-        this.$t('remotePatrol.exportAllDetail'),
+        this.$t('remotePatrol.inspectTotalScore'),//報告總分inspectSummary
+        this.$t('remotePatrol.inspectSummary'), //巡檢總評
+        this.$t('eventView.submitter'), //送出人
+        this.$t('remotePatrol.exportAllDetail'),// 詳情
         this.$t('audit.inceptionRpt.attachment'),
         this.$t('titleView.description'),
-        this.$t('remotePatrol.createRptDT')];
+        this.$t('remotePatrol.signatureInfo'), //簽到資訊-地圖link
+        this.$t('remotePatrol.signInTime'),
+        this.$t('remotePatrol.createRptDT'),
+        ];
       
       downLoadInspectReportEntireDetail(params).then(res => {
         console.log("res:",res);
         const that = this;
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
-          const filterVal = ['storename', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 'totlascore', 'detail', 'attachment','comment',
-            'reportts'];
+          const filterVal = ['province','city','storename','code', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 
+          'totlascore','status','submitter', 'detail', 'attachment','comment','singinmap','signints','reportts'];
           const curData = res.data;
           const tagName = that.inspectTableList.find(item=>item.id ==self.params.inspectTagId ).name;
           const data = that.formatJson(filterVal, curData);
@@ -858,6 +871,7 @@ export default {
           let data = [];
           if (errCode === 0) {
             data = res.data.content;
+            this.totalElements = res.data.totalElements
           } 
           const temp = [];
           self.isLoading = true;
@@ -905,7 +919,7 @@ export default {
           }
           //);
           self.reportList = temp;
-          console.log('self.reportList ~~~~~>> ', self.reportList);
+          console.log('self.reportList !!!~~~~~>> ', self.reportList);
 
           self.total = Math.ceil(res.data.totalElements/self.sizeNum);
           self.isLoading = false;
@@ -1143,6 +1157,17 @@ export default {
           delete this.inspectStatus.update_time
           delete this.inspectStatus.update_user_id
           console.log('this.inspectStatus~~~~~ :>> ', this.inspectStatus);
+
+            if(this.inspectStatus.is_customize_2 == false){
+            this.inspectStatus.status_2 = this.$t('overview.echartGood')
+          }
+          if(this.inspectStatus.is_customize_1 == false){
+            this.inspectStatus.status_1 = this.$t('overview.improve')
+          }
+          if(this.inspectStatus.is_customize_0 == false){
+            this.inspectStatus.status_0 = this.$t('overview.danger')
+          }
+
           
           this.appraiseList.forEach(item =>{
             if(item.status === 0) {item.label = this.inspectStatus.status_0}
@@ -1632,7 +1657,7 @@ $filterWidth: (100%-706);
               display: flex;
               flex-wrap: wrap;
               flex-direction: row;
-              align-items: flex-start;
+              align-items: stretch;
               justify-content: flex-start;
               margin-bottom: 1%;
               .status-tag {
@@ -1696,7 +1721,13 @@ $filterWidth: (100%-706);
 .el-pat{
     //position: absolute;
     height: 30px;
-    margin-top: -10px;
+    margin-top: 0px;
+    margin-right: calc(20/1920*100vw);;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    
     .el-pag{
         position: absolute;
         //float: right;

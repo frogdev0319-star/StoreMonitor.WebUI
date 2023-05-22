@@ -81,7 +81,7 @@
                   :class="{'child-space': isFullScreenMode}"
                   :style="{'width':isFullScreenMode?'246px':'calc(50% - 10px)'}"
                 >
-                  <div 
+                  <div
                     @click="clickBtn(item,index)"
                     class="channel"
                     :class="{'channel-isActive': item.isClick}"
@@ -174,11 +174,11 @@
                       <div v-for="(_item,_index) in sourceList" :key="_index" >
                        <div  v-if="_item.mediaType == 3"  class="fullWidth source-details" >
                         <div class="flex-center">
-                          <img
+                          <!-- <img
                             :src="deleteInspectIcon"
                             alt="delete"
                             @click="deleteItemResource({ index: _index })"
-                          />
+                          /> -->
                           <div
                             class="paper flex-center margin-bottom-sm inspect-text"
                             :style="curEditIndex === _index?{'border':'1px solid #006ab7'}:{'border':'1px solid #e6e6e6'}"
@@ -194,6 +194,13 @@
                               @click="editItemResource({  index: _index })"
                             />
                           </div>
+                          <!-- 刪除 -->
+                          <img
+                            :src="deleteInspectIcon_new"
+                            alt="delete"
+                            class="to_delete"
+                            @click="deleteItemResource({ index: _index })"
+                          />
                         </div>
                       </div>
                       </div>
@@ -326,14 +333,16 @@
               <div v-if=" sourceList.filter((s, idx) =>s.mediaType==3 ).length!=0" :class="'noraml-title'" class="tsource-content">
                       <div v-for="(_item,_index) in sourceList" :key="_index" >
                        <div  v-if="_item.mediaType == 3"  class="fullWidth source-details" >
-                        <div class="flex-center">
-                          <img
+                        <div class="flex-center comment_list"
+
+                        >
+                          <!-- <img
                             :src="deleteInspectIcon"
                             alt="delete"
                             @click="deleteItemResource({ index: _index })"
-                          />
+                          /> -->
                           <div
-                            class="paper flex-center margin-bottom-sm inspect-text"
+                            class="flex-center inspect-text"
                             :style="curEditIndex === _index?{'border':'1px solid #006ab7'}:{'border':'1px solid #e6e6e6'}"
                           >
                             <div style="flex: 1; text-align: left; margin: 5px">
@@ -347,6 +356,12 @@
                               @click="editItemResource({  index: _index })"
                             />
                           </div>
+                          <img
+                              :src="deleteInspectIcon_new"
+                              alt="edit"
+                              style="margin: 5px"
+                              @click="deleteItemResource({ index: _index })"
+                            />
                         </div>
                       </div>
                       </div>
@@ -466,8 +481,12 @@ export default {
 
   data() {
     return {
+
       deleteInspectIcon: require('../../../static/img/cross.png'),
+      deleteInspectIcon_new: require('../../../static/img/table-delete.png'),
+
       editInspectIcon: require('../../../static/img/pen.png'),
+      storeList:[],
       curEditIndex : -1,
       patrolstore: '',
       PatrolList: [],
@@ -662,6 +681,7 @@ export default {
         {key:'id-ID',value:'id-backToNow'},{key:'th-TH',value:'th-backToNow'}
       ],
       editCount_storeMonitor:0,
+      storeStatus:-1,
     };
   },
 
@@ -792,7 +812,7 @@ export default {
             src: this.eventDes,
           })
           self.editCount_storeMonitor+=1;
-        
+
         } else {
           this.RuleCountTip = true;
         }
@@ -818,7 +838,15 @@ export default {
       const self =this
       //console.log("getCurStore:",storeData)
       this.tempCurSelStoreId = storeData.curSelectedStore;
+      const storeItem = this.storeList.find(store => store.storeId === this.tempCurSelStoreId);
+      if(storeItem){
+        self.storeStatus = storeItem.status;
+        console.log("StoreStatsu="+storeItem.status)
+        console.log("StoreStatsu="+self.storeStatus)
+      }
+
       this.RuleCountTip = false;
+
       self.$refs.vendorVideo.stopVideoPlay();
       /*if ((self.$refs.vendorVideo.playState || self.eventName.length !== 0|| self.sourceList.length>0) && (self.curSelStoreId!=storeData.curSelectedStore) ){
         console.log("getters.favoriteList:",self.$store.getters.favoriteList);
@@ -985,7 +1013,7 @@ export default {
         self.showChannelBtns = [];
         self.allChannelBtns = [];
       } else {
-        if (!util.validateLicense(storeData[0].status)) {
+        if (!util.validateLicense(storeData[0].status) && storeData[0].status!=61) {
           return false;
         }
         const obj = {};
@@ -1050,7 +1078,9 @@ export default {
       };
       try {
         const res = await self.getAllStoreList();
+
         if (res.errCode === 0) {
+          this.storeList = res.data.content;
           const favoriteStoreList = res.data.content.filter(item => item.storeId === this.curSelStoreId);
           self.getFaStoreData(favoriteStoreList);
           const storeData = res.data.content.filter(item => item.storeId === this.curSelStoreId)
@@ -1107,7 +1137,7 @@ export default {
           self.store.storeUp = false;
           self.store.storeUpTitle = self.$t('remotePatrol.clickToStar');
           self.tabList[2].storeList.forEach((item, index) => {
-            
+
             item.storeList.forEach((_item, _index) => {
               if (self.store.storeId === _item.storeId) {
                 _item.favorite = false;
@@ -1149,7 +1179,7 @@ export default {
     },
 
     getEventList() {
-      
+
       const self = this;
       const date = new Date();
       console.log("Get EventList"+self.curSelStoreId);
@@ -1376,7 +1406,7 @@ export default {
           obj.mediaType = 3;
           obj.url = this.sourceList[i].src;
           obj.deviceId = this.channel.id;
-        } 
+        }
         else if (this.sourceList[i].mediaType === 2) {
           const url = await this.upLoadFile(this.sourceList[i]);
           obj.mediaType = 2;
@@ -1511,7 +1541,13 @@ export default {
     },
 
     async submit() {
+      console.log("Submit")
+
       const self = this;
+      if(self.storeStatus==61){
+        util.notify(this.$t('route.errorStoreNoPermission'), 'error', 1000 );
+        return false;
+      }
       if (self.eventName.trim().length === 0) {
         self.showEventNameInfo = true;
         return false;
@@ -1786,7 +1822,7 @@ export default {
         }
         item.status === 1 && temp.push(obj);
       });
-      this.store = { 
+      this.store = {
         ...this.store,
         device: [...temp]
       }
@@ -2016,7 +2052,7 @@ export default {
       self.eventDes = content;
       self.showEventDescInfo = false;
       const length = filterString.getContentLength(val);
- 
+
     },
 
     notShowInputRuleTips(e) {
@@ -2048,6 +2084,24 @@ export default {
   }
 };
 </script>
+<style lang="sass" scoped>
+  .inspect-text
+    padding: 10px
+    margin-left: 0 !important
+  .comment_list
+    width: 100%
+    padding: 4px
+    margin-bottom: 5px
+    // background: rgb(242, 249, 254)
+  .to_delete
+    margin-bottom: 5px
+    transition: all .3s
+    cursor: pointer
+    margin-left: 5px
+    &:hover
+      transform: scale(1.1)
+
+</style>
 <style lang="scss" scoped>
 
 * {
@@ -2526,7 +2580,7 @@ $h1: #292e36;
         cursor: pointer;
       }
 
-      
+
     }
     .time-content {
       .date-picker-content {
@@ -2542,7 +2596,7 @@ $h1: #292e36;
       }
     }
   }
-  .el-radio-details {  
+  .el-radio-details {
     width: calc(160 / 1920 * 100vw);
     height: calc(40 / 1920 * 100vw);
     margin: 0 0 0 calc(16 / 1920 * 100vw);
@@ -2675,13 +2729,14 @@ $h1: #292e36;
         display: block;
       }
       .tsource-content{
-              min-height: 110px;
-              width: 90%;
-              margin: auto 20px;
+              // min-height: 110px;
+              width: 100%;
+              margin-bottom: 10px;
+              // margin: auto 20px;
               .source-details{
                 display: inline-block;
                 margin-right: 15px;
-                padding-top: 15px;
+                // padding-top: 15px;
                 position: relative;
                 span{
                   font-size: 12px;
@@ -2735,27 +2790,27 @@ $h1: #292e36;
 </style>
 <style lang="scss" scoped>
 .problemTab {
-  
+
   height: calc(34 / 1920 * 100vw);
   line-height: calc(34 / 1920 * 100vw);
-  cursor: pointer; 
+  cursor: pointer;
   border-top-right-radius: 5px;
   border-top-left-radius: 5px;
-  font-size: calc(13 / 1920 * 100vw); 
-  @media screen and (max-width:1367px) { 
-      width: calc(150 / 1920 * 100vw); 
+  font-size: calc(13 / 1920 * 100vw);
+  @media screen and (max-width:1367px) {
+      width: calc(150 / 1920 * 100vw);
     }
     @media screen and(min-width: 1367px){
-      width: calc(120 / 1920 * 100vw); 
+      width: calc(120 / 1920 * 100vw);
     }
 }
 .tabs {
-  position: absolute; 
+  position: absolute;
   top: calc(-34 / 1920 * 100vw);
-  left: 20px; 
+  left: 20px;
 }
 .event-box {
-  height: calc(100% - 80 / 1920 * 100vw); 
+  height: calc(100% - 80 / 1920 * 100vw);
   margin: calc(20 / 1920 * 100vw);
   margin-top: calc(60 / 1920 * 100vw) ;
   position: relative;
@@ -2763,7 +2818,7 @@ $h1: #292e36;
   border-radius: calc(10 / 1920 * 100vw);
 }
 .event-box-full {
-  height: calc(100% - 80 / 1920 * 100vw); 
+  height: calc(100% - 80 / 1920 * 100vw);
   margin-top: calc(60 / 1920 * 100vw) ;
   position: relative;
   background-color: #fff;
@@ -2803,11 +2858,11 @@ $h1: #292e36;
   border: 0px;
 }
 .backToNow {
-  width: calc(120 / 1920 * 100vw); 
-  height: calc(30 / 1920 * 100vw); 
+  width: calc(120 / 1920 * 100vw);
+  height: calc(30 / 1920 * 100vw);
   line-height: calc(30 / 1920 * 100vw);
   border-radius: 5px;
-  border: solid 1px #c60957; 
+  border: solid 1px #c60957;
   font-size: calc(15 / 1920 * 100vw);
   color: #c60957;
   cursor: pointer;
@@ -2817,17 +2872,17 @@ $h1: #292e36;
   font-size: calc(12 / 1920 * 100vw);
 }
 .id-backToNow{
-  @media screen and (max-width:1367px) { 
+  @media screen and (max-width:1367px) {
       width: calc(220/1440*100vw);
   }
   @media screen and(min-width: 1367px){
       width: calc(160/1440*100vw);
-  } 
+  }
   font-size: calc(12 / 1920 * 100vw);
 }
 .th-backToNow{
-  
-  @media screen and (max-width:1367px) { 
+
+  @media screen and (max-width:1367px) {
       width: calc(160/1440*100vw);
   }
   @media screen and(min-width: 1367px){
@@ -2836,7 +2891,7 @@ $h1: #292e36;
   font-size: calc(12 / 1920 * 100vw);
 }
 .vi-backToNow{
-  @media screen and (max-width:1367px) { 
+  @media screen and (max-width:1367px) {
       width: calc(200/1440*100vw);
   }
   @media screen and(min-width: 1367px){

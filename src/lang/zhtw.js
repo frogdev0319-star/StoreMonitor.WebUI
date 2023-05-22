@@ -113,7 +113,17 @@ export default{
       "generalMode":"一般模式",
       "mimicMode":"神秘客模式",
       "MysterioManage":"神秘客權限",
-      "MysterioSetting":"門店權限設定"										
+      "MysterioSetting":"門店權限設定",
+      "InceptionSchedule":"巡檢排程",
+      "ScheduleSetting":"排程設定",
+      "ScheduleHistory":"排程紀錄",
+      "PersonalSchedule":"個人排程",
+      "CreateSchedule":"建立排程",
+      "ModifySchedule":"編輯排程",
+      "schedulePersonalCreate":"巡檢排程｜個人排程",
+      "schedulePersonalModify":"巡檢排程｜個人排程",
+      "errorStoreNoPermission":"門店無服務權限，請聯繫管理員",
+      "errorStoreNameNoPerssion":"因{storeNames}無服務權限無法操作，請重新確認",
   },
   "overview":{
       "DangerousLess":"立即督導＜60%",
@@ -366,6 +376,10 @@ export default{
       "fluency":"流暢",
       "fullScreenMode":"寬螢幕模式",
       "generateTime":"報告產生時間",
+      "signInTime":"簽到時間",
+      "patrolTime":"巡檢花費時間",
+      "signInDistance":"簽到距離",
+      "aroundDistance":"約",
       "getAccessTokenError":"獲取Access Token失敗",
       "getBeseyeStreamError":"獲取Beseye視頻流信息失敗！",
       "getscore":"本次得分",
@@ -484,7 +498,7 @@ export default{
       "title":"問題名稱",
       "total":"個問題",
       "totalScore":"單項總分值",
-      "totalScoreUnit":"總分：",
+      "totalScoreUnit":"總分",
       "tryAgain":"重新嘗試",
       "unit":"個",
       "unknownErr":"未知錯誤",
@@ -524,6 +538,26 @@ export default{
       "systemRejectMsg":"無可簽核人員，請重新確認",
       "cannotSwitchMimicMode":"正在編輯報告，不能切換模式",
       "tipLimitGroupScore":"得分超過類別上限時以上限計算總分",
+      "signatureInfo":"簽到資訊",
+      "mapDistance1":"與",
+      "mapDistance2":"距離約",
+      "mapDistance3":"公尺",
+      "hour":"時",
+      "seconds":"秒",
+      "minute":"分",
+      "reportSubmitting":"報告送出中...",
+      "storeCode":"門店代碼",
+      "inspectSummary":"巡檢總評",
+      "pleaseAdd":"* 請加入 ",
+      "notQualifyAdd":"* 不合格時需加入 ",
+      "lowerThan":"* 低於 ",
+      "lowScoreAdd":"分時，需加入 ",
+      "textItem":"「文字」 ",
+      "mediaItem":"「圖片或影片」 ",
+      "attachments":"類型附件 ",
+      "notFinishWithText":"尚有必填項目未完成，備註標籤請加入「文字」類型附件 ",
+      "notFinishWithMedia":"尚有必填項目未完成，備註標籤請加入「圖片或影像」類型附件 ",
+      "maximumTotalAttach":"全表最多允許上傳120個附件"
   },
   "eventView":{
       "ClosedEvent":"已結案事件",
@@ -532,6 +566,7 @@ export default{
       "ReturnEvent":"退回事件",
       "Returned":"已退回",
       "addDetails":"添加處理資訊",
+      "addAttchement":"添加附件",
       "adding":"追加",
       "all":"全部",
       "allEvents":"全部事件",
@@ -573,7 +608,9 @@ export default{
       "expiredate":" 結案時間 ",
       "closeSelectedEvent":"確認將選擇事件結案?",
       "confirmBachClose":"確認批次結案",
-      "expiretag":"逾期"
+      "expiretag":"逾期",
+      "maximumAttVedio":"僅能上傳2個影片附件檔案",
+      "videoFormatNotSupoort":"該瀏覽器不支援此影片格式，請至 StoreVue app 查看"
   },
   "insSettingView":{
       "Addscoreitems":"附加評分項目",
@@ -663,6 +700,7 @@ export default{
       "excelPassFailScoreType":"項目分值選填，取值範圍為0.5~50",
       "excelScoreItemEmpty":"評分選項不能為空！",
       "excelScoreItemType":"評分選項必填，取值範圍為-50~50",
+      "excelScoreInvalidType":"數值欄位輸入錯誤(如: 遺漏'/'或存在非合法數值)",
       "export":"匯出",
       "exportFailTitle":"匯出失敗",
       "group":"大類",
@@ -803,8 +841,13 @@ export default{
       "needHeighterThan":"考評範圍最高值需高於最低值! ",
       "cantEmptyScoreLow":"最低考評總分範圍不可為空! ",
       "cantEmptyScoreHeight":"最高考評總分範圍不可為空! ",
-
-      
+      "memoAdvanced":"備註標籤",
+      "memoSeparate":"(多項請以\"/\"隔開)",
+      "inputMemoAdvanced":"請輸入備註標籤 ",
+      "memoCheckText":"文字 ",
+      "memoCheckMedai":"圖片或影片 ",
+      "notQualifyIsRequired":"僅不合格必填 ",
+      "selectAtLeastOne":"至少選擇一項備註類別（文字、圖片或影片) "
   },
   "deviceView":{
       "EzvizAccount":"串流服務帳號",
@@ -1437,8 +1480,6 @@ export default{
         "cantEmptyDays" : "停留天數不可為空! ",
         "cantTooMuchDays" : "天數不可超過365天! ",
         "cantEmptyInspectStatus" : "巡檢總評選項自定義名稱不可為空! ",
-
-
     },
     "inceptionRpt":{
         "sendAudit":"送出簽核",
@@ -1460,7 +1501,9 @@ export default{
         "editAuditFail":"重送簽核失敗",
         "auditReport":"簽核紀錄表",
         "saveReport":"儲存",
-        "submitReport":"儲存並送出"
+        "submitReport":"儲存並送出",
+        "warnWorkflowUnbind":"巡檢表綁定流程已被取消，請完成巡檢表綁定流程設定後再繼續此操作",
+        "errorEditReport":"編輯報告錯誤"
     }
   },
   "mysterio":{
@@ -1490,6 +1533,41 @@ export default{
       "duplicateNickName":"已有相同的神秘客代稱，請重新輸入",
       "mysterio":"神秘客",
       "allMysterio":"全部神秘客",
-  }
+  },
+  "schedule":{
+    "inceptionSchedule":"巡檢排程",
+    "scheduleSetting":"排程設定",
+    "scheduleHistory":"排程紀錄",
+    "scheduleExecuted":"排程執行",
+    "lastUpdatePerson":"最後更新人",
+    "getScheduleSettingFail":"取得排程設定失敗",
+    "schStartDate":"開始執行",
+    "schName":"排程名稱",
+    "incepNum":"巡檢數量",
+    "schEndDate":"最後執行",
+    "addSchedule":"新增排程",
+    "tagInfo":"巡檢類型 | 巡檢表名稱",
+    "deleteSchedule":"刪除排程",
+    "confirmDeleteSchedule":"是否需要刪除已選擇的排程？",
+    "store":"門店/時區",
+    "schExeDate":"執行日期",
+    "reportUploadDate":"報告上傳時間",
+    "incepPerson":"執行人",
+    "inCompleted":"未完成",
+    "exportAll":"全部匯出",
+    "isProcessing":"簽核中",
+    "NA":"無",
+    "storeTimeZone":"門店時區",
+    "inceptionMode":"巡檢類型",
+    "generated":"已產生",
+    "exportScheduleRecordTips":"匯出排程紀錄提示",
+    "exportScheduleRecordMsg1":"排程紀錄匯出執行中，匯出完成將自動下載檔案",
+    "exportScheduleRecordMsg2":"於執行時間您仍可繼續操作系統功能",
+    "exportScheduleRecordWarn":"請選擇匯出項目",
+    "deletePersonSchError":"個人排程刪除失敗",
+    "deleted":"已刪除",
+
+    
+  },
 
 }

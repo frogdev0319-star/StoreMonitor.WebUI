@@ -165,6 +165,18 @@ export default class PermissionHelper {
     return this.enableAuthorities(6, 0x0, 0x04);
   }
 
+  //index(7) => 巡檢排程
+  static enableScheduleSetting2() {
+    return this.enableAuthorities(7, 0x0, 0x01);
+  }
+  static enableScheduleHistroy() {
+    return this.enableAuthorities(7, 0x0, 0x02);
+  }
+
+  static enableScheduleExecuted() {
+    return this.enableAuthorities(7, 0x0, 0x04);
+  }
+
   //秘密客權限
   static enableMimicMode = false;
   static setShowMimicMode(val){

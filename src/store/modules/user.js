@@ -221,6 +221,7 @@ const user = {
     setEditReport({ commit }, mode){
       commit('SET_EDIT_REPORT',mode)
     },
+
     GetDash({ commit }) {
       return new Promise((resolve, reject) => {
         getDashServerInfo().then(res => {
@@ -370,12 +371,16 @@ const user = {
           const statisticsRoute = navbarRoute.getStatisticalRoute();
           if(statisticsRoute.children.length > 0 && !PermissionHelper.enableMimicMode) accessedRoutes.push(statisticsRoute);
 
-          console.log("PermissionHelper.enableMimicMode:",PermissionHelper.enableMimicMode);
-          console.log("PermissionHelper.enableWaitAudit():",PermissionHelper.enableWaitAudit());
+          //console.log("PermissionHelper.enableMimicMode:",PermissionHelper.enableMimicMode);
+          //console.log("PermissionHelper.enableWaitAudit():",PermissionHelper.enableWaitAudit());
           const auditRoute = navbarRoute.getAuditRoute();
-          console.log("auditRoute:",auditRoute);
+          //console.log("auditRoute:",auditRoute);
           (auditRoute.children.length >0 && accessedRoutes.findIndex(item=>item.name==auditRoute.name)==-1) ? accessedRoutes.push(auditRoute):'';
 
+          const scheduleRoute = navbarRoute.getInceptionSchedule();
+          console.log("auditRoute:",scheduleRoute);
+          (scheduleRoute.children.length >0 && accessedRoutes.findIndex(item=>item.name==scheduleRoute.name)==-1) ? accessedRoutes.push(scheduleRoute):'';
+          
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();
           systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';
           console.log("accessedRoutes.length:",accessedRoutes.length);

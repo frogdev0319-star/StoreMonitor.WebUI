@@ -19,8 +19,8 @@
         </div>
         <div style="flex: 1;"></div>
         <div class="footer-right flex-center">
-          <!-- <div 
-            v-if="playBackState" 
+          <!-- <div
+            v-if="playBackState"
             class="iconrside"
           >
             <div style="margin-right: 20px" class="speed-content flex-center">
@@ -106,7 +106,7 @@
           height="0.2rem"/>
       </div>
       <transition name="fade">
-        
+
       </transition>
       <div v-if="showError" ref="errorModel" :class="isEvent ? 'event-error': ''" class="errorVideo-model">
         <span>{{ errorMsg }}</span>
@@ -124,7 +124,7 @@
       @mouseleave="hiddenModel"
       @mouseenter="showModel"
       @mousemove="showModel">
-      
+
       <div class="video-model">
         <span v-if="showInfoContent" id="channelName">{{ channelInfo.name }}</span>
         <div v-if="showInfoContent" class="icon-footer">
@@ -443,6 +443,10 @@ export default {
     },
     isEvent: {
       type: Boolean
+    },
+    isRemote: {
+      type: Boolean,
+      default: false
     },
     isStoreMonitor: {
       type: Boolean
@@ -1491,7 +1495,7 @@ export default {
         self.fullDecoder.closeSound();
         self.fullDecoder.stop();
         self.fullDecoder = null;
-      } 
+      }
       if (self.decoder) {
         self.decoder.closeSound();
         self.decoder.stop();
@@ -1543,9 +1547,13 @@ export default {
       self.imageCanvasList = [];
       self.sourceList = [];
       self.inspectInput = '';
+      if (self.isRemote && self.sourceListLength >= 120) {
+        util.notify(self.$t('remotePatrol.maximumTotalAttach'), 'warning', 3000);
+        return false;
+      }
       if (self.showFeedBack) {
         self.showSnapshotFeedbackDialog = true;
-        
+
         self.eventName = '';
         self.eventDes = '';
         self.showEventNameInfo = false;
@@ -1573,11 +1581,15 @@ export default {
         });
       } else {
         self.showCancelContent = false;
-        if (self.sourceListLength >= 10) {
+        console.log("Get Content "+ self.isRemote  + " len="+self.sourceListLength)
+
+
+        if (!self.isRemote && self.sourceListLength >= 10) {
           const msg = self.isStoreMonitor ? self.$t('remotePatrol.storeMaxAttach') : self.$t('remotePatrol.maximumAttach');
           util.notify(msg, 'warning', 3000);
           return false;
         }
+
         self.showCutDialog = true;
         this.$nextTick(() => {
           self.canvasEl = document.getElementById('icanvas');
@@ -2087,7 +2099,7 @@ export default {
     display: flex;
     align-items: center;
   }
-  .hr-vertical {    
+  .hr-vertical {
     margin: 0;
     -webkit-flex-shrink: 0;
     -ms-flex-negative: 0;
@@ -2606,7 +2618,7 @@ export default {
   .select-popClass .el-select-dropdown__list{
     padding:0;
   }
-  
+
   .el-select-dropdown.el-popper.select-popClass{
     border:0px;
     margin-top:-5px;

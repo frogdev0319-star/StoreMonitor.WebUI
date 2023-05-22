@@ -75,8 +75,8 @@
         </el-form-item>
         <div class="rem-content">
           <el-checkbox v-model="rememberUserName" class="elCheckBox"/>
-          <span>记住账号</span>
-          <span class="forget-pass" @click="forgetPass">忘记密码？</span>
+          <span>記住帳號</span>
+          <span class="forget-pass" @click="forgetPass">忘記密碼？</span>
         </div>
         <div class="el-il8">
           <el-select v-model="loginForm.lang" size="small" class="el-il8List">
@@ -127,7 +127,7 @@ export default {
       login: {
         username: 'username',
         password: 'password',
-        loginBtnTitle: '登录'
+        loginBtnTitle: '登錄'
       },
       logoSrc: './static/img/imgLogin/storevue_logo.png',
       imgList: [

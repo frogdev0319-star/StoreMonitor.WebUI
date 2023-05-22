@@ -7,11 +7,53 @@
           path = "eventManage"
           @storeChange = "onStoreChange"
         >
+        <template v-slot:others>
+            <div class="last-row" >
+              <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.reportType') }}</span>
+              <div class="flex-center report-type-area">
+                <el-select
+                  v-model="curReportType"
+                  class="el-province"
+                  :placeholder="$t('remotePatrol.all')"
+                  size="mini"
+                  style="margin-right:0px;border:none;"
+                  @change="getInspectList"
+                >
+                  <el-option
+                    v-for="item in reportTypeList"
+                    :key="item.mode"
+                    :label="item.label"
+                    :value="item.mode"/>
+                </el-select>
+                <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" />
+                  <multi-select
+                    class="store-group-select region"
+                    :selected="inspectId"
+                    :prompt-msg="$t('remotePatrol.all')"
+                    :all-select="0"
+                    :alltype="0"
+                    :options="inspectTableList"
+                    @changeInput="changeSelect(arguments)"/>
+                  <!--<el-select
+                    class="el-province"
+                    style="margin-left:0px;border:none;border-radius:0px;"
+                    v-model="inspectId"
+                    :placeholder="$t('insSettingView.selectPost')"
+                    size="mini">
+                  <el-option
+                    v-for="item in inspectTableList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"/>
+                  </el-select>-->
+              </div>
+            </div>
+          </template>
         </store-filter>
       </div>
       <div class="flex-center" style="justify-content: space-between; margin: 20px 0 20px 0px;font-size:calc(16/1920*100vw)">
         <div class="flex-center">
-          <date-time-selector 
+          <date-time-selector
             ref="eventTimePicker"
             :dateTimeValue = dateValue
             @change="dateChange"
@@ -98,7 +140,7 @@
                   <span
                     v-if="scope.row.status === 0"
                     :class="lang.indexOf('ja') !== -1 ? 'ja-icon': 'icon-span'"
-                    style="background-color:#fff2ef;color:#f57848;" 
+                    style="background-color:#fff2ef;color:#f57848;"
                     >
                     {{ $t('eventView.pending') }}
                   </span>
@@ -120,7 +162,7 @@
                     style="background-color:#ffeff5;color:#e22472;" >
                     {{ $t('eventView.returnStatus') }}
                   </span>
-                  
+
                   <el-tooltip v-if="scope.row.status === 4" effect="light" placement="right-end">
                     <div slot="content">{{ $t('eventView.expiredate')+scope.row.updateTs }}</div>
                     <div v-if="scope.row.status === 4" class="expiretag">
@@ -202,12 +244,12 @@
         </el-tab-pane>
       </el-tabs>
     </div>
-    <dialog-vue 
-    :dialog-title="$t('eventView.confirmBachClose')" 
-    :show-info="$t('eventView.closeSelectedEvent')" 
-    :is-warning=true 
-    :dialog-closed="showBachCloseDialog" 
-    @confirmed="confirmBachClose" 
+    <dialog-vue
+    :dialog-title="$t('eventView.confirmBachClose')"
+    :show-info="$t('eventView.closeSelectedEvent')"
+    :is-warning=true
+    :dialog-closed="showBachCloseDialog"
+    @confirmed="confirmBachClose"
     @canceled="showBachCloseDialog = false"/>
   </div>
 </template>
@@ -216,6 +258,7 @@
 
 import util from '@/common/util.js';
 import { eventRESTful } from '@/api/index';
+import {  GetInspectTagList } from '@/api/inspect';
 import { getCookie } from '@/common/auth';
 import { isLoginIn } from '@/api/login';
 import { mapGetters } from 'vuex';
@@ -359,7 +402,18 @@ export default {
             ],
       tabContentId:[{key:'en',value:'#en-tabs-content'},{key:'zh',value:'#en-tabs-content'},{key:'zhtw',value:'#en-tabs-content'},
         {key:'ja-JP',value:'#en-tabs-content'},{key:'ko-KR',value:'#en-tabs-content'},{key:'vi-VN',value:'#en-tabs-content'},
-        {key:'id-ID',value:'#en-tabs-content'},{key:'th-TH',value:'#th-tabs-content'}]
+        {key:'id-ID',value:'#en-tabs-content'},{key:'th-TH',value:'#th-tabs-content'}],
+      curReportType: -1,
+      reportTypeList: [
+        { 'mode': -1, 'label': this.$t('remotePatrol.all') },
+        { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
+        { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') }
+      ],
+      inspectId: [],
+      inspectTableList: [],
+      inspectCatch:[],
+      storeList:[],
+      selectStoreList:[]
     };
   },
 
@@ -384,7 +438,7 @@ export default {
         self.tableDataList[i].tableData =[];
         self.tableDataList[i].eventCount = 0;
       }
-      
+
       if (val !== 0) {
         window.setTimeout(function() {
           self.$route.meta.keepAlive = true;
@@ -394,7 +448,7 @@ export default {
         self.ifChangeAccount = true;
         self.ifSaveParams = false;
         self.ifSearchData = true;
-        
+
       }
     },
 
@@ -402,7 +456,6 @@ export default {
       const self = this;
       if (val === 0 && self.totalElements > 0) {
         self.params.filter.page -= 1;
-        console.log('numberofElements');
         self.getEventList();
       }
     }
@@ -425,9 +478,9 @@ export default {
     const self = this;
     self.windowHeight = window.innerHeight;
     if (!self.$route.meta.isBack || self.isFirstLoad) {
+      self.getInspectList();
       self.initData();
     } else {
-      console.log("Activate")
       self.getEventList('Back');
       self.getEventCount();
       self.$route.meta.isBack = false;
@@ -435,7 +488,7 @@ export default {
     }
     self.$route.meta.isBack = false;
     self.isFirstLoad = false;
-  }, 
+  },
   beforeDestroy() {
     //console.log('searchFrom:',this.searchParams['searchFrom']);
     if(this.searchParams['searchFrom']=='PatrolPersonStat'){
@@ -444,23 +497,19 @@ export default {
         this.searchParams['searchFrom'] = '';
         this.ifSaveParams && this.saveSearchParams(true);
     }else if(this.searchParams['searchFrom']=='EventStatistics'){
-        console.log("in beforeDestroy");
         delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
         this.searchParams['searchFrom'] = '';
         this.ifSaveParams && this.saveSearchParams(true);
     }
   },
   deactivated() {
-      console.log('deactivated');
       //console.log('searchFrom:',this.searchParams['searchFrom']);
-      
+
       if(this.searchParams['searchFrom']=='PatrolPersonStat'){
-          //console.log("in deactivated");
           delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
           this.searchParams['searchFrom'] = '';
           this.ifSaveParams && this.saveSearchParams(true);
       }else if(this.searchParams['searchFrom']=='EventStatistics'){
-        //console.log("in beforeDestroy");
         delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
         this.searchParams['searchFrom'] = '';
         this.ifSaveParams && this.saveSearchParams(true);
@@ -482,8 +531,6 @@ export default {
         realWidth = span.clientWidth;
         if(column.sortable == 'custom') realWidth = realWidth;
         else column.minWidth = realWidth;
-        //console.log(column.label+":"+column.minWidth);
-        //console.log(column.label+" realWidth:"+realWidth);
         if(column.minWidth<realWidth) column.minWidth = realWidth;
 
         document.body.removeChild(span);
@@ -519,7 +566,6 @@ export default {
     },
 
     dateChange(val) {
-      console.log("dateChange");
       const self = this;
       const tabIndex = Number(self.activeName);
       const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
@@ -562,23 +608,19 @@ export default {
     },
 
     searchData() {
-      console.log("SearchData")
       this.tableDataList[Number(this.activeName)].page = 1;
       this.getEventListAndCount();
     },
 
     getEventListAndCount() {
-      console.log("Get Event List and Count")
       if (this.dateValue.length === 0) return;
       this.getEventList('');
       this.getEventCount();
     },
 
     rowClickItem(row) {
-      console.log("rowClickItem",row);
       if(!this.stopRowClick){
         this.event = row;
-        console.log("rowClickItem:",this.event);
         sessionStorage.setItem('event', JSON.stringify(this.event));
         sessionStorage.setItem('queryparams', JSON.stringify(this.params));
         this.$router.push({ name: 'eventDetails', params: { event: this.event }});
@@ -587,9 +629,7 @@ export default {
       }
     },
     cellClickItem(row, column, cell, event){
-      //console.log("column:",column);
       if(column.type == "selection"){
-        //console.log("cell in");
         this.stopRowClick = true;
       }
     },
@@ -604,7 +644,7 @@ export default {
     sortChange(col) {
       const self = this;
       const tabIndex = Number(self.activeName);
-      console.log("sortChange page:",self.tableDataList[tabIndex].page);
+      //console.log("sortChange page:",self.tableDataList[tabIndex].page);
       self.tableDataList[tabIndex].page = 1;
       const order = col.order;
       self.order = order;
@@ -633,7 +673,7 @@ export default {
     },
 
     async getEventList(val) {
-      console.log("GetEventList");
+      //"GetEventList");
       const self = this;
       const tabIndex = Number(this.activeName);
       for(var k in self.tableDataList){
@@ -648,7 +688,7 @@ export default {
         this.getRouterData(routeData);
       }else{*/
       await self.getEventListRequestParams(val);
-      
+
       //}
       if ( self.params.clause.storeId && self.params.clause.storeId.length === 0) {
         //return ;
@@ -661,7 +701,7 @@ export default {
         delete self.params.clause.storeId;
         return;
       }
-      console.log("@@@self.params:",self.params);
+      //console.log("@@@self.params:",self.params);
       eventRESTful.getEventList(self.params).then((res) => {
         const data = res.data.content;
         //console.log("data:",data);
@@ -703,15 +743,12 @@ export default {
           };
           temp.push(obj);
         });
-        console.log("Set ",tabIndex,temp)
         self.tableDataList[tabIndex].tableData = temp;
         self.tableDataList[tabIndex].total = res.data.totalPages;
         self.tableDataList[tabIndex].eventCount = res.data.totalElements;
-        console.log("res.data.pageable.pageNumber:",res.data.pageable.pageNumber);
         self.tableDataList[tabIndex].page = res.data.pageable.pageNumber+1;
         self.totalElements = res.data.totalElements;
         if(tabIndex == this.activeName){
-          console.log("@@res.data.pageable.pageNumber:",res.data.pageable.pageNumber);
           self.page = (res.data.pageable.pageNumber+1);
           self.total = res.data.totalPages;
         }
@@ -721,7 +758,7 @@ export default {
         console.log('EventManagement-getEventList:' + err);
       });
     },
-    
+
     getEventListRequestParams(val) {
       const tabIndex = Number(this.activeName);
       let like = {};
@@ -737,7 +774,6 @@ export default {
       }
       let storeId = null;
       var p = Object.assign({}, this.params);
-      console.log("*p:",p)
       //if(this.searchParams['searchFrom']=='PatrolPersonStat' || this.searchParams['searchFrom']=="EventStatistics")
         storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : (p.hasOwnProperty('clause'))?p.clause.storeId:'-1';
       /*else{
@@ -747,7 +783,7 @@ export default {
         }
         storeId =  (tempStore!="-1")? tempStore :((Object.keys(this.storeFilterObj).length > 0) ? this.storeFilterObj.filterStoreIds :'-1');
       }*/
-      console.log("getEventListRequestParams > storeId:",storeId);
+      //console.log("getEventListRequestParams > storeId:",storeId);
       let status = [];
       if (this.curState.length !== 0) {
         if (this.curState.length === 1) {
@@ -766,11 +802,11 @@ export default {
         }else{
           status = [];
         }
-        
+
       }
       let page = 0;
       if (val === 'currentChange') {
-        console.log('currentChange',this.tableDataList[tabIndex].page);
+        //console.log('currentChange',this.tableDataList[tabIndex].page);
         page = this.tableDataList[tabIndex].page-1;
       }
       if (val === 'Back') {
@@ -807,13 +843,22 @@ export default {
           like: like,
           searchMysteryMode : this.searchParams.searchMysteryMode
       }
-      console.log("1.this.params:",params);
+
+      //console.log("1.this.params:",params);
       if(storeId && storeId!='-1' && storeId!=""){
-        console.log("storeId:",storeId);
+        //console.log("storeId:",storeId);
          params.clause['storeId'] = storeId;
       }
-      console.log("2.this.params:",params);
-      console.log("this.searchParams:",this.searchParams);
+      if(this.inspectId.length>0 && this.searchParams['searchFrom']!='PatrolPersonStat'){
+        let inspectTagId = this.inspectId;
+        if(this.inspectId[0]==='-1'){
+          params['inspectTagIds'] = inspectTagId.slice(1);
+        }else{
+          params['inspectTagIds'] = inspectTagId;
+        }
+      }
+      //console.log("2.this.params:",params);
+      //console.log("this.searchParams:",this.searchParams);
       if(this.searchParams.hasOwnProperty('searchParams')){
         if(this.searchParams.searchParams.hasOwnProperty('clause') && this.searchParams['searchFrom']=='PatrolPersonStat'){
           params.clause['assigner'] =  this.searchParams.searchParams.clause.assigner;
@@ -853,7 +898,7 @@ export default {
 
     currentChange(val) {
       const self = this;
-      console.log("currentChange val:",val);
+      //console.log("currentChange val:",val);
       self.tableDataList[Number(self.activeName)].page = val.page;
       self.page = val.page;
       self.getEventList('currentChange');
@@ -866,13 +911,25 @@ export default {
     },
 
     handleSelectionChange(val){
-      console.log("handleSelectionChange:",val);
+      //console.log("handleSelectionChange:",val);
       this.closingEventId = [];
+      this.selectStoreList = [];
       if(val.length>0){
         this.showCloseBtn = true;
         val.map((item)=>{
+        　console.log(item)
+          let store = this.storeList.find(p=>p.storeId == item.storeId)
+          if(store && store.status == 61){
+            if(this.selectStoreList.indexOf(store.name)<0){
+              this.selectStoreList.push(store.name)
+            }
+          }
+          //this.selectStoreList.push(store.status)
+          //if(store)console.log("Status == " + store.status )
           this.closingEventId.push(item.id);
         })
+
+        console.log(this.selectStoreList)
       }else{
         this.showCloseBtn = false;
       }
@@ -901,7 +958,7 @@ export default {
       }
       //self.getEventListRequestParams('currentChange');
       //}
-      console.log("Get Event Count")
+      //console.log("Get Event Count")
       //console.log(self.params)
       //console.log(self.params.clause.storeId);
       if ( self.params.clause.storeId && self.params.clause.storeId.length === 0) {
@@ -911,7 +968,7 @@ export default {
       //console.log("self.params:",self.params);
       //console.log("self.storeFilterObj:",self.storeFilterObj);
       //let storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds?self.storeFilterObj.filterStoreIds:self.storeFilterObj.curStore : (this.params.hasOwnProperty('clause'))?this.params.clause.storeId:'-1';
-      
+
       //const storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : (self.params.hasOwnProperty('clause') && self.params.clause.hasOwnProperty('storeId'))?self.params.clause.storeId:'-1';
       let storeId = null;
       //if(self.searchParams['searchFrom']=='PatrolPersonStat' || self.searchParams['searchFrom']=="EventStatistics")
@@ -919,7 +976,7 @@ export default {
       /*else
         storeId =  (self.searchParams.hasOwnProperty('clause'))?self.searchParams.clause.storeId:Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds :'-1';
       */
-      console.log("getEventCount > storeId:",storeId)
+      //console.log("getEventCount > storeId:",storeId)
       let like = {};
       if (self.inputSearchValue.trim().length !== 0) {
         const inputValue = self.inputSearchValue.trim();
@@ -943,7 +1000,15 @@ export default {
       if(storeId!='-1'){
         params['clause']['storeId'] = storeId
       }
-      console.log("820: params",params);
+      if(this.inspectId.length>0 && this.searchParams['searchFrom']!='PatrolPersonStat'){
+        let inspectTagId = this.inspectId;
+        if(this.inspectId[0]==='-1'){
+          params['inspectTagIds'] = inspectTagId.slice(1);
+        }else{
+          params['inspectTagIds'] = inspectTagId;
+        }
+      }
+      //console.log("1008: params",params);
       if(this.searchParams.hasOwnProperty('searchParams')){
         if(this.searchParams.searchParams.hasOwnProperty('clause')  && this.searchParams['searchFrom']=='PatrolPersonStat'){
           params.clause['assigner'] =  this.searchParams.searchParams.clause.assigner;
@@ -952,7 +1017,7 @@ export default {
           params.clause['subject'] =  this.searchParams.searchParams.clause.subject;
         }
       }
-      
+
       //delete params.clause['status'];
       if (storeId.length === 0) {
         for (let i = 0; i < 4; i++) {
@@ -962,7 +1027,7 @@ export default {
       } else {
         eventRESTful.GetEventCountByStatus(params).then(res => {
           const data = res.data;
-          console.log("GetEventCountByStatus > data:",data);
+          //console.log("GetEventCountByStatus > data:",data);
           let numOfEventTotal = 0;
           for (let i = 0; i < 4; i++) {
             self.tableDataList[i].eventCount = data[i].numOfEvent;
@@ -1077,8 +1142,8 @@ export default {
       });
     },
 
-    initData() {
-      //console.log('init');
+    async initData() {
+      console.log('init');
       const self = this;
       self.activeName = '0';
       self.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24, this.$moment(new Date()).endOf('day')];
@@ -1089,11 +1154,18 @@ export default {
       if (windowHeight > 800) {
         self.tableHeight = 770 + 'px';
       }
+      console.log("Get Store List")
+      let res  = await this.getBriefStoreData();
+      if(res.errCode ==0){
+        this.storeList = res.data;
+      }
+      console.log(this.storeList)
+      console.log("Get Store List Finish")
       this.tableDataList[Number(this.activeName)].page = 1;
       this.getEventListAndCount() ;
     },
     getRouterData(routeData) {
-      console.log("1.eventManage routeData:", routeData);
+      //console.log("1.eventManage routeData:", routeData);
       let start = '', end = '';
       start = this.$moment(this.dateValue[0]).valueOf();
       const endTime = this.dateValue[1];
@@ -1111,26 +1183,26 @@ export default {
             size: 10
           },
         };
-        console.log("eventManage params:", this.params);
+        //console.log("eventManage params:", this.params);
         sessionStorage.setItem('event_manage', '');
-        console.log("2.eventManage routeData:", sessionStorage.getItem('event_manage'));
+        //console.log("2.eventManage routeData:", sessionStorage.getItem('event_manage'));
         this.getEventList('Back');
     },
     saveSearchParams(isLeave=false) {
-      console.log("saveSearchParams:",this.storeFilterObj);
+      //console.log("saveSearchParams:",this.storeFilterObj);
       const params = this.storeFilterObj;
       const { clause, filter, like, order } = { ...this.params };
       if(isLeave){
         let tempClause = clause;
         delete clause["assigner"];
         params.searchParams = { clause:tempClause, filter, like, order };
-        console.log("leave searchParams:",params.searchParams);
+        //console.log("leave searchParams:",params.searchParams);
       }else{
         //params.curStore = this.storeFilterObj.filterStoreIds;
         params.searchParams = { clause, filter, like, order };
         params.searchParams.clause.storeId = this.storeFilterObj.filterStoreIds;
       }
-      
+
       params.filterStoreIds = this.storeFilterObj.filterStoreIds;
       params.inputSearchValue = this.inputSearchValue;
       params.dateValue = this.dateValue;
@@ -1140,22 +1212,26 @@ export default {
       params.page = this.params.filter.page;
       params.order = this.order;
       params.searchMysteryMode = -1;
+      params.curReportType = this.curReportType;
+      params.inspectTagId = this.inspectId;
+      //console.log(">>>Save params:",params);
       const searchConditon = {
         path: 'eventManage',
         params: params
       };
-      console.log("save params:",params);
+      //console.log("save params:",params);
       SearchConditionUtil.saveSearchCondition(searchConditon);
     },
 
     getSearchParams() {
-      
+
         const searchParams = SearchConditionUtil.getSearchCondition('eventManage');
         console.log("EventMange > getSearchParams > searchParams:",searchParams);
         if (Object.keys(searchParams).length > 0) {
-          
+
           if(searchParams['searchFrom']=='PatrolPersonStat'){
             //this.dateValue =[searchParams.];
+            this.curReportType = -1;
             this.storeFilterObj.filterStoreIds = searchParams.curStore;
             this.storeFilterObj.curStore=searchParams.curStore;
             this.storeFilterObj.storeIds=searchParams.curStore;
@@ -1166,6 +1242,7 @@ export default {
             this.params.endTs = searchParams.endTs;
             this.dateValue = [util.getDates(searchParams.beginTs),searchParams.endTs];
             this.params.searchMysteryMode = searchParams.searchMysteryMode;
+
             //console.log("1.EventMange > getSearchParams > dateValue:",this.dateValue);
             //util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
           }else if(searchParams['searchFrom']=="EventStatistics"){
@@ -1176,6 +1253,10 @@ export default {
             this.storeFilterObj.storeIds=searchParams.curStore;
             this.dateValue = [util.getDates(searchParams.beginTs),searchParams.endTs];
             this.params.searchMysteryMode = -1;
+            //console.log("EventMange > getSearchParams > searchParams.inspectTagId:",searchParams.inspectTagId);
+            this.curReportType = -1;
+            this.inspectCatch = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
+            this.inspectId = this.inspectCatch;
             //console.log("1..EventMange > getSearchParams > dateValue:",this.dateValue);
           }else{
             this.storeFilterObj.filterStoreIds = (searchParams.curStore)?searchParams.curStore:[];
@@ -1184,6 +1265,9 @@ export default {
             this.params.beginTs = this.dateValue[0].valueOf();
             this.params.endTs = this.dateValue[1].valueOf();
             this.params.searchMysteryMode = -1;
+            this.curReportType = (typeof searchParams.curReportType =='undefined')? -1 : searchParams.curReportType;
+            this.inspectCatch = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
+            console.log("EventMange > getSearchParams > this.inspectCatch:",this.inspectCatch);
           }
           this.inputSearchValue = searchParams.inputSearchValue;
           this.curState = searchParams.curState;
@@ -1196,6 +1280,7 @@ export default {
           this.params = searchParams.searchParams;
           this.searchParams = searchParams;
           this.ifGetParamsFromCash = true;
+
         } else {
           this.searchParams = {};
           this.curState = [0];
@@ -1203,17 +1288,30 @@ export default {
           this.params.beginTs = this.dateValue[0].valueOf();
           this.params.endTs = this.dateValue[1].valueOf();
           this.params.searchMysteryMode = -1;
+          this.inspectCatch = '-1';
+          this.curReportType = -1;
+          this.ifGetParamsFromCash = false;
         }
-      
+
     },
 
     onStoreChange(storeObj) {
-      console.log("onStoreChange>storeFilterObj",storeObj);
+      //console.log("onStoreChange>storeFilterObj",storeObj);
       this.storeFilterObj = storeObj;
       this.ifSearchData && this.getEventListAndCount();
       this.ifSearchData = false;
     },
     doBachCloseEvent(){
+      const self = this;
+      if(self.selectStoreList.length>0){
+        let names  = self.selectStoreList +""
+        let msg  = this.$t('route.errorStoreNameNoPerssion').replace("{storeNames}",names);
+        if(self.selectStoreList.length>1){
+          msg = msg.replace("has no service","have no service")
+        }
+        util.notify(msg , 'error', 1000 );
+        return
+      }
       this.showBachCloseDialog = true;
     },
     confirmBachClose(){
@@ -1248,8 +1346,69 @@ export default {
       }).catch(err => {
         console.log('EventDetail-addComment:' + err);
       });
-    }
+    },
+    async getInspectList() {
+      const self = this;
+      const inspectArr = await self.getTagAll();
+      const newArr = ['-1'];
+      const inspectList = [];
+      inspectArr.forEach(_item => {
+        if (self.curReportType === -1) {
+          if (!newArr.includes(_item.id)) {
+            newArr.push(_item.id);
+            inspectList.push(
+              {
+                label: _item.name,
+                value: _item.id
+              }
+            );
+          }
+        } else if (self.curReportType === 0) {
+          if (!newArr.includes(_item.id) && _item.mode === 0) {
+            newArr.push(_item.id);
+            inspectList.push(
+              {
+                label: _item.name,
+                value: _item.id
+              }
+            );
+          }
+        } else if (self.curReportType === 1) {
+          if (!newArr.includes(_item.id) && _item.mode === 1) {
+            newArr.push(_item.id);
+            inspectList.push(
+              {
+                label: _item.name,
+                value: _item.id
+              }
+            );
+          }
+        }
+      });
+      self.inspectTableList = inspectList;
+      //self.inspectTableList.length > 0 && self.inspectTableList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
+      if (inspectList.length !== 0) {
+        console.log(">>>>self.ifGetParamsFromCash:",self.ifGetParamsFromCash);
+        self.inspectId = (self.ifGetParamsFromCash && self.inspectCatch!='-1') ? self.inspectCatch : newArr;
+        self.ifGetParamsFromCash = false;
+      } else {
+        self.inspectId = newArr;
+      }
+  },
 
+  getTagAll() {
+      return new Promise((resolve, reject) => {
+        GetInspectTagList().then(res => {
+          const data = res.data;
+          resolve(data);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+   },
+
+  changeSelect(val) {
+      this.inspectId = Array.from(val)[0];
   },
 
   beforeRouteEnter(to, from, next) {
@@ -1273,7 +1432,8 @@ export default {
     }
   }
 
-};
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -1515,7 +1675,7 @@ $h1:#292e36;
     .el-table
     .el-table__header-wrapper
     .el-table-column--selection
-    .el-checkbox__inner 
+    .el-checkbox__inner
     {
       border-radius: 1px;
       border: solid 1px #acaeb1;
@@ -1529,7 +1689,7 @@ $h1:#292e36;
     .el-table__header-wrapper
     .el-table-column--selection
     .is-checked
-    .el-checkbox__inner 
+    .el-checkbox__inner
     {
       border-radius: 1px;
       border: solid 1px #2c90d9;
@@ -1539,7 +1699,7 @@ $h1:#292e36;
     .el-table
     .el-table__body-wrapper
     .el-table-column--selection
-    .el-checkbox__inner 
+    .el-checkbox__inner
     {
       border-radius: 1px;
       border: solid 1px #acaeb1;
@@ -1550,7 +1710,7 @@ $h1:#292e36;
     .el-table__body-wrapper
     .el-table-column--selection
     .is-checked
-    .el-checkbox__inner 
+    .el-checkbox__inner
     {
       border-radius: 1px;
       border: solid 1px #2c90d9;
@@ -1565,6 +1725,24 @@ $h1:#292e36;
   padding-bottom: 6px; // 6px为横向滚动条高度
 }
 
+.last-row{
+      display: flex;
+      flex-direction: row;
+      width:100%;
+      margin-left: 42px;
+      height: 36px;
+      align-items: flex-start;
+      align-items:center;
+      justify-content: flex-start;
+      padding-right: (180/1920*100vw);
+}
+.report-type-area{
+    width:calc(346/1440*100vw);
+    height: calc(36/1920*100vw);
+    background-color: #FFF;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+}
 </style>
 <style scoped>
     .el-select >>> .el-input__inner{
@@ -1572,7 +1750,7 @@ $h1:#292e36;
         /*border-radius: 0px !important;*/
         /*border: 0 !important;*/
     }
-    
+
 </style>
 <style>
  @import '../../assets/css/pagination.css';
@@ -1598,7 +1776,7 @@ $h1:#292e36;
    .table-content.el-table__body tr:hover>td{
     background-color: #f2f9fe !important;
   }
-  
+
   /*.el-table__header{
     width:auto !important;
   }*/
@@ -1611,4 +1789,3 @@ $h1:#292e36;
     border-color: #2c90d9;
 }*/
 </style>
-

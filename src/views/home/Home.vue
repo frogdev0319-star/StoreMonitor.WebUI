@@ -159,8 +159,8 @@
                   :disabled="item.isReadOnly"
                   :style="{'paddingLeft':'calc(30/1920*100vw) !important','height': 'calc(66/1920*100vw)','lineHeight': 'calc(66/1920*100vw)'}"
                 >
-                  <img class="menu_img" :src="($route.name=='auth')? `./../static/img/menu/${index}.png`:`./static/img/menu/${index}.png`" />
-                  <img class="menu_img-active" :src="($route.name=='auth')? `./../static/img/menu/${index}-active.png`:`./static/img/menu/${index}-active.png`" />
+                  <img class="menu_img" :src="($route.name=='auth')? `./../static/img/menu/${item.id}.png`:`./static/img/menu/${item.id}.png`" />
+                  <img class="menu_img-active" :src="($route.name=='auth')? `./../static/img/menu/${item.id}-active.png`:`./static/img/menu/${item.id}-active.png`" />
                   <span class="span1">{{collapsed ? "" : $t(`route.${item.children[0].name}`)}}</span>
                 </el-menu-item>
 
@@ -171,8 +171,8 @@
                   :index="index+''"
                   :style="{}">
                   <template slot="title">
-                    <img class="menu_img" :src="($route.name=='auth')? `./../static/img/menu/${index}.png`:`./static/img/menu/${index}.png`"/>
-                    <img class="menu_img-active" :src="($route.name=='auth')? `./../static/img/menu/${index}-active.png`:`./static/img/menu/${index}-active.png`"/>
+                    <img class="menu_img" :src="($route.name=='auth')? `./../static/img/menu/${item.id}.png`:`./static/img/menu/${item.id}.png`"/>
+                    <img class="menu_img-active" :src="($route.name=='auth')? `./../static/img/menu/${item.id}-active.png`:`./static/img/menu/${item.id}-active.png`"/>
                     <span class="span2">{{collapsed ? "" : $t(`route.${item.name}`) }}</span>
                   </template>
                   <div v-for="child in item.children" :key="child.path">
@@ -275,9 +275,9 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.0.5.5
-                &copy; {{ getFullYear }} Advantech Intelligent City
-                Services Co., Ltd. (AiCS) All Rights Reserved.
+                v3.1.1.7
+                  &copy; {{ getFullYear }} Advantech Intelligent City
+                  Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
             </footer>
           </el-col>
@@ -511,6 +511,11 @@ export default {
         { curPath: ["/reportdetails"], activePath: "/auditHandling" },
         //神秘客
         { curPath: ["/mysterioSetting"], activePath: "/mysterio" },
+
+        //[巡檢排程]
+        { curPath: ["/personalSchedule"], activePath: "/scheduleSetting" },
+        { curPath: ["/scheduleDetailCreate"], activePath: "/scheduleSetting" },
+        { curPath: ["/scheduleDetailModify"], activePath: "/scheduleSetting" },
 
       ];
       const pathMAP = pathMapArr.find((item) => item.curPath.includes(path));
@@ -932,6 +937,19 @@ export default {
           parentBread: { path: "/mysterio", name: "MysterioManage" },
         },
 
+        //巡檢排程
+        {
+          paths:["/personalSchedule"],
+          parentBread: { path: "/scheduleSetting", name: "ScheduleSetting" },
+        },
+        {
+          paths:["/scheduleDetailCreate"],
+          parentBread: { path: "/personalSchedule", name: "schedulePersonalCreate" },
+        },
+        {
+          paths:["/scheduleDetailModify"],
+          parentBread: { path: "/personalSchedule", name: "schedulePersonalModify" },
+        }
       ];
       const pathAndBreadMap = pathAndBreadMaps.find((map) =>
         map.paths.includes(currentRoute)

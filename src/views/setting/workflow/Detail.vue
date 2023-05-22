@@ -624,9 +624,19 @@ export default {
 
 
         this.ccToUSer = this.nodeList.copyToUsers
-        console.log('this.nodeList 4 ------>> ', this.nodeList);
-        console.log('res.data 4 ------>> ', res.data);
-        console.log('this.workflowDetail 4 ------>> ', this.workflowDetail);
+
+        // 刪除不存在 user
+        this.ccToUSer.forEach((i, index, arr) =>{
+          var isRealUser = this.userInfo.some( n => n.userId === i)
+          if(!isRealUser) {arr.splice(index, 1)}
+        })
+
+
+        // console.log('this.ccToUSer ------>> ', this.ccToUSer);
+        // console.log('this.userInfo ------>> ', this.userInfo)
+        // console.log('this.nodeList 4 ------>> ', this.nodeList);
+        // console.log('res.data 4 ------>> ', res.data);
+        // console.log('this.workflowDetail 4 ------>> ', this.workflowDetail);
         
         // flat data  
         this.flattenData(this.nodeList)
@@ -704,7 +714,7 @@ export default {
       await getAllUserInfoNoAuth().then(res=>{
         this.userInfo = res.data
         this.userData = this.userInfo
-        // console.log('this.userInfo ------>> ', this.userInfo);
+        console.log('this.userInfo ------>> ', this.userInfo);
       }).catch(err => {
         console.log('error' + err);
       });
@@ -1229,7 +1239,7 @@ export default {
         this.$router.push({name: 'workflowManage'})
       }).catch(err => {
           console.log('error' + err);
-       })
+      })
     },
     
   }

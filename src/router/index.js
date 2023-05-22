@@ -62,6 +62,7 @@ export const navbarRoute = {
   getOverviewRoute() {
     primaryPathesList = [];
     const overviewRoute = {
+      id:0,
       path: '/home',
       name: 'overview',
       component: Home,
@@ -84,10 +85,11 @@ export const navbarRoute = {
     }) && primaryPathesList.push('/eventOverview');
     return overviewRoute;
   },
-  
+
   getPatrolRoute() {
     console.log("PermissionHelper.enableInspectReport()",PermissionHelper.enableInspectReport());
     const patrolRoute = {
+      id:1,
       path: '/home',
       name: 'patrolManage',
       component: Home,
@@ -163,6 +165,7 @@ export const navbarRoute = {
   },
   getEventRoute() {
     const eventRoute = {
+      id:2,
       path: '/home',
       name: 'eventManage',
       component: Home,
@@ -195,6 +198,7 @@ export const navbarRoute = {
 
   getAuditRoute() {
     const auditRoute = {
+      id:4,
       path: '/home',
       name: 'AuditManage',
       component: Home,
@@ -303,8 +307,74 @@ export const navbarRoute = {
     return auditRoute;
   },
 
+  getInceptionSchedule(){
+    const schduleRoute = {
+      id:5,
+      path: '/home',
+      name: 'InceptionSchedule',
+      component: Home,
+      iconCls: 'iconfont icon-shijian',
+      styles: 'font-size:22px',
+      leaf: false,
+      hidden: false,
+      children: []
+    };
+    !PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleSetting2() && schduleRoute.children.push(
+      {
+
+        path: '/scheduleSetting',
+        name: 'ScheduleSetting',
+        component: resolve => require(['@/views/schedule/ScheduleSetting'], resolve),
+        meta: {
+          keepAlive: true, // the component is't to be cache.
+          requireAuth: true
+        },
+        isReadOnly: false
+      } ,
+      {
+        path: '/personalSchedule',
+        name: 'PersonalSchedule',
+        hidden: true,
+        component: resolve => require(['@/views/schedule/details/personalSchedule'], resolve)
+      },
+      {
+        path: '/scheduleDetailCreate',
+        name: 'CreateSchedule',
+        hidden: true,
+        meta: {
+          keepAlive: false
+        },
+        component: resolve => require(['@/views/schedule/details/scheduleDetail'], resolve)
+      },
+      {
+        path: '/scheduleDetailModify',
+        name: 'ModifySchedule',
+        hidden: true,
+        meta: {
+          keepAlive: false
+        },
+        component: resolve => require(['@/views/schedule/details/scheduleDetail'], resolve)
+      }
+
+    ) && primaryPathesList.push('/scheduleSetting', '/personalSchedule','/scheduleDetailCreate','scheduleDetailModify');
+    !PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleHistroy() && schduleRoute.children.push(
+      {
+        path: '/scheduleHistory',
+        name: 'ScheduleHistory',
+        component: resolve => require(['@/views/schedule/ScheduleHistory'], resolve),
+        meta: {
+          keepAlive: true, // the component is't to be cache.
+          requireAuth: true
+        },
+        isReadOnly: false
+      }
+    ) && primaryPathesList.push('/scheduleHistory');
+    return schduleRoute;
+  },
+
   getStatisticalRoute() {
     const statisticsRoute = {
+      id:3,
       path: '/home',
       name: 'statistics',
       component: Home,
@@ -371,7 +441,7 @@ export const navbarRoute = {
         }
       }
     ) && primaryPathesList.push('/eventStat');
-    !PermissionHelper.enableMimicMode && PermissionHelper.enableEventStatistics() && statisticsRoute.children.push(
+    !PermissionHelper.enableMimicMode && PermissionHelper.enableAppraisalCompareStatistics() && statisticsRoute.children.push(
       {
         path: '/patrolCompareStat',
         name: 'patrolCompareStat',
@@ -413,6 +483,7 @@ export const navbarRoute = {
   },
   getSystemSettingRoute() {
     const systemSettingRoute = {
+      id:6,
       path: '/home',
       name: 'systemSetting',
       iconCls: 'iconfont icon-button',
@@ -567,7 +638,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/workflow/NodeSetting'], resolve),
         hidden: true,
       }
-      
+
     ) && primaryPathesList.push('/workflows', '/workflowDetail', '/createWorkflownode', '/workflownode', '/createWorkflow','/createEditWorkflownode');
     (store.getters.roleId==1) && !PermissionHelper.enableMimicMode && systemSettingRoute.children.push(
       {

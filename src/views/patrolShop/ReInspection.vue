@@ -7,9 +7,9 @@
     ></store-filter>
     <div class="el-container" style="margin-top: 20px" :class="{'flex-column': isFullScreenMode}">
       <div :style="{'border-bottom-right-radius': isFullScreenMode ? '0px': 'unset', 'border-bottom-left-radius': isFullScreenMode ? '0px': 'unset'}"
-        :class="{liseAnmiClass:showSpread}" 
+        :class="{liseAnmiClass:showSpread}"
         class="lside paper spacer"
-        
+
       >
         <div class="el-header-title flex-center">
           <img v-if="enableMimicMode?false:true" :src="store.storeUp? starYellowIcon : starGreyIcon"  @click="addStoreUp" style="cursor: pointer">
@@ -22,6 +22,7 @@
             {{isFullScreenMode? $t('remotePatrol.defaulteMode'):$t('remotePatrol.fullScreenMode')}}
           </div>
         </div>
+
         <el-dialog
           v-if="showCutDialog"
           :title="$t('remotePatrol.edit')"
@@ -69,6 +70,7 @@
             <el-button id="confirmBtn" size="mini" type="primary" @click="confirmEdit">{{ $t('remotePatrol.confirm') }}</el-button>
           </div>
         </el-dialog>
+
         <el-dialog
           v-if="dialogCommentVideo"
           :title="$t('remotePatrol.view')"
@@ -141,7 +143,7 @@
                   resize="none"
                   @input="eventDesChanged"
                   @blur="notShowInputRuleTips('eventDes')"/>
-                
+
                 <button
                   class="inspect-btn"
                   @click="submitFeedbackItemResource()"
@@ -245,7 +247,7 @@
                   resize="none"
                   @input="eventDesChanged"
                   @blur="notShowInputRuleTips('eventDes')"/>
-                
+
                 <button
                   class="inspect-btn"
                   @click="submitFeedbackItemResource()"
@@ -344,6 +346,7 @@
             <div class="padding-vertical-sm">{{noAllInspectObj.showInfo}}</div>
           </div>
         </dialog-pop>
+
         <dialog-pop
           v-if="requiredObj.dialogCosed"
           :title="requiredObj.title"
@@ -353,7 +356,7 @@
           @confirmHandler="requiredObj.dialogCosed = false"
           >
           <div class="dialog-slot">
-            <div class="padding-vertical-sm">{{requiredObj.showInfo}}</div>
+            <div class="padding-vertical-sm">{{requiredObj.showInfo}} </div>
           </div>
         </dialog-pop>
         <dialog-pop
@@ -380,8 +383,37 @@
             {{leaveObj.showInfo}}
           </div>
         </dialog-pop>
+
+        <!-- 備註標籤 memoConfigTextObj-->
+        <dialog-pop
+          v-if="memoConfigTextObj.dialogCosed"
+          :title="memoConfigTextObj.title"
+          :isWarning="memoConfigTextObj.isWarning"
+          :visible="memoConfigTextObj.dialogCosed"
+          @cancelHandler="memoConfigTextObj.dialogCosed = false"
+          @confirmHandler="memoConfigTextObj.dialogCosed = false"
+          >
+          <div class="dialog-slot">
+            <div class="padding-vertical-sm">{{memoConfigTextObj.showInfo}} </div>
+          </div>
+        </dialog-pop>
+
+        <dialog-pop
+          v-if="memoConfigMediaObj.dialogCosed"
+          :title="memoConfigMediaObj.title"
+          :isWarning="memoConfigMediaObj.isWarning"
+          :visible="memoConfigMediaObj.dialogCosed"
+          @cancelHandler="memoConfigMediaObj.dialogCosed = false"
+          @confirmHandler="memoConfigMediaObj.dialogCosed = false"
+          >
+          <div class="dialog-slot">
+            <div class="padding-vertical-sm">{{memoConfigMediaObj.showInfo}} </div>
+          </div>
+        </dialog-pop>
+
+
         <div v-if="showGuide && inspectList.length > 0" class="guide-content">
-          
+
           <div class="guide-rside">
             <div class="num-content">
               <span class="guide-num">2</span>
@@ -408,7 +440,8 @@
             :is="currentVideoComponent"
             ref="vendorVideo"
             :channel-info="channel"
-            :source-list-length= "sourceListLength"
+            :source-list-length= "totalSourceList"
+            :is-remote="true"
             :show-feed-back="showFeedBack"
             :store-id="store.storeId"
             :video-authority="videoAuthority"
@@ -419,11 +452,12 @@
           <div v-if="isFullScreenMode" class="patrol-select title ">
             <div class="patrol-content text-left flex-center" :class="{'margin-bottom-md': isFullScreenMode}">
               {{ $t('remotePatrol.selectInspect') }}
-              <el-select 
+              <el-select
                 style="margin-left: 20px;"
-                class="storevue-select-grey" 
-                :value="patrolstore" 
+                class="storevue-select-grey"
+                :value="patrolstore"
                 :placeholder="$t('remotePatrol.selectInspect')"
+                :disabled = "emptyPatrolList"
                 @change="changeInspect">
                 <el-option
                   v-for="item in PatrolList"
@@ -434,7 +468,7 @@
                 </el-option>
               </el-select>
               <div class="spacer"></div>
-              <el-button :disabled="!allRemarkItemsFlag && !isDisabled"
+              <el-button :disabled="(!allRemarkItemsFlag && !isDisabled)||storeStatus==61 "　
                 class="storevue-button-filled"
                 :size="varyWindowWidth>1680?'small':'mini'" type="primary" @click="confirmSummary">
                 {{ $t('remotePatrol.confirmSum') }}
@@ -442,8 +476,8 @@
             </div>
           </div>
           <div class="channel-content" :class="{'margin-bottom-md': isFullScreenMode}" style="height: 100%; display: flex; flex-direction: column;">
-            <div 
-              class="flex-center title " 
+            <div
+              class="flex-center title "
               :style="{'justify-content': isFullScreenMode?'unset':'space-between'}"
             >
               {{ $t('remotePatrol.zoneList') }}
@@ -468,14 +502,14 @@
                 style="padding-top: 20px"
                 :style="{'justify-content':isFullScreenMode?'unset':'space-between'}"
               >
-                <div 
-                  v-for="(item,index) in showChannelBtns.filter(d => d.name.indexOf(serachChannelValue) > -1)" 
-                  :key="index" 
+                <div
+                  v-for="(item,index) in showChannelBtns.filter(d => d.name.indexOf(serachChannelValue) > -1)"
+                  :key="index"
                   class="btn-details"
                   :class="{'child-space': isFullScreenMode}"
                   :style="{'width':isFullScreenMode?'246px':'calc(50% - 10px)'}"
-                > 
-                  <div 
+                >
+                  <div
                     @click="clickBtn(item,index)"
                     class="channel"
                     :class="{'channel-isActive': item.isClick}"
@@ -490,22 +524,23 @@
               </div> -->
             </div>
           </div>
-          
+
           <hr v-if="isFullScreenMode" class="hr-horizontal" >
         </div>
       </div>
-      
-      
+
+
       <div :style="{'border-top-right-radius': isFullScreenMode ? '0px': 'unset', 'border-top-left-radius': isFullScreenMode ? '0px': 'unset'}"
       :class="{'margin-left-md': !isFullScreenMode, 'padding': isFullScreenMode}" v-if="!showSpread" class="rside paper spacer" >
         <div v-if="!isFullScreenMode" class="patrol-select title" :class="{'padding': !isFullScreenMode}">
           <div class="patrol-content text-left flex-center" :class="{'margin-bottom-md': isFullScreenMode}">
-            {{ $t('remotePatrol.selectInspect') }} 
-            <el-select 
+            {{ $t('remotePatrol.selectInspect') }}
+            <el-select
               style="margin-left: 20px;"
-              class="storevue-select-grey" 
-              :value="patrolstore" 
+              class="storevue-select-grey"
+              :value="patrolstore"
               :placeholder="$t('remotePatrol.selectInspect')"
+              :disabled = "emptyPatrolList"
               @change="changeInspect">
               <el-option
                 v-for="item in PatrolList"
@@ -516,7 +551,7 @@
               </el-option>
             </el-select>
             <div class="spacer"></div>
-            <el-button :disabled="!allRemarkItemsFlag && !isDisabled"
+            <el-button :disabled="(!allRemarkItemsFlag && !isDisabled)||storeStatus==61"
               class="storevue-button-filled"
               :size="varyWindowWidth>1680?'small':'mini'" type="primary" @click="confirmSummary">
               {{ $t('remotePatrol.confirmSum') }}
@@ -525,6 +560,7 @@
         </div>
         <hr v-if="!isFullScreenMode" class="hr-horizontal" :style="isFullScreenMode?{'margin-bottom': '20px'}:{}">
         <div v-if="sheetName.length!=0" :class="{'flex': isFullScreenMode, fullWidth: isFullScreenMode}">
+
           <div v-if="isFullScreenMode" style="width: 200px; padding-right: 10px">
             <el-input
               :placeholder="$t('insSettingView.enterInspectFilter')"
@@ -588,8 +624,13 @@
               </div>
             </div>
           </div>
+
+          <!-- right side -->
           <div class="fullWidth rside">
+
             <div v-if="!showFeedBack" class="padding" :class="{flex:isFullScreenMode && $store.getters.collapsed}" style="background-color: rgb(237, 240, 242); height: 60vh; overflow: auto;flex-wrap: wrap; justify-content: space-between">
+
+
               <div
                 v-for="(item_) in inspectList"
                 :key="item_.id"
@@ -598,20 +639,31 @@
                   <div class="spacer font-13" style="text-align: left; border-left: 4px solid #2c90d9; padding-left: 8px;">{{ item_.groupName }}</div>
                   <div v-if="!showIgnoreItem ">{{ item_.dealCount+'/'+item_.count }}</div>
                 </div>
+
                 <hr v-if="!showIgnoreItem ||item_.ignoreCount>0"  class="hr-horizontal">
-                <div   v-for="(item,index) in item_.items.filter(d => d.subject.indexOf(searchItemValue ) > -1 && (!showIgnoreItem || d.ignore )) " :key="index" class="item-details padding-sm">
-                  <div class="flex fullWidth">
+                <div v-for="(item,index) in item_.items.filter(d => d.subject.indexOf(searchItemValue ) > -1 && (!showIgnoreItem || d.ignore )) "
+                  :key="index"
+                  class="item-details padding-sm"
+                  :style="item.checked?{'background-color':'#f5f7fa'}:{}"
+                  @click="clickItem({item,index:showIgnoreItem?item.originIndex:index})"
+                  >
+
+                  <div class="flex fullWidth" >
                     <div class="font-15" style="text-align: left; width: calc(20/1920*100vw)" :style="item.checked?{'color':'#006ab7'}:{}">{{(index+1) + '.'}}</div>
-                    <div class="flex padding-bottom-sm spacer" :style="item.checked?{'background-color':'#f2f9fe'}:{}">
+                    <div class="flex padding-bottom-sm spacer" >
+
+                      <!-- subject -->
                       <div
                         :class="!item.manualIgnore?'noraml-title':'ignore-title'"
                         :style="item.checked?{'color':'#006ab7'}:{'color': '#484848'}"
                         class="spacer font-15"
                         style="text-align: left; font-weight: 500; word-break: break-all;"
-                        @click="clickItem({item,index:showIgnoreItem?item.originIndex:index})">
+                      >
                         <span style="color: #c60957" v-if="item.required">*</span>
-                        {{ item.subject }}
+                        <span :class= "{ is_important : item.isImportant}"> {{ item.subject }}  </span>
                       </div>
+
+                      <!-- dropdown -->
                       <div v-if="item.itemType === 0">
                         <el-dropdown v-if="item.groupType !== 1" :class="!item.manualIgnore?'noraml-title':'ignore-title'"
                                       trigger="click" class="item-score" size="small" :disabled="(item.manualIgnore || item.notEdit)">
@@ -640,13 +692,15 @@
                               @click.native="checkScore({item,itemDS: itemDS,index: index, e:1})">{{ itemDS }}</el-dropdown-item>
                           </el-dropdown-menu>
                         </el-dropdown>
-                        <div v-if="!item.required" class="cancel-text" 
+                        <div v-if="!item.required" class="cancel-text"
                           :style="(item.notEdit && isEditReport)?{'pointer-events':'none'}:{'pointer-events':'auto'}"
                           @click="item.manualIgnore ? CancleIgnoreItem({item,index}) : ignoreItem({item,index,e:0})">{{item.manualIgnore ? $t('remotePatrol.cancel') : $t('remotePatrol.ignore')}}</div>
                       </div>
                     </div>
                   </div>
-                  <div style="margin-left: calc(20/1920*100vw)" :style="item.checked?{'background-color':'#f2f9fe'}:{}">
+
+                  <!-- description -->
+                  <div style="margin-left: calc(20/1920*100vw)" >
                     <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" style=" word-break: break-all" class="details-content margin-bottom-sm">
                       {{ item.description }}
                     </div>
@@ -654,24 +708,23 @@
                       {{ $t('remotePatrol.failedRecord') + item.lastUnqualifiedNumber }}
                     </div>
                   </div>
+
+                  <!-- comment -->
                   <div style="padding-left: calc(20/1920*100vw)">
+                    <!-- img -->
                     <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
                       <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                         <div v-if="_item.mediaType == 3" class="flex-center">
-                          <img
-                            v-if="_item.showDelBtn"
-                            :src="deleteInspectIcon"
-                            alt="delete"
-                            @click="deleteItemResource({ item, index: _index })"
-                          />
+
                           <div
-                            class="paper flex-center margin-bottom-sm inspect-text"
+                            class=" flex-center comment_list "
                             :style="curEditIndex === _index?{'border':'1px solid #006ab7'}:{'border':'1px solid #e6e6e6'}"
                           >
-                            <div style="flex: 1; text-align: left; margin: 5px">
+                            <div style="flex: 1; text-align: left; margin: 5px; font-size: 13px;">
                               {{ _item.src }}
                             </div>
                             <hr v-if="_item.showDelBtn" class="hr-vertical" />
+                            <!-- 編輯 -->
                             <img
                               v-if="_item.showDelBtn"
                               :src="editInspectIcon"
@@ -680,11 +733,20 @@
                               @click="editItemResource({ item, index: _index })"
                             />
                           </div>
+                          <!-- 刪除 -->
+                          <img
+                            v-if="_item.showDelBtn"
+                            :src="deleteInspectIcon_new"
+                            alt="delete"
+                            class="to_delete"
+                            @click="deleteItemResource({ item, index: _index })"
+                          />
                         </div>
                       </div>
                     </div>
+
                     <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="img-source-content">
-                      <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
+                      <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details" >
                         <div v-if="_item.mediaType==2" class="img-content">
                           <i v-if="_item.showDelBtn" class="el-icon-close icondelete" @click="deleteImg({item,index: _index})" />
                           <el-image
@@ -699,14 +761,18 @@
                         </div>
                       </div>
                     </div>
+
+                    <!-- text input -->
                     <div style="position: relative">
                       <el-input
                         :autosize="{ minRows: 2, maxRows: 7 }"
                         v-model="item.inspectInput"
                         :placeholder="$t('remotePatrol.coment')"
                         :disabled="item.disabled"
+
                         size="mini"
-                        class="storevue-textarea"
+                        class="force_white"
+
                         type="textarea"
                         resize="none"
                         @input="(val) => itemDescriptionChanged({ val, item })"
@@ -720,6 +786,28 @@
                         {{$t('remotePatrol.confirm')}}
                       </button>
                     </div>
+
+                    <!-- notification -->
+                    <div class="advance_memo" v-if="(item.memo_config !== null && item.memo_config.memo_required_type == 1)">
+                      {{$t('remotePatrol.pleaseAdd')}} <span v-show="(item.memo_config.memo_check_text == true)"> {{$t('remotePatrol.textItem')}}</span>
+                          <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">, </span>
+                          <span v-show="(item.memo_config.memo_check_media == true)">{{$t('remotePatrol.mediaItem')}}</span> {{$t('remotePatrol.attachments')}}
+                    </div>
+
+                    <div class="advance_memo" v-else-if="( item.memo_config !== null && item.memo_config.memo_required_type == 2)">
+                      <div class="" v-if="(item.qualifiedScore === 0)">
+                      {{$t('remotePatrol.notQualifyAdd')}}
+                          <span v-show="(item.memo_config.memo_check_text == true)"> {{$t('remotePatrol.textItem')}}</span>
+                          <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">, </span>
+                          <span v-show="(item.memo_config.memo_check_media == true)">{{$t('remotePatrol.mediaItem')}}</span> {{$t('remotePatrol.attachments')}}
+                      </div>
+                      <div class="advance_memo" v-else-if="(item.qualifiedScore > 0)">
+                        {{$t('remotePatrol.lowerThan')}}  {{item.qualifiedScore}} {{$t('remotePatrol.lowScoreAdd')}}
+                          <span v-show="(item.memo_config.memo_check_text == true)"> {{$t('remotePatrol.textItem')}}</span>
+                          <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">, </span>
+                          <span v-show="(item.memo_config.memo_check_media == true)">{{$t('remotePatrol.mediaItem')}}</span> {{$t('remotePatrol.attachments')}}
+                      </div>
+                    </div>
                     <span v-if="item.RuleCountTip" class="rules">{{
                       $t("remotePatrol.commentCountRuleTip")
                     }}</span>
@@ -729,8 +817,9 @@
                   </div>
                 </div>
               </div>
-              
+
             </div>
+
             <div v-if="showFeedBack" style="background-color: rgb(237, 240, 242); height: 60vh; overflow: auto;">
               <div v-if="showFeedBackInfo&&showFeedBack" class="item-content paper" style="margin: 20px; height: calc(100% - 40px); position: relative">
                 <div id="feedback-content">
@@ -793,7 +882,7 @@
                   </div>
                 </div>
                 <div class="flex fullWidth" style="justify-content: right"><img :src="plusSrc" alt="plusSrc" class="plus-icon" @click="addFeedBack"></div>
-               
+
               </div>
             </div>
           </div>
@@ -850,6 +939,7 @@ export default {
   },
   data() {
     return {
+      storeStatus:-1,
       serachChannelValue: '',
       isFullScreenMode: false,
       sheetName: [],
@@ -874,7 +964,10 @@ export default {
       channelIcon: require('../../../static/img/channel.png'),
       channelActiveIcon: require('../../../static/img/channel_active.png'),
       deleteInspectIcon: require('../../../static/img/cross.png'),
+
+      deleteInspectIcon_new: require('../../../static/img/table-delete.png'),
       editInspectIcon: require('../../../static/img/pen.png'),
+
       starYellowIcon: require('../../../static/img/star-yellow.png'),
       starGreyIcon: require('../../../static/img/star-grey.png'),
       defaultModeIcon: require('../../../static/img/default-mode.png'),
@@ -997,6 +1090,8 @@ export default {
         isWarning: true,
         dialogCosed: false
       },
+
+      // requiredObj
       requiredObj: {
         title: this.$t('remotePatrol.prompt'),
         showInfo: this.$t('remotePatrol.requiredValid'),
@@ -1015,6 +1110,23 @@ export default {
         isWarning: false,
         dialogCosed: false
       },
+
+      // 備註標籤
+      memoConfigTextObj: {
+        title: this.$t('remotePatrol.prompt'),
+        showInfo: this.$t('remotePatrol.requiredValid'),
+        isWarning: true,
+        dialogCosed: false
+      },
+      memoConfigMediaObj: {
+        title: this.$t('remotePatrol.prompt'),
+        showInfo: this.$t('remotePatrol.requiredValid'),
+        isWarning: true,
+        dialogCosed: false
+      },
+
+
+
       recorder: null,
       videoCanvasSrc: '',
       isRecordingStarted: false,
@@ -1080,6 +1192,10 @@ export default {
       auditCancelable:false,
       reportStatus:-1,
       enableMimicMode:false,
+
+      showIgnoreItem: false,
+      emptyPatrolList: true
+
     };
   },
   computed: {
@@ -1098,10 +1214,40 @@ export default {
         'storeUp-content': this.lang.indexOf('ja') === -1,
         'ja-storeUp-content': this.lang.indexOf('ja') !== -1
       }
+    },
+    totalSourceList(){
+        const self = this;
+        let total = 0;
+        self.sheetName.forEach((inspectItem, index1) => {
+          //  console.log(inspectItem.inspectList)
+            if(inspectItem.inspectList){
+            inspectItem.inspectList.forEach((group, index2) => {
+                if(group.items){
+                  group.items.forEach((item, index3) => {
+                    item.sourceList.forEach((source, index4) => {
+                       console.log("Add source type="+source.mediaType)
+                       if(source.mediaType!=3){
+                         total = total+1;
+                       }
+                    });
+                  });
+                }
+            });
+
+            }
+
+        });
+
+        this.eventList.forEach((event, index1) => {
+           if(event.sourceObj){
+              total = total +1;
+           }
+        });
+        console.log("Total Source="+total)
+        return total;
     }
   },
   watch: {
-   
     accountChanged(val, oldVal) {
       const self = this;
       if (val !== 0) {
@@ -1124,6 +1270,12 @@ export default {
       self.getAllStore();
       //console.log("enableMimicMode:",this.enableMimicMode);
     },
+
+    PatrolList(val){
+      console.log('val :>> ', val);
+      if(val.length > 0) this.emptyPatrolList = false
+
+    }
   },
 
   beforeRouteLeave(to, from, next) {
@@ -1168,7 +1320,7 @@ export default {
         // from.meta.keepAlive=false;
         this.editCount = 0;
         this.$store.dispatch('setEditCount', this.editCount);
-         self.$store.dispatch('setEditReport', false);
+        self.$store.dispatch('setEditReport', false);
         self.$store.dispatch('setPatrolHistory', null);
         self.$store.dispatch('setPatrolComment', null);
         self.$store.dispatch('setStoreList', []);
@@ -1257,7 +1409,7 @@ export default {
         self.isEditReport = PatrolHistory.isEditReport;
         self.auditState = PatrolHistory.auditState;
         self.auditCancelable = PatrolHistory.auditCancelable;
-        
+
       }
     }else if(BackPatrolParam != null){
       self.getAllStore();
@@ -1294,8 +1446,10 @@ export default {
 
   methods: {
     changeStore_(_item) {
+      console.log("CHange STore")
+      console.log(_item)
       const self = this;
-      
+
       self.patrolstore = '';
       self.curSheetIndex = 0;
       self.curSheet = {};
@@ -1312,7 +1466,7 @@ export default {
       self.notShowAlert = false;
       this.showIgnoreItem = false;
       this.$emit("listenerChild", false);
-      
+
       self.showStoreUp = true;
       self.$refs.vendorVideo && (self.$refs.vendorVideo.editCount = 0);
       self.$refs.vendorVideo && self.$refs.vendorVideo.stopVideoPlay();
@@ -1323,6 +1477,7 @@ export default {
       self.showGuide = true;
       self.channel = null;
       self.store = {};
+      self.storeStatus = _item?_item.status:-1;
       if(typeof _item!='undefined'){
         _item.authorizedInspect.forEach(au_item => {
           if (au_item.mode === 0) {
@@ -1336,7 +1491,7 @@ export default {
         obj.storeTitle = _item.name;
         obj.storeUp = _item.favorite;
         obj.device = _item.device;
-        
+
         self.getChannelByStore(_item);
         if (_item.favorite) {
           obj.storeUpTitle = this.$t('remotePatrol.stared');
@@ -1354,7 +1509,16 @@ export default {
           self.changeInspectList(self.curInspectId); //抓整個全新的巡檢項目,在做分數、附件更新
         }
       }
-      
+      else{
+        const obj = {};
+        obj.storeId = "";
+        obj.storeName ="";
+        obj.storeTitle = "";
+        obj.storeUp = "";
+        obj.device = [];
+        self.saveStoreObj(obj);
+      }
+
     },
     changeBrand() {
       const self = this;
@@ -1496,7 +1660,7 @@ export default {
         this.eventList.push(obj);
       } else {
         this.eventList[this.feedbackIndex].eventName = this.eventName;
-        this.eventList[this.feedbackIndex].sourceList = this.feedbackSourceList; 
+        this.eventList[this.feedbackIndex].sourceList = this.feedbackSourceList;
         this.eventList[this.feedbackIndex].showDelBtn = true;
       }
       this.showAddTextFeedbackDialog = false;
@@ -1508,7 +1672,7 @@ export default {
       let tempId = null;
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
-      
+
         sheetName.forEach((s_item, s_index) => {
           s_item.inspectList[0].items.forEach((item, index) => {
             if (item.id === id) {
@@ -1519,7 +1683,7 @@ export default {
             }
           });
         });
-      
+
       return tempId;
     },
     getChannelIndexById(id) {
@@ -1662,7 +1826,7 @@ export default {
             resolve(res);
           });
         });
-        
+
       }else{
         return new Promise((resolve, reject) => {
           getStoreList(params).then(res => {
@@ -1800,13 +1964,11 @@ export default {
           break;
       }
     },
-    
+
     changeInspect(val) {
       const self = this;
-      console.log('val :::::::::>> ', val);
+
       sessionStorage.setItem('inspectId', JSON.stringify(val))
-
-
       // console.log(self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 0, self.$store.getters.PatrolHistory != null)
       if (self.$store.getters.editCount > 0) {
         self.changeInspectObj.dialogCosed = true;
@@ -1820,6 +1982,9 @@ export default {
     },
 
     changeInspectList(val) {
+      console.log('changeInspectList :::::::::>> ');
+      console.log('val :::::::::>> ', val);
+
       const self = this;
       if (!self.showGuide && self.$refs.vendorVideo) {
         self.$refs.vendorVideo.editCount = 0;
@@ -1837,7 +2002,7 @@ export default {
       self.isShowWarn = false;
       self.notShowAlert = false;
       this.showIgnoreItem = false;
-       this.$emit("listenerChild", false); 
+      this.$emit("listenerChild", false);
       self.eventList = [];
       // self.showChannelBtns = [];
       self.curSheetIndex = 0;
@@ -1860,6 +2025,9 @@ export default {
         if (res.errCode == 0) {
           const data = res.data.groups;
           const inspectSettings = {};
+
+          console.log('res.data :::::::::::::::::>> ', res.data);
+
           res.data.inspectSettings.forEach(item => {
             switch (item.name) {
               case 'includedInTotalScoreWithType1':
@@ -1941,6 +2109,8 @@ export default {
               itemObj.description = _item.description;
               itemObj.itemScore = _item.itemScore;
               itemObj.required = _item.required;
+              itemObj.isImportant = _item.isImportant;
+
               let itemScoreLength = [];
               if (_item.availableScores.length !== 0) {
                 itemScoreLength = _item.availableScores;
@@ -1977,6 +2147,12 @@ export default {
                 {val: -1, scoreTitle: btnNameArr[1], isClick: false}
                 ];
               itemObj.itemType = _item.type;
+
+              // 處理備註標籤
+              itemObj.memo_is_advanced = _item.memo_is_advanced
+              itemObj.memo_options = _item.memo_options
+              itemObj.memo_config = _item.memo_config
+
               tempItems.push(itemObj);
             });
             obj.items = tempItems;
@@ -1997,31 +2173,34 @@ export default {
             })
             handleData.push(obj);
           })
+
+          console.log('handleData :::::::::::::::::>> ', handleData);
+
           for (let i = 0; i < handleData.length; i++) {
             let count = 0, label = '';
             if (handleData[i].subcatergy.length === 0){
               count = handleData[i].cateray.items.length;
               te_temp.push({
-                inspectList: [handleData[i].cateray], 
-                dealCount: 0, 
-                Effective: 0, 
-                count: count, 
+                inspectList: [handleData[i].cateray],
+                dealCount: 0,
+                Effective: 0,
+                count: count,
                 isClick: false,
-                label: handleData[i].cateray.groupName, 
-                type: handleData[i].cateray.type, 
+                label: handleData[i].cateray.groupName,
+                type: handleData[i].cateray.type,
                 isCategory: false,
                 weight: handleData[i].cateray.weight
               });
             } else {
               handleData[i].subcatergy.forEach(item => count += item.items.length);
               te_temp.push({
-                inspectList: handleData[i].subcatergy, 
-                dealCount: 0, 
-                Effective: 0, 
-                count: count, 
+                inspectList: handleData[i].subcatergy,
+                dealCount: 0,
+                Effective: 0,
+                count: count,
                 isClick: false,
-                label: handleData[i].cateray.groupName, 
-                type: handleData[i].cateray.type, 
+                label: handleData[i].cateray.groupName,
+                type: handleData[i].cateray.type,
                 isCategory: true,
                 weight: handleData[i].cateray.weight
               });
@@ -2067,7 +2246,7 @@ export default {
         sheet.Effective = 1;
         console.log("sheet:",sheet);
         if(sheet.groupId!="feedBack"){
-          
+
           var tabIncep = hisData.find( hd => hd.groupName==sheet.label );
           console.log("tabIncep:",tabIncep);
           if(tabIncep.children){//有三層時的第二層 對應sheet.inspectList
@@ -2125,7 +2304,7 @@ export default {
     },
     doGetcateryItems(sheetItem,cateryItems,type){ //type:0:合格率評分 1:巡檢評分項 2:附加評分項
       var dealCount=0;
-      
+
       for(let i=0; i<cateryItems.length; i++){
         var showDelBtn = true;
         sheetItem[i].id = cateryItems[i].itemId;
@@ -2180,7 +2359,7 @@ export default {
           }
           for(let j=0; j<cateryItems[i].sourceList.length;j++){
             var attItem = cateryItems[i].sourceList[j];
-              var fileName = attItem.url.substring(attItem.url.lastIndexOf('/')+1); 
+              var fileName = attItem.url.substring(attItem.url.lastIndexOf('/')+1);
               var attFile ={
                   mediaType:attItem.mediaType,
                   src:attItem.url,
@@ -2196,7 +2375,7 @@ export default {
           //console.log("sourceList:",attFile);
           sheetItem[i].sourceList = att;
         }
-      } 
+      }
       console.log("*after fill sheetItem:",sheetItem);
       return sheetItem;
     },
@@ -2210,12 +2389,15 @@ export default {
     onStoreChange (storeData) {
       this.curSelStoreId = storeData.curSelectedStore
       const storeItem = this.storeList.find(store => store.storeId === this.curSelStoreId);
+      if(storeItem && storeItem.status == 61){
+          util.notify(this.$t('route.errorStoreNoPermission'), 'error', 1000 );
+      }
       if (!this.$store.getters.storeCache && !this.isEditReport) {
         this.changeStore_(storeItem);
       } else {
         this.$store.dispatch('setStoreCache', '');
       }
-      
+
     },
     async getAllStore () {
       const self = this;
@@ -2507,7 +2689,7 @@ export default {
       const self = this;
       item.sourceList.splice(index, 1);
       self.sourceListLength--;
-      
+
       self.sheetName[self.curSheetIndex].inspectList.forEach((inspect, idx) => {
         inspect.items.forEach(item_ => {
           if (item_.id === item.id) self.curGroupIndex = idx
@@ -2525,7 +2707,7 @@ export default {
       self.curItem.disabled = true;
 
         self.showGuide = false;
-        
+
         self.sheetName[self.curSheetIndex].inspectList.forEach((inspect, idx) => {
           inspect.items.forEach(item_ => {
             if (item_.id === self.curItemId) self.curGroupIndex = idx
@@ -2549,7 +2731,7 @@ export default {
             self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].scoreList.forEach(x => {
               x.isClick = false;
             });
-        
+
         const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
         const sheetName = JSON.parse(JSON.stringify(self.sheetName.slice(0, indexFeed)));
         const hasIgnoretemp = [];
@@ -2582,7 +2764,7 @@ export default {
       self.sheetName[self.curSheetIndex].dealCount--
       this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].dealCount--
       // if (self.sheetName[self.curSheetIndex].dealCount != 0) {
-        
+
       // }
       self.notShowAlert ? self.notShowAlert = false : null;
 
@@ -2664,9 +2846,39 @@ export default {
     clickItem({item, index}) {
 
       const self = this;
- 
+
       self.sourceList = [];
       self.sourceListLength = item.sourceList.length;
+      console.log("ClickItem")
+      console.log(this.sheetName);
+      let total = 0;
+      self.sheetName.forEach((inspectItem, index1) => {
+        //  console.log(inspectItem.inspectList)
+          if(inspectItem.inspectList){
+          inspectItem.inspectList.forEach((group, index2) => {
+              if(group.items){
+                group.items.forEach((item, index3) => {
+                  item.sourceList.forEach((source, index4) => {
+                     if(source.mediaType>=2 &&  source.mediaType<=4){
+                       total = total+1;
+                     }
+                  });
+                });
+              }
+          });
+
+          }
+
+      });
+      console.log(this.eventList)
+
+      this.eventList.forEach((event, index1) => {
+         if(event.sourceObj){
+            total = total +1;
+         }
+      });
+      self.sourceListLength = total;
+      console.log("Source = "+self.sourceListLength)
       self.curDeviceId = item.deviceId[0];
       self.curItem = item;
       self.curItemIndex = index;
@@ -2696,7 +2908,7 @@ export default {
       const self = this;
       self.leaveObj.dialogCosed = false;
       if (self.$refs.vendorVideo) self.$refs.vendorVideo.editCount = 0;
-      
+
     },
     cancelLeave() {
       const self = this;
@@ -2724,6 +2936,7 @@ export default {
       self.allIgnoreObj.dialogCosed = false;
     },
 
+    // sourceList
     async resolveConfoirmSummaryData() {
       const inspectList = [];
       const indexFeed = this.sheetName.map(x => x.groupId).indexOf('feedBack');
@@ -2737,8 +2950,8 @@ export default {
             item.items.forEach((_item, _index) => {
               if (_item.inputCount === 0) {
                 _item.isIgnore = true;
-                _item.inspectInput = '';
-                _item.sourceList = [];
+                // _item.inspectInput = '';
+                // _item.sourceList = [];
                 if (inspectSettings.qualifiedForIgnoredWithType1 && _item.type === 0
                   || inspectSettings.qualifiedForIgnoredWithType2 && _item.type === 1) {
                   _item.itemgetScore = _item.itemScore;
@@ -2756,8 +2969,8 @@ export default {
               this.hasIgnoretemp.forEach((h_item, h_index) => {
                 if (this.hasIgnoretemp[h_index].inputCount == 0) {
                   this.hasIgnoretemp[h_index].isIgnore = true;
-                  this.hasIgnoretemp[h_index].inspectInput = '';
-                  this.hasIgnoretemp[h_index].sourceList = [];
+                  // this.hasIgnoretemp[h_index].inspectInput = '';
+                  // this.hasIgnoretemp[h_index].sourceList = [];
                   if (inspectSettings.qualifiedForIgnoredWithType1 && h_item.type === 0
                     || inspectSettings.qualifiedForIgnoredWithType2 && h_item.type === 1) {
                     h_item.itemgetScore = h_item.itemScore;
@@ -2833,27 +3046,114 @@ export default {
       this.$router.push({ name: 'confirmSum', params: params });
     },
 
+
+
     async confirmSummary() {
       const self = this;
       const temp = [];
       let count = 0;
       let dealCount = 0;
       let requiredValid = false;
+      let memoCheckText = false;
+      let memoCheckMedia = false;
+
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
+
+      console.log('self.sheetName ::::::::>> ', self.sheetName);
+      console.log('sheetName ::::::::>> ', sheetName);
+
       sheetName.forEach(s_item => {
           s_item.inspectList.forEach(item => {
-            
+
             item.items.forEach((_item, _index) => {
               if (!_item.manualIgnore && _item.required) {
-              console.log(_item)
+              console.log("_item ::::::::>>", _item)
                 if (
-                  (_item.itemType === 0 && _item.itemgetScore === '--') || 
+                  (_item.itemType === 0 && _item.itemgetScore === '--') ||
                   (_item.itemType === 1 && _item.sourceList.length === 0)
                 ) {
                   requiredValid = true
                 }
               }
+
+
+              if(_item.memo_config !== null){
+                switch (_item.type) {
+                  case 0:
+                    // console.log('this is type ===:>> 0');
+                    // console.log('_item.type ::::::::>> ', _item.type);
+                    const hasText_tab1 = _item.sourceList.some(i => i.mediaType === 3)
+                    const hasImg_tab1 = _item.sourceList.some(i => i.mediaType === 2)
+                    if(_item.memo_config.memo_required_type === 1){
+                      if(_item.memo_config.memo_check_text && !hasText_tab1) {
+                        memoCheckText = true
+                        }
+                      else if(_item.memo_config.memo_check_media && !hasImg_tab1){
+                        memoCheckMedia = true
+                        }
+                    }
+                    else if(_item.memo_config.memo_required_type === 2){
+                      if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle && _item.memo_config.memo_check_text && !hasText_tab1){
+                        memoCheckText = true
+                      }
+                      else if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle && _item.memo_config.memo_check_media && !hasImg_tab1){
+                        memoCheckMedia = true
+                      }
+                    }
+                    break;
+
+                  case 1:
+                    // console.log('this is type ===:>> 1  ');
+                    // console.log('_item.type ::::::::>> ', _item.type);
+                    const hasText_tab2 = _item.sourceList.some(i => i.mediaType === 3)
+                    const hasImg_tab2 = _item.sourceList.some(i => i.mediaType === 2)
+                    if(_item.memo_config.memo_required_type === 1){
+                      if(_item.memo_config.memo_check_text && !hasText_tab2) {
+                        memoCheckText = true
+                        }
+                      else if(_item.memo_config.memo_check_media && !hasImg_tab2){
+                        memoCheckMedia = true
+                        }
+                    }
+                    else if(_item.memo_config.memo_required_type === 2){
+                      if(_item.qualifiedScore > _item.itemgetScore && _item.memo_config.memo_check_text && !hasText_tab2){
+                        memoCheckText = true
+                      }
+                      else if(_item.qualifiedScore > _item.itemgetScore && _item.memo_config.memo_check_media && !hasImg_tab2){
+                        memoCheckMedia = true
+                      }
+                    }
+                    break;
+
+                  case 2:
+                    // console.log('this is type ===:>> 2  ');
+                    // console.log('_item.type ::::::::>> ', _item.type);
+                    const hasText_tab3 = _item.sourceList.some(i => i.mediaType === 3)
+                    const hasImg_tab3 = _item.sourceList.some(i => i.mediaType === 2)
+                    if(_item.memo_config.memo_required_type === 1){
+                      if(_item.memo_config.memo_check_text && !hasText_tab3) {
+                        memoCheckText = true
+                        }
+                      else if(_item.memo_config.memo_check_media && !hasImg_tab3){
+                        memoCheckMedia = true
+                        }
+                    }
+                    else if(_item.memo_config.memo_required_type === 2){
+                      if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle && _item.memo_config.memo_check_text && !hasText_tab3){
+                        memoCheckText = true
+                      }
+                      else if(_item.itemScoreTitle == _item.scoreList[1].scoreTitle && _item.memo_config.memo_check_media && !hasImg_tab3){
+                        memoCheckMedia = true
+                      }
+                    }
+                    break;
+
+                  default:
+                    break
+                }
+              }
+
             });
           });
         });
@@ -2882,10 +3182,24 @@ export default {
           count = count + s_item.count;
         });
       }
+
       if (requiredValid) {
         self.requiredObj.dialogCosed = true;
         return false;
       }
+
+      // 備註標籤文字
+      if (memoCheckText) {
+        self.memoConfigTextObj.dialogCosed = true;
+        return false;
+      }
+      // 備註標籤圖片或影像
+      if (memoCheckMedia) {
+        self.memoConfigMediaObj.dialogCosed = true;
+        return false;
+      }
+
+
       if(this.allRemarkItemsFlag && dealCount === 0){
         util.notify(this.$t('remotePatrol.invalidInspection'), 'warning', 3000);
         return false;
@@ -2896,6 +3210,9 @@ export default {
       }
       this.resolveConfoirmSummaryData();
     },
+
+
+
 
     spreadContent() {
       const self = this;
@@ -3065,7 +3382,7 @@ export default {
       }else{
         self.changeStoreObj.dialogCosed = false;
       }
-      
+
     },
     canceldChangeBrand() {
       const self = this;
@@ -3247,7 +3564,7 @@ export default {
 
 
         }
-        
+
         s_item.ignoreCount = count;
         if(s_item.ignoreCount>0&&first){
           this.changeSheet(s_item,sheetIndex)
@@ -3372,7 +3689,7 @@ export default {
       });
     },
     clickStore(item, index, _item, _index) {
-      
+
       const self = this;
       if (!_item.hasInspect && _item.hasInspect != undefined) {
         return false;
@@ -3646,6 +3963,49 @@ export default {
   }
 };
 </script>
+
+<style lang="sass">
+  .force_white .el-textarea__inner
+    background-color: #FFF !important
+    border-color: none !important
+    padding: 7px 70px 7px 7px
+
+  .force_white .el-textarea__inner:focus
+    border-color: #c0c0c0 !important
+
+</style>
+
+<style lang="sass" scoped>
+
+  .advance_memo
+    font-size: 12px
+    color: #f31d65
+    text-align: left
+    margin-top: 5px
+
+  .comment_list
+    width: 100%
+    padding: 4px
+    margin-bottom: 5px
+    // background: rgb(242, 249, 254)
+  .to_delete
+    margin-bottom: 5px
+    transition: all .3s
+    cursor: pointer
+    margin-left: 5px
+    &:hover
+      transform: scale(1.1)
+  .input_bg
+    background: #FFF !important
+
+  .is_important
+    color: #f31d65
+
+
+
+
+</style>
+
 <style lang="scss" scoped>
   $red:#f31d65;
   $black:#182752;
@@ -3678,7 +4038,7 @@ export default {
       padding-left: calc(40/1920*100vw);
       color: #006ab7;
       font-size: calc(24/1920*100vw);
-      font-weight: bold; 
+      font-weight: bold;
       &:last-child {
         margin-top: calc(30/1920*100vw);
       }
@@ -3693,6 +4053,7 @@ export default {
     margin-bottom: calc(10/1920*100vw);
   }
   .item-details {
+    border-bottom: 1px solid #f5f7fa
   }
   .img-content{
     position: relative;
@@ -4692,7 +5053,7 @@ export default {
             @include point(padding-left,20);
             padding-bottom: 0;
             margin-top: 5px;
-            
+
             .rules{
               margin-left: 20px;
               font-size: 10px;
@@ -5060,11 +5421,12 @@ export default {
     .group_content {
       border: 1px solid #e6e6e6;
       border-radius: 4px;
-      padding: calc(5/1920*100vw) calc(20/1920*100vw);
+      padding: 6px calc(20/1920*100vw);
       margin-right: calc(10/1920*100vw);
       margin-top: calc(10/1920*100vw);
       cursor: pointer;
       font-size: calc(15/1920*100vw);
+      line-height: 1.8
     }
     .noraml-color{
       background-color: #006ab7;
