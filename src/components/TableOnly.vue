@@ -619,15 +619,22 @@ export default {
     getOrderBasedOnDefaultSort() {
       const defaultSort = this.defaultSort;
       const property = defaultSort.prop;
+
+      console.log('defaultSort', defaultSort)
+
       if (property.indexOf('Str') > -1) {
         this.order.property = property.substr(0, property.indexOf('Str'));
       } else {
         this.order.property = property;
       }
       this.order.direction = defaultSort.order === 'ascending' ? 'asc' : 'desc';
+
+      console.log('this.order.direction', this.order.direction)
     },
 
 
+
+    
     handleOperationButton(methods, row, index) {
       this.tableData.map(item => { item.isEditing = false; });
       // console.log('this.tableData ======>> ', this.tableData);

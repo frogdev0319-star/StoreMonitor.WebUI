@@ -157,8 +157,8 @@ export default{
         {
           'prop': 'remindTimeStr',
           'label': this.$t('schedule.schExeDate'),
-          'sortable': 'custom',
-          // 'sortable': true,
+          // 'sortable': 'custom',
+          'sortable': true,
           'width': 50,
           'maxWidth': 50,
           'isExpand': false
@@ -329,7 +329,7 @@ export default{
       this.isLoadingData = true
       const self = this;
       let order = {
-        direction: this.defaultSort.order=='ascending'? 'asc':'desc',
+        direction: this.defaultSort.order == 'ascending'? 'asc':'desc',
         // direction: 'desc',
         // property: self.defaultSort.prop
         property: "remindTs"
@@ -449,13 +449,15 @@ export default{
 
 
     handleSortChange(order, defaultSort) {
-        
-        this.defaultSort = { ...defaultSort };
+        console.log('sort !!!!!')
+        // this.defaultSort = { ...defaultSort };\
+
+        this.defaultSort = { 
+          prop: 'remindTimeStr', 
+          order: 'ascending'
+        },
         console.log('this.defaultSort :>> ', this.defaultSort);
-        this.doSearchScheduleHis();
-
-
-        
+        // this.doSearchScheduleHis();
     },
 
 

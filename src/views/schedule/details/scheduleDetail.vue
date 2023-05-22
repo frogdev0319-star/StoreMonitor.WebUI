@@ -754,12 +754,10 @@ export default{
     // },
 
 
-
     // dialoge
     filterInputSearchStore(stores){
         return stores.filter( item => (item.name.indexOf(this.inputSearchStore) > -1) ||  (item.timeZone.indexOf(this.inputSearchStore) > -1))
     },
-
 
     filterCurTemplateProvince(stores){
         console.log('this.curTempProvinceList', this.curTempProvinceList)
@@ -772,6 +770,7 @@ export default{
           return stores.filter(item => this.curTempProvinceList.includes(item.province))
         }
     },
+
     filterCurTemplateCity(stores){
       console.log('this.curTempCityList', this.curTempCityList)
       if(this.curTempCityList.length == 0){
@@ -782,8 +781,8 @@ export default{
       }
     }, 
 
-
     onselectSec1(val){
+      console.log('val 1', val)
       var c = this.showSearchStoreData.map(c => c.city)
       const cccSet = new Set(c)
       this.cityAry = [...cccSet]
@@ -791,13 +790,21 @@ export default{
     },
 
     onselectSec2(val){
-      console.log('val', val)
-      var p = this.showSearchStoreData.map(p => p.province)
-      const pppSet = new Set(p)
-      this.provinceAry = [...pppSet]
+      console.log('val 2', val)
+      if(val.length == 0){
+        
+        // console.log('this.showSearchStoreData XDXD', this.showSearchStoreData)
+        // console.log('this.searchStoreData XDXD', this.searchStoreData)
+        var p = this.searchStoreData.map(p => p.province)
+        const pppSet = new Set(p)
+        this.provinceAry = [...pppSet]
 
-      
-
+      } else {
+        var p = this.showSearchStoreData.map(p => p.province)
+        const pppSet = new Set(p)
+        this.provinceAry = [...pppSet]
+      }
+    
     },
 
     async init(){
