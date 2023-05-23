@@ -449,15 +449,12 @@ export default{
 
 
     handleSortChange(order, defaultSort) {
-        console.log('sort !!!!!')
-        this.defaultSort = { ...defaultSort };
+      
+      this.defaultSort = { ...defaultSort };
+      this.isLoadingData = true
 
-        // this.defaultSort = { 
-        //   prop: 'remindTimeStr', 
-        //   order: 'ascending'
-        // },
-        console.log('this.defaultSort :>> ', this.defaultSort);
-        // this.doSearchScheduleHis();
+      console.log('this.defaultSort :>> ', this.defaultSort);
+      this.doSearchScheduleHis();
     },
 
 
