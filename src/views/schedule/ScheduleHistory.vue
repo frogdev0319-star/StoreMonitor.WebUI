@@ -178,8 +178,8 @@ export default{
         {
           'prop': 'reportTsStr',
           'label': this.$t('schedule.reportUploadDate'),
-          // 'sortable': 'custom',
-          'sortable': true,
+          'sortable': 'custom',
+          // 'sortable': true,
           'width': 130,
           'maxWidth': 130,
           'isExpand': false
