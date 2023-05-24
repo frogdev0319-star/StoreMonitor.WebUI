@@ -43,6 +43,7 @@
         <div class="flex-center" style="padding-bottom: 20px">
           <div>{{ $t('titleView.roleSetting') }}</div>
           <div class="spacer"></div>
+          
           <div class="temp-select-area" :style="{'width':getLangStyleValue(tempSelectAreaWidth)}">
             <div class="temp-select-label" :style="{'width':getLangStyleValue(tempSelectLabelWidth)}">{{ $t('titleView.templateSelection') }}</div> 
             <el-select
@@ -59,7 +60,7 @@
         </div>
 
         <hr class="hr-horizontal">
-
+        {{ roleNameList }}
         <el-scrollbar :class="showRolesList? 'showlist-el-menuscrollbar' : 'el-menuscrollbar'">
           <div v-for="(item,index) in roleNameList" :key="index" class="role-group">
             <div class="role-all-checkbox" style="text-align: left">
@@ -303,31 +304,34 @@ export default {
             }
           ]
         },
-        {
-          roleName: this.$t('schedule.inceptionSchedule'),
-          checked: false,
-          disabled: false,
-          children: [
-            {
-              roleName: this.$t('schedule.scheduleSetting'),
-              checked: false,
-              disabled: false,
-              visabled:true
-            },
-            {
-              roleName: this.$t('schedule.scheduleHistory'),
-              checked: false,
-              disabled: false,
-              visabled:true
-            },
-            {
-              roleName: this.$t('schedule.scheduleExecuted'),
-              checked: false,
-              disabled: false,
-              visabled:true
-            }
-          ]
-        },
+
+        // ==== 暫時隱藏 巡檢排程相關(勿刪) ====
+        // {
+        //   roleName: this.$t('schedule.inceptionSchedule'),
+        //   checked: false,
+        //   disabled: false,
+        //   children: [
+        //     {
+        //       roleName: this.$t('schedule.scheduleSetting'),
+        //       checked: false,
+        //       disabled: false,
+        //       visabled:true
+        //     },
+        //     {
+        //       roleName: this.$t('schedule.scheduleHistory'),
+        //       checked: false,
+        //       disabled: false,
+        //       visabled:true
+        //     },
+        //     {
+        //       roleName: this.$t('schedule.scheduleExecuted'),
+        //       checked: false,
+        //       disabled: false,
+        //       visabled:true
+        //     }
+        //   ]
+        // },
+
         {
           roleName: this.$t('route.systemSetting'),
           checked: false,
