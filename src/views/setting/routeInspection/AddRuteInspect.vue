@@ -2,7 +2,7 @@
   <div class="el-addrute paper flex" id="addInspection" style="flex-direction: column">
     <div class="flex-center padding">
       <div v-if="!showEditTab" style="display:flex;flex-direction:row;margin-right: 20px">
-      <div class="tab-name">{{ routeName }}</div>
+      <div class="tab-name">{{ routeName }} </div>
         <!--<i class="iconfont icon-bianji icon-tabname" @click="editTabName"/>-->
         <img :src="require('../../../../static/img/table-edit.png')" style="width:24px;height:24px;cursor:pointer;margin-left:8px;" @click="editTabName" />
       </div>
@@ -500,6 +500,7 @@
 <script>
 import util from '@/common/util';
 import { inpectRESTful, titleRESTful } from '@/api/index';
+
 import PubSub from 'pubsub-js';
 import filterString from '@/common/filterString';
 import MultiSelect from '@/components/MultiSelect';
@@ -879,7 +880,7 @@ export default {
         if (res.errCode === 0) {
           self.showEditTab = false;
           self.routeName = self.editRouteName;
-          //self.tabName = self.editRouteName;
+          
           self.showLengthNameWarning = false;
           util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           return false;

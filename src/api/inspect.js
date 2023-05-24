@@ -234,11 +234,11 @@ export const GetInspectGroupBindList = data => {
   });
 };
 
-export const UpdateInspectGroupTag = params => {
+export const UpdateInspectGroupTag = data => {
   return request({
     url: `${version}/inspect/tag/update`,
     method: 'post',
-    params
+    data
   });
 };
 

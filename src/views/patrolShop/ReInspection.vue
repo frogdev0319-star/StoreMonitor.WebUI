@@ -2016,7 +2016,7 @@ export default {
         storeId: self.store.storeId,
         mode: 0,
         authorizedOnly: this.enableMimicMode?0:1,
-        tagName: self.patrolstore,
+        // tagName: self.patrolstore,
         inspectId: val,
         isMysteryMode:this.enableMimicMode
       };
