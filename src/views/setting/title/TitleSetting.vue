@@ -60,7 +60,6 @@
         </div>
 
         <hr class="hr-horizontal">
-        {{ roleNameList }}
         <el-scrollbar :class="showRolesList? 'showlist-el-menuscrollbar' : 'el-menuscrollbar'">
           <div v-for="(item,index) in roleNameList" :key="index" class="role-group">
             <div class="role-all-checkbox" style="text-align: left">
