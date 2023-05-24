@@ -307,70 +307,72 @@ export const navbarRoute = {
     return auditRoute;
   },
 
-  getInceptionSchedule(){
-    const schduleRoute = {
-      id:5,
-      path: '/home',
-      name: 'InceptionSchedule',
-      component: Home,
-      iconCls: 'iconfont icon-shijian',
-      styles: 'font-size:22px',
-      leaf: false,
-      hidden: false,
-      children: []
-    };
-    !PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleSetting2() && schduleRoute.children.push(
-      {
 
-        path: '/scheduleSetting',
-        name: 'ScheduleSetting',
-        component: resolve => require(['@/views/schedule/ScheduleSetting'], resolve),
-        meta: {
-          keepAlive: true, // the component is't to be cache.
-          requireAuth: true
-        },
-        isReadOnly: false
-      } ,
-      {
-        path: '/personalSchedule',
-        name: 'PersonalSchedule',
-        hidden: true,
-        component: resolve => require(['@/views/schedule/details/personalSchedule'], resolve)
-      },
-      {
-        path: '/scheduleDetailCreate',
-        name: 'CreateSchedule',
-        hidden: true,
-        meta: {
-          keepAlive: false
-        },
-        component: resolve => require(['@/views/schedule/details/scheduleDetail'], resolve)
-      },
-      {
-        path: '/scheduleDetailModify',
-        name: 'ModifySchedule',
-        hidden: true,
-        meta: {
-          keepAlive: false
-        },
-        component: resolve => require(['@/views/schedule/details/scheduleDetail'], resolve)
-      }
+  // ==== 暫時隱藏 巡檢排程相關(勿刪) ====
+  // getInceptionSchedule(){
+  //   const schduleRoute = {
+  //     id:5,
+  //     path: '/home',
+  //     name: 'InceptionSchedule',
+  //     component: Home,
+  //     iconCls: 'iconfont icon-shijian',
+  //     styles: 'font-size:22px',
+  //     leaf: false,
+  //     hidden: false,
+  //     children: []
+  //   };
+  //   !PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleSetting2() && schduleRoute.children.push(
+  //     {
 
-    ) && primaryPathesList.push('/scheduleSetting', '/personalSchedule','/scheduleDetailCreate','scheduleDetailModify');
-    !PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleHistroy() && schduleRoute.children.push(
-      {
-        path: '/scheduleHistory',
-        name: 'ScheduleHistory',
-        component: resolve => require(['@/views/schedule/ScheduleHistory'], resolve),
-        meta: {
-          keepAlive: true, // the component is't to be cache.
-          requireAuth: true
-        },
-        isReadOnly: false
-      }
-    ) && primaryPathesList.push('/scheduleHistory');
-    return schduleRoute;
-  },
+  //       path: '/scheduleSetting',
+  //       name: 'ScheduleSetting',
+  //       component: resolve => require(['@/views/schedule/ScheduleSetting'], resolve),
+  //       meta: {
+  //         keepAlive: true, // the component is't to be cache.
+  //         requireAuth: true
+  //       },
+  //       isReadOnly: false
+  //     } ,
+  //     {
+  //       path: '/personalSchedule',
+  //       name: 'PersonalSchedule',
+  //       hidden: true,
+  //       component: resolve => require(['@/views/schedule/details/personalSchedule'], resolve)
+  //     },
+  //     {
+  //       path: '/scheduleDetailCreate',
+  //       name: 'CreateSchedule',
+  //       hidden: true,
+  //       meta: {
+  //         keepAlive: false
+  //       },
+  //       component: resolve => require(['@/views/schedule/details/scheduleDetail'], resolve)
+  //     },
+  //     {
+  //       path: '/scheduleDetailModify',
+  //       name: 'ModifySchedule',
+  //       hidden: true,
+  //       meta: {
+  //         keepAlive: false
+  //       },
+  //       component: resolve => require(['@/views/schedule/details/scheduleDetail'], resolve)
+  //     }
+
+  //   ) && primaryPathesList.push('/scheduleSetting', '/personalSchedule','/scheduleDetailCreate','scheduleDetailModify');
+  //   !PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleHistroy() && schduleRoute.children.push(
+  //     {
+  //       path: '/scheduleHistory',
+  //       name: 'ScheduleHistory',
+  //       component: resolve => require(['@/views/schedule/ScheduleHistory'], resolve),
+  //       meta: {
+  //         keepAlive: true, // the component is't to be cache.
+  //         requireAuth: true
+  //       },
+  //       isReadOnly: false
+  //     }
+  //   ) && primaryPathesList.push('/scheduleHistory');
+  //   return schduleRoute;
+  // },
 
   getStatisticalRoute() {
     const statisticsRoute = {

@@ -303,31 +303,35 @@ export default {
             }
           ]
         },
-        {
-          roleName: this.$t('schedule.inceptionSchedule'),
-          checked: false,
-          disabled: false,
-          children: [
-            {
-              roleName: this.$t('schedule.scheduleSetting'),
-              checked: false,
-              disabled: false,
-              visabled:true
-            },
-            {
-              roleName: this.$t('schedule.scheduleHistory'),
-              checked: false,
-              disabled: false,
-              visabled:true
-            },
-            {
-              roleName: this.$t('schedule.scheduleExecuted'),
-              checked: false,
-              disabled: false,
-              visabled:true
-            }
-          ]
-        },
+
+        // ==== 暫時隱藏 巡檢排程相關(勿刪) ====
+        // {
+        //   roleName: this.$t('schedule.inceptionSchedule'),
+        //   checked: false,
+        //   disabled: false,
+        //   children: [
+        //     {
+        //       roleName: this.$t('schedule.scheduleSetting'),
+        //       checked: false,
+        //       disabled: false,
+        //       visabled:true
+        //     },
+        //     {
+        //       roleName: this.$t('schedule.scheduleHistory'),
+        //       checked: false,
+        //       disabled: false,
+        //       visabled:true
+        //     },
+        //     {
+        //       roleName: this.$t('schedule.scheduleExecuted'),
+        //       checked: false,
+        //       disabled: false,
+        //       visabled:true
+        //     }
+        //   ]
+        // },
+
+
         {
           roleName: this.$t('route.systemSetting'),
           checked: false,
