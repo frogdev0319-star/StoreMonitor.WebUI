@@ -61,7 +61,9 @@
 
         <hr class="hr-horizontal">
         <el-scrollbar :class="showRolesList? 'showlist-el-menuscrollbar' : 'el-menuscrollbar'">
-          <div v-for="(item,index) in roleNameList" :key="index" class="role-group">
+
+          <!-- ==== 暫時隱藏 巡檢排程相關 ==== -->
+          <div v-for="(item,index) in roleNameList" :key="index" class="role-group" v-show="item.roleName !== $t('schedule.inceptionSchedule')">
             <div class="role-all-checkbox" style="text-align: left">
               <el-checkbox  class="storevue-checkbox-filled" v-model="item.checked" :disabled="item.disabled" @change="(val)=>checkAllChildrenRole(index, val)"/>
               <span class="group-name">{{ item.roleName }}</span>
@@ -305,31 +307,31 @@ export default {
         },
 
         // ==== 暫時隱藏 巡檢排程相關(勿刪) ====
-        // {
-        //   roleName: this.$t('schedule.inceptionSchedule'),
-        //   checked: false,
-        //   disabled: false,
-        //   children: [
-        //     {
-        //       roleName: this.$t('schedule.scheduleSetting'),
-        //       checked: false,
-        //       disabled: false,
-        //       visabled:true
-        //     },
-        //     {
-        //       roleName: this.$t('schedule.scheduleHistory'),
-        //       checked: false,
-        //       disabled: false,
-        //       visabled:true
-        //     },
-        //     {
-        //       roleName: this.$t('schedule.scheduleExecuted'),
-        //       checked: false,
-        //       disabled: false,
-        //       visabled:true
-        //     }
-        //   ]
-        // },
+        {
+          roleName: this.$t('schedule.inceptionSchedule'),
+          checked: false,
+          disabled: false,
+          children: [
+            {
+              roleName: this.$t('schedule.scheduleSetting'),
+              checked: false,
+              disabled: false,
+              visabled:true
+            },
+            {
+              roleName: this.$t('schedule.scheduleHistory'),
+              checked: false,
+              disabled: false,
+              visabled:true
+            },
+            {
+              roleName: this.$t('schedule.scheduleExecuted'),
+              checked: false,
+              disabled: false,
+              visabled:true
+            }
+          ]
+        },
 
         {
           roleName: this.$t('route.systemSetting'),
@@ -433,9 +435,12 @@ export default {
       this.showRolesList = false;
       this.getAvailableAuthority(this.authorityInfoLists[this.templateRoleId - 1].availableAuth);
     },
+
     getTitleInfo() {
       const data = sessionStorage.getItem('titleInfo');
       this.infoForm = JSON.parse(data);
+
+      console.log('this.infoForm', this.infoForm)
       this.roleId = this.infoForm.roleId;
       const comment = this.infoForm.comment && filterString.all(this.infoForm.comment, 200);
       const commentLength = this.infoForm.comment && filterString.getContentLength(comment);
@@ -494,9 +499,9 @@ export default {
       this.roleNameList[4].children[2].checked = !!PermissionHelper.enableTranscriptNotify();
 
       //Schedule
-      this.roleNameList[5].children[0].checked = !!PermissionHelper.enableScheduleSetting2();
-      this.roleNameList[5].children[1].checked = !!PermissionHelper.enableScheduleHistroy();
-      this.roleNameList[5].children[2].checked = !!PermissionHelper.enableScheduleExecuted();
+      // this.roleNameList[5].children[0].checked = !!PermissionHelper.enableScheduleSetting2();
+      // this.roleNameList[5].children[1].checked = !!PermissionHelper.enableScheduleHistroy();
+      // this.roleNameList[5].children[2].checked = !!PermissionHelper.enableScheduleExecuted();
 
 
       if (authorities.length >= 7 && resetFlag) {
