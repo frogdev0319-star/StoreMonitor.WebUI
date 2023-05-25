@@ -725,6 +725,7 @@ export default{
       "itemsOfCate":"類別巡檢項",
       "loadingbindstore":"載入中",
       "moreThan":"超過",
+      "needSignature":"須進行現場簽名",
       "defineTitle":"自定義簽名顯示名稱",
       "addSignature":"新增簽名",
       "principal":"負責人",
