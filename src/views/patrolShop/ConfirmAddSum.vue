@@ -1041,10 +1041,12 @@ export default {
       curSumIndex = self.resultList.filter(x => x.isActive);
       status = curSumIndex[0].label;
       const uuid = sessionStorage.getItem('uuid');
+
       const params = {
         uuid: uuid,
         status: status,
         comment: (self.suggest)?self.suggest.trim():"",
+        reportScore: this.scorecount,
         items: temp,
         feedback: feedEventList,
         isMysteryMode:PermissionHelper.enableMimicMode,
@@ -1052,8 +1054,6 @@ export default {
       };
 
       console.log('params ::::::::::>> ', params);
-
-
 
       let routeData = null;
       if(self.reportId!=-1 && self.isEditReport){
@@ -1135,7 +1135,7 @@ export default {
 
 
 
-
+    // modfiy
     doModifyReportSubmit(params,auditAttachment,sendEvent){
       const self = this;
       console.log("submit report params:",params);
@@ -1144,6 +1144,7 @@ export default {
         reLoadData: self.$route.params,
         isBindWorkflow:!!PermissionHelper.enableSendAudit()
       };
+
       self.reportSubmitting = true;
       var resReportModify = modifyReportWorkflow(params);
       var resWorkflowTask = getReportWorkflowTask({type:0,inspectReportId:self.reportId});
