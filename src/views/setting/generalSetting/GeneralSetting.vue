@@ -1,99 +1,162 @@
 <template>
-  <div class="page-container report-setting paper" style="height: 100%">
-    <div class="setting-titles padding flex-center">
-      超時提醒  
-      <div class="spacer"></div>
-      <div class="buttons">
-        <delay-button type="filled" >  {{$t('audit.workFlows.saveAndEnable')}}</delay-button>
+  <div>
+    <div class="submit_btn" >
+      <delay-button type="filled" @click="submit">
+        <div class="button-area" style="width: 100px;">
+          <span>保存</span>
+        </div>
+      </delay-button>
+    </div>
+  
+    <div class="page-container report-setting paper" >
+      <div class="setting-titles padding flex-center">
+        超時提醒  
+        <div class="spacer"></div>
+      </div>
+      <!-- 節點停留時間 -->
+      <div v-loading="isLoadingData" class="setting-details self-loading">
+        <div class="template-info">
+          <div class="inspect-basic">
+            <!-- 事件超時未處理提醒 -->
+            <setting-table table-name="事件超時未處理提醒">
+              <template slot="tableDetail">
+                <!-- row -->
+                <div class="setting-config basic-config">
+                  <div class="title-status">
+                    <el-checkbox
+                      class="storevue-checkbox-outlined"
+                      :label="$t('audit.workFlows.alertAtOverTime')"/>
+                  </div>
+                </div>
+                
+                <!-- row -->
+                <div class="setting-config basic-config">
+                  <div class="title-status ">
+                    {{$t('audit.workFlows.stayOver')}}
+                    <el-input
+                      ref="stayOver"
+                      placeholder=""
+                      type="number"
+                      max="50"
+                      class="input-name_short"
+                      />
+                    {{$t('audit.workFlows.day')}}
+                  </div>
+                  <div class="title-status flex-row">
+                    提醒時間
+                    <div class="remider_setting ">
+                      <el-time-select
+                        v-model="alertTime"
+                        :picker-options="{
+                          start: '00:00',
+                          step: '0:30',
+                          end: '23:00'
+                        }"
+                        placeholder="提醒時間">
+                      </el-time-select>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </setting-table>
+
+
+            <!-- 節點停留時間 -->
+            <setting-table table-name="節點停留時間" style="margin-top: 20px;">
+              <template slot="tableDetail">
+                <!-- row -->
+                <div class="setting-config basic-config">
+                  <div class="title-status">
+                    <el-checkbox
+                      class="storevue-checkbox-outlined"
+                      :label="$t('audit.workFlows.alertAtOverTime')"/>
+                  </div>
+                </div>
+                
+                <!-- row -->
+                <div class="setting-config basic-config">
+                  <div class="title-status ">
+                    {{$t('audit.workFlows.stayOver')}}
+                    <el-input
+                      ref="stayOver"
+                      placeholder=""
+                      type="number"
+                      max="50"
+                      class="input-name_short"
+                      />
+                    {{$t('audit.workFlows.day')}}
+                  </div>
+                  <div class="title-status flex-row">
+                    提醒時間
+                    <div class="remider_setting ">
+                      <el-time-select
+                        v-model="alertTime"
+                        :picker-options="{
+                          start: '00:00',
+                          step: '0:30',
+                          end: '23:00'
+                        }"
+                        placeholder="提醒時間">
+                      </el-time-select>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </setting-table>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- <div v-loading="isLoadingData" class="setting-details self-loading">
-      <div class="template-info">
-        <div class="inspect-basic">
-          <setting-table table-name="事件超時未處理提醒">
-            <template slot="tableDetail">
-              <div class="setting-config">
-                <div class="flex-row" style="margin-right: 30px">
-                  <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.workFlowName')}}</div>
-                  <div class="title-status"> 
-                      
-
-
-                  </div>  
-                </div>
-              </div>
-            </template>
-          </setting-table>
-        </div>
-
-
+    <div class="page-container report-setting paper" >
+      <div class="setting-titles padding flex-center">
+        巡檢報告  
+        <div class="spacer"></div>
       </div>
-  
-    </div> -->
 
-    <!-- 節點停留時間 -->
-    <div v-loading="isLoadingData" class="setting-details self-loading">
-      <div class="template-info">
-        <div class="inspect-basic">
-          <setting-table table-name="事件超時未處理提醒">
-            <template slot="tableDetail">
-              <!-- row -->
-              <div class="setting-config basic-config">
-                <div class="title-status">
-                  <el-checkbox
-                    class="storevue-checkbox-outlined"
-                    :label="$t('audit.workFlows.alertAtOverTime')"/>
-                </div>
-              </div>
-              
-              <!-- row -->
-              <div class="setting-config basic-config">
-                <div class="title-status ">
-                  {{$t('audit.workFlows.stayOver')}}
-                  <el-input
-                    ref="stayOver"
-                    placeholder=""
-                    type="number"
-                    max="50"
-                    class="input-name_short"
-                    />
-                  {{$t('audit.workFlows.day')}}
-                </div>
-                <div class="title-status flex-row">
-                  提醒時間
-                  <div class="remider_setting ">
-                    <el-time-select
-                      :picker-options="{
-                        start: '00:00',
-                        step: '01:00',
-                        end: '23:00'
-                      }"
-                      placeholder="提醒時間">
-                    </el-time-select>
+      <div v-loading="isLoadingData" class="setting-details self-loading">
+        <div class="template-info">
+          <div class="inspect-basic">
+            <!-- 巡檢總評選項顯示 -->
+            <setting-table :table-name="$t('insSettingView.commentStatus')">
+              <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
+                <div class="overall_options">
+
+                  <div class="overall_row" v-for="(item, index) in defaultDefineName" :key="index">
+                    <el-radio-group class="storevue-radio radio_item" v-model="item.defineStatus" style="margin-left: 20px;">
+                      <el-radio :label="0" style="  min-width: 100px; text-align: left;" >{{item.name}}</el-radio>
+                      <el-radio :label="1" style=" width: fit-content;">{{ $t('insSettingView.userDefined')}} </el-radio>
+                    </el-radio-group>
+                    <el-input
+                      :ref=item.refName
+                      :placeholder="$t('audit.workFlows.defineItem')"
+                      v-model="item.newName"
+                      :disabled="item.defineStatus == 0"
+                      style="width: 200px;  margin: 0 20px ;"
+                      @input="(val) => itemInputChanged_overall({ val, item })"
+                      />
                   </div>
-                  
+
+                  <span class="text_limit_sign" v-if="showInputLimit_overallItem"> {{$t('insSettingView.inputRuletip')}} </span>
                 </div>
-
-
               </div>
-
-            </template>
-          </setting-table>
+            </setting-table>
+          </div>
         </div>
       </div>
     </div>
 
   </div>
+  
 </template>
 
 <script>
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
-
-
-import { titleRESTful } from '@/api/index';
+import { inpectRESTful } from '@/api/index';
 import { mapGetters } from 'vuex';
+import filterString from '@/common/filterString.js';
+
 import TablePagination from '@/components/TablePagination';
 import TableOnly from '@/components/TableOnly';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
@@ -108,7 +171,32 @@ export default {
   },
   data() {
     return {
-      isLoadingData: false
+      isLoadingData: false,
+      alertTime: '09:00',
+      showInputLimit_overallItem: false,
+      defaultDefineName:[
+        {
+          name: this.$t('overview.danger') ,
+          newName:  this.$t('overview.danger'),
+          defineStatus: 0,
+          refName: 'bad',
+          is_customize: false
+        },
+        {
+          name: this.$t('overview.improve'),
+          newName: this.$t('overview.improve'),
+          defineStatus: 0,
+          refName: 'fair',
+          is_customize: false
+        },
+        {
+          name: this.$t('overview.echartGood'),
+          newName: this.$t('overview.echartGood'),
+          defineStatus: 0,
+          refName: 'good',
+          is_customize: false
+        },
+      ],
       
     };
   },
@@ -118,15 +206,116 @@ export default {
   },
 
   watch: {
+
     accountChanged(val) {
       val !== 0 && this.getTitleList();
+    },
+
+    defaultDefineName:{
+      immediate: false,
+      deep: true,
+      handler (val, old ) {
+        // if(val[0].defineStatus == 0) val[0].newName = val[0].name
+        for(let i of val ){
+          if(i.defineStatus == 0) {
+            i.newName = i.name
+            i.is_customize = false
+          } else if(i.defineStatus == 1){
+            i.is_customize = true
+          }
+
+        }
+        console.log('val :>> ', val);
+      }
+    },
+  },
+
+  async created() {
+
+    await this.getInspectStatus()
+
+
+    for (let i = 0; i < 3; i++) {
+      if(this.inspectStatus["is_customize_" + i] == false){
+        this.defaultDefineName[i].defineStatus = 0
+        this.defaultDefineName[i].newName = this.defaultDefineName[i].name
+      } else {
+          this.defaultDefineName[i].defineStatus = 1
+          this.defaultDefineName[i].newName = this.inspectStatus["status_"+ i]
+      }
     }
   },
 
-  created() {
-  },
+
 
   methods: {
+
+    getInspectStatus(){
+      return new Promise((resolve, reject) => {
+        inpectRESTful.getInspectStatus().then(res => {
+          resolve(res);
+          this.inspectStatus = res.data.settingContent.general_setting_inspect_status_name
+          delete this.inspectStatus.update_time
+          delete this.inspectStatus.update_user_id
+          console.log('this.inspectStatus :>> ', this.inspectStatus);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
+    updateInspectStatus(){
+      var status = {
+          status_0: this.defaultDefineName[0].newName,
+          is_customize_0: this.defaultDefineName[0].is_customize,
+          status_1: this.defaultDefineName[1].newName,
+          is_customize_1: this.defaultDefineName[1].is_customize,
+          status_2: this.defaultDefineName[2].newName,
+          is_customize_2: this.defaultDefineName[2].is_customize,
+      }
+      console.log('status ~~~~~~~~>> ', status);
+      return new Promise((resolve, reject) => {
+        inpectRESTful.updateInspectStatus(status).then(res => {
+          resolve(res);
+
+        }).catch(err => {
+          reject(err);
+        });
+      });
+
+    },
+
+    async submit(){
+      for (let i = 0; i < 3; i++) {
+        if(this.defaultDefineName[i].defineStatus == 1 && this.defaultDefineName[i].newName == "") {
+          // this.$refs.stayOver.focus()
+          util.notify(this.defaultDefineName[i].name + ", "+ this.$t('audit.workFlows.cantEmptyInspectStatus'), 'error', 2000)
+          return
+          }
+      }
+
+      const statusNameRes = await this.updateInspectStatus();
+      if (statusNameRes.errCode == 0) {
+        util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
+        return false;
+      } else {
+        util.notify(this.$t('deviceView.editFail'), 'warning', 3000);
+        return false;
+      }
+    },
+
+    itemInputChanged_overall({ val, item }){
+      const content = filterString.all(val, 20);
+      item.newName = content
+      const length = filterString.getContentLength(val);
+      if(length > 20) {
+        this.showInputLimit_overallItem = true
+      } else {
+        this.showInputLimit_overallItem = false
+      }
+    },
+
+
   
   }
 };
@@ -134,7 +323,12 @@ export default {
 
 
 <style lang="sass" scoped>
-  
+  .submit_btn
+    margin-bottom: 20px
+    display: flex
+    flex-direction: row
+    justify-content: flex-end
+    align-items: center
   .flex-row
     display: flex
     flex-direction: row
@@ -153,6 +347,34 @@ export default {
     .select_audit_dep
       height: 36px
       margin-right: 30px
+
+
+  .overall_options
+    width: 100%
+    padding: 10px 0
+
+    .overall_row
+      display: flex
+      flex-direction: row
+      justify-content: flex-start
+      align-items: center
+      margin-bottom: 20px
+
+  .text_limit_sign
+    position: relative
+    text-align: left
+    line-height: 20px
+    margin-left: 25px
+    font-size: 10px
+    margin-top: 2px
+    color: #ff2400
+    display: block
+
+
+
+
+
+
   .search_member
     height: 36px
     font-size: 14px
@@ -336,10 +558,11 @@ export default {
 
 <style scoped>
   .report-setting{
-    height: 100%;
     position: relative;
     font-size: calc(18/1920*100vw);
     box-sizing: border-box;
+    padding-bottom: 30px;
+    margin-bottom: 30px;
   }
   /* .setting-titles{
     display: flex;
@@ -489,9 +712,7 @@ export default {
     
   }
   
-  .title-operation{
-    /* width: 20%; */
-  }
+ 
 
   .sortable-ghost{
     color: #424151 !important;
