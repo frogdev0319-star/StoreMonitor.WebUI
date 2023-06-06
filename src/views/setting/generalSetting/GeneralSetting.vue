@@ -18,12 +18,13 @@
         <div class="template-info">
           <div class="inspect-basic">
             <!-- 事件超時未處理提醒 -->
-            <setting-table table-name="事件超時未處理提醒">
+            <setting-table :table-name="$t('insSettingView.eventTimeoutReminder')">
               <template slot="tableDetail">
                 <!-- row -->
                 <div class="setting-config basic-config">
                   <div class="title-status">
                     <el-checkbox
+                      v-model="enableDelay"
                       class="storevue-checkbox-outlined"
                       :label="$t('audit.workFlows.alertAtOverTime')"/>
                   </div>
@@ -34,10 +35,13 @@
                   <div class="title-status ">
                     {{$t('audit.workFlows.stayOver')}}
                     <el-input
+                      v-model="delayDay"
                       ref="stayOver"
                       placeholder=""
                       type="number"
-                      max="50"
+                      :disabled="!enableDelay"
+                      :min="1"
+                      @change="onMsgRemindChanged"
                       class="input-name_short"
                       />
                     {{$t('audit.workFlows.day')}}
@@ -47,6 +51,7 @@
                     <div class="remider_setting ">
                       <el-time-select
                         v-model="alertTime"
+                        :disabled="!enableDelay"
                         :picker-options="{
                           start: '00:00',
                           step: '0:30',
@@ -60,7 +65,7 @@
               </template>
             </setting-table>
 
-
+        
             <!-- 節點停留時間 -->
             <setting-table table-name="節點停留時間" style="margin-top: 20px;">
               <template slot="tableDetail">
@@ -172,6 +177,10 @@ export default {
   data() {
     return {
       isLoadingData: false,
+      changeNotify: false,
+      enableDelay: false,
+      delayDay: 1,
+
       alertTime: '09:00',
       showInputLimit_overallItem: false,
       defaultDefineName:[
@@ -312,6 +321,14 @@ export default {
         this.showInputLimit_overallItem = true
       } else {
         this.showInputLimit_overallItem = false
+      }
+    },
+
+    onMsgRemindChanged(e){
+      if(e<=0){
+        this.delayDay=1;
+      }else{
+        this.delayDay = e;
       }
     },
 
