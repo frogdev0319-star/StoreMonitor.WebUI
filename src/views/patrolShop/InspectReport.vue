@@ -54,12 +54,20 @@
             <span :class="isexportPDF ? 'pdf-info-value' : 'info-value'">{{ report.submitterName }}</span>
             <span class="info-label">{{ $t('remotePatrol.generateTime')+'：' }}</span>
             <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
+            <span class="ignoreSign" v-if="report.isCheckInIgnore"> 略過簽到 </span>
+
             <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.signInTime')+'：' }}</span>
-            <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ signInTime }}</span>
+            <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ signInTime }} </span>
             <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.patrolTime')+'：' }}</span>
             <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ inceptionExecutTime }}</span>
+            <!-- 簽到距離 -->
             <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.signInDistance')+'：' }}</span>
-            <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{$t('remotePatrol.aroundDistance')+signInDistance}}</span>
+            <span v-if="!isexportPDF && hasSignRecord && signInDistance !== -1">{{ $t('remotePatrol.aroundDistance')  }}</span>
+            <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">
+              {{ (signInDistance === -1 ? '超出簽到範圍' : signInDistance) }}
+            </span>
+            <span v-if="!isexportPDF && hasSignRecord && signInDistance !== -1" >{{$t('remotePatrol.mapDistance3')}}</span>
+
         </div>
         <div class="weather-content">
           <img v-if="weatherImg" class="weather-info-content" :src="weatherImg">
@@ -95,12 +103,22 @@
       </div>
     </div>
     <div v-if="isexportPDF && hasSignRecord" class="pdf_font_24 info-content" style="margin-left:46px">
+      <span v-if="hasSignRecord && report.isCheckInIgnore"> (略過簽到) </span>
       <span v-if="hasSignRecord" class="info-label">{{ $t('remotePatrol.signInTime')+'：' }}</span>
       <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ signInTime }}</span>
+      
+
       <span v-if="hasSignRecord" class="info-label" style="margin-left:calc(40/1980*100vw)">{{ $t('remotePatrol.patrolTime')+'：' }}</span>
       <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ inceptionExecutTime }}</span>
+
       <span v-if="hasSignRecord" class="info-label" style="margin-left:calc(40/1980*100vw)">{{ $t('remotePatrol.signInDistance')+'：' }}</span>
-      <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{$t('remotePatrol.aroundDistance')+signInDistance}}</span>
+      <span v-if="hasSignRecord && signInDistance !== -1">{{ $t('remotePatrol.aroundDistance')  }}</span>
+      <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">
+        {{ (signInDistance === -1 ? '超出簽到範圍' : signInDistance) }}
+      </span>
+      <span v-if="hasSignRecord && signInDistance !== -1" >{{$t('remotePatrol.mapDistance3')}}</span>
+
+
     </div>
     <div class="template-titles" v-if="!isexportPDF">
       <el-select
@@ -991,6 +1009,7 @@ export default {
         obj.submitterName = routeData.submitterName;
         obj.tagName = routeData.tagName;
         obj.iconSrc = this.getIconSrc(routeData.status);
+        obj.isCheckInIgnore = routeData.isCheckInIgnore
         switch (routeData.mode) {
           case 0:
             obj.inspectSrc = self.inspectSrc;
@@ -1201,7 +1220,7 @@ export default {
           this.signInTime = util.getDateStr2(data.checkinRecord.ts);
           this.inceptionExecutTime = util.getDiffTimeStr(data.ts,data.checkinRecord.ts);
           this.signMapUrl = data.checkinRecord.report_sign_map_url;
-          this.signInDistance = data.checkinRecord.execute_sign_distance+this.$i18n.t('remotePatrol.mapDistance3');
+          this.signInDistance = data.checkinRecord.execute_sign_distance ;
         }
 
         this.getGroupsData(data.groups);
@@ -2159,6 +2178,7 @@ export default {
   }
 };
 </script>
+
 <style lang="scss" scoped>
   @function rem($val){
     @return $val/16+rem;
@@ -3171,10 +3191,19 @@ export default {
     overflow-x: hidden;
   }
 </style>
+
 <style lang="sass" scoped>
   .spacer
     display: flex
     flex-direction: column
     justify-content: center
     align-items: center
+  .ignoreSign
+    width: fit-content
+    border-radius: 4px
+    font-size: 12px
+    color: #989ca0
+    background: #EFEFEF
+    padding: 5px
+    margin-left: 10px
 </style>

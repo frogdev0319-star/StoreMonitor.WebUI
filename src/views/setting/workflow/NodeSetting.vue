@@ -178,12 +178,11 @@
     </div>
 
     <!-- 節點停留時間 -->
-    <div v-loading="isLoadingData" class="setting-details self-loading">
+    <!-- <div v-loading="isLoadingData" class="setting-details self-loading">
       <div class="template-info">
         <div class="inspect-basic">
           <setting-table :table-name="$t('audit.workFlows.nodeStayTime')">
             <template slot="tableDetail">
-              <!-- row -->
               <div class="setting-config basic-config">
                 <div class="title-status">
                   <el-checkbox
@@ -192,8 +191,6 @@
                     :label="$t('audit.workFlows.alertAtOverTime')"/>
                 </div>
               </div>
-              
-              <!-- row -->
               <div class="setting-config basic-config">
                 <div class="title-status">
                   {{$t('audit.workFlows.stayOver')}}
@@ -215,7 +212,7 @@
           </setting-table>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- search user popup -->
     <dialog-pop

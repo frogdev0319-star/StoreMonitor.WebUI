@@ -2,7 +2,7 @@
   <div>
     <div class="submit_btn" >
       <delay-button type="filled" @click="submit">
-        <div class="button-area" style="width: 100px;">
+        <div class="button-area" style="width: 80px; height: 20px;">
           <span>保存</span>
         </div>
       </delay-button>
@@ -36,7 +36,7 @@
                     {{$t('audit.workFlows.stayOver')}}
                     <el-input
                       v-model="delayDay"
-                      ref="stayOver"
+                      ref="delay_day"
                       placeholder=""
                       type="number"
                       :disabled="!enableDelay"
@@ -237,6 +237,10 @@ export default {
         console.log('val :>> ', val);
       }
     },
+    enableDelay(val){
+      if(val == true && this.delayDay == undefined)  this.delayDay = 1
+    },
+
   },
 
   async created() {
@@ -303,6 +307,18 @@ export default {
           }
       }
 
+      if(this.enableDelay && this.delayDay == undefined){
+        util.notify(this.$t('audit.workFlows.cantEmptyDays'), 'error', 2000 );
+        this.$refs.delay_day.focus()
+        return
+      }
+      else if(this.delayDay > 90){
+        util.notify('天數不可大於 90 天', 'error', 2000 );
+        this.$refs.delay_day.focus()
+        return
+      }
+
+
       const statusNameRes = await this.updateInspectStatus();
       if (statusNameRes.errCode == 0) {
         util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
@@ -331,9 +347,6 @@ export default {
         this.delayDay = e;
       }
     },
-
-
-  
   }
 };
 </script>

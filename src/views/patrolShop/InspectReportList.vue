@@ -66,7 +66,7 @@
           <date-time-selector
             class="time-selector"
             @change="dateChange" 
-          :dateTimeValue = dateValue /> 
+            :dateTimeValue = dateValue /> 
           <div class="flex-center fullWidth" style="margin-left: 20px">
             <div class="search-content flex-center" style="margin-right: 20px">
               <div class="search-label">{{ $t('remotePatrol.keywords') }}</div>
@@ -188,6 +188,7 @@
                         {{ $t('insSettingView.scores') }}
                       </div>
                     </div>
+                    <div class="ignoreSign" v-if="item.mode == 1 && item.routeObj.isCheckInIgnore">略過簽到</div>
                   </div>
 
                   <!-- card bottom -->
@@ -1333,6 +1334,16 @@ export default {
 
 };
 </script>
+<style lang="sass" scoped>
+  .ignoreSign
+    width: fit-content
+    border-radius: 4px
+    font-size: 12px
+    color: #989ca0
+    background: #EFEFEF
+    padding: 5px
+
+</style>
 <style lang="scss" scoped>
 $red:#f31d65;
 $black:#182752;
@@ -1760,7 +1771,6 @@ $filterWidth: (100%-706);
 }
 </style>
 <style scoped>
-
     #el-menuscrollbar .el-scrollbar__wrap {
       overflow-x: hidden;
     }
