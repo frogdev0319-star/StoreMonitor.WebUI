@@ -17,6 +17,7 @@
       <div v-loading="isLoadingData" class="setting-details self-loading">
         <div class="template-info">
           <div class="inspect-basic">
+
             <!-- 事件超時未處理提醒 -->
             <setting-table :table-name="$t('insSettingView.eventTimeoutReminder')">
               <template slot="tableDetail">
@@ -41,7 +42,7 @@
                       type="number"
                       :disabled="!enableDelay"
                       :min="1"
-                      @change="onMsgRemindChanged"
+                      @change="onEventChanged"
                       class="input-name_short"
                       />
                     {{$t('audit.workFlows.day')}}
@@ -73,6 +74,7 @@
                 <div class="setting-config basic-config">
                   <div class="title-status">
                     <el-checkbox
+                      v-model="wokflowDelay"
                       class="storevue-checkbox-outlined"
                       :label="$t('audit.workFlows.alertAtOverTime')"/>
                   </div>
@@ -83,10 +85,12 @@
                   <div class="title-status ">
                     {{$t('audit.workFlows.stayOver')}}
                     <el-input
-                      ref="stayOver"
+                      v-model="workflowDay"
+                      :disabled="!wokflowDelay"
+                      ref="workflow_day"
                       placeholder=""
                       type="number"
-                      max="50"
+                      @change="onWokflowChanged"
                       class="input-name_short"
                       />
                     {{$t('audit.workFlows.day')}}
@@ -95,7 +99,8 @@
                     提醒時間
                     <div class="remider_setting ">
                       <el-time-select
-                        v-model="alertTime"
+                        v-model="wokflowTime"
+                        :disabled="!wokflowDelay"
                         :picker-options="{
                           start: '00:00',
                           step: '0:30',
@@ -177,11 +182,20 @@ export default {
   data() {
     return {
       isLoadingData: false,
+
       changeNotify: false,
       enableDelay: false,
       delayDay: 1,
-
       alertTime: '09:00',
+
+      wokflowDelay: false,
+      workflowDay: 1,
+      wokflowTime: '09:00',
+
+
+      
+
+
       showInputLimit_overallItem: false,
       defaultDefineName:[
         {
@@ -240,13 +254,16 @@ export default {
     enableDelay(val){
       if(val == true && this.delayDay == undefined)  this.delayDay = 1
     },
+    
+    wokflowDelay(val){
+      if(val == true && this.workflowDay == undefined)  this.workflowDay = 1
+    },
 
   },
 
   async created() {
 
     await this.getInspectStatus()
-
 
     for (let i = 0; i < 3; i++) {
       if(this.inspectStatus["is_customize_" + i] == false){
@@ -262,11 +279,32 @@ export default {
 
 
   methods: {
-
     getInspectStatus(){
       return new Promise((resolve, reject) => {
         inpectRESTful.getInspectStatus().then(res => {
           resolve(res);
+
+          console.log('res.data', res.data)
+
+          // event
+          this.enableDelay = res.data.settingContent.general_setting_event_push_config.isNotify
+          this.delayDay = res.data.settingContent.general_setting_event_push_config.eventUnHandleNotifyDay
+
+          var eventCT =  res.data.settingContent.general_setting_event_push_config.checkTime
+          var geteventT  = new Date(eventCT)
+          console.log('geteventT', geteventT)
+          this.alertTime = geteventT.toString().slice(16, 21)
+          console.log('this.alertTime', this.alertTime)
+
+
+          // workflow
+          this.wokflowDelay = res.data.settingContent.general_setting_workflow_config.isNotify
+          this.workflowDay = res.data.settingContent.general_setting_workflow_config.unHandleNotifyDay
+          var workflowCT =  res.data.settingContent.general_setting_workflow_config.checkTime
+          var getworkflowT  = new Date(workflowCT)
+          this.wokflowTime = getworkflowT.toString().slice(16, 21)
+          console.log('this.wokflowTime', this.wokflowTime)
+          
           this.inspectStatus = res.data.settingContent.general_setting_inspect_status_name
           delete this.inspectStatus.update_time
           delete this.inspectStatus.update_user_id
@@ -277,7 +315,36 @@ export default {
       });
     },
 
+
+
+
+    
+    getSettingTimestamp(day, t){
+      var tempTiming = new Date()
+      tempTiming = tempTiming.setDate(tempTiming.getDate() + day)
+      tempTiming = new Date(tempTiming)
+      console.log('tempTiming -->', tempTiming)
+      var onlyDate = tempTiming.toString().slice(0, 16)
+
+      var eventT = onlyDate + t
+      return Date.parse(eventT)
+    },
+
     updateInspectStatus(){
+      const delayDay =  Number(this.delayDay)
+      const workflowDay =  Number(this.workflowDay)
+      var t = new Date();
+      var tString = t.toTimeString()
+      var timeZone = tString.slice(12,15)
+
+      // for event
+      var eventCheckTime = this.getSettingTimestamp(delayDay, this.alertTime)
+      console.log('eventCheckTime', eventCheckTime)
+
+      // for workflow
+      var workflowTime = this.getSettingTimestamp(workflowDay, this.wokflowTime)
+      console.log('workflowTime', workflowTime)
+
       var status = {
           status_0: this.defaultDefineName[0].newName,
           is_customize_0: this.defaultDefineName[0].is_customize,
@@ -285,12 +352,25 @@ export default {
           is_customize_1: this.defaultDefineName[1].is_customize,
           status_2: this.defaultDefineName[2].newName,
           is_customize_2: this.defaultDefineName[2].is_customize,
+
+          workflowSettingConfig: {
+            isNotify: this.wokflowDelay,
+            unHandleNotifyDay: workflowDay,
+            checkTime: workflowTime
+          },
+          eventNotifyConfig: {
+              isNotify: this.enableDelay,
+              unHandleNotifyDay: delayDay,
+              checkTime: eventCheckTime
+          },
+          time_zone: timeZone
+          
       }
+
       console.log('status ~~~~~~~~>> ', status);
       return new Promise((resolve, reject) => {
         inpectRESTful.updateInspectStatus(status).then(res => {
           resolve(res);
-
         }).catch(err => {
           reject(err);
         });
@@ -317,10 +397,15 @@ export default {
         this.$refs.delay_day.focus()
         return
       }
-
+      else if(this.workflowDay > 90){
+        util.notify('天數不可大於 90 天', 'error', 2000 );
+        this.$refs.workflow_day.focus()
+        return
+      }
 
       const statusNameRes = await this.updateInspectStatus();
       if (statusNameRes.errCode == 0) {
+        this. getInspectStatus()
         util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
         return false;
       } else {
@@ -340,11 +425,19 @@ export default {
       }
     },
 
-    onMsgRemindChanged(e){
+    onEventChanged(e){
       if(e<=0){
         this.delayDay=1;
       }else{
         this.delayDay = e;
+      }
+    },
+
+    onWokflowChanged(e){
+      if(e<=0){
+        this.workflowDay=1;
+      }else{
+        this.workflowDay = e;
       }
     },
   }
