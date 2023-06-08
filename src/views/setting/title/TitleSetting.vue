@@ -62,6 +62,8 @@
         <hr class="hr-horizontal">
         <el-scrollbar :class="showRolesList? 'showlist-el-menuscrollbar' : 'el-menuscrollbar'">
 
+          {{ roleNameList }}
+
           <!-- ==== 暫時隱藏 巡檢排程相關 ==== -->
           <div v-for="(item,index) in roleNameList" :key="index" class="role-group" v-show="item.roleName !== $t('schedule.inceptionSchedule')">
             <div class="role-all-checkbox" style="text-align: left">
@@ -306,7 +308,6 @@ export default {
           ]
         },
 
-        // ==== 暫時隱藏 巡檢排程相關(勿刪) ====
         {
           roleName: this.$t('schedule.inceptionSchedule'),
           checked: false,
@@ -343,6 +344,12 @@ export default {
               checked: false,
               disabled: false,
               visabled:true
+            },
+            {
+              roleName: '通用設定',
+              checked: false,
+              disabled: false,
+              visabled : true
             },
             {
               roleName: this.$t('route.inspectListSetting'),
