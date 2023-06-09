@@ -479,7 +479,11 @@ export default {
     async getUserInfo(){
       await getAllUserInfoNoAuth().then(res=>{
         this.userInfo = res.data
-        
+        this.userInfo.forEach(i => {
+          if(i.status == 40){
+            i.userName = i.userName + " (停用中)"
+          }
+        })
         let newAuditByUsersArr = []
         if(this.auditMembers !== null){
           if(this.nodeData.auditByUsers.length !== 0){  

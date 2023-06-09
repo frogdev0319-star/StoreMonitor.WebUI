@@ -713,7 +713,17 @@ export default {
     async getUserInfo(){
       await getAllUserInfoNoAuth().then(res=>{
         this.userInfo = res.data
+        this.userInfo.forEach(i => {
+          if(i.status == 40){
+            i.userName = i.userName + " (停用中)"
+
+          }
+        })
+
         this.userData = this.userInfo
+
+        
+
         console.log('this.userInfo ------>> ', this.userInfo);
       }).catch(err => {
         console.log('error' + err);
