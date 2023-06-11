@@ -531,7 +531,7 @@ export const navbarRoute = {
     };
 
     // 通用設定
-    !PermissionHelper.enableMimicMode && PermissionHelper.enableTitleSetting() && systemSettingRoute.children.push(
+    !PermissionHelper.enableMimicMode && PermissionHelper.enableGeneralSetting() && systemSettingRoute.children.push(
       {
         path: '/generalSetting',
         name: 'generalSetting',

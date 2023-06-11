@@ -7,6 +7,7 @@
           <div class="title-name">{{ infoForm.title }}</div>
         </div>
         <div class="spacer"></div>
+        <!-- 保存 -->
         <delay-button type="filled" @click="saveBasicInfo">{{ $t('titleView.save') }}</delay-button>
       </div>
       <div class="basic-information flex" style="padding: 20px 0 20px 20px">
@@ -62,8 +63,7 @@
         <hr class="hr-horizontal">
         <el-scrollbar :class="showRolesList? 'showlist-el-menuscrollbar' : 'el-menuscrollbar'">
 
-          {{ roleNameList }}
-
+          <!-- {{ roleNameList }} -->
           <!-- ==== 暫時隱藏 巡檢排程相關 ==== -->
           <div v-for="(item,index) in roleNameList" :key="index" class="role-group" v-show="item.roleName !== $t('schedule.inceptionSchedule')">
             <div class="role-all-checkbox" style="text-align: left">
@@ -334,6 +334,7 @@ export default {
           ]
         },
 
+        // 系統設定
         {
           roleName: this.$t('route.systemSetting'),
           checked: false,
@@ -343,7 +344,7 @@ export default {
               roleName: this.$t('route.deviceManage'),
               checked: false,
               disabled: false,
-              visabled:true
+              visabled: true
             },
             {
               roleName: '通用設定',
@@ -355,31 +356,31 @@ export default {
               roleName: this.$t('route.inspectListSetting'),
               checked: false,
               disabled: false,
-              visabled:true
+              visabled: true
             },
             {
               roleName: this.$t('route.storeManage'),
               checked: false,
               disabled: false,
-              visabled:false
+              visabled: false
             },
             {
               roleName: this.$t('route.scheduleManage'),
               checked: false,
               disabled: false,
-              visabled:false
+              visabled: false
             },
             {
               roleName: this.$t('route.insepctionReportSetting'),
               checked: false,
               disabled: false,
-              visabled:true
+              visabled: true
             },
             {
               roleName: this.$t('route.workflowManage'),
               checked: false,
               disabled: false,
-              visabled:true
+              visabled: true
             }
           ]
         }
@@ -495,14 +496,16 @@ export default {
       this.roleNameList[3].children[4].checked = !!PermissionHelper.enableSingleStoreStatStatistics();
       this.roleNameList[3].children[5].checked = !!PermissionHelper.enableAppraisalCompareStatistics();
 
-      this.roleNameList[6].children[0].checked = !!PermissionHelper.enableDeviceSetting();
 
-      this.roleNameList[6].children[1].checked = true
+      this.roleNameList[6].children[0].checked = !!PermissionHelper.enableDeviceSetting();
+      this.roleNameList[6].children[1].checked = !!PermissionHelper.enableGeneralSetting();
       this.roleNameList[6].children[2].checked = !!PermissionHelper.enablePatrolSetting();
-      this.roleNameList[6].children[3].checked = !!PermissionHelper.enableStoreSetting();
-      this.roleNameList[6].children[4].checked = !!PermissionHelper.enableScheduleSetting();
+      this.roleNameList[6].children[3].checked = !!PermissionHelper.enableStoreSetting(); //no
+      this.roleNameList[6].children[4].checked = !!PermissionHelper.enableScheduleSetting(); //no
       this.roleNameList[6].children[5].checked = !!PermissionHelper.enableReportSetting();
       this.roleNameList[6].children[6].checked = !!PermissionHelper.enableWorkflowSetting();
+
+      
 
       //auditSetting
       this.roleNameList[4].children[0].checked = !!PermissionHelper.enableSendAudit();
@@ -609,7 +612,11 @@ export default {
       this.infoForm.authorities = [];
       const decAuthorityNum = Math.pow(2, 32);
       const newAuth = this.roleNameList.slice(0);
+      console.log('newAuth', newAuth)
+
       const auditElement = newAuth.splice(4,2);//將簽核權限,排程管理提出來，往後放 備註:4原本是系統設定
+      console.log('auditElement', auditElement)
+
       newAuth.push.apply(newAuth,auditElement);
       newAuth.forEach((item, index) => {
         /**因為新加的權限只能往後加，所以5以後順序需要特別處理 */
@@ -617,17 +624,35 @@ export default {
         if(index>=5) powerIdx=index+1;
         /********************/
         let tempAuthorityNum = Math.pow(2, powerIdx) * decAuthorityNum;
+
         item.children.forEach((_item, _index) => {
           if(_item.checked){
             if(index === 4 && _index === 0){
-              tempAuthorityNum += Math.pow(2, 1);
-            }else if(index === 4 && _index === 1){
+              console.log('xdxdxd 0')
               tempAuthorityNum += Math.pow(2, 0);
-            } else if(index === 4 && _index === 4){
+            }
+            else if(index === 4 && _index === 1){
+              console.log('xdxdxd 1')
+              tempAuthorityNum += Math.pow(2, 1);
+            } 
+            else if(index === 4 && _index === 2){
+              console.log('xdxdxd 2')
+              tempAuthorityNum += Math.pow(2, 2);
+            } 
+            else if(index === 4 && _index === 4){
+              console.log('xdxdxd 4')
               tempAuthorityNum += Math.pow(2, 5);
-            } else if(index === 4 && _index === 5){
+            } 
+            else if(index === 4 && _index === 4){
+              console.log('xdxdxd 5')
+              tempAuthorityNum += Math.pow(2, 5);
+            }
+            else if(index === 4 && _index === 6){
+              console.log('xdxdxd 6')
               tempAuthorityNum += Math.pow(2, 6);
-            }else {
+            }
+            else {
+              console.log('!!!')
               tempAuthorityNum += Math.pow(2, _index);
             }
           }
@@ -638,11 +663,15 @@ export default {
       this.ifAccessVideo && (videoAndMessNum += Math.pow(2, 0));
       this.ifReceiveMes && (videoAndMessNum += Math.pow(2, 1));
       this.infoForm.authorities.push(videoAndMessNum);
+
+      console.log('this.infoForm.authorities', this.infoForm.authorities)
+
     },
 
     updateBasicInformation() {
       const self = this;
       const params = self.infoForm;
+      console.log('params', params)
       return new Promise((resolve, reject) => {
         titleRESTful.updateUserTitle(params).then(result => {
           resolve(result);

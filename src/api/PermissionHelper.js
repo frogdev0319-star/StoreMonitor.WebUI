@@ -23,9 +23,13 @@ export default class PermissionHelper {
     if(index==6 && this.data.length<7){
       this.data[index] = 274877906944;//全不勾,全勾:274877906951
     }
+
+    // console.log('bigEndian', bigEndian)
+    // console.log('littleEndian', littleEndian)
     const authority = new Uint64BE(this.data[index].toString()).toString(10);
     const base = new Uint64BE(bigEndian, littleEndian).toString(10);
-
+    // console.log('authority', authority)
+    // console.log('base', base)
     return authority & base;
   }
 
@@ -69,6 +73,9 @@ export default class PermissionHelper {
   static enableCustomers() {
     return this.enableAuthorities(1, 0x0, 0x80);
   }
+
+
+
 
   // index(2) => ID(4): Event
   static enableEventHandle() {
@@ -116,25 +123,60 @@ export default class PermissionHelper {
     return this.enableAuthorities(3, 0x8, 0x0);
   }
 
+  // ===== index(4) => ID(16): Settings =====
+  // static enablePatrolSetting() {
+  //   return this.enableAuthorities(4, 0x0, 0x1);
+  // }
+  // static enableDeviceSetting() {
+  //   return this.enableAuthorities(4, 0x0, 0x2);
+  // }
+
+  // static enableGeneralSetting() {
+  //   return this.enableAuthorities(4, 0x0, 0x2);
+  // }
+
+  // static enableStoreSetting() {
+  //   return this.enableAuthorities(4, 0x0, 0x4);
+  // }
+
+  // static enableScheduleSetting() {
+  //   return this.enableAuthorities(4, 0x0, 0x8);
+  // }
+
+  // static enableTitleSetting() {
+  //   return this.enableAuthorities(4, 0x0, 0x10);
+  // }
+
+  // static enableReportSetting() {
+  //   return this.enableAuthorities(4, 0x0, 0x20);
+  // }
+  // static enableWorkflowSetting() {
+  //   return this.enableAuthorities(4, 0x0, 0x40);
+  // }
+
+
+
   // index(4) => ID(16): Settings
-  static enablePatrolSetting() {
+  static enableDeviceSetting() {
     return this.enableAuthorities(4, 0x0, 0x1);
   }
-  static enableDeviceSetting() {
+  static enableGeneralSetting() {
     return this.enableAuthorities(4, 0x0, 0x2);
   }
 
-  static enableStoreSetting() {
+  static enablePatrolSetting() {
     return this.enableAuthorities(4, 0x0, 0x4);
   }
 
-  static enableScheduleSetting() {
+  static enableStoreSetting() {
     return this.enableAuthorities(4, 0x0, 0x8);
   }
 
-  static enableTitleSetting() {
+  static enableScheduleSetting() {
     return this.enableAuthorities(4, 0x0, 0x10);
   }
+
+
 
   static enableReportSetting() {
     return this.enableAuthorities(4, 0x0, 0x20);
@@ -142,6 +184,13 @@ export default class PermissionHelper {
   static enableWorkflowSetting() {
     return this.enableAuthorities(4, 0x0, 0x40);
   }
+
+
+  static enableTitleSetting() {
+    return this.enableAuthorities(4, 0x0, 0x80);
+  }
+
+
 
   // index(5) => ID(32): Video/Message
   static enableVideo() {
