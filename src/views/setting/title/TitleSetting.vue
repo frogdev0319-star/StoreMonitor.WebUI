@@ -469,6 +469,8 @@ export default {
     },
 
     getAvailableAuthority(authorities, resetFlag = true) {
+
+      console.log('authorities :>> ', authorities);
       PermissionHelper.setData(authorities);
       this.roleNameList[0].children[0].checked = !!PermissionHelper.enableRemoteOverview();
       this.roleNameList[0].children[1].checked = !!PermissionHelper.enableEventOverview();
@@ -494,11 +496,13 @@ export default {
       this.roleNameList[3].children[5].checked = !!PermissionHelper.enableAppraisalCompareStatistics();
 
       this.roleNameList[6].children[0].checked = !!PermissionHelper.enableDeviceSetting();
-      this.roleNameList[6].children[1].checked = !!PermissionHelper.enablePatrolSetting();
-      this.roleNameList[6].children[2].checked = !!PermissionHelper.enableStoreSetting();
-      this.roleNameList[6].children[3].checked = !!PermissionHelper.enableScheduleSetting();
-      this.roleNameList[6].children[4].checked = !!PermissionHelper.enableReportSetting();
-      this.roleNameList[6].children[5].checked = !!PermissionHelper.enableWorkflowSetting();
+
+      this.roleNameList[6].children[1].checked = true
+      this.roleNameList[6].children[2].checked = !!PermissionHelper.enablePatrolSetting();
+      this.roleNameList[6].children[3].checked = !!PermissionHelper.enableStoreSetting();
+      this.roleNameList[6].children[4].checked = !!PermissionHelper.enableScheduleSetting();
+      this.roleNameList[6].children[5].checked = !!PermissionHelper.enableReportSetting();
+      this.roleNameList[6].children[6].checked = !!PermissionHelper.enableWorkflowSetting();
 
       //auditSetting
       this.roleNameList[4].children[0].checked = !!PermissionHelper.enableSendAudit();
