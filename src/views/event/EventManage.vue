@@ -1295,8 +1295,12 @@ export default {
 
     },
 
-    onStoreChange(storeObj) {
+    async onStoreChange(storeObj) {
       //console.log("onStoreChange>storeFilterObj",storeObj);
+      if(this.ifChangeAccount){
+        this.ifChangeAccount =false;
+        await this.getInspectList()
+      }
       this.storeFilterObj = storeObj;
       this.ifSearchData && this.getEventListAndCount();
       this.ifSearchData = false;
