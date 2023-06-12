@@ -163,20 +163,15 @@ export default class PermissionHelper {
   static enableGeneralSetting() {
     return this.enableAuthorities(4, 0x0, 0x2);
   }
-
   static enablePatrolSetting() {
     return this.enableAuthorities(4, 0x0, 0x4);
   }
-
   static enableStoreSetting() {
     return this.enableAuthorities(4, 0x0, 0x8);
   }
-
   static enableScheduleSetting() {
     return this.enableAuthorities(4, 0x0, 0x10);
   }
-
-
 
   static enableReportSetting() {
     return this.enableAuthorities(4, 0x0, 0x20);
@@ -184,7 +179,6 @@ export default class PermissionHelper {
   static enableWorkflowSetting() {
     return this.enableAuthorities(4, 0x0, 0x40);
   }
-
 
   static enableTitleSetting() {
     return this.enableAuthorities(4, 0x0, 0x80);
