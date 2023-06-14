@@ -388,7 +388,9 @@
                       <div v-if="categoryItem.weight != -1 && categoryItem.type != 2">{{ categoryItem.weight + '%' }}</div>
                       <div>
                         {{ categoryItem.groupName }}
-                        <span style="color: #7d8cad; margin-left: 5px;" v-if="setting_isShowGroupSum"> ( {{$t('remotePatrol.totalScoreUnit')}} : {{ getSum(categoryItem.children) }} ) </span>
+                        <span style="color: #7d8cad; margin-left: 5px;" v-if="setting_isShowGroupSum"> 
+                          ( {{$t('remotePatrol.totalScoreUnit')}} : {{ getSum(categoryItem.children) }})
+                        </span>
                       </div>
                     </div>
                   </td>
@@ -834,7 +836,33 @@ export default {
 
     },
 
+    // 計算比例制分母（tab1 & tab2 項目總分乘過權重）
+    getTotalWithWeights(data){
+      console.log('getTotalWithWeights data :>> ', data);
+
+      // 剩下子類別（groupScore !== -99999）
+      var items = data.filter(i => i.totalScore !== 0  && i.type !== 2 )
+      console.log('items :>> ', items);
+
+      var n = 0
+      items.forEach(i => {
+        if(i.groupScore !== -99999){
+          var aaa = (i.groupScore * i.weight) / 100
+          console.log('aaa :>> ',i.groupName , aaa);
+        }else {
+          var aaa = (i.totalScore * i.weight) / 100
+        }
+        
+        n = n + aaa
+
+      })
+
+      console.log('n =======>> ', n)
+
+    },
+
     getSum(Array){
+      // console.log('getSum Array :>> ', Array);
       var totalScore = 0
       Array.forEach(i => {
         var isInfinity = this.getDoubleNum(i.actualScore)
@@ -869,7 +897,11 @@ export default {
         this.getInspectTemplateList(results[0]);
 
         console.log('results[1] :>> ', results[1]);
+
+
         this.getReportInfo(results[1]);
+        this.getTotalWithWeights(results[1].data[0].info.summary)
+
 
         this.setting_isShowGroupSum = (results[1].data[0].inspectSettings.find( i => i.name == "setting_isShowGroupSum")).value
         this.setting_isShowDistrictSum = (results[1].data[0].inspectSettings.find( i => i.name == "setting_isShowDistrictSum")).value
