@@ -760,6 +760,8 @@ export default {
       workflowUnbindDialogShow:false,
       warnWorkflowUnbind:this.$t('audit.inceptionRpt.warnWorkflowUnbind'),
       warnWorkflowUnbindTitle:this.$t('audit.inceptionRpt.errorEditReport'),
+
+      totalSumScore: 0
     };
   },
 
@@ -847,17 +849,18 @@ export default {
       var n = 0
       items.forEach(i => {
         if(i.groupScore !== -99999){
-          var aaa = (i.groupScore * i.weight) / 100
+          var aaa = ((i.groupScore * i.weight) / 100)
           console.log('aaa :>> ',i.groupName , aaa);
         }else {
           var aaa = (i.totalScore * i.weight) / 100
         }
         
         n = n + aaa
-
+        
       })
-
-      console.log('n =======>> ', n)
+      this.totalSumScore = Number(n.toFixed(3))
+      console.log('this.totalSumScore =======>> ', n)
+      console.log(typeof(n))
 
     },
 
@@ -870,9 +873,11 @@ export default {
           totalScore = totalScore + 0
         } else {
           if(i.weight == -1 || i.type==2 ){
+            // tab3
             totalScore = totalScore + i.actualScore
           } else {
-            totalScore = totalScore + i.actualScore * i.weight / 100
+            // totalScore = totalScore + i.actualScore * i.weight / 100
+            totalScore = i.actualScore * i.weight / 100
           }
         }
       })
