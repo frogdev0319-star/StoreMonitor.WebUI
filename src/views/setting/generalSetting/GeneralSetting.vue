@@ -19,7 +19,7 @@
           <div class="inspect-basic">
 
             <!-- 事件超時未處理提醒 -->
-            <setting-table :table-name="$t('insSettingView.eventTimeoutReminder')">
+            <setting-table table-name="事件超時提醒">
               <template slot="tableDetail">
                 <!-- row -->
                 <div class="setting-config basic-config">
@@ -27,14 +27,14 @@
                     <el-checkbox
                       v-model="enableDelay"
                       class="storevue-checkbox-outlined"
-                      :label="$t('audit.workFlows.alertAtOverTime')"/>
+                      label="事件超時提醒"/>
                   </div>
                 </div>
                 
                 <!-- row -->
                 <div class="setting-config basic-config">
                   <div class="title-status ">
-                    {{$t('audit.workFlows.stayOver')}}
+                    超過天數
                     <el-input
                       v-model="delayDay"
                       ref="delay_day"
@@ -68,7 +68,7 @@
 
         
             <!-- 節點停留時間 -->
-            <setting-table table-name="節點停留時間" style="margin-top: 20px;">
+            <setting-table table-name="簽核超時提醒" style="margin-top: 20px;">
               <template slot="tableDetail">
                 <!-- row -->
                 <div class="setting-config basic-config">
@@ -76,14 +76,14 @@
                     <el-checkbox
                       v-model="wokflowDelay"
                       class="storevue-checkbox-outlined"
-                      :label="$t('audit.workFlows.alertAtOverTime')"/>
+                      label="簽核超時提醒"/>
                   </div>
                 </div>
                 
                 <!-- row -->
                 <div class="setting-config basic-config">
                   <div class="title-status ">
-                    {{$t('audit.workFlows.stayOver')}}
+                    停留天數
                     <el-input
                       v-model="workflowDay"
                       :disabled="!wokflowDelay"
@@ -229,9 +229,8 @@ export default {
   },
 
   watch: {
-
     accountChanged(val) {
-      val !== 0 && this.getTitleList();
+      val !== 0 && this.init();
     },
 
     defaultDefineName:{
@@ -262,48 +261,57 @@ export default {
   },
 
   async created() {
-
-    await this.getInspectStatus()
-
-    for (let i = 0; i < 3; i++) {
-      if(this.inspectStatus["is_customize_" + i] == false){
-        this.defaultDefineName[i].defineStatus = 0
-        this.defaultDefineName[i].newName = this.defaultDefineName[i].name
-      } else {
-          this.defaultDefineName[i].defineStatus = 1
-          this.defaultDefineName[i].newName = this.inspectStatus["status_"+ i]
-      }
-    }
+    this.init()
   },
 
-
-
   methods: {
+    async init(){
+      await this.getInspectStatus()
+      for (let i = 0; i < 3; i++) {
+        if(this.inspectStatus["is_customize_" + i] == false){
+          this.defaultDefineName[i].defineStatus = 0
+          this.defaultDefineName[i].newName = this.defaultDefineName[i].name
+        } else {
+            this.defaultDefineName[i].defineStatus = 1
+            this.defaultDefineName[i].newName = this.inspectStatus["status_"+ i]
+        }
+      }
+    },
+
+
     getInspectStatus(){
       return new Promise((resolve, reject) => {
         inpectRESTful.getInspectStatus().then(res => {
           resolve(res);
-
           console.log('res.data', res.data)
 
-          // event
-          this.enableDelay = res.data.settingContent.general_setting_event_push_config.isNotify
-          this.delayDay = res.data.settingContent.general_setting_event_push_config.eventUnHandleNotifyDay
+          if(res.data.settingContent.general_setting_event_push_config.checkTime !== -1){
+            // event
+            this.enableDelay = res.data.settingContent.general_setting_event_push_config.isNotify
+            this.delayDay = res.data.settingContent.general_setting_event_push_config.eventUnHandleNotifyDay
 
-          var eventCT =  res.data.settingContent.general_setting_event_push_config.checkTime
-          var geteventT  = new Date(eventCT)
-          console.log('geteventT', geteventT)
-          this.alertTime = geteventT.toString().slice(16, 21)
-          console.log('this.alertTime', this.alertTime)
+            var eventCT =  res.data.settingContent.general_setting_event_push_config.checkTime
+            var geteventT  = new Date(eventCT)
+            console.log('geteventT', geteventT)
+            this.alertTime = geteventT.toString().slice(16, 21)
+            console.log('this.alertTime', this.alertTime)
+          } else {
+            this.enableDelay = false
+            this.alertTime = "09:00"
+          }
 
-
-          // workflow
-          this.wokflowDelay = res.data.settingContent.general_setting_workflow_config.isNotify
-          this.workflowDay = res.data.settingContent.general_setting_workflow_config.unHandleNotifyDay
-          var workflowCT =  res.data.settingContent.general_setting_workflow_config.checkTime
-          var getworkflowT  = new Date(workflowCT)
-          this.wokflowTime = getworkflowT.toString().slice(16, 21)
-          console.log('this.wokflowTime', this.wokflowTime)
+          if(res.data.settingContent.general_setting_workflow_config.checkTime !== -1){
+            // workflow
+            this.wokflowDelay = res.data.settingContent.general_setting_workflow_config.isNotify
+            this.workflowDay = res.data.settingContent.general_setting_workflow_config.unHandleNotifyDay
+            var workflowCT =  res.data.settingContent.general_setting_workflow_config.checkTime
+            var getworkflowT  = new Date(workflowCT)
+            this.wokflowTime = getworkflowT.toString().slice(16, 21)
+            console.log('this.wokflowTime', this.wokflowTime)
+          } else {
+            this.wokflowDelay = false
+            this.wokflowTime = "09:00"
+          }
           
           this.inspectStatus = res.data.settingContent.general_setting_inspect_status_name
           delete this.inspectStatus.update_time
@@ -316,9 +324,6 @@ export default {
     },
 
 
-
-
-    
     getSettingTimestamp(day, t){
       var tempTiming = new Date()
       tempTiming = tempTiming.setDate(tempTiming.getDate() + day)

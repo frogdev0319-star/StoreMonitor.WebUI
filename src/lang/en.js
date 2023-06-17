@@ -829,7 +829,7 @@ export default{
         "setGroupScoreRange0":"Upper limit of the category score Input range 0 ~ 9999",
         "setGroupScoreRange":"Upper limit of the category score Input range -9999 ~ 9999",
         "groupScoreLimit":"Upper limit of the category score",
-        "commentStatus":"Inspection summary option display (this setting will affect the display related to the inspection summary of the brand)",
+        "commentStatus":"Inspection summary option display ",
         "autoSelectComment":"Enable automatic selection of inspection summary by conditions ",
         "selectByScore":"Automatic selection by score conditions",
         "noUserDefinedName":"No custom name",

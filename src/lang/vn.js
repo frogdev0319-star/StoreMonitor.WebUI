@@ -824,7 +824,7 @@ export default{
       "setGroupScoreRange0":"Giới hạn trên của mức đầu vào điểm danh mục là 0 ~ 9999",
       "setGroupScoreRange":"Giới hạn trên của mức đầu vào điểm danh mục là -9999 ~ 9999",
       "groupScoreLimit":"Giới hạn trên của điểm danh mục",
-      "commentStatus":"Hiển thị tùy chọn tóm tắt kết quả kiểm tra (cài đặt này sẽ tác động đến nội dung hiển thị tóm tắt kết quả kiểm tra của nhãn hiệu)",
+      "commentStatus":"Hiển thị tùy chọn tóm tắt kết quả kiểm tra ",
       "autoSelectComment":"Bật chức năng tự động chọn tóm tắt kết quả kiểm tra theo điều kiện ",
       "selectByScore":"Tự động chọn theo điều kiện",
       "noUserDefinedName":"Không có tên tùy biến",

@@ -824,7 +824,7 @@ export default{
       "setGroupScoreRange0":"カテゴリースコア上限：入力範囲 0～9999",
       "setGroupScoreRange":"カテゴリースコア上限：入力範囲 -9999～9999",
       "groupScoreLimit":"カテゴリースコアの上限",
-      "commentStatus":"検査概要オプション表示（この設定はブランドの検査概要に関する表示に影響します）",
+      "commentStatus":"検査概要オプション表示",
       "autoSelectComment":"条件による検査概要の自動選択を有効にする ",
       "selectByScore":"スコア条件による自動選択",
       "noUserDefinedName":"カスタム名なし",

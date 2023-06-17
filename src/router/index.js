@@ -531,7 +531,7 @@ export const navbarRoute = {
     };
 
     // 通用設定
-    !PermissionHelper.enableMimicMode && PermissionHelper.enableGeneralSetting() && systemSettingRoute.children.push(
+    !PermissionHelper.enableMimicMode && PermissionHelper.enableGeneralSetting()  && systemSettingRoute.children.push(
       {
         path: '/generalSetting',
         name: 'generalSetting',
@@ -544,7 +544,7 @@ export const navbarRoute = {
         }
       },
 
-    ) && primaryPathesList.push('/title', '/titleSetting');
+    ) && primaryPathesList.push('/generalSetting');
 
     
     !PermissionHelper.enableMimicMode && PermissionHelper.enablePatrolSetting() && inspectionRoute.children.push(
@@ -602,7 +602,6 @@ export const navbarRoute = {
 
     inspectionRoute.children.length > 0 && systemSettingRoute.children.push(inspectionRoute);
 
-
     // 職務管理
     !PermissionHelper.enableMimicMode && PermissionHelper.enableTitleSetting() && systemSettingRoute.children.push(
       {
@@ -623,6 +622,7 @@ export const navbarRoute = {
         hidden: true
       }
     ) && primaryPathesList.push('/title', '/titleSetting');
+
     !PermissionHelper.enableMimicMode && PermissionHelper.enableWorkflowSetting() && systemSettingRoute.children.push(
       {
         path: '/workflows',

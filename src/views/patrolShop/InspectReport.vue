@@ -389,7 +389,7 @@
                       <div>
                         {{ categoryItem.groupName }}
                         <span style="color: #7d8cad; margin-left: 5px;" v-if="setting_isShowGroupSum"> 
-                          ( {{$t('remotePatrol.totalScoreUnit')}} : {{ getSum(categoryItem.children) }})
+                          ( {{$t('remotePatrol.totalScoreUnit')}} : {{ getSum(categoryItem.children)}} ) 
                         </span>
                       </div>
                     </div>
@@ -557,11 +557,24 @@
             </div>
             <div v-if="pageItem.ifExpand" class="item-content">
               <div class="pdf_font_20">
-                <div class="content-title"><span class="pdf_font_20">{{ $t('remotePatrol.mapDistance1')+`${report.storeName}`+$t('remotePatrol.mapDistance2')+`${pageItem.distance}`}}</span></div>
+
+                <div class="content-title" v-if="pageItem.distance == -1 ">
+                  <span class="pdf_font_20">
+                    {{ $t('remotePatrol.mapDistance1')+`${report.storeName}`+ $t('remotePatrol.signInDistance')}} : 超出簽到範圍
+                  </span>
+                </div>
+
+                <div class="content-title" v-else>
+                  <span class="pdf_font_20">
+                    {{ $t('remotePatrol.mapDistance1')+`${report.storeName}`+$t('remotePatrol.mapDistance2')+` ${pageItem.distance}`}}
+                  </span>
+                </div>
+
+
                 <hr class="hr-horizontal" />
               </div>
               <div style="display:flex;flex-direction:row; justify-content:start;" :style="isexportPDF ? 'height:calc(984/1440*100vw)' : ''">
-                <img :src= "pageItem.data" style="width:calc(984/1440*100vw);height:auto; margin-top:10px;margin-bottom:10px"/>
+                <img :src= "pageItem.data" style="width:50%;height:auto; margin-top:10px;margin-bottom:10px"/>
               </div>
             </div>
           </div>
@@ -826,7 +839,8 @@ export default {
               if(ii.weight == -1 || ii.type== 2 ){
                 tableTotalScore = tableTotalScore + ii.actualScore
               } else {
-                tableTotalScore = tableTotalScore + ii.actualScore * ii.weight / 100
+                // tableTotalScore = tableTotalScore + ii.actualScore * ii.weight / 100
+                tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
               }
             }
         })
@@ -841,7 +855,6 @@ export default {
     // 計算比例制分母（tab1 & tab2 項目總分乘過權重）
     getTotalWithWeights(data){
       console.log('getTotalWithWeights data :>> ', data);
-
       // 剩下子類別（groupScore !== -99999）
       var items = data.filter(i => i.totalScore !== 0  && i.type !== 2 )
       console.log('items :>> ', items);
@@ -849,23 +862,22 @@ export default {
       var n = 0
       items.forEach(i => {
         if(i.groupScore !== -99999){
-          var aaa = ((i.groupScore * i.weight) / 100)
-          console.log('aaa :>> ',i.groupName , aaa);
+          var tempScore = ((i.groupScore * i.weight) / 100)
+          console.log('tempScore1 :>> ',i.groupName , tempScore);
         }else {
-          var aaa = (i.totalScore * i.weight) / 100
+          var tempScore = (i.totalScore * i.weight) / 100
+          console.log('tempScore2 :>> ',i.groupName , tempScore);
         }
-        
-        n = n + aaa
-        
+        n = n + tempScore
       })
       this.totalSumScore = Number(n.toFixed(3))
-      console.log('this.totalSumScore =======>> ', n)
+      console.log('this.totalSumScore =======>> ', this.totalSumScore)
       console.log(typeof(n))
 
     },
 
     getSum(Array){
-      // console.log('getSum Array :>> ', Array);
+      console.log('getSum Array :>> ', Array);
       var totalScore = 0
       Array.forEach(i => {
         var isInfinity = this.getDoubleNum(i.actualScore)
@@ -875,9 +887,10 @@ export default {
           if(i.weight == -1 || i.type==2 ){
             // tab3
             totalScore = totalScore + i.actualScore
+            console.log('i.groupName totalScore (沒有權重)>> ', i.groupName, totalScore);
           } else {
-            // totalScore = totalScore + i.actualScore * i.weight / 100
-            totalScore = i.actualScore * i.weight / 100
+            totalScore = totalScore + ((i.actualScore * i.weight) / this.totalSumScore) 
+            console.log('i.groupName totalScore (有權重)>> ', i.groupName, totalScore);
           }
         }
       })
