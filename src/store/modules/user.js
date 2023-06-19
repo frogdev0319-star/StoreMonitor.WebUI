@@ -280,7 +280,7 @@ const user = {
           // console.log(res);
           const data = res.data;
           if (res.data) {
-            
+
             commit('SET_TOKEN', data.token);
             setToken(data.token);
           }
@@ -309,6 +309,7 @@ const user = {
       return new Promise(resolve => {
         commit('SET_TOKEN', '');
         commit('SET_ROLES', []);
+        localStorage.clear();
         removeToken();
         resetRouter();
         resolve();
@@ -378,7 +379,7 @@ const user = {
           // ==== 暫時隱藏 巡檢排程相關(勿刪) ====
           // const scheduleRoute = navbarRoute.getInceptionSchedule();
           // (scheduleRoute.children.length > 0 && accessedRoutes.findIndex(item=>item.name==scheduleRoute.name)==-1) ? accessedRoutes.push(scheduleRoute):'';
-          
+
 
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();
           systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';
@@ -422,4 +423,3 @@ const user = {
 };
 
 export default user;
-

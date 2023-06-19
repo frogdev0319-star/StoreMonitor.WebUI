@@ -28,8 +28,8 @@
                     ? 'bold-breadcrumb-span'
                   : 'normal-breadcrumb-span'">
                 {{ $t(`route.${item.name}`) }} </span>
-                
-                
+
+
               <span
                 @click="backPage"
                 v-if="item.name=='remotePatrol'"
@@ -50,7 +50,7 @@
         <div>
           <div v-if="$route.path ==='/reportdetails'"
               style="background-color: transparent; color: #fff; border: none; position:absolute;top:15px;right:24px;">
-            <el-dropdown 
+            <el-dropdown
               style="display:flex; flex-direction: row-reverse; align-items: center;color: #fff;cursor: pointer;">
               <div class="button-area">
                 <img :src="exportPdf" class="icon-excel" />
@@ -79,7 +79,7 @@
             style="background-color: transparent; color: #fff; border: none; position:absolute;top:6px;right:24px"
             @click="handleDownload"
           >
-          
+
           <div class="button-area" >
             <img :src="exportPdf" class="icon-excel" />
             <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
@@ -500,10 +500,10 @@ export default {
         { curPath: ["/waitAuditReportdetails"], activePath: "/waitAuditDetail" },
         { curPath: ["/handlingReportdetails"], activePath: "/auditHandling" },
 
-        
+
         { curPath: ["/transcriptnotifyAuditDetail"], activePath: "/transcriptnotify" },
         { curPath: ["/transcriptnotifyReportdetails"], activePath: "/transcriptnotifyAuditDetail" },
-        
+
 
         { curPath: ["/auditHandling"], activePath: "/waitaudit" },
         { curPath: ["/reportdetails"], activePath: "/auditHandling" },
@@ -564,7 +564,7 @@ export default {
     },
     mimicMode(){
       this.showMimicMode = this.$store.getters.mimicMode;
-      
+
     },
     isMystery(){
       this.hasMystery = this.$store.getters.isMystery;
@@ -579,11 +579,11 @@ export default {
     });
     PubSub.subscribe("success-page", (event, data) => {
       if (data.changeStyle) {
-        self.wapper = true; 
-        
+        self.wapper = true;
+
       }
     });
-    
+
     window.addEventListener("resize", this.$_isMobile);
     self.$_isMobile();
     this.getBrandList();
@@ -688,7 +688,7 @@ export default {
     getBread() {
       this.breadList = [];
       const currentRoute = this.$route.fullPath;
-      
+
       let matched = [];
       matched = this.$route.matched.filter((x) => x.name);
       matched.length === 2 &&
@@ -743,7 +743,7 @@ export default {
     setSecondBread(matched, str, path) {
       matched[1].name = str;
       matched[1].path = path;
-    
+
     },
 
     setInspectionSettingBread(matched, currentRoute) {
@@ -882,7 +882,7 @@ export default {
           paths: ["/handlingReportdetails"],
           parentBread: { path: "/auditHandling", name: "reportdetailsAuditHandling" },
         },
-        
+
 
 
         {
@@ -894,7 +894,7 @@ export default {
           paths: ["/transcriptnotifyReportdetails"],
           parentBread: { path: "/transcriptnotifyAuditDetail", name: "reportdetailsAuditTranscriptnotify" },
         },
-        
+
         {
           paths: ["/auditHandling"],
           parentBread: { path: "/waitaudit", name: "WaitAuditManage" },
@@ -971,6 +971,7 @@ export default {
     },
 
     fedlogout() {
+      localStorage.clear();
       Database.destoryDB();
       const url = sessionStorage.getItem("LoginURL");
       let nowHref = window.location.href;
@@ -985,6 +986,7 @@ export default {
     },
     logOut() {
       const self = this;
+      localStorage.clear();
       self.$store.dispatch("logout").then(() => {});
     },
     async getBrandList() {
@@ -1036,7 +1038,7 @@ export default {
           util.notify(self.$t('route.accountTerminated'), 'warning', 3000);
         }
       });
-      
+
     },
 
     async changeRoutes(mimicModeChanged=false) {
@@ -1169,10 +1171,10 @@ export default {
     }
   }
   span {
-    
+
     color:#a5a5a5;
     margin-left: 15px;
-    @media screen and (max-width:1367px) { 
+    @media screen and (max-width:1367px) {
       font-size: 10px;
     }
     @media screen and(min-width: 1367px){
@@ -1976,14 +1978,14 @@ $collapseWidth: 5.5%;
   i {display: none;}
   width: calc(150/1920*100vw) !important;
   .el-input__inner {
-    @media screen and (max-width:1367px) { 
+    @media screen and (max-width:1367px) {
       width: calc(160/1920*100vw);
     }
     @media screen and(min-width: 1367px){
       width: calc(150/1920*100vw);
     }
     height: calc(36/1920*100vw);
-    
+
     color: #484848;
     font-size: calc(15/1920*100vw);
     border-color: #e6e6e6;
