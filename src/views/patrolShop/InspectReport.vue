@@ -826,10 +826,10 @@ export default {
   },
 
   methods: {
+    
     // 加總
     getTotalSum(Array){
       var tableTotalScore = 0
-
       Array.forEach(i => {
         i.children.forEach( ii => {
           var isInfinity = this.getDoubleNum(ii.actualScore)
@@ -837,10 +837,15 @@ export default {
             tableTotalScore = tableTotalScore + 0
             } else {
               if(ii.weight == -1 || ii.type== 2 ){
-                tableTotalScore = tableTotalScore + ii.actualScore
+                
+                tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) /10
+                // tableTotalScore.toFixed(1)
+                console.log('gogo 沒有權重啊！！ :>> ', ii.groupName, tableTotalScore);
+                
               } else {
                 // tableTotalScore = tableTotalScore + ii.actualScore * ii.weight / 100
                 tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
+                console.log('gogo 有權重啊 :>> ' , ii.groupName, tableTotalScore);
               }
             }
         })
@@ -849,31 +854,44 @@ export default {
         tableTotalScore = tableTotalScore.toFixed(1)
       }
       return tableTotalScore
-
     },
 
-    // 計算比例制分母（tab1 & tab2 項目總分乘過權重）
-    getTotalWithWeights(data){
-      console.log('getTotalWithWeights data :>> ', data);
+
+    // 計算分母（tab1 & tab2 項目總分乘過權重）
+    getTotalScore(data){
+      console.log('getTotalScore data :>> ', data);
       // 剩下子類別（groupScore !== -99999）
       var items = data.filter(i => i.totalScore !== 0  && i.type !== 2 )
       console.log('items :>> ', items);
 
       var n = 0
       items.forEach(i => {
-        if(i.groupScore !== -99999){
-          var tempScore = ((i.groupScore * i.weight) / 100)
-          console.log('tempScore1 :>> ',i.groupName , tempScore);
-        }else {
-          var tempScore = (i.totalScore * i.weight) / 100
-          console.log('tempScore2 :>> ',i.groupName , tempScore);
+
+        if(i.weight !== -1){
+          // 權重
+          if(i.groupScore !== -99999){
+            var tempScore = ((i.groupScore * i.weight) / 100)
+            console.log('tempScore1 :>> ',i.groupName , tempScore);
+          }else {
+            var tempScore = (i.totalScore * i.weight) / 100
+            console.log('tempScore2 :>> ',i.groupName , tempScore);
+          }
+        } else {
+          // 無權重
+          if(i.groupScore !== -99999){
+            var tempScore = (i.groupScore / 100)
+            console.log('tempScore3 :>> ',i.groupName , tempScore);
+          }else {
+            var tempScore = i.totalScore / 100
+            console.log('tempScore4 :>> ',i.groupName , tempScore);
+          }
         }
         n = n + tempScore
       })
+
       this.totalSumScore = Number(n.toFixed(3))
       console.log('this.totalSumScore =======>> ', this.totalSumScore)
       console.log(typeof(n))
-
     },
 
     getSum(Array){
@@ -886,7 +904,8 @@ export default {
         } else {
           if(i.weight == -1 || i.type==2 ){
             // tab3
-            totalScore = totalScore + i.actualScore
+            totalScore = totalScore + i.actualScore / this.totalSumScore
+            totalScore.toFixed(2)
             console.log('i.groupName totalScore (沒有權重)>> ', i.groupName, totalScore);
           } else {
             totalScore = totalScore + ((i.actualScore * i.weight) / this.totalSumScore) 
@@ -905,6 +924,7 @@ export default {
       num = util.isDouble(num,2);
       return Math.round(num * 100) / 100
     },
+
     getReportTemplateAndInfo() {
       const templatePromise = ReportSetting.getInspectReportTemplateList({ enable: true });
       console.log("this.report.reportId:",this.report.reportId);
@@ -918,8 +938,7 @@ export default {
 
 
         this.getReportInfo(results[1]);
-        this.getTotalWithWeights(results[1].data[0].info.summary)
-
+        this.getTotalScore(results[1].data[0].info.summary)
 
         this.setting_isShowGroupSum = (results[1].data[0].inspectSettings.find( i => i.name == "setting_isShowGroupSum")).value
         this.setting_isShowDistrictSum = (results[1].data[0].inspectSettings.find( i => i.name == "setting_isShowDistrictSum")).value
@@ -928,7 +947,6 @@ export default {
         console.log('this.setting_isShowDistrictSum :>> ', this.setting_isShowDistrictSum);
 
         this.showMaxInfo = results[1].data[0].info.summary.some(i => i.isAdvanced == true)
-
 
       }).catch(err => {
         console.log('ReportDetail-getReportTemplateAndInfo:' + err);
