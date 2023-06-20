@@ -27,7 +27,7 @@
         </div>
       </div>
       <div v-if="showDateSelector">
-        
+
         <date-time-selector class="time-selector" @change="dateChange"/>
       </div>
       <div>
@@ -69,7 +69,7 @@ export default {
     DelayButton,
     MultiSelect,
     RegionMultiSelect,
-    
+
   },
 
   props: {
@@ -124,7 +124,7 @@ export default {
       storeFilterObj: {},
       searchParams: {},
       ifSaveParams: false,
-      
+
     };
   },
 
@@ -225,13 +225,13 @@ export default {
     },
 
     async searchData() {
-      
+
       this.params.storeIds = this.storeFilterObj.filterStoreIds;
       console.log("Search Data",this.storeFilterObj)
      // if( this.params.storeIds && this.params.storeIds[0] &&this.params.storeIds[0]=='-1')this.params.storeIds=  this.params.storeIds.shift()
       this.params.timeMode = this.timeMode;
       this.params.curCountry= this.storeFilterObj.curCountry;
-      this.params.curStore= this.storeFilterObj.curStore; 
+      this.params.curStore= this.storeFilterObj.curStore;
       this.params.curStoreGroup= this.storeFilterObj.curStoreGroup;
       this.params.curStoreType= this.storeFilterObj.curStoreType;
       this.params.inspectId = this.inspectList;
@@ -340,6 +340,7 @@ export default {
         this.order = searchParams.order;
         this.filter = searchParams.filter;
         this.inspectCatch = searchParams.inspectId;
+        this.inspectList = searchParams.inspectId?searchParams.inspectId:""
         this.ifGetParamsFromCash = true;
         this.searchParams = searchParams;
       } else {
