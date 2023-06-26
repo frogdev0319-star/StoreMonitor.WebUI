@@ -836,13 +836,15 @@ export default {
           if( isInfinity === Infinity) {
             tableTotalScore = tableTotalScore + 0
             } else {
-              if(ii.weight == -1 || ii.type== 2 ){
-                
+              if(ii.weight == -1 ){
                 tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) /10
                 // tableTotalScore.toFixed(1)
                 console.log('gogo 沒有權重啊！！ :>> ', ii.groupName, tableTotalScore);
-                
-              } else {
+              }
+              else if(ii.type== 2){
+                tableTotalScore = ii.actualScore
+              } 
+              else {
                 // tableTotalScore = tableTotalScore + ii.actualScore * ii.weight / 100
                 tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
                 console.log('gogo 有權重啊 :>> ' , ii.groupName, tableTotalScore);
@@ -902,12 +904,15 @@ export default {
         if( isInfinity === Infinity) {
           totalScore = totalScore + 0
         } else {
-          if(i.weight == -1 || i.type==2 ){
-            // tab3
+          if(i.weight == -1 ){
             totalScore = totalScore + i.actualScore / this.totalSumScore
             totalScore.toFixed(2)
             console.log('i.groupName totalScore (沒有權重)>> ', i.groupName, totalScore);
-          } else {
+          } 
+          else if( i.type==2 ){
+            totalScore = i.actualScore
+          }
+          else {
             totalScore = totalScore + ((i.actualScore * i.weight) / this.totalSumScore) 
             console.log('i.groupName totalScore (有權重)>> ', i.groupName, totalScore);
           }
