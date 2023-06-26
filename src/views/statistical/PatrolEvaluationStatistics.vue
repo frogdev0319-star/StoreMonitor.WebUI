@@ -2340,20 +2340,26 @@ export default {
         },
         async dataGetOverview() {
 
-            const self = this;
             const params = {};
-            console.log("dataGetOverview")
-            console.log(self.params)
-            params.beginTs = self.params.beginTs;
-            params.endTs = self.params.endTs;
+
+
+            params.beginTs = this.params.beginTs;
+            params.endTs = this.params.endTs;
             params.regionMode = 3;
-            params.storeIds = self.params.storeIds;
-            params.inspectTagId = self.params.inspectId;
+            params.storeIds = this.params.storeIds;
+            params.inspectTagId = this.params.inspectId;
             params.filter = {
                 page: 0,
                 size: params.storeIds.length
             };
-            const storeResult = await self.getInspectStatsOverviewWithRegion(params);
+            if(params.curCountry =='-1'){
+              params.curCity =null;
+              params.curProvince = null;
+            }
+            console.log("dataGetOverview")
+            console.log(this.params)
+            console.log(params)
+            const storeResult = await this.getInspectStatsOverviewWithRegion(params);
             if (storeResult.errCode === 0) {
                 const result = storeResult.data;
                 if (result) {
@@ -2405,7 +2411,10 @@ export default {
             params.order = self.regionOrder;
             params.regionMode = self.regionMode;
             params.storeIds = self.params.storeIds;
-
+            if(params.curCountry=='-1'){
+              params.curProvince = null;
+              params.curCity = null;
+            }
             params.inspectTagId = self.params.inspectId;
             const storeResult = await self.getInspectStatsOverviewWithRegion(params);
             if (storeResult.errCode === 0) {
@@ -3524,7 +3533,8 @@ export default {
         },
 
         initData() {
-            this.params = SearchConditionUtil.getSearchCondition(this.path);
+            console.log("PATG="+this.path)
+            this.params = SearchConditionUtil.getSearchCondition("inspectEvalutionStatistics");
             console.log("Init Data")
             console.log(this.params)
             this.params.filter = {
@@ -3548,12 +3558,24 @@ export default {
             timeMode
         }) {
             console.log("Emit Search");
-            console.log(searchParams)
+
             this.part2.standardScore = -9999;
             this.part3.standardScore = -9999;
             this.doGetAssessmentStandardScore();
-            this.params = searchParams;
-            console.log(this.params)
+            let params  = JSON.parse(JSON.stringify(searchParams));
+            if(params.curCountry=='-1'){
+
+              params.curCity = null;
+              params.test = []
+              params.test2 = ""
+              console.log(params.curCity)
+              console.log(JSON.stringify(params))
+            }
+
+            this.params = params
+            console.log("Emit Search" +this.params.curCountry );
+
+
             this.daysRangeList = dateRangeList;
             this.curRegionI = regionI;
             this.curRegionII = regionII;
@@ -3561,6 +3583,7 @@ export default {
             this.timeMode = timeMode;
             this.storePatrolLists = storePatrolLists;
             this.curCountry = this.params.curCountry;
+
             const searchParamsObj = {
                 path: 'inspectEvalutionStatistics',
                 params: this.params
