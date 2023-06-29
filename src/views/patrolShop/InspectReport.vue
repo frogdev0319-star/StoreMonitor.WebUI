@@ -410,13 +410,14 @@
                     <div style="display:flex;flex-direction:row;justify-content:space-between;">
                       <!-- 分數 -->
                       <div style="flex:2;">{{ getDoubleNum(subcategory.actualScore) == Infinity ? '--' : getDoubleNum((subcategory.weight == -1 || subcategory.type==2 ) ? subcategory.actualScore : subcategory.actualScore * subcategory.weight / 100) }} </div>
+
                       <div v-if="subcategory.children" style="display:flex;flex:1;flex-direction:row;align-content:center;">
                         <img v-if="categoryItem.isAdvanced" style="margin-right:4px;" :src="require('../../../static/img/group_score.svg')" width="15" height="15" />
-                        <div style="color:#9EACB6;font-size:10px;font-weight:normal;">{{ categoryItem.isAdvanced? categoryItem.groupScore:''}}</div>
+                        <div style="color:#9EACB6;font-size:10px;font-weight:normal;">{{ categoryItem.isAdvanced ? categoryItem.groupScore :''}}</div>
                       </div>
                       <div v-else-if="!subcategory.children" style="display:flex;flex:1;flex-direction:row;align-content:center;">
                         <img v-if="subcategory.isAdvanced" style="margin-right:4px;" :src="require('../../../static/img/group_score.svg')" width="15" height="15" />
-                        <div style="color:#9EACB6;font-size:10px;font-weight:normal;">{{ subcategory.isAdvanced? subcategory.groupScore:''}}</div>
+                        <div style="color:#9EACB6;font-size:10px;font-weight:normal;">{{ subcategory.isAdvanced ? subcategory.groupScore :''}}</div>
                       </div>
                     </div>
                   </td>
@@ -828,6 +829,7 @@ export default {
   methods: {
     
     // 加總
+    // 計算分母（tab1 & tab2 項目總分乘過權重）
     getTotalSum(Array){
       var tableTotalScore = 0
       Array.forEach(i => {
@@ -859,7 +861,7 @@ export default {
     },
 
 
-    // 計算分母（tab1 & tab2 項目總分乘過權重）
+    
     getTotalScore(data){
       console.log('getTotalScore data :>> ', data);
       // 剩下子類別（groupScore !== -99999）
