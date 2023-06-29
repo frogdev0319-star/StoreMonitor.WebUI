@@ -827,43 +827,11 @@ export default {
 
   methods: {
     
-    // 加總
-    getTotalSum(Array){
-      var tableTotalScore = 0
-      Array.forEach(i => {
-        i.children.forEach( ii => {
-          var isInfinity = this.getDoubleNum(ii.actualScore)
-          if( isInfinity === Infinity) {
-            tableTotalScore = tableTotalScore + 0
-            } else {
-              if(ii.weight == -1 ){
-                tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) /10
-                // tableTotalScore.toFixed(1)
-                console.log('gogo 沒有權重啊！！ :>> ', ii.groupName, tableTotalScore);
-              }
-              else if(ii.type== 2){
-                tableTotalScore = ii.actualScore
-              } 
-              else {
-                // tableTotalScore = tableTotalScore + ii.actualScore * ii.weight / 100
-                tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
-                console.log('gogo 有權重啊 :>> ' , ii.groupName, tableTotalScore);
-              }
-            }
-        })
-      })
-      if(!isNaN(parseFloat(tableTotalScore))){
-        tableTotalScore = tableTotalScore.toFixed(1)
-      }
-      return tableTotalScore
-    },
-
-
     // 計算分母（tab1 & tab2 項目總分乘過權重）
     getTotalScore(data){
       console.log('getTotalScore data :>> ', data);
       // 剩下子類別（groupScore !== -99999）
-      var items = data.filter(i => i.totalScore !== 0  && i.type !== 2 )
+      var items = data.filter(i =>  i.type !== 2 )
       console.log('items :>> ', items);
 
       var n = 0
@@ -896,6 +864,48 @@ export default {
       console.log(typeof(n))
     },
 
+    // 加總
+    getTotalSum(Array){
+      var tableTotalScore = 0
+      Array.forEach(i => {
+        i.children.forEach( ii => {
+          var isInfinity = this.getDoubleNum(ii.actualScore)
+          if( isInfinity === Infinity) {
+            tableTotalScore = tableTotalScore + 0
+            } else {
+              if(ii.weight == -1 && i.type == 0){
+                tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) /10
+                // tableTotalScore.toFixed(1)
+                console.log('gogo 沒有權重啊！！ :>> ', ii.groupName, tableTotalScore);
+              }
+              else if(ii.weight !== -1 && i.type == 0){
+                // tableTotalScore = tableTotalScore + ii.actualScore * ii.weight / 100
+                tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
+                console.log('gogo 有權重啊 :>> ' , ii.groupName, tableTotalScore);
+              }
+              else if(ii.weight == -1 && i.type == 1){
+                tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) /10
+                // tableTotalScore.toFixed(1)
+                console.log('gogo 沒有權重啊！！ :>> ', ii.groupName, tableTotalScore);
+              }
+              else if(ii.weight !== -1 && i.type == 1){
+                // tableTotalScore = tableTotalScore + ii.actualScore * ii.weight / 100
+                tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
+                console.log('gogo 有權重啊 :>> ' , ii.groupName, tableTotalScore);
+              }
+              else if(ii.type== 2){
+                tableTotalScore = ii.actualScore
+              } 
+            }
+        })
+      })
+      if(!isNaN(parseFloat(tableTotalScore))){
+        tableTotalScore = tableTotalScore.toFixed(1)
+      }
+      return tableTotalScore
+    },
+
+    
     getSum(Array){
       console.log('getSum Array :>> ', Array);
       var totalScore = 0
@@ -904,17 +914,29 @@ export default {
         if( isInfinity === Infinity) {
           totalScore = totalScore + 0
         } else {
-          if(i.weight == -1 ){
+          if(i.weight == -1 && i.type == 0){
             totalScore = totalScore + i.actualScore / this.totalSumScore
             totalScore.toFixed(2)
-            console.log('i.groupName totalScore (沒有權重)>> ', i.groupName, totalScore);
+            console.log('i.groupName totalScore tab1 (沒有權重)>> ', i.groupName, totalScore);
           } 
-          else if( i.type==2 ){
-            totalScore = i.actualScore
-          }
-          else {
+          else if(i.weight !== -1 && i.type == 0){
             totalScore = totalScore + ((i.actualScore * i.weight) / this.totalSumScore) 
-            console.log('i.groupName totalScore (有權重)>> ', i.groupName, totalScore);
+            console.log('i.groupName totalScore tab1(有權重)>> ', i.groupName, totalScore);
+          }
+
+          else if(i.weight == -1 && i.type == 1){
+            totalScore = totalScore + i.actualScore / this.totalSumScore
+            totalScore.toFixed(2)
+            console.log('i.groupName totalScore tab2(沒有權重)>> ', i.groupName, totalScore);
+          } 
+          else if(i.weight !== -1 && i.type == 1){
+            totalScore = totalScore + ((i.actualScore * i.weight) / this.totalSumScore) 
+            console.log('i.groupName totalScore tab2(有權重)>> ', i.groupName, totalScore);
+          }
+
+          else if( i.type == 2 ){
+            totalScore = i.actualScore
+            console.log('i.groupName totalScore tab3(附加類別項)>> ', i.groupName, totalScore);
           }
         }
       })
