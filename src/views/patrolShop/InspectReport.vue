@@ -775,7 +775,8 @@ export default {
       warnWorkflowUnbind:this.$t('audit.inceptionRpt.warnWorkflowUnbind'),
       warnWorkflowUnbindTitle:this.$t('audit.inceptionRpt.errorEditReport'),
 
-      totalSumScore: 0
+      totalSumScore: 0,
+
     };
   },
 
@@ -829,7 +830,7 @@ export default {
   methods: {
     
     // 加總
-    // 計算分母（tab1 & tab2 項目總分乘過權重）
+    
     getTotalSum(Array){
       var tableTotalScore = 0
       Array.forEach(i => {
@@ -861,42 +862,75 @@ export default {
     },
 
 
-    
-    getTotalScore(data){
+    // 計算分母
+    getTotalScore(data, hundredMarkType){
       console.log('getTotalScore data :>> ', data);
+      console.log('hundredMarkType', hundredMarkType)
       // 剩下子類別（groupScore !== -99999）
       var items = data.filter(i =>  i.type !== 2 )
       console.log('items :>> ', items);
+      if(hundredMarkType == 0){
+        var n = 0
+        items.forEach(i => {
+          if(i.weight !== -1){
+            // 權重
+            if(i.groupScore !== -99999){
+              // tab1 為Number.MAX_VALUE ,不計分
+              if(i.actualScore === Number.MAX_VALUE)  var tempScore = 0
+              else  var tempScore = ((i.groupScore * i.weight) / 100)
+              // 所有項目為忽略項，不列入分母
+              if(i.numOfIgnored === i.numOfTotalItems) var tempScore = 0
+              console.log('tempScore1 :>> ',i.groupName , tempScore);
+            }else {
+              // tab1 為Number.MAX_VALUE ,不計分
+              if(i.actualScore === Number.MAX_VALUE)  var tempScore = 0
+              else  var tempScore = (i.totalScore * i.weight) / 100
+              // 所有項目為忽略項，不列入分母
+              if(i.numOfIgnored === i.numOfTotalItems) var tempScore = 0
 
-      var n = 0
-      items.forEach(i => {
+              console.log('tempScore2 :>> ',i.groupName , tempScore);
+            }
+          } else {
+            // 無權重
+            if(i.groupScore !== -99999 ){
+              // tab1 為Number.MAX_VALUE ,不計分
+              if(i.actualScore === Number.MAX_VALUE)  var tempScore = 0
+              else  var tempScore = (i.groupScore / 100)
+              // 所有項目為忽略項，不列入分母
+              if(i.numOfIgnored === i.numOfTotalItems) var tempScore = 0
+              console.log('tempScore3 :>> ',i.groupName , tempScore);
+            }
+            else if(i.groupScore == -99999){
+              // tab1 為Number.MAX_VALUE ,不計分
+              if(i.actualScore === Number.MAX_VALUE)  var tempScore = 0
+              else  var tempScore = i.totalScore / 100
+              // 所有項目為忽略項，不列入分母
+              if(i.numOfIgnored === i.numOfTotalItems) var tempScore = 0
 
-        if(i.weight !== -1){
-          // 權重
-          if(i.groupScore !== -99999){
-            var tempScore = ((i.groupScore * i.weight) / 100)
-            console.log('tempScore1 :>> ',i.groupName , tempScore);
-          }else {
-            var tempScore = (i.totalScore * i.weight) / 100
-            console.log('tempScore2 :>> ',i.groupName , tempScore);
+              console.log('tempScore4 :>> ',i.groupName , tempScore);
+            }
           }
-        } else {
-          // 無權重
-          if(i.groupScore !== -99999){
-            var tempScore = (i.groupScore / 100)
-            console.log('tempScore3 :>> ',i.groupName , tempScore);
-          }else {
-            var tempScore = i.totalScore / 100
-            console.log('tempScore4 :>> ',i.groupName , tempScore);
-          }
-        }
-        n = n + tempScore
-      })
+          n = n + tempScore
+        })
 
-      this.totalSumScore = Number(n.toFixed(3))
+        this.totalSumScore = Number(n.toFixed(3))
+
+      }
+      else if(hundredMarkType == -1){
+        console.log('加分制')
+        this.totalSumScore = 1
+      }
+      else if(hundredMarkType == 1){
+        console.log('扣分制')
+        this.totalSumScore = 100
+      }
+    
+
       console.log('this.totalSumScore =======>> ', this.totalSumScore)
       console.log(typeof(n))
     },
+
+
 
     // 加總
     getTotalSum(Array){
@@ -981,6 +1015,9 @@ export default {
     },
 
 
+
+    
+    // 四捨五入
     getDoubleNum (num) {
       num = util.isDouble(num,2);
       return Math.round(num * 100) / 100
@@ -996,11 +1033,15 @@ export default {
         this.getInspectTemplateList(results[0]);
 
         console.log('results[1] :>> ', results[1]);
-
-
         this.getReportInfo(results[1]);
-        this.getTotalScore(results[1].data[0].info.summary)
 
+        var hundredMarkType = results[1].data[0].inspectSettings.find( i => i.name == 'hundredMarkType')
+        // -1 - original mark system， 
+        // 0 - hundred mark system, 
+        // 1 - penalty point system
+        this.getTotalScore(results[1].data[0].info.summary , hundredMarkType.value)
+
+  
         this.setting_isShowGroupSum = (results[1].data[0].inspectSettings.find( i => i.name == "setting_isShowGroupSum")).value
         this.setting_isShowDistrictSum = (results[1].data[0].inspectSettings.find( i => i.name == "setting_isShowDistrictSum")).value
 

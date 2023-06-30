@@ -991,9 +991,8 @@ export default {
     },
     async getBrandList() {
       await this.changeRoutes();
-      // console.log("Get Brand List");
       this.brandList = JSON.parse(sessionStorage.getItem("brandList"));
-      // console.log(this.brandList);
+      console.log("Get Brand List", this.brandList);
       const idIndex = this.brandList
         .map((item) => item.accountId)
         .indexOf(this.accountId);

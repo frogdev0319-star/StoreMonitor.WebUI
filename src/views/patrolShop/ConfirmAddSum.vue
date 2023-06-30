@@ -30,7 +30,7 @@
               @click="clickSum(item,index)">{{ item.name }}</span>
           </span>
         </div>
-        <span class="sug-label">{{ $t('remotePatrol.inspectionAdvice') }}</span>
+        <span class="sug-label">{{ $t('remotePatrol.inspectionAdvice') }} </span>
         <el-input
           :autosize="{ minRows: 2, maxRows: 7}"
           v-model="suggest"
@@ -152,6 +152,7 @@
               <tr>
                 <th v-for="(t_item ,t_index) in s_item.data[0].tHeader" :key="t_index" :style="t_item.width" scope="col">
                   {{ t_item.name }}
+                  <!-- 類別總分 -->
                   <span style="color: #7d8cad; margin-left: 5px;" v-if="t_index == 0 && setting_isShowDistrictSum">( {{$t('remotePatrol.totalScoreUnit')}} : {{ getTotalSum(s_item.data)}} )</span>
                 </th>
               </tr>
@@ -165,7 +166,11 @@
                         <div v-if="inspectItem.weight != -1 && inspectItem.type != 2">{{ inspectItem.weight + '%' }} </div>
                         <div class="sheet_title">
                           {{ inspectItem.label }}
-                          <span style="color: #7d8cad; margin-left: 5px;" v-if="setting_isShowGroupSum">( {{$t('remotePatrol.totalScoreUnit')}} : {{getSum(inspectItem.inspectList)}} )</span>
+
+                          <!-- 項目總分 -->
+                          <span style="color: #7d8cad; margin-left: 5px;" v-if="setting_isShowGroupSum">
+                            ( {{$t('remotePatrol.totalScoreUnit')}} : {{getSum(inspectItem.inspectList)}} )
+                          </span>
                         </div>
                       </div>
                       <div class="flex" style="align-items: center">
@@ -182,7 +187,7 @@
                   </td>
                   <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfQualified }} </span></td>
                   <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfUnqualified }} </span></td>
-                  <td v-if="inspectItem.type === 1"><span>{{ getDoubleNum(item.itemScore) }} </span></td>
+                  <td v-if="inspectItem.type === 1"><span>{{ getDoubleNum(item.itemScore) }}  </span></td>
                   <td>
                     <div style="display:flex;flex-direction:row;justify-content:space-between;">
                       <div style="flex:2;">{{ item.itemgetScore == '--' ? '--' : getDoubleNum(item.itemgetScore) }}</div>
@@ -599,6 +604,9 @@ export default {
       scoreMiddleLow: 0,
       scoreMiddleHeight: 0,
       showMaxInfo: false,
+
+      ScoreTotalScoreX: 0,
+      hundredMarkType: 0
     };
   },
   computed: {
@@ -667,7 +675,15 @@ export default {
       Array.forEach(i => {
         i.inspectList.forEach( ii => {
           if(ii.itemgetScore!='--' && ii.itemgetScore!='-'){
-            tableTotalScore = tableTotalScore + ii.itemgetScore
+            if(i.type !== 2){
+              if(this.hundredMarkType == 0){
+                tableTotalScore = tableTotalScore + (ii.itemgetScore / this.ScoreTotalScoreX) *100
+              } else {
+                tableTotalScore = tableTotalScore + ii.itemgetScore
+              }
+            } else {
+              tableTotalScore = tableTotalScore + ii.itemgetScore
+            }
           }
 
         })
@@ -678,23 +694,39 @@ export default {
       }
 
       return tableTotalScore
-
     },
+
+
     getSum(Array){
+      console.log('getSum Array', Array)
       var totalScore = 0
       Array.forEach(i => {
         if(i.itemgetScore!='--' && i.itemgetScore!='-'){
-          totalScore = totalScore + i.itemgetScore
+
+          if(i.type !== 2){
+            if(this.hundredMarkType == 0){
+              // 比例制
+              totalScore = totalScore + (i.itemgetScore / this.ScoreTotalScoreX) * 100
+            } else {
+              totalScore = totalScore + i.itemgetScore
+            }
+          } else {
+            totalScore = totalScore + i.itemgetScore
+          }
+          
+          
+          
         }
 
       })
-
       if(!isNaN(parseFloat(totalScore))){
         totalScore = totalScore.toFixed(1)
       }
 
       return totalScore
     },
+    
+  
 
     // 四捨五入
     getDoubleNum (num) {
@@ -1726,7 +1758,9 @@ export default {
           }
         });
         let s_count = 0;
-        console.log("***********Get Count**************",inspect.length,inspect[0].type,inspectSettings.hundredMarkType)
+        console.log("***********Get Count**************",inspect.length, inspect[0].type, inspectSettings.hundredMarkType)
+        this.hundredMarkType = inspectSettings.hundredMarkType
+
         if (inspect.length === 1 && inspect[0].type === 0) {
           // console.log(1)
           if (inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1') {//加分 or 扣分制
@@ -1802,8 +1836,11 @@ export default {
               } else {
                 total_a = ScoreTotalScoreX === 0 || ScoreTotalScoreSystem === 0 ? 0 : (util.accDiv(ScoreTotalScoreSystem , ScoreTotalScoreX) * 100);
               }
-              console.log("比例制",ScoreTotalScoreSystem , ScoreTotalScoreX)
+              
               s_count = total_a + otherGetscoreTotal;
+
+              console.log("比例制",ScoreTotalScoreSystem , ScoreTotalScoreX)
+              this.ScoreTotalScoreX = ScoreTotalScoreX
             }
           }
         }
@@ -1816,6 +1853,7 @@ export default {
         if (inspectSettings.hundredMarkType === '1') {
           s_count = s_count + inspectSettings.baseScore;
         }
+
         self.scorecount = parseFloat(s_count.toFixed(1));
         if(typeof inspectSettings.maxScore !='undefined' && s_count > inspectSettings.maxScore)
           self.scorecount = inspectSettings.maxScore;
