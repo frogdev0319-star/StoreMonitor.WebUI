@@ -258,6 +258,8 @@ export default {
 
   async created() {
     this.init()
+
+    
   },
 
   methods: {
@@ -272,6 +274,8 @@ export default {
             this.defaultDefineName[i].newName = this.inspectStatus["status_"+ i]
         }
       }
+
+      
     },
 
 

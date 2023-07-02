@@ -65,7 +65,11 @@
 
           <!-- {{ roleNameList }} -->
           <!-- ==== 暫時隱藏 巡檢排程相關 ==== -->
-          <div v-for="(item,index) in roleNameList" :key="index" class="role-group" v-show="item.roleName !== $t('schedule.inceptionSchedule')">
+          <div 
+            v-for="(item,index) in roleNameList" 
+            :key="index" class="role-group" 
+            v-show="item.show"
+          >
             <div class="role-all-checkbox" style="text-align: left">
               <el-checkbox  class="storevue-checkbox-filled" v-model="item.checked" :disabled="item.disabled" @change="(val)=>checkAllChildrenRole(index, val)"/>
               <span class="group-name">{{ item.roleName }}</span>
@@ -145,6 +149,7 @@ export default {
           roleName: this.$t('route.overview'),
           checked: false,
           disabled: false,
+          show: true,
           children: [
             {
               roleName: this.$t('route.patrolOverview'),
@@ -164,6 +169,7 @@ export default {
           roleName: this.$t('route.patrolShop'),
           checked: false,
           disabled: false,
+          show: true,
           children: [
             {
               roleName: this.$t('route.remotePatrol'),
@@ -207,6 +213,7 @@ export default {
           roleName: this.$t('route.eventManage'),
           checked: false,
           disabled: false,
+          show: true,
           children: [
             {
               roleName: this.$t('eventView.handling'),
@@ -238,6 +245,7 @@ export default {
           roleName: this.$t('route.statisticalAna'),
           checked: false,
           disabled: false,
+          show: true,
           children: [
             {
               roleName: this.$t('route.patrolAppraisalStat'),
@@ -286,6 +294,7 @@ export default {
           roleName: this.$t('route.AuditManage'),
           checked: false,
           disabled: false,
+          show: true,
           children: [
             {
               roleName: this.$t('route.SendAuditManage'),
@@ -312,6 +321,7 @@ export default {
           roleName: this.$t('schedule.inceptionSchedule'),
           checked: false,
           disabled: false,
+          show: false,
           children: [
             {
               roleName: this.$t('schedule.scheduleSetting'),
@@ -339,6 +349,7 @@ export default {
           roleName: this.$t('route.systemSetting'),
           checked: false,
           disabled: false,
+          show: true,
           children: [
             {
               roleName: this.$t('route.deviceManage'),
@@ -399,6 +410,8 @@ export default {
       tempSelectLabelWidth:[{key:'en',value:'75px'},{key:'zh',value:'75px'},{key:'zhtw',value:'75px'},
         {key:'ja-JP',value:'105px'},{key:'ko-KR',value:'85px'},{key:'vi-VN',value:'85px'},
         {key:'id-ID',value:'95px'},{key:'th-TH',value:'75px'}],
+
+        isShowing:  false
     };
   },
 
@@ -421,6 +434,10 @@ export default {
   mounted() {
     this.getTitleInfo();
     this.getAuthorityInfoList();
+
+    this.getWhiteLsit()
+
+
   },
 
   destroyed() {
@@ -431,6 +448,27 @@ export default {
     
   },
   methods: {
+    getWhiteLsit(){
+      const whiteList = this.$store.getters.whiteList
+      const accountId = this.$store.getters.accountId
+
+      console.log('whiteList!!!!!!!!!!!!!!!!!!!!', whiteList)
+      console.log('accountId !!!!!!!!!!!!!!!!!!!!', accountId)
+
+      this.isShowing = whiteList.some( i => i == accountId)
+      console.log('this.isShowing', this.isShowing)
+
+      if(this.isShowing){
+        this.roleNameList[5].show = true
+      } else {
+        this.roleNameList[5].show = false
+      }
+
+
+
+
+    },
+
     getLangStyleValue(langArray){
       return util.getLangStyleValue(langArray);
     },

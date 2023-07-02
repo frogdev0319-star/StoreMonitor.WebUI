@@ -29,5 +29,7 @@ const getters = {
   mimicMode:state => state.user.mimicMode,
   isMystery:state => state.user.isMystery,
   editReport:state => state.user.editReport,
+  whiteList: state => state.user.whiteList,
+  accountId: state => state.user.accountId
 };
 export default getters;

@@ -601,6 +601,9 @@ export default {
     this.$store.dispatch("GetIsMysteryMode");
     this.showMimicMode = this.$store.getters.ShowMimicMode;
     this.hasMystery = this.$store.getters.isMystery;
+
+    this.$store.dispatch("GetWhiteList");
+    
   },
 
   methods: {
