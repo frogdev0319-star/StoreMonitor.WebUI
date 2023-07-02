@@ -404,15 +404,26 @@ const user = {
 
 
           // ==== 依據白名單設定顯示&隱藏 ====
+          
+          getWhiteList().then(res => {
+            const data = res.data;
+            if (res.data) {
+              resolve(res);
+              commit('SET_WHITE_LIST', res.data);
+            } 
+          }).catch(err => {
+            reject(err);
+          });
+
           const whiteList = user.state.whiteList
           const accountId = user.state.accountId
 
-          // console.log('whiteList!!!!!!!!!!!!!!!!!!!!', whiteList)
-          // console.log('accountId !!!!!!!!!!!!!!!!!!!!', user.state.accountId)
+          console.log('whiteList!!!!!!!!!!!!!!!!!!!!', whiteList)
+          console.log('accountId !!!!!!!!!!!!!!!!!!!!', user.state.accountId)
 
           var isShowing = whiteList.some( i => i == accountId)
           console.log('isShowing !!!!!!', isShowing)
-
+          
           if(isShowing){
             const scheduleRoute = navbarRoute.getInceptionSchedule();
             (scheduleRoute.children.length > 0 && accessedRoutes.findIndex(item=>item.name==scheduleRoute.name)==-1) ? accessedRoutes.push(scheduleRoute):'';
