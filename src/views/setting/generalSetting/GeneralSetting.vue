@@ -289,12 +289,16 @@ export default {
             // event
             this.enableDelay = res.data.settingContent.general_setting_event_push_config.isNotify
             this.delayDay = res.data.settingContent.general_setting_event_push_config.eventUnHandleNotifyDay
-
             var eventCT =  res.data.settingContent.general_setting_event_push_config.checkTime
-            var geteventT  = new Date(eventCT)
-            console.log('geteventT', geteventT)
-            this.alertTime = geteventT.toString().slice(16, 21)
-            console.log('this.alertTime', this.alertTime)
+            console.log('eventCT :~~~~~>> ', eventCT);
+            if( eventCT == null) {
+              this.alertTime = "09:00"
+            } else {
+              var geteventT  = new Date(eventCT)
+              console.log('geteventT', geteventT)
+              this.alertTime = geteventT.toString().slice(16, 21)
+              console.log('this.alertTime', this.alertTime)
+            }
           } else {
             this.enableDelay = false
             this.alertTime = "09:00"
@@ -305,9 +309,13 @@ export default {
             this.wokflowDelay = res.data.settingContent.general_setting_workflow_config.isNotify
             this.workflowDay = res.data.settingContent.general_setting_workflow_config.unHandleNotifyDay
             var workflowCT =  res.data.settingContent.general_setting_workflow_config.checkTime
+            if( workflowCT == null) {
+              this.wokflowTime = "09:00"
+            } else {
             var getworkflowT  = new Date(workflowCT)
             this.wokflowTime = getworkflowT.toString().slice(16, 21)
             console.log('this.wokflowTime', this.wokflowTime)
+            }
           } else {
             this.wokflowDelay = false
             this.wokflowTime = "09:00"
@@ -410,7 +418,7 @@ export default {
 
       const statusNameRes = await this.updateInspectStatus();
       if (statusNameRes.errCode == 0) {
-        this. getInspectStatus()
+        this.getInspectStatus()
         util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
         return false;
       } else {
@@ -418,6 +426,7 @@ export default {
         return false;
       }
     },
+
 
     itemInputChanged_overall({ val, item }){
       const content = filterString.all(val, 20);
@@ -835,7 +844,7 @@ export default {
     margin-left: calc(20/1920*100vw);
   }
   .title-status{
-    width: 25%;
+    width: 28%;
     text-align: left;
     
   }

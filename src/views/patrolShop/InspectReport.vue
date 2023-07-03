@@ -991,7 +991,7 @@ export default {
             totalScore = totalScore + ((i.actualScore * i.weight) / this.totalSumScore) 
             console.log('i.groupName totalScore tab1(有權重)>> ', i.groupName, totalScore);
           }
-
+          
           else if(i.weight == -1 && i.type == 1){
             totalScore = totalScore + i.actualScore / this.totalSumScore
             totalScore.toFixed(2)

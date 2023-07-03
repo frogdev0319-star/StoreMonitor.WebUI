@@ -161,6 +161,7 @@
       </div>
     </dialog-pop>
 
+    <!-- 匯入失敗 -->
     <dialog-pop
       :title="$t('insSettingView.importFailTitle')"
       :append-to-body="true"
@@ -176,6 +177,7 @@
       <div class="import-slot">
         <span>{{ $t('insSettingView.FailTitle') }}</span>
       </div>
+    
       <ul class="ul_style">
         <li v-for="(item,index) in FileInfo" :key="index" class="li_style">
           <div class="list_style"/>
@@ -1685,6 +1687,7 @@ export default {
         self.ImportName = '';
       }
     },
+
     checkBeforeImport() {
       const self = this;
       if (self.checkValue === '新增巡检表' && (self.tabNameInput == null || self.tabNameInput.trim().length === 0)) {
@@ -2243,11 +2246,21 @@ export default {
         } else if (filterString.getContentLength(item.itemName.toString().trim()) > ITEMSLENGTH) {
           otherFlagObj.flags.flagItemLengthOthers = true;
         }
-        if (item.score == undefined || item.score.length == 0 || isNaN(item.score) ||
-            parseFloat(item.score) < -100 || parseFloat(item.score) > 100) {
+        
+        // if (item.score == undefined || item.score.length == 0 || isNaN(item.score) ||
+        //     parseFloat(item.score) < -100 || parseFloat(item.score) > 100) {
+        //   // 项目分值必填，字符类型为-100~+100
+        //   otherFlagObj.flags.flagOtherScoreType = true;
+        // }
+
+
+        // === 項目分值欄位留空可以匯入 ====
+        if ( parseFloat(item.score) < -100 || parseFloat(item.score) > 100) {
           // 项目分值必填，字符类型为-100~+100
           otherFlagObj.flags.flagOtherScoreType = true;
         }
+
+        
         if (item.description != undefined) {
           if (filterString.getContentLength(item.description.toString().trim()) > 1200) {
             otherFlagObj.flags.flagDesLengthOthers = true;
@@ -2343,9 +2356,12 @@ export default {
         if (scoreFlag.flagMinScoreType) {
           warningInfo.push('[Score]' + ' ' + this.$t('insSettingView.excelMinScoreType'));
         }
+
+        // 項目分值必填，取值範圍為-100~100
         if (othersFlag.flagOtherScoreType) {
           warningInfo.push('[Others]' + ' ' + this.$t('insSettingView.excelOtherScoreType'));
         }
+
         if(scoreFlag.flagScoreTypeInvalid){
           warningInfo.push('[Score]' + ' ' + this.$t('insSettingView.excelScoreInvalidType'));
         }
