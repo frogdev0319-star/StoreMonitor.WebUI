@@ -605,7 +605,7 @@ export default {
       scoreMiddleHeight: 0,
       showMaxInfo: false,
 
-      ScoreTotalScoreX: 0,
+      totalScoreSum: 0,
       hundredMarkType: 0
     };
   },
@@ -663,10 +663,6 @@ export default {
 
     await self.getUpLoadBucketInfo();
     await self.getOssInfo();
-
-
-
-
   },
   methods: {
     // 加總
@@ -677,7 +673,7 @@ export default {
           if(ii.itemgetScore!='--' && ii.itemgetScore!='-'){
             if(i.type !== 2){
               if(this.hundredMarkType == 0){
-                tableTotalScore = tableTotalScore + (ii.itemgetScore / this.ScoreTotalScoreX) *100
+                tableTotalScore = tableTotalScore + (ii.itemgetScore / this.totalScoreSum) *100
               } else {
                 tableTotalScore = tableTotalScore + ii.itemgetScore
               }
@@ -685,14 +681,12 @@ export default {
               tableTotalScore = tableTotalScore + ii.itemgetScore
             }
           }
-
         })
       })
 
       if(!isNaN(parseFloat(tableTotalScore))){
         tableTotalScore = tableTotalScore.toFixed(1)
       }
-
       return tableTotalScore
     },
 
@@ -702,27 +696,22 @@ export default {
       var totalScore = 0
       Array.forEach(i => {
         if(i.itemgetScore!='--' && i.itemgetScore!='-'){
-
           if(i.type !== 2){
             if(this.hundredMarkType == 0){
               // 比例制
-              totalScore = totalScore + (i.itemgetScore / this.ScoreTotalScoreX) * 100
+              console.log('=== 比例制 ====')
+              totalScore = totalScore + (i.itemgetScore / this.totalScoreSum) * 100
             } else {
               totalScore = totalScore + i.itemgetScore
             }
           } else {
             totalScore = totalScore + i.itemgetScore
           }
-          
-          
-          
         }
-
       })
       if(!isNaN(parseFloat(totalScore))){
         totalScore = totalScore.toFixed(1)
       }
-
       return totalScore
     },
     
@@ -1597,10 +1586,11 @@ export default {
                   ScoreTotalScoreX += util.accMul(type1tsX,tempWeight);
                   console.log("2******item.groupScor="+type1ts,ScoreTS, type1XN , type1tsX)
 
-            //  console.log("type 1 allScoreB:",allScoreB);
-            //  console.log("type 1 ScoreTotalScoreSystem:",ScoreTotalScoreSystem);
-          //    console.log("type 1 ScoreXN:",ScoreXN);
-              console.log("type 1 ScoreTotalScoreX:",ScoreTotalScoreX);
+                  //  console.log("type 1 allScoreB:",allScoreB);
+                  //  console.log("type 1 ScoreTotalScoreSystem:",ScoreTotalScoreSystem);
+                  //  console.log("type 1 ScoreXN:",ScoreXN);
+                  console.log("type 1 ScoreTotalScoreX:",ScoreTotalScoreX);
+                  this.ScoreTotalScoreX = ScoreTotalScoreX
 
             }
             if (p_item.type === 2) {
@@ -1820,6 +1810,9 @@ export default {
               console.log('total_c:',total_c);
               s_count = total_c + otherGetscoreTotal;
               // console.log(s_count)
+
+              this.totalScoreSum = total_b.toFixed(1)
+
             }
           } else {
             if (inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1') {
@@ -1829,7 +1822,6 @@ export default {
                 s_count = ScoreTotalScoreSystem + OtherTotalScoreSystem;
               }
             } else {
-
               let total_a = 0;
               if (inspectSettings.qualifiedForIgnoredWithType2) {
                 total_a = allScoreB === 0 || ScoreXN === 0 ? 0 : (util.accDiv(ScoreXN , allScoreB) * 100);
@@ -1840,7 +1832,7 @@ export default {
               s_count = total_a + otherGetscoreTotal;
 
               console.log("比例制",ScoreTotalScoreSystem , ScoreTotalScoreX)
-              this.ScoreTotalScoreX = ScoreTotalScoreX
+              
             }
           }
         }
