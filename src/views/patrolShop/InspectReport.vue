@@ -971,47 +971,57 @@ export default {
                   tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
                   console.log('gogo 有權重啊 :>> ' , ii.groupName, tableTotalScore);
                 }
-                else if(ii.type== 2){
-                  tableTotalScore = ii.actualScore
+                else if(ii.weight == -1 && ii.type== 2){
+                  tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) /10
+                } 
+                else if(ii.weight !== -1 && ii.type== 2){
+                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore)
                 } 
               }
 
               // 加分制
               else if(this.hundredMarkType.value == -1){
                 if(ii.weight == -1 && i.type == 0){
-                  tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) / 100
+                  tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) / 10
                 }
                 else if(ii.weight !== -1 && i.type == 0){
-                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) / 100
+                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) / 10
                 }
                 else if(ii.weight == -1 && i.type == 1){
-                  tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) / 100
+                  tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) / 10
                 }
                 else if(ii.weight !== -1 && i.type == 1){
-                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) / 100
+                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) / 10
                 }
-                else if(ii.type== 2){
-                  tableTotalScore = ii.actualScore
+                else if(ii.weight == -1 && ii.type== 2){
+                  tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) / 10
+                } 
+                else if(ii.weight !== -1 && ii.type== 2){
+                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) / 10
                 } 
               }
 
               // 扣分制
               else if(this.hundredMarkType.value == 1){
                 if(ii.weight == -1 && i.type == 0){
-                  tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) 
+                  tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore)  *100
                 }
                 else if(ii.weight !== -1 && i.type == 0){
                   tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
                 }
                 else if(ii.weight == -1 && i.type == 1){
-                  tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) 
+                  tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore) *100
                 }
                 else if(ii.weight !== -1 && i.type == 1){
                   tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
                 }
-                else if(ii.type== 2){
-                  tableTotalScore = ii.actualScore
+                else if(ii.weight == -1 && ii.type== 2){
+                  tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore)  *100
                 } 
+                else if(ii.weight !== -1 && ii.type== 2){
+                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
+                } 
+
               }
               
             }
@@ -1052,10 +1062,13 @@ export default {
               totalScore = totalScore + ((i.actualScore * i.weight) / this.totalSumScore) 
               console.log('i.groupName totalScore tab2(有權重)>> ', i.groupName, totalScore);
             }
-
-            else if( i.type == 2 ){
-              totalScore = i.actualScore
+            else if( i.weight == -1 && i.type == 2 ){
+              totalScore = totalScore + i.actualScore / this.totalSumScore
+              totalScore.toFixed(2)
               console.log('i.groupName totalScore tab3(附加類別項)>> ', i.groupName, totalScore);
+            }
+            else if( i.weight !== -1 && i.type == 2 ){
+              totalScore = totalScore + ((i.actualScore * i.weight) / this.totalSumScore) 
             }
           }
         }
@@ -1064,22 +1077,25 @@ export default {
           console.log('加分制走這邊！')
           if(i.weight == -1 && i.type == 0){
             if(i.actualScore === Number.MAX_VALUE) totalScore = 0
-            else totalScore = totalScore + (i.actualScore / 100)
+            else totalScore = totalScore + (i.actualScore )
           }
           else if(i.weight !== -1 && i.type == 0){
             if(i.actualScore === Number.MAX_VALUE) totalScore = 0
-            else totalScore = totalScore + (i.actualScore * i.weight / 100)
+            else totalScore = totalScore + (i.actualScore * i.weight )
           }
           if(i.weight == -1 && i.type == 1){
             if(i.actualScore === Number.MAX_VALUE) totalScore = 0
-            else totalScore = totalScore + (i.actualScore / 100)
+            else totalScore = totalScore + (i.actualScore )
           }
           else if(i.weight !== -1 && i.type == 1){
             if(i.actualScore === Number.MAX_VALUE) totalScore = 0
-            else totalScore = totalScore + (i.actualScore * i.weight / 100)
+            else totalScore = totalScore + (i.actualScore * i.weight )
           }
-          else if( i.type == 2 ){
-            totalScore = i.actualScore
+          else if( i.weight == -1 && i.type == 2 ){
+            totalScore = totalScore + (i.actualScore )
+          }
+          else if( i.weight !== -1 && i.type == 2 ){
+            totalScore = totalScore + (i.actualScore * i.weight )
           }
         }
 
@@ -1088,7 +1104,7 @@ export default {
           console.log('扣分制走這邊！')
           if(i.weight == -1 && i.type == 0){
             if(i.actualScore === Number.MAX_VALUE) totalScore = 0
-            else totalScore = totalScore + (i.actualScore / 100)
+            else totalScore = totalScore + (i.actualScore )
           }
           else if(i.weight !== -1 && i.type == 0){
             if(i.actualScore === Number.MAX_VALUE) totalScore = 0
@@ -1096,14 +1112,17 @@ export default {
           }
           if(i.weight == -1 && i.type == 1){
             if(i.actualScore === Number.MAX_VALUE) totalScore = 0
-            else totalScore =  totalScore + (i.actualScore / 100)
+            else totalScore =  totalScore + (i.actualScore )
           }
           else if(i.weight !== -1 && i.type == 1){
             if(i.actualScore === Number.MAX_VALUE) totalScore = 0
             else totalScore = totalScore + (i.actualScore * i.weight / 100)
           }
-          else if( i.type == 2 ){
-            totalScore = i.actualScore
+          else if( i.weight == -1  && i.type == 2 ){
+            totalScore =totalScore + (i.actualScore )
+          }
+          else if( i.weight !== -1  && i.type == 2 ){
+            totalScore = totalScore + (i.actualScore * i.weight / 100)
           }
         }
       })
