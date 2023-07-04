@@ -693,6 +693,7 @@ export default {
 
     getSum(Array){
       console.log('getSum Array', Array)
+      console.log('this.totalScoreSum', this.totalScoreSum)
       var totalScore = 0
       Array.forEach(i => {
         if(i.itemgetScore!='--' && i.itemgetScore!='-'){
@@ -1832,6 +1833,8 @@ export default {
               s_count = total_a + otherGetscoreTotal;
 
               console.log("比例制",ScoreTotalScoreSystem , ScoreTotalScoreX)
+              this.totalScoreSum = ScoreTotalScoreX.toFixed(1)
+              console.log(" total_a", total_a)
               
             }
           }
