@@ -972,10 +972,10 @@ export default {
                   console.log('gogo 有權重啊 :>> ' , ii.groupName, tableTotalScore);
                 }
                 else if(ii.weight == -1 && ii.type== 2){
-                  tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) /10
+                  tableTotalScore = tableTotalScore + ii.actualScore
                 } 
                 else if(ii.weight !== -1 && ii.type== 2){
-                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore)
+                  tableTotalScore = tableTotalScore + ii.actualScore * ii.weight
                 } 
               }
 
@@ -1063,12 +1063,11 @@ export default {
               console.log('i.groupName totalScore tab2(有權重)>> ', i.groupName, totalScore);
             }
             else if( i.weight == -1 && i.type == 2 ){
-              totalScore = totalScore + i.actualScore / this.totalSumScore
-              totalScore.toFixed(2)
+              totalScore = totalScore + i.actualScore 
               console.log('i.groupName totalScore tab3(附加類別項)>> ', i.groupName, totalScore);
             }
             else if( i.weight !== -1 && i.type == 2 ){
-              totalScore = totalScore + ((i.actualScore * i.weight) / this.totalSumScore) 
+              totalScore = totalScore + i.actualScore * i.weight
             }
           }
         }
