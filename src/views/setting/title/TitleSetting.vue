@@ -551,9 +551,9 @@ export default {
       this.roleNameList[4].children[2].checked = !!PermissionHelper.enableTranscriptNotify();
 
       //Schedule
-      // this.roleNameList[5].children[0].checked = !!PermissionHelper.enableScheduleSetting2();
-      // this.roleNameList[5].children[1].checked = !!PermissionHelper.enableScheduleHistroy();
-      // this.roleNameList[5].children[2].checked = !!PermissionHelper.enableScheduleExecuted();
+      this.roleNameList[5].children[0].checked = !!PermissionHelper.enableScheduleSetting2();
+      this.roleNameList[5].children[1].checked = !!PermissionHelper.enableScheduleHistroy();
+      this.roleNameList[5].children[2].checked = !!PermissionHelper.enableScheduleExecuted();
 
 
       if (authorities.length >= 7 && resetFlag) {
