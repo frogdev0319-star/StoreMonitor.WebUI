@@ -1903,8 +1903,8 @@ export default {
               console.log('======!!!======')
               console.log('total_a , total_b' , total_a , total_b)
               console.log('total_c !!!', total_c);
-
-    
+              this.totalScoreSum = total_b
+              
               console.log('====== 得分 ======')
               s_count = total_c + otherGetscoreTotal;
               console.log('s_count', s_count)
