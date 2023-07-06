@@ -456,14 +456,13 @@ export default {
       if(whiteList){
         this.isShowing = whiteList.some( i => i == accountId)
         console.log('this.isShowing', this.isShowing)
-      }
-      
 
-      if(this.isShowing){
-        this.roleNameList[5].show = true
-      } else {
-        this.roleNameList[5].show = false
-      }
+        if(this.isShowing){
+          this.roleNameList[5].show = true
+          } else {
+            this.roleNameList[5].show = false
+          }
+        }
     },
 
     getLangStyleValue(langArray){

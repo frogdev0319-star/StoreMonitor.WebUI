@@ -67,3 +67,13 @@ export const getSchedulePersonList = data => {
       data
     });
   };
+
+
+  export const getWhiteList = data => {
+    return request({
+      url: `${version}/report/schedule/white/list`,
+      method: 'get',
+      data
+    });
+  };
+  

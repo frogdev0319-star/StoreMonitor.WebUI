@@ -399,8 +399,6 @@ const user = {
           const auditRoute = navbarRoute.getAuditRoute();
           (auditRoute.children.length >0 && accessedRoutes.findIndex(item=>item.name==auditRoute.name)==-1) ? accessedRoutes.push(auditRoute):'';
 
-          const scheduleRoute = navbarRoute.getInceptionSchedule();
-          (scheduleRoute.children.length >0 && accessedRoutes.findIndex(item=>item.name==scheduleRoute.name)==-1) ? accessedRoutes.push(scheduleRoute):'';
           
           // ==== 依據白名單設定顯示&隱藏 ====
           const whiteList = user.state.whiteList
@@ -408,7 +406,7 @@ const user = {
 
           console.log('whiteList!!!!!!!!!!!!!!!!!!!!', whiteList)
           console.log('accountId !!!!!!!!!!!!!!!!!!!!', user.state.accountId)
-
+          
           var isShowing = whiteList.some( i => i == accountId)
           console.log('isShowing !!!!!!', isShowing)
 
