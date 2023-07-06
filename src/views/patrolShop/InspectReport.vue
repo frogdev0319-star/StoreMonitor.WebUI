@@ -957,7 +957,7 @@ export default {
                   tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) / 10
                 }
                 else if(ii.weight !== -1 && i.type == 1){
-                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) / 10
+                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) / 100
                 }
                 else if(ii.weight == -1 && ii.type== 2){
                   tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) / 10
@@ -980,6 +980,9 @@ export default {
                 }
                 else if(ii.weight !== -1 && i.type == 1){
                   tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
+                }
+                else if( ii.weight == 0  && ii.type == 2){
+                  tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore)  *100
                 }
                 else if(ii.weight == -1 && ii.type== 2){
                   tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore)  *100
@@ -1028,6 +1031,7 @@ export default {
               totalScore = totalScore + ((i.actualScore * i.weight) / this.totalSumScore) 
               console.log('i.groupName totalScore tab2(有權重)>> ', i.groupName, totalScore);
             }
+            
             else if( i.weight == -1 && i.type == 2 ){
               totalScore = totalScore + i.actualScore 
               console.log('i.groupName totalScore tab3(附加類別項)>> ', i.groupName, totalScore);
@@ -1054,7 +1058,7 @@ export default {
           }
           else if(i.weight !== -1 && i.type == 1){
             if(i.actualScore === Number.MAX_VALUE) totalScore = 0
-            else totalScore = totalScore + (i.actualScore * i.weight )
+            else totalScore = totalScore + (i.actualScore * i.weight ) /100
           }
           else if( i.weight == -1 && i.type == 2 ){
             totalScore = totalScore + (i.actualScore )
@@ -1083,12 +1087,16 @@ export default {
             if(i.actualScore === Number.MAX_VALUE) totalScore = 0
             else totalScore = totalScore + (i.actualScore * i.weight / 100)
           }
+          else if( i.weight == 0  && i.type == 2 ){
+            totalScore = totalScore + i.actualScore
+          }
           else if( i.weight == -1  && i.type == 2 ){
-            totalScore =totalScore + (i.actualScore )
+            totalScore =totalScore + i.actualScore 
           }
           else if( i.weight !== -1  && i.type == 2 ){
             totalScore = totalScore + (i.actualScore * i.weight / 100)
           }
+          
         }
       })
 
