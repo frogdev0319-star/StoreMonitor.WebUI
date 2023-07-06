@@ -3,7 +3,9 @@ import { getDashServerInfo } from '@/api/device';
 import { getToken, setToken, removeToken, getCookie, setCookie } from '@/common/auth';
 import PermissionHelper from '@/api/PermissionHelper';
 import { resetRouter, constantRoutes, navbarRoute } from '@/router';
-import {isMysteryMode} from  '@/api/mystero'
+import {isMysteryMode} from  '@/api/mystero';
+import { getWhiteList } from '@/api/scheduleTask';
+
 
 const user = {
   state: {
@@ -46,6 +48,7 @@ const user = {
     mimicMode:false,
     isMystery:false,
     editReport:false,
+    whiteList: [],
   },
 
   mutations: {
@@ -175,6 +178,11 @@ const user = {
     SET_EDIT_REPORT:(state,mode)=>{
       state.editReport = mode;
     },
+    SET_WHITE_LIST: (state, mode) => {
+      state.whiteList = mode;
+      console.log('SET_WHITE_LIST', mode)
+    }
+
   },
   actions: {
     setEditCount({ commit }, count) {
@@ -268,6 +276,22 @@ const user = {
       });
     },
 
+    GetWhiteList({ commit }, params) {
+      return new Promise((resolve, reject) => {
+        getWhiteList(params).then(res => {
+          const data = res.data;
+          if (res.data) {
+            commit('SET_WHITE_LIST', res.data);
+            resolve(res);
+            // console.log('whiteList!!!!!!!!!!!!!!!!!!!!', res.data)
+          } 
+        }).catch(err => {
+          reject(err);
+        });;
+      });
+    },
+
+
     LoginByUser({ commit }, userInfo) {
       const username = userInfo.username.trim();
       const params = {
@@ -324,6 +348,7 @@ const user = {
             commit('SET_ROLES', [res.data.title]);
             commit('SET_ROLE_ID', res.data.roleId);
             commit('SET_USERID',res.data.userId);
+            commit('SET_ACCOUNTID',res.data.accountId)
           } else {
             commit('SET_AUTHORITY', []);
             commit('SET_ROLES', []);
@@ -374,9 +399,27 @@ const user = {
           const auditRoute = navbarRoute.getAuditRoute();
           (auditRoute.children.length >0 && accessedRoutes.findIndex(item=>item.name==auditRoute.name)==-1) ? accessedRoutes.push(auditRoute):'';
 
-          // const scheduleRoute = navbarRoute.getInceptionSchedule();
-          // (scheduleRoute.children.length >0 && accessedRoutes.findIndex(item=>item.name==scheduleRoute.name)==-1) ? accessedRoutes.push(scheduleRoute):'';
+          const scheduleRoute = navbarRoute.getInceptionSchedule();
+          (scheduleRoute.children.length >0 && accessedRoutes.findIndex(item=>item.name==scheduleRoute.name)==-1) ? accessedRoutes.push(scheduleRoute):'';
           
+          // ==== 依據白名單設定顯示&隱藏 ====
+          const whiteList = user.state.whiteList
+          const accountId = user.state.accountId
+
+          console.log('whiteList!!!!!!!!!!!!!!!!!!!!', whiteList)
+          console.log('accountId !!!!!!!!!!!!!!!!!!!!', user.state.accountId)
+
+          var isShowing = whiteList.some( i => i == accountId)
+          console.log('isShowing !!!!!!', isShowing)
+
+          if(isShowing){
+            const scheduleRoute = navbarRoute.getInceptionSchedule();
+            (scheduleRoute.children.length > 0 && accessedRoutes.findIndex(item=>item.name==scheduleRoute.name)==-1) ? accessedRoutes.push(scheduleRoute):'';
+          }
+          // ====
+
+
+
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();
           systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';
           console.log("accessedRoutes.length:",accessedRoutes.length);

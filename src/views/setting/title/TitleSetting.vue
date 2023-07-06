@@ -7,6 +7,7 @@
           <div class="title-name">{{ infoForm.title }}</div>
         </div>
         <div class="spacer"></div>
+        <!-- 保存 -->
         <delay-button type="filled" @click="saveBasicInfo">{{ $t('titleView.save') }}</delay-button>
       </div>
       <div class="basic-information flex" style="padding: 20px 0 20px 20px">
@@ -43,6 +44,7 @@
         <div class="flex-center" style="padding-bottom: 20px">
           <div>{{ $t('titleView.roleSetting') }}</div>
           <div class="spacer"></div>
+          
           <div class="temp-select-area" :style="{'width':getLangStyleValue(tempSelectAreaWidth)}">
             <div class="temp-select-label" :style="{'width':getLangStyleValue(tempSelectLabelWidth)}">{{ $t('titleView.templateSelection') }}</div> 
             <el-select
@@ -59,10 +61,15 @@
         </div>
 
         <hr class="hr-horizontal">
-
         <el-scrollbar :class="showRolesList? 'showlist-el-menuscrollbar' : 'el-menuscrollbar'">
-           <!-- ==== 暫時隱藏 巡檢排程相關 ==== -->
-          <div v-for="(item,index) in roleNameList" :key="index" class="role-group" v-show="item.roleName !== $t('schedule.inceptionSchedule')">
+
+          <!-- {{ roleNameList }} -->
+          <!-- ==== 暫時隱藏 巡檢排程相關 ==== -->
+          <div 
+            v-for="(item,index) in roleNameList" 
+            :key="index" class="role-group" 
+            v-show="item.show"
+          >
             <div class="role-all-checkbox" style="text-align: left">
               <el-checkbox  class="storevue-checkbox-filled" v-model="item.checked" :disabled="item.disabled" @change="(val)=>checkAllChildrenRole(index, val)"/>
               <span class="group-name">{{ item.roleName }}</span>
@@ -142,6 +149,7 @@ export default {
           roleName: this.$t('route.overview'),
           checked: false,
           disabled: false,
+          show: true,
           children: [
             {
               roleName: this.$t('route.patrolOverview'),
@@ -161,6 +169,7 @@ export default {
           roleName: this.$t('route.patrolShop'),
           checked: false,
           disabled: false,
+          show: true,
           children: [
             {
               roleName: this.$t('route.remotePatrol'),
@@ -204,6 +213,7 @@ export default {
           roleName: this.$t('route.eventManage'),
           checked: false,
           disabled: false,
+          show: true,
           children: [
             {
               roleName: this.$t('eventView.handling'),
@@ -235,6 +245,7 @@ export default {
           roleName: this.$t('route.statisticalAna'),
           checked: false,
           disabled: false,
+          show: true,
           children: [
             {
               roleName: this.$t('route.patrolAppraisalStat'),
@@ -283,6 +294,7 @@ export default {
           roleName: this.$t('route.AuditManage'),
           checked: false,
           disabled: false,
+          show: true,
           children: [
             {
               roleName: this.$t('route.SendAuditManage'),
@@ -305,11 +317,11 @@ export default {
           ]
         },
 
-       
         {
           roleName: this.$t('schedule.inceptionSchedule'),
           checked: false,
           disabled: false,
+          show: false,
           children: [
             {
               roleName: this.$t('schedule.scheduleSetting'),
@@ -332,47 +344,54 @@ export default {
           ]
         },
 
-
+        // 系統設定
         {
           roleName: this.$t('route.systemSetting'),
           checked: false,
           disabled: false,
+          show: true,
           children: [
             {
               roleName: this.$t('route.deviceManage'),
               checked: false,
               disabled: false,
-              visabled:true
+              visabled: true
+            },
+            {
+              roleName: '通用設定',
+              checked: false,
+              disabled: false,
+              visabled : true
             },
             {
               roleName: this.$t('route.inspectListSetting'),
               checked: false,
               disabled: false,
-              visabled:true
+              visabled: true
             },
             {
               roleName: this.$t('route.storeManage'),
               checked: false,
               disabled: false,
-              visabled:false
+              visabled: false
             },
             {
               roleName: this.$t('route.scheduleManage'),
               checked: false,
               disabled: false,
-              visabled:false
+              visabled: false
             },
             {
               roleName: this.$t('route.insepctionReportSetting'),
               checked: false,
               disabled: false,
-              visabled:true
+              visabled: true
             },
             {
               roleName: this.$t('route.workflowManage'),
               checked: false,
               disabled: false,
-              visabled:true
+              visabled: true
             }
           ]
         }
@@ -391,6 +410,8 @@ export default {
       tempSelectLabelWidth:[{key:'en',value:'75px'},{key:'zh',value:'75px'},{key:'zhtw',value:'75px'},
         {key:'ja-JP',value:'105px'},{key:'ko-KR',value:'85px'},{key:'vi-VN',value:'85px'},
         {key:'id-ID',value:'95px'},{key:'th-TH',value:'75px'}],
+
+        isShowing:  false
     };
   },
 
@@ -413,6 +434,8 @@ export default {
   mounted() {
     this.getTitleInfo();
     this.getAuthorityInfoList();
+
+    this.getWhiteLsit()
   },
 
   destroyed() {
@@ -423,6 +446,26 @@ export default {
     
   },
   methods: {
+    getWhiteLsit(){
+      const whiteList = this.$store.getters.whiteList
+      const accountId = this.$store.getters.accountId
+
+      console.log('whiteList!!!!!!!!!!!!!!!!!!!!', whiteList)
+      console.log('accountId !!!!!!!!!!!!!!!!!!!!', accountId)
+
+      if(whiteList){
+        this.isShowing = whiteList.some( i => i == accountId)
+        console.log('this.isShowing', this.isShowing)
+      }
+      
+
+      if(this.isShowing){
+        this.roleNameList[5].show = true
+      } else {
+        this.roleNameList[5].show = false
+      }
+    },
+
     getLangStyleValue(langArray){
       return util.getLangStyleValue(langArray);
     },
@@ -435,9 +478,12 @@ export default {
       this.showRolesList = false;
       this.getAvailableAuthority(this.authorityInfoLists[this.templateRoleId - 1].availableAuth);
     },
+
     getTitleInfo() {
       const data = sessionStorage.getItem('titleInfo');
       this.infoForm = JSON.parse(data);
+
+      console.log('this.infoForm', this.infoForm)
       this.roleId = this.infoForm.roleId;
       const comment = this.infoForm.comment && filterString.all(this.infoForm.comment, 200);
       const commentLength = this.infoForm.comment && filterString.getContentLength(comment);
@@ -459,6 +505,8 @@ export default {
     },
 
     getAvailableAuthority(authorities, resetFlag = true) {
+
+      console.log('authorities :>> ', authorities);
       PermissionHelper.setData(authorities);
       this.roleNameList[0].children[0].checked = !!PermissionHelper.enableRemoteOverview();
       this.roleNameList[0].children[1].checked = !!PermissionHelper.enableEventOverview();
@@ -483,12 +531,16 @@ export default {
       this.roleNameList[3].children[4].checked = !!PermissionHelper.enableSingleStoreStatStatistics();
       this.roleNameList[3].children[5].checked = !!PermissionHelper.enableAppraisalCompareStatistics();
 
+
       this.roleNameList[6].children[0].checked = !!PermissionHelper.enableDeviceSetting();
-      this.roleNameList[6].children[1].checked = !!PermissionHelper.enablePatrolSetting();
-      this.roleNameList[6].children[2].checked = !!PermissionHelper.enableStoreSetting();
-      this.roleNameList[6].children[3].checked = !!PermissionHelper.enableScheduleSetting();
-      this.roleNameList[6].children[4].checked = !!PermissionHelper.enableReportSetting();
-      this.roleNameList[6].children[5].checked = !!PermissionHelper.enableWorkflowSetting();
+      this.roleNameList[6].children[1].checked = !!PermissionHelper.enableGeneralSetting();
+      this.roleNameList[6].children[2].checked = !!PermissionHelper.enablePatrolSetting();
+      this.roleNameList[6].children[3].checked = !!PermissionHelper.enableStoreSetting(); //no
+      this.roleNameList[6].children[4].checked = !!PermissionHelper.enableScheduleSetting(); //no
+      this.roleNameList[6].children[5].checked = !!PermissionHelper.enableReportSetting();
+      this.roleNameList[6].children[6].checked = !!PermissionHelper.enableWorkflowSetting();
+
+      
 
       //auditSetting
       this.roleNameList[4].children[0].checked = !!PermissionHelper.enableSendAudit();
@@ -496,9 +548,9 @@ export default {
       this.roleNameList[4].children[2].checked = !!PermissionHelper.enableTranscriptNotify();
 
       //Schedule
-      // this.roleNameList[5].children[0].checked = !!PermissionHelper.enableScheduleSetting2();
-      // this.roleNameList[5].children[1].checked = !!PermissionHelper.enableScheduleHistroy();
-      // this.roleNameList[5].children[2].checked = !!PermissionHelper.enableScheduleExecuted();
+      this.roleNameList[5].children[0].checked = !!PermissionHelper.enableScheduleSetting2();
+      this.roleNameList[5].children[1].checked = !!PermissionHelper.enableScheduleHistroy();
+      this.roleNameList[5].children[2].checked = !!PermissionHelper.enableScheduleExecuted();
 
 
       if (authorities.length >= 7 && resetFlag) {
@@ -595,7 +647,11 @@ export default {
       this.infoForm.authorities = [];
       const decAuthorityNum = Math.pow(2, 32);
       const newAuth = this.roleNameList.slice(0);
+      console.log('newAuth', newAuth)
+
       const auditElement = newAuth.splice(4,2);//將簽核權限,排程管理提出來，往後放 備註:4原本是系統設定
+      console.log('auditElement', auditElement)
+
       newAuth.push.apply(newAuth,auditElement);
       newAuth.forEach((item, index) => {
         /**因為新加的權限只能往後加，所以5以後順序需要特別處理 */
@@ -603,17 +659,35 @@ export default {
         if(index>=5) powerIdx=index+1;
         /********************/
         let tempAuthorityNum = Math.pow(2, powerIdx) * decAuthorityNum;
+
         item.children.forEach((_item, _index) => {
           if(_item.checked){
             if(index === 4 && _index === 0){
-              tempAuthorityNum += Math.pow(2, 1);
-            }else if(index === 4 && _index === 1){
+              console.log('xdxdxd 0')
               tempAuthorityNum += Math.pow(2, 0);
-            } else if(index === 4 && _index === 4){
+            }
+            else if(index === 4 && _index === 1){
+              console.log('xdxdxd 1')
+              tempAuthorityNum += Math.pow(2, 1);
+            } 
+            else if(index === 4 && _index === 2){
+              console.log('xdxdxd 2')
+              tempAuthorityNum += Math.pow(2, 2);
+            } 
+            else if(index === 4 && _index === 4){
+              console.log('xdxdxd 4')
               tempAuthorityNum += Math.pow(2, 5);
-            } else if(index === 4 && _index === 5){
+            } 
+            else if(index === 4 && _index === 4){
+              console.log('xdxdxd 5')
+              tempAuthorityNum += Math.pow(2, 5);
+            }
+            else if(index === 4 && _index === 6){
+              console.log('xdxdxd 6')
               tempAuthorityNum += Math.pow(2, 6);
-            }else {
+            }
+            else {
+              console.log('!!!')
               tempAuthorityNum += Math.pow(2, _index);
             }
           }
@@ -624,11 +698,15 @@ export default {
       this.ifAccessVideo && (videoAndMessNum += Math.pow(2, 0));
       this.ifReceiveMes && (videoAndMessNum += Math.pow(2, 1));
       this.infoForm.authorities.push(videoAndMessNum);
+
+      console.log('this.infoForm.authorities', this.infoForm.authorities)
+
     },
 
     updateBasicInformation() {
       const self = this;
       const params = self.infoForm;
+      console.log('params', params)
       return new Promise((resolve, reject) => {
         titleRESTful.updateUserTitle(params).then(result => {
           resolve(result);
