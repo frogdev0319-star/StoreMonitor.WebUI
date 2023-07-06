@@ -450,12 +450,12 @@ export default {
       const whiteList = this.$store.getters.whiteList
       const accountId = this.$store.getters.accountId
 
-      console.log('whiteList!!!!!!!!!!!!!!!!!!!!', whiteList)
-      console.log('accountId !!!!!!!!!!!!!!!!!!!!', accountId)
+      console.log('whiteList~~', whiteList)
+      console.log('accountId ~~', accountId)
 
       if(whiteList){
         this.isShowing = whiteList.some( i => i == accountId)
-        console.log('this.isShowing', this.isShowing)
+        console.log('this.isShowing titleSetting', this.isShowing)
 
         if(this.isShowing){
           this.roleNameList[5].show = true

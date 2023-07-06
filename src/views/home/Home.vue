@@ -573,7 +573,7 @@ export default {
       console.log("hasMystery:",this.hasMystery);
     }
   },
-  created() {
+  async created() {
     const self = this;
     this.headUrl = "./static/img/admin.png";
     PubSub.subscribe("change-color", (event, data) => {
@@ -587,12 +587,16 @@ export default {
     });
 
     window.addEventListener("resize", this.$_isMobile);
+    
     self.$_isMobile();
-    this.getBrandList();
-    this.updateTitle();
+    await this.GetWhiteList()
+    await this.getBrandList();
+    await this.updateTitle();
   },
 
   mounted() {
+
+    
     if (this.$refs.fieldSelect !== undefined) {
       this.$nextTick(() => {
         this.$refs.fieldSelect.$refs.scrollbar.$el.classList.add(
@@ -604,10 +608,13 @@ export default {
     this.showMimicMode = this.$store.getters.ShowMimicMode;
     this.hasMystery = this.$store.getters.isMystery;
 
-    this.$store.dispatch("GetWhiteList");
+    
   },
 
   methods: {
+    GetWhiteList(){
+      this.$store.dispatch("GetWhiteList");
+    },
     changeMimicMode(){
       if(this.$route.path=="/reinspection" && this.$store.getters.editReport){
         this.EditRptchangeStoreObj.dialogCosed = true;

@@ -110,6 +110,11 @@ const user = {
       state.accountId = accountId;
     },
 
+    SET_WHITE_LIST: (state, mode) => {
+      state.whiteList = mode;
+      console.log('SET_WHITE_LIST', mode)
+    },
+
     newCachePath(state, msg) {
       state.cachePath = msg;
     },
@@ -178,10 +183,7 @@ const user = {
     SET_EDIT_REPORT:(state,mode)=>{
       state.editReport = mode;
     },
-    SET_WHITE_LIST: (state, mode) => {
-      state.whiteList = mode;
-      console.log('SET_WHITE_LIST', mode)
-    }
+    
 
   },
   actions: {
@@ -283,7 +285,7 @@ const user = {
           if (res.data) {
             commit('SET_WHITE_LIST', res.data);
             resolve(res);
-            // console.log('whiteList!!!!!!!!!!!!!!!!!!!!', res.data)
+            console.log('whiteList res.data ', res.data)
           } 
         }).catch(err => {
           reject(err);
@@ -399,16 +401,16 @@ const user = {
           const auditRoute = navbarRoute.getAuditRoute();
           (auditRoute.children.length >0 && accessedRoutes.findIndex(item=>item.name==auditRoute.name)==-1) ? accessedRoutes.push(auditRoute):'';
 
-          
+
+        
           // ==== 依據白名單設定顯示&隱藏 ====
           const whiteList = user.state.whiteList
           const accountId = user.state.accountId
-
           console.log('whiteList!!!!!!!!!!!!!!!!!!!!', whiteList)
           console.log('accountId !!!!!!!!!!!!!!!!!!!!', user.state.accountId)
           
           var isShowing = whiteList.some( i => i == accountId)
-          console.log('isShowing !!!!!!', isShowing)
+          console.log('isShowing users!', isShowing)
 
           if(isShowing){
             const scheduleRoute = navbarRoute.getInceptionSchedule();
