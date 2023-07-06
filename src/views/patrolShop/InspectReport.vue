@@ -830,39 +830,7 @@ export default {
 
   methods: {
     
-    // 加總
-
-    getTotalSum(Array){
-      var tableTotalScore = 0
-      Array.forEach(i => {
-        i.children.forEach( ii => {
-          var isInfinity = this.getDoubleNum(ii.actualScore)
-          if( isInfinity === Infinity) {
-            tableTotalScore = tableTotalScore + 0
-            } else {
-              if(ii.weight == -1 ){
-                tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) /10
-                // tableTotalScore.toFixed(1)
-                console.log('gogo 沒有權重啊！！ :>> ', ii.groupName, tableTotalScore);
-              }
-              else if(ii.type== 2){
-                tableTotalScore = ii.actualScore
-              } 
-              else {
-                // tableTotalScore = tableTotalScore + ii.actualScore * ii.weight / 100
-                tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
-                console.log('gogo 有權重啊 :>> ' , ii.groupName, tableTotalScore);
-              }
-            }
-        })
-      })
-      if(!isNaN(parseFloat(tableTotalScore))){
-        tableTotalScore = tableTotalScore.toFixed(1)
-      }
-      return tableTotalScore
-    },
-
-
+  
     // 計算分母
     getTotalScore(data, hundredMarkType){
       console.log('getTotalScore data :>> ', data);
@@ -920,7 +888,6 @@ export default {
           }
           n = n + tempScore
         })
-
         this.totalSumScore = Number(n.toFixed(3))
 
       }
@@ -935,7 +902,6 @@ export default {
     
 
       console.log('this.totalSumScore =======>> ', this.totalSumScore)
-      console.log(typeof(n))
     },
 
 

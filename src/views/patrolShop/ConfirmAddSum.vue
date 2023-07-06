@@ -665,6 +665,7 @@ export default {
     await self.getOssInfo();
   },
   methods: {
+
     // 加總
     getTotalSum(Array){
       var tableTotalScore = 0
@@ -1396,14 +1397,16 @@ export default {
           }
           allTypeArr.add(p_item.type);
         });
+
         console.log(">>>isOnlyTab1:",isOnlyTab1);
         let Tab0Status = false;
         let inspectPic = 0;
         let totalScore0 = 0, CurAddScoreB = 0, CurOtherTotalScore = 0, PassFileX = 0, PassFileTS = 0, ScoreTS = 0, OtherTS = 0, PassFileN = 0;
         let PassFile_totalScoreX = 0, Score_totalScoreX = 0;
+
+
         inspect.forEach(p_item => { //大類別
-          
-          console.log('p_item~~~~~~~~>>>', p_item)
+          // console.log('p_item~~~~~~~~>>>', p_item)
           p_item.inspectList.forEach(item => {//子類別, groupScore在這層
             PassFileTS=0;PassFileN = 0;PassFileX = 0;totalScore0=0;PassFile_totalScoreX=0;
             ScoreTS = 0;Score_totalScoreX = 0;ScoreX = 0;ScoreN = 0;
@@ -1419,8 +1422,7 @@ export default {
             item.numOfCommentItem = 0;
             item.numOfTotalItems = 0;
             
-          
-
+        
             item.items.forEach(s_item => {//子項
               item.numOfTotalItems++;
       
@@ -1452,6 +1454,7 @@ export default {
               }
               s_item.itemgetScore === '--' ? s_item.itemgetScore = 0 : null;
 
+              // tab1
               if (p_item.type === 0) {
                 PassFileTS += s_item.itemgetScore ;
                 totalScore0 += s_item.itemScore;
@@ -1483,7 +1486,7 @@ export default {
                   }
                 }
               } else if (p_item.type === 1) {
-                console.log('s_item ~~~~~~>>>', s_item)
+                // console.log('s_item ~~~~~~>>>', s_item)
                 totalScore += s_item.itemScore;
                 ScoreTS += s_item.itemgetScore;
 
@@ -1570,7 +1573,9 @@ export default {
               let type1Score = ScoreTS;
               let type1XN = (ScoreX + ScoreN);
               let type1tsX = Score_totalScoreX;
-              console.log("1******item.groupScor=" +type1ts, ScoreTS, type1XN , type1tsX)
+
+              console.log('item ******', item)
+              console.log("1******item.groupScor=" , type1ts, type1Score, type1XN , type1tsX)
               if(item.isAdvanced){
                 //if(inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1'){
                   //console.log("PassFileTtotalScoreS:",totalScore);
@@ -1604,8 +1609,19 @@ export default {
 
                   ScoreTotalScoreSystem += util.accMul(type1Score,tempWeight);
                   ScoreXN += util.accMul(type1XN,tempWeight);
-                  ScoreTotalScoreX += util.accMul(type1tsX,tempWeight);
-                  console.log("2******item.groupScor="+type1ts,ScoreTS, type1XN , type1tsX)
+
+                  console.log('type1tsX******', type1tsX)
+                  console.log('tempWeight******', tempWeight)
+
+                  if(type1tsX == -99999){
+                    ScoreTotalScoreX += util.accMul(type1XN, tempWeight);
+                    console.log('ScoreTotalScoreX oooo1', ScoreTotalScoreX)
+                  } else {
+                    ScoreTotalScoreX += util.accMul(type1tsX, tempWeight);
+                    console.log('ScoreTotalScoreX oooo2', ScoreTotalScoreX)
+                  }
+
+                  // console.log("2******item.groupScor=", type1ts, ScoreTS, type1XN , type1tsX)
 
                   //  console.log("type 1 allScoreB:",allScoreB);
                   //  console.log("type 1 ScoreTotalScoreSystem:",ScoreTotalScoreSystem);
@@ -1613,9 +1629,10 @@ export default {
 
                   console.log("type1tsX", type1tsX);
                   console.log("tempWeight", tempWeight);
-                  console.log("type 1 ScoreTotalScoreX !!:", ScoreTotalScoreX);
+                  
 
                   this.ScoreTotalScoreX = ScoreTotalScoreX
+                  console.log("type 1 ScoreTotalScoreX ******", ScoreTotalScoreX);
 
             }
             if (p_item.type === 2) {
@@ -1809,7 +1826,7 @@ export default {
 
               let total_a = 0, total_b = 0, total_c = 0;
               if (inspectSettings.qualifiedForIgnoredWithType1 && !inspectSettings.qualifiedForIgnoredWithType2) {
-                console.log('*PassFileXN:',PassFileXN);
+                console.log('*PassFileXN 1:',PassFileXN);
                 console.log('*ScoreTotalScoreSystem:',ScoreTotalScoreSystem);
                 total_a = PassFileXN + ScoreTotalScoreSystem;
                 
@@ -1820,7 +1837,7 @@ export default {
                 total_b = PassFileTotalScoreX + allScoreB;
               } 
               else if (inspectSettings.qualifiedForIgnoredWithType1 && inspectSettings.qualifiedForIgnoredWithType2) {
-                console.log('*PassFileXN:',PassFileXN);
+                console.log('*PassFileXN 2:',PassFileXN);
                 console.log('*ScoreXN:',ScoreXN);
                 total_a = PassFileXN + ScoreXN;
                 console.log('*PassFileTotalScore:',PassFileTotalScore);
@@ -1828,20 +1845,26 @@ export default {
                 total_b = PassFileTotalScore + allScoreB;
               } 
               else {
-                console.log('*PassFileXS:',PassFileXS);
+                console.log('*PassFileXS 3:',PassFileXS);
                 console.log('*ScoreTotalScoreSystem:',ScoreTotalScoreSystem);
+
                 total_a = PassFileXS + ScoreTotalScoreSystem;
                 total_b = PassFileTotalScoreX + ScoreTotalScoreX;
+
                 console.log('*PassFileTotalScoreX:',PassFileTotalScoreX);
                 console.log('*ScoreTotalScoreX:',ScoreTotalScoreX);
               }
               total_c = total_a === 0 || total_b === 0 ? 0 : (util.accDiv(total_a , total_b) * 100);
-              console.log(total_a , total_b)
-              console.log('total_c:',total_c);
-              s_count = total_c + otherGetscoreTotal;
-              // console.log(s_count)
 
+              console.log('======!!!======')
+              console.log(total_a , total_b)
+              console.log('total_c !!!', total_c);
+
+              s_count = total_c + otherGetscoreTotal;
+              
               this.totalScoreSum = total_b.toFixed(1)
+              // console.log('this.totalScoreSum:========>>>>', this.totalScoreSum)
+              
 
             }
           } else {
@@ -1861,9 +1884,9 @@ export default {
               
               s_count = total_a + otherGetscoreTotal;
 
-              console.log("比例制",ScoreTotalScoreSystem , ScoreTotalScoreX)
+              console.log("比例制 ~~~",ScoreTotalScoreSystem , ScoreTotalScoreX)
               this.totalScoreSum = ScoreTotalScoreX.toFixed(1)
-              console.log(" total_a", total_a)
+            
               
             }
           }
@@ -1886,8 +1909,7 @@ export default {
         }
 
         self.summary = this.groupbyKey(inspect, 'type');
-
-
+        
         var ary = []
         self.summary.forEach(i => {
           i.data.forEach(ii => {
