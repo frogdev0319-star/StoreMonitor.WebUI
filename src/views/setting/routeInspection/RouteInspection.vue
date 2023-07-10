@@ -1236,9 +1236,12 @@ export default {
           }
         }
       });
-       //console.log(primaryGroupCelss)
-      // console.log(secondaryGroupCells)
-      // console.log(groupItemCells)
+
+      console.log(primaryGroupCelss)
+      console.log(secondaryGroupCells)
+      console.log(groupItemCells)
+
+
       const groupType = this.getGroupType(type);
       let addGroupParams = primaryGroupCelss.filter(cell => cell.v).map(cell => {
         if(cell.weight==''){
@@ -1304,6 +1307,9 @@ export default {
         current[next.cellAddress.r].parent = nextCell.parent;
         return current;
       }, {});
+
+     
+
       const subjectMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderB', 'subject');
       const itemScoreMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderE', 'itemScore');
       const descriptionMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderD', 'description');
@@ -1311,6 +1317,9 @@ export default {
       const qualifiedScoreMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderF', 'qualifiedScore');
       const requiredMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderH', 'required');
       const mapping = {};
+
+
+      
       Object.assign(mapping, subjectMapping, itemScoreMapping, descriptionMapping, availableScoreMapping, qualifiedScoreMapping, requiredMapping);
       var names = {};
       Object.values(rowCellsObject).forEach(rowCells => {
@@ -1321,7 +1330,7 @@ export default {
           if (mapping[key] === 'availableScores') {
             let score = [];
             if(cell.v){
-               cell.v.split('/').map(item => {
+              cell.v.split('/').map(item => {
                 if(!isNaN(Number(item))){
                   score.push( Number(item));
                 }
@@ -1348,9 +1357,10 @@ export default {
         if (type === 'Score') {
           const availableScore = deepClone(item['availableScores']);
           if(availableScore.length>0){
-            const maxAvailableScore = (availableScore.length==0)? 0:availableScore.sort((a, b) => { return a - b; })[availableScore.length - 1];
+            const maxAvailableScore = (availableScore.length==0)? 0 : availableScore.sort((a, b) => { return a - b; })[availableScore.length - 1];
             item['itemScore'] = maxAvailableScore;
-            item['qualifiedScore'] = item['qualifiedScore'].length === 0 ? maxAvailableScore : item['qualifiedScore'];
+            // item['qualifiedScore'] = item['qualifiedScore'].length === 0 ? maxAvailableScore : item['qualifiedScore'];
+            item['qualifiedScore'] = item['qualifiedScore'].length === 0 ? 0 : item['qualifiedScore'];
           }else{
             item['itemScore'] = 0;
             item['type'] = 1;
@@ -2523,6 +2533,8 @@ export default {
       const sheetData = [];
       if (sheetDataArr) {
         const treeData = util.handleInspctionCatergyTree(sheetDataArr);
+        console.log('treeData ~~~~~>> ', treeData);
+        
         treeData.forEach(item => {
           if (!item.children) {
             if (item.itemData.length !== 0) {
@@ -2548,6 +2560,7 @@ export default {
                   obj[tableHeader[4]] = _item.type === 0 ? _item.availableScores : 0;
                   obj[tableHeader[5]] = _item.type === 0 ? _item.qualifiedScore : 0;
                   obj[tableHeader[6]] = _item.description === '---' ? '' : _item.description;
+
                 } else {
                   obj[tableHeader[1]] = '';
                   obj[tableHeader[2]] = _item.name;
