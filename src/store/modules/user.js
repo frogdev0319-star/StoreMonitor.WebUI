@@ -404,6 +404,16 @@ const user = {
 
         
           // ==== 依據白名單設定顯示&隱藏 ====
+          getWhiteList().then(res => {
+            const data = res.data;
+            if (res.data) {
+              resolve(res);
+              commit('SET_WHITE_LIST', res.data);
+            } 
+          }).catch(err => {
+            reject(err);
+          });
+          
           const whiteList = user.state.whiteList
           const accountId = user.state.accountId
           console.log('whiteList!!!!!!!!!!!!!!!!!!!!', whiteList)

@@ -589,7 +589,7 @@ export default {
     window.addEventListener("resize", this.$_isMobile);
     
     self.$_isMobile();
-    await this.GetWhiteList()
+    // await this.GetWhiteList()
     await this.getBrandList();
     await this.updateTitle();
   },
@@ -608,9 +608,9 @@ export default {
   },
 
   methods: {
-    GetWhiteList(){
-      this.$store.dispatch("GetWhiteList");
-    },
+    // GetWhiteList(){
+    //   this.$store.dispatch("GetWhiteList");
+    // },
 
     changeMimicMode(){
       if(this.$route.path=="/reinspection" && this.$store.getters.editReport){
