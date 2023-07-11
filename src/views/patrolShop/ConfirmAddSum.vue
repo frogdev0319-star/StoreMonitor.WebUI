@@ -1569,11 +1569,15 @@ export default {
                 
 
                 if(item.items.length == item.numIgnore){
-                  PassFileTotalScore = 0
-                  PassFileTotalScoreX = 0
+                  console.log('1 :>> ');
+                  PassFileTotalScore += 0
+                  PassFileTotalScoreX += 0
                 } else {
+                  console.log('2 :>> ');
                   PassFileTotalScore += util.accMul(ts0,tempWeight);
                   PassFileTotalScoreX += util.accMul(tsX,tempWeight);
+
+                  console.log('PassFileTotalScoreX ??===>', PassFileTotalScoreX)
                 }
             
 
