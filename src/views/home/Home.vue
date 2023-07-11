@@ -595,8 +595,6 @@ export default {
   },
 
   mounted() {
-
-    
     if (this.$refs.fieldSelect !== undefined) {
       this.$nextTick(() => {
         this.$refs.fieldSelect.$refs.scrollbar.$el.classList.add(
@@ -607,14 +605,13 @@ export default {
     this.$store.dispatch("GetIsMysteryMode");
     this.showMimicMode = this.$store.getters.ShowMimicMode;
     this.hasMystery = this.$store.getters.isMystery;
-
-    
   },
 
   methods: {
     GetWhiteList(){
       this.$store.dispatch("GetWhiteList");
     },
+
     changeMimicMode(){
       if(this.$route.path=="/reinspection" && this.$store.getters.editReport){
         this.EditRptchangeStoreObj.dialogCosed = true;
