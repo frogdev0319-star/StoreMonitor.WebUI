@@ -308,10 +308,10 @@ export const navbarRoute = {
   },
 
 
-  // ==== 巡檢排程相關 ====
+   // ==== 暫時隱藏 巡檢排程相關(勿刪) ====
   getInceptionSchedule(){
     const schduleRoute = {
-      id:5,
+      id: 5,
       path: '/home',
       name: 'InceptionSchedule',
       component: Home,
@@ -374,6 +374,9 @@ export const navbarRoute = {
     return schduleRoute;
   },
 
+
+
+  
   getStatisticalRoute() {
     const statisticsRoute = {
       id:3,
@@ -483,6 +486,7 @@ export const navbarRoute = {
     // ) && primaryPathesList.push('/checkInStatistics');
     return statisticsRoute;
   },
+
   getSystemSettingRoute() {
     const systemSettingRoute = {
       id:6,
@@ -498,6 +502,7 @@ export const navbarRoute = {
 
     const deviceRoutes = this.getDeviceRoutes();
     // console.log(deviceRoutes)
+    
     !PermissionHelper.enableMimicMode && PermissionHelper.enableDeviceSetting() && deviceRoutes.length > 0 && systemSettingRoute.children.push(
       {
         path: '/device',
@@ -525,6 +530,23 @@ export const navbarRoute = {
       children: []
     };
 
+    // 通用設定
+    !PermissionHelper.enableMimicMode && PermissionHelper.enableGeneralSetting()  && systemSettingRoute.children.push(
+      {
+        path: '/generalSetting',
+        name: 'generalSetting',
+        isReadOnly: false,
+        component: resolve => require(['@/views/setting/generalSetting/GeneralSetting'], resolve),
+        hidden: false,
+        meta: {
+          keepAlive: false, // the component is't to be cache.
+          requireAuth: true
+        }
+      },
+
+    ) && primaryPathesList.push('/generalSetting');
+
+    
     !PermissionHelper.enableMimicMode && PermissionHelper.enablePatrolSetting() && inspectionRoute.children.push(
       {
         path: '/routeinspection',
@@ -579,6 +601,8 @@ export const navbarRoute = {
     }) && primaryPathesList.push('/insepctionReportSetting');
 
     inspectionRoute.children.length > 0 && systemSettingRoute.children.push(inspectionRoute);
+
+    // 職務管理
     !PermissionHelper.enableMimicMode && PermissionHelper.enableTitleSetting() && systemSettingRoute.children.push(
       {
         path: '/title',
@@ -598,6 +622,7 @@ export const navbarRoute = {
         hidden: true
       }
     ) && primaryPathesList.push('/title', '/titleSetting');
+
     !PermissionHelper.enableMimicMode && PermissionHelper.enableWorkflowSetting() && systemSettingRoute.children.push(
       {
         path: '/workflows',

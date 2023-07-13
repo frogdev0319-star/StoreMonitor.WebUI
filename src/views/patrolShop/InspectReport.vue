@@ -54,12 +54,20 @@
             <span :class="isexportPDF ? 'pdf-info-value' : 'info-value'">{{ report.submitterName }}</span>
             <span class="info-label">{{ $t('remotePatrol.generateTime')+'：' }}</span>
             <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
+            <span class="ignoreSign" v-if="report.isCheckInIgnore"> 略過簽到 </span>
+
             <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.signInTime')+'：' }}</span>
-            <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ signInTime }}</span>
+            <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ signInTime }} </span>
             <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.patrolTime')+'：' }}</span>
             <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ inceptionExecutTime }}</span>
+            <!-- 簽到距離 -->
             <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.signInDistance')+'：' }}</span>
-            <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{$t('remotePatrol.aroundDistance')+signInDistance}}</span>
+            <span v-if="!isexportPDF && hasSignRecord && signInDistance !== -1">{{ $t('remotePatrol.aroundDistance')  }}</span>
+            <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">
+              {{ (signInDistance === -1 ? '超出簽到範圍' : signInDistance) }}
+            </span>
+            <span v-if="!isexportPDF && hasSignRecord && signInDistance !== -1" >{{$t('remotePatrol.mapDistance3')}}</span>
+
         </div>
         <div class="weather-content">
           <img v-if="weatherImg" class="weather-info-content" :src="weatherImg">
@@ -95,12 +103,22 @@
       </div>
     </div>
     <div v-if="isexportPDF && hasSignRecord" class="pdf_font_24 info-content" style="margin-left:46px">
+      <span v-if="hasSignRecord && report.isCheckInIgnore"> (略過簽到) </span>
       <span v-if="hasSignRecord" class="info-label">{{ $t('remotePatrol.signInTime')+'：' }}</span>
       <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ signInTime }}</span>
+      
+
       <span v-if="hasSignRecord" class="info-label" style="margin-left:calc(40/1980*100vw)">{{ $t('remotePatrol.patrolTime')+'：' }}</span>
       <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ inceptionExecutTime }}</span>
+
       <span v-if="hasSignRecord" class="info-label" style="margin-left:calc(40/1980*100vw)">{{ $t('remotePatrol.signInDistance')+'：' }}</span>
-      <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{$t('remotePatrol.aroundDistance')+signInDistance}}</span>
+      <span v-if="hasSignRecord && signInDistance !== -1">{{ $t('remotePatrol.aroundDistance')  }}</span>
+      <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">
+        {{ (signInDistance === -1 ? '超出簽到範圍' : signInDistance) }}
+      </span>
+      <span v-if="hasSignRecord && signInDistance !== -1" >{{$t('remotePatrol.mapDistance3')}}</span>
+
+
     </div>
     <div class="template-titles" v-if="!isexportPDF">
       <el-select
@@ -370,7 +388,9 @@
                       <div v-if="categoryItem.weight != -1 && categoryItem.type != 2">{{ categoryItem.weight + '%' }}</div>
                       <div>
                         {{ categoryItem.groupName }}
-                        <span style="color: #7d8cad; margin-left: 5px;" v-if="setting_isShowGroupSum"> ( {{$t('remotePatrol.totalScoreUnit')}} : {{ getSum(categoryItem.children) }} ) </span>
+                        <span style="color: #7d8cad; margin-left: 5px;" v-if="setting_isShowGroupSum"> 
+                          ( {{$t('remotePatrol.totalScoreUnit')}} : {{ getSum(categoryItem.children)}} ) 
+                        </span>
                       </div>
                     </div>
                   </td>
@@ -390,13 +410,14 @@
                     <div style="display:flex;flex-direction:row;justify-content:space-between;">
                       <!-- 分數 -->
                       <div style="flex:2;">{{ getDoubleNum(subcategory.actualScore) == Infinity ? '--' : getDoubleNum((subcategory.weight == -1 || subcategory.type==2 ) ? subcategory.actualScore : subcategory.actualScore * subcategory.weight / 100) }} </div>
+
                       <div v-if="subcategory.children" style="display:flex;flex:1;flex-direction:row;align-content:center;">
                         <img v-if="categoryItem.isAdvanced" style="margin-right:4px;" :src="require('../../../static/img/group_score.svg')" width="15" height="15" />
-                        <div style="color:#9EACB6;font-size:10px;font-weight:normal;">{{ categoryItem.isAdvanced? categoryItem.groupScore:''}}</div>
+                        <div style="color:#9EACB6;font-size:10px;font-weight:normal;">{{ categoryItem.isAdvanced ? categoryItem.groupScore :''}}</div>
                       </div>
                       <div v-else-if="!subcategory.children" style="display:flex;flex:1;flex-direction:row;align-content:center;">
                         <img v-if="subcategory.isAdvanced" style="margin-right:4px;" :src="require('../../../static/img/group_score.svg')" width="15" height="15" />
-                        <div style="color:#9EACB6;font-size:10px;font-weight:normal;">{{ subcategory.isAdvanced? subcategory.groupScore:''}}</div>
+                        <div style="color:#9EACB6;font-size:10px;font-weight:normal;">{{ subcategory.isAdvanced ? subcategory.groupScore :''}}</div>
                       </div>
                     </div>
                   </td>
@@ -537,11 +558,24 @@
             </div>
             <div v-if="pageItem.ifExpand" class="item-content">
               <div class="pdf_font_20">
-                <div class="content-title"><span class="pdf_font_20">{{ $t('remotePatrol.mapDistance1')+`${report.storeName}`+$t('remotePatrol.mapDistance2')+`${pageItem.distance}`}}</span></div>
+
+                <div class="content-title" v-if="pageItem.distance == -1 ">
+                  <span class="pdf_font_20">
+                    {{ $t('remotePatrol.mapDistance1')+`${report.storeName}`+ $t('remotePatrol.signInDistance')}} : 超出簽到範圍
+                  </span>
+                </div>
+
+                <div class="content-title" v-else>
+                  <span class="pdf_font_20">
+                    {{ $t('remotePatrol.mapDistance1')+`${report.storeName}`+$t('remotePatrol.mapDistance2')+` ${pageItem.distance}`}}
+                  </span>
+                </div>
+
+
                 <hr class="hr-horizontal" />
               </div>
               <div style="display:flex;flex-direction:row; justify-content:start;" :style="isexportPDF ? 'height:calc(984/1440*100vw)' : ''">
-                <img :src= "pageItem.data" style="width:calc(984/1440*100vw);height:auto; margin-top:10px;margin-bottom:10px"/>
+                <img :src= "pageItem.data" style="width:50%;height:auto; margin-top:10px;margin-bottom:10px"/>
               </div>
             </div>
           </div>
@@ -740,6 +774,10 @@ export default {
       workflowUnbindDialogShow:false,
       warnWorkflowUnbind:this.$t('audit.inceptionRpt.warnWorkflowUnbind'),
       warnWorkflowUnbindTitle:this.$t('audit.inceptionRpt.errorEditReport'),
+
+      totalSumScore: 0,
+      hundredMarkType: 0,
+
     };
   },
 
@@ -791,21 +829,170 @@ export default {
   },
 
   methods: {
+    
+  
+    // 計算分母
+    getTotalScore(data, hundredMarkType){
+      console.log('getTotalScore data :>> ', data);
+      console.log('hundredMarkType', hundredMarkType)
+      // 剩下子類別（groupScore !== -99999）
+      var items = data.filter(i =>  i.type !== 2 )
+      console.log('items :>> ', items);
+
+      // -1 - original mark system， 
+      // 0 - hundred mark system, 
+      // 1 - penalty point system
+      if(hundredMarkType == 0){
+        var n = 0
+        items.forEach(i => {
+          // 權重
+          if(i.weight !== -1){
+            // 分數無上限
+            if(i.groupScore !== -99999){
+              // tab1 為Number.MAX_VALUE ,不計分
+              if(i.actualScore === Number.MAX_VALUE)  var tempScore = 0
+              else  var tempScore = ((i.groupScore * i.weight) / 100)
+              // 所有項目為忽略項，不列入分母
+              if(i.numOfIgnored === i.numOfTotalItems) var tempScore = 0
+              console.log('tempScore1 :>> ',i.groupName , tempScore);
+            }
+
+            // 無分數無上限
+            else {
+              if(i.actualScore === Number.MAX_VALUE)  var tempScore = 0
+              else  var tempScore = (i.totalScore * i.weight) / 100
+              
+              // if(i.numOfIgnored === i.numOfTotalItems) var tempScore = 0
+              console.log('tempScore2 :>> ',i.groupName , tempScore);
+            }
+          } 
+
+          // 無權重
+          else {
+            // 分數無上限
+            if(i.groupScore !== -99999 ){
+              if(i.actualScore === Number.MAX_VALUE)  var tempScore = 0
+              else  var tempScore = (i.groupScore / 100)
+              
+              if(i.numOfIgnored === i.numOfTotalItems) var tempScore = 0
+              console.log('tempScore3 :>> ',i.groupName , tempScore);
+            }
+            // 無分數無上限
+            else if(i.groupScore == -99999){
+              if(i.actualScore === Number.MAX_VALUE)  var tempScore = 0
+              else  var tempScore = i.totalScore / 100
+              
+              if(i.numOfIgnored === i.numOfTotalItems) var tempScore = 0
+              console.log('tempScore4 :>> ',i.groupName , tempScore);
+            }
+          }
+          n = n + tempScore
+        })
+        this.totalSumScore = Number(n.toFixed(3))
+
+      }
+      else if(hundredMarkType == -1){
+        console.log('加分制')
+        this.totalSumScore = 1
+      }
+      else if(hundredMarkType == 1){
+        console.log('扣分制')
+        this.totalSumScore = 100
+      }
+    
+
+      console.log('this.totalSumScore =======>> ', this.totalSumScore)
+    },
+
+
+
     // 加總
     getTotalSum(Array){
       var tableTotalScore = 0
-
       Array.forEach(i => {
         i.children.forEach( ii => {
           var isInfinity = this.getDoubleNum(ii.actualScore)
           if( isInfinity === Infinity) {
             tableTotalScore = tableTotalScore + 0
             } else {
-              if(ii.weight == -1 || ii.type== 2 ){
-                tableTotalScore = tableTotalScore + ii.actualScore
-              } else {
-                tableTotalScore = tableTotalScore + ii.actualScore * ii.weight / 100
+              // 比例制
+              if(this.hundredMarkType.value == 0){
+                if(ii.weight == -1 && i.type == 0){
+                  tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) /10
+                  // tableTotalScore.toFixed(1)
+                  console.log('gogo 沒有權重啊！！ :>> ', ii.groupName, tableTotalScore);
+                }
+                else if(ii.weight !== -1 && i.type == 0){
+                  // tableTotalScore = tableTotalScore + ii.actualScore * ii.weight / 100
+                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
+                  console.log('gogo 有權重啊 :>> ' , ii.groupName, tableTotalScore);
+                }
+                else if(ii.weight == -1 && i.type == 1){
+                  tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) /10
+                  // tableTotalScore.toFixed(1)
+                  console.log('gogo 沒有權重啊！！ :>> ', ii.groupName, tableTotalScore);
+                }
+                else if(ii.weight !== -1 && i.type == 1){
+                  // tableTotalScore = tableTotalScore + ii.actualScore * ii.weight / 100
+                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
+                  console.log('gogo 有權重啊 :>> ' , ii.groupName, tableTotalScore);
+                }
+                else if(ii.weight == -1 && ii.type== 2){
+                  tableTotalScore = tableTotalScore + ii.actualScore
+                } 
+                else if(ii.weight !== -1 && ii.type== 2){
+                  tableTotalScore = tableTotalScore + ii.actualScore * ii.weight
+                } 
               }
+
+              // 加分制
+              else if(this.hundredMarkType.value == -1){
+                if(ii.weight == -1 && i.type == 0){
+                  tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) / 10
+                }
+                else if(ii.weight !== -1 && i.type == 0){
+                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) / 10
+                }
+                else if(ii.weight == -1 && i.type == 1){
+                  tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) / 10
+                }
+                else if(ii.weight !== -1 && i.type == 1){
+                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) / 100
+                }
+                else if(ii.weight == -1 && ii.type== 2){
+                  tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) / 10
+                } 
+                else if(ii.weight !== -1 && ii.type== 2){
+                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) / 10
+                } 
+              }
+
+              // 扣分制
+              else if(this.hundredMarkType.value == 1){
+                if(ii.weight == -1 && i.type == 0){
+                  tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore)  *100
+                }
+                else if(ii.weight !== -1 && i.type == 0){
+                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
+                }
+                else if(ii.weight == -1 && i.type == 1){
+                  tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore) *100
+                }
+                else if(ii.weight !== -1 && i.type == 1){
+                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
+                }
+                else if( ii.weight == 0  && ii.type == 2){
+                  tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore)  *100
+                }
+                else if(ii.weight == -1 && ii.type== 2){
+                  tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore)  *100
+                } 
+                else if(ii.weight !== -1 && ii.type== 2){
+                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
+                } 
+
+              }
+              
             }
         })
       })
@@ -813,23 +1000,106 @@ export default {
         tableTotalScore = tableTotalScore.toFixed(1)
       }
       return tableTotalScore
-
     },
 
+    
     getSum(Array){
+      console.log('getSum Array :>> ', Array);
       var totalScore = 0
       Array.forEach(i => {
-        var isInfinity = this.getDoubleNum(i.actualScore)
-        if( isInfinity === Infinity) {
-          totalScore = totalScore + 0
-        } else {
-          if(i.weight == -1 || i.type==2 ){
-            totalScore = totalScore + i.actualScore
+        // 比例制
+        if(this.hundredMarkType.value == 0){
+          var isInfinity = this.getDoubleNum(i.actualScore)
+          if( isInfinity === Infinity) {
+            totalScore = totalScore + 0
           } else {
-            totalScore = totalScore + i.actualScore * i.weight / 100
+            if(i.weight == -1 && i.type == 0){
+              totalScore = totalScore + i.actualScore / this.totalSumScore
+              totalScore.toFixed(2)
+              console.log('i.groupName totalScore tab1 (沒有權重)>> ', i.groupName, totalScore);
+            } 
+            else if(i.weight !== -1 && i.type == 0){
+              totalScore = totalScore + ((i.actualScore * i.weight) / this.totalSumScore) 
+              console.log('i.groupName totalScore tab1(有權重)>> ', i.groupName, totalScore);
+            }
+            else if(i.weight == -1 && i.type == 1){
+              totalScore = totalScore + i.actualScore / this.totalSumScore
+              totalScore.toFixed(2)
+              console.log('i.groupName totalScore tab2(沒有權重)>> ', i.groupName, totalScore);
+            } 
+            else if(i.weight !== -1 && i.type == 1){
+              totalScore = totalScore + ((i.actualScore * i.weight) / this.totalSumScore) 
+              console.log('i.groupName totalScore tab2(有權重)>> ', i.groupName, totalScore);
+            }
+            
+            else if( i.weight == -1 && i.type == 2 ){
+              totalScore = totalScore + i.actualScore 
+              console.log('i.groupName totalScore tab3(附加類別項)>> ', i.groupName, totalScore);
+            }
+            else if( i.weight !== -1 && i.type == 2 ){
+              totalScore = totalScore + i.actualScore * i.weight
+            }
           }
         }
+        // 加分制
+        else if(this.hundredMarkType.value == -1){
+          console.log('加分制走這邊！')
+          if(i.weight == -1 && i.type == 0){
+            if(i.actualScore === Number.MAX_VALUE) totalScore = 0
+            else totalScore = totalScore + (i.actualScore )
+          }
+          else if(i.weight !== -1 && i.type == 0){
+            if(i.actualScore === Number.MAX_VALUE) totalScore = 0
+            else totalScore = totalScore + (i.actualScore * i.weight )
+          }
+          if(i.weight == -1 && i.type == 1){
+            if(i.actualScore === Number.MAX_VALUE) totalScore = 0
+            else totalScore = totalScore + (i.actualScore )
+          }
+          else if(i.weight !== -1 && i.type == 1){
+            if(i.actualScore === Number.MAX_VALUE) totalScore = 0
+            else totalScore = totalScore + (i.actualScore * i.weight ) /100
+          }
+          else if( i.weight == -1 && i.type == 2 ){
+            totalScore = totalScore + (i.actualScore )
+          }
+          else if( i.weight !== -1 && i.type == 2 ){
+            totalScore = totalScore + (i.actualScore * i.weight )
+          }
+        }
+
+        // 扣分制
+        else if(this.hundredMarkType.value == 1){
+          console.log('扣分制走這邊！')
+          if(i.weight == -1 && i.type == 0){
+            if(i.actualScore === Number.MAX_VALUE) totalScore = 0
+            else totalScore = totalScore + (i.actualScore )
+          }
+          else if(i.weight !== -1 && i.type == 0){
+            if(i.actualScore === Number.MAX_VALUE) totalScore = 0
+            else totalScore = totalScore + (i.actualScore * i.weight / 100)
+          }
+          if(i.weight == -1 && i.type == 1){
+            if(i.actualScore === Number.MAX_VALUE) totalScore = 0
+            else totalScore =  totalScore + (i.actualScore )
+          }
+          else if(i.weight !== -1 && i.type == 1){
+            if(i.actualScore === Number.MAX_VALUE) totalScore = 0
+            else totalScore = totalScore + (i.actualScore * i.weight / 100)
+          }
+          else if( i.weight == 0  && i.type == 2 ){
+            totalScore = totalScore + i.actualScore
+          }
+          else if( i.weight == -1  && i.type == 2 ){
+            totalScore =totalScore + i.actualScore 
+          }
+          else if( i.weight !== -1  && i.type == 2 ){
+            totalScore = totalScore + (i.actualScore * i.weight / 100)
+          }
+          
+        }
       })
+
       if(!isNaN(parseFloat(totalScore))){
         totalScore = totalScore.toFixed(1)
       }
@@ -837,10 +1107,14 @@ export default {
     },
 
 
+
+
+    // 四捨五入
     getDoubleNum (num) {
       num = util.isDouble(num,2);
       return Math.round(num * 100) / 100
     },
+
     getReportTemplateAndInfo() {
       const templatePromise = ReportSetting.getInspectReportTemplateList({ enable: true });
       console.log("this.report.reportId:",this.report.reportId);
@@ -853,6 +1127,14 @@ export default {
         console.log('results[1] :>> ', results[1]);
         this.getReportInfo(results[1]);
 
+        var hundredMarkType = results[1].data[0].inspectSettings.find( i => i.name == 'hundredMarkType')
+        this.hundredMarkType = hundredMarkType
+        // -1 - original mark system， 
+        // 0 - hundred mark system, 
+        // 1 - penalty point system
+        this.getTotalScore(results[1].data[0].info.summary , hundredMarkType.value)
+
+  
         this.setting_isShowGroupSum = (results[1].data[0].inspectSettings.find( i => i.name == "setting_isShowGroupSum")).value
         this.setting_isShowDistrictSum = (results[1].data[0].inspectSettings.find( i => i.name == "setting_isShowDistrictSum")).value
 
@@ -860,7 +1142,6 @@ export default {
         console.log('this.setting_isShowDistrictSum :>> ', this.setting_isShowDistrictSum);
 
         this.showMaxInfo = results[1].data[0].info.summary.some(i => i.isAdvanced == true)
-
 
       }).catch(err => {
         console.log('ReportDetail-getReportTemplateAndInfo:' + err);
@@ -991,6 +1272,7 @@ export default {
         obj.submitterName = routeData.submitterName;
         obj.tagName = routeData.tagName;
         obj.iconSrc = this.getIconSrc(routeData.status);
+        obj.isCheckInIgnore = routeData.isCheckInIgnore
         switch (routeData.mode) {
           case 0:
             obj.inspectSrc = self.inspectSrc;
@@ -1201,7 +1483,7 @@ export default {
           this.signInTime = util.getDateStr2(data.checkinRecord.ts);
           this.inceptionExecutTime = util.getDiffTimeStr(data.ts,data.checkinRecord.ts);
           this.signMapUrl = data.checkinRecord.report_sign_map_url;
-          this.signInDistance = data.checkinRecord.execute_sign_distance+this.$i18n.t('remotePatrol.mapDistance3');
+          this.signInDistance = data.checkinRecord.execute_sign_distance ;
         }
 
         this.getGroupsData(data.groups);
@@ -2159,6 +2441,7 @@ export default {
   }
 };
 </script>
+
 <style lang="scss" scoped>
   @function rem($val){
     @return $val/16+rem;
@@ -3171,10 +3454,19 @@ export default {
     overflow-x: hidden;
   }
 </style>
+
 <style lang="sass" scoped>
   .spacer
     display: flex
     flex-direction: column
     justify-content: center
     align-items: center
+  .ignoreSign
+    width: fit-content
+    border-radius: 4px
+    font-size: 12px
+    color: #989ca0
+    background: #EFEFEF
+    padding: 5px
+    margin-left: 10px
 </style>

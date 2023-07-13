@@ -275,7 +275,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.1.2.0
+                v3.1.2.10
                   &copy; {{ getFullYear }} Advantech Intelligent City
                   Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
@@ -605,6 +605,9 @@ export default {
     this.$store.dispatch("GetIsMysteryMode");
     this.showMimicMode = this.$store.getters.ShowMimicMode;
     this.hasMystery = this.$store.getters.isMystery;
+
+  
+    
   },
 
   methods: {
@@ -979,6 +982,7 @@ export default {
     },
 
     fedlogout() {
+      localStorage.clear();
       Database.destoryDB();
       const url = sessionStorage.getItem("LoginURL");
       let nowHref = window.location.href;
@@ -993,13 +997,13 @@ export default {
     },
     logOut() {
       const self = this;
+      localStorage.clear();
       self.$store.dispatch("logout").then(() => {});
     },
     async getBrandList() {
       await this.changeRoutes();
-      // console.log("Get Brand List");
       this.brandList = JSON.parse(sessionStorage.getItem("brandList"));
-      // console.log(this.brandList);
+      console.log("Get Brand List", this.brandList);
       const idIndex = this.brandList
         .map((item) => item.accountId)
         .indexOf(this.accountId);

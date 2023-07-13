@@ -49,6 +49,7 @@ const user = {
     isMystery:false,
     editReport:false,
     whiteList: [],
+    
   },
 
   mutations: {
@@ -183,9 +184,12 @@ const user = {
     SET_EDIT_REPORT:(state,mode)=>{
       state.editReport = mode;
     },
-    
-
+    SET_WHITE_LIST: (state, mode) => {
+      state.whiteList = mode;
+      console.log('SET_WHITE_LIST', mode)
+    }
   },
+
   actions: {
     setEditCount({ commit }, count) {
       commit('SET_EDIT_COUNT', count);
@@ -285,7 +289,7 @@ const user = {
           if (res.data) {
             commit('SET_WHITE_LIST', res.data);
             resolve(res);
-            console.log('whiteList res.data ', res.data)
+            // console.log('whiteList!!!!!!!!!!!!!!!!!!!!', res.data)
           } 
         }).catch(err => {
           reject(err);
@@ -306,7 +310,7 @@ const user = {
           // console.log(res);
           const data = res.data;
           if (res.data) {
-            
+
             commit('SET_TOKEN', data.token);
             setToken(data.token);
           }
@@ -335,6 +339,7 @@ const user = {
       return new Promise(resolve => {
         commit('SET_TOKEN', '');
         commit('SET_ROLES', []);
+        localStorage.clear();
         removeToken();
         resetRouter();
         resolve();
@@ -402,8 +407,8 @@ const user = {
           (auditRoute.children.length >0 && accessedRoutes.findIndex(item=>item.name==auditRoute.name)==-1) ? accessedRoutes.push(auditRoute):'';
 
 
-        
           // ==== 依據白名單設定顯示&隱藏 ====
+          
           getWhiteList().then(res => {
             const data = res.data;
             if (res.data) {
@@ -413,23 +418,23 @@ const user = {
           }).catch(err => {
             reject(err);
           });
-          
+
           const whiteList = user.state.whiteList
           const accountId = user.state.accountId
+
           console.log('whiteList!!!!!!!!!!!!!!!!!!!!', whiteList)
           console.log('accountId !!!!!!!!!!!!!!!!!!!!', user.state.accountId)
-          
-          var isShowing = whiteList.some( i => i == accountId)
-          console.log('isShowing users!', isShowing)
 
+          var isShowing = whiteList.some( i => i == accountId)
+          console.log('isShowing !!!!!!', isShowing)
+          
           if(isShowing){
             const scheduleRoute = navbarRoute.getInceptionSchedule();
             (scheduleRoute.children.length > 0 && accessedRoutes.findIndex(item=>item.name==scheduleRoute.name)==-1) ? accessedRoutes.push(scheduleRoute):'';
           }
           // ====
-
-
-
+          
+        
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();
           systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';
           console.log("accessedRoutes.length:",accessedRoutes.length);
@@ -472,4 +477,3 @@ const user = {
 };
 
 export default user;
-

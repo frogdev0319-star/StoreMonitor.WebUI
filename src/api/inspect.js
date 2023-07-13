@@ -303,8 +303,12 @@ export const getInspectStatus = params => {
 
 export const updateInspectStatus = data => {
   return request({
-    url: `${version}/general/setting/inspect/status/name/update`,
+    // url: `${version}/general/setting/inspect/status/name/update`,
+    url: `${version}/general/setting/update`,
     method: 'post',
     data
   });
 }
+
+
+

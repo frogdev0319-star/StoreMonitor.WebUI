@@ -824,7 +824,7 @@ export default{
       "setGroupScoreRange0":"Batas atas rentang input skor kategori 0 ~ 9999",
       "setGroupScoreRange":"Batas atas rentang input skor kategori -9999 ~ 9999",
       "groupScoreLimit":"Batas atas skor kategori",
-      "commentStatus":"Tampilan opsi rangkuman inspeksi (pengaturan ini hanya memengaruhi tampilan yang terkait rangkuman inspeksi merek)",
+      "commentStatus":"Tampilan opsi rangkuman inspeksi ",
       "autoSelectComment":"Aktifkan seleksi rangkuman inspeksi otomatis berdasarkan kondisi",
       "selectByScore":"Seleksi otomatis berdasarkan kondisi skor",
       "noUserDefinedName":"Belum ada nama kustom",

@@ -9,6 +9,9 @@ export default class SaveSearchConditionUtil {
     const parmas = searchConditionObj.params;
     localStorage.setItem(key, JSON.stringify(parmas));
   }
+  static clearAll(){
+    localStorage.clear();
+  }
 
   static getSearchCondition(path) {
     const accountId = localStorage.getItem('oss_bucket');

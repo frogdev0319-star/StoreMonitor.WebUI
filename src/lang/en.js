@@ -674,7 +674,6 @@ export default{
       "enterName":"Enter Category Name",
       "enterNameRuletip":"Enter up to 30 characters",
         "inputRuletip":"Enter up to 20 characters",
-
       "enterScore":"Please enter the score",
       "enterSelfListName":"Please Enter Custom List Name",
       "evaluationType":"Participating in scoring",

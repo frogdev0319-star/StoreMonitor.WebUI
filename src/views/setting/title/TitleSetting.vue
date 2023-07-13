@@ -436,6 +436,8 @@ export default {
     this.getAuthorityInfoList();
 
     this.getWhiteLsit()
+
+
   },
 
   destroyed() {
@@ -461,6 +463,9 @@ export default {
       } else {
         this.roleNameList[5].show = false
       }
+
+
+
 
     },
 

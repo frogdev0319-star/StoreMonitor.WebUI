@@ -145,7 +145,7 @@
 
 
     <!-- 巡檢總評選項顯示 -->
-    <el-col :span="24" class="el-rute-content storeLevel">
+    <!-- <el-col :span="24" class="el-rute-content storeLevel">
       <setting-table :table-name="$t('insSettingView.commentStatus')">
         <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
           <div class="overall_options">
@@ -169,7 +169,7 @@
           </div>
         </div>
       </setting-table>
-    </el-col>
+    </el-col> -->
 
 
 
@@ -339,7 +339,7 @@
     </el-col>
 
     <!-- 自定義評估選項 -->
-    <el-col :span="24" class="el-rute-content" style="margin-bottom:20px;">
+    <el-col :span="24" class="el-rute-content" >
       <setting-table :table-name="$t('insSettingView.btnAttributeValues')">
         <div slot="tableDetail" class="setting-config" >
           <div class="radio-setting-content">
@@ -419,7 +419,7 @@
     </el-col>
 
     <!-- 事件超時未處理提醒 -->
-    <el-col :span="24" class="el-rute-content">
+    <!-- <el-col :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.eventTimeoutReminder')">
         <div slot="tableDetail" class="setting-config rule-item">
           <div>
@@ -446,7 +446,7 @@
           </div>
         </div>
       </setting-table>
-    </el-col>
+    </el-col> -->
 
 
     <el-col v-if="mode === 1" :span="24" class="el-rute-content">
@@ -599,10 +599,9 @@ export default {
     },
 
 
-    enableDelay(val){
-      if(val == true && this.delayDay == undefined)  this.delayDay = 1
-    },
-
+    // enableDelay(val){
+    //   if(val == true && this.delayDay == undefined)  this.delayDay = 1
+    // },
 
     onSiteSignature:{
       immediate: false,
@@ -731,16 +730,16 @@ export default {
 
     async submitRule() {
       const self = this;
-      if(this.enableDelay && this.delayDay == undefined){
-        util.notify(this.$t('audit.workFlows.cantEmptyDays'), 'error', 2000 );
-        this.$refs.delay_day.focus()
-        return
-      }
-      else if(this.delayDay > 365){
-        util.notify(this.$t('audit.workFlows.cantTooMuchDays'), 'error', 2000 );
-        this.$refs.delay_day.focus()
-        return
-      }
+      // if(this.enableDelay && this.delayDay == undefined){
+      //   util.notify(this.$t('audit.workFlows.cantEmptyDays'), 'error', 2000 );
+      //   this.$refs.delay_day.focus()
+      //   return
+      // }
+      // else if(this.delayDay > 365){
+      //   util.notify(this.$t('audit.workFlows.cantTooMuchDays'), 'error', 2000 );
+      //   this.$refs.delay_day.focus()
+      //   return
+      // }
 
        // handle bind workflow
       if( !!this.workFlowToBind ){
@@ -820,11 +819,11 @@ export default {
               'value': this.otherBtnAttr,
               'extra': this.itemOptionsForType3[2]
             },
-            {
-              'name': 'eventUnHandleNotify',
-              'value': this.enableDelay,
-              'extra': Number(this.delayDay)
-            }
+            // {
+            //   'name': 'eventUnHandleNotify',
+            //   'value': this.enableDelay,
+            //   'extra': Number(this.delayDay)
+            // }
           ]
         };
 
@@ -842,9 +841,9 @@ export default {
         return
       }
 
-      const statusNameRes = await self.updateInspectStatus();
+      // const statusNameRes = await self.updateInspectStatus();
       const res = await self.updateInspectRule(params);
-      if (res.errCode === 0 && statusNameRes.errCode == 0) {
+      if (res.errCode === 0 ) {
           util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           return false;
         } else {
@@ -866,10 +865,10 @@ export default {
         if (res.errCode === 0) {
           res.data.forEach(item => {
             switch (item.name) {
-              case 'eventUnHandleNotify':
-                self.enableDelay = item.value;
-                self.delayDay = item.extra;
-                break;
+              // case 'eventUnHandleNotify':
+              //   self.enableDelay = item.value;
+              //   self.delayDay = item.extra;
+              //   break;
               case 'includedInTotalScoreWithType1':
                 self.includedInTotalScoreWithType1 = item.value;
                 break;
@@ -1005,29 +1004,25 @@ export default {
       });
     },
 
-    updateInspectStatus(){
-      var status = {
-          status_0: this.defaultDefineName[0].newName,
-          is_customize_0: this.defaultDefineName[0].is_customize,
-          status_1: this.defaultDefineName[1].newName,
-          is_customize_1: this.defaultDefineName[1].is_customize,
-          status_2: this.defaultDefineName[2].newName,
-          is_customize_2: this.defaultDefineName[2].is_customize,
-      }
+    // updateInspectStatus(){
+    //   var status = {
+    //       status_0: this.defaultDefineName[0].newName,
+    //       is_customize_0: this.defaultDefineName[0].is_customize,
+    //       status_1: this.defaultDefineName[1].newName,
+    //       is_customize_1: this.defaultDefineName[1].is_customize,
+    //       status_2: this.defaultDefineName[2].newName,
+    //       is_customize_2: this.defaultDefineName[2].is_customize,
+    //   }
+    //   console.log('status ~~~~~~~~>> ', status);
+    //   return new Promise((resolve, reject) => {
+    //     inpectRESTful.updateInspectStatus(status).then(res => {
+    //       resolve(res);
 
-
-
-      console.log('status ~~~~~~~~>> ', status);
-      return new Promise((resolve, reject) => {
-        inpectRESTful.updateInspectStatus(status).then(res => {
-          resolve(res);
-
-        }).catch(err => {
-          reject(err);
-        });
-      });
-
-    },
+    //     }).catch(err => {
+    //       reject(err);
+    //     });
+    //   });
+    // },
 
     inputChangeMin(e) {
       const self = this;
@@ -1166,13 +1161,14 @@ export default {
       }
       this.standardScore = score;
     },
-    onMsgRemindChanged(e){
-      if(e<=0){
-        this.delayDay=1;
-      }else{
-        this.delayDay = e;
-      }
-    },
+
+    // onMsgRemindChanged(e){
+    //   if(e<=0){
+    //     this.delayDay=1;
+    //   }else{
+    //     this.delayDay = e;
+    //   }
+    // },
 
     async workflowItems(){
       await workflowItems().then(res=>{

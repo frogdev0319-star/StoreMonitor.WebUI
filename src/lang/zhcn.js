@@ -827,7 +827,7 @@ export default{
       "setGroupScoreRange0":"类别分值上限 输入范围 0 ~ 9999",
       "setGroupScoreRange":"类别分值上限 输入范围 -9999 ~ 9999",
       "groupScoreLimit":"类别分值上限",
-      "commentStatus":"巡检总评选项显示 (此设定将影响品牌之巡检总评相关显示)",
+      "commentStatus":"巡检总评选项显示",
       "autoSelectComment":"开启依条件自动选取巡检总评 ",
       "selectByScore":"依分数条件自动选取 ",
       "noUserDefinedName":"无自定义名称 ",

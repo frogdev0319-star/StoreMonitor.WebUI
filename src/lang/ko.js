@@ -824,7 +824,7 @@ export default{
       "setGroupScoreRange0":"카테고리 상한 점수 입력 범위 0 ~ 9999",
       "setGroupScoreRange":"카테고리 상한 점수 입력 범위 -9999 ~ 9999",
       "groupScoreLimit":"카테고리 상한 점수",
-      "commentStatus":"검사 요약 옵션 표시(이 설정은 브랜드의 검사 요약과 관련된 표시에 영향을 줌)",
+      "commentStatus":"검사 요약 옵션 표시",
       "autoSelectComment":"조건에 따라 검사 요약 자동 선택을 활성화합니다",
       "selectByScore":"점수 조건을 기준으로 자동 선택",
       "noUserDefinedName":"사용자 정의 이름 없음",

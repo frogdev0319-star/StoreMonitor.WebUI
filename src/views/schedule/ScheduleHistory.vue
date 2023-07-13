@@ -178,8 +178,8 @@ export default{
         {
           'prop': 'reportTsStr',
           'label': this.$t('schedule.reportUploadDate'),
-          // 'sortable': 'custom',
-          'sortable': true,
+          'sortable': 'custom',
+          // 'sortable': true,
           'width': 130,
           'maxWidth': 130,
           'isExpand': false
@@ -449,12 +449,19 @@ export default{
 
 
     handleSortChange(order, defaultSort) {
+      console.log('order ~~~~~>> ', order);
       
       this.defaultSort = { ...defaultSort };
       this.isLoadingData = true
-
+      // this.defaultSort = { 
+      //   prop: 'remindTimeStr', 
+      //   order: 'ascending'
+      // },
       console.log('this.defaultSort :>> ', this.defaultSort);
       this.doSearchScheduleHis();
+
+
+      this.isLoadingData = false
     },
 
 
