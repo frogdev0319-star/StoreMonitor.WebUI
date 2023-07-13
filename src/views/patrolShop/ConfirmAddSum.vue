@@ -1622,7 +1622,7 @@ export default {
                   }else{
                     console.log('---- 比例制 !!----')
                     type1ts = item.groupScore;//(Math.abs(type1ts) >Math.abs(item.groupScore))?item.groupScore:type1ts ;
-                    type1tsX =(type1tsX < item.groupScore) ? type1tsX :item.groupScore;
+                    type1tsX =(type1tsX < item.groupScore) ? type1tsX : item.groupScore;
                     //(Math.abs(type1tsX)>Math.abs(item.groupScore))?item.groupScore:type1tsX;
                   }
                 //  type1tsX = Math.min(type1tsX,
@@ -1645,7 +1645,12 @@ export default {
                       ScoreTotalScoreX += 0
                     } else {
                       var n = 0
-                      item.items.forEach(i => {
+
+                      var ignore = item.ignoreItems.map( i => i = i.id)
+                      var countItems  = item.items.filter( i => !ignore.includes(i.id))
+                      console.log('countItems :>> ', countItems);
+
+                      countItems.forEach(i => {
                         n = n + i.itemScore
                       })
                       ScoreTotalScoreX += util.accMul(n, tempWeight);
