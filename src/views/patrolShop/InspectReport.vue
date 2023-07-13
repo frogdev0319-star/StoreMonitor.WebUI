@@ -879,11 +879,45 @@ export default {
             }
             // 無分數無上限
             else if(i.groupScore == -99999){
-              if(i.actualScore === Number.MAX_VALUE)  var tempScore = 0
-              else  var tempScore = i.totalScore / 100
+              if(i.actualScore === Number.MAX_VALUE)  {
+                var tempScore = 0
+              }
+
+              // else  var tempScore = i.totalScore / 100
+
+              // if(this.qualifiedForIgnoredWithType1) {
+                
+              // }
+
+
+
+
+
+
+              if(i.type == 0 && this.qualifiedForIgnoredWithType1){
+                var tempScore = i.totalScore / 100
+                console.log('tempScore4 - 1 :>> ',i.groupName , tempScore);
+              } 
+              else if(i.type == 0 && !this.qualifiedForIgnoredWithType1 && i.numOfIgnored === i.numOfTotalItems){
+                var tempScore = 0
+                console.log('tempScore4 - 2 :>> ',i.groupName , tempScore);
+              }
+              if(i.type == 1 && this.qualifiedForIgnoredWithType2){
+                var tempScore = i.totalScore / 100
+                console.log('tempScore4 - 3 :>> ',i.groupName , tempScore);
+              } 
+              else if(i.type == 1 && !this.qualifiedForIgnoredWithType2 && i.numOfIgnored === i.numOfTotalItems){
+                var tempScore = 0
+                console.log('tempScore4 - 4 :>> ',i.groupName , tempScore);
+              }
+              else {
+                var tempScore = i.totalScore / 100
+                console.log('tempScore4 - 5 :>> ',i.groupName , tempScore);
+              }
+
               
-              if(i.numOfIgnored === i.numOfTotalItems) var tempScore = 0
-              console.log('tempScore4 :>> ',i.groupName , tempScore);
+              
+              
             }
           }
           n = n + tempScore
