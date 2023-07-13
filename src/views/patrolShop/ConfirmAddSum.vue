@@ -1573,6 +1573,7 @@ export default {
                   PassFileTotalScore += 0
                   PassFileTotalScoreX += 0
                 } else {
+                  
                   console.log('2 :>> ');
                   PassFileTotalScore += util.accMul(ts0,tempWeight);
                   PassFileTotalScoreX += util.accMul(tsX,tempWeight);
@@ -1859,6 +1860,8 @@ export default {
         } 
         else {
           if (inspectSettings.includedInTotalScoreWithType1 || isOnlyTab1) {
+            // 加分 or 減分制 
+            console.log('status ooo1')
             if (inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1') {
               if (inspectSettings.qualifiedForIgnoredWithType1 && !inspectSettings.qualifiedForIgnoredWithType2) {
                 s_count = PassFileXN + ScoreTotalScoreSystem + OtherTotalScoreSystem;
@@ -1882,6 +1885,12 @@ export default {
               } 
               else if (!inspectSettings.qualifiedForIgnoredWithType1 && inspectSettings.qualifiedForIgnoredWithType2) {
                 console.log('status 2')
+                console.log('*PassFileXN 2:',PassFileXN);
+                console.log('*ScoreXN:',ScoreXN);
+                console.log('*PassFileTotalScore:',PassFileTotalScore);
+                console.log('*allScoreB:',allScoreB);
+                console.log('*ScoreTotalScoreX:',ScoreTotalScoreX);
+                
                 total_a = PassFileXS + ScoreXN;
                 total_b = PassFileTotalScoreX + allScoreB;
               } 
@@ -1891,9 +1900,10 @@ export default {
                 console.log('*ScoreXN:',ScoreXN);
                 console.log('*PassFileTotalScore:',PassFileTotalScore);
                 console.log('*allScoreB:',allScoreB);
+                console.log('*ScoreTotalScoreX:',ScoreTotalScoreX);
 
                 total_a = PassFileXN + ScoreXN;
-                total_b = PassFileTotalScore + allScoreB;
+                total_b = PassFileTotalScore + ScoreTotalScoreX;
               } 
               else {
                 console.log('status 4')
