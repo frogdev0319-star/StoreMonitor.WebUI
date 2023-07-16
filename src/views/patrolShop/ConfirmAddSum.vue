@@ -1371,6 +1371,7 @@ export default {
 
 
         console.log('self.inspectList :::::::>> ', self.inspectList);
+        
 
         if(self.isEditReport) {
           self.reportId = routeData.reportId;
@@ -1493,20 +1494,24 @@ export default {
                 totalScore += s_item.itemScore;
                 ScoreTS += s_item.itemgetScore;
 
-                
+                console.log('s_item.groupName ~~~~~~>>>', s_item.groupName)
+
                 if(item.items.length == item.ignoreItems.length){
+                  console.log('<< 1 >>')
                     console.log('全部忽略，分母要列入計算！！！！！')
                     Score_totalScoreX = s_item.groupScore
                 }
 
                 if (!s_item.isIgnore && !s_item.manualIgnore) {
+                  console.log('<< 2 >>')
                   ScoreX += s_item.itemgetScore;
                   Score_totalScoreX += s_item.itemScore;
-                  console.log('Score_totalScoreX ~~~~~~>>>', Score_totalScoreX)
-
+                  
                   notAddIgnoretotalScore += s_item.itemScore;
                   tab2NotIgnoredItemsGetScore += s_item.itemgetScore;
+
                 } else {
+                  console.log('<< 3 >>')
                   ScoreN += s_item.itemScore;
                   tab2IgnoredItemsGetScore += s_item.itemScore;
                 } 
@@ -1516,13 +1521,17 @@ export default {
                 } else {
                   s_item.showTotalScore = true;
                 }
+
               } else if (p_item.type === 2 && !s_item.isIgnore) {
                 OtherTS += s_item.itemgetScore;// * p_item.weight / 100;
                 s_item.showTotalScore = true;
               }
               
+              console.log(' Score_totalScoreX  ~~~~~~>>>',  Score_totalScoreX)
               inspectPic += s_item.sourceList.length;
             });//end for //子項加總完
+
+
             item['numOfQualified'] = QualifiedArr.length;
             item['numOfUnqualified'] = UnqualifiedArr.length;
             item['numIgnore'] = IgnoredArr.length;
@@ -1568,18 +1577,32 @@ export default {
 
                 
 
-                if(item.items.length == item.numIgnore){
-                  console.log('1 :>> ');
-                  PassFileTotalScore += 0
-                  PassFileTotalScoreX += 0
-                } else {
-                  
-                  console.log('2 :>> ');
+                if(inspectSettings.qualifiedForIgnoredWithType1){
                   PassFileTotalScore += util.accMul(ts0,tempWeight);
-                  PassFileTotalScoreX += util.accMul(tsX,tempWeight);
-
-                  console.log('PassFileTotalScoreX ??===>', PassFileTotalScoreX)
+                  PassFileTotalScoreX += util.accMul(tsX,tempWeight)
+                } else {
+                  if(item.items.length == item.numIgnore){
+                    console.log('1 :>> ');
+                    PassFileTotalScore += 0
+                    PassFileTotalScoreX += 0
+                  } else {
+                    PassFileTotalScore += util.accMul(ts0,tempWeight);
+                    PassFileTotalScoreX += util.accMul(tsX,tempWeight)
+                  }
                 }
+
+                // if(item.items.length == item.numIgnore){
+                //   console.log('1 :>> ');
+                //   PassFileTotalScore += 0
+                //   PassFileTotalScoreX += 0
+                // } else {
+  
+                //   console.log('2 :>> ');
+                //   PassFileTotalScore += util.accMul(ts0,tempWeight);
+                //   PassFileTotalScoreX += util.accMul(tsX,tempWeight);
+
+                //   console.log('PassFileTotalScoreX ??===>', PassFileTotalScoreX)
+                // }
             
 
                 console.log('item===>', item)
@@ -1639,22 +1662,37 @@ export default {
                   console.log('type1tsX******', type1tsX)
                   console.log('tempWeight******', tempWeight)
 
+                  console.log('inspectSettings.qualifiedForIgnoredWithType1', inspectSettings.qualifiedForIgnoredWithType1)
+                  console.log('inspectSettings.qualifiedForIgnoredWithType2', inspectSettings.qualifiedForIgnoredWithType2)
+
 
                   if(type1tsX == -99999 || item.groupScore == -99999){
                     console.log('---1--')
-                    if(item.items.length == item.numIgnore){
-                      ScoreTotalScoreX += 0
-                    } else {
-                      var n = 0
-                      var ignore = item.ignoreItems.map( i => i = i.id)
-                      var countItems  = item.items.filter( i => !ignore.includes(i.id))
-                      console.log('countItems :>> ', countItems);
-
-                      countItems.forEach(i => {
-                        n = n + i.itemScore
-                      })
-                      ScoreTotalScoreX += util.accMul(n, tempWeight);
+                    console.log('inspectSettings.qualifiedForIgnoredWithType2', inspectSettings.qualifiedForIgnoredWithType2)
+                    
+                    if(inspectSettings.qualifiedForIgnoredWithType2){
+                      console.log('item ---', item)
+                      ScoreTotalScoreX += util.accMul(type1ts, tempWeight);
                     }
+                    else {
+
+                      if(item.items.length == item.numIgnore){
+                        ScoreTotalScoreX += 0
+                      } else {
+                        var n = 0
+                        var ignore = item.ignoreItems.map( i => i = i.id)
+                        var countItems  = item.items.filter( i => !ignore.includes(i.id))
+                        console.log('countItems :>> ', countItems);
+
+                        countItems.forEach(i => {
+                          n = n + i.itemScore
+                        })
+                        ScoreTotalScoreX += util.accMul(n, tempWeight);
+                      }
+                      
+                    }
+                    
+
                   } else {
                     console.log('---2--')
                     if(item.items.length == item.numIgnore){
@@ -1667,7 +1705,7 @@ export default {
                   }
                   console.log('ScoreTotalScoreX oooo2', ScoreTotalScoreX)
 
-                  console.log("2******item.groupScor=", type1ts, ScoreTS, type1XN , type1tsX)
+                  console.log("2******item.groupScore=", type1ts, ScoreTS, type1XN , type1tsX)
                   console.log('分數上限 type1ts', type1ts)
                   console.log('項目實際得分 ScoreTS', ScoreTS)
                   console.log('有上限後得分 type1XN', type1XN)
