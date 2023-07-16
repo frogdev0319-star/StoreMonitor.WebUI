@@ -1628,6 +1628,8 @@ export default {
                   }
                 //  type1tsX = Math.min(type1tsX,
               }
+
+
                   CurAddScoreB += util.accMul(type1ts,tempWeight);
                   allScoreB = CurAddScoreB;
 
@@ -1636,17 +1638,14 @@ export default {
 
                   console.log('type1tsX******', type1tsX)
                   console.log('tempWeight******', tempWeight)
-                  console.log('item******1', item)
 
 
                   if(type1tsX == -99999 || item.groupScore == -99999){
                     console.log('---1--')
-
                     if(item.items.length == item.numIgnore){
                       ScoreTotalScoreX += 0
                     } else {
                       var n = 0
-
                       var ignore = item.ignoreItems.map( i => i = i.id)
                       var countItems  = item.items.filter( i => !ignore.includes(i.id))
                       console.log('countItems :>> ', countItems);
@@ -1656,12 +1655,13 @@ export default {
                       })
                       ScoreTotalScoreX += util.accMul(n, tempWeight);
                     }
-
                   } else {
                     console.log('---2--')
                     if(item.items.length == item.numIgnore){
+                      console.log('1 :>>:>> ');
                       ScoreTotalScoreX += 0
                     } else {
+                      console.log('2 :>>:>> ');
                       ScoreTotalScoreX += util.accMul(item.groupScore, tempWeight);
                     }
                   }
@@ -1890,7 +1890,7 @@ export default {
                 console.log('*PassFileTotalScore:',PassFileTotalScore);
                 console.log('*allScoreB:',allScoreB);
                 console.log('*ScoreTotalScoreX:',ScoreTotalScoreX);
-                
+
                 total_a = PassFileXS + ScoreXN;
                 total_b = PassFileTotalScoreX + allScoreB;
               } 
@@ -1961,11 +1961,8 @@ export default {
             }
           }
         }
-        
 
-        
         console.log('s_count--------->>>', s_count)
-
 
         if (!Tab0Status && dealType.length !== 1 && inspect[0].type === 0 || inspect[0].type !== 0) {
           self.resultList.forEach(item => {
