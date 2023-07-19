@@ -778,6 +778,7 @@ export default {
       totalSumScore: 0,
       hundredMarkType: 0,
 
+      includedInTotalScoreWithType1: false,
       qualifiedForIgnoredWithType1: false,
       qualifiedForIgnoredWithType2: false,
 
@@ -841,6 +842,7 @@ export default {
       // 剩下子類別（groupScore !== -99999）
       var items = data.filter(i =>  i.type !== 2 )
       console.log('items :>> ', items);
+      console.log('this.includedInTotalScoreWithType1 :>> ', this.includedInTotalScoreWithType1);
       console.log('this.qualifiedForIgnoredWithType1 :>> ', this.qualifiedForIgnoredWithType1);
       console.log('this.qualifiedForIgnoredWithType2 :>> ', this.qualifiedForIgnoredWithType2);
 
@@ -857,24 +859,40 @@ export default {
               // tab1 為Number.MAX_VALUE ,不計分
               if(i.actualScore === Number.MAX_VALUE)  var tempScore = 0
               
-              // tab1
-              if(this.qualifiedForIgnoredWithType1 && i.type == 0){
-                var tempScore = ((i.groupScore * i.weight) / 100)
-                console.log('tempScore2 tab1 a:>> ',i.groupName , tempScore);
+              if(this.includedInTotalScoreWithType1){
+                // tab1
+                if(this.qualifiedForIgnoredWithType1 && i.type == 0){
+                  var tempScore = ((i.groupScore * i.weight) / 100)
+                  console.log('tempScore2 tab1 a:>> ',i.groupName , tempScore);
+                }
+                else if(!this.qualifiedForIgnoredWithType1 && i.type == 0 ){
+                  var tempScore = (i.numOfIgnored == i.numOfTotalItems) ? 0 : ((i.groupScore * i.weight) / 100)
+                  console.log('tempScore2 tab1 b:>> ',i.groupName , tempScore);
+                }
+                // tab2
+                if(this.qualifiedForIgnoredWithType2 && i.type == 1){
+                  var tempScore = ((i.groupScore * i.weight) / 100)
+                  console.log('tempScore2 tab2 a:>> ',i.groupName , tempScore);
+                }
+                else if(!this.qualifiedForIgnoredWithType2 && i.type == 1 ){
+                  var tempScore = (i.numOfIgnored == i.numOfTotalItems) ? 0 : ((i.groupScore * i.weight) / 100)
+                  console.log('tempScore2 tab1 b:>> ',i.groupName , tempScore);
+                }
               }
-              else if(!this.qualifiedForIgnoredWithType1 && i.type == 0 ){
-                var tempScore = (i.numOfIgnored == i.numOfTotalItems) ? 0 : ((i.groupScore * i.weight) / 100)
-                console.log('tempScore2 tab1 b:>> ',i.groupName , tempScore);
-              }
-
-              // tab2
-              if(this.qualifiedForIgnoredWithType2 && i.type == 1){
-                var tempScore = ((i.groupScore * i.weight) / 100)
-                console.log('tempScore2 tab2 a:>> ',i.groupName , tempScore);
-              }
-              else if(!this.qualifiedForIgnoredWithType2 && i.type == 1 ){
-                var tempScore = (i.numOfIgnored == i.numOfTotalItems) ? 0 : ((i.groupScore * i.weight) / 100)
-                console.log('tempScore2 tab1 b:>> ',i.groupName , tempScore);
+              else {
+                // tab1
+                if(this.qualifiedForIgnoredWithType1 && i.type == 0){
+                  var tempScore = 0
+                }
+                // tab2
+                if(this.qualifiedForIgnoredWithType2 && i.type == 1){
+                  var tempScore = ((i.groupScore * i.weight) / 100)
+                  console.log('tempScore2 tab2 a:>> ',i.groupName , tempScore);
+                }
+                else if(!this.qualifiedForIgnoredWithType2 && i.type == 1 ){
+                  var tempScore = (i.numOfIgnored == i.numOfTotalItems) ? 0 : ((i.groupScore * i.weight) / 100)
+                  console.log('tempScore2 tab1 b:>> ',i.groupName , tempScore);
+                }
               }
             }
 
@@ -882,25 +900,44 @@ export default {
             else {
               if(i.actualScore === Number.MAX_VALUE)  var tempScore = 0
               
-              // tab1
-              if(this.qualifiedForIgnoredWithType1 && i.type == 0){
-                var tempScore = (i.totalScore * i.weight) / 100
-                console.log('tempScore2 tab1 a:>> ',i.groupName , tempScore);
+              if(this.includedInTotalScoreWithType1){
+                // tab1
+                if(this.qualifiedForIgnoredWithType1 && i.type == 0){
+                  var tempScore = (i.totalScore * i.weight) / 100
+                  console.log('tempScore2 tab1 a:>> ',i.groupName , tempScore);
+                }
+                else if(!this.qualifiedForIgnoredWithType1 && i.type == 0 ){
+                  var tempScore = (i.numOfIgnored == i.numOfTotalItems) ? 0 : (i.totalScore * i.weight) / 100
+                  console.log('tempScore2 tab1 b:>> ',i.groupName , tempScore);
+                }
+
+                // tab2
+                if(this.qualifiedForIgnoredWithType2 && i.type == 1){
+                  var tempScore = (i.totalScore * i.weight) / 100
+                  console.log('tempScore2 tab2 a:>> ',i.groupName , tempScore);
+                }
+                else if(!this.qualifiedForIgnoredWithType2 && i.type == 1 ){
+                  var tempScore = (i.numOfIgnored == i.numOfTotalItems) ? 0 : (i.totalScore * i.weight) / 100
+                  console.log('tempScore2 tab1 b:>> ',i.groupName , tempScore);
+                }
               }
-              else if(!this.qualifiedForIgnoredWithType1 && i.type == 0 ){
-                var tempScore = (i.numOfIgnored == i.numOfTotalItems) ? 0 : (i.totalScore * i.weight) / 100
-                console.log('tempScore2 tab1 b:>> ',i.groupName , tempScore);
+              else {
+                // tab1
+                if(i.type == 0){
+                  var tempScore = 0
+                }
+                // tab2
+                if(this.qualifiedForIgnoredWithType2 && i.type == 1){
+                  var tempScore = (i.totalScore * i.weight) / 100
+                  console.log('tempScore2 tab2 a:>> ',i.groupName , tempScore);
+                }
+                else if(!this.qualifiedForIgnoredWithType2 && i.type == 1 ){
+                  var tempScore = (i.numOfIgnored == i.numOfTotalItems) ? 0 : (i.totalScore * i.weight) / 100
+                  console.log('tempScore2 tab1 b:>> ',i.groupName , tempScore);
+                }
               }
 
-              // tab2
-              if(this.qualifiedForIgnoredWithType2 && i.type == 1){
-                var tempScore = (i.totalScore * i.weight) / 100
-                console.log('tempScore2 tab2 a:>> ',i.groupName , tempScore);
-              }
-              else if(!this.qualifiedForIgnoredWithType2 && i.type == 1 ){
-                var tempScore = (i.numOfIgnored == i.numOfTotalItems) ? 0 : (i.totalScore * i.weight) / 100
-                console.log('tempScore2 tab1 b:>> ',i.groupName , tempScore);
-              }
+              
             }
           } 
 
@@ -910,53 +947,83 @@ export default {
             if(i.groupScore !== -99999 ){
               if(i.actualScore === Number.MAX_VALUE)  var tempScore = 0
           
-              // if(i.numOfIgnored === i.numOfTotalItems) var tempScore = 0
-              // var tempScore = (i.groupScore / 100)
-              
-              // tab1
-              if(this.qualifiedForIgnoredWithType1 && i.type == 0){
-                var tempScore = i.groupScore / 100
-                console.log('tempScore3 tab1 a:>> ',i.groupName , tempScore);
-              }
-              else if(!this.qualifiedForIgnoredWithType1 && i.type == 0 ){
-                var tempScore = (i.numOfIgnored == i.numOfTotalItems) ? 0 : i.groupScore / 100
-                console.log('tempScore3 tab1 b:>> ',i.groupName , tempScore);
-              }
+              if(this.includedInTotalScoreWithType1){
+                 // tab1
+                if(this.qualifiedForIgnoredWithType1 && i.type == 0){
+                  var tempScore = i.groupScore / 100
+                  console.log('tempScore3 tab1 a:>> ',i.groupName , tempScore);
+                }
+                else if(!this.qualifiedForIgnoredWithType1 && i.type == 0 ){
+                  var tempScore = (i.numOfIgnored == i.numOfTotalItems) ? 0 : i.groupScore / 100
+                  console.log('tempScore3 tab1 b:>> ',i.groupName , tempScore);
+                }
 
-              // tab2
-              if(this.qualifiedForIgnoredWithType2 && i.type == 1){
-                var tempScore = i.groupScore / 100
-                console.log('tempScore3 tab2 a:>> ',i.groupName , tempScore);
+                // tab2
+                if(this.qualifiedForIgnoredWithType2 && i.type == 1){
+                  var tempScore = i.groupScore / 100
+                  console.log('tempScore3 tab2 a:>> ',i.groupName , tempScore);
+                }
+                else if(!this.qualifiedForIgnoredWithType2 && i.type == 1 ){
+                  var tempScore = (i.numOfIgnored == i.numOfTotalItems) ? 0 : i.groupScore / 100
+                  console.log('tempScore3 tab2 b:>> ',i.groupName , tempScore);
+                }
               }
-              else if(!this.qualifiedForIgnoredWithType2 && i.type == 1 ){
-                var tempScore = (i.numOfIgnored == i.numOfTotalItems) ? 0 : i.groupScore / 100
-                console.log('tempScore3 tab2 b:>> ',i.groupName , tempScore);
+              else {
+                // tab1
+                if(i.type == 0){
+                  var tempScore =  0 
+                }
+                // tab2
+                if(this.qualifiedForIgnoredWithType2 && i.type == 1){
+                  var tempScore = i.groupScore / 100
+                  console.log('tempScore3 tab2 a:>> ',i.groupName , tempScore);
+                }
+                else if(!this.qualifiedForIgnoredWithType2 && i.type == 1 ){
+                  var tempScore = (i.numOfIgnored == i.numOfTotalItems) ? 0 : i.groupScore / 100
+                  console.log('tempScore3 tab2 b:>> ',i.groupName , tempScore);
+                }
+
               }
             }
 
             // 無分數無上限
             else if(i.groupScore == -99999){
-              if(i.actualScore === Number.MAX_VALUE)  {
-                var tempScore = 0
-              }
-              // tab1
-              if(this.qualifiedForIgnoredWithType1 && i.type == 0){
-                var tempScore = i.totalScore / 100
-                console.log('tempScore4 tab1 a:>> ',i.groupName , tempScore);
-              }
-              else if(!this.qualifiedForIgnoredWithType1 && i.type == 0 ){
-                var tempScore = (i.numOfIgnored == i.numOfTotalItems) ? 0 : i.totalScore / 100
-                console.log('tempScore4 tab1 b:>> ',i.groupName , tempScore);
-              }
+              if(i.actualScore === Number.MAX_VALUE) var tempScore = 0
 
-              // tab2
-              if(this.qualifiedForIgnoredWithType2 && i.type == 1){
-                var tempScore = i.totalScore / 100
-                console.log('tempScore4 tab2 a:>> ',i.groupName , tempScore);
+              if(this.includedInTotalScoreWithType1){
+                // tab1
+                if(this.qualifiedForIgnoredWithType1 && i.type == 0){
+                  var tempScore = i.totalScore / 100
+                  console.log('tempScore4 tab1 a:>> ',i.groupName , tempScore);
+                }
+                else if(!this.qualifiedForIgnoredWithType1 && i.type == 0 ){
+                  var tempScore = (i.numOfIgnored == i.numOfTotalItems) ? 0 : i.totalScore / 100
+                  console.log('tempScore4 tab1 b:>> ',i.groupName , tempScore);
+                }
+                // tab2
+                if(this.qualifiedForIgnoredWithType2 && i.type == 1){
+                  var tempScore = i.totalScore / 100
+                  console.log('tempScore4 tab2 a:>> ',i.groupName , tempScore);
+                }
+                else if(!this.qualifiedForIgnoredWithType2 && i.type == 1 ){
+                  var tempScore = (i.numOfIgnored == i.numOfTotalItems) ? 0 : i.totalScore / 100
+                  console.log('tempScore4 tab1 b:>> ',i.groupName , tempScore);
+                }
               }
-              else if(!this.qualifiedForIgnoredWithType2 && i.type == 1 ){
-                var tempScore = (i.numOfIgnored == i.numOfTotalItems) ? 0 : i.totalScore / 100
-                console.log('tempScore4 tab1 b:>> ',i.groupName , tempScore);
+              else {
+                // tab1
+                if( i.type == 0){
+                  var tempScore =  0 
+                }
+                // tab2
+                if(this.qualifiedForIgnoredWithType2 && i.type == 1){
+                  var tempScore = i.totalScore / 100
+                  console.log('tempScore4 tab2 a:>> ',i.groupName , tempScore);
+                }
+                else if(!this.qualifiedForIgnoredWithType2 && i.type == 1 ){
+                  var tempScore = (i.numOfIgnored == i.numOfTotalItems) ? 0 : i.totalScore / 100
+                  console.log('tempScore4 tab1 b:>> ',i.groupName , tempScore);
+                }
               }
             }
           }
@@ -992,7 +1059,7 @@ export default {
               // 比例制
               if(this.hundredMarkType.value == 0){
                 if(ii.weight == -1 && i.type == 0){
-                  tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) /10
+                  tableTotalScore = tableTotalScore +  (ii.actualScore / this.totalSumScore) 
                   // tableTotalScore.toFixed(1)
                   console.log('gogo 沒有權重啊！！ :>> ', ii.groupName, tableTotalScore);
                 }
@@ -1002,7 +1069,7 @@ export default {
                   console.log('gogo 有權重啊 :>> ' , ii.groupName, tableTotalScore);
                 }
                 else if(ii.weight == -1 && i.type == 1){
-                  tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) /10
+                  tableTotalScore = tableTotalScore +  (ii.actualScore / this.totalSumScore) 
                   // tableTotalScore.toFixed(1)
                   console.log('gogo 沒有權重啊！！ :>> ', ii.groupName, tableTotalScore);
                 }
@@ -1022,19 +1089,19 @@ export default {
               // 加分制
               else if(this.hundredMarkType.value == -1){
                 if(ii.weight == -1 && i.type == 0){
-                  tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) / 10
+                  tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore)
                 }
                 else if(ii.weight !== -1 && i.type == 0){
                   tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) / 10
                 }
                 else if(ii.weight == -1 && i.type == 1){
-                  tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) / 10
+                  tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore) 
                 }
                 else if(ii.weight !== -1 && i.type == 1){
                   tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) / 100
                 }
                 else if(ii.weight == -1 && ii.type== 2){
-                  tableTotalScore = tableTotalScore + Math.round( (ii.actualScore / this.totalSumScore) *10) / 10
+                  tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore) 
                 } 
                 else if(ii.weight !== -1 && ii.type== 2){
                   tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) / 10
@@ -1064,9 +1131,7 @@ export default {
                 else if(ii.weight !== -1 && ii.type== 2){
                   tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
                 } 
-
               }
-              
             }
         })
       })
@@ -1214,9 +1279,12 @@ export default {
         console.log('this.setting_isShowDistrictSum :>> ', this.setting_isShowDistrictSum);
 
         this.showMaxInfo = results[1].data[0].info.summary.some(i => i.isAdvanced == true)
-
+        
+        var includedInTotalScoreWithType1 = results[1].data[0].inspectSettings.find( i => i.name == "includedInTotalScoreWithType1")
         var qualifiedForIgnoredWithType1 = results[1].data[0].inspectSettings.find( i => i.name == "qualifiedForIgnoredWithType1")
         var qualifiedForIgnoredWithType2 = results[1].data[0].inspectSettings.find( i => i.name == "qualifiedForIgnoredWithType2")
+
+        this.includedInTotalScoreWithType1 = includedInTotalScoreWithType1.value
         this.qualifiedForIgnoredWithType1 = qualifiedForIgnoredWithType1.value
         this.qualifiedForIgnoredWithType2 = qualifiedForIgnoredWithType2.value
 
