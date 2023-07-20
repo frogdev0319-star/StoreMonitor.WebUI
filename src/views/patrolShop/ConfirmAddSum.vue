@@ -2154,10 +2154,10 @@ export default {
 
     adviceChanged(val) {
       const self = this;
-      const content = filterString.all(val, 600);
+      const content = filterString.all(val, 1000);
       const length = filterString.getContentLength(val);
       self.suggest = content;
-      if (length > 600) {
+      if (length > 1000) {
         this.adviceInfoRuletip = true;
       } else {
         this.adviceInfoRuletip = false;
@@ -2192,10 +2192,10 @@ export default {
 
     auditNoteChanged(val) {
       const self = this;
-      const content = filterString.all(val, 600);
+      const content = filterString.all(val, 1000);
       const length = filterString.getContentLength(val);
       self.auditNote = content;
-      if (length > 600) {
+      if (length > 1000) {
         this.auditNoteRuletip = true;
       } else {
         this.auditNoteRuletip = false;

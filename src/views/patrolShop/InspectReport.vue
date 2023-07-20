@@ -2730,8 +2730,8 @@ export default {
            color: #c60957;
         }
         .font-score_count {
-           font-size: calc(12/1440*100vw);
-           color: #69727c;
+          font-size: calc(12/1440*100vw);
+          color: #69727c;
         }
       }
 

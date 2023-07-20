@@ -559,10 +559,10 @@ export default {
   methods: {
     ivsIdChange(val) {
       const self = this;
-      const comment = filterString.all(val, 200);
+      const comment = filterString.all(val, 1000);
       self.eventDes = comment;
       const length = filterString.getContentLength(val);
-      if (length > 200) {
+      if (length > 1000) {
         self.ivsIdRuletip = true;
       } else {
         self.ivsIdRuletip = false;
