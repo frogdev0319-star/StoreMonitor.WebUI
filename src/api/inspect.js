@@ -217,6 +217,17 @@ export const GetInspectTagList = params => {
     params
   });
 };
+export const GetInspectTagListAll = params => {
+  return request({
+    url: `${version}/inspect/tag/listAll`,
+    method: 'get',
+    params
+  });
+};
+
+
+
+
 
 export const GetMysteryInspectTagList = params => {
   return request({
