@@ -1135,7 +1135,13 @@ export default {
               };
             }
 
-          } else {
+          } 
+          else if(res.errCode == 7001){
+            console.log('errerrerr 7001')
+            util.notify("無表單執行權限，請確認或聯繫管理員", 'error', 3000);
+          }
+          
+          else {
             self.reportSubmitting = false;
             util.notify(res.errMsg, 'error', 3000);
             routeData = {
@@ -1143,9 +1149,11 @@ export default {
               reLoadData: self.$route.params,
               isBindWorkflow:false
             };
+
+
           }
-          if(!self.isBindWorkflow)
-            self.$router.push({ name: 'submitEvent', params: { data: routeData}});
+          if(!self.isBindWorkflow) self.$router.push({ name: 'submitEvent', params: { data: routeData}});
+          
         }).catch(err => {
           self.reportSubmitting = false;
           util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);

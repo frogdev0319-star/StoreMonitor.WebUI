@@ -151,6 +151,26 @@
                 </div>
               </div>
             </setting-table>
+
+            <!-- 報表檢視權限 -->
+            <setting-table table-name="報表檢視權限" style="margin-top: 20px;">
+              <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
+                <div class="overall_options">
+
+                  <div class="overall_row" >
+                    <el-radio-group class="storevue-radio radio_item" v-model="viewReportByTagAuth" style="margin-left: 20px;">
+                      <el-radio :label="1" style="  min-width: 100px; text-align: left; margin-right: 50px;" >依表單執行權限檢視報告</el-radio>
+                      <el-radio :label="0" style=" width: fit-content;">依門店權限檢視報告 </el-radio>
+                    </el-radio-group>
+                  </div>
+
+                  <span class="text_limit_sign" v-if="showInputLimit_overallItem"> {{$t('insSettingView.inputRuletip')}} </span>
+                </div>
+              </div>
+            </setting-table>
+
+
+
           </div>
         </div>
       </div>
@@ -216,6 +236,8 @@ export default {
           is_customize: false
         },
       ],
+
+      viewReportByTagAuth: 0
       
     };
   },
@@ -376,7 +398,8 @@ export default {
               unHandleNotifyDay: delayDay,
               checkTime: eventCheckTime
           },
-          time_zone: timeZone
+          time_zone: timeZone,
+          view_report_by_tag_auth: this.viewReportByTagAuth == 1 ? true : false
           
       }
 
