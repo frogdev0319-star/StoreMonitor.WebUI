@@ -1136,9 +1136,21 @@ export default {
             }
 
           } 
+
           else if(res.errCode == 7001){
             console.log('errerrerr 7001')
-            util.notify("無表單執行權限，請確認或聯繫管理員", 'error', 3000);
+            util.notify("無表單執行權限，請確認或聯繫管理員", 'error', 3300);
+            routeData = {
+              isSuccess: false,
+              reLoadData: self.$route.params,
+              isBindWorkflow: false,
+              viewReportByTagAuth: true
+            };
+            console.log('routeData ~~~>> ', routeData);
+            setTimeout(() => {
+              this.reportSubmitting = false
+            },3500);
+            
           }
           
           else {
