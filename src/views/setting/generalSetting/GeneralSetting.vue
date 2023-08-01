@@ -346,6 +346,8 @@ export default {
           this.inspectStatus = res.data.settingContent.general_setting_inspect_status_name
           delete this.inspectStatus.update_time
           delete this.inspectStatus.update_user_id
+
+          this.viewReportByTagAuth = res.data.settingContent.general_setting.view_report_by_tag_auth == true ? 1 : 0
           console.log('this.inspectStatus :>> ', this.inspectStatus);
         }).catch(err => {
           reject(err);
