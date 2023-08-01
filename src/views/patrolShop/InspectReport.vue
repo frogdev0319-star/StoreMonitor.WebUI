@@ -1040,8 +1040,7 @@ export default {
         console.log('扣分制')
         this.totalSumScore = 100
       }
-    
-
+  
       console.log('this.totalSumScore =======>> ', this.totalSumScore)
     },
 
@@ -1089,10 +1088,10 @@ export default {
               // 加分制
               else if(this.hundredMarkType.value == -1){
                 if(ii.weight == -1 && i.type == 0){
-                  tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore)
+                  tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore) 
                 }
                 else if(ii.weight !== -1 && i.type == 0){
-                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) / 10
+                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) / 100
                 }
                 else if(ii.weight == -1 && i.type == 1){
                   tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore) 
@@ -1104,7 +1103,7 @@ export default {
                   tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore) 
                 } 
                 else if(ii.weight !== -1 && ii.type== 2){
-                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) / 10
+                  tableTotalScore = tableTotalScore + ii.actualScore 
                 } 
               }
 
@@ -1184,12 +1183,14 @@ export default {
         else if(this.hundredMarkType.value == -1){
           console.log('加分制走這邊！')
           if(i.weight == -1 && i.type == 0){
+            console.log('a ~~~~----->> ');
             if(i.actualScore === Number.MAX_VALUE) totalScore = 0
-            else totalScore = totalScore + (i.actualScore )
+            else totalScore = totalScore + (i.actualScore ) 
           }
           else if(i.weight !== -1 && i.type == 0){
+            console.log('b ~~~~----->> ');
             if(i.actualScore === Number.MAX_VALUE) totalScore = 0
-            else totalScore = totalScore + (i.actualScore * i.weight )
+            else totalScore = totalScore + (i.actualScore * i.weight ) / 100
           }
           if(i.weight == -1 && i.type == 1){
             if(i.actualScore === Number.MAX_VALUE) totalScore = 0
@@ -1197,13 +1198,13 @@ export default {
           }
           else if(i.weight !== -1 && i.type == 1){
             if(i.actualScore === Number.MAX_VALUE) totalScore = 0
-            else totalScore = totalScore + (i.actualScore * i.weight ) /100
+            else totalScore = totalScore + (i.actualScore * i.weight ) / 100
           }
           else if( i.weight == -1 && i.type == 2 ){
-            totalScore = totalScore + (i.actualScore )
+            totalScore = totalScore + i.actualScore 
           }
           else if( i.weight !== -1 && i.type == 2 ){
-            totalScore = totalScore + (i.actualScore * i.weight )
+            totalScore = totalScore + i.actualScore  
           }
         }
 
