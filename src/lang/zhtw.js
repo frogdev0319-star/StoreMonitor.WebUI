@@ -363,7 +363,7 @@ export default{
       "errorConnection":"連線錯誤",
       "errorEncry":"調用查詢設備是否加密失敗",
       "errorVerifyCode":"調用驗證設備密碼失敗",
-      "eventDesRuletip":"最多可輸入200個字元",
+      "eventDesRuletip":"最多可輸入1000個字元",
       "eventNameRuletip":"最多可輸入50個字元",
       "eventStatus":"問題狀態",
       "eventTitle":"問題名稱",
