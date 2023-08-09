@@ -13,7 +13,7 @@
         </div>
           <div class="type-pick">
             <el-select v-bind:disabled='layer1=="all"' style="width:250px"
-             class="dropdown-select" v-model="layer2" value-key="value"  @change="changeLayer2">
+              class="dropdown-select" v-model="layer2" value-key="value"  @change="changeLayer2">
                 <el-option 
                   v-for="item in layer2List"
                   :key="item.value"
@@ -24,7 +24,7 @@
         </div>
           <div v-if="showItems" class="type-pick">
             <el-select v-bind:disabled='layer2=="all"' style="width:250px"
-             class="dropdown-select" v-model="selectedItem" value-key="value"  @change="changeItem">
+              class="dropdown-select" v-model="selectedItem" value-key="value"  @change="changeLayer3">
                 <el-option 
                   v-for="item in itemList"
                   :key="item.value"
@@ -61,23 +61,33 @@ export default {
     },
     data() {
         return {
-            DatePickIconSrc: require('../../static/img/statistics/ic_edit.svg'),
-            CalenderIconSrc: require('../../static/img/statistics/ic_calender.svg'),
-            layer1:'all',
-            curLayer1:null,
-            curLayer2:null,
-            layer1List:[{value:'all',label:this.$t('eventView.all')}],
-            layer2:'all',
-            layer2List:[{value:'all',label:this.$t('eventView.all')}],
-            itemList:[{value:'all',label:this.$t('eventView.all')}],
-            selectedItem:'',
-            curItem:null,
-            selAllString:this.$t('eventView.all'),
-            showItems:false,
-            lang:this.$i18n.locale,
-            typeDivWidth:[{key:'en',value:'calc(52/1440*100vw)'},{key:'zh',value:'calc(52/1440*100vw)'},{key:'zhtw',value:'calc(52/1440*100vw)'},
-              {key:'ja-JP',value:util.getWindowWidth()>1600?'calc(62/1440*100vw)':'80px'},{key:'ko-KR',value:'calc(52/1440*100vw)'},{key:'vi-VN',value:'calc(52/1440*100vw)'},
-              {key:'id-ID',value:'calc(52/1440*100vw)'},{key:'th-TH',value:'calc(72/1440*100vw)'}],
+          DatePickIconSrc: require('../../static/img/statistics/ic_edit.svg'),
+          CalenderIconSrc: require('../../static/img/statistics/ic_calender.svg'),
+          
+          curLayer1: null,
+          layer1: 'all',
+          layer1List:[{value:'all',label:this.$t('eventView.all')}],
+          
+          curLayer2: null,
+          layer2: 'all',
+          layer2List:[{value:'all',label:this.$t('eventView.all')}],
+
+          curLayer3: null,
+          layer3: 'all',
+          layer3List: [{value:'all',label:this.$t('eventView.all')}],
+
+          hasLayer3List: false,
+          layer3Id: [],
+
+          itemList:[{value:'all',label:this.$t('eventView.all')}],
+          selectedItem:'',
+          curItem:null,
+          selAllString:this.$t('eventView.all'),
+          showItems:false,
+          lang:this.$i18n.locale,
+          typeDivWidth:[{key:'en',value:'calc(52/1440*100vw)'},{key:'zh',value:'calc(52/1440*100vw)'},{key:'zhtw',value:'calc(52/1440*100vw)'},
+            {key:'ja-JP',value:util.getWindowWidth()>1600?'calc(62/1440*100vw)':'80px'},{key:'ko-KR',value:'calc(52/1440*100vw)'},{key:'vi-VN',value:'calc(52/1440*100vw)'},
+            {key:'id-ID',value:'calc(52/1440*100vw)'},{key:'th-TH',value:'calc(72/1440*100vw)'}],
         }
   },
   created() {
@@ -135,7 +145,7 @@ export default {
       this.layer1List = layer1List;
       if(list.length==0){
         console.log("emit list empty")
-         this.$emit("emitItemChanged",{item:[]});
+        this.$emit("emitItemChanged",{item:[]});
         
       }else{
         this.notifyItemChanged();
@@ -146,11 +156,11 @@ export default {
         const self =this;
         let list = [];
         if(item.items){
-           item.items.forEach(function(d){
-             let o =  self.getIds(d);
-             list = list.concat(o);
-           })
-           return list;
+          item.items.forEach(function(d){
+            let o =  self.getIds(d);
+            list = list.concat(o);
+          })
+          return list;
         }
         else{
           
@@ -159,17 +169,17 @@ export default {
 
     },
     getScore(item){
-       const self =this;
-        if(item.items){
-           let qualifiedScore = 0;
-           item.items.forEach(function(d){
-             qualifiedScore += self.getScore(d);
-           })
-           return qualifiedScore;
-        }
-        else{
-          return item.itemScore;
-        }
+      const self =this;
+      if(item.items){
+          let qualifiedScore = 0;
+          item.items.forEach(function(d){
+            qualifiedScore += self.getScore(d);
+          })
+          return qualifiedScore;
+      }
+      else{
+        return item.itemScore;
+      }
     },
     changeLayer1(e){
       console.log("Change Layer1 to="+e)
@@ -203,19 +213,20 @@ export default {
       this.notifyItemChanged();
     },
     changeLayer2(e){
+      console.log("Change Layer2" , e)
       this.layer2 = e;
       let itemList =[{value:'all',label:this.$t('eventView.all')}];
-      if(e=='all'){
-          this.curLayer2 =null;
+      if(e =='all'){
+          this.curLayer2 = null;
       }
       else{
-        this.curLayer2 =null;
+        this.curLayer2 = null;
         this.curLayer1.items.forEach(subitem => {
           if(subitem.id == e){
             this.curLayer2 = subitem;
               if(this.curLayer2 && this.curLayer2.items){
-               this.showItems= true;
-               this.curLayer2.items.forEach(subitem => {
+                this.showItems= true;
+                this.curLayer2.items.forEach(subitem => {
                 itemList.push({label:subitem.subject,value:subitem.id})
               });
 
@@ -226,24 +237,67 @@ export default {
           }
         });
       }
-      this.itemList=itemList;
-      this.curItem =null;
+      this.itemList = itemList;
+      this.curItem = null;
       this.selectedItem = 'all'
       this.notifyItemChanged();
 
     },
-    changeItem(e){
-      console.log("Change Layer1")
+    
+    changeLayer3(e){
+      console.log("Change Layer3" , e)
+      this.hasLayer3List = true
+      this.layer3Id = e
+      // this.layer3 = e;
+      // let itemList =[{value:'all',label:this.$t('eventView.all')}];
+      // if(e =='all'){
+      //     this.curLayer3 =null;
+      // }
+      // else{
+      //   this.curLayer3 =null;
+      //   this.curLayer1.items.forEach(subitem => {
+      //     if(subitem.id == e){
+      //       this.curLayer3 = subitem;
+      //         if(this.curLayer3 && this.curLayer3.items){
+      //           this.showItems= true;
+      //           this.curLayer3.items.forEach(subitem => {
+      //           itemList.push({label:subitem.subject,value:subitem.id})
+      //         });
+
+      //       }
+      //     }
+      //   });
+      // }
+      // this.itemList=itemList;
+      // this.curItem =null;
+      // this.selectedItem = 'all'
+      this.notifyItemChanged();
     },
+
+
     notifyItemChanged(){
-       console.log("NOtify changed")
-       console.log("this.curItem:",this.curItem)
-       let item = this.selectedItem!='all' && this.curItem ? this.curItem: this.layer2!='all'&& this.curLayer2 ?this.curLayer2:this.curLayer1;
-       let ids = this.getIds(item)
-       console.log(ids)
-       item.ids = ids;
-       item.qualifiedScore = this.getScore(item);
-       this.$emit("emitItemChanged",{item});
+      console.log("NOtify changed")
+      console.log("this.curItem:",this.curItem)
+
+      let item = this.selectedItem!='all' && this.curItem ? this.curItem : this.layer2!='all'&& this.curLayer2 ? this.curLayer2 : this.curLayer1;
+
+      if(this.hasLayer3List){
+        let ids = []
+        ids.push(this.layer3Id)
+        item.ids = ids;
+      } else {
+        let ids = this.getIds(item)
+        item.ids = ids;
+      }
+      
+      
+      item.qualifiedScore = this.getScore(item);
+
+      console.log('item.ids', item.ids)
+      console.log('item.qualifiedScore', item.qualifiedScore)
+      console.log('item', item)
+
+      this.$emit("emitItemChanged",{item});
     }
   }
 }

@@ -33,7 +33,7 @@
             <div class="head">
               <div class="region-titles">
                   <span class="title">
-                        {{ $t('statistics.titles.inspectItemScores') }}
+                        {{ $t('statistics.titles.inspectItemScores') }} 
                   </span>
               </div>
                   <TypeSelectArea
@@ -780,6 +780,7 @@ export default {
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{},
               table:{total:0,page:1,sizeNum:10,order:'desc',property:'numOfTotal'}},
+              
       operationBtnClass:[
         {key:'en',value:'operation-btns-en'},{key:'zh',value:'operation-btns-zh'},{key:'zhtw',value:'operation-btns-zhTW'},
         {key:'ja-JP',value:'operation-btns-ja'},{key:'ko-KR',value:'operation-btns-ko'},{key:'vi-VN',value:'operation-btns-vi'},
@@ -1260,7 +1261,7 @@ export default {
       this.dataGetPart3();
 
     },
-   getInspectLineOption() {
+    getInspectLineOption() {
       const option = {
         width:'100%',
         color: ['#f11e66'],
@@ -2001,7 +2002,7 @@ export default {
       this.part2.barStoreOption = option;
     },
     async getPart3RegionBar() {
-      
+      // this.inspectItem
       const self = this;
       const params = {};
       this.totalAvgScore =-9999;
@@ -2075,6 +2076,7 @@ export default {
         console.log("this.inspectItem:",this.inspectItem);
         params.itemIds = this.inspectItem.item.ids
       }
+
       let totalReport = 0;
       let totalStandard = 0;
 
@@ -2153,7 +2155,7 @@ export default {
           }})
           }
 
-           regionLabel.push(this.maxLabel(item.groupName))
+          regionLabel.push(this.maxLabel(item.groupName))
         });
         if(count>0){
           totalAvgScore = (totalAvgScore/count).toFixed(1);
@@ -2191,6 +2193,8 @@ export default {
       //console.log(option)
       await this.getPart3StoreBar();
     },
+
+
     async getPart3StoreBar(){
       const self = this;
       const option = this.getInspectLineOption();
@@ -2638,7 +2642,7 @@ export default {
     getInspectTagStandardScore(){//取得巡檢表達標分數
       const self = this;
       return new Promise((resolve, reject) => {
-         GetInspectTagList({includeRule:true}).then(res => {
+        GetInspectTagList({includeRule:true}).then(res => {
           resolve(res);
         }).catch(err => {
           reject(err);
@@ -2648,7 +2652,7 @@ export default {
     getInspectItemList(inspectId){
       const self = this;
       return new Promise((resolve, reject) => {
-         getInspectItemList({inspectId}).then(res => {
+        getInspectItemList({inspectId}).then(res => {
           resolve(res);
         }).catch(err => {
           reject(err);
@@ -2658,13 +2662,15 @@ export default {
         return result;
       });
     },
+
     emitItemChanged(item){
-       console.log("Emit Item Changed:",item);
-       this.inspectItem = item;
-       this.getItemSubtitle();
-       console.log("2.getPart3RegionBar");
-       this.getPart3RegionBar();
+      console.log("Emit Item Changed:",item);
+      this.inspectItem = item;
+      this.getItemSubtitle();
+      console.log("2.getPart3RegionBar");
+      this.getPart3RegionBar();
     },
+    
     async doGetAssessmentStandardScore(){
       console.log("tag-doGetAssessmentStandardScore")
       let tagList = await this.getInspectTagStandardScore();
@@ -2693,9 +2699,10 @@ export default {
     getItemSubtitle(){
       if(this.inspectItem && this.inspectItem.item){
         let item = this.inspectItem.item;
-        let name = item.subject?item.subject:item.name
-        this.inspectSubTitle= name + " "+ this.$t('statistics.itemAverageScore') + "  ( " + this.$t('statistics.totalScore') +  parseFloat(item.qualifiedScore.toFixed(1)) + " )";
-        this.inspectDetailSubTitle= name+ " " + this.$t('statistics.evalDetail')+ "  ( " + this.$t('statistics.totalScore') +  parseFloat(item.qualifiedScore.toFixed(1)) + " )";
+        let name = item.subject ? item.subject : item.name
+        console.log('item ~~~~~>> ', item)
+        this.inspectSubTitle = name + " " + this.$t('statistics.itemAverageScore') + "  ( " + this.$t('statistics.totalScore') +  parseFloat(item.qualifiedScore.toFixed(1)) + " )";
+        this.inspectDetailSubTitle = name + " " + this.$t('statistics.evalDetail')+ "  ( " + this.$t('statistics.totalScore') +  parseFloat(item.qualifiedScore.toFixed(1)) + " )";
       }
     }
   }

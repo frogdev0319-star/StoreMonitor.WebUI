@@ -430,11 +430,6 @@
         </div>
     </el-row>
 
-
-
-
-
-
     <div id="pdf-area" v-if="ispdf" ref="printPDF" class="statistics-container">
         <div style="width:1280px;">
             <div class="statistics-content-pdf" style="height: 194px;marginTop:20px;box-shadow:none;">
@@ -1080,8 +1075,8 @@ export default {
                     'prop': 'storeSubmitters',
                     'label': this.$t('statistics.submitter'),
                     'sortable': false,
-                    'width': '110',
-                    'maxWidth': '110',
+                    'width': '210',
+                    'maxWidth': '210',
                     'pdfwidth': '11%'
                 },
                 {
@@ -1513,11 +1508,18 @@ export default {
                 let params = JSON.parse(JSON.stringify(this.params))
                 params.storeIds = [e.row.innerId]
                 params.curStore = [e.row.innerId]
+                params.filterStoreIds = [e.row.innerId]
+                if (!params.curProvince) {
+                    params.curProvince = [];
+                }
+                if (!params.curCity) {
+                    params.curCity = [];
+                }
                 const searchParamsObj = {
                     path: 'PatrolCompareStat',
                     params: params
                 };
-                this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
+                SearchConditionUtil.saveSearchCondition(searchParamsObj);
                 this.$router.push({
                     path: '/patrolCompareStat',
                 });
@@ -2757,7 +2759,7 @@ export default {
                             params.submitters = users;
                         else
                             params.submitters = [self.part1.content[self.part1.indexRegion].innerId];
-                        this.curSubmitter =params.submitters;
+                        this.curSubmitter = params.submitters;
 
                     }else if(this.part1.compareType == 'mysterio'){
                         params.storeIds = self.params.storeIds;
@@ -2820,7 +2822,7 @@ export default {
                     console.log(item)
                     item.storeGroup = item.storeRegion.toString();
                     item.storeType = item.storeBranchType.toString();
-                    if (item.submitters) item.storeSubmitters = item.submitters.toString();
+                    if (item.submitters) item.storeSubmitters = item.submitters.join(", ");
                     if (item.code == '') item.code = '- -'
                     if (item.storeGroup == '') item.storeGroup = '- -'
                     if (item.storeType == '') item.storeType = '- -'
@@ -3115,12 +3117,21 @@ export default {
                     }
                 }
 
+                var tempContent = [...content]
+                tempContent = tempContent.sort( (a, b) => b.standardRate - a.standardRate)
+                tempContent.map((x, index) => x.rank = parseInt(index) + 1)
+                tempContent.forEach( i => {
+                    content.map( ii => {
+                        if(i.innerId == ii.innerId) ii.rank = i.rank
+                    })
+                })
+
                 content.map((item, index) => {
-                    item.rank = parseInt(index) + 1;
+                    // item.rank = parseInt(index) + 1;
                     item.compareTrend = this.$t('statistics.check'),
                         item.storeGroup = item.storeRegion.toString();
                     item.storeType = item.storeBranchType.toString();
-                    if (item.submitters) item.storeSubmitters = item.submitters.toString();
+                    if (item.submitters) item.storeSubmitters = item.submitters.join(", ");;
                     if (item.code == '') item.code = '- -'
                     if (item.storeGroup == '') item.storeGroup = '- -'
                     if (item.storeType == '') item.storeType = '- -'
@@ -3376,12 +3387,22 @@ export default {
                     }
                 }
 
+                var tempContent = [...content]
+                tempContent = tempContent.sort( (a, b) => b.standardRate - a.standardRate)
+                tempContent.map((x, index) => x.rank = parseInt(index) + 1)
+                tempContent.forEach( i => {
+                    content.map( ii => {
+                        if(i.innerId == ii.innerId) ii.rank = i.rank
+                    })
+                })
+
                 content.map((item, index) => {
-                    item.rank = parseInt(index) + 1;
+                    // item.rank = parseInt(index) + 1;
+
                     item.compareTrend = this.$t('statistics.check'),
                         item.storeGroup = item.storeRegion.toString();
                     item.storeType = item.storeBranchType.toString();
-                    if (item.submitters) item.storeSubmitters = item.submitters.toString();
+                    if (item.submitters) item.storeSubmitters = item.submitters.join(", ");
                     if (item.code == '') item.code = '- -'
                     if (item.storeGroup == '') item.storeGroup = '- -'
                     if (item.storeType == '') item.storeType = '- -'
@@ -3565,11 +3586,11 @@ export default {
             let params  = JSON.parse(JSON.stringify(searchParams));
             if(params.curCountry=='-1'){
 
-              params.curCity = null;
-              params.test = []
-              params.test2 = ""
-              console.log(params.curCity)
-              console.log(JSON.stringify(params))
+                params.curCity = null;
+                params.test = []
+                params.test2 = ""
+                console.log(params.curCity)
+                console.log(JSON.stringify(params))
             }
 
             this.params = params
@@ -3839,7 +3860,14 @@ export default {
     }
 };
 </script>
+<style lang="sass">
+    .el-table .cell
+        text-overflow: ellipsis !important
+        word-break: normal !important
+        padding-left: 3px !important
+        text-align: center
 
+</style>
 <style lang="scss" scoped>
 @import "../../assets/sass/stastical.scss";
 
