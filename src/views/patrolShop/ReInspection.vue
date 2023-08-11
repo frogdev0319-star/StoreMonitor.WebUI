@@ -155,6 +155,7 @@
             </div>
           </div>
         </dialog-pop>
+
         <dialog-pop
           v-if="showFeedDialog2"
           :title="$t('remotePatrol.feedbacks')"
@@ -2211,7 +2212,11 @@ export default {
           const isCategory = self.sheetName[0].isCategory;
           self.inspectList = isCategory ? self.sheetName[0].inspectList : self.sheetName[0].inspectList;
           //bug
-          const feedobj = {groupId: 'feedBack', label: self.$t('remotePatrol.feedbacks'), isClick: false, isCategory: true};
+          const feedobj = {
+            groupId: 'feedBack', 
+            label: self.$t('remotePatrol.feedbacks'), 
+            isClick: false, 
+            isCategory: true};
           if (self.sheetName.length != 0) {
             self.sheetName.push(feedobj);
             self.getItemByGroup(self.sheetName[0].inspectList[0], 0);

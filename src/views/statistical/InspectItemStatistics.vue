@@ -66,7 +66,7 @@
               <el-col :span="10" class="division">
                 <el-col class="text-area">
                   <el-row class="top">
-                      <span class="mainTitle">{{totalAvgScore!=-9999?totalAvgScore:'N/A'}}</span>
+                      <span class="mainTitle">{{ totalAvgScore != -9999 ? totalAvgScore : 'N/A' }}</span>
                       <span class="unit">{{$t('statistics.score')}}</span>
                   </el-row >
                   <el-row class="subtitlehead">
@@ -2087,12 +2087,13 @@ export default {
         return;
       }
         params.filter = { page: 0, size: params.groupIds.length };
-        console.log(params)
         if( !params.hasOwnProperty('itemIds') ||params.itemIds.length==0 || params.storeIds.length ==0)return
         console.log("********************************")
         console.log("getPart3RegionBar params",params)
         const storeResult = await self.getInspectStatsItemOverGroup(params);
-        //console.log(storeResult)
+
+        console.log('storeResult//////>>', storeResult)
+        
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
           console.log("getPart3RegionBar result:",result);
@@ -2106,9 +2107,8 @@ export default {
                   totalReport += item.numOfTotal;
                   totalStandard +=  item.numOfStandard;
             })
-            this.part3.averageScore =  totalStandard>0? Math.round( (100*totalStandard) /totalReport):-1;
-            console.log("Leave FIlterContent"+Math.round( (100*totalStandard) /totalReport)+ " " + ( (100*totalStandard) /totalReport))
-            console.log(this.part3.content)
+            this.part3.averageScore =  totalStandard > 0 ? Math.round( (100*totalStandard) / totalReport): -1;
+            console.log('this.part3 //////>>' , this.part3)
             this.part3.indexRegion = -1;
             this.drawPart3RegionBar();
           }
@@ -2121,14 +2121,14 @@ export default {
       const regionData =[];
       const regionLabel =[];
       let max = 0;
-      this.totalAvgScore= -9999;
+      this.totalAvgScore = -9999;
       if(this.part3.content){
         let totalAvgScore = 0;
         let count = 0;
         this.part3.content.map((item,index) => {
           let value = item.averageScore;
           if(value>max)max = value;
-          totalAvgScore += value *item.numOfTotal ;
+          totalAvgScore += value * item.numOfTotal ;
           count += item.numOfTotal;
 
         //  if(this.part3.indexRegion<0 && value>0){
@@ -2148,18 +2148,23 @@ export default {
             regionData.push({value,itemStyle: {
             color: 'rgba(123 ,216, 235, 0.5)',
             emphasis: {
-                            shadowBlur: 0,
-                            shadowOffsetX: 0,
-                            shadowColor: 'rgba(0, 0, 0, 0.0)'
+                        shadowBlur: 0,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.0)'
                     }
-          }})
+            }})
           }
 
           regionLabel.push(this.maxLabel(item.groupName))
         });
-        if(count>0){
+        
+        console.log('totalAvgScore //////>> ', totalAvgScore);
+        console.log('count //////>> ', count);
+
+        if(count > 0){
           totalAvgScore = (totalAvgScore/count).toFixed(1);
-          this.totalAvgScore =totalAvgScore;
+          this.totalAvgScore = totalAvgScore;
+          console.log('this.totalAvgScore //////>> ', this.totalAvgScore);
         }
       }
 
@@ -2283,7 +2288,7 @@ export default {
           regionData.push({value,itemStyle: {
             color: '#7bd8eb',
           }})
-           regionLabel.push(this.maxLabel(item.groupName))
+          regionLabel.push(this.maxLabel(item.groupName))
         });
       }
       this.part3.storeTableData = content;
