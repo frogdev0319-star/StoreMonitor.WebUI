@@ -475,6 +475,7 @@ import {
 } from '@/api/inspectOverview';
 import {
     GetInspectTagList,
+    GetInspectTagListAll,
     getInspectStatus
 } from '@/api/inspect';
 import SearchComponent from '@/components/SearchComponent';
@@ -1179,7 +1180,7 @@ export default {
                     page: 1,
                     sizeNum: 10,
                     order: 'desc',
-                    property: 'numOfRepo rt'
+                    property: 'numOfReport'
                 }
             },
             part3: {
@@ -2716,6 +2717,8 @@ export default {
 
             let content = [];
             this.curSubmitter = '-1';
+
+            console.log('option >>>>>>>', option)
             //console.log("getPart1StoreBar > this.part1.indexRegion:", this.part1.indexRegion);
             //console.log("getPart1StoreBar > this.part1.content:", this.part1.content);
             if (this.part1.content && (this.part1.content[this.part1.indexRegion] || this.part1.indexRegion==-1)) {
@@ -2733,6 +2736,7 @@ export default {
                     params.groupMode = 0;
                     console.log("*self.params.storeIds:",self.params.storeIds);
                     console.log("*this.part1.selStoreIdArr:",this.part1.selStoreIdArr)
+                    console.log("*this.part1 >>>>>",this.part1)
                     params.storeIds = this.part1.indexRegion==-1? this.part1.selStoreIdArr:this.part1.content[this.part1.indexRegion].list;
                     if (this.part1.compareType == 'users' ) {//|| this.part1.compareType == 'position'
                         //console.log("********self.part1.content:",self.part1.content);
@@ -2802,7 +2806,7 @@ export default {
                         size: (this.part1.storeMode == 1) ? params.storeIds.length : this.part1.table.sizeNum
                     }
 
-
+                    // storeIds
                     console.log("getPart1StoreBar  ----->>>>" , params)
                     if (params.storeIds.length == 0) return;
                     const storeResult = await this.getInspectStatsOverviewWithGroup(params);
@@ -2819,7 +2823,7 @@ export default {
 
                 console.log("Content store bar")
                 content.forEach((item, index) => {
-                    console.log(item)
+                    console.log('item >>>>>',item)
                     item.storeGroup = item.storeRegion.toString();
                     item.storeType = item.storeBranchType.toString();
                     if (item.submitters) item.storeSubmitters = item.submitters.join(", ");
@@ -2840,7 +2844,7 @@ export default {
                     }
                     item.value = value;
                 });
-                console.log(content)
+                console.log('content >>>>>>>>', content)
                 content = content.sort(function (a, b) {
                     if (self.part1.storeOrder == "desc")
                         return b.value - a.value;
@@ -2859,6 +2863,7 @@ export default {
                 });
             }
             this.part1.storeTableData = content;
+            
             option.series[0].name = "";
             option.series[0].data = regionData;
             option.xAxis.data = regionLabel;
@@ -2874,6 +2879,8 @@ export default {
 
             this.part1.barStoreOption = option;
         },
+
+
         async getPart2RegionBar() {
             console.log("getPart2RegionBar")
             const self = this;

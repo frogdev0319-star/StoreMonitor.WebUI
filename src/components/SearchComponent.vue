@@ -32,7 +32,7 @@
       </div>
       <div>
         <delay-button
-          :disabled="storeListLength === 0"
+          :disabled="storeListLength === 0 || inspectTypeList.length == 0"
           :class="lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
           type="primary"
           size="mini"
