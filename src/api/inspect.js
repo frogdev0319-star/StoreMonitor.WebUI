@@ -170,6 +170,15 @@ export const getInspectReportList = data => {
   });
 };
 
+export const statisticsGetInspectReportList = data => {
+  return request({
+    url: `${version}/statistics/inspect/report/list`,
+    method: 'post',
+    data
+  });
+};
+
+
 export const getInspectReportInfo = data => {
   return request({
     url: `v5.0/inspect/report/info`,

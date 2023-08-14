@@ -1936,7 +1936,8 @@ export default {
       if (data.feedback.length === 0) {
         this.showFeedBacks = false;
       } else {
-        this.showFeedBacks = true;
+        this.showFeedBacks = true; 
+
         data.feedback.forEach((item, index) => {
           const obj = {};
           obj.feedbackId = item.id,
@@ -1951,19 +1952,30 @@ export default {
             obj.descriptionList = [];
             item.attachment.forEach((_item, _index) => {
               if (_item.mediaType === 0) {
-                audioObj.audioSrc = _item.url;
-                audioObj.audioRef = 'audioRef' + _index;
-                audioObj.isPlaying = false;
-                audioObj.audioOftenText = '';
-                audioObj.hasNotPlayAudio = true;
+
+                // audioObj.audioSrc = _item.url;
+                // audioObj.audioRef = 'audioRef' + _index;
+                // audioObj.isPlaying = false;
+                // audioObj.audioOftenText = '';
+                // audioObj.hasNotPlayAudio = true;
+                obj.audioList.push({
+                  audioSrc: _item.url,
+                  audioRef: 'audioRef' + _index,
+                  isPlaying : false,
+                  audioOftenText: "",
+                  hasNotPlayAudio: true
+                });
                 obj.showAudio = true;
-                obj.audioList.push(audioObj);
+                
+
               } else if (_item.mediaType === 3) {
                 obj.descriptionList.push({ description: _item.url });
               } else {
                 obj.sourceList.push(_item);
               }
             });
+
+
           } else {
             obj.showAttachment = false;
           }

@@ -32,25 +32,25 @@
                   <el-radio :label="true" :class="lang === 'en'? 'en-span-class' : ''">{{ $t('mysterio.mysterio') }}</el-radio>
                 </div>
               </el-radio-group>
-               <div class="date-range">
-                <region-multi-select
-                  ref="multiState"
-                  :selected="positionIds"
-                  :options="positionsList"
-                  :all="$t('statistics.patrolPerson.dutyAll')"
-                  class="position"
-                  :class="positionDisabled?'disable':''"
-                  :disabled="positionDisabled"
-                  @changeInput="handlePositionsChange"/>
-                <div style="width:0px;height:25px;border:1px solid rgba(172,174,177,0.3); " />
-                <region-multi-select
-                  ref="multiState"
-                  :selected="userIds"
-                  :all="$t('overview.allUser')"
-                  :placeholder="$t('overview.user')"
-                  :options="userList"
-                  class="person"
-                  @changeInput="handleUserChange"/>
+                <div class="date-range">
+                  <region-multi-select
+                    ref="multiState"
+                    :selected="positionIds"
+                    :options="positionsList"
+                    :all="$t('statistics.patrolPerson.dutyAll')"
+                    class="position"
+                    :class="positionDisabled?'disable':''"
+                    :disabled="positionDisabled"
+                    @changeInput="handlePositionsChange"/>
+                  <div style="width:0px;height:25px;border:1px solid rgba(172,174,177,0.3); " />
+                  <region-multi-select
+                    ref="multiState"
+                    :selected="userIds"
+                    :all="$t('overview.allUser')"
+                    :placeholder="$t('overview.user')"
+                    :options="userList"
+                    class="person"
+                    @changeInput="handleUserChange"/>
                 </div>
             </div>
             <delay-button
