@@ -144,7 +144,12 @@
                         <el-button class="mode-btn" :class="{'active-mode-btn' :part1.storeMode==0}" @click="onSwitchPart1Mode(0)">{{ $t('statistics.event.tableMode')}}</el-button>
                         <el-button class="mode-btn" :class="{'active-mode-btn' :part1.storeMode==1}" @click="onSwitchPart1Mode(1)">{{ $t('statistics.event.imageMode')}}</el-button>
                     </div>
-                    <delay-button :class="getLangStyleValue(operationBtnClass)" style="margin-left:32px;background-color:#FFF;color:#006ab7;border:none;" type="default" size="mini" @click="exportStore2ExcelPart1">
+                    <delay-button 
+                        :class="getLangStyleValue(operationBtnClass)" 
+                        style="margin-left:32px;background-color:#FFF;color:#006ab7;border:none;" 
+                        type="default" size="mini" 
+                        @click="exportStore2ExcelPart1">
+                        
                         <div class="button-area">
                             <img :src="exportPng" class="icon-excel">
                             <span style="color:rgb(0, 106, 183)">{{ $t('eventView.exportReport') }}</span>
@@ -1817,15 +1822,21 @@ export default {
                 const {
                     export_json_to_excel
                 } = require('@/excel/Export2Excel');
+
+                self.exportPart1DataHeader[8] = self.inspectStatus.status_2
+                self.exportPart1DataHeader[9] = self.inspectStatus.status_1
+                self.exportPart1DataHeader[10] = self.inspectStatus.status_0
+
+                console.log('self.exportPart1DataHeader :>> ', self.exportPart1DataHeader);
                 const tHeader = self.exportPart1DataHeader;
-                const filterVal = ['province', 'city', 'groupName', 'storeGroup', 'storeType', 'code', 'submitters', 'numOfReport', 'numOfQualified', 'numOfImproved',
-                    'numOfDangerous'
+                const filterVal = ['province', 'city', 'groupName', 'storeGroup', 'storeType', 'code', 'submitters', 'numOfReport', 'numOfQualified', 'numOfImproved','numOfDangerous'
                 ];
                 const data = that.formatJson(filterVal, content);
                 const fileName = (this.part1.indexRegion==-1?this.$t('statistics.event.seeAll'):this.part1.content[this.part1.indexRegion].groupName) + '_Inspection evaluation result_' + util.getCurrentTime();
                 export_json_to_excel(tHeader, data, fileName);
             });
         },
+        
         async exportStore2ExcelPart2() {
             const self = this;
             const that = this;

@@ -95,6 +95,7 @@ else if(data.SITE == 'iservice-preview'){
   isGlobalWebsite = true;
 }
 else{
+  // environJSON = _Environments.Preview;
   environJSON = _Environments.RC;
   isGlobalWebsite = true;
 }
