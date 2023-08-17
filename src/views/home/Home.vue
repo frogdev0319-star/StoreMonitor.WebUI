@@ -273,7 +273,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.1.3.2
+                v3.1.3.2i
                   &copy; {{ getFullYear }} Advantech Intelligent City
                   Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
@@ -1863,7 +1863,7 @@ $collapseWidth: 5.5%;
   border-color: #e3e9f4;
 }
 .el-table .cell {
-  // word-break: break-word;
+  word-break: break-word;
   text-overflow: clip;
 }
 .el-message__content,
