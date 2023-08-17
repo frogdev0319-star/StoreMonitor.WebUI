@@ -1012,7 +1012,7 @@ export default {
                     'maxWidth': '100'
                 },
                 {
-                    'prop': 'rank',
+                    'prop': 'rankbyaveragescore',
                     'label': this.$t('statistics.rank'),
                     'sortable': 'custom',
                     'pdfwidth': '12%',
@@ -1112,7 +1112,7 @@ export default {
                     'maxWidth': '100'
                 },
                 {
-                    'prop': 'rank',
+                    'prop': 'rankbystandardrate',
                     'label': this.$t('statistics.rank'),
                     'sortable': 'custom',
                     'pdfwidth': '12%',
@@ -3135,17 +3135,19 @@ export default {
                     }
                 }
 
+
                 var tempContent = [...content]
-                tempContent = tempContent.sort( (a, b) => b.standardRate - a.standardRate)
-                tempContent.map((x, index) => x.rank = parseInt(index) + 1)
+                tempContent = tempContent.sort( (a, b) => b.averageScore - a.averageScore)
+                tempContent.map((x, index) => x.rankbyaveragescore = parseInt(index) + 1)
+                console.log('tempContent ~~~~>> ', tempContent);
                 tempContent.forEach( i => {
                     content.map( ii => {
-                        if(i.innerId == ii.innerId) ii.rank = i.rank
+                        if(i.averageScore == ii.averageScore) ii.rankbyaveragescore = i.rankbyaveragescore
                     })
                 })
-
+                
                 content.map((item, index) => {
-                    // item.rank = parseInt(index) + 1;
+                    // item.rankbyaveragescore = parseInt(index) + 1;
                     item.compareTrend = this.$t('statistics.check'),
                         item.storeGroup = item.storeRegion.toString();
                     item.storeType = item.storeBranchType.toString();
@@ -3407,18 +3409,18 @@ export default {
 
                 var tempContent = [...content]
                 tempContent = tempContent.sort( (a, b) => b.standardRate - a.standardRate)
-                tempContent.map((x, index) => x.rank = parseInt(index) + 1)
+                tempContent.map((x, index) => x.rankbystandardrate = parseInt(index) + 1)
                 tempContent.forEach( i => {
                     content.map( ii => {
-                        if(i.innerId == ii.innerId) ii.rank = i.rank
+                        if(i.innerId == ii.innerId) ii.rankbystandardrate = i.rankbystandardrate
                     })
                 })
 
                 content.map((item, index) => {
-                    // item.rank = parseInt(index) + 1;
+                    // item.rankbystandardrate = parseInt(index) + 1;
 
                     item.compareTrend = this.$t('statistics.check'),
-                        item.storeGroup = item.storeRegion.toString();
+                    item.storeGroup = item.storeRegion.toString();
                     item.storeType = item.storeBranchType.toString();
                     if (item.submitters) item.storeSubmitters = item.submitters.join(", ");
                     if (item.code == '') item.code = '- -'

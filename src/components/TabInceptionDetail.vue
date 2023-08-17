@@ -117,7 +117,7 @@
 <script>
 import TablePagination from '@/components/TablePagination_V2';
 import { getInspectReportList, getNotInspectStoresByPerson, statisticsGetInspectReportList } from '@/api/inspect';
-import {GetEventAndCommentList} from '@/api/event';
+import {GetEventAndCommentList , StatisticsGetEventAndCommentList} from '@/api/event';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import util from '@/common/util';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
@@ -532,7 +532,7 @@ export default {
         let params = {beginTs:this.beginTs,endTs:this.endTs,clause: {assigner:this.submitter},
                         order: {direction: "asc",property: "storeId"},searchMysteryMode:this.isMystery?1:0};
         return new Promise((resolve) => {
-            GetEventAndCommentList(params).then(res => {
+            StatisticsGetEventAndCommentList(params).then(res => {
                 const errCode = res.errCode;
                 let data = [];
                 if (errCode === 0) {

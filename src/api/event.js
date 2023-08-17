@@ -66,6 +66,14 @@ export const GetEventAndCommentList = data => {
   });
 };
 
+export const StatisticsGetEventAndCommentList = data => {
+  return request({
+    url: `v1.0/statistics/event/list/comment`,
+    method: 'post',
+    data
+  });
+};
+
 export const doBatchCloseEventByStore = data => {
   return request({
     url: `v1.0/event/batch/close/store`,
