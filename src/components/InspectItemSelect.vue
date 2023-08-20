@@ -11,7 +11,8 @@
                 ></el-option>
             </el-select>
         </div>
-          <div class="type-pick">
+        
+        <div class="type-pick">
             <el-select v-bind:disabled='layer1=="all"' style="width:250px"
               class="dropdown-select" v-model="layer2" value-key="value"  @change="changeLayer2">
                 <el-option 
@@ -22,9 +23,15 @@
                 ></el-option>
             </el-select>
         </div>
+        
           <div v-if="showItems" class="type-pick">
-            <el-select v-bind:disabled='layer2=="all"' style="width:250px"
-              class="dropdown-select" v-model="selectedItem" value-key="value"  @change="changeLayer3">
+            <el-select 
+              v-bind:disabled='layer2=="all"' 
+              style="width:250px"
+              class="dropdown-select" 
+              v-model="selectedItem" 
+              value-key="value"  
+              @change="changeLayer3">
                 <el-option 
                   v-for="item in itemList"
                   :key="item.value"
@@ -77,10 +84,11 @@ export default {
           layer3List: [{value:'all',label:this.$t('eventView.all')}],
 
           hasLayer3List: false,
-          layer3Id: [],
+          layer3Id: 'all',
 
           itemList:[{value:'all',label:this.$t('eventView.all')}],
           selectedItem:'',
+
           curItem:null,
           selAllString:this.$t('eventView.all'),
           showItems:false,
@@ -212,6 +220,7 @@ export default {
       this.itemList =[{value:'all',label:this.$t('eventView.all')}];
       this.notifyItemChanged();
     },
+
     changeLayer2(e){
       console.log("Change Layer2" , e)
       this.layer2 = e;
@@ -247,30 +256,15 @@ export default {
     changeLayer3(e){
       console.log("Change Layer3" , e)
       this.hasLayer3List = true
-      this.layer3Id = e
-      // this.layer3 = e;
-      // let itemList =[{value:'all',label:this.$t('eventView.all')}];
-      // if(e =='all'){
-      //     this.curLayer3 =null;
-      // }
-      // else{
-      //   this.curLayer3 =null;
-      //   this.curLayer1.items.forEach(subitem => {
-      //     if(subitem.id == e){
-      //       this.curLayer3 = subitem;
-      //         if(this.curLayer3 && this.curLayer3.items){
-      //           this.showItems= true;
-      //           this.curLayer3.items.forEach(subitem => {
-      //           itemList.push({label:subitem.subject,value:subitem.id})
-      //         });
+      
+      if( e == 'all'){
+        this.layer3Id = 'all'
+      } else {
+        this.layer3Id = e
+      }
+    
+      console.log('this.itemList', this.itemList)
 
-      //       }
-      //     }
-      //   });
-      // }
-      // this.itemList=itemList;
-      // this.curItem =null;
-      // this.selectedItem = 'all'
       this.notifyItemChanged();
     },
 
@@ -281,16 +275,33 @@ export default {
 
       let item = this.selectedItem!='all' && this.curItem ? this.curItem : this.layer2!='all'&& this.curLayer2 ? this.curLayer2 : this.curLayer1;
 
-      if(this.hasLayer3List){
+      console.log('this.layer3Id----->>>', this.layer3Id)
+      if(this.layer3Id == 'all'){
         let ids = []
-        ids.push(this.layer3Id)
-        item.ids = ids;
+        this.curLayer2.items.forEach( i => {
+          ids.push(i.id)
+        })
+        item.ids = ids
       } else {
-        let ids = this.getIds(item)
-        item.ids = ids;
+        if(this.hasLayer3List){
+          console.log('1')
+          let ids = []
+          ids.push(this.layer3Id)
+          item.ids = ids;
+        } 
+
       }
       
+      // if(this.hasLayer3List){
+      //   console.log('1')
+      //   let ids = []
+      //   ids.push(this.layer3Id)
+      //   item.ids = ids;
+      // } 
+
       
+
+      console.log('item----->>>', item)
       item.qualifiedScore = this.getScore(item);
 
       console.log('item.ids', item.ids)

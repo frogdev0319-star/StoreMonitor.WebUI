@@ -19,9 +19,9 @@
                 :default-sort="defaultSort"
                 path="inspectEvalutionStatistics"
                 @emitSearch="emitSearch"
-                @exportPdf="exportPdf"
                 @setDefaultSortAndPage="setDefaultSortAndPage"
             />
+            <!-- @exportPdf="exportPdf" -->
         </el-col>
         <div class="statistics-content" id="imgTest_avg1" style="height:194px;margin-top:200px;box-shadow:none;" :style="{width:ispdf?'1280px':null}">
             <div class="head">
@@ -526,6 +526,7 @@ export default {
             storePatrolLists: '',
             curRegion: [],
             timeMode: 1,
+            
             regionsList: [],
             params: {},
 
@@ -1296,6 +1297,7 @@ export default {
     watch: {
         async accountChanged(val) {
             if (val !== 0) {
+
                 await this.getInspectStatus();
                 await this.initData();
                 await this.renameTableLabel();
@@ -1444,8 +1446,8 @@ export default {
                 path: 'inspectReport',
                 params: searchParams
             };
-            console.log("searchParamsObj bbb" , searchParamsObj)
-            SearchConditionUtil.saveSearchCondition(searchParamsObj);
+            SearchConditionUtil.saveSearchCondition(searchParamsObj)
+
             //this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
             this.$router.push({
                 path: '/report',
@@ -1574,6 +1576,7 @@ export default {
             };
             console.log("searchParamsObj aaa" , searchParamsObj)
             SearchConditionUtil.saveSearchCondition(searchParamsObj);
+
             //this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
             this.$router.push({
                 path: '/report',
@@ -1716,8 +1719,10 @@ export default {
                 items: -9999,
                 avgScore: -9999
             };
+            console.log('searchData go')
             if (this.params.storeIds.length > 0) {
 
+                // console.log('this.params go ---> ', this.params)
                 await this.dataGetOverview();
                 await this.dataGetPart1();
                 await this.dataGetPart2();
@@ -2013,9 +2018,10 @@ export default {
             });
         },
 
+        // !!!!
         getInspectStatsOverviewWithGroup(params) {
             console.log("getInspectStatsOverviewWithGroup", params)
-            if (params.filter.size == 0) {
+            if (params.filter.size == 0 ) {
                 return;
             }
             return new Promise((resolve, reject) => {
@@ -2027,6 +2033,7 @@ export default {
                     });
             });
         },
+
         getInspectReulstStatsOverview(params) {
             if (params.filter.size == 0) {
                 params.filter.size == 10;
@@ -2353,10 +2360,7 @@ export default {
             return tempData;
         },
         async dataGetOverview() {
-
             const params = {};
-
-
             params.beginTs = this.params.beginTs;
             params.endTs = this.params.endTs;
             params.regionMode = 3;
@@ -2367,8 +2371,8 @@ export default {
                 size: params.storeIds.length
             };
             if(params.curCountry =='-1'){
-              params.curCity =null;
-              params.curProvince = null;
+                params.curCity =null;
+                params.curProvince = null;
             }
             console.log("dataGetOverview")
             console.log(this.params)
@@ -2426,8 +2430,8 @@ export default {
             params.regionMode = self.regionMode;
             params.storeIds = self.params.storeIds;
             if(params.curCountry=='-1'){
-              params.curProvince = null;
-              params.curCity = null;
+                params.curProvince = null;
+                params.curCity = null;
             }
             params.inspectTagId = self.params.inspectId;
             const storeResult = await self.getInspectStatsOverviewWithRegion(params);
@@ -2572,7 +2576,7 @@ export default {
             };
 
             console.log('getPart1RegionBar ----->>>>', params)
-            if (params.storeIds.length === 0) {
+            if (params.storeIds.length === 0 ) {
                 ;
                 return false;
             }
@@ -2806,6 +2810,7 @@ export default {
                         params.storeIds = this.part1.compareIds;
                         params.groupIds = this.part1.compareIds;
                     }*/
+                    
 
                     params.inspectTagId = self.params.inspectId;
                     params.order = {
@@ -2818,15 +2823,17 @@ export default {
                     }
 
                     // storeIds
+                    // inspectTagId
+                    console.log('this.param ----->>>>', this.params)
                     console.log("getPart1StoreBar  ----->>>>" , params)
-                    if (params.storeIds.length == 0) return;
+                    if (params.storeIds.length == 0 ) return;
                     const storeResult = await this.getInspectStatsOverviewWithGroup(params);
                     if (storeResult.errCode === 0) {
                         const result = storeResult.data;
                         if (result) {
                             content = result.content
                             this.part1.table.total = result.totalPages;
-
+                            
                             //   console.log(result)
                         }
                     }
@@ -2961,10 +2968,9 @@ export default {
                 size: params.groupIds.length
             };
 
-            if (params.storeIds.length === 0) {
-                ;
-                return false;
-            }
+            if (params.storeIds.length === 0) {return false;}
+
+            console.log("getPart2RegionBar  ----->>>>" , params)
             const storeResult = await self.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
                 const result = storeResult.data;
@@ -3247,7 +3253,7 @@ export default {
                 page: 0,
                 size: params.groupIds.length
             };
-            if (params.storeIds.length == 0) return;
+            if (params.storeIds.length == 0 ) return;
             const storeResult = await self.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
                 const result = storeResult.data;
@@ -3396,7 +3402,7 @@ export default {
                         size: (this.part3.storeMode == 1) ? params.storeIds.length : this.part3.table.sizeNum
                     }
 
-                    if (params.storeIds.length == 0) return;
+                    if (params.storeIds.length == 0 ) return;
                     const storeResult = await this.getInspectStatsOverviewWithGroup(params);
                     if (storeResult.errCode === 0) {
                         const result = storeResult.data;
@@ -3575,9 +3581,12 @@ export default {
 
         initData() {
             console.log("PATG="+this.path)
+            
             this.params = SearchConditionUtil.getSearchCondition("inspectEvalutionStatistics");
+
             console.log("Init Data")
             console.log(this.params)
+
             this.params.filter = {
                 page: 0,
                 size: this.sizeNumStore
@@ -3596,7 +3605,7 @@ export default {
             regionII,
             regionMode,
             storePatrolLists,
-            timeMode
+            timeMode ,
         }) {
             console.log("Emit Search");
 
@@ -3605,18 +3614,11 @@ export default {
             this.doGetAssessmentStandardScore();
             let params  = JSON.parse(JSON.stringify(searchParams));
             if(params.curCountry=='-1'){
-
-                params.curCity = null;
-                params.test = []
-                params.test2 = ""
-                console.log(params.curCity)
-                console.log(JSON.stringify(params))
+                params.curCity = null;                
             }
 
+            console.log('params --->', params)
             this.params = params
-            console.log("Emit Search" +this.params.curCountry );
-
-
             this.daysRangeList = dateRangeList;
             this.curRegionI = regionI;
             this.curRegionII = regionII;
@@ -3629,7 +3631,10 @@ export default {
                 path: 'inspectEvalutionStatistics',
                 params: this.params
             };
-            this.ifSaveParams && this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
+
+            console.log('emitSearch ===' )
+
+            // this.ifSaveParams && this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
             this.ifSaveParams = true;
             this.searchData();
         },
@@ -3681,30 +3686,30 @@ export default {
             });
             // this.handleExportReport();
             /*
-        if (self.avgChartOption.series[0].data.length === 0 && self.AssChartOption.series[0].data.length===0) {
-        util.notify(self.$t('statistics.emptyInsRecordList'), 'warning', 3000);
-        return false;
-      }
-      self.ispdf = true;
-      this.$nextTick(() => {
-        const img_avg = document.getElementById('imgTest_avg');
-        const img_assm = document.getElementById('imgTest_assm');
-        setTimeout(() => {
-          html2canvas(img_avg,{backgroundColor: "#FFFFFF"}).then(function(canvas) {
-            var oGrayImg1 = canvas.toDataURL('image/jpeg');
-            self.pdfSrc_avg = oGrayImg1;
-          });
-          html2canvas(img_assm,{ backgroundColor: "#FFFFFF"}).then(function(canvas) {
-            var oGrayImg2 = canvas.toDataURL('image/jpeg');
-            self.pdfSrc_assm = oGrayImg2;
-          });
-          setTimeout(() => {
-            self.$print(self.$refs.printPDF);
-            self.ispdf = false;
-          }, 1000);
-        }, 5000);
-      });
-    */
+            if (self.avgChartOption.series[0].data.length === 0 && self.AssChartOption.series[0].data.length===0) {
+                util.notify(self.$t('statistics.emptyInsRecordList'), 'warning', 3000);
+                return false;
+            }
+            self.ispdf = true;
+            this.$nextTick(() => {
+                const img_avg = document.getElementById('imgTest_avg');
+                const img_assm = document.getElementById('imgTest_assm');
+                setTimeout(() => {
+                html2canvas(img_avg,{backgroundColor: "#FFFFFF"}).then(function(canvas) {
+                    var oGrayImg1 = canvas.toDataURL('image/jpeg');
+                    self.pdfSrc_avg = oGrayImg1;
+                });
+                html2canvas(img_assm,{ backgroundColor: "#FFFFFF"}).then(function(canvas) {
+                    var oGrayImg2 = canvas.toDataURL('image/jpeg');
+                    self.pdfSrc_assm = oGrayImg2;
+                });
+                setTimeout(() => {
+                    self.$print(self.$refs.printPDF);
+                    self.ispdf = false;
+                }, 1000);
+                }, 5000);
+            });
+            */
         },
 
         handleRegionPageAndSizeChange(pageObj) {

@@ -8,13 +8,14 @@
       />
     </div>
     <div class="store-filter">
-    <div class="last-row">
+    <div class="last-row"> 
       <div v-if="isInspectItem || isPatrol" class="inspect-div">
         <div class="tag-label">{{ $t('overview.patrolLists') }}</div>
         <div class="tag-select">
           <el-select
             v-model="inspectList"
             :placeholder="$t('insSettingView.selectPost')"
+            :disabled="storeFilterObjHasItems"
             size="medium"
             class="el-province"
             @change="onInspectListChange">
@@ -32,7 +33,7 @@
       </div>
       <div>
         <delay-button
-          :disabled="storeListLength === 0 || inspectTypeList.length == 0"
+          :disabled="storeListLength === 0 || inspectTypeList.length == 0 || storeFilterObjHasItems"
           :class="lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
           type="primary"
           size="mini"
@@ -78,8 +79,8 @@ export default {
       default: false
     },
     isInspectItem: {
-      type: String,
-      default: ''
+      type: Boolean,
+      default: false
     },
     path: {
       type: String,
@@ -124,6 +125,7 @@ export default {
       storeFilterObj: {},
       searchParams: {},
       ifSaveParams: false,
+      storeFilterObjHasItems: false,
 
     };
   },
@@ -156,6 +158,7 @@ export default {
     this.params.endTs = this.dateValue[1].valueOf();
     self.params.timeMode = self.timeMode;
     await this.getSearchParams();
+
     self.initDaysRange();
     self.initData();
   },
@@ -179,30 +182,9 @@ export default {
       this.storePatrolLists = filterInspect.length > 0 ? filterInspect[0].name : '';
     },
 
-    async getInspectList() {
-      console.log("*start getInspectList");
-      const self = this;
-      const newArr = [];
-      const inspectList = [];
-      const inspectArr = await self.getTagAll();
-      console.log("*middle getInspectList",inspectArr);
-      inspectArr.forEach(_item => {
-        if (!newArr.includes(_item.id)) {
-          newArr.push(_item.id);
-          inspectList.push(_item);
-        }
-      });
-      self.inspectTypeList = inspectList;
-      self.isPatrol ? self.inspectTypeList.unshift({ id: '-1', name: self.$t('remotePatrol.all') }) : null;
-      if (inspectList.length !== 0) {
-        self.inspectList = self.ifGetParamsFromCash
-          ? (self.inspectTypeList.map(x => x.id).indexOf(self.inspectCatch) !== -1
-            ? self.inspectCatch : '') : self.inspectTypeList[0].id;
-      } else {
-        self.inspectList = '';
-      }
-      console.log("*End getInspectList",self.inspectList);
-    },
+    
+
+
 
     async getCountryStore() {
       if (this.isInspectItem || this.isPatrol) {
@@ -224,10 +206,48 @@ export default {
       });
     },
 
+
+    async getInspectList() {
+      console.log("*start getInspectList");
+      const self = this;
+      const newArr = [];
+      const inspectList = [];
+      const inspectArr = await self.getTagAll();
+      console.log("*middle getInspectList",inspectArr);
+
+      inspectArr.forEach(_item => {
+        if (!newArr.includes(_item.id)) {
+          newArr.push(_item.id);
+          inspectList.push(_item);
+        }
+      });
+
+      self.inspectTypeList = inspectList;
+      self.isPatrol ? self.inspectTypeList.unshift({ id: '-1', name: self.$t('remotePatrol.all') }) : null;
+      if (inspectList.length !== 0) {
+        self.inspectList = self.ifGetParamsFromCash
+          ? (self.inspectTypeList.map(x => x.id).indexOf(self.inspectCatch) !== -1
+            ? self.inspectCatch : '') : self.inspectTypeList[0].id;
+      } else {
+        self.inspectList = '';
+      }
+      console.log("*End getInspectList ---->", self.inspectList);
+    },
+
+
+
+
     async searchData() {
 
+    //  first loading page
+    if(!this.inspectList){
+      const inspectArr = await this.getTagAll();
+      this.inspectList = inspectArr[0].id
+    }
+    
       this.params.storeIds = this.storeFilterObj.filterStoreIds;
       console.log("Search Data",this.storeFilterObj)
+      console.log('this.inspectList ~~~~~~>', this.inspectList)
      // if( this.params.storeIds && this.params.storeIds[0] &&this.params.storeIds[0]=='-1')this.params.storeIds=  this.params.storeIds.shift()
       this.params.timeMode = this.timeMode;
       this.params.curCountry= this.storeFilterObj.curCountry;
@@ -235,6 +255,13 @@ export default {
       this.params.curStoreGroup= this.storeFilterObj.curStoreGroup;
       this.params.curStoreType= this.storeFilterObj.curStoreType;
       this.params.inspectId = this.inspectList;
+
+      console.log('this.params.curStore', this.params.curStore)
+      this.storeFilterObjHasItems =  this.params.curStore[1] ? false : true
+      if(this.storeFilterObjHasItems) {
+        this.inspectList = [] ;
+      } 
+    
       const emitParmas = {};
       emitParmas.searchParams = this.params;
       emitParmas.dateRangeList = this.daysRangeList;
@@ -247,12 +274,13 @@ export default {
       emitParmas.storeGroupStr = this.storeFilterObj.storeGroupString;
       emitParmas.storeTypeStr = this.storeFilterObj.storeTypeString;
       emitParmas.timeMode = this.timeMode;
+      
       //console.log(emitParmas)
       this.$emit('emitSearch', emitParmas);
     },
 
     getInspectId() {
-      console.log("*then getInspectList > getInspectId",this.inspectList);
+      console.log("* getInspectList > getInspectId", this.inspectList);
       const length = this.inspectTypeList.length;
       for (let i = 0; i < length; i++) {
         const name = this.inspectTypeList[i].name;
@@ -264,7 +292,7 @@ export default {
           this.params.inspectId = this.inspectList === '-1' ? '' : this.inspectList;
         }
       }
-      console.log("*then getInspectList > getInspectId",this.params.inspectId);
+      console.log("*then getInspectList > getInspectId", this.params.inspectId);
     },
 
     initDaysRange() {
@@ -325,6 +353,8 @@ export default {
       params.inspectId = this.inspectList === '-1' ? '' : this.inspectList;
       params.storeIds = this.storeFilterObj.filterStoreIds;
       //console.log("Save Comdition="+saveParamsObj.path)
+      console.log('params  --->>>', params)
+      console.log('saveSearchCondition --->>>', )
       SearchConditionUtil.saveSearchCondition(saveParamsObj);
     },
 

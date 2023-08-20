@@ -30,27 +30,29 @@
 
     <!-- 巡檢項目得分 -->
     <div class="statistics-content"   id="imgTest_avg1"   style="height:1110px;margin-top:200px;box-shadow:none;"  :style="{width:ispdf?'1024px':null}">
-            <div class="head">
-              <div class="region-titles">
-                  <span class="title">
-                        {{ $t('statistics.titles.inspectItemScores') }} 
-                  </span>
-              </div>
-                  <TypeSelectArea
-                    path="inspectItemStatistics"
-                    ref="typeSelectArea"
-                    :allow-all=true
-                    :allow-person=true
-                    :region-array1="params.curProvince"
-                    :region-array2="params.curCity"
-                    :cur-store-group="params.curStoreGroup"
-                    :cur-store-type="params.curStoreType"
-                    :cur-stores="params.storeIds"
-                    :cached-params="params"
-                    :cur-country="curCountry"
-                    @emitTypeChanged="emitTypeChangedPart3"
-                ></TypeSelectArea>
+          <div class="head">
+            <div class="region-titles">
+                <span class="title">
+                      {{ $t('statistics.titles.inspectItemScores') }} 
+                </span>
             </div>
+                <TypeSelectArea
+                  path="inspectItemStatistics"
+                  ref="typeSelectArea"
+                  :allow-all=true
+                  :allow-person=true
+                  :region-array1="params.curProvince"
+                  :region-array2="params.curCity"
+                  :cur-store-group="params.curStoreGroup"
+                  :cur-store-type="params.curStoreType"
+                  :cur-stores="params.storeIds"
+                  :cached-params="params"
+                  :cur-country="curCountry"
+                  @emitTypeChanged="emitTypeChangedPart3"
+              ></TypeSelectArea>
+          </div>
+          
+          <!-- 巡檢項目選單 -->
           <div style="padding:20px">
             <InspectItemSelect
                 :inspect-item-list="inspectItemList"
@@ -59,9 +61,10 @@
           </div>
           <div class="subtitle-head">
               <span class="title" style="width:80%" >
-                {{inspectSubTitle}}
+                {{inspectSubTitle}} 
               </span>
           </div>
+
           <el-row :span="24" class="region-overview" style="margin-left:40px;width:400px">
               <el-col :span="10" class="division">
                 <el-col class="text-area">
