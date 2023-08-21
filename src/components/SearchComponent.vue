@@ -7,6 +7,7 @@
         @storeChange = "onStoreChange"
       />
     </div>
+  
     <div class="store-filter">
     <div class="last-row"> 
       <div v-if="isInspectItem || isPatrol" class="inspect-div">
@@ -184,8 +185,6 @@ export default {
 
     
 
-
-
     async getCountryStore() {
       if (this.isInspectItem || this.isPatrol) {
         await this.getInspectList();
@@ -235,16 +234,16 @@ export default {
     },
 
 
-
-
     async searchData() {
+      console.log('searchData go:>> ');
+      //  first loading page
+      if(!this.inspectList){
+        const inspectArr = await this.getTagAll();
+        this.inspectList = inspectArr[0].id
+        console.log('inspectArr ~~~~~~> ', inspectArr);
+      }
+      
 
-    //  first loading page
-    if(!this.inspectList){
-      const inspectArr = await this.getTagAll();
-      this.inspectList = inspectArr[0].id
-    }
-    
       this.params.storeIds = this.storeFilterObj.filterStoreIds;
       console.log("Search Data",this.storeFilterObj)
       console.log('this.inspectList ~~~~~~>', this.inspectList)
@@ -257,10 +256,13 @@ export default {
       this.params.inspectId = this.inspectList;
 
       console.log('this.params.curStore', this.params.curStore)
-      this.storeFilterObjHasItems =  this.params.curStore[1] ? false : true
+      console.log('this.params.curStore[0]', this.params.curStore[0])
+      console.log('this.params.curStore.length', this.params.curStore.length)
+
+      this.storeFilterObjHasItems = (this.params.curStore.length == 0) || (this.params.curStore[0] === '-1' && this.params.curStore.length == 1) ? true : false
       if(this.storeFilterObjHasItems) {
         this.inspectList = [] ;
-      } 
+      }  
     
       const emitParmas = {};
       emitParmas.searchParams = this.params;
@@ -275,9 +277,10 @@ export default {
       emitParmas.storeTypeStr = this.storeFilterObj.storeTypeString;
       emitParmas.timeMode = this.timeMode;
       
-      //console.log(emitParmas)
+      console.log('emitParmas~~~~~~>', emitParmas)
       this.$emit('emitSearch', emitParmas);
     },
+
 
     getInspectId() {
       console.log("* getInspectList > getInspectId", this.inspectList);
@@ -370,7 +373,7 @@ export default {
         this.order = searchParams.order;
         this.filter = searchParams.filter;
         this.inspectCatch = searchParams.inspectId;
-        this.inspectList = searchParams.inspectId?searchParams.inspectId:""
+        this.inspectList = searchParams.inspectId ? searchParams.inspectId : ""
         this.ifGetParamsFromCash = true;
         this.searchParams = searchParams;
       } else {
