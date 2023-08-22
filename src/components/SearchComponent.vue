@@ -231,6 +231,12 @@ export default {
         self.inspectList = '';
       }
       console.log("*End getInspectList ---->", self.inspectList);
+      if(this.storeFilterObjHasItems) {
+        console.log('clear !!!!')
+        this.inspectList = '' ;
+        this.inspectTypeList = []
+      }  
+    
     },
 
 
@@ -260,8 +266,11 @@ export default {
       console.log('this.params.curStore.length', this.params.curStore.length)
 
       this.storeFilterObjHasItems = (this.params.curStore.length == 0) || (this.params.curStore[0] === '-1' && this.params.curStore.length == 1) ? true : false
+
       if(this.storeFilterObjHasItems) {
-        this.inspectList = [] ;
+        console.log('clear !!!!')
+        this.inspectList = '' ;
+        this.inspectTypeList = []
       }  
     
       const emitParmas = {};

@@ -79,10 +79,6 @@
                 </el-col>
           </el-row>
 
-          <!-- !!!! -->
-          <pre style="font-size: 10px; text-align: left;">  {{ inspectItem}}</pre>
-          <!-- !!!! -->
-
           <el-row  :span="24" class="partition" style="height:320px;;padding-right:40px;width:calc(100% - 40px)">
             <el-col  style="overflow-x:auto;overflow-y:hidden;height:320px;width :100%">
               <v-chart @click='clickPart3Bar' ref="storeChart" :options="part3.barRegionOption"  autoresize
@@ -1932,7 +1928,7 @@ export default {
           }})
           }
 
-           regionLabel.push(this.maxLabel(item.groupName))
+          regionLabel.push(this.maxLabel(item.groupName))
         });
       }
 

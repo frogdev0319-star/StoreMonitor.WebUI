@@ -160,6 +160,7 @@ export default {
       }
       
     },
+
     getIds(item){
         const self =this;
         let list = [];
@@ -171,11 +172,11 @@ export default {
           return list;
         }
         else{
-          
           return [item.id]
         }
-
     },
+
+
     getScore(item){
       const self =this;
       if(item.items){
@@ -189,6 +190,9 @@ export default {
         return item.itemScore;
       }
     },
+
+
+
     changeLayer1(e){
       console.log("Change Layer1 to",  e)
       console.log('this.inspectItemList :>> ', this.inspectItemList);
@@ -234,13 +238,13 @@ export default {
         this.curLayer1.items.forEach(subitem => {
           if(subitem.id == e){
             this.curLayer2 = subitem;
-              if(this.curLayer2 && this.curLayer2.items){
-                this.showItems= true;
-                this.curLayer2.items.forEach(subitem => {
-                itemList.push({label:subitem.subject,value:subitem.id})
-              });
-            }
-            else{
+            if(this.curLayer2 && this.curLayer2.items){
+              this.showItems= true;
+              this.curLayer2.items.forEach(subitem => {
+              itemList.push({label:subitem.subject,value:subitem.id})
+            });
+          }
+          else{
               this.showItems=false;
             }
           }
@@ -255,11 +259,15 @@ export default {
     changeLayer3(e){
       console.log("Change Layer3" , e)
       this.hasLayer3List = true
-      
+      this.layer3 = e
       if( e == 'all'){
-        this.layer3Id = 'all'
+        this.layer3Id = null
       } else {
-        this.layer3Id = e
+        this.curLayer2.items.forEach(i =>{
+          if(i.id == e){
+            this.curLayer3 = i
+          }
+        })
       }
       console.log('this.itemList', this.itemList)
       this.notifyItemChanged();
@@ -267,15 +275,25 @@ export default {
 
 
     notifyItemChanged(){
-      console.log("Notify changed")
+      console.log("Notify changed") 
       console.log("this.curItem:",this.curItem)
 
-      let item = this.selectedItem!='all' && this.curItem ? this.curItem : this.layer2!='all'&& this.curLayer2 ? this.curLayer2 : this.curLayer1;
+      console.log("this.selectedItem",this.selectedItem)
 
-      console.log('this.layer3Id----->>>', this.layer3Id)
+      console.log('this.curLayer1----->>>', this.curLayer1)
       console.log('this.curLayer2----->>>', this.curLayer2)
-      let ids = []
+      console.log('this.curLayer3----->>>', this.curLayer3)
+
+      let item = (this.selectedItem !=='all' && this.curItem ) 
+        ? this.curItem : this.layer2 !=='all' && this.curLayer2 
+        ? (this.layer3 !=='all' && this.curLayer3 ? this.curLayer3 : this.curLayer2) : this.curLayer1;
+
+      // if(this.layer3Id !== 'all' && this.layer3Id) {
+      //   item.items = item.items.filter( i => i.id == this.layer3Id)
+      // } 
       
+  
+    
       // if(this.layer3Id == 'all'){
       //   let ids = []
       //   if(this.curLayer2){
@@ -292,7 +310,11 @@ export default {
       //     item.ids = ids;
       //   } 
       // }
-    
+        
+      let ids = this.getIds(item)
+      item.ids = ids;
+
+
       console.log('item----->>>', item)
       item.qualifiedScore = this.getScore(item);
       console.log('item.ids', item.ids)
@@ -338,7 +360,7 @@ export default {
       width:calc(141.5/1440*100vw);
       font-size: calc(15/1920*100vw);
       ::v-deep.el-select.el-select--medium{
-         background-color: #f7f9f9 !important;
+        background-color: #f7f9f9 !important;
         }
     }
     
