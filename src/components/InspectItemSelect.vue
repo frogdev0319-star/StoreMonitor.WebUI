@@ -100,7 +100,7 @@ export default {
   },
   created() {
    // console.log("InspectItemSelect Created")
-    this. getLayer1List(this.inspectItemList);
+    this.getLayer1List(this.inspectItemList);
   },
   watch: {
       inspectItemList: {
@@ -190,8 +190,10 @@ export default {
       }
     },
     changeLayer1(e){
-      console.log("Change Layer1 to="+e)
-      this.curLayer1=null;
+      console.log("Change Layer1 to",  e)
+      console.log('this.inspectItemList :>> ', this.inspectItemList);
+
+      this.curLayer1 = null;
       let layer2List =[{value:'all',label:this.$t('eventView.all')}];
       let showItems = false;
       if(this.inspectItemList){
@@ -210,10 +212,9 @@ export default {
           }
               
         });
-      
       }
       this.showItems= showItems;
-      this.layer1 =e;
+      this.layer1 = e;
       this.layer2 = 'all'
       this.selectedItem = 'all'
       this.layer2List = layer2List;
@@ -238,7 +239,6 @@ export default {
                 this.curLayer2.items.forEach(subitem => {
                 itemList.push({label:subitem.subject,value:subitem.id})
               });
-
             }
             else{
               this.showItems=false;
@@ -250,7 +250,6 @@ export default {
       this.curItem = null;
       this.selectedItem = 'all'
       this.notifyItemChanged();
-
     },
     
     changeLayer3(e){
@@ -262,51 +261,42 @@ export default {
       } else {
         this.layer3Id = e
       }
-    
       console.log('this.itemList', this.itemList)
-
       this.notifyItemChanged();
     },
 
 
     notifyItemChanged(){
-      console.log("NOtify changed")
+      console.log("Notify changed")
       console.log("this.curItem:",this.curItem)
 
       let item = this.selectedItem!='all' && this.curItem ? this.curItem : this.layer2!='all'&& this.curLayer2 ? this.curLayer2 : this.curLayer1;
 
       console.log('this.layer3Id----->>>', this.layer3Id)
-      if(this.layer3Id == 'all'){
-        let ids = []
-        this.curLayer2.items.forEach( i => {
-          ids.push(i.id)
-        })
-        item.ids = ids
-      } else {
-        if(this.hasLayer3List){
-          console.log('1')
-          let ids = []
-          ids.push(this.layer3Id)
-          item.ids = ids;
-        } 
-
-      }
+      console.log('this.curLayer2----->>>', this.curLayer2)
+      let ids = []
       
-      // if(this.hasLayer3List){
-      //   console.log('1')
+      // if(this.layer3Id == 'all'){
       //   let ids = []
-      //   ids.push(this.layer3Id)
-      //   item.ids = ids;
-      // } 
-
-      
-
+      //   if(this.curLayer2){
+      //     this.curLayer2.items.forEach( i => {
+      //       ids.push(i.id)
+      //     })
+      //   }
+      //   item.ids = ids
+      // } else {
+      //   if(this.hasLayer3List){
+      //     console.log('1')
+      //     let ids = []
+      //     ids.push(this.layer3Id)
+      //     item.ids = ids;
+      //   } 
+      // }
+    
       console.log('item----->>>', item)
       item.qualifiedScore = this.getScore(item);
-
       console.log('item.ids', item.ids)
       console.log('item.qualifiedScore', item.qualifiedScore)
-      console.log('item', item)
 
       this.$emit("emitItemChanged",{item});
     }

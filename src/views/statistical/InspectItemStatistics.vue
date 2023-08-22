@@ -78,6 +78,11 @@
                 </el-col>
                 </el-col>
           </el-row>
+
+          <!-- !!!! -->
+          <pre style="font-size: 10px; text-align: left;">  {{ inspectItem}}</pre>
+          <!-- !!!! -->
+
           <el-row  :span="24" class="partition" style="height:320px;;padding-right:40px;width:calc(100% - 40px)">
             <el-col  style="overflow-x:auto;overflow-y:hidden;height:320px;width :100%">
               <v-chart @click='clickPart3Bar' ref="storeChart" :options="part3.barRegionOption"  autoresize
@@ -736,7 +741,7 @@ export default {
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
-         {
+        {
           'prop': 'numOfTotal',
           'label': this.$t('overview.numOfEvaluations'),
           'sortable': 'custom',
@@ -1135,7 +1140,8 @@ export default {
           });
       });
     },
-   getInspectReulstStatsOverview(params) {
+
+    getInspectReulstStatsOverview(params) {
       return new Promise((resolve, reject) => {
         getInspectStatsOverviewV2(params).then(res => {
           resolve(res);
@@ -1145,6 +1151,7 @@ export default {
           });
       });
     },
+
     getInspectResultOverRegion(params) {
       return new Promise((resolve, reject) => {
         getInspectStatsOverRegion(params).then(res => {
@@ -1254,7 +1261,7 @@ export default {
 
     },
     emitTypeChangedPart3({compareType,compareArr,selectedLabels,originArray,selStoreIdArr}){ //劃分類型選擇
-      console.log("Part3 Emit Type Change="+compareType)
+      console.log("Part3 Emit Type Change ", compareType)
       console.log("compareArr:",compareArr)
       this.part3.compareType = compareType;
       this.part3.compareIds = compareArr;
@@ -1262,8 +1269,8 @@ export default {
       this.part3.originArray = originArray;
       this.part3.selStoreIdArr = selStoreIdArr;
       this.dataGetPart3();
-
     },
+    
     getInspectLineOption() {
       const option = {
         width:'100%',
@@ -1501,6 +1508,7 @@ export default {
     async dataGetPart2(){
       await this.getPart2RegionBar();
     },
+
     async dataGetPart3(){
       this.part3.storeTableData = null;
       this.part3.barRegionOption = {};
@@ -1508,6 +1516,7 @@ export default {
     //  console.log("1.getPart3RegionBar");
       await this.getPart3RegionBar();
     },
+
     async getInspectStatsOverviewOfRegionTable() {
       const self = this;
       const params = {};
@@ -2004,6 +2013,8 @@ export default {
       option.yAxis[0].name  =  this.$t('statistics.score'),
       this.part2.barStoreOption = option;
     },
+    
+
     async getPart3RegionBar() {
       // this.inspectItem
       const self = this;
@@ -2023,9 +2034,6 @@ export default {
         direction: this.part3.regionOrder,
         property:"averageScore"
       }
-
-
-
       if(this.part3.compareType=='stores'){
         params.groupIds  = this.part3.compareIds;
         params.storeIds  = this.part3.compareIds;
@@ -2075,11 +2083,13 @@ export default {
         params.searchMysteryMode = 0
       }
 
+
       if(this.inspectItem){
-        console.log("this.inspectItem:",this.inspectItem);
+        console.log("this.inspectItem :::::>>>",this.inspectItem);
         params.itemIds = this.inspectItem.item.ids
       }
 
+      
       let totalReport = 0;
       let totalStandard = 0;
 
@@ -2089,35 +2099,42 @@ export default {
         this.drawPart3RegionBar();
         return;
       }
-        params.filter = { page: 0, size: params.groupIds.length };
-        if( !params.hasOwnProperty('itemIds') ||params.itemIds.length==0 || params.storeIds.length ==0)return
+      
+      params.filter = { page: 0, size: params.groupIds.length };
+      console.log('params :::::::::::::>> ', params);
+
+      // params.itemIds.push(30795)
+
+      if(!params.hasOwnProperty('itemIds') || params.itemIds.length== 0 || params.storeIds.length == 0) return
         console.log("********************************")
         console.log("getPart3RegionBar params",params)
         const storeResult = await self.getInspectStatsItemOverGroup(params);
 
         console.log('storeResult//////>>', storeResult)
-        
-        if (storeResult.errCode === 0) {
-          const result = storeResult.data;
-          console.log("getPart3RegionBar result:",result);
-          if (result) {
-            this.part3.content = this.filterContent(result.content,
-                                  this.part3.compareType,
-                                  this.part3.compareIds,
-                                  this.part3.comapareLabels,
-                                  this.part3.originArray);
-            this.part3.content.forEach(function(item){
-                  totalReport += item.numOfTotal;
-                  totalStandard +=  item.numOfStandard;
-            })
-            this.part3.averageScore =  totalStandard > 0 ? Math.round( (100*totalStandard) / totalReport): -1;
-            console.log('this.part3 //////>>' , this.part3)
-            this.part3.indexRegion = -1;
-            this.drawPart3RegionBar();
-          }
+      
+      if (storeResult.errCode === 0) {
+        const result = storeResult.data;
+        console.log("getPart3RegionBar result:",result);
+        if (result) {
+          this.part3.content = this.filterContent(result.content,
+                                this.part3.compareType,
+                                this.part3.compareIds,
+                                this.part3.comapareLabels,
+                                this.part3.originArray);
+          this.part3.content.forEach(function(item){
+                totalReport += item.numOfTotal;
+                totalStandard +=  item.numOfStandard;
+          })
+          this.part3.averageScore =  totalStandard > 0 ? Math.round( (100*totalStandard) / totalReport): -1;
+          console.log('this.part3 //////>>' , this.part3)
+          this.part3.indexRegion = -1;
+          this.drawPart3RegionBar();
         }
+      }
 
     },
+
+    
     async drawPart3RegionBar(){
       console.log("drawPart3RegionBar")
       const option = this.getInspectLineOption();
@@ -2491,12 +2508,9 @@ export default {
       this.ifSaveParams && this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
       this.ifSaveParams = true;
       if(searchParams.inspectId && searchParams.inspectId!=''){
-          console.log(searchParams.inspectId,this.curInspectId)
       //  if(searchParams.inspectId !=this.curInspectId){
-          console.log("Get InpectItemList "+searchParams.inspectId)
           this.inspectItemList =[];
           this.getInspectItemList(searchParams.inspectId).then(result =>{
-            console.log(result)
             if(result.errCode==0 && result.data){
               let tempList = [];
               result.data.forEach(function(item){
@@ -2512,10 +2526,12 @@ export default {
                   });
 
               })
-             // console.log("Change inspect Itemlist")
-            // console.log(this.inspectItemList);
+  
               this.inspectItemList = tempList ;
               this.curInspectId = searchParams.inspectId
+              console.log('this.inspectItemList :>> ', this.inspectItemList);
+              console.log('this.curInspectId :>> ', this.curInspectId);
+
               //this.params = JSON.parse(JSON.stringify(searchParams));
               //this.daysRangeList = dateRangeList;
               //this.curRegionI = regionI;
@@ -2526,9 +2542,7 @@ export default {
               //this.curCountry = this.params.curCountry;
             }
           });
-
      //   }
-
       }else{
         let changed = false;
         if(this.params.inspectId != searchParams.inspectId ||
@@ -2537,36 +2551,25 @@ export default {
             console.log("Change = TRUE")
             changed = true;
         }
-          this.params = JSON.parse(JSON.stringify(searchParams));
-          this.daysRangeList = dateRangeList;
-          this.curRegionI = regionI;
-          this.curRegionII = regionII;
-          this.regionMode = regionMode;
-          this.timeMode = timeMode;
-          this.storePatrolLists = storePatrolLists;
-          this.curCountry = this.params.curCountry;
-          /*if(changed){
-            await this.dataGetPart3();
-          }*/
-    }
-      //console.log(this.params)
-      //console.log(searchParams)
-
-
-    //  console.log(searchParams)
-      //if(this.params.storeIds.length>0){
-      //  console.log("Get Part3")
-      //  await this.dataGetPart3();
-     // }
-
-
+        this.params = JSON.parse(JSON.stringify(searchParams));
+        this.daysRangeList = dateRangeList;
+        this.curRegionI = regionI;
+        this.curRegionII = regionII;
+        this.regionMode = regionMode;
+        this.timeMode = timeMode;
+        this.storePatrolLists = storePatrolLists;
+        this.curCountry = this.params.curCountry;
+        /*if(changed){
+          await this.dataGetPart3();
+        }*/
+      }
     },
 
- exportPDF() {
+    exportPDF() {
       console.log("Export PDF")
-       const self = this;
-       self.ispdf = true;
-       this.$nextTick(() => {
+        const self = this;
+        self.ispdf = true;
+        this.$nextTick(() => {
         const img_avg1 = document.getElementById('imgTest_avg1');
         setTimeout(() => {
           html2canvas(img_avg1,{backgroundColor: "#FFFFFF"}).then(function(canvas) {
