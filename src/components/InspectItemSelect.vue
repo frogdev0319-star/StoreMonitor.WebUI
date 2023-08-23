@@ -253,6 +253,7 @@ export default {
       this.itemList = itemList;
       this.curItem = null;
       this.selectedItem = 'all'
+      this.changeLayer3('all')
       this.notifyItemChanged();
     },
     
@@ -261,7 +262,7 @@ export default {
       this.hasLayer3List = true
       this.layer3 = e
       if( e == 'all'){
-        this.layer3Id = null
+        this.curLayer3 = null
       } else {
         this.curLayer2.items.forEach(i =>{
           if(i.id == e){
