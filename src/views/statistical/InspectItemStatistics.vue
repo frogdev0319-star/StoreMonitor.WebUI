@@ -30,27 +30,29 @@
 
     <!-- 巡檢項目得分 -->
     <div class="statistics-content"   id="imgTest_avg1"   style="height:1110px;margin-top:200px;box-shadow:none;"  :style="{width:ispdf?'1024px':null}">
-            <div class="head">
-              <div class="region-titles">
-                  <span class="title">
-                        {{ $t('statistics.titles.inspectItemScores') }}
-                  </span>
-              </div>
-                  <TypeSelectArea
-                    path="inspectItemStatistics"
-                    ref="typeSelectArea"
-                    :allow-all=true
-                    :allow-person=true
-                    :region-array1="params.curProvince"
-                    :region-array2="params.curCity"
-                    :cur-store-group="params.curStoreGroup"
-                    :cur-store-type="params.curStoreType"
-                    :cur-stores="params.storeIds"
-                    :cached-params="params"
-                    :cur-country="curCountry"
-                    @emitTypeChanged="emitTypeChangedPart3"
-                ></TypeSelectArea>
+          <div class="head">
+            <div class="region-titles">
+                <span class="title">
+                      {{ $t('statistics.titles.inspectItemScores') }} 
+                </span>
             </div>
+                <TypeSelectArea
+                  path="inspectItemStatistics"
+                  ref="typeSelectArea"
+                  :allow-all=true
+                  :allow-person=true
+                  :region-array1="params.curProvince"
+                  :region-array2="params.curCity"
+                  :cur-store-group="params.curStoreGroup"
+                  :cur-store-type="params.curStoreType"
+                  :cur-stores="params.storeIds"
+                  :cached-params="params"
+                  :cur-country="curCountry"
+                  @emitTypeChanged="emitTypeChangedPart3"
+              ></TypeSelectArea>
+          </div>
+          
+          <!-- 巡檢項目選單 -->
           <div style="padding:20px">
             <InspectItemSelect
                 :inspect-item-list="inspectItemList"
@@ -59,14 +61,15 @@
           </div>
           <div class="subtitle-head">
               <span class="title" style="width:80%" >
-                {{inspectSubTitle}}
+                {{inspectSubTitle}} 
               </span>
           </div>
+
           <el-row :span="24" class="region-overview" style="margin-left:40px;width:400px">
               <el-col :span="10" class="division">
                 <el-col class="text-area">
                   <el-row class="top">
-                      <span class="mainTitle">{{totalAvgScore!=-9999?totalAvgScore:'N/A'}}</span>
+                      <span class="mainTitle">{{ totalAvgScore != -9999 ? totalAvgScore : 'N/A' }}</span>
                       <span class="unit">{{$t('statistics.score')}}</span>
                   </el-row >
                   <el-row class="subtitlehead">
@@ -75,6 +78,7 @@
                 </el-col>
                 </el-col>
           </el-row>
+
           <el-row  :span="24" class="partition" style="height:320px;;padding-right:40px;width:calc(100% - 40px)">
             <el-col  style="overflow-x:auto;overflow-y:hidden;height:320px;width :100%">
               <v-chart @click='clickPart3Bar' ref="storeChart" :options="part3.barRegionOption"  autoresize
@@ -733,7 +737,7 @@ export default {
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
-         {
+        {
           'prop': 'numOfTotal',
           'label': this.$t('overview.numOfEvaluations'),
           'sortable': 'custom',
@@ -780,6 +784,7 @@ export default {
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{},
               table:{total:0,page:1,sizeNum:10,order:'desc',property:'numOfTotal'}},
+              
       operationBtnClass:[
         {key:'en',value:'operation-btns-en'},{key:'zh',value:'operation-btns-zh'},{key:'zhtw',value:'operation-btns-zhTW'},
         {key:'ja-JP',value:'operation-btns-ja'},{key:'ko-KR',value:'operation-btns-ko'},{key:'vi-VN',value:'operation-btns-vi'},
@@ -1131,7 +1136,8 @@ export default {
           });
       });
     },
-   getInspectReulstStatsOverview(params) {
+
+    getInspectReulstStatsOverview(params) {
       return new Promise((resolve, reject) => {
         getInspectStatsOverviewV2(params).then(res => {
           resolve(res);
@@ -1141,6 +1147,7 @@ export default {
           });
       });
     },
+
     getInspectResultOverRegion(params) {
       return new Promise((resolve, reject) => {
         getInspectStatsOverRegion(params).then(res => {
@@ -1250,7 +1257,7 @@ export default {
 
     },
     emitTypeChangedPart3({compareType,compareArr,selectedLabels,originArray,selStoreIdArr}){ //劃分類型選擇
-      console.log("Part3 Emit Type Change="+compareType)
+      console.log("Part3 Emit Type Change ", compareType)
       console.log("compareArr:",compareArr)
       this.part3.compareType = compareType;
       this.part3.compareIds = compareArr;
@@ -1258,9 +1265,9 @@ export default {
       this.part3.originArray = originArray;
       this.part3.selStoreIdArr = selStoreIdArr;
       this.dataGetPart3();
-
     },
-   getInspectLineOption() {
+    
+    getInspectLineOption() {
       const option = {
         width:'100%',
         color: ['#f11e66'],
@@ -1497,6 +1504,7 @@ export default {
     async dataGetPart2(){
       await this.getPart2RegionBar();
     },
+
     async dataGetPart3(){
       this.part3.storeTableData = null;
       this.part3.barRegionOption = {};
@@ -1504,6 +1512,7 @@ export default {
     //  console.log("1.getPart3RegionBar");
       await this.getPart3RegionBar();
     },
+
     async getInspectStatsOverviewOfRegionTable() {
       const self = this;
       const params = {};
@@ -1919,7 +1928,7 @@ export default {
           }})
           }
 
-           regionLabel.push(this.maxLabel(item.groupName))
+          regionLabel.push(this.maxLabel(item.groupName))
         });
       }
 
@@ -2000,8 +2009,10 @@ export default {
       option.yAxis[0].name  =  this.$t('statistics.score'),
       this.part2.barStoreOption = option;
     },
+    
+
     async getPart3RegionBar() {
-      
+      // this.inspectItem
       const self = this;
       const params = {};
       this.totalAvgScore =-9999;
@@ -2019,9 +2030,6 @@ export default {
         direction: this.part3.regionOrder,
         property:"averageScore"
       }
-
-
-
       if(this.part3.compareType=='stores'){
         params.groupIds  = this.part3.compareIds;
         params.storeIds  = this.part3.compareIds;
@@ -2071,10 +2079,13 @@ export default {
         params.searchMysteryMode = 0
       }
 
+
       if(this.inspectItem){
-        console.log("this.inspectItem:",this.inspectItem);
+        console.log("this.inspectItem :::::>>>",this.inspectItem);
         params.itemIds = this.inspectItem.item.ids
       }
+
+      
       let totalReport = 0;
       let totalStandard = 0;
 
@@ -2084,49 +2095,56 @@ export default {
         this.drawPart3RegionBar();
         return;
       }
-        params.filter = { page: 0, size: params.groupIds.length };
-        console.log(params)
-        if( !params.hasOwnProperty('itemIds') ||params.itemIds.length==0 || params.storeIds.length ==0)return
+      
+      params.filter = { page: 0, size: params.groupIds.length };
+      console.log('params :::::::::::::>> ', params);
+
+      // params.itemIds.push(30795)
+
+      if(!params.hasOwnProperty('itemIds') || params.itemIds.length== 0 || params.storeIds.length == 0) return
         console.log("********************************")
         console.log("getPart3RegionBar params",params)
         const storeResult = await self.getInspectStatsItemOverGroup(params);
-        //console.log(storeResult)
-        if (storeResult.errCode === 0) {
-          const result = storeResult.data;
-          console.log("getPart3RegionBar result:",result);
-          if (result) {
-            this.part3.content = this.filterContent(result.content,
-                                  this.part3.compareType,
-                                  this.part3.compareIds,
-                                  this.part3.comapareLabels,
-                                  this.part3.originArray);
-            this.part3.content.forEach(function(item){
-                  totalReport += item.numOfTotal;
-                  totalStandard +=  item.numOfStandard;
-            })
-            this.part3.averageScore =  totalStandard>0? Math.round( (100*totalStandard) /totalReport):-1;
-            console.log("Leave FIlterContent"+Math.round( (100*totalStandard) /totalReport)+ " " + ( (100*totalStandard) /totalReport))
-            console.log(this.part3.content)
-            this.part3.indexRegion = -1;
-            this.drawPart3RegionBar();
-          }
+
+        console.log('storeResult//////>>', storeResult)
+      
+      if (storeResult.errCode === 0) {
+        const result = storeResult.data;
+        console.log("getPart3RegionBar result:",result);
+        if (result) {
+          this.part3.content = this.filterContent(result.content,
+                                this.part3.compareType,
+                                this.part3.compareIds,
+                                this.part3.comapareLabels,
+                                this.part3.originArray);
+          this.part3.content.forEach(function(item){
+                totalReport += item.numOfTotal;
+                totalStandard +=  item.numOfStandard;
+          })
+          this.part3.averageScore =  totalStandard > 0 ? Math.round( (100*totalStandard) / totalReport): -1;
+          console.log('this.part3 //////>>' , this.part3)
+          this.part3.indexRegion = -1;
+          this.drawPart3RegionBar();
         }
+      }
 
     },
+
+    
     async drawPart3RegionBar(){
       console.log("drawPart3RegionBar")
       const option = this.getInspectLineOption();
       const regionData =[];
       const regionLabel =[];
       let max = 0;
-      this.totalAvgScore= -9999;
+      this.totalAvgScore = -9999;
       if(this.part3.content){
         let totalAvgScore = 0;
         let count = 0;
         this.part3.content.map((item,index) => {
           let value = item.averageScore;
           if(value>max)max = value;
-          totalAvgScore += value *item.numOfTotal ;
+          totalAvgScore += value * item.numOfTotal ;
           count += item.numOfTotal;
 
         //  if(this.part3.indexRegion<0 && value>0){
@@ -2146,18 +2164,23 @@ export default {
             regionData.push({value,itemStyle: {
             color: 'rgba(123 ,216, 235, 0.5)',
             emphasis: {
-                            shadowBlur: 0,
-                            shadowOffsetX: 0,
-                            shadowColor: 'rgba(0, 0, 0, 0.0)'
+                        shadowBlur: 0,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.0)'
                     }
-          }})
+            }})
           }
 
-           regionLabel.push(this.maxLabel(item.groupName))
+          regionLabel.push(this.maxLabel(item.groupName))
         });
-        if(count>0){
+        
+        console.log('totalAvgScore //////>> ', totalAvgScore);
+        console.log('count //////>> ', count);
+
+        if(count > 0){
           totalAvgScore = (totalAvgScore/count).toFixed(1);
-          this.totalAvgScore =totalAvgScore;
+          this.totalAvgScore = totalAvgScore;
+          console.log('this.totalAvgScore //////>> ', this.totalAvgScore);
         }
       }
 
@@ -2191,6 +2214,8 @@ export default {
       //console.log(option)
       await this.getPart3StoreBar();
     },
+
+
     async getPart3StoreBar(){
       const self = this;
       const option = this.getInspectLineOption();
@@ -2279,7 +2304,7 @@ export default {
           regionData.push({value,itemStyle: {
             color: '#7bd8eb',
           }})
-           regionLabel.push(this.maxLabel(item.groupName))
+          regionLabel.push(this.maxLabel(item.groupName))
         });
       }
       this.part3.storeTableData = content;
@@ -2479,12 +2504,9 @@ export default {
       this.ifSaveParams && this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
       this.ifSaveParams = true;
       if(searchParams.inspectId && searchParams.inspectId!=''){
-          console.log(searchParams.inspectId,this.curInspectId)
       //  if(searchParams.inspectId !=this.curInspectId){
-          console.log("Get InpectItemList "+searchParams.inspectId)
           this.inspectItemList =[];
           this.getInspectItemList(searchParams.inspectId).then(result =>{
-            console.log(result)
             if(result.errCode==0 && result.data){
               let tempList = [];
               result.data.forEach(function(item){
@@ -2500,10 +2522,12 @@ export default {
                   });
 
               })
-             // console.log("Change inspect Itemlist")
-            // console.log(this.inspectItemList);
+  
               this.inspectItemList = tempList ;
               this.curInspectId = searchParams.inspectId
+              console.log('this.inspectItemList :>> ', this.inspectItemList);
+              console.log('this.curInspectId :>> ', this.curInspectId);
+
               //this.params = JSON.parse(JSON.stringify(searchParams));
               //this.daysRangeList = dateRangeList;
               //this.curRegionI = regionI;
@@ -2514,9 +2538,7 @@ export default {
               //this.curCountry = this.params.curCountry;
             }
           });
-
      //   }
-
       }else{
         let changed = false;
         if(this.params.inspectId != searchParams.inspectId ||
@@ -2525,36 +2547,25 @@ export default {
             console.log("Change = TRUE")
             changed = true;
         }
-          this.params = JSON.parse(JSON.stringify(searchParams));
-          this.daysRangeList = dateRangeList;
-          this.curRegionI = regionI;
-          this.curRegionII = regionII;
-          this.regionMode = regionMode;
-          this.timeMode = timeMode;
-          this.storePatrolLists = storePatrolLists;
-          this.curCountry = this.params.curCountry;
-          /*if(changed){
-            await this.dataGetPart3();
-          }*/
-    }
-      //console.log(this.params)
-      //console.log(searchParams)
-
-
-    //  console.log(searchParams)
-      //if(this.params.storeIds.length>0){
-      //  console.log("Get Part3")
-      //  await this.dataGetPart3();
-     // }
-
-
+        this.params = JSON.parse(JSON.stringify(searchParams));
+        this.daysRangeList = dateRangeList;
+        this.curRegionI = regionI;
+        this.curRegionII = regionII;
+        this.regionMode = regionMode;
+        this.timeMode = timeMode;
+        this.storePatrolLists = storePatrolLists;
+        this.curCountry = this.params.curCountry;
+        /*if(changed){
+          await this.dataGetPart3();
+        }*/
+      }
     },
 
- exportPDF() {
+    exportPDF() {
       console.log("Export PDF")
-       const self = this;
-       self.ispdf = true;
-       this.$nextTick(() => {
+        const self = this;
+        self.ispdf = true;
+        this.$nextTick(() => {
         const img_avg1 = document.getElementById('imgTest_avg1');
         setTimeout(() => {
           html2canvas(img_avg1,{backgroundColor: "#FFFFFF"}).then(function(canvas) {
@@ -2638,7 +2649,7 @@ export default {
     getInspectTagStandardScore(){//取得巡檢表達標分數
       const self = this;
       return new Promise((resolve, reject) => {
-         GetInspectTagList({includeRule:true}).then(res => {
+        GetInspectTagList({includeRule:true}).then(res => {
           resolve(res);
         }).catch(err => {
           reject(err);
@@ -2648,7 +2659,7 @@ export default {
     getInspectItemList(inspectId){
       const self = this;
       return new Promise((resolve, reject) => {
-         getInspectItemList({inspectId}).then(res => {
+        getInspectItemList({inspectId}).then(res => {
           resolve(res);
         }).catch(err => {
           reject(err);
@@ -2658,13 +2669,15 @@ export default {
         return result;
       });
     },
+
     emitItemChanged(item){
-       console.log("Emit Item Changed:",item);
-       this.inspectItem = item;
-       this.getItemSubtitle();
-       console.log("2.getPart3RegionBar");
-       this.getPart3RegionBar();
+      console.log("Emit Item Changed:",item);
+      this.inspectItem = item;
+      this.getItemSubtitle();
+      console.log("2.getPart3RegionBar");
+      this.getPart3RegionBar();
     },
+    
     async doGetAssessmentStandardScore(){
       console.log("tag-doGetAssessmentStandardScore")
       let tagList = await this.getInspectTagStandardScore();
@@ -2693,9 +2706,10 @@ export default {
     getItemSubtitle(){
       if(this.inspectItem && this.inspectItem.item){
         let item = this.inspectItem.item;
-        let name = item.subject?item.subject:item.name
-        this.inspectSubTitle= name + " "+ this.$t('statistics.itemAverageScore') + "  ( " + this.$t('statistics.totalScore') +  parseFloat(item.qualifiedScore.toFixed(1)) + " )";
-        this.inspectDetailSubTitle= name+ " " + this.$t('statistics.evalDetail')+ "  ( " + this.$t('statistics.totalScore') +  parseFloat(item.qualifiedScore.toFixed(1)) + " )";
+        let name = item.subject ? item.subject : item.name
+        console.log('item ~~~~~>> ', item)
+        this.inspectSubTitle = name + " " + this.$t('statistics.itemAverageScore') + "  ( " + this.$t('statistics.totalScore') +  parseFloat(item.qualifiedScore.toFixed(1)) + " )";
+        this.inspectDetailSubTitle = name + " " + this.$t('statistics.evalDetail')+ "  ( " + this.$t('statistics.totalScore') +  parseFloat(item.qualifiedScore.toFixed(1)) + " )";
       }
     }
   }

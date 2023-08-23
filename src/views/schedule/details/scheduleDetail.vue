@@ -483,7 +483,7 @@
 import { mapGetters } from 'vuex';
 import {scheduleRESTful} from '@/api/index';
 import { getBriefStoreList} from '@/api/store';
-import {  GetInspectTagList } from '@/api/inspect';
+import {  GetInspectTagList, GetInspectTagListAll } from '@/api/inspect';
 import DateTimeSelector from '@/components/DateTimeSelector';
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
@@ -844,7 +844,7 @@ export default{
     // 取得巡檢表
     getTagAll() {
       return new Promise((resolve, reject) => {
-        GetInspectTagList().then(res => {
+        GetInspectTagListAll().then(res => {
           const data = res.data;
           resolve(data);
 

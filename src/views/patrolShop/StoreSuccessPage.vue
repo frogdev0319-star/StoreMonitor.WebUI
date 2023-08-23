@@ -41,10 +41,20 @@
         <span v-if="lang.indexOf('zh') === -1 " class="en-event-label" style="margin-right: 60px;">{{ $t('remotePatrol.description') }}:</span>
         <span v-else class="event-label" >{{ $t('remotePatrol.description') }}：</span>
       </div>
-       <div class="source-content flex fullWidth" style="margin-top:20px;margin-left:20px;display:block">
+      <div class="source-content flex fullWidth" style="margin-top:20px;margin-left:20px;display:block">
               <div v-for="(_item, _index) in sourceList" :key="_index" >
                 <div v-if="_item.mediaType === 3"  class="fullwidth" 
-                     style="display:flex;justify-content:flex-start;align-items:flex-start;margin-bottom:7px">
+                  style="
+                      width: 94%;   
+                      word-break: break-all; 
+                      display:flex;
+                      justify-content:flex-start;
+                      align-items:flex-start;
+                      margin-bottom:7px;
+                      text-align: left; "
+
+                  :style=" /\s/.test(_item.url) ? {'word-break':'normal'} : {'word-break':'break-all'} "
+                      >
                   {{_item.url}}
                 </div>
               </div>

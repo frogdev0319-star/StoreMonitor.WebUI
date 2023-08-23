@@ -170,6 +170,15 @@ export const getInspectReportList = data => {
   });
 };
 
+export const statisticsGetInspectReportList = data => {
+  return request({
+    url: `${version}/statistics/inspect/report/list`,
+    method: 'post',
+    data
+  });
+};
+
+
 export const getInspectReportInfo = data => {
   return request({
     url: `v5.0/inspect/report/info`,
@@ -217,6 +226,17 @@ export const GetInspectTagList = params => {
     params
   });
 };
+export const GetInspectTagListAll = params => {
+  return request({
+    url: `${version}/inspect/tag/listAll`,
+    method: 'get',
+    params
+  });
+};
+
+
+
+
 
 export const GetMysteryInspectTagList = params => {
   return request({

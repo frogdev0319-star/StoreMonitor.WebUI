@@ -1957,11 +1957,11 @@ export default {
 
     eventDesChanged(val) {
       const self = this;
-      const content = filterString.all(val, 200);
+      const content = filterString.all(val, 1000);
       self.eventDesEdit.val = content;
       self.inspectInput = content;
       const length = filterString.getContentLength(val);
-      if (length > 200) {
+      if (length > 1000) {
         this.eventDesRuletip = true;
       } else {
         this.eventDesRuletip = false;

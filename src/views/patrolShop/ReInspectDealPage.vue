@@ -20,9 +20,16 @@
             </el-button>
           </div >
           <div v-else>
-            <el-button size="samll" type="primary" class="retry-btn" @click="reTry">
+            
+            <el-button size="samll" type="primary" class="retry-btn" @click="backToReinspection" v-if="viewReportByTagAuth">
+              {{ $t('audit.inceptionRpt.backReInspection') }} 
+            </el-button>
+
+            <el-button size="samll" type="primary" class="retry-btn" @click="reTry" v-else>
               {{ curSecond }}s{{ $t('remotePatrol.tryAgain') }}
             </el-button>
+
+            
           </div>
         </div>
         <!--<div v-else>
@@ -50,6 +57,7 @@ export default {
       timeid: 0,
       lang: this.$i18n.locale,
       isBindWorkflow:false,
+      viewReportByTagAuth: false
     };
   },
 
@@ -73,6 +81,10 @@ export default {
     getRouterData() {
       const self = this;
       let routeData = self.$route.params.data;
+      console.log('routeData :>> ', routeData);
+      
+      this.viewReportByTagAuth = routeData.viewReportByTagAuth
+
       
       if (self.$route.params.data === undefined) {
         routeData = JSON.parse(sessionStorage.getItem('reinspect_submit'));
@@ -112,6 +124,10 @@ export default {
     reTry() {
       const self = this;
       self.$router.push({ name: 'confirmSum', params: self.$route.params.data.reLoadData });
+    },
+    backToReinspection(){
+      const self = this;
+      self.$router.push({ name: 'remotePatrol'});
     }
   }
 };

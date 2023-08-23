@@ -207,7 +207,7 @@
                     </div>
                   <div style="position: relative">
                           <el-input
-                            :autosize="{ minRows: 1, maxRows: 5 }"
+                            :autosize="{ minRows: 5, maxRows: 10 }"
                             v-model="eventDes"
                             :placeholder="$t('remotePatrol.coment')"
                             :disabled="false"
@@ -227,13 +227,11 @@
                           </button>
                         </div>
                   <span v-if="showEventDescInfo" class="error-class">{{ $t("remotePatrol.enterDesc") }}</span>
-                  <span v-if="eventDesRuletip" class="rules">{{ $t("remotePatrol.eventDesRuletip") }}</span>
-              <span v-if="RuleCountTip" class="rules">{{
-                  $t("remotePatrol.commentCountRuleTip")
-                }}</span>
+                  <span v-if="eventDesRuletip" class="rules" style="margin-left: 8px;">{{ $t("remotePatrol.eventDesRuletip") }}</span>
+                  <span v-if="RuleCountTip" class="rules" style="margin-left: 8px;">{{$t("remotePatrol.commentCountRuleTip")}}</span>
 
                   <div class="source-content">
-                    <span>* {{ $t("remotePatrol.storeMaxAttach") }}</span>
+                    <span>* {{ $t("remotePatrol.storeMaxAttach") }} </span>
                     <div
                       v-for="(item, index) in sourceList"
                       :key="index"
@@ -332,7 +330,7 @@
               <div class="event-title margin-bottom-sm">{{ $t("remotePatrol.description") }}</div>
               <div v-if=" sourceList.filter((s, idx) =>s.mediaType==3 ).length!=0" :class="'noraml-title'" class="tsource-content">
                       <div v-for="(_item,_index) in sourceList" :key="_index" >
-                       <div  v-if="_item.mediaType == 3"  class="fullWidth source-details" >
+                      <div  v-if="_item.mediaType == 3"  class="fullWidth source-details" >
                         <div class="flex-center comment_list"
 
                         >
@@ -366,48 +364,45 @@
                       </div>
                       </div>
                     </div>
-               <div   style="position: relative">
-                      <el-input
-                        :autosize="{ minRows: 2, maxRows: 7 }"
-                        v-model="eventDes"
-                        :placeholder="$t('remotePatrol.coment')"
-                        :disabled="false"
-                        size="mini"
-                        class="storevue-textarea"
-                        type="textarea"
-                        resize="none"
-                        @input="eventDesChanged"
-                        @blur="notShowInputRuleTips('eventDes')"
-                      />
-                      <button
-                        class="inspect-btn"
-                        :disabled="false"
-                        @click="submitItemResource()"
-                      >
-                        {{$t('remotePatrol.confirm')}}
-                      </button>
-                    </div>
-              <span v-if="showEventDescInfo" class="error-class">{{ $t("remotePatrol.enterDesc") }}</span>
-              <span v-if="eventDesRuletip" class="rules">{{ $t("remotePatrol.eventDesRuletip") }}</span>
-              <span v-if="RuleCountTip" class="rules">{{
-                  $t("remotePatrol.commentCountRuleTip")
-                }}</span>
-
-              <div class="source-content">
-                <span>* {{ $t("remotePatrol.storeMaxAttach") }}</span>
-                <div
-                  v-for="(item, index) in sourceList"
-                  :key="index"
-                  class="source-details"
+              <div   style="position: relative">
+                <el-input
+                  :autosize="{ minRows: 5, maxRows: 10 }"
+                  v-model="eventDes"
+                  :placeholder="$t('remotePatrol.coment')"
+                  :disabled="false"
+                  size="mini"
+                  class="storevue-textarea"
+                  type="textarea"
+                  resize="none"
+                  @input="eventDesChanged"
+                  @blur="notShowInputRuleTips('eventDes')"
+                />
+                <button
+                  class="inspect-btn"
+                  :disabled="false"
+                  @click="submitItemResource()"
                 >
-                  <div v-if="item.mediaType === 2" class="img-content">
-                    <i class="el-icon-close icondelete"  @click="deleteImg(index)" />
-                    <el-image
-                      :src="item.src"
-                      :style="{width: `calc(${item.width} / 1920 * 100vw)`, height:  `calc(${item.height} / 1920 * 100vw)`}"
-                      :preview-src-list="getImgList(index, sourceList)"/>
+                  {{$t('remotePatrol.confirm')}}
+                </button>
+              </div>
+              <span v-if="showEventDescInfo" class="error-class">{{ $t("remotePatrol.enterDesc") }}</span>
+              <span v-if="eventDesRuletip" class="rules" style="margin-left: 8px;">{{ $t("remotePatrol.eventDesRuletip") }}</span>
+              <span v-if="RuleCountTip" class="rules" style="margin-left: 8px;">{{$t("remotePatrol.commentCountRuleTip")}}</span>
+              <div class="source-content">
+                <span>* {{ $t("remotePatrol.storeMaxAttach") }}  </span>
+                <div
+                    v-for="(item, index) in sourceList"
+                    :key="index"
+                    class="source-details"
+                  >
+                    <div v-if="item.mediaType === 2" class="img-content">
+                      <i class="el-icon-close icondelete"  @click="deleteImg(index)" />
+                      <el-image
+                        :src="item.src"
+                        :style="{width: `calc(${item.width} / 1920 * 100vw)`, height:  `calc(${item.height} / 1920 * 100vw)`}"
+                        :preview-src-list="getImgList(index, sourceList)"/>
+                    </div>
                   </div>
-                </div>
               </div>
             </div>
             <div v-if="corEvent && problemTab == 1 && store.storeId" style="height: 500px; overflow: auto;">
@@ -2048,11 +2043,15 @@ export default {
 
     eventDesChanged(val) {
       const self = this;
-      const content = filterString.all(val, 200);
+      const content = filterString.all(val, 1000);
       self.eventDes = content;
       self.showEventDescInfo = false;
       const length = filterString.getContentLength(val);
-
+      if (length > 1000) {
+        this.eventDesRuletip = true;
+      } else {
+        this.eventDesRuletip = false;
+      }
     },
 
     notShowInputRuleTips(e) {

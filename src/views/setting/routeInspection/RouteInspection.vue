@@ -610,7 +610,7 @@ export default {
         mode: parseInt(self.activeName) === 0 ? 1 : 0
       };
       return new Promise((resolve, reject) => {
-        inpectRESTful.GetInspectTagList(params).then(res => {
+        inpectRESTful.GetInspectTagListAll(params).then(res => {
           const data = res.data;
           resolve(data);
         }).catch(err => {

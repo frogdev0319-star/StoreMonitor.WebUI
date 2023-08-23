@@ -63,8 +63,6 @@
         <hr class="hr-horizontal">
         <el-scrollbar :class="showRolesList? 'showlist-el-menuscrollbar' : 'el-menuscrollbar'">
 
-          <!-- {{ roleNameList }} -->
-          <!-- ==== 暫時隱藏 巡檢排程相關 ==== -->
           <div 
             v-for="(item,index) in roleNameList" 
             :key="index" class="role-group" 
@@ -666,28 +664,28 @@ export default {
         item.children.forEach((_item, _index) => {
           if(_item.checked){
             if(index === 4 && _index === 0){
-              console.log('xdxdxd 0')
               tempAuthorityNum += Math.pow(2, 0);
+              console.log('xdxdxd 0' , tempAuthorityNum)
             }
             else if(index === 4 && _index === 1){
-              console.log('xdxdxd 1')
               tempAuthorityNum += Math.pow(2, 1);
+              console.log('xdxdxd 1' , tempAuthorityNum)
             } 
             else if(index === 4 && _index === 2){
-              console.log('xdxdxd 2')
               tempAuthorityNum += Math.pow(2, 2);
+              console.log('xdxdxd 2' , tempAuthorityNum)
             } 
             else if(index === 4 && _index === 4){
-              console.log('xdxdxd 4')
-              tempAuthorityNum += Math.pow(2, 5);
+              tempAuthorityNum += Math.pow(2, 4);
+              console.log('xdxdxd 4' , tempAuthorityNum)
             } 
-            else if(index === 4 && _index === 4){
-              console.log('xdxdxd 5')
+            else if(index === 4 && _index === 5){
               tempAuthorityNum += Math.pow(2, 5);
+              console.log('xdxdxd 5' , tempAuthorityNum)
             }
             else if(index === 4 && _index === 6){
-              console.log('xdxdxd 6')
               tempAuthorityNum += Math.pow(2, 6);
+              console.log('xdxdxd 6' , tempAuthorityNum)
             }
             else {
               console.log('!!!')
@@ -720,6 +718,7 @@ export default {
     },
 
     checkAllChildrenRole(index, val) {
+      console.log('index , val :>> ', index , val);
       const self = this;
       self.roleNameList[index].children.forEach(item => {
         if (!item.disabled) {

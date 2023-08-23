@@ -59,12 +59,12 @@
               <el-input
                 ref="audit_comment"
                 v-model="commentsToApi.comment.description"
-                :autosize="{ minRows: 3, maxRows: 5 }"
+                :autosize="{ minRows: 5, maxRows: 12 }"
                 :placeholder="$t('remotePatrol.enterDesc')"
                 class="storevue-textarea"
                 type="textarea"
                 resize="none"
-                @input="(val) => itemInputChanged(val, 600)"
+                @input="(val) => itemInputChanged(val, 1000)"
 
               />
               <span class="text_limit_notice" v-if="showInputLimit"> {{$t('remotePatrol.comentRuletip_suggest')}}  </span>

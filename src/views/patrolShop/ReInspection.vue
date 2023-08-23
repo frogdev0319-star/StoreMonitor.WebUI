@@ -155,6 +155,7 @@
             </div>
           </div>
         </dialog-pop>
+
         <dialog-pop
           v-if="showFeedDialog2"
           :title="$t('remotePatrol.feedbacks')"
@@ -715,10 +716,10 @@
                     <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
                       <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                         <div v-if="_item.mediaType == 3" class="flex-center">
-
+                        
                           <div
                             class=" flex-center comment_list "
-                            :style="curEditIndex === _index?{'border':'1px solid #006ab7'}:{'border':'1px solid #e6e6e6'}"
+                            :style="curEditIndex === _index ? {'border':'1px solid #006ab7'}:{'border':'1px solid #e6e6e6'}, /\s/.test(_item.src) ? {'word-break':'normal'} : {'word-break':'break-all'}"
                           >
                             <div style="flex: 1; text-align: left; margin: 5px; font-size: 13px;">
                               {{ _item.src }}
@@ -2211,7 +2212,11 @@ export default {
           const isCategory = self.sheetName[0].isCategory;
           self.inspectList = isCategory ? self.sheetName[0].inspectList : self.sheetName[0].inspectList;
           //bug
-          const feedobj = {groupId: 'feedBack', label: self.$t('remotePatrol.feedbacks'), isClick: false, isCategory: true};
+          const feedobj = {
+            groupId: 'feedBack', 
+            label: self.$t('remotePatrol.feedbacks'), 
+            isClick: false, 
+            isCategory: true};
           if (self.sheetName.length != 0) {
             self.sheetName.push(feedobj);
             self.getItemByGroup(self.sheetName[0].inspectList[0], 0);
@@ -2859,9 +2864,9 @@ export default {
               if(group.items){
                 group.items.forEach((item, index3) => {
                   item.sourceList.forEach((source, index4) => {
-                     if(source.mediaType>=2 &&  source.mediaType<=4){
-                       total = total+1;
-                     }
+                    if(source.mediaType>=2 &&  source.mediaType<=4){
+                      total = total+1;
+                    }
                   });
                 });
               }
@@ -2873,9 +2878,9 @@ export default {
       console.log(this.eventList)
 
       this.eventList.forEach((event, index1) => {
-         if(event.sourceObj){
-            total = total +1;
-         }
+        if(event.sourceObj){
+          total = total +1;
+        }
       });
       self.sourceListLength = total;
       console.log("Source = "+self.sourceListLength)
@@ -3872,11 +3877,11 @@ export default {
       this.feedbackInput = ''
     },
     itemDescriptionChanged({ val, item }) {
-      const content = filterString.all(val, 200);
+      const content = filterString.all(val, 1000);
       item.inspectInput = content;
       const length = filterString.getContentLength(val);
       if (item.RuleCountTip) item.RuleCountTip = false;
-      if (length > 200) {
+      if (length > 1000) {
         item.Ruletip = true;
       } else {
         item.Ruletip = false;
@@ -3923,11 +3928,11 @@ export default {
     },
     eventDesChanged(val) {
       const self = this;
-      const content = filterString.all(val, 200);
+      const content = filterString.all(val, 1000);
       self.eventDes = content;
       self.feedbackInput = content;
       const length = filterString.getContentLength(val);
-      if (length > 200) {
+      if (length > 1000) {
         this.eventDesRuletip = true;
       } else {
         this.eventDesRuletip = false;
@@ -3987,6 +3992,7 @@ export default {
     width: 100%
     padding: 4px
     margin-bottom: 5px
+    
     // background: rgb(242, 249, 254)
   .to_delete
     margin-bottom: 5px
@@ -4001,7 +4007,7 @@ export default {
   .is_important
     color: #f31d65
 
-
+  
 
 
 </style>

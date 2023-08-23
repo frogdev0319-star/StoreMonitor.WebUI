@@ -85,6 +85,7 @@
             
           </template>
 
+
           <!-- workflow switch state -->
           <template v-else-if="_item.forWorkflowsSwitch">
             <div class="forWorkflowsSwitch" @click="needAlert(row)">
@@ -125,7 +126,6 @@
               <el-radio :label="false">{{$t('audit.workFlows.unnecessary')}}</el-radio>
             </el-radio-group>
           </template>
-
           
           <template v-else>
             <template v-if="isDevice && _index < 3 ">
