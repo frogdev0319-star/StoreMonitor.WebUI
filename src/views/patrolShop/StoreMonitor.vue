@@ -1423,7 +1423,7 @@ export default {
       const self = this;
       const commentobj = {
         ts: new Date().getTime(),
-        description:"N/A",
+        description:"",
         attachment: tempFileUrl,
         status: 0
       };
