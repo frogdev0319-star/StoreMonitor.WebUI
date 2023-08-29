@@ -200,7 +200,7 @@
                 </div>
               </div>
           </div>
-          <div v-else class="list-table">
+          <div v-else class="list-table for_pre">
             <table-only
               ref="elTP"
               class="table-white"
@@ -219,44 +219,6 @@
               @sortChange="sortChange"
               @row-click = "clickReport"
             />
-            <!--<el-table
-              :data="reportList"
-              :highlight-current-row="true"
-              :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
-              :cell-style="cellStyle"
-              :cell-class-name="cellClass"
-              :header-cell-class-name="headerClass"
-              align="left"
-              stripe
-              style=""
-              class="table-content"
-              @row-click="clickReport"
-              @sort-change="sortChange"
-            >
-              <el-table-column
-                v-for="(_item,_index) in reportInfoTable"
-                :key="_index"
-                :prop="_item.prop"
-                :label="_item.label"
-                :sortable="_item.sortable"
-                :min-width="_item.width"
-                align="left"/>
-              <el-table-column
-                :label="$t('eventView.operation')"
-                prop="option"
-                min-width="110"
-                align="left">
-                <template slot-scope="scope">
-                  <i class="iconfont icon-gengduo"/>
-                </template>
-              </el-table-column>
-              <div slot="empty">
-                <div>
-                  <i class="iconfont icon-zhengque empty-data-icon"/>
-                  <span :style="{'margin-left':'20px','font-size':'16px','color':'#7d8cad'}">{{ $t('eventView.noEvents') }}</span>
-                </div>
-              </div>
-            </el-table>-->
           </div>
           
         </div>
@@ -879,7 +841,7 @@ export default {
           for(const item of data){
           //data.forEach(async (item,index) => {
             const reportObj = {};
-            reportObj.province = item.province;
+            reportObj.province = item.province + '\n' + item.city;
             reportObj.city = item.city;
             reportObj.id = item.id;
             reportObj.datestr = util.getDateStr(item.ts);
@@ -1342,6 +1304,11 @@ export default {
     color: #989ca0
     background: #EFEFEF
     padding: 5px
+  .el-table--mini .el-table__row
+    .cell
+      span
+        white-space: pre !important
+
 
 </style>
 <style lang="scss" scoped>
