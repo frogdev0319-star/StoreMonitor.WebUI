@@ -281,7 +281,7 @@
               class="el-pag"
               @current-change="currentChange"
               @size-change="sizeChange"/>-->
-              <div class="pageSizeTitle" style="color: #666">巡檢報告共有 <b style="font-size: 16px">{{totalElements}} </b> 筆</div>
+              <div class="pageSizeTitle" style="color: #666"> {{ $t('remotePatrol.totalOf') }} <b style="font-size: 16px"> {{totalElements}} </b> {{ $t('remotePatrol.numReports') }}</div>
 
               <tbl-pagination-only
               :btn-style="{backgroundColor:'transparent'}"

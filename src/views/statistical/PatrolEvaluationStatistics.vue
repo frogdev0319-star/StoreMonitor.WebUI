@@ -3613,9 +3613,9 @@ export default {
             this.part3.standardScore = -9999;
             this.doGetAssessmentStandardScore();
             let params  = JSON.parse(JSON.stringify(searchParams));
-            if(params.curCountry=='-1'){
-                params.curCity = null;                
-            }
+            // if(params.curCountry=='-1'){
+            //     params.curCity = null;                
+            // }
 
             console.log('params --->', params)
             this.params = params
