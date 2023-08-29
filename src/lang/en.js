@@ -114,8 +114,17 @@ export default{
         "mimicMode":"Mystery shopper mode",
         "MysterioManage":"Mystery shopper permissions",
         "MysterioSetting":"Store permission setting",
+        "InceptionSchedule":"Schedule",
+        "ScheduleSetting":"Schedule Setting",
+        "ScheduleHistory":"Schedule History",
+        "PersonalSchedule":"Personal Schedule",
+        "CreateSchedule":"Create Schedule",
+        "ModifySchedule":"Modify Schedule",
+        "schedulePersonalCreate":"Schedule｜Personal Schedule",
+        "schedulePersonalModify":"Schedule｜Personal Schedule",
         "errorStoreNoPermission":"The store does not have service permissions, please contact the administrator",
-        "errorStoreNameNoPerssion":"Cannot be operated because {storeNames} has no service permission, please reconfirm"
+        "errorStoreNameNoPerssion":"Cannot be operated because {storeNames} has no service permission, please reconfirm",
+        "generalSetting": "General Setting"
     },
     "overview":{
         "DangerousLess":"Pool Ratio＜60%",
@@ -549,8 +558,9 @@ export default{
         "attachments":"Attachment type",
         "notFinishWithText":"尚有必填項目未完成，備註標籤請加入「文字」類型附件 ",
         "notFinishWithMedia":"尚有必填項目未完成，備註標籤請加入「圖片或影像」類型附件 ",
-        "maximumTotalAttach": "Up to 120 attachments are allowed in the inspection form"
-
+        "maximumTotalAttach": "Up to 120 attachments are allowed in the inspection form",
+        "totalOf":"A total of",
+        "numReports":"reports",
     },
     "eventView":{
         "ClosedEvent":"Closed Events",
@@ -603,7 +613,8 @@ export default{
         "confirmBachClose":"Confirm bach close events",
         "expiretag":"Expired",
         "maximumAttVedio":"Only 2 video attachments can be uploaded",
-        "videoFormatNotSupoort":"The browser does not support this video format, please use the StoreVue app to view"
+        "videoFormatNotSupoort":"The browser does not support this video format, please use the StoreVue app to view",
+        
     },
     "insSettingView":{
         "Addscoreitems":"Additional scoring items",
@@ -1528,6 +1539,51 @@ export default{
         "duplicateNickName":"The same mystery nick name already exists, please re-enter nick name.",
         "mysterio":"Mystery Shopper",
         "allMysterio":"All of Mystery Shopper"
+    },
+    "schedule":{
+        "inceptionSchedule":"Inception Schedule",
+        "scheduleSetting":"Schedule Setting",
+        "scheduleHistory":"Schedule History",
+        "scheduleExecuted":"Schedule Executed",
+        "lastUpdatePerson":"Last Update Person",
+        "getScheduleSettingFail":"Get Schedule Setting Fail",
+        "schStartDate":"Schedule Starting Date",
+        "schName":"Schedule Name",
+        "incepNum":"Inspection quantity",
+        "schEndDate":"Schedule Ending Date",
+        "addSchedule":"Add Schedule",
+        "tagInfo":"Inception Mode | Inception Name",
+        "deleteSchedule":"Delete Schedule",
+        "confirmDeleteSchedule":"Confirm Delete Schedule",
+        "store":"store/time zone",
+        "schExeDate":"execution date",
+        "reportUploadDate":"Report Upload Date",
+        "incepPerson":"executor",
+        "inCompleted":"InCompleted",
+        "exportAll":"Export All",
+        "isProcessing":"Signing off",
+        "NA":"N/A",
+        "storeTimeZone":"Store TimeZone",
+        "inceptionMode":"Inception Mode",
+        "generated":"Generated",
+        "exportScheduleRecordTips":"Export Schedule Record Tips",
+        "exportScheduleRecordMsg1":"The schedule record export is in progress, and the file will be downloaded automatically when the export is completed",
+        "exportScheduleRecordMsg2":"You can continue operating system functions during execution time",
+        "exportScheduleRecordWarn":"Please select an export item",
+        "deletePersonSchError":"Failed to delete personal schedule",
+        "deleted":"Deleted",
+    },
+    "generalSetting":{
+        "save":"Save",
+        "timeoutReminder":"Time out Reminder",
+        "eventTimeoutReminder":"Event Time out Reminder",
+        "moreThanDays":"More Than",
+        "daysOfStay":"Stay",
+        "reminderTime":"Reminder Time",
+        "signatureTimeoutReminder":"Signature Time out Reminder",
+        "reports":"Reports",
+        "reportViewPermissions":"Report View Permissions",
+        "viewReportbyFormExecutionPermissions":"View Report by Form Execution Permissions",
+        "viewReportsByStorePermissions":"view Reports By Store Permissions ",
     }
-
-  }
+}

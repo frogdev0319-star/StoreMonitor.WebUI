@@ -3,14 +3,14 @@
     <div class="submit_btn" >
       <delay-button type="filled" @click="submit">
         <div class="button-area" style="width: 80px; height: 20px;">
-          <span>保存</span>
+          <span>{{$t('generalSetting.save')}}</span>
         </div>
       </delay-button>
     </div>
   
     <div class="page-container report-setting paper" >
       <div class="setting-titles padding flex-center">
-        超時提醒  
+        {{$t('generalSetting.timeoutReminder')}}  
         <div class="spacer"></div>
       </div>
       <!-- 節點停留時間 -->
@@ -19,7 +19,7 @@
           <div class="inspect-basic">
 
             <!-- 事件超時未處理提醒 -->
-            <setting-table table-name="事件超時提醒">
+            <setting-table :table-name="$t('generalSetting.eventTimeoutReminder')">
               <template slot="tableDetail">
                 <!-- row -->
                 <div class="setting-config basic-config">
@@ -27,14 +27,14 @@
                     <el-checkbox
                       v-model="enableDelay"
                       class="storevue-checkbox-outlined"
-                      label="事件超時提醒"/>
+                      :label="$t('generalSetting.eventTimeoutReminder')"/>
                   </div>
                 </div>
                 
                 <!-- row -->
                 <div class="setting-config basic-config">
                   <div class="title-status ">
-                    超過天數
+                    {{$t('generalSetting.moreThanDays')}}
                     <el-input
                       v-model="delayDay"
                       ref="delay_day"
@@ -48,7 +48,7 @@
                     {{$t('audit.workFlows.day')}}
                   </div>
                   <div class="title-status flex-row">
-                    提醒時間
+                    {{$t('generalSetting.reminderTime')}}
                     <div class="remider_setting ">
                       <el-time-select
                         v-model="alertTime"
@@ -58,7 +58,7 @@
                           step: '0:30',
                           end: '23:00'
                         }"
-                        placeholder="提醒時間">
+                        :placeholder="$t('generalSetting.reminderTime')">
                       </el-time-select>
                     </div>
                   </div>
@@ -68,7 +68,7 @@
 
         
             <!-- 節點停留時間 -->
-            <setting-table table-name="簽核超時提醒" style="margin-top: 20px;">
+            <setting-table :table-name="$t('generalSetting.signatureTimeoutReminder')" style="margin-top: 20px;">
               <template slot="tableDetail">
                 <!-- row -->
                 <div class="setting-config basic-config">
@@ -76,14 +76,14 @@
                     <el-checkbox
                       v-model="wokflowDelay"
                       class="storevue-checkbox-outlined"
-                      label="簽核超時提醒"/>
+                      :label="$t('generalSetting.signatureTimeoutReminder')"/>
                   </div>
                 </div>
                 
                 <!-- row -->
                 <div class="setting-config basic-config">
                   <div class="title-status ">
-                    停留天數
+                    {{$t('generalSetting.daysOfStay')}}
                     <el-input
                       v-model="workflowDay"
                       :disabled="!wokflowDelay"
@@ -96,7 +96,7 @@
                     {{$t('audit.workFlows.day')}}
                   </div>
                   <div class="title-status flex-row">
-                    提醒時間
+                    {{$t('generalSetting.reminderTime')}}
                     <div class="remider_setting ">
                       <el-time-select
                         v-model="wokflowTime"
@@ -106,7 +106,7 @@
                           step: '0:30',
                           end: '23:00'
                         }"
-                        placeholder="提醒時間">
+                        placeholder="$t('generalSetting.reminderTime')">
                       </el-time-select>
                     </div>
                   </div>
@@ -120,7 +120,7 @@
 
     <div class="page-container report-setting paper" >
       <div class="setting-titles padding flex-center">
-        巡檢報告  
+        {{$t('generalSetting.reports')}}  
         <div class="spacer"></div>
       </div>
 
@@ -153,14 +153,14 @@
             </setting-table>
 
             <!-- 報表檢視權限 -->
-            <setting-table table-name="報表檢視權限" style="margin-top: 20px;">
+            <setting-table :table-name="$t('generalSetting.reportViewPermissions')" style="margin-top: 20px;">
               <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
                 <div class="overall_options">
 
                   <div class="overall_row" >
                     <el-radio-group class="storevue-radio radio_item" v-model="viewReportByTagAuth" style="margin-left: 20px;">
-                      <el-radio :label="1" style="  min-width: 100px; text-align: left; margin-right: 50px;" >依表單執行權限檢視報告</el-radio>
-                      <el-radio :label="0" style=" width: fit-content;">依門店權限檢視報告 </el-radio>
+                      <el-radio :label="1" style="  min-width: 100px; text-align: left; margin-right: 50px;" >{{$t('generalSetting.viewReportbyFormExecutionPermissions')}}</el-radio>
+                      <el-radio :label="0" style=" width: fit-content;">{{$t('generalSetting.viewReportsByStorePermissions')}} </el-radio>
                     </el-radio-group>
                   </div>
 
