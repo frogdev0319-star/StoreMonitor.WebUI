@@ -135,6 +135,7 @@
             </el-select>
             <hr class="hr-horizontal">
           </div>
+
           <el-scrollbar
             ref="scroll"
             id="el-menuscrollbar"
@@ -216,6 +217,7 @@
               </div>
             </el-menu>
           </el-scrollbar>
+          
           <div class="spacer"></div>
           <div class="headUrl-content flex-center" :style="collapsed?{'justify-content':'center'}:{}">
             <el-dropdown class="el-user-drop" >
@@ -224,11 +226,20 @@
                 <div class="headImg" :style="collapsed?{'margin-left':'calc(-20/1920*100vw)'}:{'margin-right':'calc(16/1920*100vw)'}">{{iconName}}</div>
               </span>
               <el-dropdown-menu slot="dropdown" class="dropdown">
+
+                <el-dropdown-item
+                  class="dropdown-item"
+                  style="width:auto;min-width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
+                  @click.native="changeMimicMode">
+                  進階管理
+                </el-dropdown-item>
+
                 <el-dropdown-item
                   v-if="hasMystery"
                   class="dropdown-item"
                   style="width:auto;min-width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
-                  @click.native="changeMimicMode">{{showMimicMode? $t('route.generalMode'):$t('route.mimicMode') }}</el-dropdown-item>
+                  @click.native="changeMimicMode">{{showMimicMode? $t('route.generalMode'):$t('route.mimicMode') }}
+                </el-dropdown-item>
                 <el-dropdown-item
                   :disabeled="true"
                   class="dropdown-item"
