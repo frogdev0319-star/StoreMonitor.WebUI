@@ -404,7 +404,6 @@ const user = {
 
 
           // ==== 依據白名單設定顯示&隱藏 ====
-          
           getWhiteList().then(res => {
             const data = res.data;
             if (res.data) {
@@ -433,6 +432,13 @@ const user = {
         
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();
           systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';
+
+          const advanceSettingRoute = navbarRoute.getAdvanceSetting();
+          advanceSettingRoute.children.length > 0 ? accessedRoutes.push(advanceSettingRoute) : '';
+
+
+
+
           console.log("accessedRoutes.length:",accessedRoutes.length);
           if(accessedRoutes.length == 0){
             const errorRoute = navbarRoute.getErrorRoute();

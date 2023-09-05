@@ -516,7 +516,9 @@ export default {
         this.$t('remotePatrol.patrolWay'),
         this.$t('remotePatrol.patrolResult'),
         this.$t('remotePatrol.patrolScore'),
-        this.$t('remotePatrol.patrolDate')],
+        this.$t('remotePatrol.patrolDate'),
+        this.$t('remotePatrol.signInTime')
+      ],
       inspectId: '',
       inspectTableList: [],
       isLoading: false,
@@ -620,7 +622,7 @@ export default {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportReportHeader;
         const filterVal = ['province', 'city', 'storeName', 'code', 'storeType', 'submitterName', 'tagName',
-          'modeText', 'status', 'totalScore', 'datestr'];
+          'modeText', 'status', 'totalScore', 'datestr', 'signstr'];
         let curData = [];
         curData = await that.getReportList_({...that.params, filter: {page: 0, size: 1000}});
         const data = that.formatJson(filterVal, curData);
@@ -762,6 +764,8 @@ export default {
             reportObj.city = item.city;
             reportObj.id = item.id;
             reportObj.datestr = util.getDateStr(item.ts);
+            reportObj.signstr = item.check_in_ts == 0 || !item.check_in_ts ? '--' : util.getDateStr(item.check_in_ts);
+            
             reportObj.storeName = item.storeName;
             reportObj.tagName = item.tagName;
             reportObj.submitterName = item.submitterName;
@@ -795,18 +799,12 @@ export default {
             reportObj.iconSrc = statusAndIconObj.iconSrc;
             temp.push(reportObj);
           }
-          //);
-          // self.reportList = temp;
-          // self.total = Math.ceil(res.data.totalElements/self.sizeNum);
-          // self.isLoading = false;
-          // if (temp.length === 0) {
-          //   self.noData = self.$t('deviceView.noData');
-          // }
           resolve(temp);
         }).catch(err => {
         });
       });
     },
+    
     getReportList(p) {
       console.log("1.Get Report List")
       var params = {
@@ -876,7 +874,7 @@ export default {
             
             let storeType = '';
             item.tags.length !== 0 ? item.tags.forEach((_item, _index) => {
-              const isuu = _index === item.tags.length - 1 ? '' : ',';
+              const isuu = _index === item.tags.length - 1 ? '' : ', \n';
               storeType += _item + isuu;
             }) : storeType = '--';
             reportObj.storeType = storeType;
@@ -905,6 +903,7 @@ export default {
 
             tableObj.id = item.id;
             tableObj.datestr = util.getDateStr(item.ts);
+            tableObj.signstr = item.check_in_ts == 0 || !item.check_in_ts ? '--' : util.getDateStr(item.check_in_ts);
             tableObj.submitterName = item.submitterName;
             tableObj.submitter = item.submitter;
             tableObj.routeObj = item;
@@ -1355,12 +1354,16 @@ export default {
     padding: 5px
   .el-table__row
     td
-      &:nth-child(1), &:nth-child(2), &:nth-child(5),
+      &:nth-child(1), &:nth-child(2), &:nth-child(3), &:nth-child(5),
         .cell
           padding-left: 10% !important
+          text-overflow: ellipsis
+          white-space: nowrap
+          overflow: hidden
           span
             // background: #9872 !important
             white-space: pre !important
+            
 
 
 </style>

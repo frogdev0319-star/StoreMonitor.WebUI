@@ -308,7 +308,7 @@ export const navbarRoute = {
   },
 
 
-   // ==== 暫時隱藏 巡檢排程相關(勿刪) ====
+  
   getInceptionSchedule(){
     const schduleRoute = {
       id: 5,
@@ -375,8 +375,6 @@ export const navbarRoute = {
   },
 
 
-
-  
   getStatisticalRoute() {
     const statisticsRoute = {
       id:3,
@@ -688,6 +686,37 @@ export const navbarRoute = {
     ) && primaryPathesList.push('/mysterio', '/mysteriosetting');
     return systemSettingRoute;
   },
+
+
+  getAdvanceSetting(){
+    const advanceSettingRoute = {
+      id: 5,
+      path: '/home',
+      name: 'Safety',
+      component: Home,
+      iconCls: 'iconfont icon-shijian',
+      styles: 'font-size:22px',
+      leaf: false,
+      hidden: false,
+      children: [
+        {
+          path: '/waterMark',
+          name: 'WaterMark',
+          component: resolve => require(['@/views/advanceSetting/safety/WaterMark'], resolve),
+          meta: {
+            keepAlive: true, // the component is't to be cache.
+            requireAuth: true
+          },
+          isReadOnly: false
+        } ,
+
+      ]
+    };
+    
+    return advanceSettingRoute;
+  },
+
+
 
   getDeviceRoutes() {
     const deviceRoutes = [];
