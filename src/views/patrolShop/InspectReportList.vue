@@ -685,6 +685,7 @@ export default {
         this.$t('titleView.description'),
         this.$t('remotePatrol.signatureInfo'), //簽到資訊-地圖link
         this.$t('remotePatrol.signInTime'),
+        '巡檢花費時間',
         this.$t('remotePatrol.createRptDT'),
         ];
       
@@ -694,7 +695,7 @@ export default {
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
           const filterVal = ['province','city','storename','code', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 
-          'totlascore','status','submitter', 'detail', 'attachment','comment','singinmap','signints','reportts'];
+          'totlascore','status','submitter', 'detail', 'attachment','comment','singinmap','signints','timediff', 'reportts'];
           const curData = res.data;
           const tagName = that.inspectTableList.find(item=>item.id ==self.params.inspectTagId ).name;
           const data = that.formatJson(filterVal, curData);

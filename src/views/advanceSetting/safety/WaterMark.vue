@@ -98,88 +98,12 @@
                   :style="{ 
                     color: color , 
                     fontSize: textSize,
-                    
                   }"
                 >
-                  {{showTextStatus == false ? userName : defineText}}
+                  {{showTextStatus == false ? userName : defineText}} 
                 </div>
-
-                
               </div>
-
-
-
-
-
             </div>
-
-            
-
-            
-
-
-            <!-- <div class="overall_row" v-for="(item, index) in defaultDefineName" :key="index">
-                  <el-radio-group class="storevue-radio radio_item" v-model="item.defineStatus" style="margin-left: 20px;">
-                    <el-radio :label="0" style="  min-width: 100px; text-align: left;" >{{item.name}}</el-radio>
-                    <el-radio :label="1" style=" width: fit-content;">{{ $t('insSettingView.userDefined')}} </el-radio>
-                  </el-radio-group>
-                  <el-input
-                    :ref=item.refName
-                    :placeholder="$t('audit.workFlows.defineItem')"
-                    v-model="item.newName"
-                    :disabled="item.defineStatus == 0"
-                    style="width: 200px;  margin: 0 20px ;"
-                    @input="(val) => itemInputChanged_overall({ val, item })"
-                    />
-                </div> -->
-
-
-
-
-
-            <!-- 巡檢總評選項顯示 -->
-            <!-- <setting-table :table-name="$t('insSettingView.commentStatus')">
-              <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
-                <div class="overall_options">
-
-                  <div class="overall_row" v-for="(item, index) in defaultDefineName" :key="index">
-                    <el-radio-group class="storevue-radio radio_item" v-model="item.defineStatus" style="margin-left: 20px;">
-                      <el-radio :label="0" style="  min-width: 100px; text-align: left;" >{{item.name}}</el-radio>
-                      <el-radio :label="1" style=" width: fit-content;">{{ $t('insSettingView.userDefined')}} </el-radio>
-                    </el-radio-group>
-                    <el-input
-                      :ref=item.refName
-                      :placeholder="$t('audit.workFlows.defineItem')"
-                      v-model="item.newName"
-                      :disabled="item.defineStatus == 0"
-                      style="width: 200px;  margin: 0 20px ;"
-                      @input="(val) => itemInputChanged_overall({ val, item })"
-                      />
-                  </div>
-
-                  <span class="text_limit_sign" v-if="showInputLimit_overallItem"> {{$t('insSettingView.inputRuletip')}} </span>
-                </div>
-              </div>
-            </setting-table> -->
-
-            <!-- 報表檢視權限 -->
-            <!-- <setting-table :table-name="$t('generalSetting.reportViewPermissions')" style="margin-top: 20px;">
-              <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
-                <div class="overall_options">
-
-                  <div class="overall_row" >
-                    <el-radio-group class="storevue-radio radio_item" v-model="viewReportByTagAuth" style="margin-left: 20px;">
-                      <el-radio :label="1" style="  min-width: 100px; text-align: left; margin-right: 50px;" >{{$t('generalSetting.viewReportbyFormExecutionPermissions')}}</el-radio>
-                      <el-radio :label="0" style=" width: fit-content;">{{$t('generalSetting.viewReportsByStorePermissions')}} </el-radio>
-                    </el-radio-group>
-                  </div>
-
-                  <span class="text_limit_sign" v-if="showInputLimit_overallItem"> {{$t('insSettingView.inputRuletip')}} </span>
-                </div>
-              </div>
-            </setting-table> -->
-
-
 
           </div>
         </div>
@@ -194,15 +118,13 @@
 import { mapGetters } from 'vuex';
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
-import { inpectRESTful } from '@/api/index';
-import {getAllUserInfoNoAuth, getDepartAll} from '@/api/login';
-
+import util from '@/common/util';
 import filterString from '@/common/filterString.js';
 
-import TablePagination from '@/components/TablePagination';
-import TableOnly from '@/components/TableOnly';
-import TblPaginationOnly from '@/components/TblPaginationOnly';
-import util from '@/common/util';
+import { inpectRESTful } from '@/api/index';
+import {advancedUpdate, advancedFetch} from '@/api/advanceSetting';
+
+
 
 export default {
   name: 'GeneralSetting',
@@ -228,25 +150,29 @@ export default {
         }
       ],
       color:'#FFFFFF',
-      textSize: "44px",
+      textSize: "中",
       textSizeSelect:[
         {
-          value: "66px",
-          label: "66px"
+          value: "26.4px",
+          label: "大",
+          mobileSize: "66px"
+
         }, 
         {
-          value: "44px",
-          label: "44px"
+          value: "17.6px",
+          label: "中",
+          mobileSize: "44px"
         }, 
         {
-          value: "22px",
-          label: "22px"
+          value: "8.8px",
+          label: "小",
+          mobileSize: "22px"
         }
       ],
       textPosition: '左上 ',
       textPositionSelect:[
         {
-          value: "lefTop",
+          value: "topLeft",
           label: "左上"
         }, 
         {
@@ -286,53 +212,7 @@ export default {
       text_justifyContent: "flex-start",
       text_alignItems: "flex-start",
       showInputLimit_overallItem: false,
-      
-      
-
-
-
-
-
-
-
-
-			
-      changeNotify: false,
-      enableDelay: false,
-      delayDay: 1,
-      alertTime: '09:00',
-
-      wokflowDelay: false,
-      workflowDay: 1,
-      wokflowTime: '09:00',
-
-     
-      defaultDefineName:[
-        {
-          name: this.$t('overview.danger') ,
-          newName:  this.$t('overview.danger'),
-          defineStatus: 0,
-          refName: 'bad',
-          is_customize: false
-        },
-        {
-          name: this.$t('overview.improve'),
-          newName: this.$t('overview.improve'),
-          defineStatus: 0,
-          refName: 'fair',
-          is_customize: false
-        },
-        {
-          name: this.$t('overview.echartGood'),
-          newName: this.$t('overview.echartGood'),
-          defineStatus: 0,
-          refName: 'good',
-          is_customize: false
-        },
-      ],
-
-      viewReportByTagAuth: 0
-      
+  
     };
   },
 
@@ -347,7 +227,7 @@ export default {
 
     textPosition(val){
       switch (val) {
-        case "lefTop":
+        case "topLeft":
           this.text_justifyContent = "flex-start"
           this.text_alignItems =  "flex-start"
           break
@@ -396,9 +276,11 @@ export default {
   },
 
   methods: {
-    init(){
-      this.getUserInfo()
+    async init(){
+      await this.getUserInfo()
+      await this.getInitAdvance()
     },
+
     // get user
     async getUserInfo(){
       const result = await this.$store.dispatch("GetUserAuthorities");
@@ -407,152 +289,66 @@ export default {
       // console.log('this.userName  :>> ', this.userName );
     },
 
-    getInspectStatus(){
-      return new Promise((resolve, reject) => {
-        inpectRESTful.getInspectStatus().then(res => {
-          resolve(res);
-          console.log('res.data', res.data)
 
-          if(res.data.settingContent.general_setting_event_push_config.checkTime !== -1){
-            // event
-            this.enableDelay = res.data.settingContent.general_setting_event_push_config.isNotify
-            this.delayDay = res.data.settingContent.general_setting_event_push_config.eventUnHandleNotifyDay
-            var eventCT =  res.data.settingContent.general_setting_event_push_config.checkTime
-            console.log('eventCT :~~~~~>> ', eventCT);
-            if( eventCT == null) {
-              this.alertTime = "09:00"
-            } else {
-              var geteventT  = new Date(eventCT)
-              console.log('geteventT', geteventT)
-              this.alertTime = geteventT.toString().slice(16, 21)
-              console.log('this.alertTime', this.alertTime)
-            }
-          } else {
-            this.enableDelay = false
-            this.alertTime = "09:00"
-          }
-
-          if(res.data.settingContent.general_setting_workflow_config.checkTime !== -1){
-            // workflow
-            this.wokflowDelay = res.data.settingContent.general_setting_workflow_config.isNotify
-            this.workflowDay = res.data.settingContent.general_setting_workflow_config.unHandleNotifyDay
-            var workflowCT =  res.data.settingContent.general_setting_workflow_config.checkTime
-            if( workflowCT == null) {
-              this.wokflowTime = "09:00"
-            } else {
-            var getworkflowT  = new Date(workflowCT)
-            this.wokflowTime = getworkflowT.toString().slice(16, 21)
-            console.log('this.wokflowTime', this.wokflowTime)
-            }
-          } else {
-            this.wokflowDelay = false
-            this.wokflowTime = "09:00"
-          }
-          
-          this.inspectStatus = res.data.settingContent.general_setting_inspect_status_name
-          delete this.inspectStatus.update_time
-          delete this.inspectStatus.update_user_id
-
-          this.viewReportByTagAuth = res.data.settingContent.general_setting.view_report_by_tag_auth == true ? 1 : 0
-          console.log('this.inspectStatus :>> ', this.inspectStatus);
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
-
-
-    getSettingTimestamp(day, t){
-      var tempTiming = new Date()
-      tempTiming = tempTiming.setDate(tempTiming.getDate() + day)
-      tempTiming = new Date(tempTiming)
-      console.log('tempTiming -->', tempTiming)
-      var onlyDate = tempTiming.toString().slice(0, 16)
-
-      var eventT = onlyDate + t
-      return Date.parse(eventT)
-    },
-
-    updateInspectStatus(){
-      const delayDay =  Number(this.delayDay)
-      const workflowDay =  Number(this.workflowDay)
-      var t = new Date();
-      var tString = t.toTimeString()
-      var timeZone = tString.slice(12,15)
-
-      // for event
-      var eventCheckTime = this.getSettingTimestamp(delayDay, this.alertTime)
-      console.log('eventCheckTime', eventCheckTime)
-
-      // for workflow
-      var workflowTime = this.getSettingTimestamp(workflowDay, this.wokflowTime)
-      console.log('workflowTime', workflowTime)
-
-      var status = {
-          status_0: this.defaultDefineName[0].newName,
-          is_customize_0: this.defaultDefineName[0].is_customize,
-          status_1: this.defaultDefineName[1].newName,
-          is_customize_1: this.defaultDefineName[1].is_customize,
-          status_2: this.defaultDefineName[2].newName,
-          is_customize_2: this.defaultDefineName[2].is_customize,
-
-          workflowSettingConfig: {
-            isNotify: this.wokflowDelay,
-            unHandleNotifyDay: workflowDay,
-            checkTime: workflowTime
-          },
-          eventNotifyConfig: {
-              isNotify: this.enableDelay,
-              unHandleNotifyDay: delayDay,
-              checkTime: eventCheckTime
-          },
-          time_zone: timeZone,
-          view_report_by_tag_auth: this.viewReportByTagAuth == 1 ? true : false
-          
+    advancedFetch(){
+      var param = {
+        contentKey: "water_print"
       }
-
-      console.log('status ~~~~~~~~>> ', status);
       return new Promise((resolve, reject) => {
-        inpectRESTful.updateInspectStatus(status).then(res => {
+        advancedFetch(param).then(res => {
           resolve(res);
         }).catch(err => {
           reject(err);
         });
       });
+    },
 
+    async getInitAdvance(){
+      const initData = await this.advancedFetch();
+      // console.log('initData.data :>> ', initData.data);
+      var tempItem = this.textSizeSelect.find( i => i.mobileSize == initData.data.content.waterPrintSize)
+
+      this.isSwitchOn = initData.data.content.isSwitchOn
+      this.defineText = initData.data.content.waterPrintText
+      this.color = initData.data.content.waterPrintColor
+      this.textSize = tempItem.value
+      this.textPosition = initData.data.content.waterPrintPosition
+
+    },
+
+
+    advancedUpdate(){
+      this.isLoadingData = true
+      var tempItem = this.textSizeSelect.find( i => i.value == this.textSize)
+      var param = {
+        contentKey: "water_print",
+        contentMap: {
+          waterPrintText: this.defineText,
+          waterPrintType: this.showTextStatus ? 0 : 1,
+          waterPrintSize: tempItem.mobileSize,
+          waterPrintPosition: this.textPosition,
+          waterPrintColor: this.color,
+          isSwitchOn: this.isSwitchOn
+        }
+  
+      }
+      return new Promise((resolve, reject) => {
+        advancedUpdate(param).then(res => {
+          resolve(res);
+        }).catch(err => {
+          reject(err);
+        });
+      });
     },
 
     async submit(){
-      for (let i = 0; i < 3; i++) {
-        if(this.defaultDefineName[i].defineStatus == 1 && this.defaultDefineName[i].newName == "") {
-          // this.$refs.stayOver.focus()
-          util.notify(this.defaultDefineName[i].name + ", "+ this.$t('audit.workFlows.cantEmptyInspectStatus'), 'error', 2000)
-          return
-          }
-      }
-
-      if(this.enableDelay && this.delayDay == undefined){
-        util.notify(this.$t('audit.workFlows.cantEmptyDays'), 'error', 2000 );
-        this.$refs.delay_day.focus()
-        return
-      }
-      else if(this.delayDay > 90){
-        util.notify('天數不可大於 90 天', 'error', 2000 );
-        this.$refs.delay_day.focus()
-        return
-      }
-      else if(this.workflowDay > 90){
-        util.notify('天數不可大於 90 天', 'error', 2000 );
-        this.$refs.workflow_day.focus()
-        return
-      }
-
-      const statusNameRes = await this.updateInspectStatus();
+      const statusNameRes = await this.advancedUpdate();
       if (statusNameRes.errCode == 0) {
-        this.getInspectStatus()
+        this.isLoadingData = false
         util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
         return false;
       } else {
+        this.isLoadingData = false
         util.notify(this.$t('deviceView.editFail'), 'warning', 3000);
         return false;
       }
@@ -570,21 +366,7 @@ export default {
       }
     },
 
-    onEventChanged(e){
-      if(e<=0){
-        this.delayDay=1;
-      }else{
-        this.delayDay = e;
-      }
-    },
-
-    onWokflowChanged(e){
-      if(e<=0){
-        this.workflowDay=1;
-      }else{
-        this.workflowDay = e;
-      }
-    },
+  
   }
 };
 </script>
@@ -617,12 +399,12 @@ export default {
           line-height: 0
 
   .mobile_review
-    width: 1080px
-    height: 1080px
-    background: url("../../../../static/img/mobile_review.jpg")
+    width: 450px
+    height: 598px
+    background: url("../../../../static/img/mobile_review.jpg") center
     background-size: cover
-    position: relative
     padding: 10px
+    margin-bottom: 40px
     display: flex
     flex-direction: row
     justify-content: flex-start
@@ -633,17 +415,10 @@ export default {
       // top: 10px
       
       color: #FFF
-      font-size: 44px
+      font-size: 18px
       transition: all .3s
 
     
-
-
-
-
-
-
-
   .submit_btn
     margin-bottom: 20px
     display: flex
@@ -692,40 +467,6 @@ export default {
 
 
 
-
-
-
-  .search_member
-    height: 36px
-    font-size: 14px
-    color: #d5d5d5
-    display: flex
-    flex-direction: row
-    justify-content: flex-start
-    align-items: center
-    width: fit-content
-    pointer-events: none
-
-    i 
-      margin-right: 5px
-      color: #d5d5d5
-  .clickable
-    color: #006ab7
-    cursor: pointer
-    pointer-events: auto !important
-    i 
-      color: #006ab7
-
-  .workflow-header
-    width: 100%
-    // height: 150px
-    // background: #dedede
-    margin-bottom: 20px
-    display: flex
-    flex-direction: row
-    justify-content: space-between
-    align-items: flex-start
-
   .setting-titles
     display: flex
     justify-content: space-between
@@ -743,137 +484,10 @@ export default {
     vertical-align: middle
     cursor: pointer
     margin-left: 20px
-  .for_row
-    display: flex
-    flex-direction: row
-    justify-content: flex-start
-    align-items: center
-    .go_up
-      margin-right: 20px
-      color: #006ab7
-    .go_down
-      color: #006ab7
-  .add-node-btn
-    position: absolute
-    right: 1%
-    top: 3px
-  .approve
-    width: 60vw
-  .approve_row
-    background-color: #f7f9fa
-    padding: calc(15/1920*100vw) calc(20/1920*100vw)
-    display: flex
-    flex-wrap: wrap
-    flex-direction: row
-    justify-content: flex-start
-    align-items: center
-    .el-input
-      margin-left: 10px
+
   
-  .dialog-content
-    width: 100%
-    .showing_search_user
-      width: 100%
-      height: 500px
-      
-      .filter_section
-        background: #FFF
-        display: flex
-        flex-wrap: wrap
-        flex-direction: row
-        justify-content: flex-start
-        align-items: center
-        padding: 10px 0 0 0
-        margin-bottom: 10px
-        .summit_filter
-          width: 90px
-          height: 37px
-          border-radius: 3px
-          background: rgb(85, 102, 121)
-          color: #FFF
-          display: flex
-          flex-direction: row
-          justify-content: center
-          align-items: center
-          margin-bottom: 10px
-          margin-left: 20px
-          cursor: pointer
-          transition: all .3s
-          &:hover
-            background: rgb(60, 92, 121)
-      .is_select
-        width: 100% !important
-        padding: 10px 0 5px 0
-        background: #FFF
-        margin-bottom: 10px
-        display: flex
-        flex-direction: row
-        justify-content: flex-start
-        align-items: center
-        width: fit-content
-        .title-name
-          width: 90px
-        .user_selected
-          display: flex
-          flex-wrap: wrap
-          flex-direction: row
-          justify-content: flex-start
-          .el-tag
-            margin-right: 5px 
-            margin-bottom: 5px
-
-      .users
-        height: 335px
-        overflow: auto
-        border-radius: 5px
 </style>
 
-<style lang="sass">
-  .title-status
-    .el-input__count-inner
-      margin-top: 55px
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button 
-      -webkit-appearance: none
-      margin: 0
-
-
-
-  .popup_width
-    .el-dialog
-      width: 70% !important
-      background: #f7f9fa
-      .el-table th
-        &:first-child
-          .cell
-            width: 50px
-            margin-left: -28px
-
-  .users
-    .el-checkbox__input.is-checked .el-checkbox__inner
-      background: #2c90d9 !important
-      border-color: #2c90d9 !important
-      &:hover
-        border-color: #dcdfe6 !important
-    .is-focus .el-checkbox__inner      
-      border-color: #dcdfe6 !important
-    
-    .el-checkbox__inner:hover
-      border-color: #190 !important
-      
-  .title-status
-    .el-input__count-inner
-      margin-top: 55px
-      
-  .text_limit_notice
-    position: absolute
-    text-align: right
-    margin-left: 5px
-    font-size: 10px
-    margin-top: 2px
-    color: #ff2400
-    display: block
-</style>
 
 
 <style scoped>
