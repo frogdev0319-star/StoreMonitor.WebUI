@@ -49,7 +49,7 @@
         >
           <div class="button-area">
             <img :src="exportPng" class="icon-excel">
-            <span>{{ $t('eventView.exportReport') }}</span>
+            <span>{{ $t('eventView.exportReport') }} </span>
           </div>
         </delay-button>
         <delay-button
@@ -61,7 +61,7 @@
         >
           <div class="button-area">
             <img :src="exportPng" class="icon-excel">
-            <span>{{ $t('schedule.exportAll') }}</span>
+            <span>{{ $t('schedule.exportAll') }} </span>
           </div>
         </delay-button>
         <table-only
@@ -138,6 +138,14 @@ export default{
       inputSearchValue:'',
       dateValue:[],
       columnData:[
+      {
+          'prop': 'creatorName',
+          'label': this.$t('audit.workFlows.workFlowsCreatedUser'),
+          'sortable': false,
+          'width': 200,
+          'maxWidth': 200,
+          'isExpand': false
+        },
         {
           'prop': 'taskName',
           'label': this.$t('schedule.schName'),
@@ -488,6 +496,7 @@ export default{
         this.SelScheduleTask.sort((a, b) => { return a['squence'] - b['squence']; });
         this.showExportExcelNotice = true;
         const tHeader = [
+          this.$t('audit.workFlows.workFlowsCreatedUser'),
           this.$t('schedule.schName'),
           this.$t('remotePatrol.storeName'),
           this.$t('schedule.storeTimeZone'),
@@ -514,6 +523,7 @@ export default{
           }
           let status = this.schStatusList.filter(status => status.mode==item.status)[0].label;
           exportData.push([
+            item.creatorName,
             item.taskName,
             item.storeName,
             item.storeTimeZone,
@@ -543,6 +553,7 @@ export default{
       this.showExportExcelNotice = true;
       const fileName = this.$t('schedule.scheduleHistory')+"_"+util.getCurDateStr();
       const tHeader = [
+        this.$t('audit.workFlows.workFlowsCreatedUser'),
         this.$t('schedule.schName'),
         this.$t('remotePatrol.storeName'),
         this.$t('schedule.storeTimeZone'),
@@ -579,7 +590,7 @@ export default{
       scheduleRESTful.exportScheduleTaskHistory(params).then(res => {
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
-          const filterVal = ['taskName','storeName','storeTimeZone','remindTime', 'inspectTagMode', 'inspectTagName', 'reportTs', 'submitterName',
+          const filterVal = ['creatorName', 'taskName','storeName','storeTimeZone','remindTime', 'inspectTagMode', 'inspectTagName', 'reportTs', 'submitterName',
           'taskStatus','reportStatus'];
           const curData = res.data.content;
           const data = self.formatJson(filterVal, curData);

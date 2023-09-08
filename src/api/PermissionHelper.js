@@ -226,4 +226,14 @@ export default class PermissionHelper {
     console.log("setShowMimicMode:",val);
     this.enableMimicMode = val;
   }
+
+  //進階設定
+  static advancedMode = false;
+  static setAdvancedModeMode(val){
+    console.log("advancedMode:",val);
+    this.advancedMode = val;
+  }
+
+
+
 }

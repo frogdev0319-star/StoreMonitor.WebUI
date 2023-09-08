@@ -688,6 +688,8 @@ export const navbarRoute = {
   },
 
 
+
+  //進階設定
   getAdvanceSetting(){
     const advanceSettingRoute = {
       id: 5,
@@ -698,23 +700,25 @@ export const navbarRoute = {
       styles: 'font-size:22px',
       leaf: false,
       hidden: false,
-      children: [
-        {
-          path: '/waterMark',
-          name: 'WaterMark',
-          component: resolve => require(['@/views/advanceSetting/safety/WaterMark'], resolve),
-          meta: {
-            keepAlive: true, // the component is't to be cache.
-            requireAuth: true
-          },
-          isReadOnly: false
-        } ,
-
-      ]
+      children: []
     };
-    
+
+    PermissionHelper.advancedMode && advanceSettingRoute.children.push(
+      {
+        path: '/waterMark',
+        name: 'WaterMark',
+        component: resolve => require(['@/views/advanceSetting/safety/WaterMark'], resolve),
+        meta: {
+          keepAlive: true, // the component is't to be cache.
+          requireAuth: true
+        },
+        isReadOnly: false
+      } ,
+    ) && primaryPathesList.push('/waterMark');
+
     return advanceSettingRoute;
   },
+
 
 
 

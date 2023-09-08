@@ -228,10 +228,11 @@
               <el-dropdown-menu slot="dropdown" class="dropdown">
 
                 <el-dropdown-item
+                  v-if="hasAdvanced"
                   class="dropdown-item"
-                  style="width:auto;min-width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
-                  @click.native="changeMimicMode">
-                  進階管理
+                  style="width:auto;min-width: calc(140/1920 *100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
+                  @click.native="advanceMode">
+                    {{ showAdvanceMode ? '返回': '進階管理' }}
                 </el-dropdown-item>
 
                 <el-dropdown-item
@@ -333,6 +334,7 @@ export default {
   },
   data() {
     return {
+      
       showTag: false,
       exportPdf: require('../../../static/img/export-pdf.png'),
       imgSrc: require("../../../static/img/logo.svg"),
@@ -370,6 +372,11 @@ export default {
       showIgnoreItem:false,
       showMimicMode:false,
       hasMystery:false,
+
+      hasAdvanced: false,
+      showAdvanceMode: false,
+      userInfo: '',
+
       leaveObj: {
         title: this.$t('remotePatrol.prompt'),
         showInfo: this.$t('remotePatrol.changPageInfo'),
@@ -595,13 +602,15 @@ export default {
       }
     });
 
+    
+
     window.addEventListener("resize", this.$_isMobile);
     self.$_isMobile();
     this.getBrandList();
     this.updateTitle();
   },
 
-  mounted() {
+  async mounted() {
     if (this.$refs.fieldSelect !== undefined) {
       this.$nextTick(() => {
         this.$refs.fieldSelect.$refs.scrollbar.$el.classList.add(
@@ -609,15 +618,34 @@ export default {
         );
       });
     }
+
+    
     this.$store.dispatch("GetIsMysteryMode");
     this.showMimicMode = this.$store.getters.ShowMimicMode;
     this.hasMystery = this.$store.getters.isMystery;
+    
+    var userInfo = await this.$store.dispatch("GetUserAuthorities");
+    this.userInfo = userInfo.data
 
-  
+    this.hasAdvanced = this.userInfo.isSystemAdvanced
+
+    console.log(' this.userInfo ~~~~~~>> ',  this.userInfo);
+
     
   },
 
   methods: {
+    advanceMode(){
+      console.log('this.showAdvanceMode :>> ', this.showAdvanceMode);
+      console.log('this.userInfo.isSystemAdvanced :>> ', this.userInfo.isSystemAdvanced);
+      
+      this.showAdvanceMode = !this.showAdvanceMode
+  
+      PermissionHelper.setAdvancedModeMode(this.showAdvanceMode);
+      this.changeRoutes(true);
+      
+
+    },
     changeMimicMode(){
       if(this.$route.path=="/reinspection" && this.$store.getters.editReport){
         this.EditRptchangeStoreObj.dialogCosed = true;
