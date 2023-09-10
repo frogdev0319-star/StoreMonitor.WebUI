@@ -217,13 +217,13 @@ export default {
   },
 
   computed: {
-    ...mapGetters({ accountChanged: 'accountChanged' })
+    // ...mapGetters({ accountChanged: 'accountChanged' })
   },
 
   watch: {
-    accountChanged(val) {
-      val !== 0 && this.init();
-    },
+    // accountChanged(val) {
+    //   val !== 0 && this.init();
+    // },
 
     textPosition(val){
       switch (val) {

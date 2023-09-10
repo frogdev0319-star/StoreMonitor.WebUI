@@ -160,9 +160,9 @@
                   :disabled="item.isReadOnly"
                   :style="{'paddingLeft':'calc(30/1920*100vw) !important','height': 'calc(66/1920*100vw)','lineHeight': 'calc(66/1920*100vw)'}"
                 >
-                  <img class="menu_img" :src="($route.name=='auth')? `./../static/img/menu/${item.id}.png`:`./static/img/menu/${item.id}.png`" />
+                  <img class="menu_img" :src="($route.name=='auth') ? `./../static/img/menu/${item.id}.png`:`./static/img/menu/${item.id}.png`" />
                   <img class="menu_img-active" :src="($route.name=='auth')? `./../static/img/menu/${item.id}-active.png`:`./static/img/menu/${item.id}-active.png`" />
-                  <span class="span1">{{collapsed ? "" : $t(`route.${item.children[0].name}`)}}</span>
+                  <span class="span1">{{collapsed ? "" : $t(`route.${item.children[0].name}`)}} </span>
                 </el-menu-item>
 
                 <!--multi nodes -->
@@ -172,9 +172,9 @@
                   :index="index+''"
                   :style="{}">
                   <template slot="title">
-                    <img class="menu_img" :src="($route.name=='auth')? `./../static/img/menu/${item.id}.png`:`./static/img/menu/${item.id}.png`"/>
+                    <img class="menu_img" :src="($route.name=='auth') ? `./../static/img/menu/${item.id}.png` : `./static/img/menu/${item.id}.png`"/>
                     <img class="menu_img-active" :src="($route.name=='auth')? `./../static/img/menu/${item.id}-active.png`:`./static/img/menu/${item.id}-active.png`"/>
-                    <span class="span2">{{collapsed ? "" : $t(`route.${item.name}`) }}</span>
+                    <span class="span2">{{collapsed ? "" : $t(`route.${item.name}`) }} </span>
                   </template>
                   <div v-for="child in item.children" :key="child.path">
                     <el-menu-item
@@ -228,7 +228,7 @@
               <el-dropdown-menu slot="dropdown" class="dropdown">
 
                 <el-dropdown-item
-                  v-if="hasAdvanced"
+                  v-if="hasAdvanced && !showMimicMode"
                   class="dropdown-item"
                   style="width:auto;min-width: calc(140/1920 *100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
                   @click.native="advanceMode">
@@ -236,7 +236,7 @@
                 </el-dropdown-item>
 
                 <el-dropdown-item
-                  v-if="hasMystery"
+                  v-if="!showAdvanceMode && hasMystery "
                   class="dropdown-item"
                   style="width:auto;min-width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
                   @click.native="changeMimicMode">{{showMimicMode? $t('route.generalMode'):$t('route.mimicMode') }}
@@ -533,6 +533,8 @@ export default {
         { curPath: ["/scheduleDetailCreate"], activePath: "/scheduleSetting" },
         { curPath: ["/scheduleDetailModify"], activePath: "/scheduleSetting" },
 
+        { curPath: ["/waterMark"], activePath: "/waterMark" },
+
       ];
       const pathMAP = pathMapArr.find((item) => item.curPath.includes(path));
       console.log('pathMAP :>> ', pathMAP);
@@ -543,6 +545,7 @@ export default {
       } else if(this.showMimicMode){
         this.setBrandListDisabled(true);
       }else {
+        
         this.setBrandListDisabled(false);
       }
       return path;
@@ -640,6 +643,7 @@ export default {
       console.log('this.userInfo.isSystemAdvanced :>> ', this.userInfo.isSystemAdvanced);
       
       this.showAdvanceMode = !this.showAdvanceMode
+      if( this.showAdvanceMode ) this.$router.push('WaterMark');
   
       PermissionHelper.setAdvancedModeMode(this.showAdvanceMode);
       this.changeRoutes(true);
