@@ -124,7 +124,12 @@ export default{
       "schedulePersonalModify":"巡檢排程｜個人排程",
       "errorStoreNoPermission":"門店無服務權限，請聯繫管理員",
       "errorStoreNameNoPerssion":"因{storeNames}無服務權限無法操作，請重新確認",
-      "generalSetting": "通用設定"
+      "generalSetting": "通用設定",
+      "AdvanceSetting": "進階設定",
+      "Safety": "安全性",
+      "WaterMark": "浮水印",
+
+
   },
   "overview":{
       "DangerousLess":"立即督導＜60%",

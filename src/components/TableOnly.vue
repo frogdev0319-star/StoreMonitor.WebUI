@@ -462,7 +462,7 @@ export default {
     renderHeader(h, { column, $index }) {
       var colElement = [column.label];
       if(column.hasIcon){
-         colElement = [column.label];
+        colElement = [column.label];
 
       }
       if(util.getWindowWidth()>1366){

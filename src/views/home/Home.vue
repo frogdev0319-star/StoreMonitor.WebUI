@@ -135,6 +135,7 @@
             </el-select>
             <hr class="hr-horizontal">
           </div>
+
           <el-scrollbar
             ref="scroll"
             id="el-menuscrollbar"
@@ -159,9 +160,9 @@
                   :disabled="item.isReadOnly"
                   :style="{'paddingLeft':'calc(30/1920*100vw) !important','height': 'calc(66/1920*100vw)','lineHeight': 'calc(66/1920*100vw)'}"
                 >
-                  <img class="menu_img" :src="($route.name=='auth')? `./../static/img/menu/${item.id}.png`:`./static/img/menu/${item.id}.png`" />
+                  <img class="menu_img" :src="($route.name=='auth') ? `./../static/img/menu/${item.id}.png`:`./static/img/menu/${item.id}.png`" />
                   <img class="menu_img-active" :src="($route.name=='auth')? `./../static/img/menu/${item.id}-active.png`:`./static/img/menu/${item.id}-active.png`" />
-                  <span class="span1">{{collapsed ? "" : $t(`route.${item.children[0].name}`)}}</span>
+                  <span class="span1">{{collapsed ? "" : $t(`route.${item.children[0].name}`)}} </span>
                 </el-menu-item>
 
                 <!--multi nodes -->
@@ -171,9 +172,9 @@
                   :index="index+''"
                   :style="{}">
                   <template slot="title">
-                    <img class="menu_img" :src="($route.name=='auth')? `./../static/img/menu/${item.id}.png`:`./static/img/menu/${item.id}.png`"/>
+                    <img class="menu_img" :src="($route.name=='auth') ? `./../static/img/menu/${item.id}.png` : `./static/img/menu/${item.id}.png`"/>
                     <img class="menu_img-active" :src="($route.name=='auth')? `./../static/img/menu/${item.id}-active.png`:`./static/img/menu/${item.id}-active.png`"/>
-                    <span class="span2">{{collapsed ? "" : $t(`route.${item.name}`) }}</span>
+                    <span class="span2">{{collapsed ? "" : $t(`route.${item.name}`) }} </span>
                   </template>
                   <div v-for="child in item.children" :key="child.path">
                     <el-menu-item
@@ -216,6 +217,7 @@
               </div>
             </el-menu>
           </el-scrollbar>
+          
           <div class="spacer"></div>
           <div class="headUrl-content flex-center" :style="collapsed?{'justify-content':'center'}:{}">
             <el-dropdown class="el-user-drop" >
@@ -224,11 +226,21 @@
                 <div class="headImg" :style="collapsed?{'margin-left':'calc(-20/1920*100vw)'}:{'margin-right':'calc(16/1920*100vw)'}">{{iconName}}</div>
               </span>
               <el-dropdown-menu slot="dropdown" class="dropdown">
+
                 <el-dropdown-item
-                  v-if="hasMystery"
+                  v-if="hasAdvanced && !showMimicMode"
+                  class="dropdown-item"
+                  style="width:auto;min-width: calc(140/1920 *100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
+                  @click.native="advanceMode">
+                    {{ showAdvanceMode ? '返回': '進階管理' }}
+                </el-dropdown-item>
+
+                <el-dropdown-item
+                  v-if="!showAdvanceMode && hasMystery "
                   class="dropdown-item"
                   style="width:auto;min-width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
-                  @click.native="changeMimicMode">{{showMimicMode? $t('route.generalMode'):$t('route.mimicMode') }}</el-dropdown-item>
+                  @click.native="changeMimicMode">{{showMimicMode? $t('route.generalMode'):$t('route.mimicMode') }}
+                </el-dropdown-item>
                 <el-dropdown-item
                   :disabeled="true"
                   class="dropdown-item"
@@ -275,7 +287,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.1.3.7
+                v3.1.4.0
                   &copy; {{ getFullYear }} Advantech Intelligent City
                   Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
@@ -324,6 +336,7 @@ export default {
   },
   data() {
     return {
+      
       showTag: false,
       exportPdf: require('../../../static/img/export-pdf.png'),
       imgSrc: require("../../../static/img/inspection.svg"),
@@ -361,6 +374,11 @@ export default {
       showIgnoreItem:false,
       showMimicMode:false,
       hasMystery:false,
+
+      hasAdvanced: false,
+      showAdvanceMode: false,
+      userInfo: '',
+
       leaveObj: {
         title: this.$t('remotePatrol.prompt'),
         showInfo: this.$t('remotePatrol.changPageInfo'),
@@ -517,6 +535,8 @@ export default {
         { curPath: ["/scheduleDetailCreate"], activePath: "/scheduleSetting" },
         { curPath: ["/scheduleDetailModify"], activePath: "/scheduleSetting" },
 
+        { curPath: ["/waterMark"], activePath: "/waterMark" },
+
       ];
       const pathMAP = pathMapArr.find((item) => item.curPath.includes(path));
       console.log('pathMAP :>> ', pathMAP);
@@ -527,6 +547,7 @@ export default {
       } else if(this.showMimicMode){
         this.setBrandListDisabled(true);
       }else {
+        
         this.setBrandListDisabled(false);
       }
       return path;
@@ -586,6 +607,8 @@ export default {
       }
     });
 
+    
+
     window.addEventListener("resize", this.$_isMobile);
     
     self.$_isMobile();
@@ -594,7 +617,7 @@ export default {
     await this.updateTitle();
   },
 
-  mounted() {
+  async mounted() {
     if (this.$refs.fieldSelect !== undefined) {
       this.$nextTick(() => {
         this.$refs.fieldSelect.$refs.scrollbar.$el.classList.add(
@@ -602,19 +625,35 @@ export default {
         );
       });
     }
+
+    
     this.$store.dispatch("GetIsMysteryMode");
     this.showMimicMode = this.$store.getters.ShowMimicMode;
     this.hasMystery = this.$store.getters.isMystery;
+    
+    var userInfo = await this.$store.dispatch("GetUserAuthorities");
+    this.userInfo = userInfo.data
 
-  
+    this.hasAdvanced = this.userInfo.isSystemAdvanced
+
+    console.log(' this.userInfo ~~~~~~>> ',  this.userInfo);
+
     
   },
 
   methods: {
-    // GetWhiteList(){
-    //   this.$store.dispatch("GetWhiteList");
-    // },
+    advanceMode(){
+      console.log('this.showAdvanceMode :>> ', this.showAdvanceMode);
+      console.log('this.userInfo.isSystemAdvanced :>> ', this.userInfo.isSystemAdvanced);
+      
+      this.showAdvanceMode = !this.showAdvanceMode
+      if( this.showAdvanceMode ) this.$router.push('WaterMark');
+  
+      PermissionHelper.setAdvancedModeMode(this.showAdvanceMode);
+      this.changeRoutes(true);
+      
 
+    },
     changeMimicMode(){
       if(this.$route.path=="/reinspection" && this.$store.getters.editReport){
         this.EditRptchangeStoreObj.dialogCosed = true;

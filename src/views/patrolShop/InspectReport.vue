@@ -1355,6 +1355,7 @@ export default {
         this.$t('remotePatrol.signatureInfo'), //簽到資訊-地圖link
         this.$t('remotePatrol.signInTime'),
         this.$t('remotePatrol.createRptDT'),
+        this.$t('remotePatrol.patrolTime'),
         ];
 
       downLoadInspectReportEntireDetail(params).then(res => {
@@ -1363,7 +1364,7 @@ export default {
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
           const filterVal = ['province','city','storename','code', 'tagname', 'group', 'item', 'inspectitem','itemscore','result',
-          'totlascore','status','submitter', 'detail', 'attachment','comment','singinmap','signints','reportts'];
+          'totlascore','status','submitter', 'detail', 'attachment','comment','singinmap','signints','reportts', 'timediff'];
           const curData = res.data;
           const tagName = this.report.tagName;
           const data = that.formatJson(filterVal, curData);

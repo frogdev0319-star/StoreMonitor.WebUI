@@ -200,13 +200,13 @@
                 </div>
               </div>
           </div>
-          <div v-else class="list-table">
+          <div v-else class="list-table for_pre">
             <table-only
               ref="elTP"
               class="table-white"
               :table-themes="white"
               :column-data="reportInfoTable"
-              :table-data="reportList"
+              :table-data="reportTableData"
               :highlight-current-row= "true"
               :is-loading-data="isLoading"
               :allowRowExpand = "false"
@@ -219,44 +219,6 @@
               @sortChange="sortChange"
               @row-click = "clickReport"
             />
-            <!--<el-table
-              :data="reportList"
-              :highlight-current-row="true"
-              :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
-              :cell-style="cellStyle"
-              :cell-class-name="cellClass"
-              :header-cell-class-name="headerClass"
-              align="left"
-              stripe
-              style=""
-              class="table-content"
-              @row-click="clickReport"
-              @sort-change="sortChange"
-            >
-              <el-table-column
-                v-for="(_item,_index) in reportInfoTable"
-                :key="_index"
-                :prop="_item.prop"
-                :label="_item.label"
-                :sortable="_item.sortable"
-                :min-width="_item.width"
-                align="left"/>
-              <el-table-column
-                :label="$t('eventView.operation')"
-                prop="option"
-                min-width="110"
-                align="left">
-                <template slot-scope="scope">
-                  <i class="iconfont icon-gengduo"/>
-                </template>
-              </el-table-column>
-              <div slot="empty">
-                <div>
-                  <i class="iconfont icon-zhengque empty-data-icon"/>
-                  <span :style="{'margin-left':'20px','font-size':'16px','color':'#7d8cad'}">{{ $t('eventView.noEvents') }}</span>
-                </div>
-              </div>
-            </el-table>-->
           </div>
           
         </div>
@@ -362,11 +324,13 @@ export default {
       onsiteIcon: require('../../../static/img/onsite.png'),
       searchContent: false,
       exportPng: require('../../../static/img/excel.png'),
-      reportList: [],
+      
       curSortType: 0,
       ShowCard: true,
       isHoverList: false,
       isHoverCard: false,
+      reportList: [],
+      reportTableData: [],
       sortTypeList: [
         {
           id: 0,
@@ -390,15 +354,14 @@ export default {
           'maxWidth': 60,
           'isExpand': false
         },
-        {
-          'prop': 'city',
-          'label': this.$t('remotePatrol.regionII'),
-          'sortable': false,
-          'width': 60,
-          'maxWidth': 60,
-          'isExpand': false
-
-        },
+        // {
+        //   'prop': 'city',
+        //   'label': this.$t('remotePatrol.regionII'),
+        //   'sortable': false,
+        //   'width': 60,
+        //   'maxWidth': 60,
+        //   'isExpand': false
+        // },
         {
           'prop': 'storeName',
           'label': this.$t('remotePatrol.patrolStore'),
@@ -407,14 +370,14 @@ export default {
           'maxWidth': 80,
           'isExpand': false
         },
-        {
-          'prop': 'code',
-          'label': this.$t('remotePatrol.code'),
-          'sortable': false,
-          'width': 60,
-          'maxWidth': 60,
-          'isExpand': false
-        },
+        // {
+        //   'prop': 'code',
+        //   'label': this.$t('remotePatrol.code'),
+        //   'sortable': false,
+        //   'width': 60,
+        //   'maxWidth': 60,
+        //   'isExpand': false
+        // },
         {
           'prop': 'storeType',
           'label': this.$t('remotePatrol.storeType'),
@@ -439,14 +402,14 @@ export default {
           'maxWidth': 100,
           'isExpand': false
         },
-        {
-          'prop': 'modeText',
-          'label': this.$t('remotePatrol.patrolWay'),
-          'sortable': false,
-          'width': 65,
-          'maxWidth': 65,
-          'isExpand': false,
-        },
+        // {
+        //   'prop': 'modeText',
+        //   'label': this.$t('remotePatrol.patrolWay'),
+        //   'sortable': false,
+        //   'width': 65,
+        //   'maxWidth': 65,
+        //   'isExpand': false,
+        // },
         {
           'prop': 'status',
           'label': this.$t('remotePatrol.patrolResult'),
@@ -473,6 +436,14 @@ export default {
           'isExpand': false
         },
         {
+          'prop': 'signstr',
+          'label': this.$t('remotePatrol.signInTime'),
+          'sortable': 'custom',
+          'width': 100,
+          'maxWidth': 100,
+          'isExpand': false
+        },
+        {
           'prop': 'operator',
           'label': this.$t('titleView.operation'),
           'sortable': false,
@@ -486,6 +457,7 @@ export default {
           'methods': 'set'
         }
       ],
+      
       columnOperationData: {
         label: this.$t('titleView.operation'),
         minWidth: '60',
@@ -544,7 +516,9 @@ export default {
         this.$t('remotePatrol.patrolWay'),
         this.$t('remotePatrol.patrolResult'),
         this.$t('remotePatrol.patrolScore'),
-        this.$t('remotePatrol.patrolDate')],
+        this.$t('remotePatrol.patrolDate'),
+        this.$t('remotePatrol.signInTime')
+      ],
       inspectId: '',
       inspectTableList: [],
       isLoading: false,
@@ -648,7 +622,7 @@ export default {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportReportHeader;
         const filterVal = ['province', 'city', 'storeName', 'code', 'storeType', 'submitterName', 'tagName',
-          'modeText', 'status', 'totalScore', 'datestr'];
+          'modeText', 'status', 'totalScore', 'datestr', 'signstr'];
         let curData = [];
         curData = await that.getReportList_({...that.params, filter: {page: 0, size: 1000}});
         const data = that.formatJson(filterVal, curData);
@@ -711,6 +685,7 @@ export default {
         this.$t('titleView.description'),
         this.$t('remotePatrol.signatureInfo'), //簽到資訊-地圖link
         this.$t('remotePatrol.signInTime'),
+        '巡檢花費時間',
         this.$t('remotePatrol.createRptDT'),
         ];
       
@@ -720,7 +695,7 @@ export default {
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
           const filterVal = ['province','city','storename','code', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 
-          'totlascore','status','submitter', 'detail', 'attachment','comment','singinmap','signints','reportts'];
+          'totlascore','status','submitter', 'detail', 'attachment','comment','singinmap','signints','timediff', 'reportts'];
           const curData = res.data;
           const tagName = that.inspectTableList.find(item=>item.id ==self.params.inspectTagId ).name;
           const data = that.formatJson(filterVal, curData);
@@ -790,6 +765,8 @@ export default {
             reportObj.city = item.city;
             reportObj.id = item.id;
             reportObj.datestr = util.getDateStr(item.ts);
+            reportObj.signstr = item.check_in_ts == 0 || !item.check_in_ts ? '--' : util.getDateStr(item.check_in_ts);
+            
             reportObj.storeName = item.storeName;
             reportObj.tagName = item.tagName;
             reportObj.submitterName = item.submitterName;
@@ -823,18 +800,12 @@ export default {
             reportObj.iconSrc = statusAndIconObj.iconSrc;
             temp.push(reportObj);
           }
-          //);
-          // self.reportList = temp;
-          // self.total = Math.ceil(res.data.totalElements/self.sizeNum);
-          // self.isLoading = false;
-          // if (temp.length === 0) {
-          //   self.noData = self.$t('deviceView.noData');
-          // }
           resolve(temp);
         }).catch(err => {
         });
       });
     },
+    
     getReportList(p) {
       console.log("1.Get Report List")
       var params = {
@@ -875,33 +846,36 @@ export default {
             this.totalElements = res.data.totalElements
           } 
           const temp = [];
+          const tempTable = [];
           self.isLoading = true;
+
+          
           for(const item of data){
-          //data.forEach(async (item,index) => {
             const reportObj = {};
-            reportObj.province = item.province;
+            reportObj.province = item.province ;
             reportObj.city = item.city;
+
+            reportObj.storeName = item.storeName ;
+            reportObj.code = item.code ? item.code : '--';
+
+            reportObj.modeText = item.mode === 0 ? self.$t('overview.remotePatrol') : self.$t('overview.onsitePatrol')
+            reportObj.tagName = item.tagName ;
+
             reportObj.id = item.id;
             reportObj.datestr = util.getDateStr(item.ts);
-            reportObj.storeName = item.storeName;
-            reportObj.tagName = item.tagName;
             reportObj.submitterName = item.submitterName;
             reportObj.submitter = item.submitter;
             reportObj.routeObj = item;
             reportObj.mode = item.mode;
             reportObj.totalScore = item.type === 1 ? "--" : item.totalScore;
-            reportObj.code = item.code !== null ? item.code : '--';
+            
             reportObj.standard = item.standard;
             reportObj.standardMsg = util.setStandardMsg(reportObj.standard);
             reportObj.statusCode = item.status; 
-            if (item.mode === 0) {
-              reportObj.modeText = self.$t('overview.remotePatrol');
-            } else if (item.mode === 1) {
-              reportObj.modeText = self.$t('overview.onsitePatrol');
-            }
+            
             let storeType = '';
             item.tags.length !== 0 ? item.tags.forEach((_item, _index) => {
-              const isuu = _index === item.tags.length - 1 ? '' : ',';
+              const isuu = _index === item.tags.length - 1 ? '' : ', \n';
               storeType += _item + isuu;
             }) : storeType = '--';
             reportObj.storeType = storeType;
@@ -913,13 +887,49 @@ export default {
             });
             const statusAndIconObj = self.getIconSrc(item.status);
             reportObj.status = statusAndIconObj.status;
-
-
             reportObj.iconSrc = statusAndIconObj.iconSrc;
             temp.push(reportObj);
+
+            
+            // ------- for table -------
+            const tableObj = {};
+            tableObj.province = item.province + '\n' + item.city;
+            tableObj.city = item.city;
+
+            tableObj.storeName = item.storeName + '\n' + (item.code ? item.code : '--');
+            tableObj.code = item.code ? item.code : '--';
+
+            tableObj.modeText = item.mode === 0 ? self.$t('overview.remotePatrol') : self.$t('overview.onsitePatrol')
+            tableObj.tagName = item.tagName + '\n' + tableObj.modeText;
+
+            tableObj.id = item.id;
+            tableObj.datestr = util.getDateStr(item.ts);
+            tableObj.signstr = item.check_in_ts == 0 || !item.check_in_ts ? '--' : util.getDateStr(item.check_in_ts);
+            tableObj.submitterName = item.submitterName;
+            tableObj.submitter = item.submitter;
+            tableObj.routeObj = item;
+            tableObj.mode = item.mode;
+            tableObj.totalScore = item.type === 1 ? "--" : item.totalScore;
+            
+            tableObj.standard = item.standard;
+            tableObj.standardMsg = util.setStandardMsg(tableObj.standard);
+            tableObj.statusCode = item.status; 
+            
+            tableObj.storeType = storeType;
+            self.storeList.forEach(_item => {
+              if (item.storeId === _item.storeId) {
+                tableObj.province = _item.province;
+                tableObj.city = _item.city;
+              }
+            });
+            tableObj.status = statusAndIconObj.status;
+            tableObj.iconSrc = statusAndIconObj.iconSrc;
+            tempTable.push(tableObj);
           }
-          //);
+
+        
           self.reportList = temp;
+          self.reportTableData = tempTable;
           console.log('self.reportList !!!~~~~~>> ', self.reportList);
 
           self.total = Math.ceil(res.data.totalElements/self.sizeNum);
@@ -1334,7 +1344,8 @@ export default {
 
 };
 </script>
-<style lang="sass" scoped>
+
+<style lang="sass">
   .ignoreSign
     width: fit-content
     border-radius: 4px
@@ -1342,8 +1353,22 @@ export default {
     color: #989ca0
     background: #EFEFEF
     padding: 5px
+  .el-table__row
+    td
+      &:nth-child(1), &:nth-child(2), &:nth-child(3), &:nth-child(5),
+        .cell
+          padding-left: 10% !important
+          text-overflow: ellipsis
+          white-space: nowrap
+          overflow: hidden
+          span
+            // background: #9872 !important
+            white-space: pre !important
+            
+
 
 </style>
+
 <style lang="scss" scoped>
 $red:#f31d65;
 $black:#182752;
