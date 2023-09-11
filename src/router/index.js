@@ -383,6 +383,7 @@ export const navbarRoute = {
     return schduleRoute;
   },
 
+  
   // 統計分析
   getStatisticalRoute() {
     const statisticsRoute = {
@@ -703,7 +704,7 @@ export const navbarRoute = {
   //進階設定
   getAdvanceSetting(){
     const advanceSettingRoute = {
-      id: 5,
+      id: 7,
       path: '/home',
       name: 'Safety',
       component: Home,
