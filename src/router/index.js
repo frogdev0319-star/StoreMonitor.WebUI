@@ -201,7 +201,6 @@ export const navbarRoute = {
     return eventRoute;
   },
 
-
   // 簽合管理
   getAuditRoute() {
     const auditRoute = {
@@ -316,74 +315,6 @@ export const navbarRoute = {
     return auditRoute;
   },
 
-  // 巡檢排程
-  getInceptionSchedule(){
-    const schduleRoute = {
-      id: 5,
-      path: '/home',
-      name: 'InceptionSchedule',
-      component: Home,
-      iconCls: 'iconfont icon-shijian',
-      styles: 'font-size:22px',
-      leaf: false,
-      hidden: false,
-      children: []
-    };
-    !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleSetting2() && schduleRoute.children.push(
-      {
-
-        path: '/scheduleSetting',
-        name: 'ScheduleSetting',
-        component: resolve => require(['@/views/schedule/ScheduleSetting'], resolve),
-        meta: {
-          keepAlive: true, // the component is't to be cache.
-          requireAuth: true
-        },
-        isReadOnly: false
-      } ,
-      {
-        path: '/personalSchedule',
-        name: 'PersonalSchedule',
-        hidden: true,
-        component: resolve => require(['@/views/schedule/details/personalSchedule'], resolve)
-      },
-      {
-        path: '/scheduleDetailCreate',
-        name: 'CreateSchedule',
-        hidden: true,
-        meta: {
-          keepAlive: false
-        },
-        component: resolve => require(['@/views/schedule/details/scheduleDetail'], resolve)
-      },
-      {
-        path: '/scheduleDetailModify',
-        name: 'ModifySchedule',
-        hidden: true,
-        meta: {
-          keepAlive: false
-        },
-        component: resolve => require(['@/views/schedule/details/scheduleDetail'], resolve)
-      }
-
-    ) && primaryPathesList.push('/scheduleSetting', '/personalSchedule','/scheduleDetailCreate','scheduleDetailModify');
-    
-    !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleHistroy() && schduleRoute.children.push(
-      {
-        path: '/scheduleHistory',
-        name: 'ScheduleHistory',
-        component: resolve => require(['@/views/schedule/ScheduleHistory'], resolve),
-        meta: {
-          keepAlive: true, // the component is't to be cache.
-          requireAuth: true
-        },
-        isReadOnly: false
-      }
-    ) && primaryPathesList.push('/scheduleHistory');
-    return schduleRoute;
-  },
-
-  
   // 統計分析
   getStatisticalRoute() {
     const statisticsRoute = {
@@ -495,6 +426,74 @@ export const navbarRoute = {
     return statisticsRoute;
   },
 
+
+  // 巡檢排程
+  getInceptionSchedule(){
+    const schduleRoute = {
+      id: 5,
+      path: '/home',
+      name: 'InceptionSchedule',
+      component: Home,
+      iconCls: 'iconfont icon-shijian',
+      styles: 'font-size:22px',
+      leaf: false,
+      hidden: false,
+      children: []
+    };
+    !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleSetting2() && schduleRoute.children.push(
+      {
+
+        path: '/scheduleSetting',
+        name: 'ScheduleSetting',
+        component: resolve => require(['@/views/schedule/ScheduleSetting'], resolve),
+        meta: {
+          keepAlive: true, // the component is't to be cache.
+          requireAuth: true
+        },
+        isReadOnly: false
+      } ,
+      {
+        path: '/personalSchedule',
+        name: 'PersonalSchedule',
+        hidden: true,
+        component: resolve => require(['@/views/schedule/details/personalSchedule'], resolve)
+      },
+      {
+        path: '/scheduleDetailCreate',
+        name: 'CreateSchedule',
+        hidden: true,
+        meta: {
+          keepAlive: false
+        },
+        component: resolve => require(['@/views/schedule/details/scheduleDetail'], resolve)
+      },
+      {
+        path: '/scheduleDetailModify',
+        name: 'ModifySchedule',
+        hidden: true,
+        meta: {
+          keepAlive: false
+        },
+        component: resolve => require(['@/views/schedule/details/scheduleDetail'], resolve)
+      }
+
+    ) && primaryPathesList.push('/scheduleSetting', '/personalSchedule','/scheduleDetailCreate','/scheduleDetailModify');
+    
+    !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleHistroy() && schduleRoute.children.push(
+      {
+        path: '/scheduleHistory',
+        name: 'ScheduleHistory',
+        component: resolve => require(['@/views/schedule/ScheduleHistory'], resolve),
+        meta: {
+          keepAlive: true, // the component is't to be cache.
+          requireAuth: true
+        },
+        isReadOnly: false
+      }
+    ) && primaryPathesList.push('/scheduleHistory');
+    return schduleRoute;
+  },
+
   // 系統設定
   getSystemSettingRoute() {
     const systemSettingRoute = {
@@ -540,7 +539,7 @@ export const navbarRoute = {
     };
 
     // 通用設定
-    !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableGeneralSetting()  && systemSettingRoute.children.push(
+    !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableGeneralSetting() && systemSettingRoute.children.push(
       {
         path: '/generalSetting',
         name: 'generalSetting',
@@ -700,11 +699,10 @@ export const navbarRoute = {
   },
 
 
-
   //進階設定
   getAdvanceSetting(){
     const advanceSettingRoute = {
-      id: 7,
+      id:7,
       path: '/home',
       name: 'Safety',
       component: Home,
@@ -714,7 +712,6 @@ export const navbarRoute = {
       hidden: false,
       children: []
     };
-
     PermissionHelper.advancedMode && advanceSettingRoute.children.push(
       {
         path: '/waterMark',
@@ -727,11 +724,8 @@ export const navbarRoute = {
         isReadOnly: false
       } ,
     ) && primaryPathesList.push('/waterMark');
-
     return advanceSettingRoute;
   },
-
-
 
 
   getDeviceRoutes() {

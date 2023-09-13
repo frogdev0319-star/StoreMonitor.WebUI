@@ -352,7 +352,11 @@ export default {
           'sortable': false,
           'width': 60,
           'maxWidth': 60,
-          'isExpand': false
+          'isExpand': false,
+          'hasIcon':{
+            icon:require('@/../static/img/table-help.png'),
+            tooltipContent : this.$t('remotePatrol.tableSection')
+          }
         },
         // {
         //   'prop': 'city',
@@ -368,7 +372,11 @@ export default {
           'sortable': false,
           'width': 80,
           'maxWidth': 80,
-          'isExpand': false
+          'isExpand': false,
+          'hasIcon':{
+            icon:require('@/../static/img/table-help.png'),
+            tooltipContent : this.$t('remotePatrol.tableStore')
+          }
         },
         // {
         //   'prop': 'code',
@@ -400,7 +408,11 @@ export default {
           'sortable': false,
           'width': 100,
           'maxWidth': 100,
-          'isExpand': false
+          'isExpand': false,
+          'hasIcon':{
+            icon:require('@/../static/img/table-help.png'),
+            tooltipContent : this.$t('remotePatrol.tableInspection')
+          }
         },
         // {
         //   'prop': 'modeText',
@@ -1354,6 +1366,9 @@ export default {
     background: #EFEFEF
     padding: 5px
   .el-table__row
+    th
+      &:nth-child(1)
+        padding-left: 0 !important
     td
       &:nth-child(1), &:nth-child(2), &:nth-child(3), &:nth-child(5),
         .cell
@@ -1365,7 +1380,9 @@ export default {
             // background: #9872 !important
             white-space: pre !important
             
-
+  .el-table th div
+    padding-left: 4% !important
+    padding-right: 0 !important
 
 </style>
 

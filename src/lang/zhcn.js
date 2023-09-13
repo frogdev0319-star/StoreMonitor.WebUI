@@ -561,6 +561,9 @@ export default{
       "maximumTotalAttach":"全表最多允许上传120个附件",
       "totalOf":"巡检报告共有",
       "numReports":"笔",
+      "tableSection":"区域一 | 区域二",
+      "tableStore":"巡检门店 | 分店代码",
+      "tableInspection":"巡检表 | 巡店方式",
 
 
   },

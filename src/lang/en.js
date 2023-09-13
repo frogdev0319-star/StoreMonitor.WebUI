@@ -511,15 +511,15 @@ export default{
         "videoLicense":"No video access",
         "view":"View",
         "visited":"Recently Visit",
-      "week":{
-          "fri":"Fri.",
-          "mon":"Mon.",
-          "sat":"Sat.",
-          "sun":"Sun.",
-          "thur":"Thur.",
-          "tues":"Tues.",
-          "wed":"Wed."
-      },
+        "week":{
+            "fri":"Fri.",
+            "mon":"Mon.",
+            "sat":"Sat.",
+            "sun":"Sun.",
+            "thur":"Thur.",
+            "tues":"Tues.",
+            "wed":"Wed."
+        },
         "zoneList":"Camera List",
         "commentCountRuleTip":"A maximum of 5 text comments can be entered",
         "cannotSwitchBrand":"Currently editing report; cannot switch current brand",
@@ -561,6 +561,9 @@ export default{
         "maximumTotalAttach": "Up to 120 attachments are allowed in the inspection form",
         "totalOf":"A total of",
         "numReports":"reports",
+        "tableSection":"Region I | regionII",
+        "tableStore":"Store Name | Store Code",
+        "tableInspection":"Inspection List | Inspection Method"
     },
     "eventView":{
         "ClosedEvent":"Closed Events",

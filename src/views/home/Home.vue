@@ -585,7 +585,6 @@ export default {
     },
     mimicMode(){
       this.showMimicMode = this.$store.getters.mimicMode;
-
     },
     isMystery(){
       this.hasMystery = this.$store.getters.isMystery;
@@ -641,14 +640,12 @@ export default {
     advanceMode(){
       console.log('this.showAdvanceMode :>> ', this.showAdvanceMode);
       console.log('this.userInfo.isSystemAdvanced :>> ', this.userInfo.isSystemAdvanced);
-      
       this.showAdvanceMode = !this.showAdvanceMode
-      if( this.showAdvanceMode ) this.$router.push('WaterMark');
-  
-      PermissionHelper.setAdvancedModeMode(this.showAdvanceMode);
-      this.changeRoutes(true);
-      
 
+      PermissionHelper.setAdvancedModeMode(this.showAdvanceMode);
+      this.changeRoutes();
+      if( this.showAdvanceMode ) this.$router.push('WaterMark');
+      
     },
     changeMimicMode(){
       if(this.$route.path=="/reinspection" && this.$store.getters.editReport){
@@ -1086,32 +1083,43 @@ export default {
 
     },
 
-    async changeRoutes(mimicModeChanged=false) {
+    async changeRoutes(mimicModeChanged=false, ) {
       //console.log("*Change Routes mimicModeChanged:",mimicModeChanged);
       const self = this;
       const result = await self.$store.dispatch("GetUserAuthorities");
       console.log("changeRoutes resule:",result);
+
       if (result.errCode === 0) {
         await self.$store.dispatch("generateRoutes");
         self.getUserName(result.data);
         const availablePathesList = this.availabePathList;
+        console.log('availablePathesList :>> ', availablePathesList);
+
+        
         if (availablePathesList.includes("/noRight")) {
           this.$router.push("/noRight");
-        } else if (!availablePathesList.includes(this.$route.path)) {
-          this.$router.push(availablePathesList[0]);
-        } else if(mimicModeChanged && this.$route.path=="/auditDetail" || this.$route.path=="/auditReportdetails"){
-          this.$router.push("/audit");
-        //this.$router.path = "/audit";
-        }else if(mimicModeChanged && this.$route.path=="/reportdetails"){
-        this.$router.push("/report");
-        //this.$router.path = "/report";
-        }else {
-          // console.log(this.$route.path);
-          this.$router.push(this.$route.path);
+        } 
+        else if(availablePathesList.includes("/waterMark")){
+          this.$router.push('WaterMark');
         }
+
+        // else if (!availablePathesList.includes(this.$route.path)) {
+        //   this.$router.push(availablePathesList[0]);
+        // } else if(mimicModeChanged && this.$route.path=="/auditDetail" || this.$route.path=="/auditReportdetails"){
+        //   this.$router.push("/audit");
+        // //this.$router.path = "/audit";
+        // }else if(mimicModeChanged && this.$route.path=="/reportdetails"){
+        // this.$router.push("/report");
+        // //this.$router.path = "/report";
+        // }else {
+        //   // console.log(this.$route.path);
+        //   this.$router.push(this.$route.path);
+        // }
       }
     },
 
+
+    // user name first word
     getUserName(result) {
       const self = this;
       self.userName =

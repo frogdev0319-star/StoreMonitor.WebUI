@@ -180,7 +180,7 @@ export default{
           'isExpand': false,
           'hasIcon':{
               icon:require('@/../static/img/table-help.png'),
-              tooltipContent:this.$t('schedule.tagInfo')
+              tooltipContent: this.$t('schedule.tagInfo')
           }
         },
         {

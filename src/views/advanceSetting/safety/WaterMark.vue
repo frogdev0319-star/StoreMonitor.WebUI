@@ -46,6 +46,7 @@
                     </el-option>
                   </el-select>
                   <el-input
+                    ref="defineName"
                     v-model="defineText"
                     :disabled = "!isSwitchOn || showTextStatus == false"
                     :placeholder="$t('audit.workFlows.defineItem')"
@@ -138,12 +139,12 @@ export default {
       isLoadingData: false,
 			isSwitchOn: false,
       userName: '',
-      defineText: '自定義文字',
+      defineText: this.$t('audit.workFlows.defineItem'),
       showTextStatus: true,
       showText:[
         {
           value: true,
-          label: '自定義文字'
+          label: this.$t('audit.workFlows.defineItem')
         }, {
           value: false,
           label: '人員名稱'
@@ -307,7 +308,6 @@ export default {
       const initData = await this.advancedFetch();
       // console.log('initData.data :>> ', initData.data);
       var tempItem = this.textSizeSelect.find( i => i.mobileSize == initData.data.content.waterPrintSize)
-
       this.isSwitchOn = initData.data.content.isSwitchOn
       this.defineText = initData.data.content.waterPrintText
       this.color = initData.data.content.waterPrintColor
@@ -330,8 +330,8 @@ export default {
           waterPrintColor: this.color,
           isSwitchOn: this.isSwitchOn
         }
-  
       }
+      console.log('param ---->> ', param);
       return new Promise((resolve, reject) => {
         advancedUpdate(param).then(res => {
           resolve(res);
@@ -342,6 +342,12 @@ export default {
     },
 
     async submit(){
+      if(this.defineText == '' && this.showTextStatus){
+        this.$refs.defineName.focus()
+        util.notify("請輸入自定義名稱！", 'error', 2000 );
+        return false
+      }
+
       const statusNameRes = await this.advancedUpdate();
       if (statusNameRes.errCode == 0) {
         this.isLoadingData = false

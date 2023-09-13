@@ -403,6 +403,9 @@ const user = {
           (auditRoute.children.length >0 && accessedRoutes.findIndex(item=>item.name==auditRoute.name)==-1) ? accessedRoutes.push(auditRoute):'';
 
 
+
+          console.log('accessedRoutes :>> ', accessedRoutes);
+
           // ==== 依據白名單設定顯示&隱藏 ====
           getWhiteList().then(res => {
             const data = res.data;
@@ -429,30 +432,32 @@ const user = {
           }
           // ====
           
-        
+      
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();
           systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';
+          console.log('systemSettingRoute :=======>> ', systemSettingRoute);
 
           const advanceSettingRoute = navbarRoute.getAdvanceSetting();
           advanceSettingRoute.children.length > 0 ? accessedRoutes.push(advanceSettingRoute) : '';
+          console.log('advanceSettingRoute :=======>> ', advanceSettingRoute);
+    
 
-     
+          console.log("accessedRoutes.length !?!?!?:",accessedRoutes.length);
 
-
-
-
-          console.log("accessedRoutes.length:",accessedRoutes.length);
           if(accessedRoutes.length == 0){
             const errorRoute = navbarRoute.getErrorRoute();
             if(accessedRoutes.findIndex(item=>item.name==errorRoute.name)==-1) accessedRoutes.push(errorRoute);
             console.log("errorRoute.children[0].path:",errorRoute.children[0].path);
             errorRoute.redirect = errorRoute.children[0].path;
           }
+
         } else {
           const errorRoute = navbarRoute.getErrorRoute();
           accessedRoutes.push(errorRoute);
           errorRoute.redirect = errorRoute.children[0].path;
         }
+        console.log('here!!! :>> ');
+        
         commit('SET_ROUTES', accessedRoutes);
         commit('SET_Available_Path_List', navbarRoute.getAvailablePath());
         if (user.state.authorities.length >= 6) {
