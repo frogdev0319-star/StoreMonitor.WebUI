@@ -1099,26 +1099,22 @@ export default {
         if (availablePathesList.includes("/noRight")) {
           this.$router.push("/noRight");
         } 
-        else if(availablePathesList.includes("/waterMark")){
-          this.$router.push('WaterMark');
+        else if (!availablePathesList.includes(this.$route.path)) {
+          this.$router.push(availablePathesList[0]);
+        } else if(mimicModeChanged && this.$route.path=="/auditDetail" || this.$route.path=="/auditReportdetails"){
+          this.$router.push("/audit");
+        //this.$router.path = "/audit";
+        }else if(mimicModeChanged && this.$route.path=="/reportdetails"){
+        this.$router.push("/report");
+        //this.$router.path = "/report";
+        }else {
+          // console.log(this.$route.path);
+          this.$router.push(this.$route.path);
         }
-
-        // else if (!availablePathesList.includes(this.$route.path)) {
-        //   this.$router.push(availablePathesList[0]);
-        // } else if(mimicModeChanged && this.$route.path=="/auditDetail" || this.$route.path=="/auditReportdetails"){
-        //   this.$router.push("/audit");
-        // //this.$router.path = "/audit";
-        // }else if(mimicModeChanged && this.$route.path=="/reportdetails"){
-        // this.$router.push("/report");
-        // //this.$router.path = "/report";
-        // }else {
-        //   // console.log(this.$route.path);
-        //   this.$router.push(this.$route.path);
-        // }
       }
     },
 
-
+    
     // user name first word
     getUserName(result) {
       const self = this;

@@ -416,30 +416,26 @@ const user = {
           }).catch(err => {
             reject(err);
           });
-
           const whiteList = user.state.whiteList
           const accountId = user.state.accountId
-
           console.log('whiteList!!!!!!!!!!!!!!!!!!!!', whiteList)
           console.log('accountId !!!!!!!!!!!!!!!!!!!!', user.state.accountId)
-
           var isShowing = whiteList.some( i => i == accountId)
           console.log('isShowing !!!!!!', isShowing)
-          
           if(isShowing){
             const scheduleRoute = navbarRoute.getInceptionSchedule();
-            (scheduleRoute.children.length > 0 && accessedRoutes.findIndex(item=>item.name==scheduleRoute.name)==-1) ? accessedRoutes.push(scheduleRoute):'';
+            (scheduleRoute.children.length > 0 && accessedRoutes.findIndex(item=>item.name==scheduleRoute.name)==-1) ? accessedRoutes.push(scheduleRoute) : '';
           }
           // ====
           
       
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();
           systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';
-          console.log('systemSettingRoute :=======>> ', systemSettingRoute);
 
           const advanceSettingRoute = navbarRoute.getAdvanceSetting();
           advanceSettingRoute.children.length > 0 ? accessedRoutes.push(advanceSettingRoute) : '';
-          console.log('advanceSettingRoute :=======>> ', advanceSettingRoute);
+          
+          
     
 
           console.log("accessedRoutes.length !?!?!?:",accessedRoutes.length);
@@ -456,7 +452,7 @@ const user = {
           accessedRoutes.push(errorRoute);
           errorRoute.redirect = errorRoute.children[0].path;
         }
-        console.log('here!!! :>> ');
+
         
         commit('SET_ROUTES', accessedRoutes);
         commit('SET_Available_Path_List', navbarRoute.getAvailablePath());
