@@ -230,6 +230,9 @@ export default class PermissionHelper {
   }
 
   //進階設定
+
+  
+
   static advancedMode = false;
   static setAdvancedModeMode(val){
     console.log("advancedMode:",val);

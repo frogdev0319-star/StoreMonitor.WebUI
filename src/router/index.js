@@ -712,7 +712,7 @@ export const navbarRoute = {
       hidden: false,
       children: []
     };
-    PermissionHelper.advancedMode && advanceSettingRoute.children.push(
+    advanceSettingRoute.children.push(
       {
         path: '/waterMark',
         name: 'WaterMark',

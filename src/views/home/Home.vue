@@ -604,12 +604,11 @@ export default {
       }
     });
 
-    
-
     window.addEventListener("resize", this.$_isMobile);
     self.$_isMobile();
     this.getBrandList();
     this.updateTitle();
+    sessionStorage.setItem("advancedSettingMode", false);
   },
 
   async mounted() {
@@ -638,13 +637,19 @@ export default {
 
   methods: {
     advanceMode(){
-      console.log('this.showAdvanceMode :>> ', this.showAdvanceMode);
-      console.log('this.userInfo.isSystemAdvanced :>> ', this.userInfo.isSystemAdvanced);
+      // console.log('this.userInfo.isSystemAdvanced :>> ', this.userInfo.isSystemAdvanced);
       this.showAdvanceMode = !this.showAdvanceMode
 
+      var mode = this.showAdvanceMode
       PermissionHelper.setAdvancedModeMode(this.showAdvanceMode);
+      // this.$store.dispatch('setAdvancedSettingMode', mode);
+
+      sessionStorage.setItem("advancedSettingStatus", this.hasAdvanced);
+      sessionStorage.setItem("advancedSettingMode", this.showAdvanceMode);
+
       this.changeRoutes();
-      if( this.showAdvanceMode ) this.$router.push('WaterMark');
+
+      
       
     },
     changeMimicMode(){
@@ -1094,7 +1099,9 @@ export default {
         self.getUserName(result.data);
         const availablePathesList = this.availabePathList;
         console.log('availablePathesList :>> ', availablePathesList);
-
+        
+        if( this.showAdvanceMode ) this.$router.push('WaterMark');
+        else this.$router.push('patrolOverview')
         
         if (availablePathesList.includes("/noRight")) {
           this.$router.push("/noRight");
