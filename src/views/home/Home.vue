@@ -545,7 +545,6 @@ export default {
       } else if(this.showMimicMode){
         this.setBrandListDisabled(true);
       }else {
-        
         this.setBrandListDisabled(false);
       }
       return path;
@@ -608,7 +607,10 @@ export default {
     self.$_isMobile();
     this.getBrandList();
     this.updateTitle();
-    sessionStorage.setItem("advancedSettingMode", false);
+
+    this.showAdvanceMode = sessionStorage.getItem("advancedSettingMode");
+    console.log(' this.showAdvanceMode 1 ~~~~~~>> ',  this.showAdvanceMode);
+
   },
 
   async mounted() {
@@ -619,8 +621,6 @@ export default {
         );
       });
     }
-
-    
     this.$store.dispatch("GetIsMysteryMode");
     this.showMimicMode = this.$store.getters.ShowMimicMode;
     this.hasMystery = this.$store.getters.isMystery;
@@ -629,9 +629,6 @@ export default {
     this.userInfo = userInfo.data
 
     this.hasAdvanced = this.userInfo.isSystemAdvanced
-
-    console.log(' this.userInfo ~~~~~~>> ',  this.userInfo);
-
     
   },
 
@@ -646,10 +643,18 @@ export default {
 
       sessionStorage.setItem("advancedSettingStatus", this.hasAdvanced);
       sessionStorage.setItem("advancedSettingMode", this.showAdvanceMode);
-
       this.changeRoutes();
 
-      
+      if(this.showAdvanceMode){ 
+          console.log('TTT~~~~~~~~ :>> ');
+          this.$router.push('WaterMark');
+        }
+        else {
+          console.log('ㄟ~~~~~~~~ :>> ');
+          sessionStorage.removeItem('advancedSettingStatus')
+          sessionStorage.removeItem('advancedSettingMode')
+          this.$router.push(this.availablePathesList[0]);
+        }
       
     },
     changeMimicMode(){
@@ -1098,30 +1103,33 @@ export default {
         await self.$store.dispatch("generateRoutes");
         self.getUserName(result.data);
         const availablePathesList = this.availabePathList;
-        console.log('availablePathesList :>> ', availablePathesList);
+        // console.log('availablePathesList :>> ', availablePathesList);
         
-        if( this.showAdvanceMode ) this.$router.push('WaterMark');
-        else this.$router.push('patrolOverview')
-        
+
+    
+
         if (availablePathesList.includes("/noRight")) {
           this.$router.push("/noRight");
-        } 
+        }
         else if (!availablePathesList.includes(this.$route.path)) {
           this.$router.push(availablePathesList[0]);
-        } else if(mimicModeChanged && this.$route.path=="/auditDetail" || this.$route.path=="/auditReportdetails"){
+        } 
+        else if(mimicModeChanged && this.$route.path=="/auditDetail" || this.$route.path=="/auditReportdetails"){
           this.$router.push("/audit");
         //this.$router.path = "/audit";
-        }else if(mimicModeChanged && this.$route.path=="/reportdetails"){
+        }
+        else if(mimicModeChanged && this.$route.path=="/reportdetails"){
         this.$router.push("/report");
         //this.$router.path = "/report";
-        }else {
+        }
+        else {
           // console.log(this.$route.path);
           this.$router.push(this.$route.path);
         }
       }
     },
 
-    
+
     // user name first word
     getUserName(result) {
       const self = this;

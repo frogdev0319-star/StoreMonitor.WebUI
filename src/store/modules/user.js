@@ -396,27 +396,33 @@ const user = {
         if (user.state.authorities.length > 0) {
           PermissionHelper.setData(user.state.authorities);
 
+          // 總覽
           const overviewRoute = navbarRoute.getOverviewRoute();
           if (overviewRoute.children.length > 0) {
             overviewRoute.redirect = overviewRoute.children[0].path;
             accessedRoutes.push(overviewRoute);
           }
 
+          // 巡店管理
           const patrolRoute = navbarRoute.getPatrolRoute();
           accessedRoutes.length === 0 ? patrolRoute.redirect = ((patrolRoute.children.length>0)?patrolRoute.children[0].path:'') : '';
           if (patrolRoute.children.length > 0) accessedRoutes.push(patrolRoute);
 
+          // 事件管理
           const eventRoute = navbarRoute.getEventRoute();
           if (PermissionHelper.enableEventHandle() || PermissionHelper.enableEventClose() || PermissionHelper.enableEventAdd() || PermissionHelper.enableEventReturn()) {
             accessedRoutes.push(eventRoute);
           }
 
+          // 統計分析
           const statisticsRoute = navbarRoute.getStatisticalRoute();
           if(statisticsRoute.children.length > 0 && !PermissionHelper.enableMimicMode) accessedRoutes.push(statisticsRoute);
 
+          // 簽合管理
           const auditRoute = navbarRoute.getAuditRoute();
           (auditRoute.children.length >0 && accessedRoutes.findIndex(item=>item.name==auditRoute.name)==-1) ? accessedRoutes.push(auditRoute):'';
 
+          // 巡檢排程
           // ==== 依據白名單設定顯示&隱藏 ====
           getWhiteList().then(res => {
             const data = res.data;
@@ -437,10 +443,10 @@ const user = {
             const scheduleRoute = navbarRoute.getInceptionSchedule();
             (scheduleRoute.children.length > 0 && accessedRoutes.findIndex(item=>item.name==scheduleRoute.name)==-1) ? accessedRoutes.push(scheduleRoute) : '';
           }
-          // ====
+          
           
       
-          
+          // 系統設定
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();
           systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';
 
@@ -448,13 +454,15 @@ const user = {
           // 進階設定
           const advancedSettingStatus = sessionStorage.getItem("advancedSettingStatus")
           const advancedSettingMode = sessionStorage.getItem("advancedSettingMode")
+
           console.log('-------{o..o}-------', advancedSettingStatus , advancedSettingMode)
-          PermissionHelper.setAdvancedModeMode(advancedSettingMode);
+        
           if(advancedSettingStatus && advancedSettingMode){
-            
+
+            PermissionHelper.setAdvancedModeMode(advancedSettingMode);
             const advanceSettingRoute = navbarRoute.getAdvanceSetting();
             advanceSettingRoute.children.length > 0 ? accessedRoutes.push(advanceSettingRoute) : '';
-          }
+          } 
 
 
           console.log("accessedRoutes.length !?!?!?:",accessedRoutes.length);
