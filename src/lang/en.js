@@ -1586,7 +1586,7 @@ export default{
         "save": "Save",
         "basicInfo": "Basic Info",
         "maxCharacter": "You can enter up to 20 characters ",
-        "store": "Sites ",
+        "schStore": "Sites ",
         "localTime": "Please setting local time ",
         "keyWord": "KeyWord ",
         "add": " + Add Sites ",

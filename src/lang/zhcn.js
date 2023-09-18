@@ -1576,7 +1576,7 @@ export default{
         "save": "储存",
         "basicInfo": "基本讯息",
         "maxCharacter": "最多可输入20个字元",
-        "store": " 巡检地点",
+        "schStore": " 巡检地点",
         "localTime": "（请设定为当地时间",
         "keyWord": "关键字",
         "add": " + 加入地点",
