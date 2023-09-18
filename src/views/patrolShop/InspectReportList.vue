@@ -1365,24 +1365,29 @@ export default {
     color: #989ca0
     background: #EFEFEF
     padding: 5px
-  .el-table__row
-    th
-      &:nth-child(1)
-        padding-left: 0 !important
-    td
-      &:nth-child(1), &:nth-child(2), &:nth-child(3), &:nth-child(5),
-        .cell
-          padding-left: 10% !important
-          text-overflow: ellipsis
-          white-space: nowrap
-          overflow: hidden
-          span
-            // background: #9872 !important
-            white-space: pre !important
+  .table-white
+    .row-class
+      th
+        &:nth-child(1)
+          padding-left: 0 !important
+      td
+        &:nth-child(1), &:nth-child(2), &:nth-child(3), &:nth-child(5),
+          .cell
+            padding-left: 10% !important
+            text-overflow: ellipsis !important
+            white-space: nowrap !important
+            overflow: hidden !important
+            span
+              // background: #9872 !important
+              white-space: pre !important
             
-  .el-table th div
-    padding-left: 4% !important
-    padding-right: 0 !important
+    .el-table th div
+      padding-left: 4% !important
+      padding-right: 0 !important
+      text-align: left  !important
+
+    .cell-class .cell
+      text-align: left  !important
 
 </style>
 
