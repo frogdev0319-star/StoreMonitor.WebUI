@@ -1601,6 +1601,7 @@ export default{
         "selectStore": "选择门店",
         "hasSelected": "已选门店总数：",
         "ifDeleted": "是否需要删除已选择的门店？",
+        "storeName": "门店 ",
         },
     "generalSetting":{
         "save":"保存",

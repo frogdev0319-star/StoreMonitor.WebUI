@@ -1602,6 +1602,7 @@ export default{
         "selectStore": "Select Store ",
         "hasSelected": "Total number of selected stores: ",
         "ifDeleted": "Do you need to delete the selected store? ",
+        "storeName": "Store ",
     },
     "generalSetting":{
         "save":"Save",

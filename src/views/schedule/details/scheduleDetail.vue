@@ -557,25 +557,25 @@ export default{
       storeColumnData: [
         {
           'prop': 'province',
-          'label': "區域一",
+          'label': this.$t('schedule.region1'),
           'width': 100,
           'maxWidth': 100,
         },
         {
           'prop': 'city',
-          'label': "區域二",
+          'label': this.$t('schedule.region2'),
           'width': 110,
           'maxWidth': 110,
         },
         {
           'prop': 'name',
-          'label': "門店",
+          'label': this.$t('schedule.storeName'),
           'width': 100,
           'maxWidth': 100,
         },
         {
           'prop': 'timeZone',
-          'label': "門店時區",
+          'label': this.$t('schedule.storeTimeZone'),
           'width': 100,
           'maxWidth': 100,
         },
