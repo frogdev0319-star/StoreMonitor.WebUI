@@ -1,7 +1,7 @@
 <template>
   <div class="schedule_setting">
     <div class="search-bar">
-      <div style="font-size:calc(18/1920*100vw)">排程設定</div>
+      <div style="font-size:calc(18/1920*100vw)">{{$t('schedule.scheduleSetting')}}</div>
       <div style="flex:2"></div>
       <delay-button
           class="search-button"
@@ -9,7 +9,7 @@
           size="mini"
           @click="saveScheduleData"
           >
-          <span>儲存</span>
+          <span>{{$t('schedule.save')}}</span>
       </delay-button>
     </div>
     
@@ -17,7 +17,7 @@
     <!-- 基本訊息 -->
     <div class="page-container report-setting paper" style="margin-bottom: 40px">
       <div class="setting-titles padding flex-center">
-        基本訊息
+        {{$t('schedule.basicInfo')}}
         <div class="spacer"></div>
       </div>
 
@@ -26,7 +26,7 @@
           <div class="setting-config">
             <!-- 排程名稱 -->
             <div class="flex-row" style="margin-right: 30px; position: relative;">
-              <div class="title-name"><span style="color: #c60957">* </span>排程名稱</div>
+              <div class="title-name"><span style="color: #c60957">* </span> {{$t('scheduleView.scheduleName')}}</div>
               <div class="title-status"> 
                 <el-input
                   v-model="taskName"
@@ -40,7 +40,7 @@
 
               <span class="notice" 
                 style="margin-right: 30px; position: absolute; bottom: -20px ; left: 92px" 
-                v-if="showInputLimit"> 最多可輸入20個字元 
+                v-if="showInputLimit"> {{$t('schedule.maxCharacter')}} 
               </span>
               
             </div>
@@ -89,11 +89,11 @@
     <div class="page-container report-setting paper" >
 
       <div class="setting-titles padding flex-center">
-        巡檢門店（請設定為當地時間）
+        {{$t('schedule.store')}}  {{$t('schedule.localTime')}}
         <div class="spacer"></div>
 
         <div class="flex-row" style="margin-right: 30px">
-          <div class="title-name">關鍵字</div>
+          <div class="title-name">{{$t('schedule.keyWord')}}</div>
           <div class="title-status" > 
             <el-input
               v-model="inputSearchStoreList"
@@ -112,7 +112,7 @@
             size="mini"
             @click="showingAddStore = true"
             >
-            <span> + 加入門店</span>
+            <span> {{$t('schedule.add')}}</span>
           </delay-button>
 
           <!-- 編輯 -->
@@ -124,7 +124,7 @@
             :disable="!edit_isActive"
             @click="showingEditStore = true"
             >
-            <span>編輯</span>
+            <span> {{$t('schedule.edit')}}</span>
           </delay-button>
           
           <!-- 刪除 -->
@@ -136,7 +136,7 @@
             :disable="!del_isActive"
             @click="showConfirmDelete = true"
             >
-            <span>刪除</span>
+            <span> {{$t('schedule.cancel')}}</span>
           </delay-button>
         </div>
       </div>
@@ -148,7 +148,7 @@
             :src="emptyData"
             alt="emptyData"
           />
-          <p style="color: #b7c7df">暫無數據</p>
+          <p style="color: #b7c7df"> {{$t('schedule.noData')}}</p>
         </div>
         
         <!-- 有數據 -->
@@ -161,7 +161,7 @@
               style="margin-right: 8px"
               @change="selectAll"
             />
-            <span class="group-name">全部門店</span>
+            <span class="group-name"> {{$t('schedule.allStore')}}</span>
           </div>
 
           <div class="task_list" style="width: 100%">
@@ -195,20 +195,20 @@
                     <div class="memo_setting" >
                       <!-- 執行日期 -->
                       <div class="remider_setting flex-column">
-                        <p>執行日期  </p> 
+                        <p>{{$t('schedule.schExeDate')}}  </p> 
                         <el-date-picker
                           v-model="item.remindDate"
                           type="date"
                           value-format="yyyy-MM-dd"
                           :picker-options="pickerOptions"
                           :disabled="(item.remindTime < new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 && item.remindTime !== '' )"
-                          placeholder="執行日期">
+                          :placeholder="$t('schedule.schExeDate') ">
                         </el-date-picker>
-                        <div class="notice" v-if="item.hasRemindDate">請完成執行日期設定 !</div>
+                        <div class="notice" v-if="item.hasRemindDate">{{$t('schedule.pleaseFinished')}} !</div>
                       </div>
                       <!-- 提醒時間 -->
                       <div class="remider_setting flex-column">
-                        <p>提醒時間</p>
+                        <p>{{$t('schedule.remiderTime')}}</p>
                         <el-time-select
                           v-model="item.remindTimePoint"
                           :picker-options="{
@@ -217,17 +217,17 @@
                             end: '23:00'
                           }"
                           :disabled="(item.remindTime < new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 && item.remindTime !== '')"
-                          placeholder="提醒時間">
+                          :placeholder="$t('schedule.remiderTime')">
                         </el-time-select>
-                        <div class="notice" v-if="item.hasRemindTime">請完成提醒時間設定 !</div>
+                        <div class="notice" v-if="item.hasRemindTime">{{$t('schedule.pleaseFinishedTime')}} !</div>
                       </div>
 
                       <!-- 提醒方式 -->
                       <div class="remider_setting flex-column">
-                        <p>提醒方式</p>
+                        <p>{{$t('schedule.remiderMethod')}}</p>
                         <el-select
                           v-model="item.remindStyle"
-                          placeholder="提醒方式"
+                          :placeholder="$t('schedule.remiderMethod')"
                           multiple
                           filterable
                           :disabled="(item.remindTime < new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 && item.remindTime !== '')"
@@ -240,14 +240,14 @@
                             :value="_item.value"
                           />
                         </el-select>
-                        <div class="notice" v-if="item.hasRemindStyle">請完成提醒方式設定 !</div>
+                        <div class="notice" v-if="item.hasRemindStyle">{{$t('schedule.pleaseFinishedMethod')}} !</div>
                       </div>
                       <div class="remider_setting flex-column">
                         <div 
                           v-if="(item.remindTime > new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 ) || item.taskId == -999 "
                           class="clear_all"
                           @click="resetData(item)"
-                        >重設 </div>
+                        >{{$t('schedule.reset')}} </div>
                       </div>
                     </div>
 
@@ -265,7 +265,7 @@
     <dialog-pop
       ref="dailog"
       class="popup_width"
-      title= "加入門店"
+      :title= "$t('schedule.addstore')"
       :close-on-click-modal="false"
       :show-close="false"
       :dialogWidth = "add_width"
@@ -283,7 +283,7 @@
                   <div class="title-status"> 
                     <el-input
                       v-model="inputSearchStore"
-                      placeholder="搜尋門店或時區"
+                      :placeholder="$t('schedule.search')"
                       style="width: 200px"
                       clearable
                       />
@@ -291,11 +291,11 @@
                 </div>
                 <!-- 區域一 -->
                 <div class="flex-row" style="margin-right: 3%; margin-bottom: 10px;">
-                  <div class="title-name"> 區域一</div>
+                  <div class="title-name"> {{$t('schedule.region1')}} </div>
                   <div class="title-status"> 
                     <el-select
                       v-model="curTempProvinceList"
-                      placeholder="區域一"
+                      :placeholder="$t('schedule.region1')"
                       multiple
                       style="width: 180px"
                       @change="onselectSec1"
@@ -311,11 +311,11 @@
                 </div>
                 <!-- 區域二 -->
                 <div class="flex-row" style="margin-right: 3%; margin-bottom: 10px;">
-                  <div class="title-name">區域二</div>
+                  <div class="title-name">{{$t('schedule.region2')}}</div>
                   <div class="title-status"> 
                     <el-select
                       v-model="curTempCityList"
-                      placeholder="區域二"
+                      :placeholder="$t('schedule.region1')"
                       multiple
                       style="width: 180px"
                       @change="onselectSec2"
@@ -331,7 +331,7 @@
                 </div>
             </div>
             <div class="is_select">
-              <div class="title-name"> 選擇門店 </div>
+              <div class="title-name"> {{$t('schedule.selectStore')}} </div>
               <div class="user_selected">
                 <el-tag
                   v-for="(tag, index) in tags"
@@ -392,7 +392,7 @@
     <!-- Edit Store -->
     <dialog-pop
       ref="dailog"
-      title= "排程設定"
+      :title= "$t('schedule.scheduleSetting')"
       :close-on-click-modal="false"
       :show-close="false"
       :visible="showingEditStore"
@@ -406,18 +406,18 @@
             <!-- 執行日期 -->
             <div class="remider_setting flex-column">
               
-              <p style="font-size: 14px; font-weight: 900"><span style="color: #f31d65">*</span> 執行日期</p>
+              <p style="font-size: 14px; font-weight: 900"><span style="color: #f31d65">*</span> {{$t('schedule.schExeDate')}}</p>
               <el-date-picker
                 v-model="editSchedule.remindDate"
                 type="date"
                 :picker-options="pickerOptions"
                 value-format="yyyy-MM-dd"
-                placeholder="執行日期">
+                :placeholder="$t('schedule.schExeDate')">
               </el-date-picker>
             </div>
             <!-- 提醒時間 -->
             <div class="remider_setting flex-column">
-              <p style="font-size: 14px; font-weight: 900"><span style="color: #f31d65">*</span>提醒時間</p>
+              <p style="font-size: 14px; font-weight: 900"><span style="color: #f31d65">*</span>{{$t('schedule.remiderTime')}}</p>
               <el-time-select
                 v-model="editSchedule.remindTimePoint"
                 :picker-options="{
@@ -425,14 +425,14 @@
                   step: '01:00',
                   end: '23:00'
                 }"
-                placeholder="提醒時間">
+                :placeholder="$t('schedule.remiderTime')">
               </el-time-select>
             </div>
           </div>
           <div class="memo_setting ">
             <!-- 提醒方式 -->
             <div class="remider_setting flex-column">
-              <p style="font-size: 14px; font-weight: 900"><span style="color: #f31d65">*</span>提醒方式</p>
+              <p style="font-size: 14px; font-weight: 900"><span style="color: #f31d65">*</span>{{$t('schedule.remiderMethod')}}</p>
               <el-select
                 v-model="editSchedule.remindStyle"
                 multiple
@@ -452,7 +452,7 @@
           <div class="memo_setting">
             <!-- 已選門店總數 -->
             <div class="remider_setting flex-column">
-              <p style="font-size: 14px; font-weight: 900">已選門店總數： {{ handleSchedule.length}}</p>
+              <p style="font-size: 14px; font-weight: 900">{{$t('schedule.hasSelected')}} {{ handleSchedule.length}}</p>
               <div class="selected_stores flex-column">
                 <div class="store_name" v-for="(_store, index) in handleSchedule" :key="index">{{_store.storeName}}</div>
 
@@ -472,7 +472,7 @@
       @confirmHandler="deleteSchedule"
       >
       <div class="dialog-slot">
-        是否需要刪除已選擇的門店？
+        {{$t('schedule.ifDeleted')}}
       </div>
     </dialog-pop>
 
@@ -525,15 +525,15 @@ export default{
       selectRemiderStyle:[
         {
           value: 'remindMode_Currently',
-          label: '當下'
+          label: this.$t('schedule.instantly')
         },
         {
           value: 'remindMode_OneDay',
-          label: '前一日'
+          label: this.$t('schedule.oneDayBefore')
         },
         {
           value: 'remindMode_OneHour',
-          label: '前1小時'
+          label: this.$t('schedule.oneHourBefore')
         },
       ],
       storeList: [],

@@ -1578,6 +1578,34 @@ export default{
         "exportScheduleRecordWarn":"請選擇匯出項目",
         "deletePersonSchError":"個人排程刪除失敗",
         "deleted":"已刪除",
+        "save": "儲存",
+        "basicInfo": "基本訊息",
+        "maxCharacter": "最多可輸入20個字元 ",
+        "store": "巡檢門店 ",
+        "localTime": "（請設定為當地時間） ",
+        "keyWord": "關鍵字 ",
+        "add": " + 加入門店 ",
+        "edit": " 編輯 ",
+        "cancel": "刪除 ",
+        "noData": "暫無數據 ",
+        "allStore": "全部門店 ",
+        "pleaseFinished": "請完成執行日期設定 ",
+        "remiderTime": "提醒時間 ",
+        "pleaseFinishedTime": "請完成提醒時間設定 ",
+        "remiderMethod": "提醒方式 ",
+        "pleaseFinishedMethod": "請完成提醒方式設定 ",
+        "reset": "重設 ",
+        "instantly": "當下 ",
+        "oneDayBefore": "前一日 ",
+        "oneHourBefore": "前1小時 ",
+        "addstore": "加入門店 ",
+        "search": "搜尋門店或時區 ",
+        "region1": "區域一 ",
+        "region2": "區域二 ",
+        "selectStore": "選擇門店 ",
+        "hasSelected": "已選門店總數： ",
+        "ifDeleted": "是否需要刪除已選擇的門店？ ",
+
     },
     "generalSetting":{
         "save":"保存",
@@ -1594,3 +1622,4 @@ export default{
     }
 
 }
+
