@@ -1374,9 +1374,9 @@ export default {
         &:nth-child(1), &:nth-child(2), &:nth-child(3), &:nth-child(5),
           .cell
             padding-left: 10% !important
-            text-overflow: ellipsis
-            white-space: nowrap
-            overflow: hidden
+            text-overflow: ellipsis !important
+            white-space: nowrap !important
+            overflow: hidden !important
             span
               // background: #9872 !important
               white-space: pre !important
@@ -1384,6 +1384,10 @@ export default {
     .el-table th div
       padding-left: 4% !important
       padding-right: 0 !important
+      text-align: left  !important
+
+    .cell-class .cell
+      text-align: left  !important
 
 </style>
 
