@@ -547,7 +547,6 @@ export default {
       } else if(this.showMimicMode){
         this.setBrandListDisabled(true);
       }else {
-        
         this.setBrandListDisabled(false);
       }
       return path;
@@ -587,7 +586,6 @@ export default {
     },
     mimicMode(){
       this.showMimicMode = this.$store.getters.mimicMode;
-
     },
     isMystery(){
       this.hasMystery = this.$store.getters.isMystery;
@@ -607,14 +605,15 @@ export default {
       }
     });
 
-    
-
     window.addEventListener("resize", this.$_isMobile);
     
     self.$_isMobile();
-    // await this.GetWhiteList()
-    await this.getBrandList();
-    await this.updateTitle();
+    this.getBrandList();
+    this.updateTitle();
+
+    this.showAdvanceMode = sessionStorage.getItem("advancedSettingMode");
+    console.log(' this.showAdvanceMode 1 ~~~~~~>> ',  this.showAdvanceMode);
+
   },
 
   async mounted() {
@@ -625,8 +624,6 @@ export default {
         );
       });
     }
-
-    
     this.$store.dispatch("GetIsMysteryMode");
     this.showMimicMode = this.$store.getters.ShowMimicMode;
     this.hasMystery = this.$store.getters.isMystery;
@@ -635,24 +632,33 @@ export default {
     this.userInfo = userInfo.data
 
     this.hasAdvanced = this.userInfo.isSystemAdvanced
-
-    console.log(' this.userInfo ~~~~~~>> ',  this.userInfo);
-
     
   },
 
   methods: {
     advanceMode(){
-      console.log('this.showAdvanceMode :>> ', this.showAdvanceMode);
-      console.log('this.userInfo.isSystemAdvanced :>> ', this.userInfo.isSystemAdvanced);
-      
+      // console.log('this.userInfo.isSystemAdvanced :>> ', this.userInfo.isSystemAdvanced);
       this.showAdvanceMode = !this.showAdvanceMode
-      if( this.showAdvanceMode ) this.$router.push('WaterMark');
-  
-      PermissionHelper.setAdvancedModeMode(this.showAdvanceMode);
-      this.changeRoutes(true);
-      
 
+      var mode = this.showAdvanceMode
+      PermissionHelper.setAdvancedModeMode(this.showAdvanceMode);
+      // this.$store.dispatch('setAdvancedSettingMode', mode);
+
+      sessionStorage.setItem("advancedSettingStatus", this.hasAdvanced);
+      sessionStorage.setItem("advancedSettingMode", this.showAdvanceMode);
+      this.changeRoutes();
+
+      if(this.showAdvanceMode){ 
+          console.log('TTT~~~~~~~~ :>> ');
+          this.$router.push('WaterMark');
+        }
+        else {
+          console.log('ㄟ~~~~~~~~ :>> ');
+          sessionStorage.removeItem('advancedSettingStatus')
+          sessionStorage.removeItem('advancedSettingMode')
+          this.$router.push(this.availablePathesList[0]);
+        }
+      
     },
     changeMimicMode(){
       if(this.$route.path=="/reinspection" && this.$store.getters.editReport){
@@ -1090,35 +1096,41 @@ export default {
 
     },
 
-    async changeRoutes(mimicModeChanged=false) {
+    async changeRoutes(mimicModeChanged=false, ) {
       //console.log("*Change Routes mimicModeChanged:",mimicModeChanged);
       const self = this;
       const result = await self.$store.dispatch("GetUserAuthorities");
       console.log("changeRoutes resule:",result);
+
       if (result.errCode === 0) {
         await self.$store.dispatch("generateRoutes");
         self.getUserName(result.data);
         const availablePathesList = this.availabePathList;
-
-        console.log('availablePathesList :>> ', availablePathesList);
-
+        // console.log('availablePathesList :>> ', availablePathesList);
+        
         if (availablePathesList.includes("/noRight")) {
           this.$router.push("/noRight");
-        } else if (!availablePathesList.includes(this.$route.path)) {
+        }
+        else if (!availablePathesList.includes(this.$route.path)) {
           this.$router.push(availablePathesList[0]);
-        } else if(mimicModeChanged && this.$route.path=="/auditDetail" || this.$route.path=="/auditReportdetails"){
+        } 
+        else if(mimicModeChanged && this.$route.path=="/auditDetail" || this.$route.path=="/auditReportdetails"){
           this.$router.push("/audit");
         //this.$router.path = "/audit";
-        }else if(mimicModeChanged && this.$route.path=="/reportdetails"){
+        }
+        else if(mimicModeChanged && this.$route.path=="/reportdetails"){
         this.$router.push("/report");
         //this.$router.path = "/report";
-        }else {
+        }
+        else {
           // console.log(this.$route.path);
           this.$router.push(this.$route.path);
         }
       }
     },
 
+
+    // user name first word
     getUserName(result) {
       const self = this;
       self.userName =

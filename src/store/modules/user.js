@@ -49,6 +49,9 @@ const user = {
     isMystery:false,
     editReport:false,
     whiteList: [],
+
+    advancedSettingMode: false,
+    advancedSettingStatus: false
     
   },
 
@@ -178,7 +181,6 @@ const user = {
       state.mimicMode = mode
     },
     SET_ISMYSTERY:(state,mode)=>{
-      console.log("SET_ISMYSTERY:",mode);
       state.isMystery = mode;
     },
     SET_EDIT_REPORT:(state,mode)=>{
@@ -186,8 +188,15 @@ const user = {
     },
     SET_WHITE_LIST: (state, mode) => {
       state.whiteList = mode;
-      console.log('SET_WHITE_LIST', mode)
-    }
+    },
+    
+    SET_ADVANCED_SETTING_MODE:(state,mode)=>{
+      state.advancedSettingMode = mode
+    },
+    SET_ADVANCED_SETTING: (state, mode) => {
+      state.advancedSettingStatus = mode;
+    },
+    
   },
 
   actions: {
@@ -229,12 +238,17 @@ const user = {
     setStoreCache({ commit }, store) {
       commit('SET_STORE_CACHE', store);
     },
-    setMimicMode({ commit }, mode){
-      commit('SET_MIMIC_MODE',mode)
-    },
     setEditReport({ commit }, mode){
       commit('SET_EDIT_REPORT',mode)
     },
+    setMimicMode({ commit }, mode){
+      commit('SET_MIMIC_MODE',mode)
+    },
+    setAdvancedSettingMode({ commit }, mode){
+      commit('SET_ADVANCED_SETTING_MODE',mode)
+    },
+    
+    
 
     GetDash({ commit }) {
       return new Promise((resolve, reject) => {
@@ -356,6 +370,7 @@ const user = {
             commit('SET_ROLE_ID', res.data.roleId);
             commit('SET_USERID',res.data.userId);
             commit('SET_ACCOUNTID',res.data.accountId)
+            commit('SET_ADVANCED_SETTING',res.data.isSystemAdvanced)
           } else {
             commit('SET_AUTHORITY', []);
             commit('SET_ROLES', []);
@@ -385,28 +400,33 @@ const user = {
         if (user.state.authorities.length > 0) {
           PermissionHelper.setData(user.state.authorities);
 
+          // 總覽
           const overviewRoute = navbarRoute.getOverviewRoute();
           if (overviewRoute.children.length > 0) {
             overviewRoute.redirect = overviewRoute.children[0].path;
             accessedRoutes.push(overviewRoute);
           }
 
+          // 巡店管理
           const patrolRoute = navbarRoute.getPatrolRoute();
           accessedRoutes.length === 0 ? patrolRoute.redirect = ((patrolRoute.children.length>0)?patrolRoute.children[0].path:'') : '';
           if (patrolRoute.children.length > 0) accessedRoutes.push(patrolRoute);
 
+          // 事件管理
           const eventRoute = navbarRoute.getEventRoute();
           if (PermissionHelper.enableEventHandle() || PermissionHelper.enableEventClose() || PermissionHelper.enableEventAdd() || PermissionHelper.enableEventReturn()) {
             accessedRoutes.push(eventRoute);
           }
 
+          // 統計分析
           const statisticsRoute = navbarRoute.getStatisticalRoute();
           if(statisticsRoute.children.length > 0 && !PermissionHelper.enableMimicMode) accessedRoutes.push(statisticsRoute);
 
+          // 簽合管理
           const auditRoute = navbarRoute.getAuditRoute();
           (auditRoute.children.length >0 && accessedRoutes.findIndex(item=>item.name==auditRoute.name)==-1) ? accessedRoutes.push(auditRoute):'';
 
-
+          // 巡檢排程
           // ==== 依據白名單設定顯示&隱藏 ====
           getWhiteList().then(res => {
             const data = res.data;
@@ -417,46 +437,56 @@ const user = {
           }).catch(err => {
             reject(err);
           });
-
           const whiteList = user.state.whiteList
           const accountId = user.state.accountId
-
-          console.log('whiteList!!!!!!!!!!!!!!!!!!!!', whiteList)
-          console.log('accountId !!!!!!!!!!!!!!!!!!!!', user.state.accountId)
-
+          // console.log('whiteList!!!!!!!!!!!!!!!!!!!!', whiteList)
+          // console.log('accountId !!!!!!!!!!!!!!!!!!!!', user.state.accountId)
           var isShowing = whiteList.some( i => i == accountId)
           console.log('isShowing !!!!!!', isShowing)
-          
           if(isShowing){
             const scheduleRoute = navbarRoute.getInceptionSchedule();
-            (scheduleRoute.children.length > 0 && accessedRoutes.findIndex(item=>item.name==scheduleRoute.name)==-1) ? accessedRoutes.push(scheduleRoute):'';
+            (scheduleRoute.children.length > 0 && accessedRoutes.findIndex(item=>item.name==scheduleRoute.name)==-1) ? accessedRoutes.push(scheduleRoute) : '';
           }
-          // ====
           
-        
+          
+      
+          // 系統設定
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();
           systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';
 
-          const advanceSettingRoute = navbarRoute.getAdvanceSetting();
-          advanceSettingRoute.children.length > 0 ? accessedRoutes.push(advanceSettingRoute) : '';
 
-     
+          // 進階設定
+          const advancedSettingStatus = sessionStorage.getItem("advancedSettingStatus")
+          const advancedSettingMode = sessionStorage.getItem("advancedSettingMode")
+
+          console.log('-------{o..o}-------', advancedSettingStatus , advancedSettingMode)
+        
+          if(advancedSettingStatus && advancedSettingMode){
+
+            PermissionHelper.setAdvancedModeMode(advancedSettingMode);
+            const advanceSettingRoute = navbarRoute.getAdvanceSetting();
+            advanceSettingRoute.children.length > 0 ? accessedRoutes.push(advanceSettingRoute) : '';
+          } 
 
 
+          console.log("accessedRoutes.length !?!?!?:",accessedRoutes.length);
+          console.log('accessedRoutes :>> ', accessedRoutes)
 
-
-          console.log("accessedRoutes.length:",accessedRoutes.length);
           if(accessedRoutes.length == 0){
             const errorRoute = navbarRoute.getErrorRoute();
             if(accessedRoutes.findIndex(item=>item.name==errorRoute.name)==-1) accessedRoutes.push(errorRoute);
             console.log("errorRoute.children[0].path:",errorRoute.children[0].path);
             errorRoute.redirect = errorRoute.children[0].path;
           }
+
         } else {
           const errorRoute = navbarRoute.getErrorRoute();
           accessedRoutes.push(errorRoute);
           errorRoute.redirect = errorRoute.children[0].path;
         }
+
+        
+        
         commit('SET_ROUTES', accessedRoutes);
         commit('SET_Available_Path_List', navbarRoute.getAvailablePath());
         if (user.state.authorities.length >= 6) {

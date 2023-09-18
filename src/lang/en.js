@@ -561,6 +561,9 @@ export default{
         "maximumTotalAttach": "Up to 120 attachments are allowed in the inspection form",
         "totalOf":"A total of",
         "numReports":"reports",
+        "tableSection":"Region I | regionII",
+        "tableStore":"Store Name | Store Code",
+        "tableInspection":"Inspection List | Inspection Method"
     },
     "eventView":{
         "ClosedEvent":"Closed Events",

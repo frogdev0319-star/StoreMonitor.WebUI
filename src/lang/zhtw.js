@@ -451,7 +451,7 @@ export default{
       "record":"錄影",
       "recordSucc":"錄製成功",
       "recording":"正在錄製",
-      "regionI":"區域一",
+      "regionI":"區域",
       "regionII":"區域二",
       "relateProblem":"已創建問題",
       "relevantEvent":"相關事件",
@@ -566,8 +566,9 @@ export default{
       "maximumTotalAttach":"全表最多允許上傳120個附件",
       "totalOf":"巡檢報告共有",
       "numReports":"筆",
-
-
+      "tableSection":"區域一 | 區域二",
+      "tableStore":"巡檢門店 | 分店代碼",
+      "tableInspection":"巡檢表 | 巡店方式"
   },
   "eventView":{
       "ClosedEvent":"已結案事件",

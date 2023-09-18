@@ -180,7 +180,7 @@ export default{
           'isExpand': false,
           'hasIcon':{
               icon:require('@/../static/img/table-help.png'),
-              tooltipContent:this.$t('schedule.tagInfo')
+              tooltipContent: this.$t('schedule.tagInfo')
           }
         },
         {
@@ -571,7 +571,7 @@ export default{
         property:self.defaultSort.prop
       };
       if(self.defaultSort.prop=="reportTsStr") order.property = "reportTs";
-      else if(self.defaultSort.prop=="remindTimeStr") order.property = "remindTime";
+      else if(self.defaultSort.prop=="remindTimeStr") order.property = "remindTs";
       let beginTs = self.$moment.utc(self.$moment(self.dateValue[0])).valueOf();
       let endTs = self.$moment.utc(self.$moment(self.dateValue[1])).valueOf();
       const params={
@@ -590,7 +590,7 @@ export default{
       scheduleRESTful.exportScheduleTaskHistory(params).then(res => {
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
-          const filterVal = ['creatorName', 'taskName','storeName','storeTimeZone','remindTime', 'inspectTagMode', 'inspectTagName', 'reportTs', 'submitterName',
+          const filterVal = ['creatorName', 'taskName','storeName','storeTimeZone','remindTs', 'inspectTagMode', 'inspectTagName', 'reportTs', 'submitterName',
           'taskStatus','reportStatus'];
           const curData = res.data.content;
           const data = self.formatJson(filterVal, curData);

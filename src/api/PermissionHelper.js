@@ -75,8 +75,6 @@ export default class PermissionHelper {
   }
 
 
-
-
   // index(2) => ID(4): Event
   static enableEventHandle() {
     return this.enableAuthorities(2, 0x0, 0x1);
@@ -220,6 +218,10 @@ export default class PermissionHelper {
     return this.enableAuthorities(7, 0x0, 0x04);
   }
 
+
+
+
+
   //秘密客權限
   static enableMimicMode = false;
   static setShowMimicMode(val){
@@ -228,6 +230,9 @@ export default class PermissionHelper {
   }
 
   //進階設定
+
+  
+
   static advancedMode = false;
   static setAdvancedModeMode(val){
     console.log("advancedMode:",val);

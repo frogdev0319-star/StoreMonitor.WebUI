@@ -99,6 +99,7 @@ else{
   isGlobalWebsite = true;
 }
 
+
 let Environment;
 export default Environment = {
   VERSION: environJSON.VERSION,
