@@ -1605,6 +1605,7 @@ export default{
         "selectStore": "選擇地點 ",
         "hasSelected": "已選地點總數： ",
         "ifDeleted": "是否需要刪除已選擇的地點？ ",
+        "storeName": "地點 ",
 
     },
     "generalSetting":{
