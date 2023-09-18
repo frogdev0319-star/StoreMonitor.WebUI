@@ -89,7 +89,7 @@
     <div class="page-container report-setting paper" >
 
       <div class="setting-titles padding flex-center">
-        {{$t('schedule.store')}}  {{$t('schedule.localTime')}}
+        {{$t('schedule.schStore')}}  {{$t('schedule.localTime')}}
         <div class="spacer"></div>
 
         <div class="flex-row" style="margin-right: 30px">
