@@ -1581,7 +1581,7 @@ export default{
         "save": "儲存",
         "basicInfo": "基本訊息",
         "maxCharacter": "最多可輸入20個字元 ",
-        "store": "巡檢門店 ",
+        "schStore": "巡檢門店 ",
         "localTime": "（請設定為當地時間） ",
         "keyWord": "關鍵字 ",
         "add": " + 加入門店 ",
