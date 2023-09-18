@@ -612,7 +612,7 @@ export default {
     this.updateTitle();
 
     this.showAdvanceMode = sessionStorage.getItem("advancedSettingMode");
-    console.log(' this.showAdvanceMode 1 ~~~~~~>> ',  this.showAdvanceMode);
+    
 
   },
 
@@ -630,9 +630,8 @@ export default {
     
     var userInfo = await this.$store.dispatch("GetUserAuthorities");
     this.userInfo = userInfo.data
-
     this.hasAdvanced = this.userInfo.isSystemAdvanced
-    
+  
   },
 
   methods: {
@@ -1104,6 +1103,7 @@ export default {
 
       if (result.errCode === 0) {
         await self.$store.dispatch("generateRoutes");
+        self.getAdvanceSettingStastus(result.data);
         self.getUserName(result.data);
         const availablePathesList = this.availabePathList;
         // console.log('availablePathesList :>> ', availablePathesList);
@@ -1129,6 +1129,11 @@ export default {
       }
     },
 
+    async getAdvanceSettingStastus(result){
+      var userInfo = await this.$store.dispatch("GetUserAuthorities");
+      this.userInfo = result
+      this.hasAdvanced = this.userInfo.isSystemAdvanced
+    },
 
     // user name first word
     getUserName(result) {
