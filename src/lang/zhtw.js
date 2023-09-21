@@ -440,7 +440,7 @@ export default{
       "patrolResult":"巡檢結果",
       "patrolScore":"巡檢得分",
       "patrolStore":"巡檢地點",
-      "patrolWay":"巡方式",
+      "patrolWay":"巡檢方式",
       "playTime":"播放時間",
       "preview":"巡檢預覽",
       "prompt":"提示",
@@ -567,8 +567,8 @@ export default{
       "totalOf":"巡檢報告共有",
       "numReports":"筆",
       "tableSection":"區域一 | 區域二",
-      "tableStore":"巡檢地點 | 分店代碼",
-      "tableInspection":"巡檢表 | 巡地點方式"
+      "tableStore":"巡檢地點 | 地點代碼",
+      "tableInspection":"巡檢表 | 巡檢方式"
   },
   "eventView":{
       "ClosedEvent":"已結案事件",
