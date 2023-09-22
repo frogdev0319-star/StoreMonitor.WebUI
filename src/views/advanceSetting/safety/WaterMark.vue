@@ -306,10 +306,11 @@ export default {
 
     async getInitAdvance(){
       const initData = await this.advancedFetch();
-      // console.log('initData.data :>> ', initData.data);
+      console.log('initData.data :>> ', initData.data);
       var tempItem = this.textSizeSelect.find( i => i.mobileSize == initData.data.content.waterPrintSize)
       this.isSwitchOn = initData.data.content.isSwitchOn
       this.defineText = initData.data.content.waterPrintText
+      this.showTextStatus = initData.data.content.waterPrintType == 0 ? true : false
       this.color = initData.data.content.waterPrintColor
       this.textSize = tempItem.value
       this.textPosition = initData.data.content.waterPrintPosition

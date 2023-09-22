@@ -287,7 +287,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.1.4.1
+                v3.1.4.1i
                   &copy; {{ getFullYear }} Advantech Intelligent City
                   Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
@@ -648,11 +648,9 @@ export default {
       this.changeRoutes();
 
       if(this.showAdvanceMode){ 
-          console.log('TTT~~~~~~~~ :>> ');
           this.$router.push('WaterMark');
         }
         else {
-          console.log('ㄟ~~~~~~~~ :>> ');
           sessionStorage.removeItem('advancedSettingStatus')
           sessionStorage.removeItem('advancedSettingMode')
           this.$router.push(this.availablePathesList[0]);
@@ -715,8 +713,6 @@ export default {
     clickCollapse() {
       this.$store.dispatch("setCollapsed", !this.collapsed);
       this.collapsed = !this.collapsed;
-
-
     },
 
     handleopen(index) {
@@ -729,6 +725,10 @@ export default {
     },
 
     routerHome() {
+      // 清除 advanceSetting 狀態
+      sessionStorage.removeItem('advancedSettingStatus')
+      sessionStorage.removeItem('advancedSettingMode')
+
       const url = sessionStorage.getItem("LoginURL");
       Database.destoryDB();
       window.location.href = url + "/homepage";
