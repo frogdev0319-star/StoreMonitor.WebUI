@@ -328,7 +328,9 @@ export default {
       //this.isFavorite = !this.isFavorite;
       //this.getStoreListAndGroupAndType();
     },
+    
     getCountryStore(initFilter) {
+      console.log('initFilter ~~>> ', initFilter);
       let temp = [];
       if (this.storeList.length !== 0) {
         // console.log("2.getCountryStore");
@@ -369,46 +371,80 @@ export default {
         self.countryList = templist;
         // console.log("5.this.countryList:",self.countryList);
       }
-      this.curCountry = (!this.ifGetParamsFromCash) ? countryList[0].value : this.curCountry;
-      //if(!initFilter)
+
+      // console.log('this.ifGetParamsFromCash ~~~>> ', this.ifGetParamsFromCash);
+      // this.curCountry = (!this.ifGetParamsFromCash) ? countryList[0].value : this.curCountry;
+
+      // ***
+      this.curCountry = !this.curCountry ? countryList[0].value : this.curCountry;
+      console.log('this.curCountry ~~~>> ', this.curCountry);
+
       this.selectAllProAndCity(this.curCountry,initFilter);
 
     },
 
     getStoreListAndGroupAndType(init) {
 
+      console.log('this.curCountry :>> ', this.curCountry);
+      
       const storeListPromise = this.isFavorite ? this.getFavoriteStoreData() : ((this.enableMimicMode)? this.getMysteryStore():this.getBriefStoreData());
       const storeGroupPromise = this.getStoreDefineList(1);
       const storeTypePromise = this.getStoreDefineList(0);
       Promise.all([storeListPromise, storeGroupPromise, storeTypePromise]).then(results => {
         var storeList = results[0];
-        //console.log(storeList)
+        
         const groupList = results[1];
         const typeList = results[2];
-        groupList.map(item => {
+
+        console.log('this.storeDataList :>> ', this.storeDataList);
+        console.log('groupList :>> ', groupList);
+        console.log('typeList :>> ', typeList);
+
+  
+
+        var tempG = []
+        this.storeDataList.forEach( i => {
+          groupList.forEach(g => {
+            if(g.contents.find(gg => gg == i.storeId)) {
+              tempG.push(g)
+            }
+          })
+        })
+        console.log('tempG :>> ', tempG);
+        var tempGroupList = [...new Set(tempG)]
+        console.log('tempGroupList :>> ', tempGroupList);
+        tempGroupList.map(item => {
           item.label = item.defineName;
           item.value = item.defineId;
           item.storeIds = item.contents;
         });
+
+
+
+
+
         typeList.map(item => {
           item.label = item.defineName;
           item.value = item.defineId;
           item.storeIds = item.contents;
         });
-        // console.log("XXXXgetStoreListAndGroupAndType")
         this.storeList = storeList;
-        let initFilter =false;
+        let initFilter = false;
+
         if(init && ((this.curStoreGroup&& this.curStoreGroup.length>0 && this.curStoreGroup[0]!='-1')||
               (this.curStoreType&& this.curStoreType.length>0 && this.curStoreType[0]!='-1'))){
                 initFilter=true;
         }
-        this.getCountryStore(initFilter||init);
-        this.storeGroupList = groupList;
+        this.ifGetParamsFromCash = init
+        this.getCountryStore(initFilter);
+
+        this.storeGroupList = tempGroupList;
+
+
         this.storeTypeList = typeList;
-      //  console.log(this.curStoreGroup,this.curStoreType)
+        console.log('initFilter :>> ', initFilter);
         if(initFilter){
-                // console.log("To FIlter stores")
-                this.filterStore();
+            this.filterStore();
           }
       }).catch(err => {
         console.log('StoreFilter - getStoreGroupAndType: ' + err);
@@ -644,7 +680,7 @@ export default {
     },
 
     onChangeStoreGroup(val) {
-      //console.log("onChangeStoreGroup:",val);
+      console.log(" onChangeStoreGroup~~~~>> ",val);
       this.curStoreGroup = val;
       if(val.length == 0 && this.curStoreType.length === 0){
         const filterStoreId = [];
@@ -1009,11 +1045,13 @@ export default {
     },
 
     onChangeCountry(val) {
+      console.log('val ~~~>> ', val)
       const self = this;
       self.clearProviceInfo();
       self.clearCityInfo();
       self.clearStoreInfo();
       self.selectAllProAndCity(val);
+      self.getStoreListAndGroupAndType(true)
     },
 
     changeCity(val) {
