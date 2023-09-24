@@ -272,6 +272,7 @@ export default {
   },
 
   created() {
+    console.log('waterMark!!!!')
     this.init()
     
   },

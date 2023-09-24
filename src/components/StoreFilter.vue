@@ -387,7 +387,7 @@ export default {
 
       console.log('this.curCountry :>> ', this.curCountry);
       
-      const storeListPromise = this.isFavorite ? this.getFavoriteStoreData() : ((this.enableMimicMode)? this.getMysteryStore():this.getBriefStoreData());
+      const storeListPromise = this.isFavorite ? this.getFavoriteStoreData() : ((this.enableMimicMode) ? this.getMysteryStore() : this.getBriefStoreData());
       const storeGroupPromise = this.getStoreDefineList(1);
       const storeTypePromise = this.getStoreDefineList(0);
       Promise.all([storeListPromise, storeGroupPromise, storeTypePromise]).then(results => {
@@ -395,6 +395,9 @@ export default {
         
         const groupList = results[1];
         const typeList = results[2];
+
+        
+        console.log('storeList :>>', storeList)
 
         console.log('this.storeDataList :>> ', this.storeDataList);
         console.log('groupList :>> ', groupList);
@@ -812,6 +815,8 @@ export default {
           console.log("getMysteryStore error:",err);
         });*/
     },
+
+    // storeDataList
     filterStore() {
       // console.log("Filter Store=>>")
       console.log("this.storeDataList:",this.storeDataList);
@@ -1052,6 +1057,7 @@ export default {
       self.clearStoreInfo();
       self.selectAllProAndCity(val);
       self.getStoreListAndGroupAndType(true)
+      
     },
 
     changeCity(val) {
