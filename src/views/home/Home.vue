@@ -594,10 +594,6 @@ export default {
     }
   },
   async created() {
-<<<<<<< HEAD
-=======
-
->>>>>>> dev-sprint5
     const self = this;
     this.headUrl = "./static/img/admin.png";
     PubSub.subscribe("change-color", (event, data) => {
