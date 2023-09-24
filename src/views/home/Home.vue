@@ -287,7 +287,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.1.4.1i
+                v3.1.4.2
                   &copy; {{ getFullYear }} Advantech Intelligent City
                   Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
@@ -329,6 +329,7 @@ import Database from '@/common/Database';
 import util from '@/common/util.js';
 import PermissionHelper from '../../api/PermissionHelper';
 import DialogPop from '@/components/DialogPop.vue';
+import environment from '@/common/environment.js'
 export default {
   name: "Home",
   components: {
@@ -336,7 +337,7 @@ export default {
   },
   data() {
     return {
-      
+      currentUrl: '',
       showTag: false,
       exportPdf: require('../../../static/img/export-pdf.png'),
       imgSrc: require("../../../static/img/inspection.svg"),
@@ -593,6 +594,10 @@ export default {
     }
   },
   async created() {
+<<<<<<< HEAD
+=======
+
+>>>>>>> dev-sprint5
     const self = this;
     this.headUrl = "./static/img/admin.png";
     PubSub.subscribe("change-color", (event, data) => {
@@ -601,7 +606,6 @@ export default {
     PubSub.subscribe("success-page", (event, data) => {
       if (data.changeStyle) {
         self.wapper = true;
-
       }
     });
 
@@ -612,8 +616,6 @@ export default {
     this.updateTitle();
 
     this.showAdvanceMode = sessionStorage.getItem("advancedSettingMode");
-    
-
   },
 
   async mounted() {
@@ -647,8 +649,13 @@ export default {
       sessionStorage.setItem("advancedSettingMode", this.showAdvanceMode);
       this.changeRoutes();
 
+      var  url = window.location.origin;
+      var base = process.env.NODE_ENV === 'development' ? '' : '/storemonitor_ui/'
+      this.currentUrl = url + base + ""
+
       if(this.showAdvanceMode){ 
-          this.$router.push('WaterMark');
+          // this.$router.push('WaterMark');
+          window.location.href = this.currentUrl + "waterMark";
         }
         else {
           sessionStorage.removeItem('advancedSettingStatus')
