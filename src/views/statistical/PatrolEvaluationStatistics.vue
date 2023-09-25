@@ -244,7 +244,7 @@
                 <el-col :span="8" class="division">
                     <el-col class="text-area">
                         <el-row class="top">
-                            <span class="mainTitle">{{part2.averageScore >=0 ? part2.averageScore : 'N/A'}}</span>
+                            <span class="mainTitle">{{part2.averageScore >=0 ? part2.averageScore : 'N/A'}} </span>
                             <span class="unit">{{ $t('statistics.score') }}</span>
                         </el-row>
                         <el-row class="subtitlehead">
@@ -2978,45 +2978,12 @@ export default {
 
             if (params.storeIds.length === 0) {return false;}
 
-            
-            console.log("this.allStoreId !!!!! ----->>>>" ,this.allStoreId)
-            const oriParam = {...params}
-            oriParam.groupIds = this.allStoreId
-
-
-            
-            console.log('oriParam !!!!! ----->>>> ', oriParam);
-            const allStoreResult = await self.getInspectStatsOverviewWithGroup(oriParam);
-    
-            if (allStoreResult.errCode === 0) {
-                const result = allStoreResult.data;
-                if (result) {
-                    this.part2.content = this.filterContent(result.content,
-                        this.part2.compareType,
-                        this.part2.compareIds,
-                        this.part2.comapareLabels,
-                        this.part2.originArray);
-                    this.part2.content.forEach(function (item) {
-                        totalReport += item.numOfReport;
-                        totalStandard += item.averageScore * item.numOfReport;
-                    })
-
-                    this.bigScore = totalStandard > 0 ? Math.round(totalStandard / totalReport) : -9999;
-                }
-            }
-
-
-
-
-
-            
-            
-            console.log("getPart2RegionBar  ----->>>>" , params)
             const storeResult = await self.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
                 const result = storeResult.data;
                 if (result) {
-                    this.part2.content = this.filterContent(result.content,
+                    this.part2.content = this.filterContent(
+                        result.content,
                         this.part2.compareType,
                         this.part2.compareIds,
                         this.part2.comapareLabels,
@@ -3027,13 +2994,32 @@ export default {
                     })
 
                     this.part2.averageScore = totalStandard > 0 ? Math.round(totalStandard / totalReport) : -9999;
-
+                    
                     this.part2.indexRegion = -1;
                     this.drawPart2RegionBar();
                 }
             }
 
+            // all store
+            const oriParam = {...params}
+            oriParam.groupIds = this.allStoreId
+            oriParam.storeIds = this.allStoreId
+
+            const allStoreResult = await self.getInspectStatsOverviewWithGroup(oriParam);
+            if (allStoreResult.errCode === 0) {
+                const aaa = allStoreResult.data;
+                if (aaa) {
+                    aaa.content.forEach(function (item) {
+                        totalReport += item.numOfReport;
+                        totalStandard += item.averageScore * item.numOfReport;
+                    })
+                    this.bigScore = totalStandard > 0 ? Math.round(totalStandard / totalReport) : -9999;
+                }
+            }
         },
+
+
+
         async drawPart2RegionBar() {
             console.log("drawPart2RegionBar")
             const option = this.getInspectLineOption();
