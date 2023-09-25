@@ -391,49 +391,70 @@ export default {
       const storeGroupPromise = this.getStoreDefineList(1);
       const storeTypePromise = this.getStoreDefineList(0);
       Promise.all([storeListPromise, storeGroupPromise, storeTypePromise]).then(results => {
+      
         var storeList = results[0];
-        
-        const groupList = results[1];
-        const typeList = results[2];
+        var groupList = results[1];
+        var typeList = results[2];
 
-        
-        console.log('storeList :>>', storeList)
 
-        console.log('this.storeDataList :>> ', this.storeDataList);
+        console.log('this.storeDataList 1:>> ', this.storeDataList);
+        console.log('storeList :>>', storeList)  
         console.log('groupList :>> ', groupList);
         console.log('typeList :>> ', typeList);
 
-  
 
-        var tempG = []
-        this.storeDataList.forEach( i => {
-          groupList.forEach(g => {
-            if(g.contents.find(gg => gg == i.storeId)) {
-              tempG.push(g)
+
+        var fStores = storeList.filter(i => i.country == this.curCountry)
+        console.log('fStores //////>> ', fStores);
+
+        // group
+        var temp = []
+        fStores.forEach(i => {
+          groupList.forEach( g => {
+            if(i.groupList.find( x => x == g.defineId)){
+              temp.push(g)
             }
           })
         })
-        console.log('tempG :>> ', tempG);
-        var tempGroupList = [...new Set(tempG)]
-        console.log('tempGroupList :>> ', tempGroupList);
+        console.log('temp  //////>> ', temp);
+        var tempGroupList = [...new Set(temp)]
+
         tempGroupList.map(item => {
           item.label = item.defineName;
           item.value = item.defineId;
           item.storeIds = item.contents;
         });
+        this.storeGroupList = tempGroupList
 
 
+    
 
+        // type
+        var tempType = []
+        fStores.forEach(i => {
+          typeList.forEach( t => {
+            if(i.typeList.find( x => x == t.defineId)){
+              tempType.push(t)
+            }
+          })
+        })
 
+        console.log('tempType :>> ', tempType);
+        var tempTypeList = [...new Set(tempType)]
 
-        typeList.map(item => {
+        tempTypeList.map(item => {
           item.label = item.defineName;
           item.value = item.defineId;
           item.storeIds = item.contents;
         });
-        this.storeList = storeList;
-        let initFilter = false;
+        
+        console.log('tempTypeList ////>> ', tempTypeList);
+        this.storeTypeList = tempTypeList;
 
+
+        this.storeList = storeList;
+
+        let initFilter = false;
         if(init && ((this.curStoreGroup&& this.curStoreGroup.length>0 && this.curStoreGroup[0]!='-1')||
               (this.curStoreType&& this.curStoreType.length>0 && this.curStoreType[0]!='-1'))){
                 initFilter=true;
@@ -441,10 +462,11 @@ export default {
         this.ifGetParamsFromCash = init
         this.getCountryStore(initFilter);
 
-        this.storeGroupList = tempGroupList;
+        
+    
 
 
-        this.storeTypeList = typeList;
+
         console.log('initFilter :>> ', initFilter);
         if(initFilter){
             this.filterStore();
@@ -684,13 +706,15 @@ export default {
 
     onChangeStoreGroup(val) {
       console.log(" onChangeStoreGroup~~~~>> ",val);
-      this.curStoreGroup = val;
+      console.log('this.curCountry :>> ', this.curCountry);
+
       if(val.length == 0 && this.curStoreType.length === 0){
         const filterStoreId = [];
         let filterStoreStr="";
         let temp=[];
+        let fStore = this.storeList.filter( i => i.country == this.curCountry)
         //filterStoreId.forEach(storeId => {
-          this.storeList.forEach(store => {
+          fStore.forEach(store => {
             //if (storeId === store.storeId) {
               filterStoreStr += `${store.name}，`;
               filterStoreId.push(store.storeId);
@@ -707,7 +731,9 @@ export default {
         console.log("*this.storeList:",this.storeList);
 
         this.storeDataList = temp;
+
         console.log("*this.storeDataList:",this.storeDataList);
+
         this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
         if(this.curStore.length != this.filterStoreIds.length){
           this.curStore = this.filterStoreIds;
