@@ -37,7 +37,7 @@
                 <el-col :span="8" class="division" @click.native="routeToInspectionReport">
                     <el-col class="text-area">
                         <el-row class="top">
-                            <span class="mainTitle">{{overviewCount.store>0?overviewCount.store:'N/A'}}</span>
+                            <span class="mainTitle">{{overviewCount.store > 0 ? overviewCount.store:'N/A'}} </span>
                             <span class="unit">{{ $t('statistics.overview.store_unit') }}</span>
                         </el-row>
                         <el-row class="subtitlehead">
@@ -60,10 +60,13 @@
                     <img class="image-area" :src="overviewCountSrc" />
                     <el-col class="line" />
                 </el-col>
+
+                <!-- 巡檢平均得分 -->
                 <el-col :span="8" class="division">
                     <el-col class="text-area">
                         <el-row class="top">
-                            <span class="mainTitle">{{overviewCount.avgScore!=-9999?overviewCount.avgScore:'N/A'}}</span>
+                            <!-- <span class="mainTitle">{{ overviewCount.avgScore!=-9999 ? overviewCount.avgScore : 'N/A'}}</span> -->
+                            <span class="mainTitle">{{ bigScore > 0 ? bigScore : 'N/A'}}</span>
                             <span class="unit">{{ $t('statistics.overview.avg_unit') }}</span>
                         </el-row>
                         <el-row class="subtitlehead">
@@ -206,7 +209,7 @@
             <div class="head">
                 <div class="region-titles">
                     <span class="title">
-                        {{ $t('statistics.titles.scoreDistribution') }}
+                        {{ $t('statistics.titles.scoreDistribution') }} 
                     </span>
                 </div>
                 <TypeSelectArea
@@ -241,7 +244,7 @@
                 <el-col :span="8" class="division">
                     <el-col class="text-area">
                         <el-row class="top">
-                            <span class="mainTitle">{{part2.averageScore>=0?part2.averageScore:'N/A'}}</span>
+                            <span class="mainTitle">{{part2.averageScore >=0 ? part2.averageScore : 'N/A'}}</span>
                             <span class="unit">{{ $t('statistics.score') }}</span>
                         </el-row>
                         <el-row class="subtitlehead">
@@ -483,6 +486,7 @@ import {
     GetInspectTagListAll,
     getInspectStatus
 } from '@/api/inspect';
+
 import SearchComponent from '@/components/SearchComponent';
 import resize from '@/components/mixins/echartResize';
 import TablePagination from '@/components/TablePagination_V2';
@@ -498,7 +502,6 @@ import PermissionHelper from '@/api/PermissionHelper';
 import { message } from '@/common/singleton-message';
 export default {
     name: 'PatrolEvaluationSta',
-
     components: {
         DelayButton,
         DialogPop,
@@ -1285,6 +1288,8 @@ export default {
 
             inspectStatus:'',
             curSubmitter:'-1',
+            allStoreId: [],
+            bigScore: 0,
         };
     },
 
@@ -2151,6 +2156,7 @@ export default {
             console.log("Part1 Emit Type Change originArray===> ", originArray)
             console.log("Part1 Emit Type Change selStoreIdArr===> ", selStoreIdArr)
 
+            this.allStoreId = selStoreIdArr
 
             this.part1.compareType = compareType;
             this.part1.compareIds = compareArr;
@@ -2383,7 +2389,7 @@ export default {
                 if (result) {
                     let total = 0;
                     let nums = 0;
-                    console.log(result)
+                    console.log('result >>>>', result)
                     result.content.forEach(function (item) {
                         total += item.averageScore * item.numOfReport;
                         nums += item.numOfReport;
@@ -2918,6 +2924,8 @@ export default {
                 params.groupIds = this.part2.compareIds;
                 params.groupMode = 0;
                 this.defineMysteryMode = -1
+
+
             } else if (this.part2.compareType == 'area1') {
                 params.storeIds = this.part2.selStoreIdArr;
                 params.groupIds = this.part2.compareIds;
@@ -2970,6 +2978,39 @@ export default {
 
             if (params.storeIds.length === 0) {return false;}
 
+            
+            console.log("this.allStoreId !!!!! ----->>>>" ,this.allStoreId)
+            const oriParam = {...params}
+            oriParam.groupIds = this.allStoreId
+
+
+            
+            console.log('oriParam !!!!! ----->>>> ', oriParam);
+            const allStoreResult = await self.getInspectStatsOverviewWithGroup(oriParam);
+    
+            if (allStoreResult.errCode === 0) {
+                const result = allStoreResult.data;
+                if (result) {
+                    this.part2.content = this.filterContent(result.content,
+                        this.part2.compareType,
+                        this.part2.compareIds,
+                        this.part2.comapareLabels,
+                        this.part2.originArray);
+                    this.part2.content.forEach(function (item) {
+                        totalReport += item.numOfReport;
+                        totalStandard += item.averageScore * item.numOfReport;
+                    })
+
+                    this.bigScore = totalStandard > 0 ? Math.round(totalStandard / totalReport) : -9999;
+                }
+            }
+
+
+
+
+
+            
+            
             console.log("getPart2RegionBar  ----->>>>" , params)
             const storeResult = await self.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
@@ -2984,7 +3025,8 @@ export default {
                         totalReport += item.numOfReport;
                         totalStandard += item.averageScore * item.numOfReport;
                     })
-                    this.part2.averageScore = totalStandard > 0 ? Math.round((totalStandard) / totalReport) : -9999;
+
+                    this.part2.averageScore = totalStandard > 0 ? Math.round(totalStandard / totalReport) : -9999;
 
                     this.part2.indexRegion = -1;
                     this.drawPart2RegionBar();
