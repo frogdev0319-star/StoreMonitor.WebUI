@@ -2976,11 +2976,14 @@ export default {
                 size: params.groupIds.length
             };
 
+
             if (params.storeIds.length === 0) {return false;}
 
+            console.log('params :>> ', params);
             const storeResult = await self.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
                 const result = storeResult.data;
+                console.log('result :>> ', result);
                 if (result) {
                     this.part2.content = this.filterContent(
                         result.content,
@@ -3001,19 +3004,45 @@ export default {
             }
 
             // all store
-            const oriParam = {...params}
-            oriParam.groupIds = this.allStoreId
-            oriParam.storeIds = this.allStoreId
+            const oriParams = {...params}
+            oriParams.storeIds = this.allStoreId
+            oriParams.filter = {
+                page: 0,
+                size: oriParams.storeIds.length
+            };
 
-            const allStoreResult = await self.getInspectStatsOverviewWithGroup(oriParam);
+            this.aaa(oriParams)
+
+            // const allStoreResult = await self.getInspectStatsOverviewWithGroup(oriParam);
+            // if (allStoreResult.errCode === 0) {
+            //     const aaa = allStoreResult.data;
+            //     if (aaa) {
+            //         aaa.content.forEach(function (item) {
+            //             totalReport += item.numOfReport;
+            //             totalStandard += item.averageScore * item.numOfReport;
+            //         })
+            //         this.bigScore = totalStandard > 0 ? Math.round(totalStandard / totalReport) : -9999;
+            //     }
+            // }
+        },
+
+        async aaa(val){
+            console.log('aaa param :>> ', val);
+            const allStoreResult = await this.getInspectStatsOverviewWithGroup(val);
+            console.log('allStoreResult :>> ', allStoreResult);
+            let totalReport = 0;
+            let totalStandard = 0;
+
             if (allStoreResult.errCode === 0) {
-                const aaa = allStoreResult.data;
-                if (aaa) {
-                    aaa.content.forEach(function (item) {
+                const tempData = allStoreResult.data;
+                console.log('tempData :>> ', tempData);
+                if (tempData) {
+                    tempData.content.forEach(function (item) {
                         totalReport += item.numOfReport;
                         totalStandard += item.averageScore * item.numOfReport;
                     })
                     this.bigScore = totalStandard > 0 ? Math.round(totalStandard / totalReport) : -9999;
+                    console.log('this.bigScore :>> ', this.bigScore);
                 }
             }
         },
