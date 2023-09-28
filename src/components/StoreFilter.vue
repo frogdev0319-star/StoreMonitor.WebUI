@@ -842,19 +842,29 @@ export default {
         }*/
 
         console.log("this.curCountry :",this.curCountry);
+        console.log("this.curProvince :",this.curProvince);
+        console.log("this.curCity :",this.curCity);
         console.log("this.storeList :",this.storeList);
         console.log("this.storeDataList 1:",this.storeDataList);
         
-        var tempFilterStores = []
+        var allProvice = this.curProvince.filter( i => i !== '-1')
+
+        var tempStores_country = []
         if(this.curCountry == -1){
-          tempFilterStores = this.storeList
+          tempStores_country = this.storeList
         } else {
-          tempFilterStores = this.storeList.filter( i => i.country == this.curCountry)
+          tempStores_country = this.storeList.filter( i => i.country == this.curCountry)
         }
+
+        var tempStores_privince = []
+        allProvice.forEach(t => {
+          var bbb = tempStores_country.find(p => p.province == t)
+          tempStores_privince.push(bbb)
+        })
 
         let temp=[];
         filterStoreArray.forEach(storeId => {
-          tempFilterStores.forEach(store => {
+          tempStores_privince.forEach(store => {
             if (storeId === store.storeId) {
               allfilterStoreStr+= `${store.name}，`;
               const obj = {
