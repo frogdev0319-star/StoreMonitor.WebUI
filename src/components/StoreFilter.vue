@@ -658,10 +658,33 @@ export default {
       this.curStoreGroup = val;
 
       if(val.length == 0 && this.curStoreType.length === 0){
+
+        console.log('onChangeStoreGroup empty ~~~~>>')
+        console.log("this.curCountry :",this.curCountry);
+        console.log("this.curProvince :",this.curProvince);
+        console.log("this.curCity :",this.curCity);
+        console.log("this.storeList :",this.storeList);
+        console.log("this.storeDataList :",this.storeDataList);
+
+        var allProvice = this.curProvince.filter( i => i !== '-1')
+
+        var tempStores_country = []
+        if(this.curCountry == -1){
+          tempStores_country = this.storeList
+        } else {
+          tempStores_country = this.storeList.filter( i => i.country == this.curCountry)
+        }
+
+        var tempStores_privince = []
+        allProvice.forEach(t => {
+          var bbb = tempStores_country.find(p => p.province == t)
+          tempStores_privince.push(bbb)
+        })
+
         const filterStoreId = [];
         let filterStoreStr="";
         let temp=[];
-        this.storeList.forEach(store => {
+        tempStores_privince.forEach(store => {
           filterStoreStr += `${store.name}，`;
           filterStoreId.push(store.storeId);
           const obj = {
@@ -689,6 +712,7 @@ export default {
         }
       // console.log("Emit From fitlerstore")
       this.emitParams();
+
       }
       else {
         this.filterStore();
@@ -792,7 +816,7 @@ export default {
       let filterStoreStr = '';
       let allfilterStoreStr = '';
       if (this.curStoreGroup.length === 0 && this.curStoreType.length === 0) {
-        // console.log("Filter Store=>>curStoreGroup and curStoreType length ==0")
+        console.log("Filter Store=>>curStoreGroup and curStoreType length ==0")
         filterStoreId = this.curStore;
         //秘密客模式可選門店取交集
         /*if(this.enableMimicMode){//秘密客模式可選門店
