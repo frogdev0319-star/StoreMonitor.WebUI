@@ -658,7 +658,7 @@ export default {
       this.curStoreGroup = val;
 
       if(val.length == 0 && this.curStoreType.length === 0){
-
+        
         console.log('onChangeStoreGroup empty ~~~~>>')
         console.log("this.curCountry :",this.curCountry);
         console.log("this.curProvince :",this.curProvince);
