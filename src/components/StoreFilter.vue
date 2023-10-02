@@ -653,10 +653,8 @@ export default {
 
     onChangeStoreGroup(val) {
       console.log("onChangeStoreGroup:",val);
-      console.log("onChangeStoreGroup this.storeDataList:", this.storeDataList);
 
       this.curStoreGroup = val;
-
       if(val.length == 0 && this.curStoreType.length === 0){
         
         console.log('onChangeStoreGroup empty ~~~~>>')
@@ -667,7 +665,8 @@ export default {
         console.log("this.storeDataList :",this.storeDataList);
 
         var allProvice = this.curProvince.filter( i => i !== '-1')
-
+        var allCity = this.curCity.filter( i => i !== '-1')
+        
         var tempStores_country = []
         if(this.curCountry == -1){
           tempStores_country = this.storeList
@@ -675,16 +674,26 @@ export default {
           tempStores_country = this.storeList.filter( i => i.country == this.curCountry)
         }
 
-        var tempStores_privince = []
-        allProvice.forEach(t => {
-          var bbb = tempStores_country.find(p => p.province == t)
-          tempStores_privince.push(bbb)
+        var tempStores_province = []
+        tempStores_country.forEach(c => {
+          allProvice.forEach( p => {
+            if(c.province == p) tempStores_province.push(c)
+          })
         })
+        const province_set = [...new Set(tempStores_province)]
+
+        var tempStores_city = []
+        province_set.forEach( i => {
+          allCity.forEach( y => {
+            if(i.city == y) tempStores_city.push(i)
+          })
+        })
+        const city_set = [...new Set(tempStores_city)]
 
         const filterStoreId = [];
         let filterStoreStr="";
         let temp=[];
-        tempStores_privince.forEach(store => {
+        city_set.forEach(store => {
           filterStoreStr += `${store.name}，`;
           filterStoreId.push(store.storeId);
           const obj = {
@@ -720,16 +729,47 @@ export default {
         
     },
 
-
-
     onChangeStoreType(val) {
       this.curStoreType = val;
       if(val.length == 0 && this.curStoreGroup.length === 0){
+
+        console.log("this.curCountry :",this.curCountry);
+        console.log("this.curProvince :",this.curProvince);
+        console.log("this.curCity :",this.curCity);
+        console.log("this.storeList :",this.storeList);
+        console.log("this.storeDataList :",this.storeDataList);
+
+        var allProvice = this.curProvince.filter( i => i !== '-1')
+        var allCity = this.curCity.filter( i => i !== '-1')
+
+        var tempStores_country = []
+        if(this.curCountry == -1){
+          tempStores_country = this.storeList
+        } else {
+          tempStores_country = this.storeList.filter( i => i.country == this.curCountry)
+        }
+
+        var tempStores_province = []
+        tempStores_country.forEach(c => {
+          allProvice.forEach( p => {
+            if(c.province == p) tempStores_province.push(c)
+          })
+        })
+        const province_set = [...new Set(tempStores_province)]
+
+        var tempStores_city = []
+        province_set.forEach( i => {
+          allCity.forEach( y => {
+            if(i.city == y) tempStores_city.push(i)
+          })
+        })
+        const city_set = [...new Set(tempStores_city)]
+
         const filterStoreId = [];
         let filterStoreStr="";
         let temp=[];
         //filterStoreId.forEach(storeId => {
-          this.storeList.forEach(store => {
+          city_set.forEach(store => {
             //if (storeId === store.storeId) {
               filterStoreStr += `${store.name}，`;
               filterStoreId.push(store.storeId);
@@ -872,6 +912,9 @@ export default {
         console.log("this.storeDataList 1:",this.storeDataList);
         
         var allProvice = this.curProvince.filter( i => i !== '-1')
+        var allCity = this.curCity.filter( i => i !== '-1')
+        console.log("allProvice :", allProvice);
+        console.log("allCity :", allCity);
 
         var tempStores_country = []
         if(this.curCountry == -1){
@@ -880,15 +923,26 @@ export default {
           tempStores_country = this.storeList.filter( i => i.country == this.curCountry)
         }
 
-        var tempStores_privince = []
-        allProvice.forEach(t => {
-          var bbb = tempStores_country.find(p => p.province == t)
-          tempStores_privince.push(bbb)
+        var tempStores_province = []
+        tempStores_country.forEach(c => {
+          allProvice.forEach( p => {
+            if(c.province == p) tempStores_province.push(c)
+          })
         })
+        const province_set = [...new Set(tempStores_province)]
+
+        var tempStores_city = []
+        province_set.forEach( i => {
+          allCity.forEach( y => {
+            if(i.city == y) tempStores_city.push(i)
+          })
+        })
+        const city_set = [...new Set(tempStores_city)]
+
 
         let temp=[];
         filterStoreArray.forEach(storeId => {
-          tempStores_privince.forEach(store => {
+          city_set.forEach(store => {
             if (storeId === store.storeId) {
               allfilterStoreStr+= `${store.name}，`;
               const obj = {
@@ -938,7 +992,6 @@ export default {
         this.curSelectedStore = (this.storeDataList.some( st => st.storeId == this.curSelectedStore))?this.curSelectedStore:"";
       }
         
-
       this.getStoreGroupString();
       this.getStoreTypeString();
       if(this.emitChanged){
