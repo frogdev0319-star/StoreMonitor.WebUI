@@ -124,7 +124,14 @@ export default{
       "schedulePersonalModify":"巡检排程｜个人排程",
       "errorStoreNoPermission":"门店无服务权限，请联系管理员",
       "errorStoreNameNoPerssion":"因{storeNames}无服务权限无法操作，请重新确认",
-      "generalSetting": "通用設定"
+      "generalSetting": "通用設定",
+      "AdvanceSetting": "進階設定",
+      "Safety": "安全性",
+      "WaterMark": "浮水印",
+      "reportAndEvent": "報告與事件",
+      "deleteReport": "刪除報告",
+      "closeEvents": "已結案事件",
+      "operationRecord": "操作記錄",
   },
   "overview":{
       "DangerousLess":"立即督导＜60%",
@@ -432,7 +439,7 @@ export default{
       "passItem":"合格项",
       "passwordErr":"密码错误",
       "patrolDate":"巡检日期",
-      "patrolResult":"巡检结果",
+      "patrolResult":"巡检总评",
       "patrolScore":"巡检得分",
       "patrolStore":"巡检门店",
       "patrolWay":"巡检方式",
@@ -625,7 +632,7 @@ export default{
       "AllowPhotos":"仅允许现场拍照（图片/视频）",
       "CalculationMethod":"考评总分计算方式",
       "FailTitle":"错误信息：",
-      "Inspector":"请选择任务执行者",
+      "Inspector":"请选择巡检人员",
       "OnsiteLength":"现场巡检表数量超限，请删除后再导入",
       "PatrolScoreCalculation":"巡检得分计算",
       "Proportional":"总分-百分制",
@@ -1073,7 +1080,7 @@ export default{
       "unbinded":"未绑定"
   },
   "scheduleView":{
-      "InspectPerson":"任务执行者",
+      "InspectPerson":"巡检人员",
       "addSchedule":"添加排程",
       "all":"全选",
       "applyToAllMon":"应用至所有月份",

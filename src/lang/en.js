@@ -124,7 +124,15 @@ export default{
         "schedulePersonalModify":"Schedule｜Personal Schedule",
         "errorStoreNoPermission":"The store does not have service permissions, please contact the administrator",
         "errorStoreNameNoPerssion":"Cannot be operated because {storeNames} has no service permission, please reconfirm",
-        "generalSetting": "General Setting"
+        "generalSetting": "General Setting",
+        "AdvanceSetting": "進階設定",
+        "Safety": "Safety",
+        "WaterMark": "Water Mark",
+        "reportAndEvent": "Report and Event",
+        "deleteReport": "Delete Report",
+        "closeEvents": "Closed Events",
+        "operationRecord": "Operation Record",
+
     },
     "overview":{
         "DangerousLess":"Pool Ratio＜60%",

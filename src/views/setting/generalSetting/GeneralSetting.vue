@@ -263,7 +263,6 @@ export default {
           } else if(i.defineStatus == 1){
             i.is_customize = true
           }
-
         }
         console.log('val :>> ', val);
       }

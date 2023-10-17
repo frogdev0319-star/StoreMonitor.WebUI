@@ -414,6 +414,12 @@ const user = {
             accessedRoutes.push(eventRoute);
           }
 
+           // 報告與事件
+          const reportAndEventRoute = navbarRoute.getReportAndEvent();
+          if (PermissionHelper.enableEventHandle() || PermissionHelper.enableEventClose() || PermissionHelper.enableEventAdd() || PermissionHelper.enableEventReturn()) {
+            accessedRoutes.push(reportAndEventRoute);
+          }
+
           // 統計分析
           const statisticsRoute = navbarRoute.getStatisticalRoute();
           if(statisticsRoute.children.length > 0 && !PermissionHelper.enableMimicMode) accessedRoutes.push(statisticsRoute);
