@@ -39,131 +39,43 @@
       <div class="el-table-content" >
         <el-tabs  v-model="activeName" @tab-click="onTabClick">
             <el-tab-pane
-                v-for="(item,index) in tableDataList"
-                :key="'sendAudit'+index"
-                :label="item.label"
-                :name="item.name">
-            
-                <div class="tablelist_workflows">
-                  <table-only
-                    ref="elTP"
-                    class="log_table"
-                    :column-data="item.columnData"
-                    :table-data="item.tableData"
-                    :highlight-current-row= "false"
-                    :is-loading-data="isLoadingData"
-                    :allowRowExpand = "false"
-                    :showBorder = "false"
-                    :default-sort = defaultSort
-                    :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
-                    :tableHeight = "760"
-                    :cellStyle="{backgroundColor: '#fff !important'}"
+              v-for="(item,index) in tableDataList"
+              :key="'sendAudit'+index"
+              :label="item.label"
+              :name="item.name">
+          
+              <div class="tablelist_workflows">
+                <table-only
+                  ref="elTP"
+                  class="log_table"
+                  :column-data="item.columnData"
+                  :table-data="item.tableData"
+                  :highlight-current-row= "false"
+                  :is-loading-data="isLoadingData"
+                  :allowRowExpand = "false"
+                  :showBorder = "false"
+                  :default-sort = defaultSort
+                  :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+                  :tableHeight = "760"
+                  :cellStyle="{backgroundColor: '#fff !important'}"
 
-                  />
-                </div>
-                <div class="page-area">
-                  <tbl-pagination-only
-                    :btn-style="{backgroundColor:'transparent'}"
-                    :total="total"
-                    :current-page="currentPage"
-                    :page-size="sizeNum"
-                    layout = "total, prev, pager, next, sizes, slot"
-                    @sizeChange="handlePagination"
-                    @currentChange="handlePagination"
-                  />
-                </div>
+                />
+              </div>
+              <div class="page-area">
+                <tbl-pagination-only
+                  :btn-style="{backgroundColor:'transparent'}"
+                  :total="total"
+                  :current-page="currentPage"
+                  :page-size="sizeNum"
+                  layout = "total, prev, pager, next, sizes, slot"
+                  @sizeChange="handlePagination"
+                  @currentChange="handlePagination"
+                />
+              </div>
             </el-tab-pane>
         </el-tabs>
         </div>
-
-
-      <!-- <div class="tablelist_workflows">
-        <table-only
-          ref="elTP"
-          class="log_table"
-          :column-data="columnData"
-          :table-data="logData"
-          :highlight-current-row= "false"
-          :is-loading-data="isLoadingData"
-          :allowRowExpand = "false"
-          :showBorder = "false"
-          :default-sort = defaultSort
-          :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
-          :tableHeight = "760"
-          :cellStyle="{backgroundColor: '#fff !important'}"
-
-        />
-      </div> -->
     </div>
-    <!-- <div style="width:100%; margin-top:12px;height:31px;">
-      <tbl-pagination-only
-        :btn-style="{backgroundColor:'transparent'}"
-        :total="total"
-        :current-page="currentPage"
-        :page-size="sizeNum"
-        layout = "total, prev, pager, next, sizes, slot"
-        @sizeChange="handlePagination"
-        @currentChange="handlePagination"
-      />
-    </div> -->
-
-    <!-- popup -->
-    <!-- <dialog-pop
-      :title="$t('audit.workFlows.comfirmDelete')"
-      :append-to-body="true"
-      :close-on-click-modal="false"
-      :show-close="false"
-      :visible="showSingleDeleteContent"
-      :isWarning="true"
-      @visibleChangeHandler="updateDeleteContentDialogFlag($event, 'showSingleDeleteContent')"
-      @cancelHandler="hideDeleteContentDialog('showSingleDeleteContent')"
-      @confirmHandler="confirmDeleteSingle(deletedProcessDefinitionKey)"
-    >
-      <div class="dialog-slot">
-        <div class="dialog-content">{{$t('audit.workFlows.comfirmDelete')}} </div>
-      </div>
-    </dialog-pop>
-
-    <dialog-pop
-      :title="$t('audit.workFlows.canNotDelete')"
-      :append-to-body="true"
-      :close-on-click-modal="false"
-      :show-close="false"
-      :visible="cantDeleteAlert"
-      :isWarning="true"
-      :showCancelbtn = "false"
-      class="alert-popup"
-      @confirmHandler="cantDeleteAlert = false"
-    >
-      <div class="dialog-slot">
-        <div class="dialog-content"> 
-          {{$t('audit.workFlows.makeSureUsign')}}<br>
-          <b> 「 {{cantDeleteList}} 」</b>
-          
-        </div>
-      </div>
-    </dialog-pop>
-
-  <dialog-pop
-      :title="$t('audit.workFlows.canNotClose')"
-      :append-to-body="true"
-      :close-on-click-modal="false"
-      :show-close="false"
-      :visible="cantCloseAlert"
-      :isWarning="true"
-      :showCancelbtn = "false"
-      class="alert-popup"
-      @confirmHandler="cantCloseAlert = false"
-    >
-      <div class="dialog-slot">
-        <div class="dialog-content">
-          {{$t('audit.workFlows.makeSureUsign')}} <br>
-          <b> 「 {{cantCloseList}} 」</b>
-        </div>
-      </div>
-    </dialog-pop> -->
-
-
   </div>
 </template>
 <script>
@@ -190,38 +102,7 @@ export default {
     return {
       inputSearchValue: '',
       searchData: [],
-      authorizedDevicesNum: 0,
       isLoadingData: false,
-      showSingleDeleteContent: false,
-      cantDeleteAlert: false,
-      cantCloseAlert: false,
-      cantDeleteList: '',
-      cantCloseList:'',
-
-      deletedProcessDefinitionKey: '',
-      columnOperationData: {
-        label: this.$t('deviceView.operation'),
-        minWidth: '100',
-        align: 'center',
-        operation: [
-          {
-            lable: '',
-            icon: 'icon-copy',
-            methods: 'copy'
-          },
-          {
-            lable: '',
-            icon: 'icon-setting',
-            methods: 'set'
-          },
-          {
-            lable: '',
-            icon: 'icon-delete',
-            methods: 'delete'
-          }
-        ]
-      },
-      
 
       dateValue:[],
       allTableData:[],
@@ -277,7 +158,7 @@ export default {
       ],
       total: 5,
       currentPage: 1,
-      curSizeNum:10,
+      curSizeNum: 10,
       sizeNum: 50,
       apiBody: {
           "page": 0,
@@ -322,10 +203,16 @@ export default {
   methods: {
 
     async init(){      
-     
+    
       await this.getUserInfo()
       await this.getLog(0)
-      this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+
+      var initDate = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+      const start = typeof (initDate[0]) === 'object' ? initDate[0].getTime() : initDate[0];
+      const end = typeof (initDate[1]) === 'object' ? initDate[1].getTime() : initDate[1];
+      this.dateValue = [new Date().setTime(start), new Date().setTime(end)];
+
+
     },
 
     async onTabClick(val){
@@ -344,8 +231,8 @@ export default {
         endTs: this.dateValue[1],
         actionType: typeN + 1,
         filter: {
-          page: 0,
-          size: 10
+          page: this.currentPage - 1,
+          size: this.curSizeNum
         },
         order: {
             direction: "asc",
@@ -376,13 +263,14 @@ export default {
             userName : i.userName,
             content: `${i.systemContent.storeName } / ${i.systemContent.inspectTable} / ${i.systemContent.reportSubmitterName} / 報告上傳時間: ${i.actionTs} / 已刪除`
           }))
-          console.log('temp :>> ', temp);
+          this.total = res.data.content.totalPages
         }
         else if(typeN == 1){
           var temp = res.data.content.map( i => ({
             userName : i.userName,
             content: `${i.systemContent.storeName }  ${i.systemContent.inspectTable} / 事件: ${i.systemContent.eventSubject} / 事件時間: ${i.actionTs} / 變更為未處理`
           }))
+          this.total = res.data.content.totalPages
         }
         
         this.tableDataList[typeN].tableData = temp
@@ -429,7 +317,6 @@ export default {
       const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
       self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
       self.inputSearchValue = '';
-
       console.log('this.dateValue :>> ', this.dateValue);
 
     },
@@ -438,37 +325,20 @@ export default {
       console.log('this.dateValue onSearchClick :>> ', this.dateValue);
       console.log('this.actionType :>> ', this.actionType);
       this.getLog(this.actionType)
-
-
-  
     },
 
 
-
-
-
-
-
-      handlePagination(pageInfo){
-      // sessionStorage.setItem('pageInfo', JSON.stringify(pageInfo))
-
-      // const newApiBody = {...this.apiBody, size:pageInfo.size, page: pageInfo.page - 1}
-      // this.apiBody = []
-      // this.apiBody = newApiBody
+    handlePagination(pageInfo){
 
       console.log('pageInfo ppp ~~~~~>> ', pageInfo);
 
       this.currentPage = pageInfo.page
       this.curSizeNum = pageInfo.size;
-      //this.inputSearchValue = ''
-      this.apiBody.page =  pageInfo.page - 1
-      this.apiBody.size =  pageInfo.size
-
-      console.log('this.apiBody ~~~~~>> ', this.apiBody);
-
+      
+      this.getLog(this.actionType)
       // this.init()
-      if(this.inputSearchValue.trim()=="") this.getWorkflowList(this.apiBody);
-      else this.setTableBySearch()
+      // if(this.inputSearchValue.trim()=="") this.getWorkflowList(this.apiBody);
+      // else this.setTableBySearch()
       
     },
 
@@ -484,54 +354,6 @@ export default {
       this.searchData = [];
       this.searchData = [...this.allTableData.slice( (this.currentPage - 1)* this.curSizeNum, this.currentPage* this.curSizeNum)];
     },
-
-    handleEmitOperation({ method, row }) {
-      switch(method){
-        case 'copy':{
-          this.duplicateRow(row.processDefinitionKey)
-          break;
-        }
-        case 'set':{
-          this.settingWorkFlow(row)
-          break;      
-        }
-        case 'delete':{
-          if(!row.isBind){
-            this.showSingleDeleteContent = true
-            this.deletedProcessDefinitionKey = row.processDefinitionKey
-          }else{
-            this.cantDeleteAlert = true
-            this.cantDeleteList = row.inspectTagName.replaceAll(',', '、')
-            
-          }
-          break;      
-        }
-        default: {
-          break;
-        }
-      }
-    },
-
-    cantCloseAlertPopup(row){
-      this.cantCloseAlert = true
-      this.cantCloseList = row.inspectTagName.replaceAll(',', '、')
-    },
-    settingWorkFlow(row){
-      // if(row.state == 0){
-      //   util.notify(this.$t('audit.workFlows.cantDisabledEdit'), 'error', 2000 );
-      //   return
-      // } else {
-        var createNewNodeNeed = {"orderedAuditNodeArray":[]}
-        sessionStorage.setItem('nodeDataToApi', JSON.stringify(createNewNodeNeed))
-
-        sessionStorage.setItem('workflowDetail', JSON.stringify(row))
-        sessionStorage.setItem('pageAction', JSON.stringify("firstEdit"))
-        this.$router.push({name: 'workflowDetail'})
-
-      // }
-    },
-
-
 
     
   },

@@ -99,20 +99,21 @@
           <div class="list-table for_pre">
             <table-only
               ref="elTP"
-              class="table-white"
+              class="table-white table_style"
               :table-themes="white"
               :column-data="reportInfoTable"
               :table-data="reportTableData"
               :highlight-current-row= "true"
               :is-loading-data="isLoading"
+              :table-operation ="columnOperationData"
               :allowRowExpand = "false"
               :showBorder = "false"
               :default-sort = "{prop: 'datestr', order: 'descending'}"
               :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '6px',}" 
               :tableHeight = "760"
               :cellStyle="{backgroundColor: '#fff !important'}"
-              @handleOperation="clickReport"
               @sortChange="sortChange"
+              @handleOperation="handleEmitOperation"
               
             />
           </div>
@@ -215,11 +216,7 @@ export default {
     return {
       varyWindowWidth: window.innerWidth,
       varyWindowHeight: window.innerHeight,
-      videoSrc: require('../../../static/img/monitor.png'),
-      remoteIcon: require('../../../static/img/remote.png'),
-      onsiteIcon: require('../../../static/img/onsite.png'),
       searchContent: false,
-      exportPng: require('../../../static/img/excel.png'),
       
       curSortType: 0,
       ShowCard: true,
@@ -311,32 +308,27 @@ export default {
           'width': '145',
           'maxWidth': '180',
         },
-        {
-          'prop': 'Action',
-          'label': 'Action',
-          'sortable': false,
-          'width': '145',
-          'maxWidth': '180',
-        },
-      
+    
       ],
 
-      
       columnOperationData: {
-        label: this.$t('titleView.operation'),
-        minWidth: '60',
-        align: 'left',
-        customIcon: true,
-        src : require('@/../static/img/icon_pen.png'),
-        methods: 'set'
-        /*operation: [
+        label: this.$t('deviceView.operation'),
+        minWidth: '100',
+        align: 'center',
+        operation: [
           {
             lable: '',
-            src : 'penSrc',
+            icon: 'el-icon-document',
             methods: 'set'
+          },
+          {
+            lable: '',
+            icon: 'icon-delete',
+            methods: 'delete'
           }
-        ]*/
+        ]
       },
+
       storeList: [],
       searchInput: '',
       sizeNum: 10,
@@ -992,7 +984,8 @@ export default {
     color: #989ca0
     background: #EFEFEF
     padding: 5px
-  .table-white
+  .table_style
+    background: #FFF
     .row-class
       th
         &:nth-child(1)
@@ -1009,7 +1002,7 @@ export default {
               white-space: pre !important
             
     .el-table th div
-      padding-left: 4% !important
+      padding-left: 10px !important
       padding-right: 0 !important
       text-align: left  !important
 
