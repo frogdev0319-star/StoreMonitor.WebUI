@@ -640,6 +640,7 @@ export default {
       this.event = row;
       sessionStorage.setItem('event', JSON.stringify(this.event));
       sessionStorage.setItem('queryparams', JSON.stringify(this.params));
+      sessionStorage.removeItem('needUpdateEvent')
       this.$router.push({ name: 'eventDetails', params: { event: this.event }});
     },
 

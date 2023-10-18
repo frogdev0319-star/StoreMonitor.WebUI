@@ -183,8 +183,7 @@ import {
 } from '@/api/inspect';
 
 import {getEventList,} from '@/api/event';
-import {handleEventStatus,} from '@/api/reportAndEvent';
-
+import {handleEventStatus} from '@/api/reportAndEvent';
 
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
@@ -421,7 +420,7 @@ export default {
 
   methods: {
     async initData() {
-      this.isLoading = true;
+      
       this.searchInput = '';
       this.storeStr = '';
       this.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24,
@@ -435,9 +434,11 @@ export default {
       this.curReportType = -1;
       
       await this.getSearchParams();
+      await this.searchData();
       
     },
     async getEvents(params){
+      this.isLoading = true;
       await getEventList(params).then(res=>{
         console.log('res.data --->', res.data)
   
@@ -513,6 +514,7 @@ export default {
   
       console.log("###",self.params)
       // self.saveSearchParams();
+      
       self.getEvents(self.params);
     },
 
@@ -537,6 +539,7 @@ export default {
     handleEventDoc(val){
       console.log('val :>> ', val);
       this.event = val.row;
+      sessionStorage.setItem('needUpdateEvent', true);
       sessionStorage.setItem('event', JSON.stringify(this.event));
       sessionStorage.setItem('queryparams', JSON.stringify(this.params));
       this.$router.push({ name: 'eventDetails', params: { event: this.event }});
@@ -549,7 +552,9 @@ export default {
     confirmUpdate(updateEventId){
       var rowID = {eventId: updateEventId}
       this.showUpdateEvent = false
-      this.isLoading = true;      
+      this.isLoading = true;   
+
+    
       handleEventStatus(rowID).then(res=>{
         console.log('res :>> ', res);
         this.getEvents(this.params);
@@ -557,8 +562,6 @@ export default {
         this.isLoading = false;
       })
     },
-
-
 
 
     cellStyle({ row, column, rowIndex, columnIndex }) {
@@ -959,6 +962,7 @@ export default {
     },
 
     getSearchParams() {
+      
       // console.log("Get SEarch Parameter");
       let searchParams = JSON.parse(JSON.stringify(SearchConditionUtil.getSearchCondition('inspectReport')));
       console.log("getSearchParams>>>>searchParams:",searchParams);
@@ -1069,9 +1073,10 @@ export default {
         &:nth-child(1)
           padding-left: 0 !important
       td
-        &:nth-child(1), &:nth-child(2), &:nth-child(3), &:nth-child(5),
+        &:nth-child(1)
           .cell
             padding-left: 10% !important
+            padding: 10px !important
             // text-overflow: ellipsis !important
             // white-space: nowrap !important
             // overflow: hidden !important
