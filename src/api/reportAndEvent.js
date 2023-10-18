@@ -10,3 +10,12 @@ export const fetchLog = data => {
     data
   });
 };
+
+
+export const handleEventStatus = data => {
+  return request({
+    url: `${version}/system/advanced/event/update`,
+    method: 'post',
+    data
+  });
+};

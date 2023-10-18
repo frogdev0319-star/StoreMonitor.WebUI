@@ -461,7 +461,7 @@ const user = {
           const advancedSettingStatus = sessionStorage.getItem("advancedSettingStatus")
           const advancedSettingMode = sessionStorage.getItem("advancedSettingMode")
 
-          console.log('-------{o..o}-------', advancedSettingStatus , advancedSettingMode)
+          // console.log('-------{o..o}-------', advancedSettingStatus , advancedSettingMode)
         
           if(advancedSettingStatus && advancedSettingMode){
 

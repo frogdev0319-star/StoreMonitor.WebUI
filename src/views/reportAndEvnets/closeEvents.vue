@@ -95,9 +95,8 @@
           class="card-content self-loading ">
 
           <!-- 報告列表 -->
-          
           <div class="list-table for_pre">
-            <!-- @handleOperation="handleEmitOperation" -->
+            
 
             <table-only
               ref="elTP"
@@ -106,7 +105,7 @@
               :table-data="eventTableData"
               :highlight-current-row= "true"
               :is-loading-data="isLoading"
-              :table-operation ="columnOperationData"
+              :tableAction ="columnOperationData"
               :allowRowExpand = "false"
               :showBorder = "false"
               :default-sort = "{prop: 'datestr', order: 'descending'}"
@@ -114,6 +113,7 @@
               :tableHeight = "760"
               :cellStyle="{backgroundColor: '#fff !important'}"
               @sortChange="sortChange"
+              @handleOperation="handleEmitOperation"
             />
           </div>
           
@@ -124,7 +124,7 @@
           v-else
           :element-loading-text="$t('insSettingView.loadingbindstore')"
           class="card-content self-loading">
-          <div class="empty-content">{{ noData }}</div>
+          <div class="empty-content">{{ noData }} </div>
         </div>
         
         <div class="el-pat">
@@ -154,42 +154,38 @@
           </div>
       </div>
     </div>
-    <!-- <dialog-pop
-      :title="$t('remotePatrol.exportExcelAllWarning')"
+    <dialog-pop
+      title="修改已結案事件"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :visible="showUpdateEvent"
       :isWarning="true"
-      :visible="showExportAllWarn"
-      :showCancelbtn="false"
-      @confirmHandler="showExportAllWarn = false"
-      >
+      @cancelHandler="cancelUpdate()"
+      @confirmHandler="confirmUpdate(updateEventId)"
+    >
       <div class="dialog-slot">
-        {{this.$t('remotePatrol.selectOnlyOneInspect')}}
+        <div class="dialog-content">請確認是否變更狀態為 <span style="color: red;"> <b>未處理</b></span>   ? </div>
       </div>
     </dialog-pop>
-    <dialog-pop
-      :title="$t('remotePatrol.exportExcelAllWarning')"
-      :isWarning="false"
-      :visible="showExportAllNotice"
-      :showCancelbtn="false"
-      @confirmHandler="showExportAllNotice = false"
-      >
-      <div class="noticeDialog">
-        {{this.$t('remotePatrol.exportExcelAllNotice1')}}<br/>
-        {{this.$t('remotePatrol.exportExcelAllNotice2')}}
-      </div>
-    </dialog-pop> -->
+
+
   </div>
 </template>
 <script>
 import { 
-      getInspectReportList, 
-      GetInspectTagList,
-      downLoadInspectReportEntireDetail,
-      getAllReportIds,
-      GetMysteryInspectTagList ,
-      getInspectStatus
-    } from '@/api/inspect';
+  getInspectReportList, 
+  GetInspectTagList,
+  downLoadInspectReportEntireDetail,
+  getAllReportIds,
+  GetMysteryInspectTagList ,
+  getInspectStatus
+} from '@/api/inspect';
 
-import {getEventList} from '@/api/event';
+import {getEventList,} from '@/api/event';
+import {handleEventStatus,} from '@/api/reportAndEvent';
+
+
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
 import StoreFilter from '@/components/StoreFilter';
@@ -227,20 +223,6 @@ export default {
 
 
       reportTableData: [],
-      sortTypeList: [
-        {
-          id: 0,
-          name: this.$t('remotePatrol.rankTime')
-        },
-        {
-          id: 1,
-          name: this.$t('remotePatrol.rankScore')
-        },
-        {
-          id: 2,
-          name: this.$t('remotePatrol.rankStore')
-        }
-      ],
       reportInfoTable: [
         {
           'prop': 'subject',
@@ -298,10 +280,7 @@ export default {
           'width': '145',
           'maxWidth': '180',
         },
-      
-    
       ],
-
       columnOperationData: {
         label: this.$t('deviceView.operation'),
         minWidth: '100',
@@ -309,16 +288,29 @@ export default {
         operation: [
           {
             lable: '',
-            icon: 'el-icon-document',
-            methods: 'set'
+            icon: 'icon-doc',
+            methods: 'doc'
           },
           {
             lable: '',
-            icon: 'icon-delete',
-            methods: 'delete'
+            icon: 'icon-edit',
+            methods: 'edit'
           }
         ]
       },
+      showUpdateEvent: false,
+      updateEventId: '',
+
+
+
+
+
+
+
+
+
+
+
 
       storeList: [],
       searchInput: '',
@@ -349,7 +341,7 @@ export default {
       showMonthDrap: false,
       showStoreContent: false,
       checkAllStore: false,
-      noData: '',
+      noData: this.$t('deviceView.noData'),
       showStoreInfo: false,
       cellClass: 'report-cell-class',
       headerClass: 'report-header-class',
@@ -376,8 +368,8 @@ export default {
       searchParams: {},
       ifSearchData: true,
       isScore:true,
-      showExportAllWarn:false,
-      showExportAllNotice:false,
+
+   
 
       inspectStatus:'',
       totalEvents: 0
@@ -428,7 +420,7 @@ export default {
 
 
   methods: {
-    initData() {
+    async initData() {
       this.isLoading = true;
       this.searchInput = '';
       this.storeStr = '';
@@ -442,45 +434,10 @@ export default {
       this.checkAllStore = false;
       this.curReportType = -1;
       
-      this.getSearchParams();
-      this.getparams();
+      await this.getSearchParams();
       
     },
-
-
-    getparams(){
-      var params = {
-        beginTs: 1689782400000,
-        endTs: 1697558399999,
-        clause: {
-          status: [
-              2,
-              4
-          ],
-          storeId: [
-              "FQCxXmy9Md9E",
-              "nPF5abRjkPpB",
-              "WjZJGxGtnSKX"
-          ]
-        },
-        filter: {
-            page: 0,
-            size: 10
-        },
-        like: {},
-        searchMysteryMode: -1,
-        inspectTagIds: [],
-        order: {
-            direction: "desc",
-            property: "ts"
-        }
-      }
-      this.getEvents(params)
-      
-    },
-
     async getEvents(params){
-      
       await getEventList(params).then(res=>{
         console.log('res.data --->', res.data)
   
@@ -490,15 +447,13 @@ export default {
         this.eventTableData.forEach(i => {
           i.ts = util.getDateStr(i.ts)
         })
+  
         this.isLoading = false;
       }).catch(err => {
         this.isLoading = false;
         console.log('error' + err);
       });
     },
-
-
-
 
     searchData() {
       console.log("Search Data" + this.dateValue)
@@ -548,48 +503,64 @@ export default {
           self.params.searchMysteryMode = PermissionHelper.enableMimicMode ? 1 : -1;
         }
       
-      console.log("###",self.params)
+      
       self.params.filter = { page: 0, size: self.sizeNum };
+      self.params.clause = {  status: [2,4]};
+      self.params.order = { 
+        direction: "desc",
+        property: "ts"
+      };
+  
+      console.log("###",self.params)
       // self.saveSearchParams();
       self.getEvents(self.params);
     },
 
 
-    handleEmitOperation(){
-      console.log('aaa')
+    handleEmitOperation(val){
+      console.log('val' , val)
+      switch (val.method) {
+        case  'doc':
+          this.handleEventDoc(val)
+          break;
+
+        case'edit':
+          this.showUpdateEvent = true
+          this.updateEventId = val.row.id
+          break;
+      
+        default:
+          break;
+      }
+    },
+
+    handleEventDoc(val){
+      console.log('val :>> ', val);
+      this.event = val.row;
+      sessionStorage.setItem('event', JSON.stringify(this.event));
+      sessionStorage.setItem('queryparams', JSON.stringify(this.params));
+      this.$router.push({ name: 'eventDetails', params: { event: this.event }});
+    },
+  
+    cancelUpdate(){
+      this.showUpdateEvent = false
+    },
+
+    confirmUpdate(updateEventId){
+      var rowID = {eventId: updateEventId}
+      this.showUpdateEvent = false
+      this.isLoading = true;      
+      handleEventStatus(rowID).then(res=>{
+        console.log('res :>> ', res);
+        this.getEvents(this.params);
+      }).catch(err => {
+        this.isLoading = false;
+      })
     },
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
     cellStyle({ row, column, rowIndex, columnIndex }) {
       let obj = {};
       if (columnIndex === 0) {
@@ -599,6 +570,34 @@ export default {
       }
       return obj;
     },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     
@@ -1073,12 +1072,12 @@ export default {
         &:nth-child(1), &:nth-child(2), &:nth-child(3), &:nth-child(5),
           .cell
             padding-left: 10% !important
-            text-overflow: ellipsis !important
-            white-space: nowrap !important
-            overflow: hidden !important
+            // text-overflow: ellipsis !important
+            // white-space: nowrap !important
+            // overflow: hidden !important
             span
               // background: #9872 !important
-              white-space: pre !important
+              // white-space: pre !important
             
     .el-table th div
       padding-left: 10px !important
@@ -1236,10 +1235,15 @@ $filterWidth: (100%-706);
         .empty-content{
           font-size: calc(16/1920*100vw);
           color: $tab;
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
+          height: 300px;
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
+          // position: absolute;
+          // top: 50%;
+          // left: 50%;
+          // transform: translate(-50%, -50%);
         }
         .card-header{
             text-align: left;
