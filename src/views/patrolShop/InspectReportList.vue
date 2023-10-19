@@ -1125,6 +1125,7 @@ export default {
 
     clickReport(item, index) {
       const self = this;
+      sessionStorage.removeItem('needDeleteReport')
       sessionStorage.setItem('report_data', JSON.stringify(item.routeObj));
       self.$router.push({ name: 'reportDetails', params: { data: item.routeObj }});
     },

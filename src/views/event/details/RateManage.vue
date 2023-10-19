@@ -307,7 +307,7 @@
         </div>
       </div>
 
-      <div class="submit-content">
+      <div class="submit-content" :class="{ 'hidden_div' : (event.status === 2 || event.status === 4)}">
         <el-scrollbar class="submit-content-scroll">
         <div>
           <span style="display:block;"><span style="color:red;">* </span>{{ $t('eventView.addDetails') }}</span>
@@ -1286,6 +1286,9 @@ $h1:#292e36;
     align-items: center;
 }
 
+.hidden_div{
+  visibility: hidden;
+}
 .to_delete{
     margin-bottom: 5px;
     transition: all .3s;

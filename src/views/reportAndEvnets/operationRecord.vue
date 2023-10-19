@@ -156,10 +156,12 @@ export default {
         },
 
       ],
-      total: 5,
+
+      total: 50,
       currentPage: 1,
       curSizeNum: 10,
       sizeNum: 50,
+
       apiBody: {
           "page": 0,
           "size": 10,
@@ -237,7 +239,8 @@ export default {
         order: {
             direction: "desc",
             property: "ts",
-        }
+        },
+        keyword: this.inputSearchValue ? this.inputSearchValue : ''
       }
       
       console.log('param :>> ', param); 
@@ -263,14 +266,14 @@ export default {
             userName : i.userName,
             content: `${i.systemContent.storeName } / ${i.systemContent.inspectTable} / ${i.systemContent.reportSubmitterName} / 報告上傳時間: ${i.actionTs} / 已刪除`
           }))
-          this.total = res.data.content.totalPages
+          this.total = res.data.totalElements
         }
         else if(typeN == 1){
           var temp = res.data.content.map( i => ({
             userName : i.userName,
             content: `${i.systemContent.storeName }  ${i.systemContent.inspectTable} / 事件: ${i.systemContent.eventSubject} / 事件時間: ${i.actionTs} / 變更為未處理`
           }))
-          this.total = res.data.content.totalPages
+          this.total = res.data.totalElements
         }
         
         this.tableDataList[typeN].tableData = temp
@@ -329,7 +332,7 @@ export default {
 
     handlePagination(pageInfo){
 
-      console.log('pageInfo ppp ~~~~~>> ', pageInfo);
+      console.log('pageInfo ~~~~~>> ', pageInfo);
 
       this.currentPage = pageInfo.page
       this.curSizeNum = pageInfo.size;

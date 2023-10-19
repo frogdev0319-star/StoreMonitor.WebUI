@@ -132,6 +132,12 @@ export default{
       "deleteReport": "刪除報告",
       "closeEvents": "已結案事件",
       "operationRecord": "操作記錄",
+      "reportAndEventDeleted":"報告與事件 | 刪除報告",
+      "reportAndEventUpdated":"報告與事件 | 已結案事件",
+      "needDeleteReport":"報告詳情",
+      "needUpdateEvent":"事件詳情",
+      
+
   },
   "overview":{
       "DangerousLess":"立即督導＜60%",

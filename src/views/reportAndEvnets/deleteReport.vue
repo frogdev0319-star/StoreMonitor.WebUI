@@ -142,16 +142,15 @@
               <div class="pageSizeTitle" style="color: #666"> {{ $t('remotePatrol.totalOf') }} <b style="font-size: 16px"> {{totalElements}} </b> {{ $t('remotePatrol.numReports') }}</div>
 
               <tbl-pagination-only
-                
                 :btn-style="{backgroundColor:'transparent'}"
                 :total="total"
-                :current-page="page"
+                :current-page="currentPage"
                 :page-size="sizeNum"
                 layout = "prev,pager, next,sizes,slot"
-                @sizeChange="sizeChange"
-                @currentChange="currentChange"
-            />
-            
+                @sizeChange="handlePagination"
+                @currentChange="handlePagination"
+              />
+                
           </div>
       </div>
     </div>
@@ -174,7 +173,7 @@
           </div>
 
           <div class="l_row" >
-            <el-checkbox  class="storevue-checkbox-filled" v-model="agreeDelete" @change="testaaa">
+            <el-checkbox  class="storevue-checkbox-filled" v-model="agreeDelete" @change="addNum">
               <span style="color: red">*</span> 我理解並同意刪除報告
             </el-checkbox>
           </div>
@@ -189,7 +188,7 @@
               ref="delay_day"
               placeholder=""
               class="input-name_short"
-              @change="testaaa"
+              @change="addNum"
               />
           </div>
 
@@ -202,7 +201,7 @@
               ref="delay_day"
               placeholder=""
               class="input-name_short"
-              @change="testaaa"
+              @change="addNum"
               />
           </div>
           <div class="delete_btn_row">
@@ -218,30 +217,6 @@
         </div>
       </div>
     </dialog-pop>
-
-    <!-- <dialog-pop
-      :title="$t('remotePatrol.exportExcelAllWarning')"
-      :isWarning="true"
-      :visible="showExportAllWarn"
-      :showCancelbtn="false"
-      @confirmHandler="showExportAllWarn = false"
-      >
-      <div class="dialog-slot">
-        {{this.$t('remotePatrol.selectOnlyOneInspect')}}
-      </div>
-    </dialog-pop>
-    <dialog-pop
-      :title="$t('remotePatrol.exportExcelAllWarning')"
-      :isWarning="false"
-      :visible="showExportAllNotice"
-      :showCancelbtn="false"
-      @confirmHandler="showExportAllNotice = false"
-      >
-      <div class="noticeDialog">
-        {{this.$t('remotePatrol.exportExcelAllNotice1')}}<br/>
-        {{this.$t('remotePatrol.exportExcelAllNotice2')}}
-      </div>
-    </dialog-pop> -->
   </div>
 </template>
 <script>
@@ -255,7 +230,6 @@ import {
     } from '@/api/inspect';
 
 import { deleteReport} from '@/api/reportAndEvent';
-
 import { Encrypt } from '@/common/Aes'
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
@@ -402,6 +376,11 @@ export default {
         ]
       },
 
+      total: 0,
+      currentPage: 1,
+      curSizeNum: 10,
+      sizeNum: 50,
+    
       storeList: [],
       searchInput: '',
       sizeNum: 10,
@@ -420,8 +399,7 @@ export default {
         { 'status': 2, 'label': this.$t('overview.echartGood') } //good
       ],
       storeStr: '',
-      total: 0,
-      page: 1,
+      
       params: {},
       storeDataList: [],
       storeIdList: [],
@@ -547,7 +525,7 @@ export default {
       return obj;
     },
 
-    testaaa(){
+    addNum(){
       this.changeNum += 1
       console.log('this.changeNum :>> ', this.changeNum);
     },
@@ -573,8 +551,9 @@ export default {
 
       var reportObj = val.row.routeObj
       console.log('reportObj :>> ', reportObj);
+      sessionStorage.setItem('needDeleteReport', true);
       sessionStorage.setItem('report_data', JSON.stringify(reportObj));
-      this.$router.push({ name: 'reportDetails', params: { data: reportObj }});
+      this.$router.push({ name: 'needDeleteReport', params: { data: reportObj }});
     },
   
     cancelUpdate(){
@@ -586,7 +565,6 @@ export default {
 
     confirmUpdate(){
       console.log('this.deleteReportId :>> ', this.deleteReportId);
-      
       var EncryptPassword = Encrypt(this.passWord)
 
       var delParams = {
@@ -595,7 +573,6 @@ export default {
         password: EncryptPassword
       }
       console.log('delParams ~~~~~~~>> ', delParams);
-     
       // this.isLoading = true;   
       deleteReport(delParams).then(res=>{
         console.log('res :>> ', res);
@@ -801,19 +778,31 @@ export default {
       self.inputSearchValue = '';
     },
 
-    currentChange(val) {
-      const self = this;
-      self.page = val.page;
-      self.params.filter = { page: val.page - 1, size: self.sizeNum };
-      self.getReportList(self.params);
+    handlePagination(pageInfo){
+      console.log('pageInfo ~~~~~>> ', pageInfo);
+      console.log('this.params ~~~~~>> ', this.params);
+      this.currentPage = pageInfo.page
+      this.curSizeNum = pageInfo.size;
+      
+      this.params.filter.page = pageInfo.page - 1
+      this.params.filter.size = pageInfo.size
+      this.getReportList(this.params);
     },
 
-    sizeChange(val) {
-      const self = this;
-      self.sizeNum = val.size;
-      self.params.filter = { page: 0, size: val.size };
-      self.getReportList(self.params);
-    },
+
+    // currentChange(val) {
+    //   const self = this;
+    //   self.page = val.page;
+    //   self.params.filter = { page: val.page - 1, size: self.sizeNum };
+    //   self.getReportList(self.params);
+    // },
+
+    // sizeChange(val) {
+    //   const self = this;
+    //   self.sizeNum = val.size;
+    //   self.params.filter = { page: 0, size: val.size };
+    //   self.getReportList(self.params);
+    // },
 
     searchData() {
       console.log("Search Data >>>>" , this.dateValue)

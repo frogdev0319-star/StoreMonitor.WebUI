@@ -128,30 +128,19 @@
         </div>
         
         <div class="el-pat"  v-if="eventTableData.length > 0">
-            <!--<el-pagination
-              :page-size="sizeNum"
-              :total="total"
-              :current-page="page"
-              :page-sizes="[12,24,50,100]"
-              background
-              small
-              layout="jumper,total, prev, pager, next,sizes"
-              class="el-pag"
-              @current-change="currentChange"
-              @size-change="sizeChange"/>-->
-              <div class="pageSizeTitle" style="color: #666">共有 <b style="font-size: 16px"> {{totalEvents}} </b> {{ $t('remotePatrol.numReports') }}</div>
+            <div class="pageSizeTitle" style="color: #666">共有 <b style="font-size: 16px"> {{totalEvents}} </b> {{ $t('remotePatrol.numReports') }}</div>
 
-              <tbl-pagination-only
-              :btn-style="{backgroundColor:'transparent'}"
-              :total="total"
-              :current-page="page"
-              :page-size="sizeNum"
-              layout = "prev,pager, next,sizes,slot"
-              @sizeChange="sizeChange"
-              @currentChange="currentChange"
-            />
-            
-          </div>
+            <tbl-pagination-only
+            :btn-style="{backgroundColor:'transparent'}"
+            :total="total"
+            :current-page="currentPage"
+            :page-size="sizeNum"
+            layout = "prev,pager, next,sizes,slot"
+            @sizeChange="handlePagination"
+            @currentChange="handlePagination"
+          />
+          
+        </div>
       </div>
     </div>
     <dialog-pop
@@ -299,7 +288,10 @@ export default {
       },
       showUpdateEvent: false,
       updateEventId: '',
-
+      total: 0,
+      currentPage: 1,
+      curSizeNum: 10,
+      sizeNum: 50,
 
 
 
@@ -329,8 +321,7 @@ export default {
         { 'status': 2, 'label': this.$t('overview.echartGood') } //good
       ],
       storeStr: '',
-      total: 0,
-      page: 1,
+      
       params: {},
       storeDataList: [],
       storeIdList: [],
@@ -444,6 +435,7 @@ export default {
   
         this.totalEvents = res.data.totalElements
         this.total = res.data.totalElements
+        
         this.eventTableData = res.data.content
         this.eventTableData.forEach(i => {
           i.ts = util.getDateStr(i.ts)
@@ -542,7 +534,7 @@ export default {
       sessionStorage.setItem('needUpdateEvent', true);
       sessionStorage.setItem('event', JSON.stringify(this.event));
       sessionStorage.setItem('queryparams', JSON.stringify(this.params));
-      this.$router.push({ name: 'eventDetails', params: { event: this.event }});
+      this.$router.push({ name: 'needUpdateEvent', params: { event: this.event }});
     },
   
     cancelUpdate(){
@@ -785,19 +777,34 @@ export default {
       self.inputSearchValue = '';
     },
 
-    currentChange(val) {
-      const self = this;
-      self.page = val.page;
-      self.params.filter = { page: val.page - 1, size: self.sizeNum };
-      self.getReportList(self.params);
+    handlePagination(pageInfo){
+      console.log('pageInfo ~~~~~>> ', pageInfo);
+      console.log('this.params ~~~~~>> ', this.params);
+      this.currentPage = pageInfo.page
+      this.curSizeNum = pageInfo.size;
+      
+      this.params.filter.page = pageInfo.page - 1
+      this.params.filter.size = pageInfo.size
+      this.getEvents(this.params)
+
+      // if(this.inputSearchValue.trim()=="") this.getWorkflowList(this.apiBody);
+      // else this.setTableBySearch()
+
     },
 
-    sizeChange(val) {
-      const self = this;
-      self.sizeNum = val.size;
-      self.params.filter = { page: 0, size: val.size };
-      self.getReportList(self.params);
-    },
+    // currentChange(val) {
+    //   const self = this;
+    //   self.page = val.page;
+    //   self.params.filter = { page: val.page - 1, size: self.sizeNum };
+    //   self.getReportList(self.params);
+    // },
+
+    // sizeChange(val) {
+    //   const self = this;
+    //   self.sizeNum = val.size;
+    //   self.params.filter = { page: 0, size: val.size };
+    //   self.getReportList(self.params);
+    // },
 
     
 

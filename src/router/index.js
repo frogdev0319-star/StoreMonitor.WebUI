@@ -243,8 +243,28 @@ export const navbarRoute = {
           requireAuth: true
         }
       },
+      {
+        path: '/needDeleteReport',
+        name: 'needDeleteReport',
+        component: resolve => require(['@/views/patrolShop/InspectReport'], resolve),
+        hidden: true,
+        meta: {
+          keepAlive: true, 
+          requireAuth: true
+        }
+      },
+      {
+        path: '/needUpdateEvent',
+        name: 'needUpdateEvent',
+        component: resolve => require(['@/views/event/details/RateManage'], resolve),
+        hidden: true,
+        meta: {
+          keepAlive: true, 
+          requireAuth: true
+        }
+      },
       
-    ) && primaryPathesList.push('/event', '/rate');
+    ) && primaryPathesList.push('/deleteReport', '/closeEvents', '/operationRecord', '/needDeleteReport', '/needUpdateEvent');
     return reportAndEventRoute;
   },
 
