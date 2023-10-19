@@ -142,7 +142,9 @@
                     :class="lang.indexOf('ja') !== -1 ? 'ja-icon': 'icon-span'"
                     style="background-color:#fff2ef;color:#f57848;"
                     >
-                    {{ $t('eventView.pending') }}
+                    {{ $t('eventView.pending') }} 
+                    
+                    <div style="margin-top: 2px;" v-if="scope.row.isSystemAdvancedEdited">(已變更狀態)</div>
                   </span>
                   <span
                     v-else-if="scope.row.status === 1"
@@ -166,7 +168,7 @@
                   <el-tooltip v-if="scope.row.status === 4" effect="light" placement="right-end">
                     <div slot="content">{{ $t('eventView.expiredate')+scope.row.updateTs }}</div>
                     <div v-if="scope.row.status === 4" class="expiretag">
-                     {{ '('+$t('eventView.expiretag')+')' }}
+                      {{ '('+$t('eventView.expiretag')+')' }}
                     </div>
                   </el-tooltip>
                 </template>
@@ -638,6 +640,7 @@ export default {
       this.event = row;
       sessionStorage.setItem('event', JSON.stringify(this.event));
       sessionStorage.setItem('queryparams', JSON.stringify(this.params));
+      sessionStorage.removeItem('needUpdateEvent')
       this.$router.push({ name: 'eventDetails', params: { event: this.event }});
     },
 
@@ -739,7 +742,8 @@ export default {
             relatedDeviceIds: item.relatedDeviceIds,
             province: item.province,
             city: item.city,
-            code: item.code
+            code: item.code,
+            isSystemAdvancedEdited: item.isSystemAdvancedEdited 
           };
           temp.push(obj);
         });
@@ -815,8 +819,8 @@ export default {
       let start = '', end = '';
       if(this.searchParams['searchFrom']=='PatrolPersonStat' || this.searchParams['searchFrom']=="EventStatistics"){
          //storeId = this.searchParams.clause.storeId;
-         start = this.searchParams.beginTs;
-         end = this.searchParams.endTs;
+          start = this.searchParams.beginTs;
+          end = this.searchParams.endTs;
       }else{
         if (val === 0) {
           start = this.$moment(this.dateValue[0]).valueOf();
@@ -1757,8 +1761,8 @@ $h1:#292e36;
 
 </style>
 <style>
- @import '../../assets/css/pagination.css';
- @import '../../assets/css/tabsItem.css';
+  @import '../../assets/css/pagination.css';
+  @import '../../assets/css/tabsItem.css';
     .el-table::before{
         height: 0px !important;
     }
@@ -1770,16 +1774,16 @@ $h1:#292e36;
     .date-picker-poper .el-button--text{
         visibility: hidden !important;
     }
-     .select-poper .el-select-dropdown__item.hover{
+    .select-poper .el-select-dropdown__item.hover{
         background-color:#FEE4E7;
     }
-   .self-class-name .cell{
-     display: flex ;
-     align-items: center;
-   }
-   .table-content.el-table__body tr:hover>td{
-    background-color: #f2f9fe !important;
-  }
+    .self-class-name .cell{
+      display: flex ;
+      align-items: center;
+    }
+    .table-content.el-table__body tr:hover>td{
+      background-color: #f2f9fe !important;
+    }
 
   /*.el-table__header{
     width:auto !important;

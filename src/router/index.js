@@ -201,7 +201,75 @@ export const navbarRoute = {
     return eventRoute;
   },
 
-  // 簽合管理
+  // 報告與事件
+  getReportAndEvent(){
+    const reportAndEventRoute = {
+      id: 2,
+      path: '/home',
+      name: 'reportAndEvent',
+      component: Home,
+      iconCls: 'iconfont icon-shijian',
+      styles: 'font-size:22px',
+      leaf: false,
+      isReadOnly: false,
+      hidden: false,
+      children: []
+    };
+    !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && reportAndEventRoute.children.push(
+      {
+        path: '/deleteReport',
+        name: 'deleteReport',
+        component: resolve => require(['@/views/reportAndEvnets/deleteReport'], resolve),
+        meta: {
+          keepAlive: true, 
+          requireAuth: true
+        }
+      },
+      {
+        path: '/closeEvents',
+        name: 'closeEvents',
+        component: resolve => require(['@/views/reportAndEvnets/closeEvents'], resolve),
+        meta: {
+          keepAlive: true, 
+          requireAuth: true
+        }
+      },
+      {
+        path: '/operationRecord',
+        name: 'operationRecord',
+        component: resolve => require(['@/views/reportAndEvnets/operationRecord'], resolve),
+        meta: {
+          keepAlive: true, 
+          requireAuth: true
+        }
+      },
+      {
+        path: '/needDeleteReport',
+        name: 'needDeleteReport',
+        component: resolve => require(['@/views/patrolShop/InspectReport'], resolve),
+        hidden: true,
+        meta: {
+          keepAlive: true, 
+          requireAuth: true
+        }
+      },
+      {
+        path: '/needUpdateEvent',
+        name: 'needUpdateEvent',
+        component: resolve => require(['@/views/event/details/RateManage'], resolve),
+        hidden: true,
+        meta: {
+          keepAlive: true, 
+          requireAuth: true
+        }
+      },
+      
+    ) && primaryPathesList.push('/deleteReport', '/closeEvents', '/operationRecord', '/needDeleteReport', '/needUpdateEvent');
+    return reportAndEventRoute;
+  },
+
+
+  // 簽核管理
   getAuditRoute() {
     const auditRoute = {
       id:4,

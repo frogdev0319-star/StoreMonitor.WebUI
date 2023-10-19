@@ -418,6 +418,7 @@ const user = {
             accessedRoutes.push(eventRoute);
           }
 
+        
           // 統計分析
           const statisticsRoute = navbarRoute.getStatisticalRoute();
           if(statisticsRoute.children.length > 0 && !PermissionHelper.enableMimicMode) accessedRoutes.push(statisticsRoute);
@@ -448,8 +449,11 @@ const user = {
             (scheduleRoute.children.length > 0 && accessedRoutes.findIndex(item=>item.name==scheduleRoute.name)==-1) ? accessedRoutes.push(scheduleRoute) : '';
           }
           
-          
+          // 報告與事件
+          const reportAndEventRoute = navbarRoute.getReportAndEvent();
+          if(reportAndEventRoute.children.length > 0 && !PermissionHelper.enableMimicMode) accessedRoutes.push(reportAndEventRoute);
       
+          
           // 系統設定
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();
           systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';
@@ -459,7 +463,7 @@ const user = {
           const advancedSettingStatus = sessionStorage.getItem("advancedSettingStatus")
           const advancedSettingMode = sessionStorage.getItem("advancedSettingMode")
 
-          console.log('-------{o..o}-------', advancedSettingStatus , advancedSettingMode)
+          // console.log('-------{o..o}-------', advancedSettingStatus , advancedSettingMode)
         
           if(advancedSettingStatus && advancedSettingMode){
 

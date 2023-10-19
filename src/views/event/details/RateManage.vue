@@ -288,7 +288,7 @@
         </delay-button>
         </div>
         <div class="line"></div>
-        <div class="btn-content">
+        <div class="btn-content"> 
           <div v-for="(item,index) in subBtnList" :key="index" class="btn_List">
             <div
               v-if="item.isShow"
@@ -297,10 +297,17 @@
               {{ item.name }}
             </div>
           </div>
+          <div class="btn_List" v-if="needUpdateEvent">
+            <div class="reopen" @click="showUpdateEvent = true" >
+              返回處理 
+            </div>
+          </div>
+        
+
         </div>
       </div>
 
-      <div class="submit-content">
+      <div class="submit-content" :class="{ 'hidden_div' : (event.status === 2 || event.status === 4)}">
         <el-scrollbar class="submit-content-scroll">
         <div>
           <span style="display:block;"><span style="color:red;">* </span>{{ $t('eventView.addDetails') }}</span>
@@ -324,14 +331,14 @@
                   <img :src="editDesImg" style="width:20px;height:20px;align-self:center;cursor:pointer;" @click="onEditDescription"/>
                 </div>
               </div>
-               <!-- 刪除 -->
-                          <img
-                            :key="'img_'+idx"
-                            :src="deleteInspectIcon_new"
-                            alt="delete"
-                            class="to_delete"
-                            @click="onDeleteDescription(idx)"
-                          />
+              <!-- 刪除 -->
+                <img
+                  :key="'img_'+idx"
+                  :src="deleteInspectIcon_new"
+                  alt="delete"
+                  class="to_delete"
+                  @click="onDeleteDescription(idx)"
+                />
           </div>
           <div v-if="curDeslistNum<5" class="des-input">
             <div style="min-height:36px;height:auto;">
@@ -381,6 +388,22 @@
         </el-scrollbar>
       </div>
 
+      <dialog-pop
+        title="修改已結案事件"
+        :append-to-body="true"
+        :close-on-click-modal="false"
+        :show-close="false"
+        :visible="showUpdateEvent"
+        :isWarning="true"
+        @cancelHandler="cancelUpdate()"
+        @confirmHandler="confirmUpdate()"
+      >
+        <div class="dialog-slot">
+          <div class="dialog-content">請確認是否變更狀態為 <span style="color: red;"> <b>未處理</b></span>   ? </div>
+        </div>
+      </dialog-pop>
+
+
       <el-dialog :visible.sync="uploadProgress" :close-on-click-modal="false" width="510px" top="35vh" left="40vh" class="AddSumupLoad">
         <div class="body-content">
           <p>{{ $t('remotePatrol.uploading') }}</p>
@@ -401,16 +424,19 @@ import { eventRESTful } from '@/api/index';
 import { getDetailedStoreInfo } from '@/api/store';
 import { getStorageInfo } from '@/api/event';
 import PermissionHelper from '@/api/PermissionHelper';
+import {handleEventStatus} from '@/api/reportAndEvent';
 import filterString from '@/common/filterString';
 import { mapGetters } from 'vuex';
 import DelayButton from '@/components/DelayButton';
 import DescriptionText from "../../../components/DescriptionText";
+import DialogPop from '@/components/DialogPop';
 
 export default {
   name: 'EventDetail',
   components: {
     DescriptionText,
     DelayButton,
+    DialogPop,
     AudioVue: () => import('@/components/AudioVue.vue'),
     SkywatchVideo: () => import('@/components/SkywatchVideo.vue'),
     DashVideo: () => import('@/components/DashVideo.vue'),
@@ -489,10 +515,13 @@ export default {
       uploadingnumOfPic:0,
       dialogAttachVideo:false,
       oss: null,
+      showUpdateEvent: false,
+      curId: '',
+      needUpdateEvent: false,
     };
   },
   watch:{
-     vendor(){
+    vendor(){
       this.currentVideoComponent = ['DashVideo', 'EzvizVideo', 'BeseyeVideo', 'SkywatchVideo'][this.vendor];
     },
     attachFileList(){
@@ -554,9 +583,27 @@ export default {
     self.getBtnList();
     self.getSessionData();
     self.getCommentList(0);
+
+    this.needUpdateEvent =  sessionStorage.getItem('needUpdateEvent')
   },
 
   methods: {
+    cancelUpdate(){
+      this.showUpdateEvent = false
+    },
+    confirmUpdate(){
+      console.log('this.curId', this.curId)
+      var rowID = {eventId: this.curId}
+      this.showUpdateEvent = false
+      handleEventStatus(rowID).then(res=>{
+        this.$router.push({ name: 'closeEvents'});
+      }).catch(err => {
+        this.isLoading = false;
+      })
+    },
+
+
+
     ivsIdChange(val) {
       const self = this;
       const comment = filterString.all(val, 1000);
@@ -644,6 +691,8 @@ export default {
       const self = this;
       const event = JSON.parse(sessionStorage.getItem('event'));
       self.curStatus = event.status;
+      self.curId = event.id;
+
       const obj = {
         id: event.id,
         eventTitle: event.subject,
@@ -960,7 +1009,7 @@ export default {
           status = self.curStatus;
         }
         //console.log("status:",status);
-       self.addComment(status, attachment_des);
+        self.addComment(status, attachment_des);
     },
 
     checkFull() {
@@ -1235,6 +1284,10 @@ $h1:#292e36;
     @include point(padding-right,20);
     display: flex;
     align-items: center;
+}
+
+.hidden_div{
+  visibility: hidden;
 }
 .to_delete{
     margin-bottom: 5px;
@@ -1913,6 +1966,15 @@ $h1:#292e36;
             align-content:flex-start;
             margin-left: 16px;
             .btn_List{
+              .reopen{
+                background-color: #c60957;
+                color: #fff;
+                &:hover{
+                  background-color:#ae0048;
+                  color: #fff;
+                  transition: all .3s;
+                }
+              }
               margin-top:16px;
                   div{
                       display: flex;

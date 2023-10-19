@@ -39,18 +39,19 @@ export default {
   name: 'DateTimeSelector',
   components: { DateTimePicker },
   props:{
-    dateTimeValue:{
-      type: Array,
-      default:()=>{return [];}
-    },
+    // dateTimeValue:{
+    //   type: Array,
+    //   default:()=>{return [];}
+    // },
+    // dateRangeTitle:{
+    //   type:String,
+    //   default:''
+    // },
     showTooltips:{
       type: Boolean,
       default: false
     },
-    dateRangeTitle:{
-      type:String,
-      default:''
-    },
+  
     pickFuturerDate:{
       type:Boolean,
       default:false
@@ -58,6 +59,12 @@ export default {
   },
   data() {
     return {
+      date: '',
+      range: '',
+      dateRangeTitle: '',
+      dateTimeValue:[],
+
+
       dateRangeItems:[{value:3,label:this.$t('overview.last3Days')},{value:7,label:this.$t('overview.last7Days')},
                       {value:30,label:this.$t('overview.last30Days')},{value:90,label:this.$t('overview.last90Days')},
                       {value:0,label:this.$t('overview.thisMonth')},{value:1,label:this.$t('overview.lastMonth')},

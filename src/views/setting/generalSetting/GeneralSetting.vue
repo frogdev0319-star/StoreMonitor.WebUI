@@ -13,7 +13,7 @@
         {{$t('generalSetting.timeoutReminder')}}  
         <div class="spacer"></div>
       </div>
-      <!-- 節點停留時間 -->
+      <!-- 超時提醒 -->
       <div v-loading="isLoadingData" class="setting-details self-loading">
         <div class="template-info">
           <div class="inspect-basic">
@@ -168,14 +168,56 @@
                 </div>
               </div>
             </setting-table>
-
-
-
           </div>
         </div>
       </div>
     </div>
 
+    <!-- 巡檢事件 -->
+    <div class="page-container report-setting paper" >
+      <div class="setting-titles padding flex-center">
+        巡檢事件
+        <div class="spacer"></div>
+      </div>
+
+      <div v-loading="isLoadingData" class="setting-details self-loading">
+        <div class="template-info">
+          <div class="inspect-basic">
+            <setting-table table-name="逾期結案" style="margin-top: 20px;">
+              <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
+                <div class="overall_options">
+
+                  <div class="overall_row" >
+                    <el-radio-group class="storevue-radio radio_item" v-model="dueDayIsFeatureOn" style="margin-left: 20px;">
+                      <el-radio :label="1" style="  min-width: 60px; text-align: left; margin-right: 50px;" >開啟</el-radio>
+                      <el-radio :label="0" style=" width: fit-content;">關閉 </el-radio>
+                    </el-radio-group>
+                  </div>
+                  
+                  <div class="title-status" style="margin-left: calc(26/1920*100vw);">
+                    逾期天數
+                    <el-input
+                      v-model="overDueDay"
+                      ref="overDue_Day"
+                      placeholder=""
+                      type="number"
+                      :disabled="dueDayIsFeatureOn == 0"
+                      :min="1"
+                      @change="onOverDueDay"
+                      class="input-name_short"
+                      />
+                    {{$t('audit.workFlows.day')}}
+                  </div>
+                  
+                  <span class="text_limit_sign" v-if="showInputLimit_overallItem"> {{$t('insSettingView.inputRuletip')}} </span>
+                </div>
+              </div>
+            </setting-table>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
   
 </template>
@@ -237,7 +279,10 @@ export default {
         },
       ],
 
-      viewReportByTagAuth: 0
+      viewReportByTagAuth: 0,
+
+      dueDayIsFeatureOn: 1,
+      overDueDay: 90
       
     };
   },
@@ -263,11 +308,11 @@ export default {
           } else if(i.defineStatus == 1){
             i.is_customize = true
           }
-
         }
         console.log('val :>> ', val);
       }
     },
+    
     enableDelay(val){
       if(val == true && this.delayDay == undefined)  this.delayDay = 1
     },
@@ -275,6 +320,12 @@ export default {
     wokflowDelay(val){
       if(val == true && this.workflowDay == undefined)  this.workflowDay = 1
     },
+
+    dueDayIsFeatureOn(val){
+      console.log('val :>> ', val);
+      if(val == 0 )  this.overDueDay = 90
+    }
+
 
   },
 
@@ -349,6 +400,11 @@ export default {
 
           this.viewReportByTagAuth = res.data.settingContent.general_setting.view_report_by_tag_auth == true ? 1 : 0
           console.log('this.inspectStatus :>> ', this.inspectStatus);
+
+          this.dueDayIsFeatureOn = res.data.settingContent.general_setting_event_event_over_due_day_config.isFeatureOn == true ? 1 : 0
+          this.overDueDay = res.data.settingContent.general_setting_event_event_over_due_day_config.overDueDay 
+
+
         }).catch(err => {
           reject(err);
         });
@@ -401,7 +457,13 @@ export default {
               checkTime: eventCheckTime
           },
           time_zone: timeZone,
-          view_report_by_tag_auth: this.viewReportByTagAuth == 1 ? true : false
+          view_report_by_tag_auth: this.viewReportByTagAuth == 1 ? true : false,
+
+          eventOverDueDayConfig:{
+            isFeatureOn: this.dueDayIsFeatureOn == 1 ? true : false,
+            overDueDay: this.overDueDay
+          }
+
           
       }
 
@@ -440,6 +502,12 @@ export default {
         this.$refs.workflow_day.focus()
         return
       }
+      else if(this.overDueDay > 365){
+        util.notify('逾期結案天數不可大於 365 天', 'error', 2000 );
+        this.$refs.overDue_Day.focus()
+        return
+      }
+
 
       const statusNameRes = await this.updateInspectStatus();
       if (statusNameRes.errCode == 0) {
@@ -479,6 +547,17 @@ export default {
         this.workflowDay = e;
       }
     },
+    onOverDueDay(e){
+      if(e<=0){
+        this.overDueDay=1;
+      }else{
+        this.overDueDay = e;
+      }
+    },
+
+
+
+
   }
 };
 </script>

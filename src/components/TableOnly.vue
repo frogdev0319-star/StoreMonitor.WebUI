@@ -182,6 +182,32 @@
         </template>
       </el-table-column>
 
+      
+      <!-- XDXDXD -->
+      <el-table-column
+        v-if="tableAction.label"
+        :min-width="tableAction.minWidth"
+        :label="tableAction.label"
+        class-name="small-padding fixed-width"
+        :render-header="renderHeader"
+        >
+        <template slot-scope="scope">
+          <div class="flex-center" >
+              <img 
+                :key="index"
+                class="child-space"
+                :class="index === 2 && item.icon.indexOf('disabled') !== -1 && scope.row.scope === 0 ? `${item.icon} icon-disabled` : item.icon"
+                v-for="(item,index) in tableAction.operation" 
+                :src="`./static/img/table-${item.methods}.png`" 
+                @click="handleOperationButton(item.methods, scope.row, scope.$index)"
+                height="24px"
+                width="24px"
+              />
+          </div>
+        </template>
+      </el-table-column>
+
+
 
       <!-- workflow 操作 -->
       <el-table-column
@@ -322,6 +348,12 @@ export default {
       default: false
     },
     tableOperation: {
+      type: Object,
+      default: () => {
+        return {};
+      }
+    },
+    tableAction: {
       type: Object,
       default: () => {
         return {};
@@ -952,7 +984,7 @@ export default {
       background-color: #e0f2ff;
       color:#2c90d9;
       &::after{
-       border-color:#2c90d9;
+        border-color:#2c90d9;
       }
     }
     
@@ -973,7 +1005,7 @@ export default {
         &:hover
           transform: scale(1.1)
       
-  .icon-copy, .icon-setting, .icon-delete
+  .icon-copy, .icon-setting, .icon-delete, .icon-doc,  .icon-edit, 
     cursor: pointer
     transition: all .2s
     &:hover

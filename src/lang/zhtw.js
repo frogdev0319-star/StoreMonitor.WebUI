@@ -128,7 +128,15 @@ export default{
       "AdvanceSetting": "進階設定",
       "Safety": "安全性",
       "WaterMark": "浮水印",
-
+      "reportAndEvent": "報告與事件",
+      "deleteReport": "刪除報告",
+      "closeEvents": "已結案事件",
+      "operationRecord": "操作記錄",
+      "reportAndEventDeleted":"報告與事件 | 刪除報告",
+      "reportAndEventUpdated":"報告與事件 | 已結案事件",
+      "needDeleteReport":"報告詳情",
+      "needUpdateEvent":"事件詳情",
+      
 
   },
   "overview":{
@@ -437,7 +445,7 @@ export default{
       "passItem":"合格項",
       "passwordErr":"密碼錯誤",
       "patrolDate":"巡檢日期",
-      "patrolResult":"巡檢結果",
+      "patrolResult":"巡檢總評",
       "patrolScore":"巡檢得分",
       "patrolStore":"巡檢地點",
       "patrolWay":"巡檢方式",
@@ -628,7 +636,7 @@ export default{
       "AllowPhotos":"僅允許現場拍照（圖片/影像）",
       "CalculationMethod":"考評總分計算方式",
       "FailTitle":"錯誤資訊：",
-      "Inspector":"請選擇任務執行者",
+      "Inspector":"請選擇巡檢人員",
       "OnsiteLength":"現場巡檢表數量超過限制，請刪除後再導入",
       "PatrolScoreCalculation":"巡檢得分計算",
       "Proportional":"總分-比例制",
@@ -1075,7 +1083,7 @@ export default{
       "unbinded":"未綁定"
   },
   "scheduleView":{
-      "InspectPerson":"任務執行者",
+      "InspectPerson":"巡檢人員",
       "addSchedule":"新增排程",
       "all":"全選",
       "applyToAllMon":"應用至所有月份",
@@ -1093,7 +1101,7 @@ export default{
       "deleteSuss":"刪除成功！",
       "details":"詳情",
       "dueDays":"執行時效",
-      "emptyAssignedTo":"請選擇任務執行者",
+      "emptyAssignedTo":"請選擇巡檢人員",
       "emptyDate":"執行日期不能為空",
       "emptyMonth":"月份不能為空",
       "emptyName":"排程名稱不能為空",

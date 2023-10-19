@@ -55,10 +55,10 @@ export default {
       type:Boolean,
       default: false
     },
-    dateTimeValue:{
-      type: Array,
-      default:()=>{return [];}
-    },
+    // dateTimeValue:{
+    //   type: Array,
+    //   default:()=>{return [];}
+    // },
     pickFuturerDate:{
       type:Boolean,
       default:false
@@ -66,6 +66,7 @@ export default {
   },
   data() {
     return {
+      dateTimeValue: [],
       poperClass: 'date-picker-poper',
       elTooltipClass: 'el-tooltip-class',
       dateOpt: {
@@ -162,7 +163,7 @@ export default {
 
   methods: {
     getDefaultTimeList() {
-      //console.log("dateTimeValue:",this.dateTimeValue);
+      console.log("dateTimeValue~~~~~~~~>>",this.dateTimeValue);
       if(this.dateTimeValue.length==0){
         this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
       //this.dateTimeValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];

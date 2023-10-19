@@ -287,7 +287,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.1.4.7
+                v3.1.5.0
                   &copy; {{ getFullYear }} Advantech Intelligent City
                   Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
@@ -537,6 +537,8 @@ export default {
         { curPath: ["/scheduleDetailModify"], activePath: "/scheduleSetting" },
 
         { curPath: ["/waterMark"], activePath: "/waterMark" },
+
+
 
       ];
       const pathMAP = pathMapArr.find((item) => item.curPath.includes(path));
@@ -1005,7 +1007,25 @@ export default {
         {
           paths:["/scheduleDetailModify"],
           parentBread: { path: "/personalSchedule", name: "schedulePersonalModify" },
-        }
+        },
+
+        // 報告與事件
+        {
+          paths:["/needDeleteReport"],
+          parentBread: { path: "/deleteReport", name: "reportAndEventDeleted" },
+        },
+
+        {
+          paths:["/needUpdateEvent"],
+          parentBread: { path: "/closeEvents", name: "reportAndEventUpdated" },
+        },
+
+
+
+
+
+
+
       ];
       const pathAndBreadMap = pathAndBreadMaps.find((map) =>
         map.paths.includes(currentRoute)

@@ -1,4 +1,78 @@
 <template>
+<div>
+  <div class="submit_btn"  v-if="needDeleteReport">
+    <delay-button type="filled" @click="showUpdateEvent = true">
+      <div class="button-area" style="width: 80px; height: 20px;">
+        <span>刪除報告</span>
+      </div>
+    </delay-button>
+  </div>
+
+  <dialog-pop
+    title="是否確認刪除報告"
+    :append-to-body="true"
+    :close-on-click-modal="false"
+    :show-close="false"
+    :visible="showUpdateEvent"
+    :isWarning="true"
+    :showButton=" false"
+  >
+    <div class="dialog-slot">
+      <div class="dialog-content">
+        <div class="comfirm_delete_report" >
+          <h3>同意刪除須知事項 </h3>
+          <p>請注意！刪除報告後資料無法復原，請確保您要刪除的報告是正確的，請謹慎操作。 
+            為確保報告的安全刪除，請提供用戶密碼並勾選 <b>「我理解並同意刪除報告」</b>。
+            如果您有任何疑問或需要協助，請隨時聯絡我們的客服團隊。</p>
+        </div>
+
+        <div class="l_row" >
+          <el-checkbox  class="storevue-checkbox-filled" v-model="agreeDelete" @change="addNum">
+            <span style="color: red">*</span> 我理解並同意刪除報告
+          </el-checkbox>
+        </div>
+
+        <div class="l_row">
+          <div style="margin-bottom: 5px ;">
+            <span style="color: red; ">*</span> 刪除原因 
+          </div>
+          <el-input
+            v-model="deleteReason"
+            type="textarea"
+            ref="delay_day"
+            placeholder=""
+            class="input-name_short"
+            @change="addNum"
+            />
+        </div>
+
+        <div class="l_row">
+          <div style="margin-bottom: 5px ;">
+            <span style="color: red; ">*</span> 請再次輸入使用者密碼 
+          </div>
+          <el-input
+            v-model="passWord"
+            ref="delay_day"
+            placeholder=""
+            class="input-name_short"
+            @change="addNum"
+            />
+        </div>
+        <div class="delete_btn_row">
+          <el-button class="cancel-btn" size="mini" @click="cancelUpdate">
+            {{ $t('remotePatrol.cancel') }}
+          </el-button>
+          <el-button :disabled="!canDeleteReport" class="confirm-btn" size="mini" type="primary" @click="confirmUpdate">
+            {{ $t('remotePatrol.confirm') }}
+          </el-button>
+      </div>
+
+      
+      </div>
+    </div>
+  </dialog-pop>
+
+
   <div ref="printPDF" class="report-container" :class="{'print': isexportPDF}">
     <div style="display: none">
       <div class="no-print">
@@ -638,7 +712,9 @@
       </div>
     </dialog-pop>
   </div>
+</div>
 </template>
+
 <script>
 import ECharts from 'vue-echarts';
 import {
@@ -649,6 +725,8 @@ import {
 } from '@/api/inspect';
 import { CancelWorkflow,taskDrawback,GetTaskInfo } from '@/api/workflow';
 import {getDetailedStoreInfo} from '@/api/store';
+import { deleteReport} from '@/api/reportAndEvent';
+import { Encrypt } from '@/common/Aes'
 import util from '@/common/util';
 import videojs from '../../../static/video.js';
 import 'videojs-contrib-hls';
@@ -683,6 +761,7 @@ export default {
 
   data() {
     return {
+      showUpdateEvent: false,
       templateList: [],
       templateConfig: [],
       curTemplateIndex: 0,
@@ -782,6 +861,13 @@ export default {
       qualifiedForIgnoredWithType1: false,
       qualifiedForIgnoredWithType2: false,
 
+      changeNum: 0,
+      agreeDelete: false,
+      deleteReason: '',
+      passWord: '',
+      deleteReportId: '',
+      canDeleteReport: false,
+      
     };
   },
 
@@ -818,7 +904,12 @@ export default {
       if(val !== -1) {
         this.showTag = true
       }
-    }
+    },
+
+    changeNum(val){
+      if(this.agreeDelete == true && this.deleteReason !== '' && this.passWord !== '') this.canDeleteReport = true
+      else this.canDeleteReport = false
+    },
 
   },
   created() {
@@ -826,15 +917,52 @@ export default {
     this.getRouterData();
     this.getReportTemplateAndInfo();
     this.getInspectStatus()
+
+    
   },
 
   mounted() {
     this.accountName = sessionStorage.getItem('accountName');
+    this.needDeleteReport = sessionStorage.getItem('needDeleteReport');
   },
 
   methods: {
     
-  
+    addNum(){
+      this.changeNum += 1
+      console.log('this.changeNum :>> ', this.changeNum);
+    },
+    cancelUpdate(){
+      this.showUpdateEvent = false
+      this.agreeDelete = false
+      this.deleteReason = ''
+      this.passWord = ''
+    },
+
+    confirmUpdate(){
+      console.log('this.deleteReportId :>> ', this.deleteReportId);
+      var EncryptPassword = Encrypt(this.passWord)
+
+      var delParams = {
+        reportId: this.deleteReportId,
+        reason: this.deleteReason,
+        password: EncryptPassword
+      }
+      console.log('delParams ~~~~~~~>> ', delParams);
+      // this.isLoading = true;   
+      deleteReport(delParams).then(res=>{
+        console.log('res :>> ', res);
+        if(res.errCode){
+          util.notify('密碼輸入錯誤', 'error', 3000);
+        } else {
+          this.$router.push({ name: 'deleteReport' });
+        }
+        
+      }).catch(err => {
+        console.log('err :>> ', err.errCode);
+      })
+    },
+
     // 計算分母
     getTotalScore(data, hundredMarkType){
       console.log('getTotalScore data :>> ', data);
@@ -1410,6 +1538,7 @@ export default {
       self.showEditBtn = self.$route.params.canEdit;
       self.showCancelBtn = self.$route.params.canCancel;
       const routeData = JSON.parse(sessionStorage.getItem('report_data'));
+      self.deleteReportId = routeData.id
       console.log("report routeData:",routeData);
       if(routeData && !self.isAuditMode){
         const obj = {};
@@ -2602,6 +2731,34 @@ export default {
   }
 };
 </script>
+
+<style lang="sass" scoped>
+  .submit_btn
+    margin-bottom: 20px
+    display: flex
+    flex-direction: row
+    justify-content: flex-end
+    align-items: center
+  .comfirm_delete_report
+    h3
+      color: red
+  .l_row
+    margin-bottom: 20px
+  .delete_btn_row
+    display: flex
+    flex-direction: row
+    align-items: flex-end
+    justify-content: flex-end
+    .cancel-btn
+    .confirm-btn
+      color: #FFF
+    .is-disabled
+      background-color: #dcdfe9
+      border-color: #dcdfe9
+      &:hover
+        background-color: #dcdfe9
+        border-color: #dcdfe9
+</style>
 
 <style lang="scss" scoped>
   @function rem($val){
