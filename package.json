@@ -20,6 +20,7 @@
     "bootstrap-vue": "^2.7.0",
     "co": "^4.6.0",
     "core-video-to-gif": "^1.0.2",
+    "crypto-js": "^4.1.1",
     "csv-exportor": "^1.0.2",
     "echarts": "^4.2.1",
     "el-cascader-multi": "^1.1.8",

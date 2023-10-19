@@ -127,7 +127,7 @@
           <div class="empty-content">{{ noData }} </div>
         </div>
         
-        <div class="el-pat">
+        <div class="el-pat"  v-if="eventTableData.length > 0">
             <!--<el-pagination
               :page-size="sizeNum"
               :total="total"
@@ -553,8 +553,6 @@ export default {
       var rowID = {eventId: updateEventId}
       this.showUpdateEvent = false
       this.isLoading = true;   
-
-    
       handleEventStatus(rowID).then(res=>{
         console.log('res :>> ', res);
         this.getEvents(this.params);

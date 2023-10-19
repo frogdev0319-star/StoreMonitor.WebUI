@@ -11,10 +11,18 @@ export const fetchLog = data => {
   });
 };
 
-
 export const handleEventStatus = data => {
   return request({
     url: `${version}/system/advanced/event/update`,
+    method: 'post',
+    data
+  });
+};
+
+
+export const deleteReport = data => {
+  return request({
+    url: `${version}/system/advanced/report/delete`,
     method: 'post',
     data
   });

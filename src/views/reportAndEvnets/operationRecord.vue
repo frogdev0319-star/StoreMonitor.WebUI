@@ -235,7 +235,7 @@ export default {
           size: this.curSizeNum
         },
         order: {
-            direction: "asc",
+            direction: "desc",
             property: "ts",
         }
       }
@@ -274,7 +274,6 @@ export default {
         }
         
         this.tableDataList[typeN].tableData = temp
-
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;

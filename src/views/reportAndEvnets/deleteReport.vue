@@ -100,12 +100,11 @@
             <table-only
               ref="elTP"
               class="table-white table_style"
-              :table-themes="white"
               :column-data="reportInfoTable"
               :table-data="reportTableData"
               :highlight-current-row= "true"
               :is-loading-data="isLoading"
-              :table-operation ="columnOperationData"
+              :tableAction ="columnOperationData"
               :allowRowExpand = "false"
               :showBorder = "false"
               :default-sort = "{prop: 'datestr', order: 'descending'}"
@@ -128,7 +127,7 @@
           <div class="empty-content">{{ noData }}</div>
         </div>
         
-        <div class="el-pat">
+        <div class="el-pat" v-if="reportTableData.length > 0">
             <!--<el-pagination
               :page-size="sizeNum"
               :total="total"
@@ -143,18 +142,83 @@
               <div class="pageSizeTitle" style="color: #666"> {{ $t('remotePatrol.totalOf') }} <b style="font-size: 16px"> {{totalElements}} </b> {{ $t('remotePatrol.numReports') }}</div>
 
               <tbl-pagination-only
-              :btn-style="{backgroundColor:'transparent'}"
-              :total="total"
-              :current-page="page"
-              :page-size="sizeNum"
-              layout = "prev,pager, next,sizes,slot"
-              @sizeChange="sizeChange"
-              @currentChange="currentChange"
+                
+                :btn-style="{backgroundColor:'transparent'}"
+                :total="total"
+                :current-page="page"
+                :page-size="sizeNum"
+                layout = "prev,pager, next,sizes,slot"
+                @sizeChange="sizeChange"
+                @currentChange="currentChange"
             />
             
           </div>
       </div>
     </div>
+    <dialog-pop
+      title="是否確認刪除報告"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :visible="showUpdateEvent"
+      :isWarning="true"
+      :showButton=" false"
+    >
+      <div class="dialog-slot">
+        <div class="dialog-content">
+          <div class="comfirm_delete_report" >
+            <h3>同意刪除須知事項 </h3>
+            <p>請注意！刪除報告後資料無法復原，請確保您要刪除的報告是正確的，請謹慎操作。 
+              為確保報告的安全刪除，請提供用戶密碼並勾選 <b>「我理解並同意刪除報告」</b>。
+              如果您有任何疑問或需要協助，請隨時聯絡我們的客服團隊。</p>
+          </div>
+
+          <div class="l_row" >
+            <el-checkbox  class="storevue-checkbox-filled" v-model="agreeDelete" @change="testaaa">
+              <span style="color: red">*</span> 我理解並同意刪除報告
+            </el-checkbox>
+          </div>
+
+          <div class="l_row">
+            <div style="margin-bottom: 5px ;">
+              <span style="color: red; ">*</span> 刪除原因 
+            </div>
+            <el-input
+              v-model="deleteReason"
+              type="textarea"
+              ref="delay_day"
+              placeholder=""
+              class="input-name_short"
+              @change="testaaa"
+              />
+          </div>
+
+          <div class="l_row">
+            <div style="margin-bottom: 5px ;">
+              <span style="color: red; ">*</span> 請再次輸入使用者密碼 
+            </div>
+            <el-input
+              v-model="passWord"
+              ref="delay_day"
+              placeholder=""
+              class="input-name_short"
+              @change="testaaa"
+              />
+          </div>
+          <div class="delete_btn_row">
+            <el-button class="cancel-btn" size="mini" @click="cancelUpdate">
+              {{ $t('remotePatrol.cancel') }}
+            </el-button>
+            <el-button :disabled="!canDeleteReport" class="confirm-btn" size="mini" type="primary" @click="confirmUpdate">
+              {{ $t('remotePatrol.confirm') }}
+            </el-button>
+        </div>
+
+        
+        </div>
+      </div>
+    </dialog-pop>
+
     <!-- <dialog-pop
       :title="$t('remotePatrol.exportExcelAllWarning')"
       :isWarning="true"
@@ -189,6 +253,10 @@ import {
       GetMysteryInspectTagList ,
       getInspectStatus
     } from '@/api/inspect';
+
+import { deleteReport} from '@/api/reportAndEvent';
+
+import { Encrypt } from '@/common/Aes'
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
 import StoreFilter from '@/components/StoreFilter';
@@ -217,7 +285,14 @@ export default {
       varyWindowWidth: window.innerWidth,
       varyWindowHeight: window.innerHeight,
       searchContent: false,
-      
+      showUpdateEvent: false,
+
+      agreeDelete: false,
+      deleteReason: '',
+      passWord: '',
+      deleteReportId: '',
+      canDeleteReport: false,
+
       curSortType: 0,
       ShowCard: true,
       isHoverList: false,
@@ -308,9 +383,7 @@ export default {
           'width': '145',
           'maxWidth': '180',
         },
-    
       ],
-
       columnOperationData: {
         label: this.$t('deviceView.operation'),
         minWidth: '100',
@@ -318,13 +391,13 @@ export default {
         operation: [
           {
             lable: '',
-            icon: 'el-icon-document',
-            methods: 'set'
+            icon: 'icon-doc',
+            methods: 'doc'
           },
           {
             lable: '',
-            icon: 'icon-delete',
-            methods: 'delete'
+            icon: 'icon-edit',
+            methods: 'edit'
           }
         ]
       },
@@ -389,12 +462,13 @@ export default {
       showExportAllNotice:false,
 
       inspectStatus:'',
-      totalElements: 0
+      totalElements: 0,
+      changeNum: 0
     };
   },
 
   created() {
-    this.isFirstLoad = true;
+    this.isFirstLoad = true
   },
   computed: {
     iconSrcHeight() {
@@ -423,7 +497,14 @@ export default {
         this.ifSearchData = true;
         this.getInspectList();
         //this.initData();
-    }
+    },
+
+    changeNum(val){
+      if(this.agreeDelete == true && this.deleteReason !== '' && this.passWord !== '') this.canDeleteReport = true
+      else this.canDeleteReport = false
+    },
+
+
   },
   activated() {
     const self = this;
@@ -437,7 +518,7 @@ export default {
 
 
   methods: {
-    initData() {
+    async initData() {
       const self = this;
       self.isLoading = true;
       this.searchInput = '';
@@ -451,15 +532,11 @@ export default {
       self.showStoreContent = false;
       self.checkAllStore = false;
       self.curReportType = -1;
-      self.getSearchParams();
-      self.getInspectList();
-      self.getInspectStatus();
+      await self.getSearchParams();
+      await self.getInspectList();
+      await self.getInspectStatus();
       
     },
-
-
-
-    
     cellStyle({ row, column, rowIndex, columnIndex }) {
       let obj = {};
       if (columnIndex === 0) {
@@ -470,8 +547,77 @@ export default {
       return obj;
     },
 
+    testaaa(){
+      this.changeNum += 1
+      console.log('this.changeNum :>> ', this.changeNum);
+    },
+    handleEmitOperation(val){
+      console.log('val' , val)
+      switch (val.method) {
+        case  'doc':
+          this.handleEventDoc(val)
+          break;
 
-    
+        case'edit':
+          this.showUpdateEvent = true
+          this.deleteReportId = val.row.id
+          break;
+      
+        default:
+          break;
+      }
+    },
+
+    handleEventDoc(val){
+      console.log('val :>> ', val);
+
+      var reportObj = val.row.routeObj
+      console.log('reportObj :>> ', reportObj);
+      sessionStorage.setItem('report_data', JSON.stringify(reportObj));
+      this.$router.push({ name: 'reportDetails', params: { data: reportObj }});
+    },
+  
+    cancelUpdate(){
+      this.showUpdateEvent = false
+      this.agreeDelete = false
+      this.deleteReason = ''
+      this.passWord = ''
+    },
+
+    confirmUpdate(){
+      console.log('this.deleteReportId :>> ', this.deleteReportId);
+      
+      var EncryptPassword = Encrypt(this.passWord)
+
+      var delParams = {
+        reportId: this.deleteReportId,
+        reason: this.deleteReason,
+        password: EncryptPassword
+      }
+      console.log('delParams ~~~~~~~>> ', delParams);
+     
+      // this.isLoading = true;   
+      deleteReport(delParams).then(res=>{
+        console.log('res :>> ', res);
+        if(res.errCode){
+          util.notify('密碼輸入錯誤', 'error', 3000);
+        } else {
+          this.showUpdateEvent = false
+          this.agreeDelete = false
+          this.deleteReason = ''
+          this.passWord = ''
+          // this.searchData()
+        }
+        
+      }).catch(err => {
+        console.log('err :>> ', err.errCode);
+      })
+    },
+
+
+
+
+
     getReportList(p) {
       console.log("1.Get Report List")
       var params = {
@@ -670,7 +816,7 @@ export default {
     },
 
     searchData() {
-      console.log("Search Data" +this.dateValue)
+      console.log("Search Data >>>>" , this.dateValue)
       const self = this;
       const val = self.dateValue;
       if (val.length === 0) return;
@@ -977,13 +1123,6 @@ export default {
 
 
 <style lang="sass">
-  .ignoreSign
-    width: fit-content
-    border-radius: 4px
-    font-size: 12px
-    color: #989ca0
-    background: #EFEFEF
-    padding: 5px
   .table_style
     background: #FFF
     .row-class
@@ -1008,6 +1147,26 @@ export default {
 
     .cell-class .cell
       text-align: left  !important
+      
+  .comfirm_delete_report
+    h3
+      color: red
+  .l_row
+    margin-bottom: 20px
+  .delete_btn_row
+    display: flex
+    flex-direction: row
+    align-items: flex-end
+    justify-content: flex-end
+    .cancel-btn
+    .confirm-btn
+      color: #FFF
+    .is-disabled
+      background-color: #dcdfe9
+      border-color: #dcdfe9
+      &:hover
+        background-color: #dcdfe9
+        border-color: #dcdfe9
 
 </style>
 
@@ -1157,10 +1316,11 @@ $filterWidth: (100%-706);
         .empty-content{
           font-size: calc(16/1920*100vw);
           color: $tab;
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
+          height: 300px;
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
         }
         .card-header{
             text-align: left;
