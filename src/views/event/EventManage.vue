@@ -166,9 +166,9 @@
                   </span>
 
                   <el-tooltip v-if="scope.row.status === 4" effect="light" placement="right-end">
-                    <div slot="content">{{ $t('eventView.expiredate')+scope.row.updateTs }}</div>
+                    <div slot="content">{{ $t('eventView.expiredate')+ scope.row.updateTs }} </div>
                     <div v-if="scope.row.status === 4" class="expiretag">
-                      {{ '('+$t('eventView.expiretag')+')' }}
+                      {{ '('+$t('eventView.expiretag')+')' }} 
                     </div>
                   </el-tooltip>
                 </template>
@@ -725,7 +725,7 @@ export default {
           const obj = {
             id: item.id,
             ts: util.getDateTime(item.ts),
-            updateTs:(item.status==4)?util.getDateTime(item.updateTs):"",
+            updateTs:(item.status==4)?util.getDateTime(item.ts):"",
             assignee: item.assignee,
             assignerName: item.assignerName,
             assigneeName: item.assigneeName,
