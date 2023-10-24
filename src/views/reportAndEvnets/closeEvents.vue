@@ -7,10 +7,10 @@
         @storeChange = "onStoreChange"
       >
         <template v-slot:others>
-          <div class="last-row" >
+          <div class="last-row"  style="justify-content: flex-start">
 
             <!-- 總評類型 -->
-            <span style="margin-right: 16px; font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.resultType') }}</span>
+            <!-- <span style="margin-right: 16px; font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.resultType') }}</span>
             <el-select
               v-model="curAppraise"
               :placeholder="$t('remotePatrol.all')"
@@ -22,7 +22,7 @@
                 :key="item.status"
                 :label="item.label"
                 :value="item.status"/>
-            </el-select>
+            </el-select> -->
 
             <!-- 報表類型 -->
             <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.reportType') }}</span>

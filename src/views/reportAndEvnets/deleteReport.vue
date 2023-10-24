@@ -99,7 +99,7 @@
           <div class="list-table for_pre">
             <table-only
               ref="elTP"
-              class="table-white table_style"
+              class="table-white table_style_delete_report"
               :column-data="reportInfoTable"
               :table-data="reportTableData"
               :highlight-current-row= "true"
@@ -180,7 +180,7 @@
 
           <div class="l_row">
             <div style="margin-bottom: 5px ;">
-              <span style="color: red; ">*</span> 刪除原因 
+              <span style="color: red; ">*</span> 刪除原因
             </div>
             <el-input
               v-model="deleteReason"
@@ -188,20 +188,21 @@
               ref="delay_day"
               placeholder=""
               class="input-name_short"
-              @change="addNum"
+              @input="addNum"
               />
           </div>
 
           <div class="l_row">
             <div style="margin-bottom: 5px ;">
-              <span style="color: red; ">*</span> 請再次輸入使用者密碼 
+              <span style="color: red; ">*</span> 請再次輸入使用者密碼
             </div>
             <el-input
               v-model="passWord"
+              show-password
               ref="delay_day"
               placeholder=""
               class="input-name_short"
-              @change="addNum"
+              @input="addNum"
               />
           </div>
           <div class="delete_btn_row">
@@ -289,7 +290,7 @@ export default {
       reportInfoTable: [
         {
           'prop': 'province',
-          'label': this.$t('remotePatrol.regionI'),
+          'label': this.$t('remotePatrol.regionI') + "一",
           'sortable': false,
           'width': '140',
           'maxWidth': '150',
@@ -577,7 +578,7 @@ export default {
       deleteReport(delParams).then(res=>{
         console.log('res :>> ', res);
         if(res.errCode){
-          util.notify('密碼輸入錯誤', 'error', 3000);
+          util.notify('密碼錯誤，請重新輸入！', 'error', 3000);
         } else {
           this.showUpdateEvent = false
           this.agreeDelete = false
@@ -781,6 +782,8 @@ export default {
     handlePagination(pageInfo){
       console.log('pageInfo ~~~~~>> ', pageInfo);
       console.log('this.params ~~~~~>> ', this.params);
+      this.isLoading = true;
+
       this.currentPage = pageInfo.page
       this.curSizeNum = pageInfo.size;
       
@@ -807,6 +810,8 @@ export default {
     searchData() {
       console.log("Search Data >>>>" , this.dateValue)
       const self = this;
+      self.isLoading = true;
+
       const val = self.dateValue;
       if (val.length === 0) return;
       const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
@@ -1112,13 +1117,14 @@ export default {
 
 
 <style lang="sass">
-  .table_style
+  .table_style_delete_report
     background: #FFF
     .row-class
       th
         &:nth-child(1)
           padding-left: 0 !important
       td
+
         &:nth-child(1), &:nth-child(2), &:nth-child(3), &:nth-child(5),
           .cell
             padding-left: 10% !important
@@ -1128,6 +1134,9 @@ export default {
             span
               // background: #9872 !important
               // white-space: pre !important
+        &:nth-child(10)
+          .cell
+            white-space: nowrap !important
             
     .el-table th div
       padding-left: 10px !important
