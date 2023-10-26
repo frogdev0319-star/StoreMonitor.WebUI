@@ -444,11 +444,16 @@ const user = {
             const scheduleRoute = navbarRoute.getInceptionSchedule();
             (scheduleRoute.children.length > 0 && accessedRoutes.findIndex(item=>item.name==scheduleRoute.name)==-1) ? accessedRoutes.push(scheduleRoute) : '';
           }
-          
+            
+
+          const roleId = user.state.roleId
+          console.log('roleId !!!!!!>> ', roleId);
           // 報告與事件
-          const reportAndEventRoute = navbarRoute.getReportAndEvent();
-          if(reportAndEventRoute.children.length > 0 && !PermissionHelper.enableMimicMode) accessedRoutes.push(reportAndEventRoute);
-      
+          if(roleId === 1){
+            const reportAndEventRoute = navbarRoute.getReportAndEvent();
+            if(reportAndEventRoute.children.length > 0 && !PermissionHelper.enableMimicMode) accessedRoutes.push(reportAndEventRoute);
+          }
+          
           
           // 系統設定
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();

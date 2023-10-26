@@ -143,8 +143,6 @@
                     style="background-color:#fff2ef;color:#f57848;"
                     >
                     {{ $t('eventView.pending') }} 
-                    
-                    <div style="margin-top: 2px;" v-if="scope.row.isSystemAdvancedEdited">(已變更狀態)</div>
                   </span>
                   <span
                     v-else-if="scope.row.status === 1"
@@ -164,6 +162,19 @@
                     style="background-color:#ffeff5;color:#e22472;" >
                     {{ $t('eventView.returnStatus') }}
                   </span>
+                  
+                  <el-tooltip v-if="scope.row.status === 0  && scope.row.isSystemAdvancedEdited" effect="light" placement="right-end">
+                    <div slot="content"> 變更時間：{{scope.row.systemAdvancedActionTs}} </div>
+                    <div v-if="scope.row.status === 0 && scope.row.isSystemAdvancedEdited" class="expiretag">
+                      <span style="color:#f57848;"> (已變更狀態) </span> 
+                    </div>
+                  </el-tooltip>
+                  <el-tooltip v-if="scope.row.status === 1 && scope.row.isSystemAdvancedEdited" effect="light" placement="right-end">
+                    <div slot="content"> 變更時間：{{scope.row.systemAdvancedActionTs}} </div>
+                    <div v-if="scope.row.status === 1 && scope.row.isSystemAdvancedEdited" class="expiretag">
+                      <span style="color:#59ab22;"> (已變更狀態) </span> 
+                    </div>
+                  </el-tooltip>
 
                   <el-tooltip v-if="scope.row.status === 4" effect="light" placement="right-end">
                     <div slot="content">{{ $t('eventView.expiredate')+ scope.row.updateTs }} </div>
@@ -625,6 +636,7 @@ export default {
         this.event = row;
         sessionStorage.setItem('event', JSON.stringify(this.event));
         sessionStorage.setItem('queryparams', JSON.stringify(this.params));
+        sessionStorage.removeItem('needUpdateEvent')
         this.$router.push({ name: 'eventDetails', params: { event: this.event }});
       }else{
         this.stopRowClick = false;
@@ -725,7 +737,7 @@ export default {
           const obj = {
             id: item.id,
             ts: util.getDateTime(item.ts),
-            updateTs:(item.status==4)?util.getDateTime(item.ts):"",
+            updateTs:(item.status==4) ? util.getDateTime(item.ts) : "",
             assignee: item.assignee,
             assignerName: item.assignerName,
             assigneeName: item.assigneeName,
@@ -743,7 +755,8 @@ export default {
             province: item.province,
             city: item.city,
             code: item.code,
-            isSystemAdvancedEdited: item.isSystemAdvancedEdited 
+            isSystemAdvancedEdited: item.isSystemAdvancedEdited,
+            systemAdvancedActionTs: item.isSystemAdvancedEdited ? util.getDateTime(item.systemAdvancedActionTs) : "",
           };
           temp.push(obj);
         });

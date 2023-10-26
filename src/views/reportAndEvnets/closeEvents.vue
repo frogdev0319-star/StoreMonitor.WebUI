@@ -96,8 +96,6 @@
 
           <!-- 報告列表 -->
           <div class="list-table for_pre">
-            
-
             <table-only
               ref="elTP"
               class="table-white table_style"
@@ -423,8 +421,9 @@ export default {
       this.showStoreContent = false;
       this.checkAllStore = false;
       this.curReportType = -1;
-      
+    
       await this.getSearchParams();
+      await this.getInspectList();
       await this.searchData();
       
     },
@@ -434,7 +433,7 @@ export default {
         console.log('res.data --->', res.data)
   
         this.totalEvents = res.data.totalElements
-        this.total = res.data.totalElements
+        this.total = res.data.totalPages
         
         this.eventTableData = res.data.content
         this.eventTableData.forEach(i => {
@@ -505,8 +504,7 @@ export default {
       };
   
       console.log("###",self.params)
-      // self.saveSearchParams();
-      
+      self.saveSearchParams();
       self.getEvents(self.params);
     },
 
@@ -565,39 +563,11 @@ export default {
     },
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
     getReportList(p) {
-      console.log("1.Get Report List")
+      console.log("1.Get Report List" , p)
       var params = {
-        beginTs:p.beginTs,endTs:p.endTs,
+        beginTs:p.beginTs,
+        endTs:p.endTs,
         clause:p.clause,
         like:p.like,
         filter:p.filter,
@@ -609,7 +579,8 @@ export default {
       console.log('params ~~~~~>> ', params);
       const self = this;
       params.endTs = params.endTs - params.endTs % 1000 + 999;
-      if (params.clause.storeId.length === 0) {
+
+      if (params.clause.storeId && params.clause.storeId.length === 0) {
         console.log("No Data")
         this.setNoData();
         return;
@@ -947,7 +918,9 @@ export default {
     saveSearchParams() {
       console.log("Save Search Params")
       let tempsearchParamsObj = this.storeFilterObj;
+      console.log('tempsearchParamsObj :>> ', tempsearchParamsObj);
       tempsearchParamsObj.curReportType = this.curReportType;
+
       if(!tempsearchParamsObj.clause){
         tempsearchParamsObj.clause={
           storeId: this.storeFilterObj.filterStoreIds,
@@ -960,16 +933,16 @@ export default {
       tempsearchParamsObj.inspectTagId = this.inspectId;
       //
       const searchParamsObj = {
-        path: 'inspectReport',
+        path: 'closeEvents',
         params: tempsearchParamsObj
       };
       SearchConditionUtil.saveSearchCondition(searchParamsObj);
     },
 
     getSearchParams() {
-      
+      // clause
       // console.log("Get SEarch Parameter");
-      let searchParams = JSON.parse(JSON.stringify(SearchConditionUtil.getSearchCondition('inspectReport')));
+      let searchParams = JSON.parse(JSON.stringify(SearchConditionUtil.getSearchCondition('closeEvents')));
       console.log("getSearchParams>>>>searchParams:",searchParams);
       this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
 

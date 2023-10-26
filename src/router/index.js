@@ -204,7 +204,7 @@ export const navbarRoute = {
   // 報告與事件
   getReportAndEvent(){
     const reportAndEventRoute = {
-      id: 2,
+      id: 8,
       path: '/home',
       name: 'reportAndEvent',
       component: Home,
