@@ -616,7 +616,7 @@ export default{
       "solver":"負責人",
       "status":"處理狀態",
       "storeName":"地點名稱",
-      "stores":"所屬地點",
+      "stores":"巡檢地點",
       "submit":"送出",
       "submitTime":"送出時間",
       "submitter":"送出人",

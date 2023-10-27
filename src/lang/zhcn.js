@@ -612,7 +612,7 @@ export default{
       "solver":"负责人",
       "status":"处理状态",
       "storeName":"地点名称",
-      "stores":"所属地点",
+      "stores":"巡检地点",
       "submit":"提交",
       "submitTime":"提报时间",
       "submitter":"提报人",
