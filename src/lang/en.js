@@ -625,7 +625,7 @@ export default{
         "expiretag":"Expired",
         "maximumAttVedio":"Only 2 video attachments can be uploaded",
         "videoFormatNotSupoort":"The browser does not support this video format, please use the StoreVue app to view",
-        
+        "createTs":"Event Time",
     },
     "insSettingView":{
         "Addscoreitems":"Additional scoring items",
