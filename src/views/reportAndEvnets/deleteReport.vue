@@ -46,9 +46,9 @@
               <el-select
                 class="el-province"
                 style="margin-left:0px;border:none;border-radius:0px;"
-              v-model="inspectId"
-              :placeholder="$t('insSettingView.selectPost')"
-              size="mini">
+                v-model="inspectId"
+                :placeholder="$t('insSettingView.selectPost')"
+                size="mini">
               <el-option
                 v-for="item in inspectTableList"
                 :key="item.id"
@@ -128,30 +128,17 @@
         </div>
         
         <div class="el-pat" v-if="reportTableData.length > 0">
-            <!--<el-pagination
-              :page-size="sizeNum"
-              :total="total"
-              :current-page="page"
-              :page-sizes="[12,24,50,100]"
-              background
-              small
-              layout="jumper,total, prev, pager, next,sizes"
-              class="el-pag"
-              @current-change="currentChange"
-              @size-change="sizeChange"/>-->
-              <div class="pageSizeTitle" style="color: #666"> {{ $t('remotePatrol.totalOf') }} <b style="font-size: 16px"> {{totalElements}} </b> {{ $t('remotePatrol.numReports') }}</div>
-
-              <tbl-pagination-only
-                :btn-style="{backgroundColor:'transparent'}"
-                :total="total"
-                :current-page="currentPage"
-                :page-size="sizeNum"
-                layout = "prev,pager, next,sizes,slot"
-                @sizeChange="handlePagination"
-                @currentChange="handlePagination"
-              />
-                
-          </div>
+          <div class="pageSizeTitle" style="color: #666"> {{ $t('remotePatrol.totalOf') }} <b style="font-size: 16px"> {{totalElements}} </b> {{ $t('remotePatrol.numReports') }}</div>
+          <tbl-pagination-only
+            :btn-style="{backgroundColor:'transparent'}"
+            :total="total"
+            :current-page="currentPage"
+            :page-size="sizeNum"
+            layout = "prev,pager, next,sizes,slot"
+            @sizeChange="handlePagination"
+            @currentChange="handlePagination"
+          />
+        </div>
       </div>
     </div>
     <dialog-pop
@@ -401,6 +388,9 @@ export default {
       ],
       storeStr: '',
       
+
+
+      
       params: {},
       storeDataList: [],
       storeIdList: [],
@@ -564,6 +554,7 @@ export default {
       this.passWord = ''
     },
 
+
     confirmUpdate(){
       console.log('this.deleteReportId :>> ', this.deleteReportId);
       var EncryptPassword = Encrypt(this.passWord)
@@ -573,8 +564,8 @@ export default {
         reason: this.deleteReason,
         password: EncryptPassword
       }
-      console.log('delParams ~~~~~~~>> ', delParams);
-      // this.isLoading = true;   
+      // console.log('delParams ~~~~~~~>> ', delParams);
+
       deleteReport(delParams).then(res=>{
         console.log('res :>> ', res);
         if(res.errCode){
@@ -584,12 +575,12 @@ export default {
           this.agreeDelete = false
           this.deleteReason = ''
           this.passWord = ''
-          // this.searchData()
+          this.searchData()
         }
-        
       }).catch(err => {
         console.log('err :>> ', err.errCode);
       })
+
     },
 
 
@@ -686,7 +677,7 @@ export default {
           self.reportTableData = tempTable;
           
 
-          self.total = Math.ceil(res.data.totalElements/self.sizeNum);
+          self.total = res.data.totalPages
           self.isLoading = false;
           if (temp.length === 0) {
             self.noData = self.$t('deviceView.noData');
@@ -1012,7 +1003,7 @@ export default {
       tempsearchParamsObj.inspectTagId = this.inspectId;
       //
       const searchParamsObj = {
-        path: 'inspectReport',
+        path: 'deleteReport',
         params: tempsearchParamsObj
       };
       SearchConditionUtil.saveSearchCondition(searchParamsObj);
@@ -1020,7 +1011,7 @@ export default {
 
     getSearchParams() {
       // console.log("Get SEarch Parameter");
-      let searchParams = JSON.parse(JSON.stringify(SearchConditionUtil.getSearchCondition('inspectReport')));
+      let searchParams = JSON.parse(JSON.stringify(SearchConditionUtil.getSearchCondition('deleteReport')));
       console.log("getSearchParams>>>>searchParams:",searchParams);
       this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
 

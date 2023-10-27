@@ -62,15 +62,21 @@
                 />
               </div>
               <div class="page-area">
-                <tbl-pagination-only
-                  :btn-style="{backgroundColor:'transparent'}"
-                  :total="total"
-                  :current-page="currentPage"
-                  :page-size="sizeNum"
-                  layout = "total, prev, pager, next, sizes, slot"
-                  @sizeChange="handlePagination"
-                  @currentChange="handlePagination"
-                />
+
+                <div class="pagination_row"  v-if="totalEvents > 0"> 
+                  <div class="pageSizeTitle" style="color: #666">共有 <b style="font-size: 16px"> {{totalEvents}} </b> {{ $t('remotePatrol.numReports') }}</div>
+
+                  <tbl-pagination-only
+                    :btn-style="{backgroundColor:'transparent'}"
+                    :total="total"
+                    :current-page="currentPage"
+                    :page-size="sizeNum"
+                    layout = "total, prev, pager, next, sizes, slot"
+                    @sizeChange="handlePagination"
+                    @currentChange="handlePagination"
+                  />
+              </div>
+
               </div>
             </el-tab-pane>
         </el-tabs>
@@ -127,11 +133,18 @@ export default {
               'maxWidth': 50,
             },
             {
-              'prop': 'content',
+              'prop': 'logContent',
               'label': '內容',
               'width': 200,
               'maxWidth': 200,
             },
+            {
+              'prop': 'actionTs',
+              'label': '操作時間',
+              'width': 200,
+              'maxWidth': 200,
+            },
+            
           ],
         },
         {
@@ -147,20 +160,29 @@ export default {
               'maxWidth': 50,
             },
             {
-              'prop': 'content',
+              'prop': 'logContent',
               'label': '內容',
+              'width': 200,
+              'maxWidth': 200,
+            },
+            {
+              'prop': 'actionTs',
+              'label': '操作時間',
               'width': 200,
               'maxWidth': 200,
             },
           ],
         },
+        
 
       ],
 
       total: 50,
       currentPage: 1,
       curSizeNum: 10,
-      sizeNum: 50,
+      sizeNum: 2,
+      totalEvents: 0,
+
 
       apiBody: {
           "page": 0,
@@ -257,6 +279,10 @@ export default {
             if(d.systemContent.reportSubmitter == n.userId){
               d.systemContent.reportSubmitterName = n.userName
             }
+
+            if(d.systemContent.reportTs) d.systemContent.reportTs = this.getdate(d.systemContent.reportTs)
+            if(d.systemContent.eventTs) d.systemContent.eventTs = this.getdate(d.systemContent.eventTs)
+
             d.actionTs = this.getdate(d.actionTs)
           })
         })
@@ -264,16 +290,20 @@ export default {
         if(typeN == 0){
           var temp = res.data.content.map( i => ({
             userName : i.userName,
-            content: `${i.systemContent.storeName } / ${i.systemContent.inspectTable} / ${i.systemContent.reportSubmitterName} / 報告上傳時間: ${i.actionTs} / 已刪除`
+            logContent: `${i.systemContent.storeName } / ${i.systemContent.inspectTable} / ${i.systemContent.reportSubmitterName} / 報告上傳時間: ${i.systemContent.reportTs} / 已刪除`,
+            actionTs: this.getdate(i.actionTs)
           }))
-          this.total = res.data.totalElements
+          this.total = res.data.totalPages
+          this.totalEvents = res.data.totalElements
         }
         else if(typeN == 1){
           var temp = res.data.content.map( i => ({
             userName : i.userName,
-            content: `${i.systemContent.storeName }  ${i.systemContent.inspectTable} / 事件: ${i.systemContent.eventSubject} / 事件時間: ${i.actionTs} / 變更為未處理`
+            logContent: `${i.systemContent.storeName }  ${i.systemContent.inspectTable} / 事件: ${i.systemContent.eventSubject} / 事件時間: ${i.systemContent.eventTs} / 變更為未處理`,
+            actionTs: this.getdate(i.actionTs)
           }))
-          this.total = res.data.totalElements
+          this.total = res.data.totalPages
+          this.totalEvents = res.data.totalElements
         }
         
         this.tableDataList[typeN].tableData = temp
@@ -285,8 +315,7 @@ export default {
 
     },
 
-    
-
+  
 
 
     pad2(n){
@@ -376,10 +405,17 @@ export default {
       
     td, th
       &:nth-child(1)
+        width: 12% !important
+        padding-left: 12px !important
+        .cell
+          padding-left: 12px !important
+      &:nth-child(3)
         width: 15% !important
         padding-left: 12px !important
         .cell
           padding-left: 12px !important
+      
+      
 
   .el-table-content
     width: 100%
@@ -478,4 +514,17 @@ export default {
     
   .width-fit
     width: max-content !important
+  
+  .pagination_row
+    //position: absolute;
+    height: 30px
+    margin: 30px 0
+    margin-right: calc(20/1920*100vw)
+    display: flex
+    flex-direction: row
+    justify-content: flex-end
+    align-items: center
+    
+
+
 </style>
