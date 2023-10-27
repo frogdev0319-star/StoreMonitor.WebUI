@@ -4371,8 +4371,13 @@ export default {
           margin-right: calc(10 / 1920 * 100vw);
         }
         .lside-title{
+          width: 80%;
           font-weight: bold;
           color:$h1;
+          overflow:hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+
         }
         @media screen and(min-width: 1366px){
           .lside-title{

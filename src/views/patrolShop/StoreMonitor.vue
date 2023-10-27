@@ -2255,8 +2255,12 @@ $h1: #292e36;
         margin-right: calc(10 / 1920 * 100vw);
       }
       .lside-title {
+        width: 80%;
         font-weight: bold;
-        color: $h1;
+        color:$h1;
+        overflow:hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
       .nocoll {
         border: 1px solid #ff9803;
