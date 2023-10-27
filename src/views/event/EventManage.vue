@@ -53,6 +53,7 @@
       </div>
       <div class="flex-center" style="justify-content: space-between; margin: 20px 0 20px 0px;font-size:calc(16/1920*100vw)">
         <div class="flex-center">
+          {{ dateValue }}
           <date-time-selector
             ref="eventTimePicker"
             :dateTimeValue = dateValue

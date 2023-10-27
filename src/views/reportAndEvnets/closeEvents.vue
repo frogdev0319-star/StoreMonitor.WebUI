@@ -457,29 +457,36 @@ export default {
       self.params["beginTs"] = start;
       self.params["endTs"] = end;
       self.page = 1;
-      const clause = {};
-      clause.storeId = this.storeFilterObj.filterStoreIds;
-      if (self.curReportType != null && self.curReportType !== -1) {
-        clause.mode = self.curReportType;
-      }
-      if (self.curAppraise != null && self.curAppraise !== -1) {
-        clause.status = self.curAppraise;
-      }
-      
+      const clause = {
+        status: [2,4],
+        storeId: [...this.storeFilterObj.filterStoreIds]
+      };
+
+
+      // if (self.curReportType != null && self.curReportType !== -1) {
+      //   clause.mode = self.curReportType;
+      // }
+      // if (self.curAppraise != null && self.curAppraise !== -1) {
+      //   clause.status = self.curAppraise;
+      // }
       self.params.clause = clause;
-      self.params.inspectTagId = self.inspectId === '-1' ? '' : self.inspectId;
-      typeof (self.params.inspectTagId) === 'string' && delete self.params.inspectTagId;
+      self.params.inspectTagIds  = []
+
+      var curInspectId = self.inspectId === '-1' ? '' : self.inspectId;
+      if(curInspectId !== '') self.params.inspectTagIds .push(curInspectId)
+
+      
       const search = self.searchInput.trim();
       if (search.length !== 0) {
         self.params.like = {
-          tagName: search,
-          submitterName: search,
+          subject: search,
+          assignerName: search,
           storeName: search
         };
       } else {
         self.params.like = {};
       }
-
+      
       if(self.params.jump){ //跳轉
           console.log("1.ump to ")
           self.params.jump = false;
@@ -488,21 +495,28 @@ export default {
           self.params.submitter = this.params.submitters;
           //this.saveSearchParams();
           //this.searchData();
-          console.log("searchData>>>>SearchParams:",self.params)
+          // console.log("searchData>>>>SearchParams:",self.params)
           this.ifSearchData = false;
         }else{
-          console.log("searchData>>>>no jump:",self.params)
+          // console.log("searchData>>>>no jump:",self.params)
           self.params.searchMysteryMode = PermissionHelper.enableMimicMode ? 1 : -1;
         }
       
       
+
       self.params.filter = { page: 0, size: self.sizeNum };
-      self.params.clause = {  status: [2,4]};
       self.params.order = { 
         direction: "desc",
         property: "ts"
       };
   
+      delete self.params.curStore
+      delete self.params.filterStoreIds
+      delete self.params.storeStr
+      delete self.params.storeGroupString
+      delete self.params.storeTypeString
+      delete self.params.curSelectedStore
+
       console.log("###",self.params)
       self.saveSearchParams();
       self.getEvents(self.params);
