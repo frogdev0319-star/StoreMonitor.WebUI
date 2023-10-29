@@ -607,8 +607,11 @@ export default {
 
     searchEventList() {
       //this.saveSearchParams(false);
-      console.log("searchEventList page:",this.tableDataList[Number(this.activeName)].page)
       this.tableDataList[Number(this.activeName)].page = 1;
+      console.log('this.searchParams ~~~~~~~>> ', this.searchParams);
+
+
+
       if(this.searchParams['searchFrom']=='PatrolPersonStat'){
         delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
         this.searchParams['searchFrom'] = '';
@@ -690,6 +693,7 @@ export default {
 
     async getEventList(val) {
       //"GetEventList");
+      console.log('getEventList ~~~~~>> ', val);
       const self = this;
       const tabIndex = Number(this.activeName);
       for(var k in self.tableDataList){
@@ -717,7 +721,7 @@ export default {
         delete self.params.clause.storeId;
         return;
       }
-      //console.log("@@@self.params:",self.params);
+      console.log("@@@self.params:",self.params);
       eventRESTful.getEventList(self.params).then((res) => {
         const data = res.data.content;
         //console.log("data:",data);
@@ -935,7 +939,7 @@ export default {
       if(val.length>0){
         this.showCloseBtn = true;
         val.map((item)=>{
-        　console.log(item)
+          console.log(item)
           let store = this.storeList.find(p=>p.storeId == item.storeId)
           if(store && store.status == 61){
             if(this.selectStoreList.indexOf(store.name)<0){
@@ -1164,7 +1168,9 @@ export default {
       console.log('init');
       const self = this;
       self.activeName = '0';
-      self.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24, this.$moment(new Date()).endOf('day')];
+      // self.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24, this.$moment(new Date()).endOf('day')];
+      self.dateValue = [ 1697040000000, 1697126399999 ];
+
       self.inputSearchValue = '';
       self.total = 0;
       self.getSearchParams();
@@ -1179,33 +1185,34 @@ export default {
       }
       console.log(this.storeList)
       console.log("Get Store List Finish")
+
       this.tableDataList[Number(this.activeName)].page = 1;
       this.getEventListAndCount() ;
     },
-    getRouterData(routeData) {
-      //console.log("1.eventManage routeData:", routeData);
-      let start = '', end = '';
-      start = this.$moment(this.dateValue[0]).valueOf();
-      const endTime = this.dateValue[1];
-      end = this.$moment(endTime);
-      this.params = {
-          beginTs: start,
-          endTs: end,
-          clause: {
-            status:[0],
-            storeId: routeData.storeId,
-            assigner : routeData.assigner
-          },
-          filter: {
-            page: 1,
-            size: 10
-          },
-        };
-        //console.log("eventManage params:", this.params);
-        sessionStorage.setItem('event_manage', '');
-        //console.log("2.eventManage routeData:", sessionStorage.getItem('event_manage'));
-        this.getEventList('Back');
-    },
+    // getRouterData(routeData) {
+    //   //console.log("1.eventManage routeData:", routeData);
+    //   let start = '', end = '';
+    //   start = this.$moment(this.dateValue[0]).valueOf();
+    //   const endTime = this.dateValue[1];
+    //   end = this.$moment(endTime);
+    //   this.params = {
+    //       beginTs: start,
+    //       endTs: end,
+    //       clause: {
+    //         status:[0],
+    //         storeId: routeData.storeId,
+    //         assigner : routeData.assigner
+    //       },
+    //       filter: {
+    //         page: 1,
+    //         size: 10
+    //       },
+    //     };
+    //     //console.log("eventManage params:", this.params);
+    //     sessionStorage.setItem('event_manage', '');
+    //     //console.log("2.eventManage routeData:", sessionStorage.getItem('event_manage'));
+    //     this.getEventList('Back');
+    // },
     saveSearchParams(isLeave=false) {
       //console.log("saveSearchParams:",this.storeFilterObj);
       const params = this.storeFilterObj;
