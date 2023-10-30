@@ -414,7 +414,9 @@ export default {
         padding-left: 12px !important
         .cell
           padding-left: 12px !important
-      
+
+    .el-table .cell
+      text-align: left !important
       
 
   .el-table-content
