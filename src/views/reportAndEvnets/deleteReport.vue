@@ -1126,7 +1126,9 @@ export default {
               // background: #9872 !important
               // white-space: pre !important
         &:nth-child(10)
+          width: 300px
           .cell
+            text-overflow:: initial !important
             white-space: nowrap !important
             
     .el-table th div
