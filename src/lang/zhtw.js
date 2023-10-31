@@ -468,7 +468,7 @@ export default{
       "reportType":"報表類型",
       "resultType":"總評類型",
       "return":"{seconds}秒後自動返回遠端巡檢頁面！",
-      "returnStoreMonitor":"{seconds}秒後自動返回現場監控頁面！",
+      "returnStoreMonitor":"{seconds}秒後自動返回地點監控頁面！",
       "requiredValid":"尚有必填項目未完成",
       "score":"得分",
       "scoreU":"單位：個",
