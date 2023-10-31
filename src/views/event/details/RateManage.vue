@@ -1389,8 +1389,8 @@ $h1:#292e36;
                 position: relative;
                 //@include point(top,8);
                 @include point(margin-left,20);
-                width:15px;
-                height:20px;
+                width:20px;
+                // height:20px;
             }
             .event-title{
                 @include point(padding-right,20);

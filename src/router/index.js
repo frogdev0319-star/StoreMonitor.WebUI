@@ -76,13 +76,19 @@ export const navbarRoute = {
     !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableRemoteOverview() && overviewRoute.children.push({
       path: '/patrolOverview',
       name: 'patrolOverview',
-      component: resolve => require(['@/views/overview/PatrolOverview'], resolve)
+      component: resolve => require(['@/views/overview/PatrolOverview'], resolve),
+      meta: {
+        keepAlive: true
+      },
     }) && primaryPathesList.push('/patrolOverview');
 
     !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableEventOverview() && overviewRoute.children.push({
       path: '/eventOverview',
       name: 'eventOverview',
-      component: resolve => require(['@/views/overview/EventOverview'], resolve)
+      component: resolve => require(['@/views/overview/EventOverview'], resolve),
+      meta: {
+        keepAlive: true
+      },
     }) && primaryPathesList.push('/eventOverview');
     return overviewRoute;
   },
@@ -408,7 +414,7 @@ export const navbarRoute = {
         hidden: false,
         meta: {
           requireAuth: true,
-          keepAlive: false
+          keepAlive: true
         }
       }
     ) && primaryPathesList.push('/patrolEvaluation');
@@ -420,7 +426,7 @@ export const navbarRoute = {
         hidden: false,
         meta: {
           requireAuth: true,
-          keepAlive: false
+          keepAlive: true
         }
       },
       {
@@ -429,7 +435,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/statistical/InspectItemStatistics_old'], resolve),
         hidden: true,
         meta: {
-          keepAlive: false
+          keepAlive: true
         },
       }
     ) && primaryPathesList.push('/patrolItem','/patrolItem_old');
@@ -441,7 +447,7 @@ export const navbarRoute = {
         hidden: false,
         meta: {
           requireAuth: true,
-          keepAlive: false
+          keepAlive: true
         }
       }
     ) && primaryPathesList.push('/patrolPersonStat');
@@ -453,7 +459,7 @@ export const navbarRoute = {
         hidden: false,
         meta: {
           requireAuth: true,
-          keepAlive: false
+          keepAlive: true
         }
       }
     ) && primaryPathesList.push('/eventStat');
@@ -465,7 +471,7 @@ export const navbarRoute = {
         hidden: false,
         meta: {
           requireAuth: true,
-          keepAlive: false
+          keepAlive: true
         }
       }
     ) && primaryPathesList.push('/patrolCompareStat');
@@ -519,7 +525,7 @@ export const navbarRoute = {
         name: 'ScheduleSetting',
         component: resolve => require(['@/views/schedule/ScheduleSetting'], resolve),
         meta: {
-          keepAlive: true, // the component is't to be cache.
+          keepAlive: true, 
           requireAuth: true
         },
         isReadOnly: false
@@ -619,7 +625,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/generalSetting/GeneralSetting'], resolve),
         hidden: false,
         meta: {
-          keepAlive: false, // the component is't to be cache.
+          keepAlive: true, 
           requireAuth: true
         }
       },
@@ -632,25 +638,37 @@ export const navbarRoute = {
         path: '/routeinspection',
         name: 'inspectListSetting',
         component: resolve => require(['@/views/setting/routeInspection/RouteInspection'], resolve),
+        meta: {
+          keepAlive: true, 
+        },
         hidden: false
       },
       {
         path: '/addroute',
         name: 'itemSetting',
         hidden: true,
-        component: resolve => require(['@/views/setting/routeInspection/AddRuteInspect'], resolve)
+        component: resolve => require(['@/views/setting/routeInspection/AddRuteInspect'], resolve),
+        meta: {
+          keepAlive: true, 
+        },
       },
       {
         path: '/setroute',
         name: 'setRule',
         hidden: true,
-        component: resolve => require(['@/views/setting/routeInspection/SetRuleInspect'], resolve)
+        component: resolve => require(['@/views/setting/routeInspection/SetRuleInspect'], resolve),
+        meta: {
+          keepAlive: true, 
+        },
       },
       {
         path: '/bindroute',
         name: 'bindStore',
         hidden: true,
-        component: resolve => require(['@/views/setting/routeInspection/BindRuteInspect'], resolve)
+        component: resolve => require(['@/views/setting/routeInspection/BindRuteInspect'], resolve),
+        meta: {
+          keepAlive: true, 
+        },
       }
 
     ) && primaryPathesList.push('/routeinspection', '/addroute', '/setroute', '/bindroute');
@@ -691,7 +709,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/title/TitleManage'], resolve),
         hidden: false,
         meta: {
-          keepAlive: false, // the component is't to be cache.
+          keepAlive: true, 
           requireAuth: true
         }
       },
@@ -711,7 +729,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/workflow/List'], resolve),
         hidden: false,
         meta: {
-          keepAlive: false, // the component is't to be cache.
+          keepAlive: true, 
           requireAuth: true
         }
       },
@@ -719,6 +737,10 @@ export const navbarRoute = {
         path: '/createWorkflow',
         name: 'createWorkflow',
         component: resolve => require(['@/views/setting/workflow/CreateWorkflow'], resolve),
+        meta: {
+          keepAlive: true, 
+          requireAuth: true
+        },
         hidden: true,
       },
       {
@@ -756,7 +778,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/mysterio/MysterioManage'], resolve),
         hidden: false,
         meta: {
-          keepAlive: false, // the component is't to be cache.
+          keepAlive: true,
           requireAuth: true
         }
       },

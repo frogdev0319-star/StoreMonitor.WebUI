@@ -263,10 +263,8 @@ export default{
   },
   watch: {
     async accountChanged(val) {
-      console.log('val :>> ', val);
       const self = this;
       if (val !== 0) {
-        console.log('XDXDXDXD>> ');
         self.init();
         // const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
         // const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
@@ -415,7 +413,7 @@ export default{
                 html: `<span style="font-size:calc(15/1920*100vw);">`+this.$t('schedule.isProcessing')+`</span>`
               };
             }else{
-              if(item.reportId==-1){//無
+              if(item.reportId==-1){
                 obj['porcessMode'] = {
                   isCellClick: false,
                   value: this.$t('schedule.NA'), 
@@ -438,8 +436,10 @@ export default{
           });
           self.tableData = [];
           self.tableData = thisData;
-          self.total = res.data.totalPages;
 
+          console.log('self.tableData :>> ', self.tableData);
+
+          self.total = res.data.totalPages;
           self.totalElements = res.data.totalElements;
           console.log('self.totalElements :>> ', self.totalElements);
           // console.log('this.curSizeNum :>> ', this.curSizeNum);
@@ -622,6 +622,10 @@ export default{
 </script>
 
 <style scoped lang="scss">
+.tbl-style-white{
+  padding: 0 0 !important
+}
+  
 .ScheduleContainer{
     width:100%;
 

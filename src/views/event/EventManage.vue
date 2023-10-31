@@ -53,7 +53,6 @@
       </div>
       <div class="flex-center" style="justify-content: space-between; margin: 20px 0 20px 0px;font-size:calc(16/1920*100vw)">
         <div class="flex-center">
-          {{ dateValue }}
           <date-time-selector
             ref="eventTimePicker"
             :dateTimeValue = dateValue
@@ -177,15 +176,37 @@
                     </div>
                   </el-tooltip>
 
+                  <el-tooltip v-if="scope.row.status === 2 " effect="light" placement="right-end">
+                    <div slot="content">{{ $t('eventView.expiredate')+ scope.row.updateTs }} </div>
+                    <div v-if="scope.row.status === 2 && scope.row.isSystemAdvancedEdited" class="expiretag">
+                      <span style="color:#556679;"> (已變更狀態) </span> 
+                    </div>
+                    <div v-else="scope.row.status === 2" class="expiretag">
+                      {{ '('+$t('eventView.expiretag')+')' }} 
+                    </div>
+                  </el-tooltip>
+
+                  <el-tooltip v-if="scope.row.status === 3 " effect="light" placement="right-end">
+                    <div slot="content">{{ $t('eventView.expiredate')+ scope.row.updateTs }} </div>
+                    <div v-if="scope.row.status === 3 && scope.row.isSystemAdvancedEdited" class="expiretag">
+                      <span style="color:#e22472;"> (已變更狀態) </span> 
+                    </div>
+                    <div v-else="scope.row.status === 3" class="expiretag">
+                      {{ '('+$t('eventView.expiretag')+')' }} 
+                    </div>
+                  </el-tooltip>
                   <el-tooltip v-if="scope.row.status === 4 " effect="light" placement="right-end">
                     <div slot="content">{{ $t('eventView.expiredate')+ scope.row.updateTs }} </div>
                     <div v-if="scope.row.status === 4 && scope.row.isSystemAdvancedEdited" class="expiretag">
-                      <span style="color:#59ab22;"> (已變更狀態) </span> 
+                      <span style="color:#556679;"> (已變更狀態) </span> 
                     </div>
                     <div v-else="scope.row.status === 4" class="expiretag">
                       {{ '('+$t('eventView.expiretag')+')' }} 
                     </div>
                   </el-tooltip>
+
+
+
                 </template>
               </el-table-column>
               <el-table-column
@@ -745,7 +766,7 @@ export default {
           const obj = {
             id: item.id,
             ts: util.getDateTime(item.ts),
-            updateTs:(item.status==4) ? util.getDateTime(item.ts) : "",
+            updateTs: util.getDateTime(item.updateTs),
             assignee: item.assignee,
             assignerName: item.assignerName,
             assigneeName: item.assigneeName,
@@ -1496,7 +1517,7 @@ $h1:#292e36;
     .sourceType-icon{
         margin-right: calc(20/1920*100vw);
         float: left;
-        height: 20px;
+        // height: 20px;
         width: 20px;
     }
     .enclosure-icon{
