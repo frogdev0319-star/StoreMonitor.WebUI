@@ -108,7 +108,8 @@ export const navbarRoute = {
         name: 'remotePatrol',
         component: resolve => require(['@/views/patrolShop/ReInspection'], resolve),
         meta: {
-          requireAuth: true
+          requireAuth: true,
+          keepAlive: true
         },
         isReadOnly: false
       },
@@ -195,7 +196,10 @@ export const navbarRoute = {
         path: '/rate',
         name: 'eventDetails',
         hidden: true,
-        component: resolve => require(['@/views/event/details/RateManage'], resolve)
+        component: resolve => require(['@/views/event/details/RateManage'], resolve),
+        meta: {
+          keepAlive: true, 
+        }
       }
     ) && primaryPathesList.push('/event', '/rate');
     return eventRoute;
