@@ -52,6 +52,7 @@
           </div>
           <el-input
             v-model="passWord"
+            show-password
             ref="delay_day"
             placeholder=""
             class="input-name_short"

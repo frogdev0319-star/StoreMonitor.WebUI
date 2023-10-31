@@ -114,9 +114,7 @@
               @handleOperation="handleEmitOperation"
             />
           </div>
-          
         </div>
-        
         <div
           v-loading="isLoading"
           v-else
@@ -126,9 +124,9 @@
         </div>
         
         <div class="el-pat"  v-if="eventTableData.length > 0">
-            <div class="pageSizeTitle" style="color: #666">共有 <b style="font-size: 16px"> {{totalEvents}} </b> {{ $t('remotePatrol.numReports') }}</div>
-
-            <tbl-pagination-only
+          <div class="pageSizeTitle" style="color: #666">共有 <b style="font-size: 16px"> {{totalEvents}} </b> {{ $t('remotePatrol.numReports') }}</div>
+    
+          <tbl-pagination-only
             :btn-style="{backgroundColor:'transparent'}"
             :total="total"
             :current-page="currentPage"
@@ -137,7 +135,6 @@
             @sizeChange="handlePagination"
             @currentChange="handlePagination"
           />
-          
         </div>
       </div>
     </div>
@@ -286,7 +283,7 @@ export default {
       },
       showUpdateEvent: false,
       updateEventId: '',
-      total: 0,
+      total: 10,
       currentPage: 1,
       curSizeNum: 10,
       sizeNum: 50,
@@ -667,9 +664,7 @@ export default {
           }
 
           self.reportTableData = tempTable;
-          
-
-          self.total = Math.ceil(res.data.totalElements/self.sizeNum);
+          // self.total = res.data.totalPages
           self.isLoading = false;
           if (temp.length === 0) {
             self.noData = self.$t('deviceView.noData');
@@ -1083,6 +1078,8 @@ export default {
 
     .cell-class .cell
       text-align: left  !important
+  .el-table__body-wrapper
+    max-height: fit-content !important
 
 </style>
 
@@ -1307,6 +1304,7 @@ $filterWidth: (100%-706);
           background-color: #fff;
           padding-left: 12px;
           padding-right: 12px;
+          max-height: fit-content !important
         }
       }
     }
