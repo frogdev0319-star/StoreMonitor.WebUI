@@ -1,7 +1,7 @@
 <template>
   <div class="el-overview-content">
     <div class="overview-date" style="margin-left:24px;">
-      <date-time-selector showTooltips="true" @change="dateChange"/>
+      <date-time-selector :showTooltips="true" @change="dateChange"/>
       <span class="el-store">
         {{ $t('overview.totalStore', {storeNum: storeDataList.length-1}) }}
       </span>
@@ -17,6 +17,8 @@
             </div>
           </div>
         </el-col>
+
+        <!-- 各門店事件趨勢分析 -->
         <el-col :span="isEnSpan? 13: 14" class="store-events">
           <div class="title">{{ $t('overview.eventTrends') }}</div>
           <div class="region-result">
@@ -41,6 +43,8 @@
           </div>
 
         </el-col>
+        
+        <!-- 事件來源 -->
         <el-col :span="isEnSpan ? 7 : 6" class="source-list">
           <div class="title">
             <span class="area-title">{{ $t('overview.eventSource') }}</span>
@@ -58,13 +62,6 @@
               </div>
               </div>
             </div>
-            <!--<div class="pct-panel">
-              <v-chart
-                ref="eventSourceRef"
-                :auto-resize="true"
-                :options="eventSourceOptions"
-                class="chart-content"/>
-            </div>-->
             <div class="pct-nums">
               <div
                 v-for="(item, index) in sourcePerArray"
@@ -81,12 +78,15 @@
           </div>
         </el-col>
       </el-row>
+
+      <!-- 事件處理狀態 -->
       <el-row class="second-row ">
         <el-col :span="isEnSpan? 7: 6" class="status-list paper">
           <div class="status-title">
             {{ $t('overview.eventStatus') }}
           </div>
           <div class="pct-content">
+            <!-- pie -->
             <div class="pie-area">
               <div class="pie-div">
                 <div class="pct-panel">
@@ -99,13 +99,7 @@
                 </div>
               </div>
             </div>
-            <!--<div class="pct-panel">
-              <v-chart
-                ref="eventStatusRef"
-                :auto-resize="true"
-                :options="eventStatusOptions"
-                class="chart-content"/>
-            </div>-->
+            <!-- nums -->
             <div class="pct-nums">
               <div v-for="(item, index) in statusPerArray" :key="index" class="content-labels">
                 <div class="excellent_nums">{{ item.percent }}%</div>
@@ -117,6 +111,8 @@
             </div>
           </div>
         </el-col>
+
+        <!-- 門店事件處理情況 -->
         <el-col :span="isEnSpan ? 17 : 18">
           <div class="store-status-panel paper" >
             <div class="store-statul-title">{{ $t('overview.eventHading') }}</div>
@@ -549,22 +545,37 @@ export default {
       const self = this;
       const jsonArray = self.statusLegend;
       const statusPieList = self.eventByStatus;
+
+      console.log('statusPieList ~~~>>>', statusPieList)
+
       let pendingEventNum = 0;
       let doneEventNum = 0;
       let closedEventNum = 0;
 
       let sumEvent = 0;
       let seriesData = [];
+      
+      var tempCloseNum_A = 0
+      var tempCloseNum_B = 0
+
       statusPieList.forEach((item, index) => {
         sumEvent += item.numOfEvent;
         if (index === 0) {
           pendingEventNum = item.numOfEvent;
-        } else if (index === 1) {
+        } 
+        else if (index === 1) {
           doneEventNum = item.numOfEvent;
-        } else if (index === 2) {
-          closedEventNum = item.numOfEvent;
+        } 
+        else if (index === 2) {
+          tempCloseNum_A = item.numOfEvent;
+        }
+        else if (index === 4) {
+          tempCloseNum_B = item.numOfEvent;
         }
       });
+      
+      closedEventNum = tempCloseNum_A + tempCloseNum_B
+
       const totalArray = [pendingEventNum, doneEventNum, closedEventNum];
       jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
       jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
@@ -658,15 +669,18 @@ export default {
 
     getEventRankingInfoSetting() {
       const settingObj = {};
+
       if (this.rankType === 0) {
         settingObj.axisArray = ['门店名称', this.$t('overview.pendingEvent')];
         settingObj.colorArray = [this.pendingColor];
         settingObj.seriesData = [{ type: 'bar', stack: 'test', barWidth: 35 }];
-      } else if (this.rankType === 2) {
+      } 
+      else if (this.rankType === 2) {
         settingObj.axisArray = ['门店名称', this.$t('overview.closedEvents')];
         settingObj.colorArray = [this.closedColor];
         settingObj.seriesData = [{ type: 'bar', stack: 'test', barWidth: 35 }];
-      } else {
+      } 
+      else {
         settingObj.axisArray = ['门店名称', this.$t('overview.pendingEvent'),
           this.$t('overview.processedEvent'), this.$t('overview.closedEvents')];
         settingObj.colorArray = [this.pendingColor, this.doneColor, this.closedColor];
@@ -679,16 +693,23 @@ export default {
       return settingObj;
     },
 
-    async getEventRankingInfo() {
+    async getEventRankingInfo() { 
       const self = this;
       let params = {};
+      console.log('params ~~~~~>', params)
       params = JSON.parse(JSON.stringify(self.params));
       params.numOfStores = 5;
       params.rankType = self.rankType;
       const { axisArray, colorArray, seriesData } = self.getEventRankingInfoSetting();
       const rankingOption = self.getEventRankingOption(colorArray, seriesData);
+
+      console.log('rankingOption 1 ~~~~~>', rankingOption)
+      console.log('seriesData ~~~~~>', seriesData)
+
       try {
         const rankingResult = await self.getEventStatsRanking(params);
+        console.log('rankingResult ~~~~~>', rankingResult)
+
         if (rankingResult.errCode === 0) {
           const result = rankingResult.data;
           self.statusStoreList = result;
@@ -701,17 +722,23 @@ export default {
               itemArray.push(item.numOfUnprocessed);
               itemArray.push(item.numOfInprocess);
               itemArray.push(item.numOfProcessed);
-            } else if (self.rankType === 0) {
+            } 
+            else if (self.rankType === 0) {
               itemArray.push(item.numOfUnprocessed);
-            } else if (self.rankType === 2) {
+            } 
+            else if (self.rankType === 2) {
               itemArray.push(item.numOfProcessed);
             }
+            
             soureceList.push(itemArray);
           });
           rankingOption.dataset.source = soureceList;
         } else {
           rankingOption.dataset.source = [];
         }
+
+        console.log('rankingOption 2 ~~~~~>', rankingOption)
+        
         self.storeStatusOptions = rankingOption;
       } catch (e) {
         self.storeStatusOptions = rankingOption;
