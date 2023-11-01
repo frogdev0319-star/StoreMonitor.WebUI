@@ -423,7 +423,12 @@ export default{
                 obj['porcessMode'] = {
                   isCellClick: false,
                   value: this.$t('schedule.deleted'),
-                  html: `<span style="font-size:calc(15/1920*100vw);">`+this.$t('schedule.deleted')+`</span>`
+                  html: `
+                    <div style="font-size:calc(15/1920*100vw);" class="has_delete">
+                      ${this.$t('schedule.deleted')}
+                      <div class='tips'>刪除時間： 2023/10/27 21:05</div>
+                    </div>
+                    `
                 };
               }
               else{
@@ -620,6 +625,47 @@ export default{
   }
 }
 </script>
+<style lang="sass">
+  .tbl-schedule
+    .row-class
+      .el-table__cell
+        &:nth-child(2)
+          .cell
+            padding: 3px 0
+        &:nth-child(10)
+          .cell
+            overflow: visible !important
+
+
+  .has_delete
+    height: 40px
+    font-size: calc(15/1920*100vw)
+    position: relative
+    display: flex
+    flex-direction: row
+    align-items: center
+    justify-content: flex-start
+    &:hover
+      .tips
+        display: block
+        visibility: visible
+        opacity: 1
+    .tips
+      display: none
+      position: absolute
+      visibility: hidden
+      opacity: 0
+      left: -170%
+      bottom: 5px
+      background: #eee
+      font-size: 12px
+      padding: 5px 15px
+      transition: all .3s
+
+  
+</style>
+
+
 
 <style scoped lang="scss">
 .tbl-style-white{
@@ -679,7 +725,7 @@ export default{
         }
     }
     .scheduleLlist-area{
-       width: 100%;
+      width: 100%;
         background-color: #FFF;
         border-radius: 5px;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
@@ -693,7 +739,7 @@ export default{
             align-items: center;
         }
         .tbl-schedule{
-           width:100%;
+          width:100%;
             border: none;
             margin-top: 40px;
             /deep/ .el-table__header-wrapper .el-table-column--selection{

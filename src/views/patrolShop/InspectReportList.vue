@@ -1737,6 +1737,7 @@ $filterWidth: (100%-706);
           
         .card_bottom{
           text-align: left;
+          width: 100%;
           .submitter{
             margin-bottom: calc(5/1440*100vw);
             overflow: hidden;
