@@ -241,7 +241,9 @@ export default {
 
     async onTabClick(val){
       var n =  Number(val.index)
+      this.currentPage = 1
       this.actionType = n
+
       await this.getLog(n)
     },
 
@@ -299,7 +301,7 @@ export default {
         else if(typeN == 1){
           var temp = res.data.content.map( i => ({
             userName : i.userName,
-            logContent: `${i.systemContent.storeName }  ${i.systemContent.inspectTable} / 事件: ${i.systemContent.eventSubject} / 事件時間: ${i.systemContent.eventTs} / 變更為未處理`,
+            logContent: `${i.systemContent.storeName } / ${i.systemContent.inspectTable} / 事件: ${i.systemContent.eventSubject} / 事件時間: ${i.systemContent.eventTs} / 變更為未處理`,
             actionTs: this.getdate(i.actionTs)
           }))
           this.total = res.data.totalPages

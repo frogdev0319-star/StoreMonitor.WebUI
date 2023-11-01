@@ -135,6 +135,8 @@ export default {
 
   methods: {
     goToReportdetails(){
+
+      sessionStorage.removeItem('needDeleteReport')
       var reportId = this.auditDetail.inspectReportId
       var canCancel = (this.auditDetail.submitter == this.currentUserInfo) && this.auditDetail.cancelable && (this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7);
       console.log("canCancel:",canCancel);

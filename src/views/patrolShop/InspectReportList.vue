@@ -60,6 +60,7 @@
         </template>
       </store-filter>
     </div>
+    
     <div id="el-containter" class="flex-column spacer" style="margin-left:0px">
       <div class="report-header">
         <div class="flex-center" style="padding-top: 0;">
@@ -1063,6 +1064,8 @@ export default {
       self.page = 1;
       const clause = {};
       clause.storeId = this.storeFilterObj.filterStoreIds;
+      console.log('clause.storeId ~~~~>> ', clause.storeId);
+
       if (self.curReportType != null && self.curReportType !== -1) {
         clause.mode = self.curReportType;
       }
