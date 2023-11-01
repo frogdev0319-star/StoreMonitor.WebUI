@@ -602,11 +602,14 @@ export default {
       console.log('params ~~~~~>> ', params);
       const self = this;
       params.endTs = params.endTs - params.endTs % 1000 + 999;
+
       if (params.clause.storeId.length === 0) {
-        console.log("No Data")
-        this.setNoData();
-        return;
+        // console.log("No Data")
+        // this.setNoData();
+        // return;
+        params.clause.storeId.push(-1)
       }
+
       console.log("***current user:",this.$store.getters.userId);
       if(PermissionHelper.enableMimicMode){
         

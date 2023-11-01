@@ -394,6 +394,8 @@ export default{
         var thisData = [];
         if(res.errCode == 0){
           res.data.content.map((item,idx )=>{
+            item.reportDeleteTs = this.getdate(item.reportDeleteTs)
+
             let obj = {...item};
             let mode = item.inspectTagMode==0?self.$t('remotePatrol.remotePatrol'):self.$t('remotePatrol.onsitePatrol');
             obj['squence'] = idx;
@@ -403,6 +405,7 @@ export default{
             // obj['remindTimeStr']=(item.remindTime==0) ?' -' : this.getdateOnlyDate(item.remindTime)
             // obj['reportTsStr']=(item.reportTs==0) ?'-' : self.$moment.utc(self.$moment(item.reportTs)).format("YYYY/MM/DD hh:mm:ss");//util.getDateStr(item.taskFinal),
             obj['reportTsStr'] = (item.reportTs==0) ? '--' : this.getdate(item.reportTs),
+            
             
             obj['submitterName']=(item.submitterName == "NONE") ? '--':item.submitterName;
             obj['status'] = item.isDelete ? '2': (item.isExecute ? 0:1);
@@ -426,7 +429,7 @@ export default{
                   html: `
                     <div style="font-size:calc(15/1920*100vw);" class="has_delete">
                       ${this.$t('schedule.deleted')}
-                      <div class='tips'>刪除時間： 2023/10/27 21:05</div>
+                      <div class='tips'>刪除時間： ${item.reportDeleteTs} </div>
                     </div>
                     `
                 };
@@ -654,10 +657,10 @@ export default{
       display: none
       visibility: hidden
       opacity: 0
-      width: 200px
+      width: 210px
       position: absolute
       border: 1px solid #c0c0c0
-      left: -210px
+      left: -220px
       bottom: 4px
       background: #f6f6f6
       border-radius: 5px
