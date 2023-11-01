@@ -415,8 +415,8 @@ export default {
         this.storeTypeList = typeList;
       //  console.log(this.curStoreGroup,this.curStoreType)
         if(initFilter){
-                // console.log("To FIlter stores")
-                this.filterStore();
+            // console.log("To FIlter stores")
+            this.filterStore();
           }
       }).catch(err => {
         console.log('StoreFilter - getStoreGroupAndType: ' + err);
@@ -595,6 +595,8 @@ export default {
         }
       }
       self.storeDataList = tempStore;
+    
+
       self.storeListLength = this.storeDataList.length;
       let storeArr = [], arr = [];
       self.storeDataList.forEach(item => {

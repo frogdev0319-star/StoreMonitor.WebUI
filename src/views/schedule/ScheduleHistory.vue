@@ -652,12 +652,15 @@ export default{
         opacity: 1
     .tips
       display: none
-      position: absolute
       visibility: hidden
       opacity: 0
-      left: -170%
-      bottom: 5px
-      background: #eee
+      width: 200px
+      position: absolute
+      border: 1px solid #c0c0c0
+      left: -210px
+      bottom: 4px
+      background: #f6f6f6
+      border-radius: 5px
       font-size: 12px
       padding: 5px 15px
       transition: all .3s
