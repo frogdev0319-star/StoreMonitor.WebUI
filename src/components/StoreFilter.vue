@@ -788,25 +788,28 @@ export default {
 
         this.storeDataList = temp;
         console.log("*this.storeDataList:",this.storeDataList);
+
         this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
         if(this.curStore.length != this.filterStoreIds.length){
           this.curStore = this.filterStoreIds;
           if(this.filterStoreIds.length == this.storeDataList.length) {
-
             this.curStore.unshift( '-1');
             console.log("**2.select all:",this.curStore);
           }
         }
+        
         this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
         if(this.emitChanged){
           console.log('*****emitStoreChange');
           this.$emit('emitStoreChange', this.filterStoreIds);
         }
-      console.log("Emit From fitlerstore")
       this.emitParams();
       }else
         this.filterStore();
     },
+
+
+    
 
     filterArr(arr1, arr2) {
       let filterArr = [];
@@ -974,6 +977,7 @@ export default {
             }
           });
         });
+        console.log("filterStoreArray:",filterStoreArray);
         console.log("filterStoreId:",filterStoreId);
         if(filterStoreId.length==0){
           this.curStore = filterStoreArray;
@@ -983,12 +987,13 @@ export default {
           }*/
         }
 
-        this.filterStoreIds = (filterStoreId.length==0)?filterStoreArray:filterStoreId.filter(storeId => storeId !== '-1');
+        this.filterStoreIds = (filterStoreId.length==0) ? filterStoreArray : filterStoreId.filter(storeId => storeId !== '-1');
         this.curStore = this.filterStoreIds;
         if(this.storeDataList.length == this.filterStoreIds.length){
           this.curStore.unshift('-1');
         }
         console.log("2.curStore:",this.curStore);
+        
         this.storeStr = (filterStoreId.length==0)?allfilterStoreStr.substr(0, filterStoreStr.length - 1) :filterStoreStr.substr(0, filterStoreStr.length - 1);
         this.curSelectedStore = (this.storeDataList.some( st => st.storeId == this.curSelectedStore))?this.curSelectedStore:"";
       }
@@ -996,14 +1001,20 @@ export default {
       this.getStoreGroupString();
       this.getStoreTypeString();
       if(this.emitChanged){
-          // console.log('*****emitStoreChange');
           this.$emit('emitStoreChange', this.filterStoreIds);
         }
-      // console.log("Emit From fitlerstore")
-      this.emitParams();
-     // console.log("emitChanged:",this.emitChanged);
 
+      
+      if(this.storeDataList.length == 0){
+        // this.curStore = []
+        // this.filterStoreId = []
+        this.filterStoreIds = []
+      }
+
+      this.emitParams();
+      // console.log("emitChanged:",this.emitChanged);
     },
+
 
     getStoreGroupString() {
       this.storeGroupString = '';
