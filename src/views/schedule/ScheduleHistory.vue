@@ -638,7 +638,8 @@ export default{
         &:nth-child(10)
           .cell
             overflow: visible !important
-
+    .el-table td, .el-table th
+      text-align: left !important
 
   .has_delete
     height: 40px
@@ -818,6 +819,7 @@ export default{
         box-shadow: none;
         width: 100% !important;
     }
+  
     /deep/
       .el-table th .cell{
       padding-left: 0px !important;
