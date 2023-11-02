@@ -84,6 +84,7 @@
         </div>
         <div style="margin-top:20.5px;">
           <table-only
+            class="person_table"
             ref="elTP"
             :column-data="insRecordColData"
             :table-data="insRecordTableData"
@@ -593,6 +594,12 @@ export default {
 };
 </script>
 
+<style lang="sass">
+  .person_table
+    .el-table
+      max-height: fit-content !important
+</style>
+
 <style lang="scss" scoped>
   @import "../../assets/sass/stastical.scss";
 
@@ -601,6 +608,7 @@ export default {
       width:97%;
       margin-left: calc(30/1920*100vw);
       margin-right: calc(30/1920*100vw);
+      height: fit-content !important
     }
     .search-bar{
       display:flex;

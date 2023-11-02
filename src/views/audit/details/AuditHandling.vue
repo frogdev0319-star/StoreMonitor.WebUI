@@ -480,7 +480,17 @@ export default {
     goToReportdetails(){
       var reportId = this.auditDetail.inspectReportId
       var canCancel = (this.auditDetail.submitter == this.currentUserInfo) && this.auditDetail.cancelable && (this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7);
-        this.$router.push(
+      const parsObj = {
+            id : reportId,
+            storeName : this.auditDetail.storeName,
+            status : '',
+            ts : this.auditDetail.processStartTs,
+            submitterName : this.auditDetail.submitterName,
+    
+          };
+      sessionStorage.setItem('report_data', JSON.stringify(parsObj));
+
+      this.$router.push(
           {
             name: 'handlingReportdetails',
             params: {

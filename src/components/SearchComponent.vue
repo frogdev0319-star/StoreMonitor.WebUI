@@ -29,12 +29,11 @@
         </div>
       </div>
       <div v-if="showDateSelector">
-
         <date-time-selector class="time-selector" @change="dateChange"/>
       </div>
       <div>
+
         <delay-button
-          :disabled="storeListLength === 0 || inspectTypeList.length == 0 || storeFilterObjHasItems"
           :class="lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
           type="primary"
           size="mini"
@@ -401,7 +400,7 @@ export default {
     },
 
     onStoreChange(storeObj) {
-     // console.log("*onStoreChange>storeObj:",storeObj);
+      console.log("*onStoreChange>storeObj:",storeObj);
       this.storeFilterObj = storeObj;
       !this.ifSaveParams && this.searchData();
       this.ifSaveParams = true;

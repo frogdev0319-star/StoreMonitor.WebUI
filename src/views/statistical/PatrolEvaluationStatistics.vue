@@ -23,6 +23,7 @@
             />
             <!-- @exportPdf="exportPdf" -->
         </el-col>
+
         <div class="statistics-content" id="imgTest_avg1" style="height:194px;margin-top:200px;box-shadow:none;" :style="{width:ispdf?'1280px':null}">
             <div class="head">
                 <el-col :span="17">
@@ -2976,7 +2977,11 @@ export default {
                 size: params.groupIds.length
             };
 
-            if (params.storeIds.length === 0) {return false;}
+
+            if (params.storeIds.length === 0) {
+                this.bigScore = -9999
+                return false;
+            }
 
             const storeResult = await self.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
@@ -3001,10 +3006,18 @@ export default {
             }
 
             // all store
-            const oriParam = {...params}
-            oriParam.groupIds = this.allStoreId
-            oriParam.storeIds = this.allStoreId
+            const oriParams = {...params}
+            oriParams.storeIds = this.allStoreId
+            oriParams.filter = {
+                page: 0,
+                size: oriParams.storeIds.length
+            };
 
+            this.bigScorefunc(oriParams)
+        },
+
+        async bigScorefunc(val){
+            console.log('aaa param :>> ', val);
             const allStoreResult = await self.getInspectStatsOverviewWithGroup(oriParam);
             if (allStoreResult.errCode === 0) {
                 const aaa = allStoreResult.data;
@@ -3016,6 +3029,9 @@ export default {
                     this.bigScore = totalStandard > 0 ? Math.round(totalStandard / totalReport) : -9999;
                 }
             }
+
+            
+            
         },
 
 

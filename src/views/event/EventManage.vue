@@ -264,14 +264,17 @@
             >
               <span>{{ $t('eventView.closing') }}</span>
             </delay-button>
-            <tbl-pagination-only
-              :total="total"
-              :current-page="page"
-              :page-size="sizeNum"
-              layout = "prev,pager, next,sizes,slot"
-              @sizeChange="sizeChange"
-              @currentChange="currentChange"
-            />
+            <div class="pagination" v-if="totalElements !== 0">
+                <tbl-pagination-only
+                :total="total"
+                :current-page="page"
+                :page-size="sizeNum"
+                layout = "prev,pager, next,sizes,slot"
+                @sizeChange="sizeChange"
+                @currentChange="currentChange"
+              />
+            </div>
+            
           </div>
         </el-tab-pane>
       </el-tabs>
@@ -730,12 +733,12 @@ export default {
       //}
       if ( self.params.clause.storeId && self.params.clause.storeId.length === 0) {
         //return ;
-        /*this.tableDataList[tabIndex].tableData = [];
-        this.tableDataList[tabIndex].total = 0;
-        this.tableDataList[tabIndex].eventCount = 0;
-        this.totalElements = 0;
-        this.numberOfElements = 0;
-        */
+        // this.tableDataList[tabIndex].tableData = [];
+        // this.tableDataList[tabIndex].total = 0;
+        // this.tableDataList[tabIndex].eventCount = 0;
+        // this.totalElements = 0;
+        // this.numberOfElements = 0;
+        
         delete self.params.clause.storeId;
         return;
       }
@@ -993,16 +996,28 @@ export default {
       //end = end - end % 1000 + 99999;
       if(self.searchParams['searchFrom']=='PatrolPersonStat'|| this.searchParams['searchFrom']=="EventStatistics"){
          //storeId = this.searchParams.clause.storeId;
-         start = self.searchParams.beginTs;
-         end = self.searchParams.endTs;
+        start = self.searchParams.beginTs;
+        end = self.searchParams.endTs;
       }
       //self.getEventListRequestParams('currentChange');
       //}
       //console.log("Get Event Count")
       //console.log(self.params)
       //console.log(self.params.clause.storeId);
+      const tabIndex = Number(this.activeName);
       if ( self.params.clause.storeId && self.params.clause.storeId.length === 0) {
-        delete self.params.clause.storeId;
+      
+        console.log('tabIndex' ,tabIndex)
+        // console.log('this.tableDataList', this.tableDataList)
+
+        this.tableDataList[tabIndex].tableData = [];
+        this.tableDataList[tabIndex].total = 0;
+        this.tableDataList.forEach(i => i.eventCount = 0)
+        this.totalElements = 0;
+        this.numberOfElements = 0;
+
+        
+        // delete self.params.clause.storeId;
         return;
       }
       //console.log("self.params:",self.params);
@@ -1186,9 +1201,7 @@ export default {
       console.log('init');
       const self = this;
       self.activeName = '0';
-      // self.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24, this.$moment(new Date()).endOf('day')];
-      self.dateValue = [ 1697040000000, 1697126399999 ];
-
+      self.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24, this.$moment(new Date()).endOf('day')];
       self.inputSearchValue = '';
       self.total = 0;
       self.getSearchParams();
@@ -1452,7 +1465,7 @@ export default {
           reject(err);
         });
       });
-   },
+  },
 
   changeSelect(val) {
       this.inspectId = Array.from(val)[0];
