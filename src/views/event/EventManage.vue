@@ -181,18 +181,12 @@
                     <div v-if="scope.row.status === 2 && scope.row.isSystemAdvancedEdited" class="expiretag">
                       <span style="color:#556679;"> (已變更狀態) </span> 
                     </div>
-                    <div v-else="scope.row.status === 2" class="expiretag">
-                      {{ '('+$t('eventView.expiretag')+')' }} 
-                    </div>
                   </el-tooltip>
 
                   <el-tooltip v-if="scope.row.status === 3 " effect="light" placement="right-end">
                     <div slot="content">{{ $t('eventView.expiredate')+ scope.row.updateTs }} </div>
                     <div v-if="scope.row.status === 3 && scope.row.isSystemAdvancedEdited" class="expiretag">
                       <span style="color:#e22472;"> (已變更狀態) </span> 
-                    </div>
-                    <div v-else="scope.row.status === 3" class="expiretag">
-                      {{ '('+$t('eventView.expiretag')+')' }} 
                     </div>
                   </el-tooltip>
                   <el-tooltip v-if="scope.row.status === 4 " effect="light" placement="right-end">

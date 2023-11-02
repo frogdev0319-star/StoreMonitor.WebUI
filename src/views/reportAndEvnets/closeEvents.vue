@@ -477,7 +477,7 @@ export default {
       if (search.length !== 0) {
         self.params.like = {
           subject: search,
-          inspectTagName: search,
+          assignerName: search,
           storeName: search
         };
       } else {

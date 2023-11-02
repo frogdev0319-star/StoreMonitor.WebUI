@@ -97,6 +97,8 @@
                 @click="barchartClick"/>
               </div>
             </div>
+            
+            <!-- 地點事件 -->
             <div class="table-area">
               <div class="sec-head">
                 <div class="title">{{ $t('statistics.event.storeEvent') }}</div>
@@ -129,6 +131,7 @@
               </div>
               <div v-if="viewMode==0">
                 <div style="margin-top:20.5px;">
+                  <p></p>
                   <table-only
                     ref="elTP"
                     :column-data="eventInfoData"
@@ -828,7 +831,7 @@ export default {
       eventInfoData: [
         {
           'prop': 'province',
-          'label': this.$t('remotePatrol.regionI'),
+          'label': this.$t('remotePatrol.regionI') + '一',
           'sortable': false,
           'width': '60',
           'maxWidth': '100',
@@ -1317,12 +1320,13 @@ export default {
       let totalInprocess = 0;
       let totalProcessed = 0;
       let totalRejected = 0;
+
       self.gloableEventData.forEach(item => {
         totalEvents += item.numOfTotal;
         totalUnprocessed += item.numOfUnprocessed;
         totalInprocess += item.numOfInprocess;
         totalProcessed += item.numOfProcessed;
-        totalRejected += item.numOfRejected;
+        totalRejected = item.numOfRejected;
       });
       self.eventKPIs[0].eventNum = totalEvents;
       self.eventKPIs[1].eventNum = totalUnprocessed+totalRejected;
@@ -1388,7 +1392,7 @@ export default {
           if (numOfTotal === 0) {
             item.completedRateStr = 0 + '%';
           } else {
-            item.completedRateStr = (item.numOfProcessed / numOfTotal * 100).toFixed(0) + '%';
+            item.completedRateStr = (item.numOfProcessed / numOfTotal * 100).toFixed(0) + '111%';
           }
           item.completedRate = Number(item.completedRateStr.replace('%', ''));
           item.detail = this.$t("statistics.event.detail");
@@ -1657,15 +1661,15 @@ export default {
         }
         else{
            //option.grid.width = 'calc(1479/1980*100vw)';
-           if(this.ispdf){
-             option.width = 'calc(800/1980*100vw)';
+          if(this.ispdf){
+            option.width = 'calc(800/1980*100vw)';
               option.grid.width = '800px';
               this.barchartWidthMode0 = 'calc(800/1980*100vw)';
-           }else{
+          }else{
             option.width = 'calc(1450/1980*100vw)';
             option.grid.width = '100%';
             this.barchartWidthMode0 = 'calc(1450/1980*100vw)';
-           }
+          }
         }
         this.barchartOptionViewMode0  = option;
         //
@@ -1703,9 +1707,11 @@ export default {
       };
       //console.log("*getEventTableData>searchParamsObj:",searchParamsObj);
       self.ifSaveParams && self.$refs.eventSearch.saveSearchParams(searchParamsObj);
-     self.ifSaveParams = true;
-     if(this.compareIds.length>0){
+      self.ifSaveParams = true;
+      if(this.compareIds.length>0){
         const eventResult = await self.getEventTableDataInfo(searchCondition);
+        console.log('eventResult ~~~~>> ', eventResult);
+
         const ignorePer = 0;
         const errCode = eventResult.errCode;
         if (errCode === 0) {
@@ -1716,12 +1722,17 @@ export default {
             //console.log("total page:",self.total)
             self.allEventTableData.forEach(item => {
               const numOfTotal = item.numOfTotal;
+
+              // 已結案＝人工結案＋預期結案
+              item.numOfProcessed = item.numOfOverdue + item.numOfProcessed
+              
               if (numOfTotal === 0) {
                 item.completedRateStr = 0 + '%';
               } else {
                 item.completedRateStr = (item.numOfProcessed / numOfTotal * 100).toFixed(0) + '%';
               }
               item.id = item.innerId;
+              
               item.completedRate = Number(item.completedRateStr.replace('%', ''));
               item.storeGroup = item.storeRegion.toString();
               item.storeType = item.storeBranchType.toString();
