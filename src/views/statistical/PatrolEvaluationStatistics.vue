@@ -3019,7 +3019,11 @@ export default {
 
         async bigScorefunc(val){
             console.log('aaa param :>> ', val);
-            const allStoreResult = await self.getInspectStatsOverviewWithGroup(oriParam);
+            const allStoreResult = await this.getInspectStatsOverviewWithGroup(val);
+            console.log('allStoreResult :>> ', allStoreResult);
+            let totalReport = 0;
+            let totalStandard = 0;
+
             if (allStoreResult.errCode === 0) {
                 const tempData = allStoreResult.data;
                 console.log('tempData :>> ', tempData);
