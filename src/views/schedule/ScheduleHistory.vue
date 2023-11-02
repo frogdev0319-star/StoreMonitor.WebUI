@@ -668,6 +668,9 @@ export default{
       font-size: 12px
       padding: 5px 15px
       transition: all .3s
+  .el-table__body-wrapper
+    max-height: fit-content !important
+
 
   
 </style>
@@ -818,6 +821,7 @@ export default{
         border:none;
         box-shadow: none;
         width: 100% !important;
+        max-height: fit-content !important;
     }
   
     /deep/

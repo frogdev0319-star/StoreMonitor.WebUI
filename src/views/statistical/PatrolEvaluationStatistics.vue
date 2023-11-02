@@ -23,6 +23,7 @@
             />
             <!-- @exportPdf="exportPdf" -->
         </el-col>
+
         <div class="statistics-content" id="imgTest_avg1" style="height:194px;margin-top:200px;box-shadow:none;" :style="{width:ispdf?'1280px':null}">
             <div class="head">
                 <el-col :span="17">
@@ -65,7 +66,6 @@
                 <el-col :span="8" class="division">
                     <el-col class="text-area">
                         <el-row class="top">
-                            <!-- <span class="mainTitle">{{ overviewCount.avgScore!=-9999 ? overviewCount.avgScore : 'N/A'}}</span> -->
                             <span class="mainTitle">{{ bigScore > 0 ? bigScore : 'N/A'}}</span>
                             <span class="unit">{{ $t('statistics.overview.avg_unit') }}</span>
                         </el-row>
@@ -2977,7 +2977,10 @@ export default {
             };
 
 
-            if (params.storeIds.length === 0) {return false;}
+            if (params.storeIds.length === 0) {
+                this.bigScore = -9999
+                return false;
+            }
 
             console.log('params :>> ', params);
             const storeResult = await self.getInspectStatsOverviewWithGroup(params);
@@ -3011,28 +3014,12 @@ export default {
                 size: oriParams.storeIds.length
             };
 
-            this.aaa(oriParams)
-
-            // const allStoreResult = await self.getInspectStatsOverviewWithGroup(oriParam);
-            // if (allStoreResult.errCode === 0) {
-            //     const aaa = allStoreResult.data;
-            //     if (aaa) {
-            //         aaa.content.forEach(function (item) {
-            //             totalReport += item.numOfReport;
-            //             totalStandard += item.averageScore * item.numOfReport;
-            //         })
-            //         this.bigScore = totalStandard > 0 ? Math.round(totalStandard / totalReport) : -9999;
-            //     }
-            // }
+            this.bigScorefunc(oriParams)
         },
 
-        async aaa(val){
+        async bigScorefunc(val){
             console.log('aaa param :>> ', val);
-            const allStoreResult = await this.getInspectStatsOverviewWithGroup(val);
-            console.log('allStoreResult :>> ', allStoreResult);
-            let totalReport = 0;
-            let totalStandard = 0;
-
+            const allStoreResult = await self.getInspectStatsOverviewWithGroup(oriParam);
             if (allStoreResult.errCode === 0) {
                 const tempData = allStoreResult.data;
                 console.log('tempData :>> ', tempData);
@@ -3045,6 +3032,9 @@ export default {
                     console.log('this.bigScore :>> ', this.bigScore);
                 }
             }
+
+            
+            
         },
 
 

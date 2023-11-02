@@ -232,29 +232,18 @@
           <div class="empty-content">{{ noData }}</div>
         </div>
         
-        <div class="el-pat">
-            <!--<el-pagination
-              :page-size="sizeNum"
-              :total="total"
-              :current-page="page"
-              :page-sizes="[12,24,50,100]"
-              background
-              small
-              layout="jumper,total, prev, pager, next,sizes"
-              class="el-pag"
-              @current-change="currentChange"
-              @size-change="sizeChange"/>-->
-              <div class="pageSizeTitle" style="color: #666"> {{ $t('remotePatrol.totalOf') }} <b style="font-size: 16px"> {{totalElements}} </b> {{ $t('remotePatrol.numReports') }}</div>
+        <div class="el-pat" v-if="reportList.length > 0">
+          <div class="pageSizeTitle" style="color: #666"> {{ $t('remotePatrol.totalOf') }} <b style="font-size: 16px"> {{totalElements}} </b> {{ $t('remotePatrol.numReports') }}</div>
 
-              <tbl-pagination-only
-              :btn-style="{backgroundColor:'transparent'}"
-              :total="total"
-              :current-page="page"
-              :page-size="sizeNum"
-              layout = "prev,pager, next,sizes,slot"
-              @sizeChange="sizeChange"
-              @currentChange="currentChange"
-            />
+          <tbl-pagination-only
+          :btn-style="{backgroundColor:'transparent'}"
+          :total="total"
+          :current-page="page"
+          :page-size="sizeNum"
+          layout = "prev,pager, next,sizes,slot"
+          @sizeChange="sizeChange"
+          @currentChange="currentChange"
+        />
             
           </div>
       </div>
@@ -1054,7 +1043,7 @@ export default {
     },
 
     searchData() {
-      console.log("Search Data" +this.dateValue)
+      console.log("Search Data" +this.dateValue) 
       const self = this;
       const val = self.dateValue;
       if (val.length === 0) return;
@@ -1107,6 +1096,8 @@ export default {
       self.params.filter = { page: 0, size: self.sizeNum };
       self.saveSearchParams();
       self.getReportList(self.params);
+
+
     },
 
     setNoData() {

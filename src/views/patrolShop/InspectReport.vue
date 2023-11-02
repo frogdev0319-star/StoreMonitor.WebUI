@@ -868,6 +868,7 @@ export default {
       passWord: '',
       deleteReportId: '',
       canDeleteReport: false,
+      needDeleteReport: false
       
     };
   },
