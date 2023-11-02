@@ -123,9 +123,11 @@ import util from '@/common/util';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
 import PermissionHelper from '@/api/PermissionHelper';
 import { message } from '@/common/singleton-message';
+import DelayButton from '@/components/DelayButton';
 export default {
     name:'TabInceptionDetail',
     components: {
+        DelayButton,
         'table-pagination':TablePagination,TblPaginationOnly
     },
     props:{
@@ -311,18 +313,19 @@ export default {
         this.getReportList()
     },
     methods:{
-        getLangStyleValue(langArray){
-        
-            return util.getLangStyleValue(langArray);
-        },
+      getLangStyleValue(langArray){
+        return util.getLangStyleValue(langArray);
+      },
+
       onClickBtn(item){
+        console.log('item :>> ', item);
         this.currentTab = item;
         if(item == "Detail"){
 
         }else if(item == "NotInspected"){
             this.getNotInspectedStores();
         }else if(item == "Event"){
-            this. getEventCompletedRate();
+            this.getEventCompletedRate();
         }
         //this.$emit('click', item)
       },
@@ -436,7 +439,6 @@ export default {
           };
           sessionStorage.setItem('report_data', JSON.stringify(parsObj));
           self.$router.push({ name: 'reportDetails', params: { data: parsObj }});
-           
       },
       handleEmitPersonEventRowClick(row){//进入事件列表界面，展示该门店该人员产生的事件
         if(!PermissionHelper.enableEventHandle() && 
@@ -529,8 +531,17 @@ export default {
       },
       getEventCompletedRate(){
         const self = this;
-        let params = {beginTs:this.beginTs,endTs:this.endTs,clause: {assigner:this.submitter},
-                        order: {direction: "asc",property: "storeId"},searchMysteryMode:this.isMystery?1:0};
+        let params = {
+          beginTs: this.beginTs, 
+          endTs: this.endTs, 
+          clause: {assigner: this.submitter}, 
+          order: {
+            direction: "asc", 
+            property: "storeId"
+          }, 
+          searchMysteryMode: this.isMystery ? 1 : 0
+        };
+
         return new Promise((resolve) => {
             StatisticsGetEventAndCommentList(params).then(res => {
                 const errCode = res.errCode;
@@ -538,80 +549,88 @@ export default {
                 if (errCode === 0) {
                     data = res.data.content;
                 }
-                //console.log("data:",data);
-                const temp = [];
-                let tempStorId=data.length>0 ? data[0].storeId:"";
-                let tempStorName=data.length>0 ? data[0].name:"";
+                // console.log("data ~~~~~>",data);
+                const temp = []; 
+                let tempStorId = data.length > 0 ? data[0].storeId : "";
+                let tempStorName = data.length > 0 ? data[0].name : "";
                 // 0-Unprocessed,1-Inprocess,2-Processed,3-Rejected,4-Overdue
-                let Unprocessed=0,Inprocess=0,Processed=0,Rejected=0,Overdue=0;
+                let Unprocessed = 0, Inprocess = 0, Processed= 0, Rejected = 0, Overdue = 0, Closed = 0;
                 data.forEach((item,idx) => {
-                    if(tempStorId!=item.storeId){
+                    if(tempStorId !== item.storeId){
                         const reportObj = {
                             id:tempStorId,
                             storeName:tempStorName,
                             assignerName:item.assignerName,
                             Unprocessed,
+                            Closed,
                             Inprocess,
                             Processed,
                             Rejected,
                             Overdue,
-                            completedRate:((Processed/(Unprocessed+Inprocess+Processed+Rejected+Overdue))*100).toFixed(1)+'%',
+                            Processed : Closed + Overdue,
+                            // completedRate:((Processed/(Unprocessed+Inprocess+Processed+Rejected+Overdue))*100).toFixed(1)+'%',
                             detail : this.$t('statistics.patrolPerson.seeDetail')
                         };
-                        //console.log("reportObj:",reportObj);
+                        reportObj.completedRate = ((reportObj.Processed / (reportObj.Unprocessed + reportObj.Inprocess + reportObj.Closed + reportObj.Rejected + reportObj.Overdue))*100).toFixed(1)+'%',
                         temp.push(reportObj);
-                        Unprocessed=0;Inprocess=0;Processed=0;Rejected=0;Overdue=0;
+
+                        Unprocessed = 0; Inprocess = 0; Processed = 0; Rejected = 0; Overdue = 0; Closed = 0
                         tempStorId = item.storeId;
                         tempStorName = item.name;
                         //assignerName = item.assignerName;
                     }
                         
                     switch(item.status){
-                        case 0:
-                           Unprocessed+=1;
-                           break;
-                        case 1: 
-                           Inprocess+=1;
-                           break;
-                        case 2:
-                            Processed+=1; //結案
-                            break;
-                        case 3:   
-                            Rejected+=1;
-                            break;
-                        case 4:
-                            Overdue+=1;
-                            break;
+                      case 0:
+                        Unprocessed+=1;
+                        break;
+                      case 1: 
+                        Inprocess+=1;
+                        break;
+                      case 2:
+                        Closed+=1; //結案
+                        break;
+                      case 3:   
+                        Rejected+=1;
+                        break;
+                      case 4:
+                        Overdue+=1;
+                        break;
                     }
 
-                    if(idx==data.length-1){
-                        const reportObj = {
-                            id:tempStorId,
-                            storeId:tempStorId,
-                            storeName:tempStorName,
-                            Unprocessed,
-                            Inprocess,
-                            Processed,
-                            Rejected,
-                            Overdue,
-                            completedRate:((Processed/(Unprocessed+Inprocess+Processed+Rejected+Overdue))*100).toFixed(1)+'%',
-                            detail : this.$t('statistics.patrolPerson.seeDetail')
-                        };
-                        temp.push(reportObj);
+                    if(idx == data.length - 1){
+                      const reportObj = {
+                        id: tempStorId,
+                        storeId: tempStorId,
+                        storeName: tempStorName,
+                        Overdue,
+                        Unprocessed,
+                        Inprocess,
+                        Rejected,
+                        Processed,
+                        Closed,
+                        Processed : Closed + Overdue,
+                        // completedRate:((Processed / (Unprocessed+Inprocess+Closed+Rejected+Overdue))*100).toFixed(1)+'%',
+                        detail : this.$t('statistics.patrolPerson.seeDetail')
+                      };
+                      reportObj.completedRate = ((reportObj.Processed / (reportObj.Unprocessed + reportObj.Inprocess + reportObj.Closed + reportObj.Rejected + reportObj.Overdue))*100).toFixed(1)+'%',
+                      temp.push(reportObj);
                     }
+                    
                         
                 });
-                console.log("temp:",temp);
+
                 this.eventTbl.all_data = temp;
                 this.eventTbl.total =Math.ceil(temp.length/this.eventTbl.sizeNum);
                 this.setEventTableData();
                 resolve(temp);
             }).catch(err => {
-            console.log('InspectReportList-getReportList: ' + err);
+              console.log('InspectReportList-getReportList: ' + err);
+          });
         });
-        });
-        
+    
       },
+
       handleEmitComplitedRowClick(row){
           const self = this;
           //sessionStorage.setItem('report_data', JSON.stringify(row));

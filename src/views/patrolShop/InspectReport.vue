@@ -42,7 +42,7 @@
             ref="delay_day"
             placeholder=""
             class="input-name_short"
-            @change="addNum"
+            @input="addNum"
             />
         </div>
 
@@ -56,7 +56,7 @@
             ref="delay_day"
             placeholder=""
             class="input-name_short"
-            @change="addNum"
+            @input="addNum"
             />
         </div>
         <div class="delete_btn_row">
