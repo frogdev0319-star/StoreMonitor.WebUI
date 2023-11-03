@@ -177,14 +177,20 @@
                   </el-tooltip>
 
                   <el-tooltip v-if="scope.row.status === 2 " effect="light" placement="right-end">
-                    <div slot="content">{{ $t('eventView.expiredate')+ scope.row.updateTs }} </div>
+                    <div slot="content">
+                      <div v-if="scope.row.isSystemAdvancedEdited">變更時間：{{scope.row.updateTs }} </div>
+                      <div v-else> {{ $t('eventView.expiredate')+ scope.row.updateTs }}</div>
+                    </div>
                     <div v-if="scope.row.status === 2 && scope.row.isSystemAdvancedEdited" class="expiretag">
                       <span style="color:#556679;"> (已變更狀態) </span> 
                     </div>
                   </el-tooltip>
 
                   <el-tooltip v-if="scope.row.status === 3 " effect="light" placement="right-end">
-                    <div slot="content">{{ $t('eventView.expiredate')+ scope.row.updateTs }} </div>
+                    <div slot="content">
+                      <div v-if="scope.row.isSystemAdvancedEdited">變更時間：{{scope.row.updateTs }} </div>
+                      <div v-else> {{ $t('eventView.expiredate')+ scope.row.updateTs }}</div>
+                    </div>
                     <div v-if="scope.row.status === 3 && scope.row.isSystemAdvancedEdited" class="expiretag">
                       <span style="color:#e22472;"> (已變更狀態) </span> 
                     </div>
