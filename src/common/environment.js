@@ -59,7 +59,23 @@ const _Environments = {
     GLOBAL_WEBSITE: 'https://preview-inspection.wise-iservice/api/',
     VERSION: version,
     clientId: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a'
-  }
+  },
+
+  // new RC vm
+  RC_StoreVue:{
+    CHINA_WEBSITE: 'https://rc-inspect.wise-apps.com/storemonitor/api/',
+    GLOBAL_WEBSITE: 'https://rc-inspect.wise-apps.com/storemonitor/api/',
+    VERSION: version,
+    clientId: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a'
+  },
+  RC_iService:{
+    CHINA_WEBSITE: 'https://rc-inspection.wise-iservice.com/storemonitor/api/',
+    GLOBAL_WEBSITE: 'https://rc-inspection.wise-iservice.com/storemonitor/api/',
+    VERSION: version,
+    clientId: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a'
+  },
+
+
 };
 
 let environJSON
