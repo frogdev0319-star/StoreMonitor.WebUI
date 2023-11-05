@@ -748,6 +748,11 @@ export default {
         delete self.params.clause.storeId;
         return;
       }
+
+      self.params.searchMysteryMode = -1
+
+
+      
       console.log("@@@self.params:",self.params);
       eventRESTful.getEventList(self.params).then((res) => {
         const data = res.data.content;
@@ -896,7 +901,7 @@ export default {
       //console.log("1.this.params:",params);
       if(storeId && storeId!='-1' && storeId!=""){
         //console.log("storeId:",storeId);
-         params.clause['storeId'] = storeId;
+        params.clause['storeId'] = storeId;
       }
       if(this.inspectId.length>0 && this.searchParams['searchFrom']!='PatrolPersonStat'){
         let inspectTagId = this.inspectId;
