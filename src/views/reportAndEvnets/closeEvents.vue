@@ -514,6 +514,11 @@ export default {
       delete self.params.storeTypeString
       delete self.params.curSelectedStore
 
+      if (self.params.clause.storeId.length === 0) {
+        console.log("No Data")
+        this.setNoData();
+        return;
+      }
       console.log("###",self.params)
       self.saveSearchParams();
       self.getEvents(self.params);
@@ -586,15 +591,13 @@ export default {
         inspectTagId: p.inspectTagId != '-1' ? p.inspectTagId : null, 
         searchMysteryMode : PermissionHelper.enableMimicMode ? 1 : p.searchMysteryMode
       }
-
       console.log('params ~~~~~>> ', params);
       const self = this;
       params.endTs = params.endTs - params.endTs % 1000 + 999;
       if (params.clause.storeId.length === 0) {
-        // console.log("No Data")
-        // this.setNoData();
-        // return;
-        params.clause.storeId.push(-1)
+        console.log("No Data")
+        this.setNoData();
+        return;
       }
       console.log("***current user:",this.$store.getters.userId);
       if(PermissionHelper.enableMimicMode){
@@ -792,7 +795,7 @@ export default {
 
 
     setNoData() {
-      this.reportList = [];
+      this.eventTableData = [];
       this.total = 0;
       this.isLoading = false;
       this.noData = this.$t('deviceView.noData');
