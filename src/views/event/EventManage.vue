@@ -34,18 +34,6 @@
                     :alltype="0"
                     :options="inspectTableList"
                     @changeInput="changeSelect(arguments)"/>
-                  <!--<el-select
-                    class="el-province"
-                    style="margin-left:0px;border:none;border-radius:0px;"
-                    v-model="inspectId"
-                    :placeholder="$t('insSettingView.selectPost')"
-                    size="mini">
-                  <el-option
-                    v-for="item in inspectTableList"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"/>
-                  </el-select>-->
               </div>
             </div>
           </template>
@@ -59,16 +47,7 @@
             @change="dateChange"
           />
         </div>
-        <!--<div class="flex-center">
-          <span style="margin-right: 10px; white-space:nowrap;">{{ $t('eventView.status') }}</span>
-          <multi-select
-            ref="multiState"
-            :selected="curState"
-            :alltype="0"
-            :options="eventStatesList"
-            :disabled="activeName!=='4'"
-            @changeInput="handleStateChange"/>
-        </div>-->
+      
         <div class="flex-center">
           <span style="margin-right: 10px; white-space:nowrap;">{{ $t('remotePatrol.keywords') }}</span>
           <el-input
@@ -1256,7 +1235,9 @@ export default {
     //     this.getEventList('Back');
     // },
     saveSearchParams(isLeave=false) {
-      //console.log("saveSearchParams:",this.storeFilterObj);
+
+      console.log("this.storeFilterObj:",this.storeFilterObj);
+
       const params = this.storeFilterObj;
       const { clause, filter, like, order } = { ...this.params };
       if(isLeave){
@@ -1281,84 +1262,94 @@ export default {
       params.searchMysteryMode = -1;
       params.curReportType = this.curReportType;
       params.inspectTagId = this.inspectId;
-      //console.log(">>>Save params:",params);
+
       const searchConditon = {
         path: 'eventManage',
         params: params
       };
-      //console.log("save params:",params);
+      console.log("save params:",params);
       SearchConditionUtil.saveSearchCondition(searchConditon);
+    
+
     },
 
+
     getSearchParams() {
+      const searchParams = SearchConditionUtil.getSearchCondition('eventManage');
+      console.log("EventMange > getSearchParams > searchParams:",searchParams);
 
-        const searchParams = SearchConditionUtil.getSearchCondition('eventManage');
-        console.log("EventMange > getSearchParams > searchParams:",searchParams);
-        if (Object.keys(searchParams).length > 0) {
+    
+      if (Object.keys(searchParams).length > 0) {
 
-          if(searchParams['searchFrom']=='PatrolPersonStat'){
-            //this.dateValue =[searchParams.];
-            this.curReportType = -1;
-            this.storeFilterObj.filterStoreIds = searchParams.curStore;
-            this.storeFilterObj.curStore=searchParams.curStore;
-            this.storeFilterObj.storeIds=searchParams.curStore;
-            this.storeFilterObj.curCountry = "-1";
-            this.storeFilterObj.curProvince = ["-1"];
-            this.storeFilterObj.curCity = ["-1"];
-            this.params.beginTs = searchParams.beginTs;
-            this.params.endTs = searchParams.endTs;
-            this.dateValue = [util.getDates(searchParams.beginTs),searchParams.endTs];
-            this.params.searchMysteryMode = searchParams.searchMysteryMode;
+        if(searchParams['searchFrom']=='PatrolPersonStat'){
+          //this.dateValue =[searchParams.];
+          this.curReportType = -1;
+          this.storeFilterObj.filterStoreIds = searchParams.curStore;
+          this.storeFilterObj.curStore=searchParams.curStore;
+          this.storeFilterObj.storeIds=searchParams.curStore;
+          this.storeFilterObj.curCountry = "-1";
+          this.storeFilterObj.curProvince = ["-1"];
+          this.storeFilterObj.curCity = ["-1"];
+          this.params.beginTs = searchParams.beginTs;
+          this.params.endTs = searchParams.endTs;
+          this.dateValue = [util.getDates(searchParams.beginTs),searchParams.endTs];
+          this.params.searchMysteryMode = searchParams.searchMysteryMode;
 
-            //console.log("1.EventMange > getSearchParams > dateValue:",this.dateValue);
-            //util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
-          }else if(searchParams['searchFrom']=="EventStatistics"){
-            this.params.beginTs = searchParams.beginTs;
-            this.params.endTs = searchParams.endTs;
-            this.storeFilterObj.filterStoreIds = searchParams.curStore;
-            this.storeFilterObj.curStore=searchParams.curStore;
-            this.storeFilterObj.storeIds=searchParams.curStore;
-            this.dateValue = [util.getDates(searchParams.beginTs),searchParams.endTs];
-            this.params.searchMysteryMode = -1;
-            //console.log("EventMange > getSearchParams > searchParams.inspectTagId:",searchParams.inspectTagId);
-            this.curReportType = -1;
-            this.inspectCatch = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
-            this.inspectId = this.inspectCatch;
-            //console.log("1..EventMange > getSearchParams > dateValue:",this.dateValue);
-          }else{
-            this.storeFilterObj.filterStoreIds = (searchParams.curStore)?searchParams.curStore:[];
-            this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
-            //console.log("2.EventMange > getSearchParams > dateValue:",this.dateValue);
-            this.params.beginTs = this.dateValue[0].valueOf();
-            this.params.endTs = this.dateValue[1].valueOf();
-            this.params.searchMysteryMode = -1;
-            this.curReportType = (typeof searchParams.curReportType =='undefined')? -1 : searchParams.curReportType;
-            this.inspectCatch = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
-            console.log("EventMange > getSearchParams > this.inspectCatch:",this.inspectCatch);
-          }
-          this.inputSearchValue = searchParams.inputSearchValue;
-          this.curState = searchParams.curState;
-          this.curStore = searchParams.curStore;
-          this.activeName = searchParams.activeName;
-          this.sizeNum = searchParams.sizeNum;
-          this.page = searchParams.page;
-          this.order = searchParams.order;
-          this.tableDataList[Number(this.activeName)].page = searchParams.page;
-          this.params = searchParams.searchParams;
-          this.searchParams = searchParams;
-          this.ifGetParamsFromCash = true;
-
-        } else {
-          this.searchParams = {};
-          this.curState = [0];
+          //console.log("1.EventMange > getSearchParams > dateValue:",this.dateValue);
+          //util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
+        }
+        else if(searchParams['searchFrom']=="EventStatistics"){
+          this.params.beginTs = searchParams.beginTs;
+          this.params.endTs = searchParams.endTs;
+          this.storeFilterObj.filterStoreIds = searchParams.curStore;
+          this.storeFilterObj.curStore=searchParams.curStore;
+          this.storeFilterObj.storeIds=searchParams.curStore;
+          this.dateValue = [util.getDates(searchParams.beginTs),searchParams.endTs];
+          this.params.searchMysteryMode = -1;
+          //console.log("EventMange > getSearchParams > searchParams.inspectTagId:",searchParams.inspectTagId);
+          this.curReportType = -1;
+          this.inspectCatch = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
+          this.inspectId = this.inspectCatch;
+          //console.log("1..EventMange > getSearchParams > dateValue:",this.dateValue);
+        }
+        else{
+          this.storeFilterObj.filterStoreIds = (searchParams.curStore)?searchParams.curStore:[];
           this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+          //console.log("2.EventMange > getSearchParams > dateValue:",this.dateValue);
           this.params.beginTs = this.dateValue[0].valueOf();
           this.params.endTs = this.dateValue[1].valueOf();
           this.params.searchMysteryMode = -1;
-          this.inspectCatch = '-1';
-          this.curReportType = -1;
-          this.ifGetParamsFromCash = false;
+          this.curReportType = (typeof searchParams.curReportType =='undefined')? -1 : searchParams.curReportType;
+          this.inspectCatch = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
+          console.log("EventMange > getSearchParams > this.inspectCatch:",this.inspectCatch);
         }
+        this.inputSearchValue = searchParams.inputSearchValue;
+        this.curState = searchParams.curState;
+        this.curStore = searchParams.curStore;
+        this.activeName = searchParams.activeName;
+        this.sizeNum = searchParams.sizeNum;
+        this.page = searchParams.page;
+        this.order = searchParams.order;
+        this.tableDataList[Number(this.activeName)].page = searchParams.page;
+        this.params = searchParams.searchParams;
+        this.searchParams = searchParams;
+        this.ifGetParamsFromCash = true;
+
+      } else {
+        this.searchParams = {};
+        this.curState = [0];
+        this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+        this.params.beginTs = this.dateValue[0].valueOf();
+        this.params.endTs = this.dateValue[1].valueOf();
+        this.params.searchMysteryMode = -1;
+        this.inspectCatch = '-1';
+        this.curReportType = -1;
+        this.ifGetParamsFromCash = false;
+      }
+
+    
+      
+
 
     },
 

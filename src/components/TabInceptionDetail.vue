@@ -445,17 +445,21 @@ export default {
           !PermissionHelper.enableEventClose() && 
           !PermissionHelper.enableEventAdd() && 
           !PermissionHelper.enableEventReturn()){
-        message({
-            message: this.$i18n.t('route.noEventAuthority'),
-            type: 'error',
-            duration: 5 * 1000
-          });
-        return;
-      }
+            message({
+                message: this.$i18n.t('route.noEventAuthority'),
+                type: 'error',
+                duration: 5 * 1000
+              });
+            return;
+          }
+        
         const self = this;
         var params = SearchConditionUtil.getSearchCondition('eventManage');
-        console.log("1.",params)
         const rowItem = row;
+        
+        console.log("params~~~>>>", params)
+        console.log("rowItem~~~>>>", rowItem)
+
       if(Object.keys(params).length > 0){
         //searchParams.searchCondition = JSON.parse(JSON.stringify(this.params))
         params.searchParams.clause ={assigner:this.submitter,storeId:[rowItem.id],status:[]};
