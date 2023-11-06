@@ -58,7 +58,7 @@
                     @sortChange="sortChange"
                 />
             </div>
-            <div class="page-area">
+            <div class="page-area" v-if="tableData.length > 0">
                 <tbl-pagination-only
                 :btn-style="{backgroundColor:'transparent'}"
                 :total="curTotalPage"
@@ -118,59 +118,59 @@ export default{
             },
             tableData: [],
             tableColumns:[
-            {
-                'prop': 'storeName',
-                'label': this.$t('audit.sendAudit.storeName'),
-                'sortable': false,
-                'width': 80,
-                'maxWidth': 80,
-                'isExpand': false
-              },
-              {
-                'prop': 'reportName',
-                'label': this.$t('audit.sendAudit.reportName'),
-                'sortable': false,
-                'width': 60,
-                'maxWidth': 60,
-                'isExpand': false
-              },
-              {
-                'prop': 'submitterName',
-                'label': this.$t('audit.sendAudit.submitterName'),
-                'sortable': false,
-                'width': 65,
-                'maxWidth': 65,
-                'minWidth': 65,
-                'isExpand': false
-              },
-              {
-                'prop': 'processStartTs',
-                'label': this.$t('audit.sendAudit.submitTime'),
-                'sortable': 'custom',
-                'width': 100,
-                'maxWidth': 100,
-                'isExpand': false
-              },
-              {
-                'prop': 'processLastUpdateTs',
-                'label': this.$t('audit.sendAudit.updateTime'),
-                'sortable': false,
-                'width': 100,
-                'maxWidth': 100,
-                'isExpand': false
-              },
-              {
-                'prop': 'operator',
-                'label': this.$t('audit.sendAudit.operation'),
-                'sortable': false,
-                'width': 50,
-                'maxWidth': 50,
-                'isExpand': false,
-                'isCellClick':true,
-                'align': 'left',
-                'customIcon': false,
-                'methods': 'set'
-              }
+                {
+                    'prop': 'storeName',
+                    'label': this.$t('audit.sendAudit.storeName'),
+                    'sortable': false,
+                    'width': 80,
+                    'maxWidth': 80,
+                    'isExpand': false
+                },
+                {
+                    'prop': 'reportName',
+                    'label': this.$t('audit.sendAudit.reportName'),
+                    'sortable': false,
+                    'width': 60,
+                    'maxWidth': 60,
+                    'isExpand': false
+                },
+                {
+                    'prop': 'submitterName',
+                    'label': this.$t('audit.sendAudit.submitterName'),
+                    'sortable': false,
+                    'width': 65,
+                    'maxWidth': 65,
+                    'minWidth': 65,
+                    'isExpand': false
+                },
+                {
+                    'prop': 'processStartTs',
+                    'label': this.$t('audit.sendAudit.submitTime'),
+                    'sortable': 'custom',
+                    'width': 100,
+                    'maxWidth': 100,
+                    'isExpand': false
+                },
+                {
+                    'prop': 'processLastUpdateTs',
+                    'label': this.$t('audit.sendAudit.updateTime'),
+                    'sortable': false,
+                    'width': 100,
+                    'maxWidth': 100,
+                    'isExpand': false
+                },
+                {
+                    'prop': 'operator',
+                    'label': this.$t('audit.sendAudit.operation'),
+                    'sortable': false,
+                    'width': 50,
+                    'maxWidth': 50,
+                    'isExpand': false,
+                    'isCellClick':true,
+                    'align': 'left',
+                    'customIcon': false,
+                    'methods': 'set'
+                }
             ],
             tabContentId:[{key:'en',value:'#en-tabs-content'},{key:'zh',value:'#en-tabs-content'},{key:'zhtw',value:'#en-tabs-content'},
                 {key:'ja-JP',value:'#en-tabs-content'},{key:'ko-KR',value:'#en-tabs-content'},{key:'vi-VN',value:'#en-tabs-content'},
@@ -334,6 +334,14 @@ export default{
                     size:this.curSizeNum
                 }
             };
+
+            if(params.storeId.length == 0){
+                this.tableData = []
+                this.curTotalPage = 0;
+                this.isLoading = false;
+                return
+            }
+
             if(Object.keys(this.curOrder).length>0){
                 params['order'] = this.curOrder;
             }

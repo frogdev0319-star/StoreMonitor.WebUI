@@ -65,7 +65,7 @@
                             @sortChange="sortChange"
                         />
                     </div>
-                    <div class="page-area">
+                    <div class="page-area" v-if="item.tableData.length > 0">
                         <tbl-pagination-only
                         :btn-style="{backgroundColor:'transparent'}"
                         :total="curTotalPage"
@@ -125,161 +125,161 @@ export default{
             curSizeNum:10,
             defaultSort:{order:'descending',prop:'processLastUpdateTs'},
             curOrder:{
-                      direction:'desc',
-                      property:'processLastUpdateTs'
+                    direction:'desc',
+                    property:'processLastUpdateTs'
             },
             tableDataList:[
                 {
-                  label: this.$t('audit.sendAudit.waiting'),
-                  name: '0',
-                  taskCount: 0,
-                  tableData: [],
-                  tableColumns:[
-                    {
-                      'prop': 'storeName',
-                      'label': this.$t('audit.sendAudit.storeName'),
-                      'sortable': false,
-                      'width': 80,
-                      'maxWidth': 80,
-                      'isExpand': false
+                    label: this.$t('audit.sendAudit.waiting'),
+                    name: '0',
+                    taskCount: 0,
+                    tableData: [],
+                    tableColumns:[
+                        {
+                        'prop': 'storeName',
+                        'label': this.$t('audit.sendAudit.storeName'),
+                        'sortable': false,
+                        'width': 80,
+                        'maxWidth': 80,
+                        'isExpand': false
+                        },
+                        {
+                        'prop': 'reportName',
+                        'label': this.$t('audit.sendAudit.reportName'),
+                        'sortable': false,
+                        'width': 60,
+                        'maxWidth': 60,
+                        'isExpand': false
+                        },
+                        {
+                        'prop': 'submitterName',
+                        'label': this.$t('audit.sendAudit.submitterName'),
+                        'sortable': false,
+                        'width': 65,
+                        'maxWidth': 65,
+                        'minWidth': 65,
+                        'isExpand': false
+                        },
+                        {
+                        'prop': 'processStartTs',
+                        'label': this.$t('audit.sendAudit.submitTime'),
+                        'sortable': 'custom',
+                        'width': 100,
+                        'maxWidth': 100,
+                        'isExpand': false
+                        },
+                        {
+                        'prop': 'processLastUpdateTs',
+                        'label': this.$t('audit.sendAudit.updateTime'),
+                        'sortable': 'custom',
+                        'width': 100,
+                        'maxWidth': 100,
+                        'isExpand': false
+                        },
+                        {
+                        'prop': 'operator',
+                        'label': this.$t('audit.sendAudit.operation'),
+                        'sortable': false,
+                        'width': 50,
+                        'maxWidth': 50,
+                        'isExpand': false,
+                        'isCellClick':true,
+                        'align': 'left',
+                        'customIcon': true,
+                        'src' : require('@/../static/img/icon_audit.png'),
+                        }
+                    ],
+                    order:{
+                        direction:'desc',
+                        property:'processLastUpdateTs'
+                    },
+                    totalPage: 1,
+                    sizeNum:10
                     },
                     {
-                      'prop': 'reportName',
-                      'label': this.$t('audit.sendAudit.reportName'),
-                      'sortable': false,
-                      'width': 60,
-                      'maxWidth': 60,
-                      'isExpand': false
+                    label: this.$t('audit.sendAudit.approved'),
+                    name: '1',
+                    taskCount: 0,
+                    tableData: [],
+                    tableColumns:[
+                        {
+                            'prop': 'storeName',
+                            'label': this.$t('audit.sendAudit.storeName'),
+                            'sortable': false,
+                            'width': 80,
+                            'maxWidth': 80,
+                            'isExpand': false
+                        },
+                        {
+                            'prop': 'reportName',
+                            'label': this.$t('audit.sendAudit.reportName'),
+                            'sortable': false,
+                            'width': 60,
+                            'maxWidth': 60,
+                            'isExpand': false
+                        },
+                        {
+                            'prop': 'submitterName',
+                            'label': this.$t('audit.sendAudit.submitterName'),
+                            'sortable': false,
+                            'width': 65,
+                            'maxWidth': 65,
+                            'minWidth': 65,
+                            'isExpand': false
+                        },
+                        {
+                            'prop': 'processStartTs',
+                            'label': this.$t('audit.sendAudit.submitTime'),
+                            'sortable': 'custom',
+                            'width': 100,
+                            'maxWidth': 100,
+                            'isExpand': false
+                        },
+                        {
+                            'prop': 'auditStatusName',
+                            'label': this.$t('audit.sendAudit.auditStatus'),
+                            'sortable': 'custom',
+                            'width': 100,
+                            'maxWidth': 100,
+                            'isExpand': false
+                        },
+                        {
+                            'prop': 'processLastUpdateTs',
+                            'label': this.$t('audit.sendAudit.updateTime'),
+                            'sortable': 'custom',
+                            'width': 100,
+                            'maxWidth': 100,
+                            'isExpand': false
+                        },
+                        {
+                            'prop': 'taskOwner',
+                            'label': this.$t('audit.sendAudit.owner'),
+                            'sortable': false,
+                            'width': 65,
+                            'maxWidth': 65,
+                            'minWidth': 65,
+                            'isExpand': false
+                        },
+                        {
+                            'prop': 'operator',
+                            'label': this.$t('audit.sendAudit.operation'),
+                            'sortable': false,
+                            'width': 50,
+                            'maxWidth': 50,
+                            'isExpand': false,
+                            'isCellClick':true,
+                            'align': 'left',
+                            'customIcon': false,
+                            'methods': 'set'
+                        }
+                    ],
+                    order:{
+                        direction:'desc',
+                        property:'processLastUpdateTs'
                     },
-                    {
-                      'prop': 'submitterName',
-                      'label': this.$t('audit.sendAudit.submitterName'),
-                      'sortable': false,
-                      'width': 65,
-                      'maxWidth': 65,
-                      'minWidth': 65,
-                      'isExpand': false
-                    },
-                    {
-                      'prop': 'processStartTs',
-                      'label': this.$t('audit.sendAudit.submitTime'),
-                      'sortable': 'custom',
-                      'width': 100,
-                      'maxWidth': 100,
-                      'isExpand': false
-                    },
-                    {
-                      'prop': 'processLastUpdateTs',
-                      'label': this.$t('audit.sendAudit.updateTime'),
-                      'sortable': 'custom',
-                      'width': 100,
-                      'maxWidth': 100,
-                      'isExpand': false
-                    },
-                    {
-                      'prop': 'operator',
-                      'label': this.$t('audit.sendAudit.operation'),
-                      'sortable': false,
-                      'width': 50,
-                      'maxWidth': 50,
-                      'isExpand': false,
-                      'isCellClick':true,
-                      'align': 'left',
-                      'customIcon': true,
-                      'src' : require('@/../static/img/icon_audit.png'),
-                    }
-                  ],
-                  order:{
-                      direction:'desc',
-                      property:'processLastUpdateTs'
-                  },
-                  totalPage: 1,
-                  sizeNum:10
-                },
-                {
-                  label: this.$t('audit.sendAudit.approved'),
-                  name: '1',
-                  taskCount: 0,
-                  tableData: [],
-                  tableColumns:[
-                    {
-                      'prop': 'storeName',
-                      'label': this.$t('audit.sendAudit.storeName'),
-                      'sortable': false,
-                      'width': 80,
-                      'maxWidth': 80,
-                      'isExpand': false
-                    },
-                    {
-                      'prop': 'reportName',
-                      'label': this.$t('audit.sendAudit.reportName'),
-                      'sortable': false,
-                      'width': 60,
-                      'maxWidth': 60,
-                      'isExpand': false
-                    },
-                    {
-                      'prop': 'submitterName',
-                      'label': this.$t('audit.sendAudit.submitterName'),
-                      'sortable': false,
-                      'width': 65,
-                      'maxWidth': 65,
-                      'minWidth': 65,
-                      'isExpand': false
-                    },
-                    {
-                      'prop': 'processStartTs',
-                      'label': this.$t('audit.sendAudit.submitTime'),
-                      'sortable': 'custom',
-                      'width': 100,
-                      'maxWidth': 100,
-                      'isExpand': false
-                    },
-                    {
-                      'prop': 'auditStatusName',
-                      'label': this.$t('audit.sendAudit.auditStatus'),
-                      'sortable': 'custom',
-                      'width': 100,
-                      'maxWidth': 100,
-                      'isExpand': false
-                    },
-                    {
-                      'prop': 'processLastUpdateTs',
-                      'label': this.$t('audit.sendAudit.updateTime'),
-                      'sortable': 'custom',
-                      'width': 100,
-                      'maxWidth': 100,
-                      'isExpand': false
-                    },
-                    {
-                      'prop': 'taskOwner',
-                      'label': this.$t('audit.sendAudit.owner'),
-                      'sortable': false,
-                      'width': 65,
-                      'maxWidth': 65,
-                      'minWidth': 65,
-                      'isExpand': false
-                    },
-                    {
-                      'prop': 'operator',
-                      'label': this.$t('audit.sendAudit.operation'),
-                      'sortable': false,
-                      'width': 50,
-                      'maxWidth': 50,
-                      'isExpand': false,
-                      'isCellClick':true,
-                      'align': 'left',
-                      'customIcon': false,
-                      'methods': 'set'
-                    }
-                  ],
-                  order:{
-                      direction:'desc',
-                      property:'processLastUpdateTs'
-                  },
-                  totalPage: 1,
-                  sizeNum:10
-                },                                                                  
+                    totalPage: 1,
+                    sizeNum:10
+                    },                                                                  
             ],
             tabContentId:[{key:'en',value:'#en-tabs-content'},{key:'zh',value:'#en-tabs-content'},{key:'zhtw',value:'#en-tabs-content'},
                 {key:'ja-JP',value:'#en-tabs-content'},{key:'ko-KR',value:'#en-tabs-content'},{key:'vi-VN',value:'#en-tabs-content'},
@@ -455,10 +455,24 @@ export default{
                     size:this.curSizeNum
                 }
             };
+
+
+            
+
             //console.log("this.storeFilterObj.curStore:",this.storeFilterObj.curStore);
             if(this.curStoreIds!=-1 && !this.storeFilterObj.curStore.includes('-1')){
-                params['storeId'] =this.curStoreIds;
+                params['storeId'] = this.curStoreIds;
             }
+
+
+            if( params['storeId'] && params['storeId'].length == 0){
+                this.tableDataList.tableData = []
+                
+                this.isLoading = false;
+                return
+            }
+            
+
             if(this.curTabIndx==0){//待簽核
                 params['type'] = 1;
                 params['auditState'] = [2];
@@ -472,7 +486,16 @@ export default{
             if(this.inputSearchValue.trim()!=''){
                 params['keyword'] = this.inputSearchValue;
             }
-            //console.log("params:",params);
+            console.log("params:",params);
+
+            // if(params.storeId && params.storeId.length == 0){
+            //     this.tableDataList = []
+            //     this.tableDataList[this.curTabIndx].page = 1;
+                
+            //     this.isLoading = false;
+            //     return
+            // }
+
             const self =this;
             return new Promise((resolve) => {
                 workflowRESTful.GetlistWorkflowTaskByType(params).then(res=>{
