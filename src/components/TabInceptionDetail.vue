@@ -440,7 +440,7 @@ export default {
           sessionStorage.setItem('report_data', JSON.stringify(parsObj));
           self.$router.push({ name: 'reportDetails', params: { data: parsObj }});
       },
-      handleEmitPersonEventRowClick(row){//进入事件列表界面，展示该门店该人员产生的事件
+      handleEmitPersonEventRowClick(row){ //进入事件列表界面，展示该门店该人员产生的事件
         if(!PermissionHelper.enableEventHandle() && 
           !PermissionHelper.enableEventClose() && 
           !PermissionHelper.enableEventAdd() && 
@@ -460,52 +460,57 @@ export default {
         console.log("params~~~>>>", params)
         console.log("rowItem~~~>>>", rowItem)
 
-      if(Object.keys(params).length > 0){
-        //searchParams.searchCondition = JSON.parse(JSON.stringify(this.params))
-        params.searchParams.clause ={assigner:this.submitter,storeId:[rowItem.id],status:[]};
-        params.filterStoreIds=[rowItem.id];
-        params.curStore=[rowItem.id];
-        params.storeIds=[rowItem.id];
-        params.curCountry = "-1";
-        params.curProvince = [];
-        params.curCity = [];
-        params.inputSearchValue = "";
-        params.curState = [];
-        params.activeName = '4';
-        params.searchParams.filter ={ page: 0, size: 10 };
-        params.beginTs=this.beginTs;
-        params.endTs=this.endTs;
-        params.searchMysteryMode=this.isMystery?1:0;
-        params.searchFrom='PatrolPersonStat';
-      }else{
+        if(Object.keys(params).length > 0){
+          //searchParams.searchCondition = JSON.parse(JSON.stringify(this.params))
+          params.searchParams.clause = {
+            assigner: this.submitter,
+            storeId: [rowItem.id],
+            status: []
+          };
+
+          params.filterStoreIds = [rowItem.id];
+          params.curStore = [rowItem.id];
+          params.storeIds = [rowItem.id];
+
+          params.curCountry = "-1";
+          params.curProvince = [];
+          params.curCity = [];
+          params.inputSearchValue = "";
+          params.curState = [];
+          params.activeName = '4';
+          params.searchParams.filter ={ page: 0, size: 10 };
+          params.beginTs=this.beginTs;
+          params.endTs=this.endTs;
+          params.searchMysteryMode=this.isMystery?1:0;
+          params.searchFrom='PatrolPersonStat';
+        }else{
           params ={
-              searchParams:{
-                  filter:{ page: 0, size: 10 },
-                  clause:{assigner:this.submitter,storeId:[rowItem.id],status:[]}
-              },
-              filterStoreIds : rowItem.id,
-              curStore : rowItem.id,
-              storeIds:rowItem.id,
-              curCountry:"-1",
-              curProvince:[],
-              curCity:[],
-              inputSearchValue:"",
-              curState:[],
-              activeName:'4',
-              beginTs:this.beginTs,
-              endTs:this.endTs,
-              searchFrom:'PatrolPersonStat'
+            searchParams:{
+                filter:{ page: 0, size: 10 },
+                clause:{assigner:this.submitter,storeId:[rowItem.id],status:[]}
+            },
+            filterStoreIds : rowItem.id,
+            curStore : rowItem.id,
+            storeIds: rowItem.id,
+            curCountry:"-1",
+            curProvince:[],
+            curCity:[],
+            inputSearchValue:"",
+            curState:[],
+            activeName:'4',
+            beginTs:this.beginTs,
+            endTs:this.endTs,
+            searchFrom:'PatrolPersonStat'
           }
-      }
-      //console.log("2.",params);
-            const searchConditon = {
-                path: 'eventManage',
-                params: params
-            };
-            console.log("searchConditon:",searchConditon);
-            SearchConditionUtil.saveSearchCondition(searchConditon);
-                    //sessionStorage.setItem('event_manage', JSON.stringify(passObj));
-            self.$router.push({ name: 'eventManage', params: params});
+        }
+
+        console.log("params 2 ~~>>>", params)
+        const searchConditon = {
+            path: 'eventManage',
+            params: params
+        };
+        SearchConditionUtil.saveSearchCondition(searchConditon);
+        self.$router.push({ name: 'eventManage', params: params});
       },
       getNotInspectedStores(){
           const self = this;

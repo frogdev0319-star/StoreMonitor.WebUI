@@ -9,6 +9,7 @@ export default class SaveSearchConditionUtil {
     const parmas = searchConditionObj.params;
     localStorage.setItem(key, JSON.stringify(parmas));
   }
+
   static clearAll(){
     localStorage.clear();
   }
@@ -23,4 +24,15 @@ export default class SaveSearchConditionUtil {
     }
     return tempParams;
   }
+
+  static deleteSearchCondition(searchConditionObj) {
+    const accountId = localStorage.getItem('oss_bucket');
+    const userId = getCookie('UserId');
+    const key = searchConditionObj.path + '_' + accountId + '_' + userId;
+    localStorage.removeItem(key)
+  }
+
+
+
+
 }
