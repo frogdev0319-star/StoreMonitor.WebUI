@@ -79,7 +79,7 @@
               >
                 <div class="button-area">
                   <img :src="exportPng" class="icon-excel">
-                  <span>{{ $t('eventView.exportReport') }}</span>
+                  <span>{{ $t('eventView.exportReport') }} aaa</span>
                 </div>
               </delay-button>
             </div>

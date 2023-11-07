@@ -21,7 +21,7 @@
         <search-component
           ref="eventSearch"
           :default-sort="defaultSort"
-          isInspectItem=true
+          :isInspectItem=true
           path="eventStatistics"
           @emitSearch = "emitSearch"
           @exportPdf = "exportPdf"
@@ -1296,6 +1296,7 @@ export default {
       console.log("getUpperGloableEventData > params.inspectTagIds:",params.inspectTagIds);
       params.regionMode = 0;
 
+     
       try {
         //console.log('params:',params);
         const eventResult = await this.getEventTableDataInfo(params);
@@ -1328,10 +1329,21 @@ export default {
         totalProcessed += item.numOfProcessed;
         totalRejected = item.numOfRejected;
       });
-      self.eventKPIs[0].eventNum = totalEvents;
-      self.eventKPIs[1].eventNum = totalUnprocessed+totalRejected;
-      self.eventKPIs[2].eventNum = totalInprocess;
-      self.eventKPIs[3].eventNum = (totalEvents==0)? 0 : ((totalProcessed/totalEvents)*100).toFixed(0);
+      
+      console.log('self.gloableEventData :>> ', self.gloableEventData);
+      if(this.storeIds.length == 0){
+        self.eventKPIs[0].eventNum = "N/A";
+        self.eventKPIs[1].eventNum = "N/A";
+        self.eventKPIs[2].eventNum = "N/A";
+        self.eventKPIs[3].eventNum = "N/A";
+      } else {
+        self.eventKPIs[0].eventNum = totalEvents;
+        self.eventKPIs[1].eventNum = totalUnprocessed+totalRejected;
+        self.eventKPIs[2].eventNum = totalInprocess;
+        self.eventKPIs[3].eventNum = (totalEvents==0)? 0 : ((totalProcessed/totalEvents)*100).toFixed(0);
+      }
+
+      
     },
     /**end 取得上方狀態 */
 
@@ -1436,7 +1448,7 @@ export default {
         order:{"direction":this.barchartOrder,"property":"numOfTotal"}
         };
       }
-     if(this.compareIds.length>0){
+      if(this.compareIds.length>0){
         const eventResult = await self.getEventTableDataInfo(searchCondition);
         //console.log("*getEventTableData>eventResult:",eventResult);
         const ignorePer = 0;
@@ -1614,18 +1626,18 @@ export default {
         }
         else{
            //option.grid.width = 'calc(1479/1980*100vw)';
-           if(this.ispdf){
-             option.width = '1024px';
+            if(this.ispdf){
+              option.width = '1024px';
               option.grid.width = '850px';
               option.series[0].barCategoryGap='10',
               option.series[0].barWidth='10',
               this.barchartWidth = '850px';
-           }else{
-            option.width = 'calc(1479/1980*100vw)';
-            option.grid.width = '100%';
-            this.barchartWidth = 'calc(1479/1980*100vw)';
-           }
-        }
+            }else{
+              option.width = 'calc(1479/1980*100vw)';
+              option.grid.width = '100%';
+              this.barchartWidth = 'calc(1479/1980*100vw)';
+            }
+          }
         this.barchartOption = option;
         //this.$ref.itemsChart1.on('rendered',()=>{console.log('rendered event fired')});
         //

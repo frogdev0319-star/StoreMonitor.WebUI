@@ -231,7 +231,7 @@
                 <el-col v-if='part2.standardScore!=-9999' :span="10" class="division">
                     <el-col class="text-area">
                         <el-row class="top">
-                            <span class="mainTitle">{{part2.standardScore!=-9999?part2.standardScore:'N/A'}}</span>
+                            <span class="mainTitle">{{ part2.standardScore != -9999 ? part2.standardScore : 'N/A' }} </span>
                             <span class="unit">{{ $t('statistics.score') }}</span>
                         </el-row>
                         <el-row class="subtitlehead">
@@ -361,7 +361,7 @@
                 <el-col :span="10" class="division">
                     <el-col class="text-area">
                         <el-row class="top">
-                            <span class="mainTitle">{{part3.averageScore>0?part3.averageScore:'N/A'}}</span>
+                            <span class="mainTitle">{{ part3.averageScore > 0 ? part3.averageScore : 'N/A' }}</span>
                             <span class="unit">{{ "%" }}</span>
                         </el-row>
                         <el-row class="subtitlehead">
@@ -2979,6 +2979,7 @@ export default {
 
             if (params.storeIds.length === 0) {
                 this.bigScore = -9999
+                this.part2.averageScore = -9999
                 return false;
             }
 
@@ -2998,6 +2999,7 @@ export default {
                         totalReport += item.numOfReport;
                         totalStandard += item.averageScore * item.numOfReport;
                     })
+
 
                     this.part2.averageScore = totalStandard > 0 ? Math.round(totalStandard / totalReport) : -9999;
                     
@@ -3304,7 +3306,10 @@ export default {
                 page: 0,
                 size: params.groupIds.length
             };
-            if (params.storeIds.length == 0 ) return;
+            if(params.storeIds.length == 0 ) {
+                this.part3.averageScore = -1
+                return;
+            }   
             const storeResult = await self.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
                 const result = storeResult.data;
@@ -3916,19 +3921,27 @@ export default {
                 return tag.id == this.params.inspectId;
             });
             console.log("@@filterTag:", filterTag);
-            if (filterTag.length > 0) {
-                let inspectSet = filterTag[0].inspectSettings.filter((setting) => {
-                    return setting.name == "standardScore";
-                });
+            console.log("@@this.params:", this.params);
+            
+            if(this.params.storeIds.length == 0){
+                this.part3.standardScore = 'N/A'
+                this.part2.standardScore = 'N/A'
+            }
+            else {
+                if (filterTag.length > 0) {
+                    let inspectSet = filterTag[0].inspectSettings.filter((setting) => {
+                        return setting.name == "standardScore";
+                    });
 
-                if (inspectSet.length > 0) {
-                    console.log("@@inspectSettings:", inspectSet[0]);
-                    if (inspectSet[0].value != null) {
-                        this.part3.standardScore = inspectSet[0].value
-                        this.part2.standardScore = inspectSet[0].value
-                        // this.standardRate =inspectSet[0].value;
-                    } else {
-                        this.standardRate = "- -";
+                    if (inspectSet.length > 0) {
+                        console.log("@@inspectSettings:", inspectSet[0]);
+                        if (inspectSet[0].value != null) {
+                            this.part3.standardScore = inspectSet[0].value
+                            this.part2.standardScore = inspectSet[0].value
+                            // this.standardRate =inspectSet[0].value;
+                        } else {
+                            this.standardRate = "- -";
+                        }
                     }
                 }
             }
