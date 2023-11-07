@@ -1233,6 +1233,8 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+  .el-select
+      width: 300px !important
   .is-multiple 
     .el-select-dropdown__item 
         padding-left: 10px !important

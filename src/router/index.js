@@ -738,7 +738,6 @@ export const navbarRoute = {
         name: 'createWorkflow',
         component: resolve => require(['@/views/setting/workflow/CreateWorkflow'], resolve),
         meta: {
-          keepAlive: true, 
           requireAuth: true
         },
         hidden: true,
