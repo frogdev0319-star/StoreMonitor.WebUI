@@ -728,10 +728,8 @@ export default {
         return;
       }
 
-      self.params.searchMysteryMode = -1
+      // self.params.searchMysteryMode = 1
 
-
-      
       console.log("@@@self.params:",self.params);
       eventRESTful.getEventList(self.params).then((res) => {
         const data = res.data.content;

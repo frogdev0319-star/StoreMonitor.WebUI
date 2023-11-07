@@ -164,7 +164,7 @@
           <!-- row 新增副本通知人員 -->
           <div class="setting-config basic-config">
             <div class="title-name" style="width: fit-content">{{$t('audit.workFlows.addCC')}}</div>
-            <div class="title-status" >
+            <div class="title-status notify_person" >
                 <el-select
                   v-model="ccToUSer"
                   multiple
@@ -1256,9 +1256,19 @@ export default {
 
 };
 </script>
+<style lang="sass">
+  // .notify_person
+  //   .el-tag.el-tag--info
+  //     overflow: hidden
+  //     text-overflow: ellipsis
+  //     white-space: nowrap
+  //     .el-select__tags-text
+</style>
 
 <style lang="sass" scoped>
-  
+  .el-select
+    width: 300px !important
+
   .is-multiple 
     .el-select-dropdown__item 
         padding-left: 10px !important
