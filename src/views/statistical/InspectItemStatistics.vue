@@ -20,7 +20,7 @@
       <el-col :span="24">
         <search-component
           ref="inspectItemSearch"
-          isInspectItem="true"
+          :isInspectItem="true"
           :default-sort="defaultSort"
           path="inspectItemStatistics"
           @emitSearch = "emitSearch"
@@ -91,6 +91,9 @@
               </div>
             </el-col>
           </el-row >
+
+
+        <!-- 嚴重缺失列入C級評分 評估詳情 -->
         <div class="subtitle-head">
           <span class="title" style="width:80%"  >
             {{ inspectDetailSubTitle }}
@@ -109,24 +112,24 @@
                 >{{ $t('statistics.event.imageMode')}}</el-button>
               </div>
               <delay-button
-                      :class="getLangStyleValue(operationBtnClass)"
-                      style="margin-left:32px;background-color:#FFF;color:#006ab7;border:none;"
-                      type="default"
-                      size="mini"
-                      @click="exportStore2Excel"
-                  >
-                    <div class="button-area">
-                        <img :src="exportPng" class="icon-excel">
-                        <span style="color:rgb(0, 106, 183)">{{ $t('eventView.exportReport') }}</span>
-                      </div>
-                  </delay-button>
+                  :class="getLangStyleValue(operationBtnClass)"
+                  style="margin-left:32px;background-color:#FFF;color:#006ab7;border:none;"
+                  type="default"
+                  size="mini"
+                  @click="exportStore2Excel"
+                >
+                <div class="button-area">
+                    <img :src="exportPng" class="icon-excel">
+                    <span style="color:rgb(0, 106, 183)">{{ $t('eventView.exportReport') }}</span>
+                  </div>
+              </delay-button>
             </div>
         </div>
         <el-col  style="height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 90px);position:absolute" :style="{width:ispdf?'900px':'calc(100% - 90px)'}">
-                  <div  v-if="part3.storeMode==1"  style="height:100%;overflow-y:hidden;overflow-x:auto">
-                      <v-chart
-                          ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption"   autoresize
-                          :style="{width:part3.barStoreOption?part3.barStoreOption.width :'100%',height:'100%'}" />
+            <div  v-if="part3.storeMode==1"  style="height:100%;overflow-y:hidden;overflow-x:auto">
+              <v-chart
+                  ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption"   autoresize
+                  :style="{width:part3.barStoreOption?part3.barStoreOption.width :'100%',height:'100%'}" />
                   </div>
                   <div v-else style="margin-top:20.5px;height:100%;overflow-y:hidden;"  :style="{width:ispdf?'1024px':null}">
                     <div style="margin-top:20.5px;">
@@ -150,7 +153,7 @@
                       @sortChange="handleSortChangePart3"
                     />
                   </div>
-                  <div style="width:100%; margin-top:12px;height:31px;">
+                  <div style="width:100%; margin-top:12px;height:31px;" v-if="part3.storeTableData.length > 0">
                   <tbl-pagination-only
                     :total="part3.table.total"
                     :pagesize="part3.table.sizeNum"
@@ -967,15 +970,15 @@ export default {
       if (this.pareams.storeIds.length > 0) {
         await this.dataGetOverview();
       } else {
-
         this.totalRegion = 0;
         this.regionTableData = [];
-      //  this.getPart1RegionBar();
-        this.storeTableData = [];
+        
+
+        this.part3.storeTableData = [];
+        
         this.regionsList = [];
         this.curRegion = [];
         this.regionsChartsOptions ={};
-       // this.part3.pieOption = null;
         this.part3.barRegionOption = {};
         this.part3.barStoreOption = {};
         console.log("Handle Clear")
@@ -1479,7 +1482,7 @@ export default {
       params.regionMode = 3;
       params.storeIds = self.params.storeIds;
       if(this.part1.compareType=='stores'){
-         params.storeIds  = this.part1.compareIds;
+        params.storeIds  = this.part1.compareIds;
       }
       params.inspectTagId = self.params.inspectId;
       const storeResult = await self.getInspectStatsOverviewWithRegion(params);
@@ -2276,7 +2279,15 @@ export default {
               page:(this.part3.storeMode==1) ? 0:this.part3.table.page-1,
               size:(this.part3.storeMode==1) ?params.storeIds.length: this.part3.table.sizeNum
             }
+
             console.log(params)
+            if(params.storeIds.length == 0){
+              this.part3.storeTableData = []
+              this.getItemSubtitle()
+              return
+            }
+
+
             if(params.itemIds.length==0 || typeof params.storeIds == 'undefined' || params.storeIds.length ==0)return
             const storeResult = await this.getInspectStatsItemOverGroup(params);
             if (storeResult.errCode === 0) {
@@ -2311,7 +2322,7 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
-     if(regionLabel.length>25){
+      if(regionLabel.length>25){
         regionData.push(0)
         regionLabel.push("")
         option.width =( regionLabel.length*50) +'px'
@@ -2707,9 +2718,19 @@ export default {
       if(this.inspectItem && this.inspectItem.item){
         let item = this.inspectItem.item;
         let name = item.subject ? item.subject : item.name
+
         console.log('item ~~~~~>> ', item)
-        this.inspectSubTitle = name + " " + this.$t('statistics.itemAverageScore') + "  ( " + this.$t('statistics.totalScore') +  parseFloat(item.qualifiedScore.toFixed(1)) + " )";
-        this.inspectDetailSubTitle = name + " " + this.$t('statistics.evalDetail')+ "  ( " + this.$t('statistics.totalScore') +  parseFloat(item.qualifiedScore.toFixed(1)) + " )";
+        console.log('this.params ======>> ', this.params)
+
+      
+        if(this.params.storeIds.length == 0){
+          this.inspectSubTitle = name + " " + this.$t('statistics.itemAverageScore') + "  ( " + this.$t('statistics.totalScore') +   " N/A)";
+          this.inspectDetailSubTitle = name + " " + this.$t('statistics.evalDetail')+ "  ( " + this.$t('statistics.totalScore') +  " N/A)";
+        } else {
+          this.inspectSubTitle = name + " " + this.$t('statistics.itemAverageScore') + "  ( " + this.$t('statistics.totalScore') +  parseFloat(item.qualifiedScore.toFixed(1)) + " )";
+          this.inspectDetailSubTitle = name + " " + this.$t('statistics.evalDetail')+ "  ( " + this.$t('statistics.totalScore') +  parseFloat(item.qualifiedScore.toFixed(1)) + " )";
+        }
+      
       }
     }
   }
