@@ -324,15 +324,20 @@ export default {
   },
 
   created() {
-    const params = SearchConditionUtil.getSearchCondition('PatrolPersonStat');
-    if(Object.keys(params).length>0){
-      console.log("cache params:",params);
-      this.ifCachedParams = true;
-      if(params.submitters.length>0)this.userIds = params.submitters;;
-      if(params.positionIds.length>0)this.positionIds = params.positionIds;
+    // const params = SearchConditionUtil.getSearchCondition('PatrolPersonStat');
+    // if(Object.keys(params).length>0){
+    //   console.log("cache params:",params);
+    //   this.ifCachedParams = true;
+    //   if(params.submitters.length>0)this.userIds = params.submitters;;
+    //   if(params.positionIds.length>0)this.positionIds = params.positionIds;
       
-    }
+    // }
     
+    const searchConditon = {
+      path: 'eventManage',
+    };
+    SearchConditionUtil.deleteSearchCondition(searchConditon);
+
     this.getSearchCondition();
   },
 
