@@ -447,7 +447,7 @@ export const navbarRoute = {
         hidden: false,
         meta: {
           requireAuth: true,
-          keepAlive: true
+          keepAlive: false
         }
       }
     ) && primaryPathesList.push('/patrolPersonStat');
@@ -729,7 +729,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/workflow/List'], resolve),
         hidden: false,
         meta: {
-          keepAlive: true, 
+          keepAlive: false, 
           requireAuth: true
         }
       },

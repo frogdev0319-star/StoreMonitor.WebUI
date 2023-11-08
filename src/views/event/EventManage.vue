@@ -728,7 +728,7 @@ export default {
         return;
       }
 
-      // self.params.searchMysteryMode = 1
+      // self.params.searchMysteryMode = 0
 
       console.log("@@@self.params:",self.params);
       eventRESTful.getEventList(self.params).then((res) => {
@@ -806,7 +806,7 @@ export default {
       let storeId = null;
       var p = Object.assign({}, this.params);
       //if(this.searchParams['searchFrom']=='PatrolPersonStat' || this.searchParams['searchFrom']=="EventStatistics")
-        storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : (p.hasOwnProperty('clause'))?p.clause.storeId:'-1';
+      storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : (p.hasOwnProperty('clause')) ? p.clause.storeId : '-1';
       /*else{
         if(p.clause){
           var tempStore = (p.clause.storeId)?p.clause.storeId:[];
@@ -1268,7 +1268,6 @@ export default {
       console.log("save params:",params);
       SearchConditionUtil.saveSearchCondition(searchConditon);
     
-
     },
 
 
@@ -1276,7 +1275,6 @@ export default {
       const searchParams = SearchConditionUtil.getSearchCondition('eventManage');
       console.log("EventMange > getSearchParams > searchParams:",searchParams);
 
-    
       if (Object.keys(searchParams).length > 0) {
 
         if(searchParams['searchFrom']=='PatrolPersonStat'){
