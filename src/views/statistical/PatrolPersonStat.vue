@@ -82,7 +82,7 @@
             </delay-button>
           </div>
         </div>
-        <div style="margin-top:20.5px;">
+        <div style="margin-top:20.5px;" v-loading="isLoading">
           <table-only
             class="person_table"
             ref="elTP"
@@ -293,12 +293,17 @@ export default {
           'isExpand':true
         }
       ],
-      componentsProps:{beginTs:this.$moment().subtract(29, 'days').startOf('d').toDate(),endTs: this.$moment().endOf('d').toDate(),isMystery:false},
-      isexportPDF:false,
-      ispdf:false,
-      ifCachedParams:false,
-      isMystery:false,
-      positionDisabled:false,
+      componentsProps:{
+        beginTs: this.$moment().subtract(29, 'days').startOf('d').toDate(),
+        endTs: this.$moment().endOf('d').toDate(),
+        isMystery: false
+      },
+      isexportPDF: false,
+      ispdf: false,
+      ifCachedParams: false,
+      isMystery: false,
+      positionDisabled: false,
+      isLoading:  false,
     }
   },
 
@@ -333,16 +338,20 @@ export default {
       
     // }
     
-    const searchConditon = {
-      path: 'eventManage',
-    };
-    SearchConditionUtil.deleteSearchCondition(searchConditon);
+    
 
     this.getSearchCondition();
   },
 
   methods: {
     async initData() {
+
+      // const searchConditon = {
+      //   path: 'eventManage',
+      // };
+      // SearchConditionUtil.deleteSearchCondition(searchConditon);
+
+      this.isLoading = true
       this.params.filter = { page: this.page - 1, size: this.sizeNum };
       this.params.order = this.order;
       this.doSearchInsRecordList();
@@ -495,7 +504,11 @@ export default {
     async doSearchInsRecordList(){
       const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
       const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
-      this.componentsProps =  {beginTs:start,endTs:end,isMystery:this.isMystery};
+      this.componentsProps =  {
+        beginTs: start,
+        endTs: end,
+        isMystery: this.isMystery
+      };
       //const daysDiff = this.$moment(end).diff(start, 'days');
       //this.timeMode = daysDiff <= 30 ? 1 : 2;
       /*this.params.beginTs = start;
@@ -521,6 +534,8 @@ export default {
       this.total = Math.ceil(this.allInsRecordData.length/this.sizeNum);
       this.page =1;
       this.doCoverDepartmentToString();
+
+      this.isLoading = false
       //console.log("this.total:",this.total);
       //console.log("this.allInsRecordData:",this.allInsRecordData);
 

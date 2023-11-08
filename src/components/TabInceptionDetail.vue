@@ -332,7 +332,10 @@ export default {
       getReportList() {
         const self = this;
         self.submitterName = "";
-        let params = {beginTs:this.beginTs,endTs:this.endTs,clause:{"submitter":this.submitter},searchMysteryMode:this.isMystery?1:0};
+        let params = {
+          beginTs: this.beginTs,
+          endTs: this.endTs,clause:{"submitter":this.submitter}, 
+          searchMysteryMode: this.isMystery ? 1 : 0};
         //console.log("params:",params);
         return new Promise((resolve) => {
             statisticsGetInspectReportList(params).then(res => {
@@ -459,15 +462,19 @@ export default {
         
         console.log("params~~~>>>", params)
         console.log("rowItem~~~>>>", rowItem)
+        console.log("this.isMystery 1~~~>>>", this.isMystery)
+        
 
         if(Object.keys(params).length > 0){
           //searchParams.searchCondition = JSON.parse(JSON.stringify(this.params))
+          console.log("this.isMystery 2~~~>>>", this.isMystery)
           params.searchParams.clause = {
             assigner: this.submitter,
             storeId: [rowItem.id],
             status: []
           };
 
+          
           params.filterStoreIds = [rowItem.id];
           params.curStore = [rowItem.id];
           params.storeIds = [rowItem.id];
@@ -481,17 +488,22 @@ export default {
           params.searchParams.filter ={ page: 0, size: 10 };
           params.beginTs=this.beginTs;
           params.endTs=this.endTs;
-          params.searchMysteryMode=this.isMystery?1:0;
+          params.searchMysteryMode = this.isMystery ? 1 : 0;
           params.searchFrom='PatrolPersonStat';
+
         }else{
           params ={
             searchParams:{
                 filter:{ page: 0, size: 10 },
-                clause:{assigner:this.submitter,storeId:[rowItem.id],status:[]}
+                clause:{
+                  assigner:this.submitter,
+                  storeId:[rowItem.id],
+                  status:[]
+                }
             },
-            filterStoreIds : rowItem.id,
-            curStore : rowItem.id,
-            storeIds: rowItem.id,
+            filterStoreIds : [rowItem.id],
+            curStore : [rowItem.id],
+            storeIds: [rowItem.id],
             curCountry:"-1",
             curProvince:[],
             curCity:[],
@@ -500,6 +512,7 @@ export default {
             activeName:'4',
             beginTs:this.beginTs,
             endTs:this.endTs,
+            searchMysteryMode: this.isMystery ? 1 : 0,
             searchFrom:'PatrolPersonStat'
           }
         }
