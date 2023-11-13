@@ -463,14 +463,21 @@ const user = {
           // 進階設定
           const advancedSettingStatus = sessionStorage.getItem("advancedSettingStatus")
           const advancedSettingMode = sessionStorage.getItem("advancedSettingMode")
-
-          // console.log('-------{o..o}-------', advancedSettingStatus , advancedSettingMode)
+          console.log('-------{o..o}-------', advancedSettingStatus , advancedSettingMode)
         
           if(advancedSettingStatus && advancedSettingMode){
+
 
             PermissionHelper.setAdvancedModeMode(advancedSettingMode);
             const advanceSettingRoute = navbarRoute.getAdvanceSetting();
             advanceSettingRoute.children.length > 0 ? accessedRoutes.push(advanceSettingRoute) : '';
+            
+            const instantPushRoute = navbarRoute.getInstantPush();
+            instantPushRoute.children.length > 0 ? accessedRoutes.push(instantPushRoute) : '';
+            
+
+        
+
           } 
 
 

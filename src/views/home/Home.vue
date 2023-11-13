@@ -1247,7 +1247,7 @@ export default {
   width: 5px;
   border-radius:50%;
   background-color:#a5a5a5;
-  // margin-right: calc(12 / 1920 * 100vw);
+  // margin-right: 11.4px;
 }
 .sider {
   transition: width .3s;
@@ -1268,10 +1268,10 @@ export default {
     color:#a5a5a5;
     margin-left: 15px;
     @media screen and (max-width:1367px) {
-      font-size: 10px;
+      font-size: 13.4px;
     }
     @media screen and(min-width: 1367px){
-      font-size: 14px;
+      font-size: 13.4px;
     }
   }
 
@@ -1282,7 +1282,7 @@ export default {
   }
   /deep/ .el-menu {
     border-right: none;
-    font-size: 14px;
+    font-size: 13.4px;
     // overflow-y: auto;
     // overflow-x: hidden;
 
@@ -1351,7 +1351,7 @@ export default {
     }
     ul {
         span {
-          font-size: calc(12 / 1920 * 100vw);
+          font-size: 11.4px;
         }
       }
       .el-submenu__title {
@@ -1375,7 +1375,7 @@ export default {
       }
       ul {
         span {
-          font-size: calc(12 / 1920 * 100vw);
+          font-size: 11.4px;
         }
         background-color: #f2f9fe;
       }
@@ -1400,7 +1400,7 @@ export default {
       }
       ul {
         span {
-          font-size: calc(12 / 1920 * 100vw);
+          font-size: 11.4px;
         }
         background-color: #f2f9fe;
       }

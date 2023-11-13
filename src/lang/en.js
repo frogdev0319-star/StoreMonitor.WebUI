@@ -132,6 +132,9 @@ export default{
         "deleteReport": "Delete Report",
         "closeEvents": "Closed Events",
         "operationRecord": "Operation Record",
+        "DataSecurity":"Data Security",
+        "send":"Send",
+        "sendingRecord":"sending Record",
 
     },
     "overview":{
