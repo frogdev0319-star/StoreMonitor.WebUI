@@ -1,10 +1,46 @@
 <template>
   <div>
-    <div class="" >
-      資料安全!!!!!
+    <div class="submit_btn" >
+      <delay-button type="filled" @click="submit" >
+        <div class="button-area" style="width: 80px; height: 20px;">
+          <span>{{$t('generalSetting.save')}} </span>
+        </div>
+      </delay-button>
     </div>
 
+    <div class="page-container report-setting paper" >
+      <div class="setting-titles padding flex-center">
+        限制螢幕截圖
+        <div class="spacer"></div>
+      </div>
 
+      <div v-loading="isLoadingData" class="setting-details self-loading">
+        <div class="template-info">
+          <div class="inspect-basic">
+            
+            <div class="Data_safety">
+
+              <div class="setting_row" >
+                <div class="setting_item">
+                  <el-switch
+                    style="display: block"
+                    v-model="isSwitchOn"
+                    active-color="#c60957"
+                    inactive-color="#eee"
+                    active-text="開啟"
+                    inactive-text="關閉"
+                  >
+                  </el-switch>
+                </div>
+              </div>
+
+              
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
 
   </div>
   
@@ -33,82 +69,6 @@ export default {
     return {
       isLoadingData: false,
 			isSwitchOn: false,
-      userName: '',
-      defineText: this.$t('audit.workFlows.defineItem'),
-      showTextStatus: true,
-      showText:[
-        {
-          value: true,
-          label: this.$t('audit.workFlows.defineItem')
-        }, {
-          value: false,
-          label: '人員名稱'
-        }
-      ],
-      color:'#FFFFFF',
-      textSize: "中",
-      textSizeSelect:[
-        {
-          value: "26.4px",
-          label: "大",
-          mobileSize: "66px"
-
-        }, 
-        {
-          value: "17.6px",
-          label: "中",
-          mobileSize: "44px"
-        }, 
-        {
-          value: "8.8px",
-          label: "小",
-          mobileSize: "22px"
-        }
-      ],
-      textPosition: '左上 ',
-      textPositionSelect:[
-        {
-          value: "topLeft",
-          label: "左上"
-        }, 
-        {
-          value: "topCenter",
-          label: "中上"
-        }, 
-        {
-          value: "topRight",
-          label: "右上"
-        },
-        {
-          value: "centerLeft",
-          label: "置左"
-        },
-        {
-          value: "center",
-          label: "置中"
-        },
-        {
-          value: "centerRight",
-          label: "置右"
-        },
-        {
-          value: "bottomLeft",
-          label: "左下"
-        },
-        {
-          value: "bottomCenter",
-          label: "中下"
-        },
-        {
-          value: "bottomRight",
-          label: "右下"
-        },
-      ],
-      
-      text_justifyContent: "flex-start",
-      text_alignItems: "flex-start",
-      showInputLimit_overallItem: false,
-  
     };
   },
 
@@ -121,19 +81,19 @@ export default {
     //   val !== 0 && this.init();
     // },
 
-  
+
   
   },
 
   created() {
-
+    this.init()
+    
   },
 
   methods: {
     async init(){
-      await this.getUserInfo()
-      await this.getInitAdvance()
-    },
+      console.log('init :>> ');
+    },  
 
     // get user
     async getUserInfo(){
@@ -233,14 +193,14 @@ export default {
 
 <style lang="sass" scoped>
             
-  .water_setting
+  .Data_safety
     display: flex
     flex-direction: column
     justify-content: flex-start
     align-items: flex-start
     .setting_row
       width: 100%
-      border-bottom: 1px solid #eee
+      // border-bottom: 1px solid #eee
       padding-left: 20px
       display: flex
       flex-direction: row

@@ -133,6 +133,7 @@ export default{
         "closeEvents": "Closed Events",
         "operationRecord": "Operation Record",
         "DataSecurity":"Data Security",
+        "InstantPush":"Instant Push",
         "send":"Send",
         "sendingRecord":"sending Record",
 

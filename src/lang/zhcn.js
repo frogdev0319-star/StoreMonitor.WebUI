@@ -133,6 +133,7 @@ export default{
     "closeEvents": "已結案事件",
     "operationRecord": "操作記錄",
     "DataSecurity":"资料安全",
+    "InstantPush":"即时推播",
     "send":"发送推播",
     "sendingRecord":"发送纪录",
   },
