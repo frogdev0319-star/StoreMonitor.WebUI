@@ -816,9 +816,62 @@ export const navbarRoute = {
         },
         isReadOnly: false
       } ,
-    ) && primaryPathesList.push('/waterMark');
+      {
+        path: '/dataSecurity',
+        name: 'DataSecurity',
+        component: resolve => require(['@/views/advanceSetting/safety/DataSecurity'], resolve),
+        meta: {
+          keepAlive: true, // the component is't to be cache.
+          requireAuth: true
+        },
+        isReadOnly: false
+      } ,
+    ) && primaryPathesList.push('/waterMark', '/dataSecurity');
     return advanceSettingRoute;
+
   },
+
+  //即時推播
+  getInstantPush(){
+    const instantPushRoute = {
+      id: 7,
+      path: '/home',
+      name: 'InstantPush',
+      component: Home,
+      iconCls: 'iconfont icon-button',
+      styles: 'font-size:22px',
+      leaf: false,
+      hidden: false,
+      children: []
+    };
+    PermissionHelper.advancedMode && instantPushRoute.children.push(
+      {
+        path: '/send',
+        name: 'Send',
+        component: resolve => require(['@/views/advanceSetting/broadcast/Send'], resolve),
+        meta: {
+          keepAlive: true, 
+          requireAuth: true
+        },
+        isReadOnly: false
+      } ,
+      {
+        path: '/sendingRecord',
+        name: 'SendingRecord',
+        component: resolve => require(['@/views/advanceSetting/broadcast/SendingRecord'], resolve),
+        meta: {
+          keepAlive: true, 
+          requireAuth: true
+        },
+        isReadOnly: false
+      } ,
+      
+    ) && primaryPathesList.push('/send', '/sendingRecord');
+    return instantPushRoute;
+
+  },
+
+
 
 
   getDeviceRoutes() {
