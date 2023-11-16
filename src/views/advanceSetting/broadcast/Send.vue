@@ -395,7 +395,7 @@ export default {
       text-align: left
       padding: 10px 0
       margin-bottom: 10px
-      border-bottom: 1px solid #ddd
+      border-bottom: 1px solid #dedede
       font-weight: bolder
     .subtitle_name
       width: 100px
