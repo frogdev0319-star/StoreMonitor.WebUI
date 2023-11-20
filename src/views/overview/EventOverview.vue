@@ -20,7 +20,7 @@
 
         <!-- 各門店事件趨勢分析 -->
         <el-col :span="isEnSpan? 13: 14" class="store-events">
-          <div class="title">{{ $t('overview.eventTrends') }}</div>
+          <div class="title">{{ $t('overview.eventTrends') }} </div>
           <div class="region-result">
             <div class="store-list">
               <span class="store-name">{{ $t('overview.selectStores') }}</span>
@@ -153,6 +153,7 @@ import { getEventStatsOverview, getEventStatsRankInfo, getEventStatsOverStore } 
 import resize from '@/components/mixins/echartResize';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DateTimeSelector from '@/components/DateTimeSelector';
+import jsCookie from 'js-cookie';
 
 export default {
   name: 'EventOverview',
@@ -858,7 +859,7 @@ export default {
           });
       });
     },
-
+    
     async getStoreEventStatics() {
       const self = this;
       let params = {};
@@ -870,6 +871,10 @@ export default {
         const storeEventResult = await self.getStoreEventData(params);
         if (storeEventResult.errCode === 0) {
           const result = storeEventResult.data;
+          
+          console.log('result :>> ', result.data);
+
+
           self.storeEventList = result;
           const soureceList = [];
           soureceList.push(self.storeEventLegend);
@@ -878,17 +883,28 @@ export default {
           let sumOfClosedEvents = 0;
           result.forEach((item, index) => {
             const storeList = item.stores;
+
+            console.log('storeList :>> ', storeList, index);
+
             storeList.forEach(_item => {
               sumOfNewEvents += _item.numOfNewEvents;
               sumOfProcessedEvents += _item.numOfProcessedEvents;
               sumOfClosedEvents += _item.numOfClosedEvents;
             });
+
+            console.log('sumOfNewEvents :>> ', sumOfNewEvents);
+            console.log('sumOfProcessedEvents :>> ', sumOfProcessedEvents);
+            console.log('sumOfClosedEvents :>> ', sumOfClosedEvents);
+
             const itemArray = [];
             itemArray.push(self.daysRangeList[index]);
             itemArray.push(sumOfNewEvents);
             itemArray.push(sumOfProcessedEvents);
-            itemArray.push(sumOfClosedEvents);
+            itemArray.push(sumOfClosedEvents);  
             soureceList.push(itemArray);
+
+            console.log('itemArray :>> ', itemArray);
+            
           });
           option.dataset.source = soureceList;
         }

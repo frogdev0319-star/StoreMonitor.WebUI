@@ -628,9 +628,15 @@
 
           <!-- right side -->
           <div class="fullWidth rside">
-
+            
             <div v-if="!showFeedBack" class="padding" :class="{flex:isFullScreenMode && $store.getters.collapsed}" style="background-color: rgb(237, 240, 242); height: 60vh; overflow: auto;flex-wrap: wrap; justify-content: space-between">
-
+              
+              <div
+                v-if="sourceListLength > 0" 
+                style="width: 100%; margin-bottom: 3px; font-size: 12px; text-align: right; color: #989797;"
+                > 
+                目前已附加截圖 {{ sourceListLength }} 張，最多可以附加 {{isSystemAdvanced ? 500 : 120}} 張。 
+              </div>
 
               <div
                 v-for="(item_) in inspectList"
@@ -648,7 +654,7 @@
                   :style="item.checked?{'background-color':'#f5f7fa'}:{}"
                   @click="clickItem({item,index:showIgnoreItem?item.originIndex:index})"
                   >
-
+                  
                   <div class="flex fullWidth" >
                     <div class="font-15" style="text-align: left; width: calc(20/1920*100vw)" :style="item.checked?{'color':'#006ab7'}:{}">{{(index+1) + '.'}}</div>
                     <div class="flex padding-bottom-sm spacer" >
@@ -662,6 +668,7 @@
                       >
                         <span style="color: #c60957" v-if="item.required">*</span>
                         <span :class= "{ is_important : item.isImportant}"> {{ item.subject }}  </span>
+                        
                       </div>
 
                       <!-- dropdown -->
@@ -716,13 +723,12 @@
                     <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
                       <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                         <div v-if="_item.mediaType == 3" class="flex-center">
-                        
                           <div
                             class=" flex-center comment_list "
                             :style="curEditIndex === _index ? {'border':'1px solid #006ab7'}:{'border':'1px solid #e6e6e6'}, /\s/.test(_item.src) ? {'word-break':'normal'} : {'word-break':'break-all'}"
                           >
                             <div style="flex: 1; text-align: left; margin: 5px; font-size: 13px;">
-                              {{ _item.src }}
+                              {{ _item.src }} 
                             </div>
                             <hr v-if="_item.showDelBtn" class="hr-vertical" />
                             <!-- 編輯 -->
@@ -762,7 +768,7 @@
                         </div>
                       </div>
                     </div>
-
+                    
                     <!-- text input -->
                     <div style="position: relative">
                       <el-input
@@ -1195,7 +1201,8 @@ export default {
       enableMimicMode:false,
 
       showIgnoreItem: false,
-      emptyPatrolList: true
+      emptyPatrolList: true,
+      isSystemAdvanced: false
 
     };
   },
@@ -1341,6 +1348,7 @@ export default {
 
   async mounted() {
     const self = this;
+    await self.getUserInfo()
     this.enableMimicMode = this.$store.getters.mimicMode;
     const PatrolHistory = self.$store.getters.PatrolHistory;
     const storeListCache = self.$store.getters.storeListCache;
@@ -1446,6 +1454,11 @@ export default {
   },
 
   methods: {
+    async getUserInfo(){
+      const result = await this.$store.dispatch("GetUserAuthorities");
+      this.isSystemAdvanced = result.data.isSystemAdvanced
+    },
+
     changeStore_(_item) {
       console.log("CHange STore")
       console.log(_item)
