@@ -1554,10 +1554,12 @@ export default {
       }
       self.imageCanvasList = [];
       self.sourceList = [];
-      self.inspectInput = '';
+      self.inspectInput = ''; 
 
+      console.log('this.sourceListLength :>> ', this.sourceListLength);
+      var imgNum = this.sourceListLength
 
-      if (self.isRemote && self.sourceListLength >= (this.isSystemAdvanced ? 5 : 120)) {
+      if (self.isRemote && self.sourceListLength >= (this.isSystemAdvanced ? 500 : 120)) {
         if(this.isSystemAdvanced){
           util.notify(self.$t('remotePatrol.maximumTotalAttach_500'), 'warning', 3000);
         } else {
