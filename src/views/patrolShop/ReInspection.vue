@@ -67,7 +67,7 @@
           </div>
           <div slot="footer">
             <el-button id="cancelBtn" size="mini" @click="showCutDialog = false">{{ $t('remotePatrol.cancel') }}</el-button>
-            <el-button id="confirmBtn" size="mini" type="primary" @click="confirmEdit">{{ $t('remotePatrol.confirm') }}</el-button>
+            <el-button id="confirmBtn" size="mini" type="primary" @click="confirmEdit">{{ $t('remotePatrol.confirm') }}aaa</el-button>
           </div>
         </el-dialog>
 
@@ -635,7 +635,7 @@
                 v-if="sourceListLength > 0" 
                 style="width: 100%; margin-bottom: 3px; font-size: 12px; text-align: right; color: #989797;"
                 > 
-                目前已附加截圖 {{ sourceListLength }} 張，最多可以附加 {{isSystemAdvanced ? 500 : 120}} 張。 
+                目前已附加截圖 {{ totalImageNum }} 張，最多可以附加 {{isSystemAdvanced ? 500 : 120}} 張。 
               </div>
 
               <div
@@ -1202,7 +1202,9 @@ export default {
 
       showIgnoreItem: false,
       emptyPatrolList: true,
-      isSystemAdvanced: false
+      isSystemAdvanced: false,
+
+      totalImageNum: 0
 
     };
   },
@@ -1233,10 +1235,10 @@ export default {
                 if(group.items){
                   group.items.forEach((item, index3) => {
                     item.sourceList.forEach((source, index4) => {
-                       console.log("Add source type="+source.mediaType)
-                       if(source.mediaType!=3){
-                         total = total+1;
-                       }
+                      console.log("Add source type="+source.mediaType)
+                      if(source.mediaType!=3){
+                        total = total+1;
+                      }
                     });
                   });
                 }
@@ -1247,10 +1249,13 @@ export default {
         });
 
         this.eventList.forEach((event, index1) => {
-           if(event.sourceObj){
-              total = total +1;
-           }
+          if(event.sourceObj){
+            total = total +1;
+          }
         });
+
+        this.totalImageNum = +total
+
         console.log("Total Source="+total)
         return total;
     }
@@ -1454,6 +1459,7 @@ export default {
   },
 
   methods: {
+    
     async getUserInfo(){
       const result = await this.$store.dispatch("GetUserAuthorities");
       this.isSystemAdvanced = result.data.isSystemAdvanced
@@ -3390,8 +3396,8 @@ export default {
     },
     canceldChangeInspect() {
       const self = this;
-       if(self.isEditReport)  self.EditRptchangeInspectObj.dialogCosed = false;
-       else self.changeInspectObj.dialogCosed = false;
+      if(self.isEditReport)  self.EditRptchangeInspectObj.dialogCosed = false;
+      else self.changeInspectObj.dialogCosed = false;
     },
     canceldChangeStore() {
       const self = this;
@@ -3792,6 +3798,7 @@ export default {
       } else {
         self.sourceListLength = self.hasIgnoretemp[self.curItemIndex].sourceList.length;
       }
+
     },
 
     ezvizPictureFeedback(obj) {
