@@ -1,5 +1,6 @@
 <template>
   <div>
+    
     <div class="el-audit-header">
         <div class="flex-center" style="justify-content: space-between; margin: 20px 0 20px 0px;font-size:calc(16/1920*100vw)">
           <!-- 時間範圍 -->
@@ -81,7 +82,8 @@
 <script>
 import { getUserInfo, getAllUserInfoNoAuth} from '@/api/login';
 
-import {getImmediateEventTable} from '@/api/advanceSetting';
+import { getImmediateTaskTable, getImmediateEventTable} from '@/api/advanceSetting';
+import { GetInspectTagListAll } from '@/api/inspect';
 import { mapGetters } from 'vuex';
 import TableOnly from '@/components/TableOnly';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
@@ -102,7 +104,13 @@ export default {
   data() {
     return {
       isLoadingData: false,
+      userInfo: [],
+      allInspectTypeList: [],
       activeName: "2",
+      actionType: 0,
+      dateValue:[],
+      inputSearchValue: '',
+      defaultSort:{order:'descending', prop:'updateTs'},
       tableDataList:[
         {
           label: '公告訊息',
@@ -256,8 +264,15 @@ export default {
   
   },
   methods: {
-    init(){
-      this.getInsantEventTable()
+    async init(){
+      
+      var initDate = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+      const start = typeof (initDate[0]) === 'object' ? initDate[0].getTime() : initDate[0];
+      const end = typeof (initDate[1]) === 'object' ? initDate[1].getTime() : initDate[1];
+      this.dateValue = [new Date().setTime(start), new Date().setTime(end)];
+
+      await this.getUserInfo()
+      await this.getInsantEventTable()
     },
 
     async onTabClick(val){
@@ -266,30 +281,16 @@ export default {
       this.actionType = n
       
       await this.getTable(n)
-      
-      
     },
 
     getTable(typeN){
       this.isLoadingData = true
-      var param = {
-        beginTs: 1700784000000,
-        endTs: 1700866800000,
-        keyword: "2023",
-        filter: {
-            page: 0,
-            size: 10
-        },
-        order: {
-            direction: "desc",
-            property: "ts"
-        }
-      }
-
       if(typeN == "0"){
 
       }
       else if (typeN == "1"){
+        this.isLoadingData = false
+        this.getInsantTaskTable()
 
       }
       else if(typeN == "2"){
@@ -300,12 +301,80 @@ export default {
     },
 
 
+    async getInsantTaskTable(){
+      this.isLoadingData = true
+
+      var allInspect = await this.getTagAll()
+
+      this.allInspectTypeList = allInspect.map(i => ({
+        id: i.id,
+        name: i.name,
+        mode: i.mode
+      }))
+
+
+
+      console.log('this.dateValue !!!!', this.dateValue)
+      var param = {
+        beginTs: this.dateValue[0],
+        endTs: this.dateValue[1],
+        keyword: "",
+        filter: {
+            page: 0,
+            size: 10
+        },
+        order: {
+            direction: "desc",
+            property: "ts"
+        }
+      }
+      await getImmediateTaskTable(param).then(res=>{
+        console.log('res.data.content getImmediateTaskTable :>> ', res.data.content);
+
+        res.data.content.forEach( i => {
+          this.userInfo.forEach(n => {
+            if(i.instantRequest.userId == n.userId){
+              i.instantRequest.msgContent.userName = n.userName
+            }
+          })
+        })
+
+        res.data.content.forEach( i => {
+          this.allInspectTypeList.forEach(n => {
+            if(i.instantRequest.msgContent.inspectTagId == n.id){
+              i.instantRequest.msgContent.inspectName = n.name
+            }
+          })
+        })
+
+
+
+        this.tableDataList[1].tableData = res.data.content.map(i => ({
+          scheduleName : i.instantRequest.msgContent.taskName,
+          inspectReport: i.instantRequest.msgContent.inspectName,
+          executeTs: this.getdate(i.instantRequest.ts),
+          sender: i.instantRequest.msgContent.userName,
+          sendTs: this.getdate(i.instantRequest.msgContent.remindTime),
+          readStatus: `${i.readMsg}/${i.totalMsg}`
+
+        }))
+        console.log('this.tableDataList[1].tableData =====>>>>>', this.tableDataList[1].tableData)
+
+        this.isLoadingData = false
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
+    },
+
+
     async getInsantEventTable(){
       this.isLoadingData = true
+      console.log('this.dateValue !!!!', this.dateValue)
       var param = {
-        beginTs: 1700409600000,
-        endTs: 1700668799999,
-        keyword: "2023",
+        beginTs: this.dateValue[0],
+        endTs: this.dateValue[1],
+        keyword: "",
         filter: {
             page: 0,
             size: 10
@@ -316,13 +385,83 @@ export default {
         }
       }
       await getImmediateEventTable(param).then(res=>{
-        console.log('res.data :>> ', res.data);
+        console.log('res.data.content :>> ', res.data.content);
+
+        res.data.content.forEach( i => {
+          this.userInfo.forEach(n => {
+            if(i.instantRequest.userId == n.userId){
+              i.instantRequest.userName = n.userName
+            }
+          })
+        })
+
+        this.tableDataList[2].tableData = res.data.content.map(i => ({
+          eventName : i.instantRequest.msgContent.eventTitle,
+          attachments: 'aaa',
+          sender: i.instantRequest.userName,
+          sendTs: this.getdate(i.instantRequest.ts),
+          readStatus: `${i.readMsg}/${i.totalMsg}`
+        }))
+        console.log('this.tableDataList[2].tableData =====>>>>>', this.tableDataList[2].tableData)
+
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;
         console.log('error' + err);
       });
-    }
+    },
+
+
+    onDateChange(val) {
+      const self = this;
+      const tabIndex = Number(self.curTabIndx);
+      const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
+      const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
+      self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
+      self.inputSearchValue = '';
+      console.log('this.dateValue :>> ', this.dateValue);
+    },
+
+    onSearchClick() {
+      console.log('this.dateValue onSearchClick :>> ', this.dateValue);
+      console.log('this.actionType :>> ', this.actionType);
+      this.getTable(this.actionType)
+      // this.getLog(this.actionType)
+    },
+    pad2(n){
+      return (n < 10 ? '0' : '') + n;
+    },
+    getdate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return year + "-"+ month +"-"+ day +" "+ hour +":"+ min +":"+ sec
+    },
+    async getUserInfo(){
+      await getAllUserInfoNoAuth().then(res=>{
+          this.userInfo = res.data
+        }).catch(err => {
+          console.log('error' + err);
+        });
+    },
+
+    // 取得巡檢表
+    getTagAll() {
+      return new Promise((resolve, reject) => {
+        GetInspectTagListAll().then(res => {
+          const data = res.data;
+          resolve(data);
+
+          
+        }).catch(err => {
+          reject(err);
+        });
+      });
+  },
 
     
   },

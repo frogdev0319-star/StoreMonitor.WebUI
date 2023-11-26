@@ -36,3 +36,10 @@ export const getImmediateEventTable = data => {
     data
   });
 };
+export const getImmediateTaskTable = data => {
+  return request({
+    url: `${version}/instant/notify/task/fetch`,
+    method: 'post',
+    data
+  });
+};
