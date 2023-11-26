@@ -24,7 +24,7 @@
                 <div class="setting_item">
                   <el-switch
                     style="display: block"
-                    v-model="isSwitchOn"
+                    v-model="isSecurityOn"
                     active-color="#c60957"
                     inactive-color="#eee"
                     active-text="開啟"
@@ -52,14 +52,12 @@ import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
 import util from '@/common/util';
 import filterString from '@/common/filterString.js';
-
-import { inpectRESTful } from '@/api/index';
 import {advancedUpdate, advancedFetch} from '@/api/advanceSetting';
 
 
 
 export default {
-  name: 'GeneralSetting',
+  name: 'DataSecurity',
   components: { 
     DelayButton,
     SettingTable
@@ -68,7 +66,7 @@ export default {
   data() {
     return {
       isLoadingData: false,
-			isSwitchOn: false,
+			isSecurityOn: false,
     };
   },
 
@@ -80,9 +78,6 @@ export default {
     // accountChanged(val) {
     //   val !== 0 && this.init();
     // },
-
-
-  
   },
 
   created() {
@@ -92,21 +87,12 @@ export default {
 
   methods: {
     async init(){
-      console.log('init :>> ');
-    },  
-
-    // get user
-    async getUserInfo(){
-      const result = await this.$store.dispatch("GetUserAuthorities");
-      this.userName = result.data.userName
-      // console.log('result  :>> ', result );
-      // console.log('this.userName  :>> ', this.userName );
-    },
-
-
+      this.getInitAdvance()
+    },      
+    
     advancedFetch(){
       var param = {
-        contentKey: "water_print"
+        contentKey: "security"
       }
       return new Promise((resolve, reject) => {
         advancedFetch(param).then(res => {
@@ -120,31 +106,18 @@ export default {
     async getInitAdvance(){
       const initData = await this.advancedFetch();
       console.log('initData.data :>> ', initData.data);
-      var tempItem = this.textSizeSelect.find( i => i.mobileSize == initData.data.content.waterPrintSize)
-      this.isSwitchOn = initData.data.content.isSwitchOn
-      this.defineText = initData.data.content.waterPrintText
-      this.showTextStatus = initData.data.content.waterPrintType == 0 ? true : false
-      this.color = initData.data.content.waterPrintColor
-      this.textSize = tempItem.value
-      this.textPosition = initData.data.content.waterPrintPosition
-    },
+      this.isSecurityOn = initData.data.content.appScreenShot_isSwitchOn
 
+    },
 
     advancedUpdate(){
       this.isLoadingData = true
-      var tempItem = this.textSizeSelect.find( i => i.value == this.textSize)
       var param = {
-        contentKey: "water_print",
+        contentKey: "security",
         contentMap: {
-          waterPrintText: this.defineText,
-          waterPrintType: this.showTextStatus ? 0 : 1,
-          waterPrintSize: tempItem.mobileSize,
-          waterPrintPosition: this.textPosition,
-          waterPrintColor: this.color,
-          isSwitchOn: this.isSwitchOn
+          appScreenShot_isSwitchOn: this.isSecurityOn
         }
       }
-      console.log('param ---->> ', param);
       return new Promise((resolve, reject) => {
         advancedUpdate(param).then(res => {
           resolve(res);
@@ -155,12 +128,6 @@ export default {
     },
 
     async submit(){
-      if(this.defineText == '' && this.showTextStatus){
-        this.$refs.defineName.focus()
-        util.notify("請輸入自定義名稱！", 'error', 2000 );
-        return false
-      }
-
       const statusNameRes = await this.advancedUpdate();
       if (statusNameRes.errCode == 0) {
         this.isLoadingData = false
@@ -173,19 +140,6 @@ export default {
       }
     },
 
-
-    itemInputChanged_overall(val){
-      const content = filterString.all(val, 12);
-      this.defineText = content
-      const length = filterString.getContentLength(val);
-      if(length > 12) {
-        this.showInputLimit_overallItem = true
-      } else {
-        this.showInputLimit_overallItem = false
-      }
-    },
-
-  
   }
 };
 </script>

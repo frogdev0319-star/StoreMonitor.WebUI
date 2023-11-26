@@ -17,3 +17,22 @@ export const advancedUpdate = data => {
     data
   });
 };
+
+
+export const sendImmediateEvent = data => {
+  return request({
+    url: `${version}/instant/notify/event/send`,
+    method: 'post',
+    data
+  });
+};
+
+
+
+export const getImmediateEventTable = data => {
+  return request({
+    url: `${version}/instant/notify/event/fetch`,
+    method: 'post',
+    data
+  });
+};

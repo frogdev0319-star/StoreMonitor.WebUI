@@ -209,7 +209,7 @@
                 <!--image-->
                 <el-image
                   :src="item.url"
-                  :style="{height: imgHeight+'px', width: 'calc(130/1920*100vw)'}"
+                  :style="{height: imgHeight+'px', width: 'auto'}"
                   :preview-src-list="getImgList(index, imgsourceList)"
                   class="imgLittle imgInner"/>
               </div>
@@ -976,11 +976,13 @@ export default {
       self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
       const storageParams = {};
       storageParams.storeId = this.event.storeId;
+
+      console.log('storageParams :>> ', storageParams);
       await getStorageInfo(storageParams).then(res => {
         if (res.errCode === 0) {
           self.oss = res.data;
         }
-      });
+      }); 
       for(let idx=0; idx<self.attachFileList.length;idx++){
         await self.upLoadFile(self.attachFileList[idx]).then((url) => {
           self.uploadingnumOfPic++;
@@ -2164,8 +2166,8 @@ $h1:#292e36;
                   }
                 }
                 .imgLittle{
-                  height:calc(64/900*100vh);
-                  width:calc(86/1440*100vw);
+                  height: calc(64/900*100vh);
+                  width: auto;
                   border-radius: 5px;
                 }
                 .icon-video{
