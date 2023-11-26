@@ -443,7 +443,7 @@ const user = {
           // console.log('whiteList!!!!!!!!!!!!!!!!!!!!', whiteList)
           // console.log('accountId !!!!!!!!!!!!!!!!!!!!', user.state.accountId)
           var isShowing = whiteList.some( i => i == accountId)
-          console.log('isShowing !!!!!!', isShowing)
+          // console.log('isShowing !!!!!!', isShowing)
           if(isShowing){
             const scheduleRoute = navbarRoute.getInceptionSchedule();
             (scheduleRoute.children.length > 0 && accessedRoutes.findIndex(item=>item.name==scheduleRoute.name)==-1) ? accessedRoutes.push(scheduleRoute) : '';
@@ -451,7 +451,7 @@ const user = {
             
 
           const roleId = user.state.roleId
-          console.log('roleId !!!!!!>> ', roleId);
+          // console.log('roleId !!!!!!>> ', roleId);
           // 報告與事件
           if(roleId === 1){
             const reportAndEventRoute = navbarRoute.getReportAndEvent();
@@ -467,10 +467,9 @@ const user = {
           // 進階設定
           const advancedSettingStatus = sessionStorage.getItem("advancedSettingStatus")
           const advancedSettingMode = sessionStorage.getItem("advancedSettingMode")
-          console.log('-------{o..o}-------', advancedSettingStatus , advancedSettingMode)
+          // console.log('-------{o..o}-------', advancedSettingStatus , advancedSettingMode)
         
           if(advancedSettingStatus && advancedSettingMode){
-
 
             PermissionHelper.setAdvancedModeMode(advancedSettingMode);
             const advanceSettingRoute = navbarRoute.getAdvanceSetting();
@@ -478,15 +477,12 @@ const user = {
             
             const instantPushRoute = navbarRoute.getInstantPush();
             instantPushRoute.children.length > 0 ? accessedRoutes.push(instantPushRoute) : '';
-            
-
-        
 
           } 
 
 
-          console.log("accessedRoutes.length !?!?!?:",accessedRoutes.length);
-          console.log('accessedRoutes :>> ', accessedRoutes)
+          // console.log("accessedRoutes.length !?!?!?:",accessedRoutes.length);
+          // console.log('accessedRoutes :>> ', accessedRoutes)
 
           if(accessedRoutes.length == 0){
             const errorRoute = navbarRoute.getErrorRoute();

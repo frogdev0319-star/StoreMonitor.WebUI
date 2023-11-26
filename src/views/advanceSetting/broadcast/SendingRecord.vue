@@ -79,8 +79,9 @@
   </div>
 </template>
 <script>
-import { fetchLog } from '@/api/reportAndEvent';
 import { getUserInfo, getAllUserInfoNoAuth} from '@/api/login';
+
+import {getImmediateEventTable} from '@/api/advanceSetting';
 import { mapGetters } from 'vuex';
 import TableOnly from '@/components/TableOnly';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
@@ -100,8 +101,8 @@ export default {
   },
   data() {
     return {
-      activeName: 0,
-      store: ['aa', 'bb', 'cc'],
+      isLoadingData: false,
+      activeName: "2",
       tableDataList:[
         {
           label: '公告訊息',
@@ -255,6 +256,73 @@ export default {
   
   },
   methods: {
+    init(){
+      this.getInsantEventTable()
+    },
+
+    async onTabClick(val){
+      var n =  Number(val.index)
+      this.currentPage = 1
+      this.actionType = n
+      
+      await this.getTable(n)
+      
+      
+    },
+
+    getTable(typeN){
+      this.isLoadingData = true
+      var param = {
+        beginTs: 1700784000000,
+        endTs: 1700866800000,
+        keyword: "2023",
+        filter: {
+            page: 0,
+            size: 10
+        },
+        order: {
+            direction: "desc",
+            property: "ts"
+        }
+      }
+
+      if(typeN == "0"){
+
+      }
+      else if (typeN == "1"){
+
+      }
+      else if(typeN == "2"){
+        this.getInsantEventTable()
+      }
+
+
+    },
+
+
+    async getInsantEventTable(){
+      this.isLoadingData = true
+      var param = {
+        beginTs: 1700409600000,
+        endTs: 1700668799999,
+        keyword: "2023",
+        filter: {
+            page: 0,
+            size: 10
+        },
+        order: {
+            direction: "desc",
+            property: "ts"
+        }
+      }
+      await getImmediateEventTable(param).then(res=>{
+        console.log('res.data :>> ', res.data);
+        this.isLoadingData = false
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
+    }
 
     
   },

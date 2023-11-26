@@ -1,16 +1,7 @@
 <template>
   <div>
-
-    <div class="submit_btn" >
-      <delay-button type="filled" >
-        <div class="button-area" style="width: 80px; height: 20px;">
-          <span>發送公告</span>
-        </div>
-      </delay-button>
-    </div>
-
-      <div class="el-table-content" >
-        <el-tabs  v-model="activeName" @tab-click="onTabClick">
+      <div class="el-table-content" @tab-click="onTabClick">
+        <el-tabs  v-model="activeName" >
           <!-- 公告訊息 -->
           <el-tab-pane
             label="公告訊息"
@@ -22,45 +13,48 @@
               <div class="send_content_row">
                 <div class="row_title">門店</div>
                 <el-select 
+                  v-model="aaa"
                   style="width: 50%;"
                   placeholder="aaa" 
                   filterable
                   >
                   <el-option
-                    v-for="item in store"
-                    :key="item"
-                    :label="item"
-                    :value="item" 
+                    v-for="item in XXXD"
+                    :key="item.storeId"
+                    :label="item.name"
+                    :value="item.storeId"  
                     />
                 </el-select>
               </div>
               <div class="send_content_row">
                 <div class="row_title">部門</div>
                 <el-select 
+                  v-model="aaa"
                   style="width: 50%;"
                   placeholder="aaa" 
                   filterable
                   >
                   <el-option
-                    v-for="item in store"
-                    :key="item"
-                    :label="item"
-                    :value="item" 
+                    v-for="item in XXXD"
+                    :key="item.storeId"
+                    :label="item.name"
+                    :value="item.storeId"  
                     />
                 </el-select>
               </div>
               <div class="send_content_row">
                 <div class="row_title">職務</div>
-                <el-select 
+                <el-select   
+                  v-model="aaa"
                   style="width: 50%;"
                   placeholder="aaa" 
                   filterable
                   >
                   <el-option
-                    v-for="item in store"
-                    :key="item"
-                    :label="item"
-                    :value="item" 
+                    v-for="item in XXXD"
+                    :key="item.storeId"
+                    :label="item.name"
+                    :value="item.storeId"  
                     />
                 </el-select>
               </div>
@@ -69,16 +63,17 @@
               <div class="subtitle_name" style="margin-top: 10px;">特定對象</div>
               <div class="send_content_row">
                 <div class="row_title">人員</div>
-                <el-select 
+                <el-select
+                  v-model="aaa"
                   style="width: 50%;"
                   placeholder="aaa" 
                   filterable
                   >
                   <el-option
-                    v-for="item in store"
-                    :key="item"
-                    :label="item"
-                    :value="item" 
+                    v-for="item in XXXD"
+                    :key="item.storeId"
+                    :label="item.name"
+                    :value="item.storeId"  
                     />
                 </el-select>
               </div>
@@ -125,57 +120,61 @@
               <div class="send_content_row">
                 <div class="row_title"><span style="color: #c60957">* </span> 排程名稱</div>
                 <el-select 
+                  v-model="aaa"
                   style="width: 50%;"
                   placeholder="aaa" 
                   filterable
                   >
                   <el-option
-                    v-for="item in store"
-                    :key="item"
-                    :label="item"
-                    :value="item" 
+                    v-for="item in XXXD"
+                    :key="item.storeId"
+                    :label="item.name"
+                    :value="item.storeId"  
                     />
                 </el-select>
               </div>
               <div class="send_content_row">
                 <div class="row_title"><span style="color: #c60957">* </span> 巡檢表</div>
-                <el-select 
+                <el-select
+                  v-model="aaa"
                   style="width: 25%;"
                   placeholder="aaa" 
                   filterable
                   >
                   <el-option
-                    v-for="item in store"
-                    :key="item"
-                    :label="item"
-                    :value="item" 
+                    v-for="item in XXXD"
+                    :key="item.storeId"
+                    :label="item.name"
+                    :value="item.storeId"  
                     />
                 </el-select>
                 <el-select 
+                  v-model="aaa"
                   style="width: 25%;"
                   placeholder="aaa" 
                   filterable
                   >
                   <el-option
-                    v-for="item in store"
-                    :key="item"
-                    :label="item"
-                    :value="item" 
+                    v-for="item in XXXD"
+                    :key="item.storeId"
+                    :label="item.name"
+                    :value="item.storeId"  
                     />
                 </el-select>
               </div>
               <div class="send_content_row">
                 <div class="row_title"> <span style="color: #c60957">* </span> 執行日期</div>
                 <el-select 
+                  v-model="aaa"
                   style="width: 50%;"
                   placeholder="aaa" 
                   filterable
                   >
                   <el-option
-                    v-for="item in store"
-                    :key="item"
-                    :label="item"
-                    :value="item" 
+                    v-for="item in XXXD"
+                    :key="item.storeId"
+                    :label="item.name"
+                    :value="item.storeId"  
                     />
                 </el-select>
               </div>
@@ -183,16 +182,17 @@
 
               <div class="send_content_row">
                 <div class="row_title"><span style="color: #c60957">* </span> 提醒時間</div>
-                <el-select 
+                <el-select
+                  v-model="aaa"
                   style="width: 50%;"
                   placeholder="aaa" 
                   filterable
                   >
                   <el-option
-                    v-for="item in store"
-                    :key="item"
-                    :label="item"
-                    :value="item" 
+                    v-for="item in XXXD"
+                    :key="item.storeId"
+                    :label="item.name"
+                    :value="item.storeId"  
                     />
                 </el-select>
               </div>
@@ -202,46 +202,49 @@
               <div class="subtitle_name" style="margin-top: 20px;"> <span style="color: #c60957">* </span> 群組對象</div>
               <div class="send_content_row">
                 <div class="row_title">門店</div>
-                <el-select 
+                <el-select
+                  v-model="aaa"
                   style="width: 50%;"
                   placeholder="aaa" 
                   filterable
                   >
                   <el-option
-                    v-for="item in store"
-                    :key="item"
-                    :label="item"
-                    :value="item" 
+                    v-for="item in XXXD"
+                    :key="item.storeId"
+                    :label="item.name"
+                    :value="item.storeId"  
                     />
                 </el-select>
               </div>
               <div class="send_content_row">
                 <div class="row_title">部門</div>
-                <el-select 
+                <el-select
+                  v-model="aaa"
                   style="width: 50%;"
                   placeholder="aaa" 
                   filterable
                   >
                   <el-option
-                    v-for="item in store"
-                    :key="item"
-                    :label="item"
-                    :value="item" 
+                    v-for="item in XXXD"
+                    :key="item.storeId"
+                    :label="item.name"
+                    :value="item.storeId"  
                     />
                 </el-select>
               </div>
               <div class="send_content_row">
                 <div class="row_title">職務</div>
                 <el-select 
+                  v-model="aaa"
                   style="width: 50%;"
                   placeholder="aaa" 
                   filterable
                   >
                   <el-option
-                    v-for="item in store"
-                    :key="item"
-                    :label="item"
-                    :value="item" 
+                    v-for="item in XXXD"
+                    :key="item.storeId"
+                    :label="item.name"
+                    :value="item.storeId"  
                     />
                 </el-select>
               </div>
@@ -250,86 +253,148 @@
               <div class="subtitle_name" style="margin-top: 10px;">特定對象</div>
               <div class="send_content_row">
                 <div class="row_title">人員</div>
-                <el-select 
+                <el-select
+                  v-model="aaa"
                   style="width: 50%;"
                   placeholder="aaa" 
                   filterable
                   >
                   <el-option
-                    v-for="item in store"
-                    :key="item"
-                    :label="item"
-                    :value="item" 
+                    v-for="item in XXXD"
+                    :key="item.storeId"
+                    :label="item.name"
+                    :value="item.storeId" 
                     />
                 </el-select>
               </div>
             </div>
           </el-tab-pane>
-
 
 
           <!-- 即時事件 -->
           <el-tab-pane
             label="即時事件"
             name="2">
-            <div class="send_content">
-            <div class="title-name"><span style="color: #c60957">* </span> 發送對象</div>
-              <!-- <div class="subtitle_name" style="margin-top: 20px;">群組對象</div> -->
+            <div class="send_content" v-loading="isLoadingData">
+              <!-- 發送事件 -->
+              <div class="submit_btn" >
+                <delay-button 
+                  @click="submitInstantEvent"
+                  type="filled" 
+                  :disabled="selectedInstantEventStore == '' || selectInstantEventTitle.length == 0 || eventName == '' " >
+                <div class="button-area" style="width: 80px; height: 20px;">
+                    <span>發送事件</span>
+                  </div>
+                </delay-button>
+              </div>
+
+              <div class="title-name"><span style="color: #c60957">* </span> 發送對象</div>
               <div class="send_content_row">
-                <div class="row_title">門店</div>
-                <el-select 
+                <div class="row_title">門店</div> 
+                <el-select
+                  v-model="selectedInstantEventStore"
                   style="width: 50%;"
-                  placeholder="aaa" 
+                  placeholder="請選擇門店" 
                   filterable
                   >
                   <el-option
-                    v-for="item in store"
-                    :key="item"
-                    :label="item"
-                    :value="item" 
+                    v-for="item in storeList"
+                    :key="item.storeId"
+                    :label="item.name"
+                    :value="item.storeId" 
                     />
                 </el-select>
               </div>
               <div class="send_content_row">
                 <div class="row_title">職務</div>
                 <el-select 
+                  v-model="selectInstantEventTitle"
                   style="width: 50%;"
-                  placeholder="aaa" 
+                  placeholder="請選擇職務" 
                   filterable
+                  multiple
                   >
                   <el-option
-                    v-for="item in store"
-                    :key="item"
-                    :label="item"
-                    :value="item" 
+                    v-for="item in titleList"
+                    :key="item.defineId"
+                    :label="item.defineName"
+                    :value="item.defineId" 
                     />
                 </el-select>
               </div>
 
-              <div class="title-name" style="margin-top: 30px;"><span style="color: #c60957">* </span> 發送事件</div>
+
+              <div class="title-name" style="margin-top: 30px;"> 發送事件</div>
               <div class="send_content_row">
                 <div class="row_title"> <span style="color: #c60957">* </span>事件名稱</div>
                 <el-input
+                  v-model="eventName"
                   style="width: 50%;"
                   />
               </div>
-              <div class="send_content_row">
+              <div class="send_content_row" >
                 <div class="row_title"> 附件</div>
-                <div class="attachments"> 選擇檔案</div>
+                <!-- <div class="attachments"> 選擇檔案</div> -->
+                <div class="attach-area" style="width: 100%;">
+                  <div v-for="(imgItem,index) in attachFileList" :key="'img'+index" class="source-details" >
+                    <!--video-->
+                      <div v-if="imgItem.type===1" class="img-content">
+                        <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
+                        <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon" @click="playAttachVideo(imgItem,index)">
+                        <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
+                      </div>
+                    <div v-else-if="imgItem.type===2" class="img-content">
+                      <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
+                      <el-image
+                        :src="imgItem.src"
+                        class="imgLittle"
+                        :preview-src-list="getAuditImgList(index)"/>
+                    </div>
+                  </div>
+                  <div v-if="attFileCount<10" class="attach-add" @click="$refs.auditfile.click()">
+                    <input 
+                      type="file" 
+                      style="display: none" 
+                      accept="image/png,image/jpeg,video/mp4" 
+                      max-size="2" 
+                      @change="doAddAttachment" 
+                      ref="auditfile" />
+                    <div style="height:16px; display: flex; flex-direction: row; align-items: center;">
+                      <img :src="addAttIcon" widht="16px" height="16px" style="border-radius:10px;"/>
+                      <div class="att-txt">選擇檔案</div>
+                    </div>
+                  </div>
+                </div>
+
+
+                
               </div>
 
             </div>
           </el-tab-pane>
         </el-tabs>
+
+        <!-- uploadProgress -->
+        <el-dialog :visible.sync="uploadProgress" :close-on-click-modal="false" width="510px" top="35vh" left="40vh" class="AddSumupLoad">
+        <div class="body-content">
+          <p>{{ $t('remotePatrol.uploading') }}</p>
+          <p style="margin-bottom:15px;">
+            {{ $t('remotePatrol.uploadInfo', {totalNum: totalnumOfPic, uploadedNum: uploadingnumOfPic}) }}
+          </p>
+          <el-progress :percentage="Math.round(uploadingnumOfPic/totalnumOfPic*100)"/>
+        </div>
+      </el-dialog>
+      
     </div>
   </div>
 </template>
 <script>
-import { fetchLog } from '@/api/reportAndEvent';
-import { getUserInfo, getAllUserInfoNoAuth} from '@/api/login';
+import { getBriefStoreList } from '@/api/store';
+import { getStorageInfo } from '@/api/event';
+import { getUserInfo, getAllUserInfoNoAuth, getDepart} from '@/api/login';
+import {sendImmediateEvent} from '@/api/advanceSetting';
+
 import { mapGetters } from 'vuex';
-import TableOnly from '@/components/TableOnly';
-import TblPaginationOnly from '@/components/TblPaginationOnly';
 import util from '@/common/util';
 import DateTimeSelector from '@/components/DateTimeSelector';
 import DelayButton from '@/components/DelayButton';
@@ -338,17 +403,48 @@ import DialogPop from '@/components/DialogPop';
 export default {
   name: 'WorkflowList',
   components: {
-    TableOnly,
     DateTimeSelector,
-    TblPaginationOnly,
     DelayButton,
     DialogPop
   },
   data() {
     return {
-      activeName: 0,
-      store: ['aa', 'bb', 'cc']
+      canSendInstantEvent: true,
+      isLoadingData: false,
+      activeName: "2",
+      aaa: '',
+      XXXD: [ 
+        {
+          "storeId": "4C7dPRwgEvAa",
+          "name": "Macy",
+          "city": "New York",
+          "province": "NY 10001",
+          "country": "USA",
+          "userId": null,
+          "tagIds": [],
+          "timeZone": "-10",
+          "status": 61,
+          "typeList": []
+        }
+      ],
+
       
+      storeList: [],
+      titleList: [],
+      
+      selectedInstantEventStore: "",
+      selectInstantEventTitle : [],
+      eventName:'',
+      attFileCount: 0,
+      attachFileList:[],
+      bucketVideo: '',
+      bucketImage: '',
+      addAttIcon: require('../../../../static/img/icon_attachment.svg'),
+      uploadProgress: false,
+      totalnumOfPic: 0,
+      uploadingnumOfPic: 0,
+      oss: null,
+
 
     }
   },
@@ -357,6 +453,7 @@ export default {
   },
   created() {
     this.init()
+    this.getUpLoadBucketInfo();
   },
   computed: {
     // ...mapGetters({ accountChanged: 'accountChanged' })
@@ -365,11 +462,280 @@ export default {
     // accountChanged(val) {
     //   val !== 0 && this.init();
     // },
-
- 
-  
   },
   methods: {
+    async init(){
+      await this.getStore()
+      await this.getTitle()
+
+    },
+
+    onTabClick(){
+      console.log('tabClick :>> ');
+    },
+
+    getBriefStoreData() {
+      return new Promise((resolve, reject) => {
+        getBriefStoreList().then(res => {
+          const errMsg = res.errMsg;
+          if (errMsg != undefined && errMsg === 'Success') {
+            resolve(res);
+          }
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+    async getStore(){
+      let res  = await this.getBriefStoreData();
+      if(res.errCode ==0){
+        this.storeList = res.data;
+      }
+    },
+
+    getDepart(){
+      return new Promise((resolve, reject) => {
+        getDepart({ type: 1 }).then(res => {
+          const errMsg = res.errMsg;
+          if (errMsg != undefined && errMsg === 'Success') {
+            resolve(res);
+          }
+        }).catch(err => {
+          reject(err);
+        });
+      });
+
+    },
+
+    async getTitle(){
+      let res  = await this.getDepart();
+      if(res.errCode ==0){
+        this.titleList = res.data;
+      }
+      console.log('this.titleList :>> ',this.titleList);
+    },
+
+    async sendInstantEvent(){
+      this.isLoadingData = true
+
+      const self = this;
+      const attachment_des = [];
+      //上傳附件
+      self.uploadingnumOfPic = 0;
+      self.totalnumOfPic = self.attachFileList.length;
+      self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
+      const storageParams = {};
+      storageParams.storeId = this.selectedInstantEventStore;
+      await getStorageInfo(storageParams).then(res => {
+        if (res.errCode === 0) {
+          self.oss = res.data;
+        }
+      });
+      for(let idx=0; idx<self.attachFileList.length;idx++){
+        await self.upLoadFile(self.attachFileList[idx]).then((url) => {
+          self.uploadingnumOfPic++;
+          const auditImgObj = {
+            fileName: self.attachFileList[idx].fileName,
+            fileSize: self.attachFileList[idx].size,
+            mediaType: self.attachFileList[idx].type,
+            url: url,
+            ts: Date.now(),
+            
+
+          };
+          attachment_des.push(auditImgObj);
+        }).catch((err) => {
+          console.log("uploade file error:",err)
+          upload++;
+        });
+      }
+      console.log('attachment_des ----->> ', attachment_des)
+      var param = {
+        requestContent: {
+          titleIds: [this.selectInstantEventTitle],
+          storeIds: [this.selectedInstantEventStore]
+        },
+        msgContent: {
+            eventTitle: this.eventName,
+            attachments: [...attachment_des]
+        }
+      }
+      console.log('param :>> ', param);
+
+      return new Promise((resolve, reject) => {
+        sendImmediateEvent(param).then(res => {
+          resolve(res);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+
+    },
+
+    async submitInstantEvent(){
+      const statusNameRes = await this.sendInstantEvent();
+      if (statusNameRes.errCode == 0) {
+        this.selectedInstantEventStore = '' 
+        this.selectInstantEventTitle =[]
+        this.eventName= ''
+        this.attachFileList = []
+        this.isLoadingData = false
+        this.uploadProgress = false
+        util.notify('發送成功', 'success', 3000);
+        return false;
+      } else {
+        this.isLoadingData = false
+        util.notify('發送失敗，目前無門店權限！', 'warning', 3000);
+        return false;
+      }
+    },
+
+    doAddAttachment(e){
+      const self = this;
+      const maxSize = 4*1024*1024; //不能超過4MB
+      var files = e.target.files || e.dataTransfer.files;
+      console.log("choose file:",files);
+      var fileName = files[0].name;
+      if (!files.length)
+        return;
+      /*
+      if(self.attFileCount==10){
+        util.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
+        return;
+      }
+      */
+      if(files[0].type.includes("video") && self.videoAttFileCount==2){
+        util.notify(self.$t('eventView.maximumAttVedio'), 'warning', 3000);
+        return;
+      }
+      if(files[0].type.includes("image")){
+        var objImg={
+          fileName:`${self.bucketImage}/inspect_${util.getCurTimeStr()}_${files[0].name}`,
+          src:'',
+          url:'',
+          file:'',
+          type:2,
+          size: files[0].size,
+        };
+        self.createFile(files[0],objImg);
+        self.attachFileList.push(objImg);
+
+      }else if(files[0].type.includes("video")){
+        console.log("choose file:",fileName);
+        var objvideo={
+          fileName:`${self.bucketVideo}/inspect_${util.getCurTimeStr()}_${files[0].name}`,
+          src:'',
+          url:URL.createObjectURL(files[0]),
+          type:1,
+          size:files[0].size,
+          
+        }
+        self.createFile(files[0],objvideo);
+        self.attachFileList.push(objvideo);
+      }
+
+      console.log('self.attachFileList :>> ', self.attachFileList);
+      self.$refs.auditfile.value = '';
+    },
+    createFile(file, objFile) {
+      //var image = new Image();
+      console.log(objFile);
+      var reader = new FileReader();
+      reader.onload = (e) => {
+        console.log("e:",e);
+        objFile.src = e.target.result;
+        objFile.file = util.base64ToBlob(e.target.result);
+        console.log(objFile.file);
+      };
+      reader.readAsDataURL(file);
+    },
+    getAuditImgList(index) {
+      const arr = [];
+      let i = 0;
+      for (i; i < this.attachFileList.length; i++) {
+        arr.push(this.attachFileList[i + index]);
+        if (i + index >= this.attachFileList.length - 1) {
+          index = 0 - (i + 1);
+        }
+      }
+      return arr.map(source => source.src);
+    },
+    deleteImg({item, index}) {
+      const self = this;
+      self.attachFileList.splice(index, 1);
+    },
+
+    playAttachVideo(item, index) {
+      const self = this;
+      self.dialogAttachVideo = true;
+      self.$nextTick(function() {
+        var video = document.getElementById('previewAttVideo');
+        video.setAttribute("src",item.url);
+      });
+    },
+    getFileUrl(fileName) {
+      const self = this;
+      const bucketName = self.oss.ossBucketName;
+      const endpoint = self.oss.ossEndPoint;
+      const key = fileName;
+      if (self.oss.ossVendor === 2) {
+        return `https://${endpoint}/${bucketName}/${fileName}`;
+      } else {
+        return `http://${bucketName}.${endpoint}/${fileName}`;
+      }
+    },
+    upLoadFile(fileItem) {
+      const self = this;
+      self.percentage = 0;
+      if (self.oss.ossVendor === null) {
+        self.oss.ossVendor = 1; // 1 -aliyun  2-azure
+      }
+      if (self.oss.ossVendor === 1) {
+        const OSS = require('ali-oss');
+        const client = new OSS({
+          region: self.oss.ossEndPoint.slice(0, self.oss.ossEndPoint.indexOf('.')),
+          accessKeyId: self.oss.ossAccessKeyId,
+          accessKeySecret: self.oss.ossAccessKeySecret,
+          // bucket: 'viumo-'+self.accountId,
+          bucket: self.oss.ossBucketName
+        });
+        const name = fileItem.fileName;
+        return new Promise((resolve, reject) => {
+          client.put(name, fileItem.file, {
+            progress: function * (percentage, cpt) {
+              self.percentage = percentage;
+            }
+          })
+            .then((results) => {
+              const url = self.getFileUrl(results.name);
+              resolve(url);
+            })
+            .catch((err) => {
+              reject(err);
+            });
+        });
+      } else {
+        const url = `https://${self.oss.ossEndPoint}/${self.oss.ossBucketName}${self.oss.ossAccessKeySecret}`;
+        const containerURL = new azblob.ContainerURL(url, azblob.StorageURL.newPipeline(new azblob.AnonymousCredential()));
+        const blockBlobURL = azblob.BlockBlobURL.fromContainerURL(containerURL, fileItem.fileName);
+        return new Promise((resolve, reject) => {
+          azblob.uploadBrowserDataToBlockBlob(azblob.Aborter.none, fileItem.file, blockBlobURL)
+            .then((results) => {
+              const url = self.getFileUrl(fileItem.fileName);
+              resolve(url);
+            })
+            .catch((error) => {
+              reject(error);
+            });
+        });
+      }
+    },
+    getUpLoadBucketInfo() {
+      const self = this;
+      self.bucketVideo = 'video' + '/' + util.getCurDate2Str();
+      self.bucketImage = 'image' + '/' + util.getCurDate2Str();
+    },
+
 
     
   },
@@ -428,7 +794,61 @@ export default {
         justify-content: center
         align-items: center
         cursor: pointer
+  .attach-area
+    display: flex
+    flex-wrap: wrap
+    align-content: flex-start
+    align-self: flex-start
+    width: calc(478/1440*100vw)
+    margin-top: 15px
+    margin-left: 16px
+    margin-right: 19px
+    margin-bottom: 10px
+    .attach-add
+      height: 120px
+      width: 120px
+      border-radius: 5px
+      box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1)
+      display: flex
+      flex-direction: row
+      justify-content: center
+      align-items: center
+      cursor: pointer
+      .att-txt
+        font-size: 12px
+        color: #006ab7
+        margin-left: 3px
+    .source-details
+      margin-right: 12px
+      margin-bottom: 12px
+      .img-content
+        position: relative
+        transition: all .3s
+        &:hover
+          transform: scale(1.1)
+        .el-icon-close
+          width: 21px
+          height: 21px
+          border-radius: 50%
+          background: rgba(0,0,0,.5)
+          color: #FFF
+          display: flex
+          flex-direction: row
+          justify-content: center
+          align-items: center
+          transition: all .3s
+          position: absolute
+          z-index: 100
+          right: 2px
+          top: 2px
+          cursor: pointer
+            
 
+        .el-image
+          width: auto
+          height: 120px
+
+        
 
 
 

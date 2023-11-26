@@ -519,7 +519,7 @@ export default{
       "unit":"個",
       "unknownErr":"未知錯誤",
       "untreated":"未處理",
-      "uploadInfo":"共{totalNum}個附件，已上傳{uploadedNum}个",
+      "uploadInfo":"共 {totalNum} 個附件，已上傳 {uploadedNum} 個",
       "uploading":"正在上傳中",
       "videoCannotPlay":"加密設備不支持播放",
       "videoEncrypted":"影像已加密",
