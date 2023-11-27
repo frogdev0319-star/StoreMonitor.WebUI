@@ -126,6 +126,21 @@
               <el-radio :label="false">{{$t('audit.workFlows.unnecessary')}}</el-radio>
             </el-radio-group>
           </template>
+
+          <!--  sendingRecord attachment -->
+          <template v-else-if="_item.forAttachement" >
+            <div class="forAttachement" @click="showAttach(row)">
+                <img src=".../../../static/img/RiAttachment.svg"  alt="" >
+            </div>
+          </template>
+          <template v-else-if="_item.readStatus" >
+            <div  class='not_Read' :class="{ is_read : row.isRead  }">
+              {{ row.isRead ? '已讀' : '未讀'}}
+            </div>
+          </template>
+
+
+
           
           <template v-else>
             <template v-if="isDevice && _index < 3 ">
@@ -773,7 +788,13 @@ export default {
       }else{
         return
       }
+    },
 
+    showAttach(row){
+      // console.log('needAlert :>> ');
+      // console.log('row :>> ', row);
+      this.$emit('showAttachDialog', row);
+      
     }
     
   }
@@ -1016,6 +1037,20 @@ export default {
   .question-icon
     font: size 14px
     margin: left 4px
+
+  .forAttachement
+    cursor: pointer
+    width: 25px
+    transition: all .2s
+    img 
+      width: 25px
+      
+    &:hover
+      transform: scale(1.1) 
+  .not_Read
+    color: #F57848
+  .is_read
+    color: #59AB22 !important
   
 
 </style>

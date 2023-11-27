@@ -6,7 +6,7 @@
           <el-tab-pane
             label="公告訊息"
             name="0">
-            <div class="send_content">
+            <div class="send_content" v-loading="isLoadingData">
 
               <div class="title-name"><span style="color: #c60957">* </span> 發送至</div>
               <div class="subtitle_name" style="margin-top: 20px;">群組對象</div>
@@ -114,24 +114,27 @@
           <el-tab-pane
             label="即時排程"
             name="1">
-            <div class="send_content">
+              
+            <div class="send_content" v-loading="isLoadingData">
+              <div class="submit_btn" >
+                <delay-button 
+                  @click="submitInstantTask"
+                  type="filled" 
+                  >
+                <div class="button-area" style="width: 80px; height: 20px;">
+                    <span>發送事件</span>
+                  </div>
+                </delay-button>
+              </div>
+
               <div class="title-name"> 發送排程</div>
               <!-- <div class="subtitle_name" style="margin-top: 20px;">群組對象</div> -->
               <div class="send_content_row">
                 <div class="row_title"><span style="color: #c60957">* </span> 排程名稱</div>
-                <el-select 
-                  v-model="aaa"
+                <el-input
+                  v-model="taskName"
                   style="width: 50%;"
-                  placeholder="aaa" 
-                  filterable
-                  >
-                  <el-option
-                    v-for="item in XXXD"
-                    :key="item.storeId"
-                    :label="item.name"
-                    :value="item.storeId"  
-                    />
-                </el-select>
+                  />
               </div>
               <div class="send_content_row">
                 <div class="row_title"><span style="color: #c60957">* </span> 巡檢表</div>
@@ -197,9 +200,7 @@
                 </el-select>
               </div>
 
-
               <div class="title-name" style="margin-top: 30px;"><span style="color: #c60957">*</span> 發送至</div>
-              <div class="subtitle_name" style="margin-top: 20px;"> <span style="color: #c60957">* </span> 群組對象</div>
               <div class="send_content_row">
                 <div class="row_title">門店</div>
                 <el-select
@@ -216,41 +217,7 @@
                     />
                 </el-select>
               </div>
-              <div class="send_content_row">
-                <div class="row_title">部門</div>
-                <el-select
-                  v-model="aaa"
-                  style="width: 50%;"
-                  placeholder="aaa" 
-                  filterable
-                  >
-                  <el-option
-                    v-for="item in XXXD"
-                    :key="item.storeId"
-                    :label="item.name"
-                    :value="item.storeId"  
-                    />
-                </el-select>
-              </div>
-              <div class="send_content_row">
-                <div class="row_title">職務</div>
-                <el-select 
-                  v-model="aaa"
-                  style="width: 50%;"
-                  placeholder="aaa" 
-                  filterable
-                  >
-                  <el-option
-                    v-for="item in XXXD"
-                    :key="item.storeId"
-                    :label="item.name"
-                    :value="item.storeId"  
-                    />
-                </el-select>
-              </div>
 
-              
-              <div class="subtitle_name" style="margin-top: 10px;">特定對象</div>
               <div class="send_content_row">
                 <div class="row_title">人員</div>
                 <el-select
@@ -392,7 +359,11 @@
 import { getBriefStoreList } from '@/api/store';
 import { getStorageInfo } from '@/api/event';
 import { getUserInfo, getAllUserInfoNoAuth, getDepart} from '@/api/login';
-import {sendImmediateEvent} from '@/api/advanceSetting';
+import {
+  sendImmediateBroadcast,
+  sendImmediateTask, 
+  sendImmediateEvent
+} from '@/api/advanceSetting';
 
 import { mapGetters } from 'vuex';
 import util from '@/common/util';
@@ -411,7 +382,7 @@ export default {
     return {
       canSendInstantEvent: true,
       isLoadingData: false,
-      activeName: "2",
+      activeName: "1",
       aaa: '',
       XXXD: [ 
         {
@@ -431,6 +402,8 @@ export default {
       
       storeList: [],
       titleList: [],
+
+      taskName: '',
       
       selectedInstantEventStore: "",
       selectInstantEventTitle : [],
@@ -517,7 +490,6 @@ export default {
 
     async sendInstantEvent(){
       this.isLoadingData = true
-
       const self = this;
       const attachment_des = [];
       //上傳附件
@@ -540,8 +512,6 @@ export default {
             mediaType: self.attachFileList[idx].type,
             url: url,
             ts: Date.now(),
-            
-
           };
           attachment_des.push(auditImgObj);
         }).catch((err) => {
@@ -561,7 +531,6 @@ export default {
         }
       }
       console.log('param :>> ', param);
-
       return new Promise((resolve, reject) => {
         sendImmediateEvent(param).then(res => {
           resolve(res);
@@ -572,6 +541,10 @@ export default {
 
     },
 
+    async submitInstantTask(){
+      console.log('submitInstantTask :>> ');
+
+    },
     async submitInstantEvent(){
       const statusNameRes = await this.sendInstantEvent();
       if (statusNameRes.errCode == 0) {

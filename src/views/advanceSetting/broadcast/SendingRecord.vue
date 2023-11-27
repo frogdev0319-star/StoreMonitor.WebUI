@@ -54,6 +54,8 @@
                   :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
                   :tableHeight = "760"
                   :cellStyle="{backgroundColor: '#fff !important'}"
+                  @showAttachDialog="handdleAttachInfo"
+                  @onCellClick="showReadStatus"
                 />
               </div>
               <!-- <div class="page-area">
@@ -76,13 +78,94 @@
         </el-tabs>
         </div>
 
+    <dialog-pop
+      title="附件"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :visible="showBroadcastAttach"
+      :isWarning="true"
+      :showButton=" false"
+      
+    >
+      <div class="dialog-slot">
+        <div class="dialog-content">
+          <div class="" style="width: 460px; margin-bottom: 30px;">
+            <table-only
+              ref="elTP"
+              class="sendingrecord_table"
+              :column-data="attachDataList"
+              :table-data="attachTableData"
+              :highlight-current-row= "false"
+              :is-loading-data="isLoadingData"
+              :allowRowExpand = "false"
+              :showBorder = "false"
+              :default-sort = defaultSort
+              :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+              :tableHeight = "760"
+              :cellStyle="{backgroundColor: '#fff !important'}"
+              @onCellClick="downloadAttachFile"
+            />
 
+          </div>
+          <div class="attach_btn_row">
+            <el-button class="confirm-btn" size="mini" type="primary" @click="showBroadcastAttach = false">
+              {{ $t('remotePatrol.confirm') }}
+            </el-button>
+          </div>
+        </div>
+      </div>
+    </dialog-pop>
+    
+    <dialog-pop
+      title="讀取狀態"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :visible="showBroadcastReadStatus"
+      :isWarning="true"
+      :showButton=" false"
+    >
+      <div class="dialog-slot">
+        <div class="dialog-content">
+          <div class="" style="width: 460px; margin-bottom: 30px;">
+            <table-only
+              ref="elTP"
+              class="sendingrecord_table"
+              :column-data="readStatusList"
+              :table-data="readStatusTableData"
+              :highlight-current-row= "false"
+              :is-loading-data="isLoadingData"
+              :allowRowExpand = "false"
+              :showBorder = "false"
+              :default-sort = defaultSort
+              :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+              :tableHeight = "350"
+              :cellStyle="{backgroundColor: '#fff !important'}"
+            />
+
+          </div>
+          <div class="attach_btn_row">
+            <el-button class="confirm-btn" size="mini" type="primary" @click="showBroadcastReadStatus = false">
+              {{ $t('remotePatrol.confirm') }}
+            </el-button>
+          </div>
+        </div>
+      </div>
+    </dialog-pop>
   </div>
 </template>
 <script>
 import { getUserInfo, getAllUserInfoNoAuth} from '@/api/login';
 
-import { getImmediateTaskTable, getImmediateEventTable} from '@/api/advanceSetting';
+import { 
+  getImmediateBroadcastTable, 
+  getImmediateTaskTable, 
+  getImmediateEventTable,
+  getImmediateBroadcastReadStatus,
+  getImmediateTaskReadStatus,
+  getImmediateEventReadStatus
+} from '@/api/advanceSetting';
 import { GetInspectTagListAll } from '@/api/inspect';
 import { mapGetters } from 'vuex';
 import TableOnly from '@/components/TableOnly';
@@ -106,9 +189,52 @@ export default {
       isLoadingData: false,
       userInfo: [],
       allInspectTypeList: [],
-      activeName: "2",
+      activeName: "0",
       actionType: 0,
       dateValue:[],
+      showBroadcastAttach: false,
+      showBroadcastReadStatus: false,
+      attachTableData: [],
+      attachDataList:[
+        {
+          'prop': 'fileName',
+          'label': '檔案名稱',
+          'width': 50,
+          'maxWidth': 50,
+          'isCellClick': true
+        },
+        {
+          'prop': 'fileSize',
+          'label': '檔案大小',
+          'width': 200,
+          'maxWidth': 200,
+        },
+      ],
+      readStatusTableData: [],
+      readStatusList:[
+        {
+          'prop': 'userName',
+          'label': '人員',
+          'width': 50,
+          'maxWidth': 50,
+        },
+        {
+          'prop': 'titleName',
+          'label': '職務',
+          'width': 200,
+          'maxWidth': 200,
+        },
+        {
+          'prop': 'isRead',
+          'label': '狀態',
+          'width': 200,
+          'maxWidth': 200,
+          'readStatus': true
+        },
+      ],
+        
+      
+
       inputSearchValue: '',
       defaultSort:{order:'descending', prop:'updateTs'},
       tableDataList:[
@@ -135,6 +261,7 @@ export default {
               'label': '附件',
               'width': 200,
               'maxWidth': 200,
+              'forAttachement': true
             },
             {
               'prop': 'sender',
@@ -153,6 +280,7 @@ export default {
               'label': '讀取狀態',
               'width': 200,
               'maxWidth': 200,
+              'isCellClick': true
             },
             
           ],
@@ -198,6 +326,7 @@ export default {
               'label': '讀取狀態',
               'width': 200,
               'maxWidth': 200,
+              'isCellClick': true
             },
           ],
         },
@@ -218,6 +347,7 @@ export default {
               'label': '附件',
               'width': 200,
               'maxWidth': 200,
+              'forAttachement': true
             },
             {
               'prop': 'sender',
@@ -236,19 +366,16 @@ export default {
               'label': '讀取狀態',
               'width': 200,
               'maxWidth': 200,
+              'isCellClick': true
             },
           ],
         },
-        
-
       ],
-      
 
+  
     }
   },
-  mounted() {
-    
-  },
+  mounted() {},
   created() {
     this.init()
   },
@@ -260,8 +387,6 @@ export default {
     //   val !== 0 && this.init();
     // },
 
- 
-  
   },
   methods: {
     async init(){
@@ -272,49 +397,85 @@ export default {
       this.dateValue = [new Date().setTime(start), new Date().setTime(end)];
 
       await this.getUserInfo()
-      await this.getInsantEventTable()
+      await this.getTable("0")
     },
 
     async onTabClick(val){
       var n =  Number(val.index)
       this.currentPage = 1
       this.actionType = n
-      
       await this.getTable(n)
     },
 
     getTable(typeN){
       this.isLoadingData = true
       if(typeN == "0"){
-
+        this.getInsantBroadcastTable()
       }
       else if (typeN == "1"){
-        this.isLoadingData = false
         this.getInsantTaskTable()
-
       }
       else if(typeN == "2"){
         this.getInsantEventTable()
       }
-
-
     },
+
+    async getInsantBroadcastTable(){
+      this.isLoadingData = true
+      console.log('this.dateValue 0', this.dateValue)
+      var param = {
+        beginTs: this.dateValue[0],
+        endTs: this.dateValue[1],
+        keyword: "",
+        filter: {
+            page: 0,
+            size: 10
+        },
+        order: {
+            direction: "desc",
+            property: "ts"
+        }
+      }
+      await getImmediateBroadcastTable(param).then(res=>{
+        console.log('res.data.content getInsantBroadcastTable :>> ', res.data.content);
+        res.data.content.forEach( i => {
+          this.userInfo.forEach(n => {
+            if(i.instantRequest.userId == n.userId){
+              i.instantRequest.userName = n.userName
+            }
+          })
+        })
+      
+        this.tableDataList[0].tableData = res.data.content.map(i => ({
+          instantId: i.instantRequest.id,
+          bulletinSubject: i.instantRequest.msgContent.broadcastTitle,
+          bulletinContent: i.instantRequest.msgContent.broadcastContent,
+          attachments: i.instantRequest.msgContent.attachments,
+          sender: i.instantRequest.userName,
+          sendTs: this.getdate(i.instantRequest.ts),
+          readStatus: `${i.readMsg}/${i.totalMsg}`
+          
+        }))
+        console.log('this.tableDataList[0].tableData =====>>>>>', this.tableDataList[0].tableData)
+
+        this.isLoadingData = false
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
+    },
+
 
 
     async getInsantTaskTable(){
       this.isLoadingData = true
-
       var allInspect = await this.getTagAll()
-
       this.allInspectTypeList = allInspect.map(i => ({
         id: i.id,
         name: i.name,
         mode: i.mode
       }))
-
-
-
-      console.log('this.dateValue !!!!', this.dateValue)
+      console.log('this.dateValue 1', this.dateValue)
       var param = {
         beginTs: this.dateValue[0],
         endTs: this.dateValue[1],
@@ -330,7 +491,6 @@ export default {
       }
       await getImmediateTaskTable(param).then(res=>{
         console.log('res.data.content getImmediateTaskTable :>> ', res.data.content);
-
         res.data.content.forEach( i => {
           this.userInfo.forEach(n => {
             if(i.instantRequest.userId == n.userId){
@@ -338,7 +498,6 @@ export default {
             }
           })
         })
-
         res.data.content.forEach( i => {
           this.allInspectTypeList.forEach(n => {
             if(i.instantRequest.msgContent.inspectTagId == n.id){
@@ -346,17 +505,14 @@ export default {
             }
           })
         })
-
-
-
         this.tableDataList[1].tableData = res.data.content.map(i => ({
+          instantId: i.instantRequest.id,
           scheduleName : i.instantRequest.msgContent.taskName,
           inspectReport: i.instantRequest.msgContent.inspectName,
           executeTs: this.getdate(i.instantRequest.ts),
           sender: i.instantRequest.msgContent.userName,
           sendTs: this.getdate(i.instantRequest.msgContent.remindTime),
           readStatus: `${i.readMsg}/${i.totalMsg}`
-
         }))
         console.log('this.tableDataList[1].tableData =====>>>>>', this.tableDataList[1].tableData)
 
@@ -370,7 +526,7 @@ export default {
 
     async getInsantEventTable(){
       this.isLoadingData = true
-      console.log('this.dateValue !!!!', this.dateValue)
+      console.log('this.dateValue 2', this.dateValue)
       var param = {
         beginTs: this.dateValue[0],
         endTs: this.dateValue[1],
@@ -386,7 +542,6 @@ export default {
       }
       await getImmediateEventTable(param).then(res=>{
         console.log('res.data.content :>> ', res.data.content);
-
         res.data.content.forEach( i => {
           this.userInfo.forEach(n => {
             if(i.instantRequest.userId == n.userId){
@@ -394,10 +549,10 @@ export default {
             }
           })
         })
-
         this.tableDataList[2].tableData = res.data.content.map(i => ({
+          instantId: i.instantRequest.id,
           eventName : i.instantRequest.msgContent.eventTitle,
-          attachments: 'aaa',
+          attachments: i.instantRequest.msgContent.attachments,
           sender: i.instantRequest.userName,
           sendTs: this.getdate(i.instantRequest.ts),
           readStatus: `${i.readMsg}/${i.totalMsg}`
@@ -461,9 +616,93 @@ export default {
           reject(err);
         });
       });
-  },
+    },
+    handdleAttachInfo(val){
+      console.log('val handdleAttachInfo >> ', val);
+      
+      this.showBroadcastAttach = true
+      val.attachments.forEach( i => {
+        if(typeof(i.fileSize) == "number"){
+      
+          i.fileSize = i.fileSize > 1024000 ? `${(i.fileSize/1024000).toFixed(1)} mb` : `${(i.fileSize/1000).toFixed(1)} kb`
+        }
+        
+      })
+      this.attachTableData = [...val.attachments]
+    },
+
+    downloadAttachFile(val){
+      window.location.href = val.row.url
+    },
+
+    async showReadStatus(val){
+      console.log('val :>> ', val);
+      console.log('this.actionType :>> ', this.actionType);
+      this.isLoadingData = true
+
+      // tab 1
+      if(this.actionType == 0){
+        console.log('0 :>> ');
+        var needId = {
+          instantId: val.row.instantId
+        }
+        await getImmediateBroadcastReadStatus(needId).then(res=>{
+          this.readStatusTableData = res.data
+          this.isLoadingData = false
+        }).catch(err => {
+          this.isLoadingData = false;
+          console.log('error' + err);
+        });
+      }
+      else if(this.actionType == 1){
+        console.log('1 :>> ');
+        var needId = {
+          instantId: val.row.instantId
+        }
+        await getImmediateTaskReadStatus(needId).then(res=>{
+          this.readStatusTableData = res.data
+          this.isLoadingData = false
+        }).catch(err => {
+          this.isLoadingData = false;
+          console.log('error' + err);
+        });
+
+      }
+      else if(this.actionType == 2){
+        console.log('2 :>> ');
+        var needId = {
+          instantId: val.row.instantId
+        }
+        await getImmediateEventReadStatus(needId).then(res=>{
+          this.readStatusTableData = res.data
+          this.isLoadingData = false
+        }).catch(err => {
+          this.isLoadingData = false;
+          console.log('error' + err);
+        });
+        
+      }
+
+
+
+
+
+
+      
+      
+      this.showBroadcastReadStatus = true
+      
+    },
+
+
+
+
 
     
+    
+
+
+
   },
 };
 </script>
@@ -521,6 +760,16 @@ export default {
       &:hover
         background-color: #3d4854
         color:#FFF
+
+  .attach_btn_row
+    display: flex
+    flex-direction: row
+    justify-content: flex-end
+    align-items: center
+
+
+
+
 
 
 
@@ -603,7 +852,7 @@ export default {
     flex-direction: row
     justify-content: flex-end
     align-items: center
-    
+  
 
 
 </style>
