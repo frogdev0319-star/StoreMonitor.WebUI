@@ -28,6 +28,37 @@ export const sendImmediateEvent = data => {
 };
 
 
+export const getImmediateBroadcastTable = data => {
+  return request({
+    url: `${version}/instant/notify/broadcast/fetch`,
+    method: 'post',
+    data
+  });
+};
+export const getImmediateBroadcastReadStatus = data => {
+  return request({
+    url: `${version}/instant/notify/broadcast/read/status`,
+    method: 'post',
+    data
+  });
+};
+
+
+export const getImmediateTaskTable = data => {
+  return request({
+    url: `${version}/instant/notify/task/fetch`,
+    method: 'post',
+    data
+  });
+};
+export const getImmediateTaskReadStatus = data => {
+  return request({
+    url: `${version}/instant/notify/task/read/status`,
+    method: 'post',
+    data
+  });
+};
+
 
 export const getImmediateEventTable = data => {
   return request({
@@ -36,10 +67,13 @@ export const getImmediateEventTable = data => {
     data
   });
 };
-export const getImmediateTaskTable = data => {
+export const getImmediateEventReadStatus = data => {
   return request({
-    url: `${version}/instant/notify/task/fetch`,
+    url: `${version}/instant/notify/event/read/status`,
     method: 'post',
     data
   });
 };
+
+
+
