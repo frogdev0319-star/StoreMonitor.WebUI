@@ -8,53 +8,68 @@
             name="0">
             <div class="send_content" v-loading="isLoadingData">
 
-              <div class="title-name"><span style="color: #c60957">* </span> 發送至</div>
+              <div class="submit_btn" >
+                <delay-button 
+                  @click="submitInstantBroadcast"
+                  type="filled" 
+                  >
+                <div class="button-area" style="width: 80px; height: 20px;">
+                    <span>發送事件</span>
+                  </div>
+                </delay-button>
+              </div>
+
+
+              <div class="title-name"> 發送至</div>
               <div class="subtitle_name" style="margin-top: 20px;">群組對象</div>
               <div class="send_content_row">
-                <div class="row_title">門店</div>
-                <el-select 
-                  v-model="aaa"
+                <div class="row_title"><span style="color: #c60957">* </span>門店</div>
+                <el-select
+                  v-model="selectedInstantBroadcastStore"
                   style="width: 50%;"
-                  placeholder="aaa" 
+                  placeholder="請選擇門店" 
                   filterable
+                  multiple
                   >
                   <el-option
-                    v-for="item in XXXD"
+                    v-for="item in storeList"
                     :key="item.storeId"
                     :label="item.name"
-                    :value="item.storeId"  
+                    :value="item.storeId" 
                     />
                 </el-select>
               </div>
               <div class="send_content_row">
                 <div class="row_title">部門</div>
-                <el-select 
-                  v-model="aaa"
+                <el-select
+                  v-model="selectedInstantBroadcastbranch"
                   style="width: 50%;"
-                  placeholder="aaa" 
+                  placeholder="請選擇部門" 
                   filterable
+                  multiple
                   >
                   <el-option
-                    v-for="item in XXXD"
-                    :key="item.storeId"
-                    :label="item.name"
-                    :value="item.storeId"  
+                    v-for="item in departList"
+                    :key="item.defineId"
+                    :label="item.defineName"
+                    :value="item.defineId" 
                     />
                 </el-select>
               </div>
               <div class="send_content_row">
-                <div class="row_title">職務</div>
-                <el-select   
-                  v-model="aaa"
+                <div class="row_title"><span style="color: #c60957">* </span>職務</div>
+                <el-select 
+                  v-model="selectInstantBroadcastTitle"
                   style="width: 50%;"
-                  placeholder="aaa" 
+                  placeholder="請選擇職務" 
                   filterable
+                  multiple
                   >
                   <el-option
-                    v-for="item in XXXD"
-                    :key="item.storeId"
-                    :label="item.name"
-                    :value="item.storeId"  
+                    v-for="item in titleList"
+                    :key="item.defineId"
+                    :label="item.defineName"
+                    :value="item.defineId" 
                     />
                 </el-select>
               </div>
@@ -64,16 +79,17 @@
               <div class="send_content_row">
                 <div class="row_title">人員</div>
                 <el-select
-                  v-model="aaa"
+                  v-model="selectedInstantBroadcastStaff"
                   style="width: 50%;"
-                  placeholder="aaa" 
+                  placeholder="請選擇人員" 
                   filterable
+                  multiple
                   >
                   <el-option
-                    v-for="item in XXXD"
-                    :key="item.storeId"
-                    :label="item.name"
-                    :value="item.storeId"  
+                    v-for="item in userList"
+                    :key="item.userId"
+                    :label="item.userName"
+                    :value="item.userId" 
                     />
                 </el-select>
               </div>
@@ -83,25 +99,27 @@
               <div class="send_content_row">
                 <div class="row_title"><span style="color: #c60957">* </span> 標題</div>
                 <el-input
+                  v-model="broadcastTitle"
                   style="width: 50%;"
                   ref="nodeName"
-                  placeholder="aaa"
-                  @input="(val) => itemInputChanged(val, 20)"
+                  placeholder="請輸入標題"
+                  
                 />
               </div>
               <div class="send_content_row">
                 <div class="row_title"><span style="color: #c60957">* </span> 內容</div>
                 <el-input
+                  v-model="broadcastContent"
                   style="width: 50%;"
                   ref="nodeName"
-                  placeholder="aaa"
+                  placeholder="請輸入內容"
                   type="textarea"
                   resize="none"
-                  @input="(val) => itemInputChanged(val, 20)"
+                  
                 />
               </div>
               <div class="send_content_row">
-                <div class="row_title"><span style="color: #c60957">* </span> 附件</div>
+                <div class="row_title"> 附件</div>
                 <div class="attachments"> 選擇檔案</div>
               </div>
 
@@ -115,7 +133,7 @@
             label="即時排程"
             name="1">
               
-            <div class="send_content" v-loading="isLoadingData">
+            <div class="send_content" v-loading="isLoadingData"  style="padding-bottom: 40px;">
               <div class="submit_btn" >
                 <delay-button 
                   @click="submitInstantTask"
@@ -128,109 +146,110 @@
               </div>
 
               <div class="title-name"> 發送排程</div>
-              <!-- <div class="subtitle_name" style="margin-top: 20px;">群組對象</div> -->
               <div class="send_content_row">
                 <div class="row_title"><span style="color: #c60957">* </span> 排程名稱</div>
                 <el-input
                   v-model="taskName"
+                  placeholder="請輸入排程名稱"
                   style="width: 50%;"
                   />
               </div>
+
+              <!-- 巡檢表 -->
               <div class="send_content_row">
                 <div class="row_title"><span style="color: #c60957">* </span> 巡檢表</div>
                 <el-select
-                  v-model="aaa"
+                  v-model="inspectionMode"
                   style="width: 25%;"
-                  placeholder="aaa" 
+                  placeholder="巡檢表"
                   filterable
                   >
                   <el-option
-                    v-for="item in XXXD"
-                    :key="item.storeId"
-                    :label="item.name"
-                    :value="item.storeId"  
-                    />
+                    v-for="(_item, index) in inspectionStyle"
+                    :key="index"
+                    :label="_item.label"
+                    :value="_item.value"
+                  />
                 </el-select>
+
                 <el-select 
-                  v-model="aaa"
+                  v-model="inspectionName"
                   style="width: 25%;"
-                  placeholder="aaa" 
+                  placeholder="巡檢表名稱"
                   filterable
                   >
                   <el-option
-                    v-for="item in XXXD"
-                    :key="item.storeId"
-                    :label="item.name"
-                    :value="item.storeId"  
-                    />
+                    v-for="(_item, index) in inspectTypeList"
+                    :key="index"
+                    :label="_item.name"
+                    :value="_item.id"
+                  />
                 </el-select>
               </div>
+
+              <!-- 執行日期 -->
               <div class="send_content_row">
                 <div class="row_title"> <span style="color: #c60957">* </span> 執行日期</div>
-                <el-select 
-                  v-model="aaa"
+                <el-date-picker
+                  v-model="remindDate"
                   style="width: 50%;"
-                  placeholder="aaa" 
-                  filterable
-                  >
-                  <el-option
-                    v-for="item in XXXD"
-                    :key="item.storeId"
-                    :label="item.name"
-                    :value="item.storeId"  
-                    />
-                </el-select>
+                  type="date"
+                  value-format="yyyy-MM-dd"
+                  :picker-options="pickerOptions"
+                  :placeholder="$t('schedule.schExeDate') ">
+                </el-date-picker>
               </div>
 
 
               <div class="send_content_row">
                 <div class="row_title"><span style="color: #c60957">* </span> 提醒時間</div>
-                <el-select
-                  v-model="aaa"
+                <el-time-select
+                  v-model="remindTimePoint"
                   style="width: 50%;"
-                  placeholder="aaa" 
-                  filterable
-                  >
-                  <el-option
-                    v-for="item in XXXD"
-                    :key="item.storeId"
-                    :label="item.name"
-                    :value="item.storeId"  
-                    />
-                </el-select>
+                  :picker-options="{
+                    start: '00:00',
+                    step: '01:00',
+                    end: '23:00'
+                  }"
+                  :placeholder="$t('schedule.remiderTime')">
+                </el-time-select>
               </div>
+
 
               <div class="title-name" style="margin-top: 30px;"><span style="color: #c60957">*</span> 發送至</div>
               <div class="send_content_row">
+                <!-- 門店 -->
                 <div class="row_title">門店</div>
                 <el-select
-                  v-model="aaa"
+                  v-model="selectedInstantTaskStore"
                   style="width: 50%;"
-                  placeholder="aaa" 
+                  placeholder="請選擇門店" 
                   filterable
+                  multiple
                   >
                   <el-option
-                    v-for="item in XXXD"
-                    :key="item.storeId"
-                    :label="item.name"
-                    :value="item.storeId"  
-                    />
-                </el-select>
-              </div>
-
-              <div class="send_content_row">
-                <div class="row_title">人員</div>
-                <el-select
-                  v-model="aaa"
-                  style="width: 50%;"
-                  placeholder="aaa" 
-                  filterable
-                  >
-                  <el-option
-                    v-for="item in XXXD"
+                    v-for="item in storeList"
                     :key="item.storeId"
                     :label="item.name"
                     :value="item.storeId" 
+                    />
+                </el-select>
+              </div>
+              <!-- 人員 -->
+              <div class="send_content_row" >
+                <div class="row_title">人員</div>
+                <el-select
+                  v-model="selectedInstantTaskStaff"
+                  style="width: 50%;"
+                  placeholder="請選擇人員" 
+                  filterable
+                  multiple
+                  >
+                  <el-option
+                    v-for="item in userList"
+                    :key="item.userId"
+                    :label="item.userName"
+                    :value="item.userId" 
                     />
                 </el-select>
               </div>
@@ -332,9 +351,6 @@
                     </div>
                   </div>
                 </div>
-
-
-                
               </div>
 
             </div>
@@ -358,12 +374,13 @@
 <script>
 import { getBriefStoreList } from '@/api/store';
 import { getStorageInfo } from '@/api/event';
-import { getUserInfo, getAllUserInfoNoAuth, getDepart} from '@/api/login';
+import { getUserInfo, getDepartAll, getAllUserInfoNoAuth, getDepart} from '@/api/login';
 import {
   sendImmediateBroadcast,
   sendImmediateTask, 
   sendImmediateEvent
 } from '@/api/advanceSetting';
+import { GetInspectTagListAll } from '@/api/inspect';
 
 import { mapGetters } from 'vuex';
 import util from '@/common/util';
@@ -382,7 +399,7 @@ export default {
     return {
       canSendInstantEvent: true,
       isLoadingData: false,
-      activeName: "1",
+      activeName: "0",
       aaa: '',
       XXXD: [ 
         {
@@ -402,9 +419,44 @@ export default {
       
       storeList: [],
       titleList: [],
+      userList: [],
+      departList: [],
 
       taskName: '',
+      inspectionMode: 0,
+      inspectionName:'',
+      inspectionStyle: [
+        {
+          value : 1,
+          label: '現場巡檢'
+        },
+        {
+          value : 0,
+          label: '遠端巡檢'
+        },
+      ],
+      allInspectTypeList: [],
+      inspectTypeList: [],
       
+      remindDate:'',
+      remindTimePoint:'',
+      remindStyle:[],
+      
+      pickerOptions: {
+        disabledDate(time) {
+            return Date.now() >= time.getTime()  ;
+          }
+      },
+      
+      selectedInstantBroadcastStore: [],
+      selectedInstantBroadcastbranch: [],
+      selectInstantBroadcastTitle: [],
+      selectedInstantBroadcastStaff: [],
+      broadcastTitle: '',
+      broadcastContent: '',
+
+      selectedInstantTaskStore: [],
+      selectedInstantTaskStaff: [],
       selectedInstantEventStore: "",
       selectInstantEventTitle : [],
       eventName:'',
@@ -435,12 +487,20 @@ export default {
     // accountChanged(val) {
     //   val !== 0 && this.init();
     // },
+    inspectionMode(val){
+      console.log('inspectionMode val', val)
+      this.inspectTypeList = [...this.allInspectTypeList]
+      this.inspectTypeList = this.inspectTypeList.filter( i => i.mode === val)
+      this.inspectionName = this.inspectTypeList[0].id
+    },
   },
   methods: {
     async init(){
       await this.getStore()
       await this.getTitle()
-
+      await this.getTagAll()
+      await this.getUserInfo()
+      await this.getDepartAll()
     },
 
     onTabClick(){
@@ -488,6 +548,23 @@ export default {
       console.log('this.titleList :>> ',this.titleList);
     },
 
+    async submitInstantEvent(){
+      const statusNameRes = await this.sendInstantEvent();
+      if (statusNameRes.errCode == 0) {
+        this.selectedInstantEventStore = '' 
+        this.selectInstantEventTitle =[]
+        this.eventName= ''
+        this.attachFileList = []
+        this.isLoadingData = false
+        this.uploadProgress = false
+        util.notify('發送成功', 'success', 3000);
+        return false;
+      } else {
+        this.isLoadingData = false
+        util.notify('發送失敗，目前無門店權限！', 'warning', 3000);
+        return false;
+      }
+    },
     async sendInstantEvent(){
       this.isLoadingData = true
       const self = this;
@@ -538,30 +615,103 @@ export default {
           reject(err);
         });
       });
-
     },
+
 
     async submitInstantTask(){
-      console.log('submitInstantTask :>> ');
-
-    },
-    async submitInstantEvent(){
-      const statusNameRes = await this.sendInstantEvent();
+      const statusNameRes = await this.sendInstantTask();
       if (statusNameRes.errCode == 0) {
-        this.selectedInstantEventStore = '' 
-        this.selectInstantEventTitle =[]
-        this.eventName= ''
-        this.attachFileList = []
+        this.selectedInstantTaskStore = [];
+        this.selectedInstantTaskStaff = [];
+        this.taskName = '';
+        this.remindDate = '';
+        this.remindTimePoint = '';
+        this.inspectionName = this.inspectTypeList[0].id
+
         this.isLoadingData = false
-        this.uploadProgress = false
         util.notify('發送成功', 'success', 3000);
-        return false;
+        return ;
       } else {
         this.isLoadingData = false
-        util.notify('發送失敗，目前無門店權限！', 'warning', 3000);
+        util.notify('發送失敗！', 'warning', 3000);
         return false;
       }
+
     },
+    async sendInstantTask(){
+      var t = this.remindDate + " " + this.remindTimePoint + " " + "GMT+00:00"
+      var gmt = new Date(t).getTime()
+      var param = {
+        requestContent: {
+          storeIds: [...this.selectedInstantTaskStore],
+          userIds: [...this.selectedInstantTaskStaff]
+      },
+      msgContent: {
+          taskName: this.taskName,
+          remindTime: gmt,
+          inspectTagId: this.inspectionName,
+      }
+    }
+    console.log('param ~~~~~~~~>>>>>>', param)
+    return new Promise((resolve, reject) => {
+      sendImmediateTask(param).then(res => {
+          resolve(res);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+
+    },
+
+
+    async submitInstantBroadcast(){
+      const statusNameRes = await this.sendInstantBroadcast();
+      if (statusNameRes.errCode == 0) {
+        this.selectedInstantBroadcastStore= []
+        this.selectedInstantBroadcastbranch= []
+        this.selectInstantBroadcastTitle= []
+        this.selectedInstantBroadcastStaff= []
+        this.broadcastTitle= ''
+        this.broadcastContent= ''
+        this.isLoadingData = false
+        util.notify('發送成功', 'success', 3000);
+        return ;
+      } else {
+        this.isLoadingData = false
+        util.notify('發送失敗！', 'warning', 3000);
+        return false;
+      }
+
+    },
+
+    async sendInstantBroadcast(){
+      var param = {
+        requestContent: {
+          titleIds: [...this.selectInstantBroadcastTitle],
+          storeIds: [...this.selectedInstantBroadcastStore],
+          depIds: [...this.selectedInstantBroadcastbranch],
+          userIds: [...this.selectedInstantBroadcastStaff]
+        },
+        msgContent: {
+          broadcastTitle: this.broadcastTitle,
+          broadcastContent: this.broadcastContent,
+          attachments: []
+        }
+    }
+    console.log('param ~~~~~~~~>>>>>>', param)
+    return new Promise((resolve, reject) => {
+      sendImmediateBroadcast(param).then(res => {
+          resolve(res);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+
+    },
+    
+
+
+
 
     doAddAttachment(e){
       const self = this;
@@ -709,7 +859,43 @@ export default {
       self.bucketImage = 'image' + '/' + util.getCurDate2Str();
     },
 
+    // 取得巡檢表
+    getTagAll() {
+      return new Promise((resolve, reject) => {
+        GetInspectTagListAll().then(res => {
+          const data = res.data;
+          resolve(data);
 
+          this.allInspectTypeList = data.map(i => ({
+            id: i.id,
+            name: i.name,
+            mode: i.mode
+          }))
+          console.log(' this.allInspectTypeList =========>>>> ',  this.allInspectTypeList)
+          
+          this.inspectTypeList = this.allInspectTypeList.filter(i => i.mode == 0)
+          this.inspectionName = this.inspectTypeList[0].id
+          
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
+    async getUserInfo(){
+      await getAllUserInfoNoAuth().then(res=>{
+          this.userList= res.data
+        }).catch(err => {
+          console.log('error' + err);
+        });
+    },
+    async getDepartAll(){
+      await getDepartAll({ type: 0 }).then(res=>{
+          this.departList= res.data
+        }).catch(err => {
+          console.log('error' + err);
+        });
+    },
     
   },
 };

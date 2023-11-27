@@ -509,9 +509,9 @@ export default {
           instantId: i.instantRequest.id,
           scheduleName : i.instantRequest.msgContent.taskName,
           inspectReport: i.instantRequest.msgContent.inspectName,
-          executeTs: this.getdate(i.instantRequest.ts),
+          executeTs: this.getdate(i.instantRequest.msgContent.remindTime),
           sender: i.instantRequest.msgContent.userName,
-          sendTs: this.getdate(i.instantRequest.msgContent.remindTime),
+          sendTs: this.getdate(i.instantRequest.ts),
           readStatus: `${i.readMsg}/${i.totalMsg}`
         }))
         console.log('this.tableDataList[1].tableData =====>>>>>', this.tableDataList[1].tableData)
