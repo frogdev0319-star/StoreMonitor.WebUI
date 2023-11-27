@@ -19,6 +19,20 @@ export const advancedUpdate = data => {
 };
 
 
+export const sendImmediateBroadcast = data => {
+  return request({
+    url: `${version}/instant/notify/broadcast/send`,
+    method: 'post',
+    data
+  });
+};
+export const sendImmediateTask = data => {
+  return request({
+    url: `${version}/instant/notify/task/send`,
+    method: 'post',
+    data
+  });
+};
 export const sendImmediateEvent = data => {
   return request({
     url: `${version}/instant/notify/event/send`,
