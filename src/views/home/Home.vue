@@ -537,6 +537,8 @@ export default {
         { curPath: ["/scheduleDetailModify"], activePath: "/scheduleSetting" },
 
         { curPath: ["/waterMark"], activePath: "/waterMark" },
+        { curPath: ["/send"], activePath: "/send" },
+        { curPath: ["/sendingRecord"], activePath: "/sendingRecord" },
 
 
 
@@ -547,9 +549,11 @@ export default {
       if (pathMAP) {
         path = pathMAP.activePath;
         this.setBrandListDisabled(true);
-      } else if(this.showMimicMode){
+      } 
+      else if(this.showMimicMode){
         this.setBrandListDisabled(true);
-      }else {
+      }
+      else {
         this.setBrandListDisabled(false);
       }
       return path;

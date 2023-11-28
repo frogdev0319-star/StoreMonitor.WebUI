@@ -106,8 +106,9 @@
                   style="width: 50%;"
                   ref="nodeName"
                   placeholder="請輸入標題"
-                  
+                  @input="(val) => itemInputChanged_a1(val, 50)"
                 />
+                <span class="notice" v-if="showInputLimit_a1"> 最多可輸入 50 個字元 </span>
               </div>
               <div class="send_content_row">
                 <div class="row_title"><span style="color: #c60957">* </span> 內容</div>
@@ -118,8 +119,9 @@
                   placeholder="請輸入內容"
                   type="textarea"
                   :autosize="{ minRows: 2, maxRows: 10}"
-                  
+                  @input="(val) => itemInputChanged_a2(val, 500)"
                 />
+                <span class="notice" v-if="showInputLimit_a2"> 最多可輸入 500 個字元 </span>
               </div>
               
               <div class="send_content_row" >
@@ -213,7 +215,9 @@
                   v-model="taskName"
                   placeholder="請輸入排程名稱"
                   style="width: 50%;"
+                  @input="(val) => itemInputChanged_b1(val, 20)"
                   />
+                  <span class="notice" v-if="showInputLimit_b1"> 最多可輸入 20 個字元 </span>
               </div>
 
               <!-- 巡檢表 -->
@@ -443,7 +447,7 @@ import {
   sendImmediateEvent
 } from '@/api/advanceSetting';
 import { GetInspectTagListAll } from '@/api/inspect';
-
+import filterString from '@/common/filterString.js';
 import { mapGetters } from 'vuex';
 import util from '@/common/util';
 import DateTimeSelector from '@/components/DateTimeSelector';
@@ -531,6 +535,11 @@ export default {
       totalnumOfPic: 0,
       uploadingnumOfPic: 0,
       oss: null,
+
+      showInputLimit_a1: false,
+      showInputLimit_a2: false,
+      showInputLimit_b1: false,
+      showInputLimit_c1: false,
 
 
     }
@@ -1022,7 +1031,38 @@ export default {
           console.log('error' + err);
         });
     },
+
+    itemInputChanged_a1(val, n){
+      const content = filterString.all(val, n);
+      this.broadcastTitle = content
+      const length = filterString.getContentLength(val);
+      if(length > n) {
+        this.showInputLimit_a1 = true
+      } else {
+        this.showInputLimit_a1 = false
+      }
+    },
     
+    itemInputChanged_a2(val, n){
+      const content = filterString.all(val, n);
+      this.broadcastContent = content
+      const length = filterString.getContentLength(val);
+      if(length > n) {
+        this.showInputLimit_a2 = true
+      } else {
+        this.showInputLimit_a2 = false
+      }
+    },
+    itemInputChanged_b1(val, n){
+      const content = filterString.all(val, n);
+      this.taskName = content
+      const length = filterString.getContentLength(val);
+      if(length > n) {
+        this.showInputLimit_b1 = true
+      } else {
+        this.showInputLimit_b1 = false
+      }
+    },
   },
 };
 </script>
@@ -1294,5 +1334,10 @@ export default {
     img
       width: 40%
       margin-bottom: 5px
+  .notice
+    color: red
+    font-size: 12px
+    margin: 5px 0 0 5px
+    margin-left: 10px
 
 </style>

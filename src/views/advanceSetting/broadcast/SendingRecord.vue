@@ -59,8 +59,10 @@
                   @onCellClick="showReadStatus"
                 />
               </div>
-              <!-- <div class="page-area">
-                <div class="pagination_row"  v-if="totalEvents > 0"> 
+
+              <!-- pagination -->
+              <div class="page-area">
+                <div class="pagination_row"  v-if="totalEvents > 0" > 
                   <div class="pageSizeTitle" style="color: #666">共有 <b style="font-size: 16px"> {{totalEvents}} </b> {{ $t('remotePatrol.numReports') }}</div>
 
                   <tbl-pagination-only
@@ -72,8 +74,8 @@
                     @sizeChange="handlePagination"
                     @currentChange="handlePagination"
                   />
+                </div>
               </div>
-              </div> -->
 
             </el-tab-pane>
         </el-tabs>
@@ -233,7 +235,11 @@ export default {
         },
       ],
         
-      
+      total: 50,
+      currentPage: 1,
+      curSizeNum: 10,
+      sizeNum: 2,
+      totalEvents: 0,
 
       inputSearchValue: '',
       defaultSort:{order:'descending', prop:'updateTs'},
@@ -426,10 +432,10 @@ export default {
       var param = {
         beginTs: this.dateValue[0],
         endTs: this.dateValue[1],
-        keyword: "",
+        keyword: this.inputSearchValue,
         filter: {
-            page: 0,
-            size: 10
+            page: this.currentPage - 1,
+            size: this.curSizeNum
         },
         order: {
             direction: "desc",
@@ -457,6 +463,8 @@ export default {
           
         }))
         console.log('this.tableDataList[0].tableData =====>>>>>', this.tableDataList[0].tableData)
+        this.total = res.data.totalPages
+        this.totalEvents = res.data.totalElements
 
         this.isLoadingData = false
       }).catch(err => {
@@ -479,10 +487,10 @@ export default {
       var param = {
         beginTs: this.dateValue[0],
         endTs: this.dateValue[1],
-        keyword: "",
+        keyword: this.inputSearchValue,
         filter: {
-            page: 0,
-            size: 10
+            page: this.currentPage - 1,
+            size: this.curSizeNum
         },
         order: {
             direction: "desc",
@@ -515,6 +523,8 @@ export default {
           readStatus: `${i.readMsg}/${i.totalMsg}`
         }))
         console.log('this.tableDataList[1].tableData =====>>>>>', this.tableDataList[1].tableData)
+        this.total = res.data.totalPages
+        this.totalEvents = res.data.totalElements
 
         this.isLoadingData = false
       }).catch(err => {
@@ -530,10 +540,10 @@ export default {
       var param = {
         beginTs: this.dateValue[0],
         endTs: this.dateValue[1],
-        keyword: "",
+        keyword: this.inputSearchValue,
         filter: {
-            page: 0,
-            size: 10
+            page: this.currentPage - 1,
+            size: this.curSizeNum
         },
         order: {
             direction: "desc",
@@ -558,6 +568,8 @@ export default {
           readStatus: `${i.readMsg}/${i.totalMsg}`
         }))
         console.log('this.tableDataList[2].tableData =====>>>>>', this.tableDataList[2].tableData)
+        this.total = res.data.totalPages
+        this.totalEvents = res.data.totalElements
 
         this.isLoadingData = false
       }).catch(err => {
@@ -683,6 +695,17 @@ export default {
         
       }
       this.showBroadcastReadStatus = true
+    },
+
+    handlePagination(pageInfo){
+      console.log('pageInfo', pageInfo)
+      this.currentPage = pageInfo.page
+      this.curSizeNum = pageInfo.size;
+      this.getTable(this.actionType)
+      // this.init()
+      // if(this.inputSearchValue.trim()=="") this.getWorkflowList(this.apiBody);
+      // else this.setTableBySearch()
+
     },
 
   },
