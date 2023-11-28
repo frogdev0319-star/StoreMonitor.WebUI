@@ -25,7 +25,7 @@
                     :label="item.label"
                     :value="item.mode"/>
                 </el-select>
-                <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" />
+                <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" ></div>
                   <multi-select
                     class="store-group-select region"
                     :selected="inspectId"
@@ -34,6 +34,7 @@
                     :alltype="0"
                     :options="inspectTableList"
                     @changeInput="changeSelect(arguments)"/>
+                  
               </div>
             </div>
           </template>
@@ -426,8 +427,12 @@ export default {
       curReportType: -1,
       reportTypeList: [
         { 'mode': -1, 'label': this.$t('remotePatrol.all') },
-        { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
-        { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') }
+        // { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
+        // { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') },
+        { 'mode': 0, 'label': '門店監控' },
+        { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') },
+        { 'mode': 2, 'label': this.$t('remotePatrol.remotePatrol') },
+        { 'mode': 3, 'label': '即時事件' }
       ],
       inspectId: [],
       inspectTableList: [],
@@ -1408,6 +1413,7 @@ export default {
     async getInspectList() {
       const self = this;
       const inspectArr = await self.getTagAll();
+      console.log('inspectArr ::::::::>> ', inspectArr);
       const newArr = ['-1'];
       const inspectList = [];
       inspectArr.forEach(_item => {
