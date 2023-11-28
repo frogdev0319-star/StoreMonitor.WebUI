@@ -598,7 +598,8 @@ export default {
         }
       ],
       notUpdateMsg: false,
-      enableMimicMode:false
+      enableMimicMode:false,
+      isSystemAdvanced: false,
     };
   },
 
@@ -698,6 +699,8 @@ export default {
     self.initPlayerHeight = 420;
     window.addEventListener('resize', self.resizeFun, false);
     window.addEventListener('visibilitychange', self.visibleChange, false);
+
+    self.getUserInfo()
   },
 
   beforeDestroy() {
@@ -736,6 +739,11 @@ export default {
   },
 
   methods: {
+    async getUserInfo(){
+      const result = await this.$store.dispatch("GetUserAuthorities");
+      this.isSystemAdvanced = result.data.isSystemAdvanced
+    },
+
     deleteItemResource (index) {
       const self = this
       this.sourceList = this.sourceList.filter((source, idx) => idx !== index)
@@ -1546,11 +1554,21 @@ export default {
       }
       self.imageCanvasList = [];
       self.sourceList = [];
-      self.inspectInput = '';
-      if (self.isRemote && self.sourceListLength >= 120) {
-        util.notify(self.$t('remotePatrol.maximumTotalAttach'), 'warning', 3000);
+      self.inspectInput = ''; 
+
+      console.log('this.sourceListLength :>> ', this.sourceListLength);
+      var imgNum = this.sourceListLength
+
+      if (self.isRemote && self.sourceListLength >= (this.isSystemAdvanced ? 500 : 120)) {
+        if(this.isSystemAdvanced){
+          util.notify(self.$t('remotePatrol.maximumTotalAttach_500'), 'warning', 3000);
+        } else {
+          util.notify(self.$t('remotePatrol.maximumTotalAttach_120'), 'warning', 3000);
+        }
+        
         return false;
       }
+
       if (self.showFeedBack) {
         self.showSnapshotFeedbackDialog = true;
 

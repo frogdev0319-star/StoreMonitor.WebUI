@@ -242,6 +242,7 @@
                   @click.native="changeMimicMode">{{showMimicMode? $t('route.generalMode'):$t('route.mimicMode') }}
                 </el-dropdown-item>
                 <el-dropdown-item
+                  v-if="!showAdvanceMode"
                   :disabeled="true"
                   class="dropdown-item"
                   style="width: auto;min-width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
@@ -249,6 +250,7 @@
                 >{{ $t('route.changePWD') }}
                 </el-dropdown-item>
                 <el-dropdown-item
+                  v-if="!showAdvanceMode"
                   class="dropdown-item"
                   style=" width: auto;min-width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw); font-size:calc(14/1920*100vw);"
                   @click.native="fedlogout">{{ $t('route.logOut') }}</el-dropdown-item>
