@@ -129,10 +129,11 @@
 
           <!--  sendingRecord attachment -->
           <template v-else-if="_item.forAttachement" >
-            <div class="forAttachement" @click="showAttach(row)">
+            <div class="forAttachement" @click="showAttach(row)" v-if="row.attachments.length > 0">
                 <img src=".../../../static/img/RiAttachment.svg"  alt="" >
             </div>
           </template>
+
           <template v-else-if="_item.readStatus" >
             <div  class='not_Read' :class="{ is_read : row.isRead  }">
               {{ row.isRead ? '已讀' : '未讀'}}

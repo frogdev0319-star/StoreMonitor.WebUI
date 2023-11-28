@@ -44,6 +44,7 @@
                 <table-only
                   ref="elTP"
                   class="sendingrecord_table"
+                  :class="{ broadcast_table : actionType == 0}"
                   :column-data="item.columnData"
                   :table-data="item.tableData"
                   :highlight-current-row= "false"
@@ -86,14 +87,13 @@
       :visible="showBroadcastAttach"
       :isWarning="true"
       :showButton=" false"
-      
     >
       <div class="dialog-slot">
         <div class="dialog-content">
           <div class="" style="width: 460px; margin-bottom: 30px;">
             <table-only
               ref="elTP"
-              class="sendingrecord_table"
+              class="attach_list_table"
               :column-data="attachDataList"
               :table-data="attachTableData"
               :highlight-current-row= "false"
@@ -682,26 +682,8 @@ export default {
         });
         
       }
-
-
-
-
-
-
-      
-      
       this.showBroadcastReadStatus = true
-      
     },
-
-
-
-
-
-    
-    
-
-
 
   },
 };
@@ -711,29 +693,57 @@ export default {
   .sendingrecord_table
     .table .el-table
       padding: 10px 0
+      
     .el-table--mini
       background: #FFF !important
       box-shadow: none !important
     td, th
       padding-left: 0 !important
       .cell
+        padding: 5px 0px !important
         padding-left: 12px !important
-      
-    // td, th
-    //   &:nth-child(1)
-    //     width: 12% !important
-    //     padding-left: 12px !important
-    //     .cell
-    //       padding-left: 12px !important
-    //   &:nth-child(3)
-    //     width: 15% !important
-    //     padding-left: 12px !important
-    //     .cell
-    //       padding-left: 12px !important
+        span
+          line-height: 20px !important
+      &:nth-child(1)
+        width: 20% !important
+        .cell
+          padding-left: 12px !important
+  
+
+  .broadcast_table
+    td, th
+      &:nth-child(2)
+        width: 30% !important
+        padding-left: 12px !important
+        .cell
+          padding-left: 12px !important
+      &:nth-child(3)
+        width: 10% !important
+        padding-left: 12px !important
+        .cell
+          padding-left: 12px !important
 
     .el-table .cell
       text-align: left !important
+      
 
+
+  .attach_list_table
+    .el-table__header-wrapper
+      .el-table__header
+        width: auto !important
+    .el-table__body-wrapper
+      .el-table__body
+        width: auto !important
+    .el-table--mini
+      background: #FFF !important
+      box-shadow: none !important
+    td, th
+      &:nth-child(1)
+        padding-left: 0 !important
+        width: 70% !important
+        .el-table .cell
+          padding-left: 0 !important      
 
 
   .el-table-content
@@ -767,81 +777,13 @@ export default {
     justify-content: flex-end
     align-items: center
 
-
-
-
-
-
-
-
-
-
-    
-  .alert-popup
-    .el-dialog__header
-      color: #c60957
-  .button-area
-    height: 23px
-    padding: 0 5px
-
   .tablelist_workflows
     .el-table__header
       width: auto !important
-
     .el-table__body
       width: auto !important
-    
-
-  .workflow-header
-    width: 100%
-    // height: 150px
-    // background: #dedede
-    margin-bottom: 20px
-    display: flex
-    flex-direction: row
-    justify-content: space-between
-    align-items: flex-start
-  .el-table
-    border: none !important
-    
-  // .el-button--primary
-  //   color: #fff
-  //   background-color: #190
-  //   border-color: #190
-
-
-
-    .forDescription
-      position: relative
-      &:hover
-        .showDescription
-          display: block
-      .shortdescription
-        overflow: hidden
-        text-overflow: ellipsis
-        white-space: nowrap
-        width: 200px
-      .showDescription
-        position: fixed
-        width: 500px
-        height: fit-content
-        font-size: 13px
-        line-height: 1.5
-        padding: 10px
-        background: rgba(0,0,0,.75)
-        color: #fff
-        border-radius: 3px
-        z-index: 1000
-        display: none
-
-  .forWorkflowsSwitch
-    display: flex
-    flex-direction: row
-    justify-content: center
-    align-items: center
-    
-  .width-fit
-    width: max-content !important
+    .table .el-table 
+      border: none !important
   
   .pagination_row
     //position: absolute;

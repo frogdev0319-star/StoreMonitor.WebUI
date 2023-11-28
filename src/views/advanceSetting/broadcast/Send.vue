@@ -3,15 +3,18 @@
       <div class="el-table-content" @tab-click="onTabClick">
         <el-tabs  v-model="activeName" >
           <!-- 公告訊息 -->
-          <el-tab-pane
-            label="公告訊息"
-            name="0">
+          <el-tab-pane label="公告訊息" name="0">
             <div class="send_content" v-loading="isLoadingData">
 
               <div class="submit_btn" >
                 <delay-button 
                   @click="submitInstantBroadcast"
                   type="filled" 
+                  :disabled="
+                    broadcastTitle == '' 
+                    ||  broadcastContent == '' 
+                    || selectedInstantBroadcastStore.length == 0 
+                    || selectInstantBroadcastTitle.length == 0 " 
                   >
                 <div class="button-area" style="width: 80px; height: 20px;">
                     <span>發送事件</span>
@@ -110,34 +113,92 @@
                 <div class="row_title"><span style="color: #c60957">* </span> 內容</div>
                 <el-input
                   v-model="broadcastContent"
-                  style="width: 50%;"
+                  style="width: 50%; "
                   ref="nodeName"
                   placeholder="請輸入內容"
                   type="textarea"
-                  resize="none"
+                  :autosize="{ minRows: 2, maxRows: 10}"
                   
                 />
               </div>
-              <div class="send_content_row">
+              
+              <div class="send_content_row" >
                 <div class="row_title"> 附件</div>
-                <div class="attachments"> 選擇檔案</div>
+                <!-- <div class="attachments"> 選擇檔案</div> -->
+                <div class="attach-area" style="width: 100%;">
+                  <div v-for="(imgItem,index) in attachFileList" :key="'img'+index" class="source-details" >
+                    <!--video-->
+                    <div v-if="imgItem.type===1" class="img-content">
+                      <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
+                      <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon" @click="playAttachVideo(imgItem,index)">
+                      <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
+                    </div>
+                    <div v-else-if="imgItem.type===2" class="img-content">
+                      <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
+                      <el-image
+                        :src="imgItem.src"
+                        class="imgLittle"
+                        :preview-src-list="getAuditImgList(index)"/>
+                    </div>
+                    <!-- .pdf -->
+                    <div v-else-if="imgItem.type===4" class="img-content">
+                      <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
+                      <div class="attach_file">
+                        <img src="../../../../static/img/MdiFilePdfOutline.svg" alt="">
+                        pdf
+                      </div>
+                    </div>
+                    <!-- .xslx -->
+                    <div v-else-if="imgItem.type===5" class="img-content">
+                      <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
+                      <div class="attach_file">
+                        <img src="../../../../static/img/IconParkSolidExcel.svg" alt="">
+                        xlsx
+                      </div>
+                    </div>
+                    <!-- .docx -->
+                    <div v-else-if="imgItem.type===6" class="img-content">
+                      <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
+                      <div class="attach_file">
+                        <img src="../../../../static/img/MaterialSymbolsDocsOutline.svg" alt="">
+                        doc
+                      </div>
+                    </div>
+                  </div>
+                  <div v-if="attFileCount<3" class="attach-add" @click="$refs.attachFiles.click()">
+                    <input 
+                      type="file" 
+                      style="display: none" 
+                      accept="image/png,image/jpeg,video/mp4, .pdf, .xlsx, .docx" 
+                      max-size="2" 
+                      @change="doAddAttachment" 
+                      ref="attachFiles" />
+                    <div style="height:16px; display: flex; flex-direction: row; align-items: center;">
+                      <img :src="addAttIcon" widht="16px" height="16px" style="border-radius:10px;"/>
+                      <div class="att-txt">選擇檔案</div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
 
             </div>
           </el-tab-pane>
 
-
           <!-- 即時排程 -->
-          <el-tab-pane
-            label="即時排程"
-            name="1">
-              
+          <el-tab-pane label="即時排程" name="1">
             <div class="send_content" v-loading="isLoadingData"  style="padding-bottom: 40px;">
               <div class="submit_btn" >
                 <delay-button 
                   @click="submitInstantTask"
                   type="filled" 
+                  :disabled="
+                    taskName == '' 
+                    || inspectionName == ''
+                    || remindDate == ''
+                    || remindTimePoint == ''
+                    || selectedInstantTaskStore.length == 0 
+                    || selectedInstantTaskStaff.length == 0 " 
                   >
                 <div class="button-area" style="width: 80px; height: 20px;">
                     <span>發送事件</span>
@@ -256,18 +317,19 @@
             </div>
           </el-tab-pane>
 
-
           <!-- 即時事件 -->
-          <el-tab-pane
-            label="即時事件"
-            name="2">
+          <el-tab-pane label="即時事件" name="2">
             <div class="send_content" v-loading="isLoadingData">
               <!-- 發送事件 -->
               <div class="submit_btn" >
                 <delay-button 
                   @click="submitInstantEvent"
                   type="filled" 
-                  :disabled="selectedInstantEventStore == '' || selectInstantEventTitle.length == 0 || eventName == '' " >
+                  :disabled="
+                    selectedInstantEventStore == '' 
+                    || selectInstantEventTitle.length == 0 
+                    || eventName == '' " 
+                >
                 <div class="button-area" style="width: 80px; height: 20px;">
                     <span>發送事件</span>
                   </div>
@@ -597,6 +659,7 @@ export default {
         });
       }
       console.log('attachment_des ----->> ', attachment_des)
+
       var param = {
         requestContent: {
           titleIds: [this.selectInstantEventTitle],
@@ -673,6 +736,8 @@ export default {
         this.selectedInstantBroadcastStaff= []
         this.broadcastTitle= ''
         this.broadcastContent= ''
+        this.attachFileList = []
+        this.uploadProgress = false
         this.isLoadingData = false
         util.notify('發送成功', 'success', 3000);
         return ;
@@ -685,6 +750,38 @@ export default {
     },
 
     async sendInstantBroadcast(){
+      this.isLoadingData = true
+      const self = this;
+      const attachment_des = [];
+      //上傳附件
+      self.uploadingnumOfPic = 0;
+      self.totalnumOfPic = self.attachFileList.length;
+      self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
+      const storageParams = {};
+      storageParams.storeId = this.selectedInstantEventStore;
+      await getStorageInfo(storageParams).then(res => {
+        if (res.errCode === 0) {
+          self.oss = res.data;
+        }
+      });
+      for(let idx=0; idx<self.attachFileList.length;idx++){
+        await self.upLoadFile(self.attachFileList[idx]).then((url) => {
+          self.uploadingnumOfPic++;
+          const auditImgObj = {
+            fileName: self.attachFileList[idx].fileName,
+            fileSize: self.attachFileList[idx].size,
+            mediaType: self.attachFileList[idx].type,
+            url: url,
+            ts: Date.now(),
+          };
+          attachment_des.push(auditImgObj);
+        }).catch((err) => {
+          console.log("uploade file error:",err)
+          upload++;
+        });
+      }
+      console.log('attachment_des ----->> ', attachment_des)
+
       var param = {
         requestContent: {
           titleIds: [...this.selectInstantBroadcastTitle],
@@ -695,7 +792,7 @@ export default {
         msgContent: {
           broadcastTitle: this.broadcastTitle,
           broadcastContent: this.broadcastContent,
-          attachments: []
+          attachments: [...attachment_des]
         }
     }
     console.log('param ~~~~~~~~>>>>>>', param)
@@ -706,18 +803,14 @@ export default {
           reject(err);
         });
       });
-
     },
     
-
-
-
 
     doAddAttachment(e){
       const self = this;
       const maxSize = 4*1024*1024; //不能超過4MB
       var files = e.target.files || e.dataTransfer.files;
-      console.log("choose file:",files);
+      console.log("choose file::::::::",files);
       var fileName = files[0].name;
       if (!files.length)
         return;
@@ -737,24 +830,54 @@ export default {
           src:'',
           url:'',
           file:'',
-          type:2,
+          type: 2,
           size: files[0].size,
         };
         self.createFile(files[0],objImg);
         self.attachFileList.push(objImg);
-
-      }else if(files[0].type.includes("video")){
+      }
+      else if(files[0].type.includes("video")){
         console.log("choose file:",fileName);
         var objvideo={
           fileName:`${self.bucketVideo}/inspect_${util.getCurTimeStr()}_${files[0].name}`,
           src:'',
-          url:URL.createObjectURL(files[0]),
-          type:1,
+          url: URL.createObjectURL(files[0]),
+          type: 1,
           size:files[0].size,
           
         }
         self.createFile(files[0],objvideo);
         self.attachFileList.push(objvideo);
+      }
+      else if(files[0].type.includes("pdf")){
+        var objpdf= {
+          fileName:`${self.bucketPdf}/inspect_${util.getCurTimeStr()}_${files[0].name}`,
+          url: URL.createObjectURL(files[0]),
+          type: 4,
+          size:files[0].size,
+        }
+        self.createFile(files[0],objpdf);
+        self.attachFileList.push(objpdf);
+      }
+      else if(files[0].type.includes("sheet")){
+        var objxlsx= {
+          fileName:`${self.bucketXslx}/inspect_${util.getCurTimeStr()}_${files[0].name}`,
+          url: URL.createObjectURL(files[0]),
+          type: 5,
+          size: files[0].size,
+        }
+        self.createFile(files[0],objxlsx);
+        self.attachFileList.push(objxlsx);
+      }
+      else if(files[0].type.includes("document")){
+        var objdocument= {
+          fileName:`${self.bucketDocx}/inspect_${util.getCurTimeStr()}_${files[0].name}`,
+          url: URL.createObjectURL(files[0]),
+          type: 6,
+          size: files[0].size,
+        }
+        self.createFile(files[0],objdocument);
+        self.attachFileList.push(objdocument);
       }
 
       console.log('self.attachFileList :>> ', self.attachFileList);
@@ -857,6 +980,9 @@ export default {
       const self = this;
       self.bucketVideo = 'video' + '/' + util.getCurDate2Str();
       self.bucketImage = 'image' + '/' + util.getCurDate2Str();
+      self.bucketPdf = 'pdf' + '/' + util.getCurDate2Str();
+      self.bucketXslx = 'xslx' + '/' + util.getCurDate2Str();
+      self.bucketDocx = 'docx' + '/' + util.getCurDate2Str();
     },
 
     // 取得巡檢表
@@ -904,7 +1030,7 @@ export default {
 <style lang="sass" scoped>
 
   .submit_btn
-    margin-bottom: 20px
+    margin-bottom: 0px
     display: flex
     flex-direction: row
     justify-content: flex-end
@@ -1154,6 +1280,19 @@ export default {
     justify-content: flex-end
     align-items: center
     
-
+  .attach_file
+    width: 100px
+    height: 120px
+    background: #f4f4f4
+    border-radius: 5px
+    display: flex
+    flex-direction: column
+    justify-content: center
+    align-items: center
+    color: #999
+    
+    img
+      width: 40%
+      margin-bottom: 5px
 
 </style>
