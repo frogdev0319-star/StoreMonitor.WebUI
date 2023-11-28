@@ -51,6 +51,7 @@
       </div>
       <div class="audit-content">
         <span class="sug-label" >{{ $t('audit.inceptionRpt.addAttach') }}</span>
+        <span class="sug-label" ></span>
         <div v-if="pdfFileList.length>0" class="attach-area" style="margin-bottom:10px;">
           <div v-for="(pdfItem,index) in pdfFileList" :key="'pdf'+index" class="source-details" >
             <div class="img-content">
@@ -71,14 +72,16 @@
                 :preview-src-list="getAuditImgList(index)"/>
             </div>
           </div>
-          <div v-if="auditFileCount < 120" class="attach-add" @click="$refs.auditfile.click()">
+          
+          <div v-if="auditFileCount < 10" class="attach-add" @click="$refs.auditfile.click()">
             <input type="file" style="display: none" accept="image/png,image/jpeg,application/pdf" max-size="2" @change="doAddAttachment" ref="auditfile" />
             <div style="height:16px;display: flex;flex-direction: row;align-items: center;">
               <img src="../../../static/img/icon_attachment.svg" widht="16px" height="16px" style="border-radius:10px;"/>
-              <div class="att-txt">{{ $t('audit.inceptionRpt.attachment') }}</div>
+              <div class="att-txt">{{ $t('audit.inceptionRpt.attachment') }} </div>
             </div>
           </div>
         </div>
+      
         <div style="margin-top:10px;">
           <span class="sug-label margin-bottom-md" >{{ $t('audit.inceptionRpt.auditNote') }}</span>
           <el-input
@@ -606,7 +609,9 @@ export default {
       showMaxInfo: false,
 
       totalScoreSum: 0,
-      hundredMarkType: 0
+      hundredMarkType: 0,
+
+      isSystemAdvanced: false
     };
   },
   computed: {
@@ -656,6 +661,7 @@ export default {
   },
   async mounted() {
     const self = this;
+    await self.getUserInfo();
     await self.getInspectStatus();
     await self.getRouteData();
 
@@ -663,8 +669,17 @@ export default {
 
     await self.getUpLoadBucketInfo();
     await self.getOssInfo();
+
+    
   },
   methods: {
+
+    async getUserInfo(){
+      const result = await this.$store.dispatch("GetUserAuthorities");
+      this.isSystemAdvanced = result.data.isSystemAdvanced
+      console.log('this.isSystemAdvanced  :>> ', this.isSystemAdvanced );
+    },
+
 
     // 加總
     getTotalSum(Array){
@@ -2232,10 +2247,12 @@ export default {
       var fileName = files[0].name;
       if (!files.length)
         return;
-      if(self.auditFileCount == 120){
-        util.notify(self.$t('remotePatrol.maximumTotalAttach'), 'warning', 3000);
-        return;
-      }
+
+      // if(self.auditFileCount == 120){
+      //   util.notify(self.$t('remotePatrol.maximumTotalAttach'), 'warning', 3000);
+      //   return;
+      // }
+
       if(files[0].type.includes("pdf") && files[0].size > maxSize){
         util.notify(self.$t('audit.inceptionRpt.maxFileSizeAlert'), 'warning', 3000);
         return;
@@ -2635,7 +2652,7 @@ export default {
 
         }
         .sug-label{
-          font-size: calc(12/1920*100vw);
+          font-size: calc(14/1920*100vw);
           display: block;
           margin-bottom: 16px;
         }
@@ -2657,7 +2674,7 @@ export default {
       /*簽核*/
       .audit-content{
         .sug-label{
-          font-size: calc(12/1920*100vw);
+          font-size: calc(14/1920*100vw);
           display: block;
           margin-bottom: 16px;
         }

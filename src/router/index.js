@@ -658,7 +658,8 @@ export const navbarRoute = {
         hidden: true,
         component: resolve => require(['@/views/setting/routeInspection/SetRuleInspect'], resolve),
         meta: {
-          keepAlive: true, 
+          keepAlive: false, 
+
         },
       },
       {

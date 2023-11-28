@@ -428,11 +428,17 @@ export default {
       startTs: 0,
       ifContinuePlay: false,
       clipStartTime: 0,
-      paused: true
+      paused: true,
+      isSystemAdvanced: false,
     };
   },
 
   methods: {
+    async getUserInfo(){
+      const result = await this.$store.dispatch("GetUserAuthorities");
+      this.isSystemAdvanced = result.data.isSystemAdvanced
+    },
+
     deleteItemResource (index) {
       const self = this
       this.sourceList = this.sourceList.filter((source, idx) => idx !== index)
@@ -627,7 +633,7 @@ export default {
         self.exitFullscreen();
         self.fullScreen = false;
       }
-      if (self.isRemote && self.sourceListLength >= 120) {
+      if (self.isRemote && self.sourceListLength >= (this.isSystemAdvanced ? 500 : 120)) {
         util.notify(self.$t('remotePatrol.maximumTotalAttach'), 'warning', 3000);
         return false;
       }
@@ -1539,6 +1545,7 @@ export default {
   },
 
   mounted() {
+    this.getUserInfo()
     this.beseyeVideo = document.getElementById('beseyeVideo');
     this.video1 = document.getElementById('video1');
     this.video2 = document.getElementById('video2');
