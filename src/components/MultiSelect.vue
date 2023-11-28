@@ -17,7 +17,7 @@
         :key="item.storeId" 
         :label="item.label"
         :value="alltype === 0 ? item.value:item.storeId" 
-        :disabled="item.disabled"/>
+        :disabled="item.disabled  "/>
     </el-select>
     <el-input
       v-model="input"
@@ -51,7 +51,8 @@ export default {
     promptMsg: {
       type: String,
       default: ''
-    }
+    },
+   
   },
 
   data() {
