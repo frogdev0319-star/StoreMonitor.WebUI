@@ -96,7 +96,7 @@
               :header-row-style="{width:'1920px'}"
               :header-cell-style="{fontSize:'calc(12/1920*100vw)',color:'#7d8cad',height: '47px'}"
               :cell-style="cellStyle"
-              empty-text="没有事件数据"
+              empty-text="没有事件數據"
               align="left"
               style="width:auto"
               class="table-content tbl-checkbox"
@@ -427,18 +427,22 @@ export default {
       curReportType: -1,
       reportTypeList: [
         { 'mode': -1, 'label': this.$t('remotePatrol.all') },
-        // { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
-        // { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') },
-        { 'mode': 0, 'label': '門店監控' },
+        { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
         { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') },
-        { 'mode': 2, 'label': this.$t('remotePatrol.remotePatrol') },
+
+        { 'mode': 2, 'label': '門店監控' },
         { 'mode': 3, 'label': '即時事件' }
+
+        // { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') },
+        // { 'mode': 2, 'label': this.$t('remotePatrol.remotePatrol') },
+        // { 'mode': 3, 'label': '即時事件' }
       ],
       inspectId: [],
       inspectTableList: [],
       inspectCatch:[],
       storeList:[],
-      selectStoreList:[]
+      selectStoreList:[],
+      sourceType: 0
     };
   },
 
@@ -735,7 +739,14 @@ export default {
 
       // self.params.searchMysteryMode = 0
 
+      if(this.curReportType == -1){ self.params.sourceType = null}
+      else if(this.curReportType == 0){self.params.sourceType = 2}
+      else if(this.curReportType == 1){self.params.sourceType = 1}
+      else if(this.curReportType == 2){self.params.sourceType = 0}
+      else if(this.curReportType == 3){self.params.sourceType = 3}
+      
       console.log("@@@self.params:",self.params);
+
       eventRESTful.getEventList(self.params).then((res) => {
         const data = res.data.content;
         //console.log("data:",data);
@@ -1427,7 +1438,8 @@ export default {
               }
             );
           }
-        } else if (self.curReportType === 0) {
+        }
+        else if (self.curReportType === 0) {
           if (!newArr.includes(_item.id) && _item.mode === 0) {
             newArr.push(_item.id);
             inspectList.push(
@@ -1437,7 +1449,8 @@ export default {
               }
             );
           }
-        } else if (self.curReportType === 1) {
+        }
+        else if (self.curReportType === 1) {
           if (!newArr.includes(_item.id) && _item.mode === 1) {
             newArr.push(_item.id);
             inspectList.push(
@@ -1448,15 +1461,25 @@ export default {
             );
           }
         }
+        else if (self.curReportType === 2 || self.curReportType === 3) {
+          console.log('curReportType === 2 || 3')
+        
+          
+        }
+        
       });
+
       self.inspectTableList = inspectList;
-      //self.inspectTableList.length > 0 && self.inspectTableList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
+
       if (inspectList.length !== 0) {
-        console.log(">>>>self.ifGetParamsFromCash:",self.ifGetParamsFromCash);
+        console.log(">>>>self.ifGetParamsFromCash:", self.ifGetParamsFromCash);
         self.inspectId = (self.ifGetParamsFromCash && self.inspectCatch!='-1') ? self.inspectCatch : newArr;
+
+        console.log('self.inspectId 1', self.inspectId)
         self.ifGetParamsFromCash = false;
       } else {
         self.inspectId = newArr;
+        console.log('self.inspectId 2', self.inspectId)
       }
   },
 

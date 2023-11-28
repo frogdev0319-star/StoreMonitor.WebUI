@@ -287,17 +287,6 @@ export default {
       currentPage: 1,
       curSizeNum: 10,
       sizeNum: 50,
-
-
-
-
-
-
-
-
-
-
-
       storeList: [],
       searchInput: '',
       sizeNum: 10,
@@ -306,8 +295,11 @@ export default {
       reportTypeList: [
         { 'mode': -1, 'label': this.$t('remotePatrol.all') },
         { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
-        { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') }
+        { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') },
+        { 'mode': 2, 'label': '門店監控' },
+        { 'mode': 3, 'label': '即時事件' }
       ],
+
       curAppraise: -1,
       appraiseList: [
         { 'status': -1, 'label': this.$t('remotePatrol.all') },
@@ -514,6 +506,13 @@ export default {
       delete self.params.storeTypeString
       delete self.params.curSelectedStore
 
+
+      if(this.curReportType == -1){ self.params.sourceType = null}
+      else if(this.curReportType == 0){self.params.sourceType = 2}
+      else if(this.curReportType == 1){self.params.sourceType = 1}
+      else if(this.curReportType == 2){self.params.sourceType = 0}
+      else if(this.curReportType == 3){self.params.sourceType = 3}
+      
       if (self.params.clause.storeId.length === 0) {
         console.log("No Data")
         this.setNoData();
@@ -915,6 +914,9 @@ export default {
             newArr.push(_item.id);
             inspectList.push(_item);
           }
+        }
+        else if (self.curReportType === 2 || self.curReportType === 3) {
+          console.log('curReportType === 2 || 3')
         }
       });
       self.inspectTableList = inspectList;
