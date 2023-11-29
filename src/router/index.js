@@ -414,7 +414,6 @@ export const navbarRoute = {
         hidden: false,
         meta: {
           requireAuth: true,
-          keepAlive: true
         }
       }
     ) && primaryPathesList.push('/patrolEvaluation');
@@ -426,7 +425,6 @@ export const navbarRoute = {
         hidden: false,
         meta: {
           requireAuth: true,
-          keepAlive: true
         }
       },
       {
@@ -434,9 +432,7 @@ export const navbarRoute = {
         name: 'patrolItemsStat',
         component: resolve => require(['@/views/statistical/InspectItemStatistics_old'], resolve),
         hidden: true,
-        meta: {
-          keepAlive: true
-        },
+    
       }
     ) && primaryPathesList.push('/patrolItem','/patrolItem_old');
     !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableSupervisionEffStatistics() && statisticsRoute.children.push(
@@ -447,7 +443,6 @@ export const navbarRoute = {
         hidden: false,
         meta: {
           requireAuth: true,
-          keepAlive: false
         }
       }
     ) && primaryPathesList.push('/patrolPersonStat');
@@ -459,7 +454,6 @@ export const navbarRoute = {
         hidden: false,
         meta: {
           requireAuth: true,
-          keepAlive: true
         }
       }
     ) && primaryPathesList.push('/eventStat');
@@ -471,7 +465,6 @@ export const navbarRoute = {
         hidden: false,
         meta: {
           requireAuth: true,
-          keepAlive: true
         }
       }
     ) && primaryPathesList.push('/patrolCompareStat');
@@ -610,7 +603,7 @@ export const navbarRoute = {
       hidden: false,
       threeChild: true,
       meta: {
-        keepAlive: true,
+        keepAlive: false,
         requireAuth: true
       },
       children: []
@@ -625,11 +618,10 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/generalSetting/GeneralSetting'], resolve),
         hidden: false,
         meta: {
-          keepAlive: true, 
+          keepAlive: false, 
           requireAuth: true
         }
       },
-
     ) && primaryPathesList.push('/generalSetting');
 
     
@@ -638,9 +630,6 @@ export const navbarRoute = {
         path: '/routeinspection',
         name: 'inspectListSetting',
         component: resolve => require(['@/views/setting/routeInspection/RouteInspection'], resolve),
-        meta: {
-          keepAlive: true, 
-        },
         hidden: false
       },
       {
@@ -648,27 +637,18 @@ export const navbarRoute = {
         name: 'itemSetting',
         hidden: true,
         component: resolve => require(['@/views/setting/routeInspection/AddRuteInspect'], resolve),
-        meta: {
-          keepAlive: true, 
-        },
       },
       {
         path: '/setroute',
         name: 'setRule',
         hidden: true,
         component: resolve => require(['@/views/setting/routeInspection/SetRuleInspect'], resolve),
-        meta: {
-          keepAlive: false, 
-        },
       },
       {
         path: '/bindroute',
         name: 'bindStore',
         hidden: true,
         component: resolve => require(['@/views/setting/routeInspection/BindRuteInspect'], resolve),
-        meta: {
-          keepAlive: true, 
-        },
       }
 
     ) && primaryPathesList.push('/routeinspection', '/addroute', '/setroute', '/bindroute');
@@ -709,7 +689,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/title/TitleManage'], resolve),
         hidden: false,
         meta: {
-          keepAlive: true, 
+          keepAlive: false, 
           requireAuth: true
         }
       },
@@ -777,7 +757,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/mysterio/MysterioManage'], resolve),
         hidden: false,
         meta: {
-          keepAlive: true,
+          keepAlive: false,
           requireAuth: true
         }
       },
@@ -795,7 +775,7 @@ export const navbarRoute = {
   //進階設定
   getAdvanceSetting(){
     const advanceSettingRoute = {
-      id:7,
+      id: 7,
       path: '/home',
       name: 'Safety',
       component: Home,
