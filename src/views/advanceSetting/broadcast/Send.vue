@@ -167,7 +167,7 @@
                       </div>
                     </div>
                   </div>
-                  <div v-if="attFileCount<3" class="attach-add" @click="$refs.attachFiles.click()">
+                  <div v-if="attachFileList.length < 3" class="attach-add" @click="$refs.attachFiles.click()">
                     <input 
                       type="file" 
                       style="display: none" 
@@ -403,7 +403,7 @@
                         :preview-src-list="getAuditImgList(index)"/>
                     </div>
                   </div>
-                  <div v-if="attFileCount<10" class="attach-add" @click="$refs.auditfile.click()">
+                  <div v-if="attFileCount < 10" class="attach-add" @click="$refs.auditfile.click()">
                     <input 
                       type="file" 
                       style="display: none" 
