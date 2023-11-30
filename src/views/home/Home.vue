@@ -537,6 +537,7 @@ export default {
         { curPath: ["/scheduleDetailModify"], activePath: "/scheduleSetting" },
 
         { curPath: ["/waterMark"], activePath: "/waterMark" },
+        { curPath: ["/dataSecurity"], activePath: "/dataSecurity" },
         { curPath: ["/send"], activePath: "/send" },
         { curPath: ["/sendingRecord"], activePath: "/sendingRecord" },
 
