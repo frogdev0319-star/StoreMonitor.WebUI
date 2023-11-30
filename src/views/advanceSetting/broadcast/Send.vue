@@ -14,10 +14,10 @@
                     broadcastTitle == '' 
                     ||  broadcastContent == '' 
                     || selectedInstantBroadcastStore.length == 0 
-                    || selectInstantBroadcastTitle.length == 0 " 
+                    || selectInstantBroadcastTitle.length == 0  " 
                   >
                 <div class="button-area" style="width: 80px; height: 20px;">
-                    <span>發送事件</span>
+                    <span>發送公告</span>
                   </div>
                 </delay-button>
               </div>
@@ -203,7 +203,7 @@
                     || selectedInstantTaskStaff.length == 0 " 
                   >
                 <div class="button-area" style="width: 80px; height: 20px;">
-                    <span>發送事件</span>
+                    <span>發送排程</span>
                   </div>
                 </delay-button>
               </div>
@@ -489,7 +489,7 @@ export default {
       departList: [],
 
       taskName: '',
-      inspectionMode: 0,
+      inspectionMode: 1,
       inspectionName:'',
       inspectionStyle: [
         {
@@ -1008,7 +1008,7 @@ export default {
           }))
           console.log(' this.allInspectTypeList =========>>>> ',  this.allInspectTypeList)
           
-          this.inspectTypeList = this.allInspectTypeList.filter(i => i.mode == 0)
+          this.inspectTypeList = this.allInspectTypeList.filter(i => i.mode == 1)
           this.inspectionName = this.inspectTypeList[0].id
           
         }).catch(err => {
