@@ -12,9 +12,9 @@
                   type="filled" 
                   :disabled="
                     broadcastTitle == '' 
-                    ||  broadcastContent == '' 
-                    || selectedInstantBroadcastStore.length == 0 
-                    || selectInstantBroadcastTitle.length == 0  " 
+                    || broadcastContent == '' 
+                    || selectedInstantBroadcastStaff.length == 0 
+                    && (selectedInstantBroadcastStore.length == 0 || selectInstantBroadcastTitle.length == 0 ) " 
                   >
                 <div class="button-area" style="width: 80px; height: 20px;">
                     <span>發送公告</span>
@@ -77,7 +77,6 @@
                 </el-select>
               </div>
 
-              
               <div class="subtitle_name" style="margin-top: 10px;">特定對象</div>
               <div class="send_content_row">
                 <div class="row_title">人員</div>
@@ -147,7 +146,7 @@
                       <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
                       <div class="attach_file">
                         <img src="../../../../static/img/MdiFilePdfOutline.svg" alt="">
-                        pdf
+                        <span>{{imgItem.oriName}}</span>
                       </div>
                     </div>
                     <!-- .xslx -->
@@ -155,7 +154,7 @@
                       <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
                       <div class="attach_file">
                         <img src="../../../../static/img/IconParkSolidExcel.svg" alt="">
-                        xlsx
+                        <span>{{imgItem.oriName}}</span>
                       </div>
                     </div>
                     <!-- .docx -->
@@ -163,7 +162,7 @@
                       <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
                       <div class="attach_file">
                         <img src="../../../../static/img/MaterialSymbolsDocsOutline.svg" alt="">
-                        doc
+                        <span>{{imgItem.oriName}}</span>
                       </div>
                     </div>
                   </div>
@@ -198,7 +197,6 @@
                     taskName == '' 
                     || inspectionName == ''
                     || remindDate == ''
-                    || remindTimePoint == ''
                     || selectedInstantTaskStore.length == 0 
                     || selectedInstantTaskStaff.length == 0 " 
                   >
@@ -265,8 +263,7 @@
                 </el-date-picker>
               </div>
 
-
-              <div class="send_content_row">
+              <!-- <div class="send_content_row">
                 <div class="row_title"><span style="color: #c60957">* </span> 提醒時間</div>
                 <el-time-select
                   v-model="remindTimePoint"
@@ -278,8 +275,7 @@
                   }"
                   :placeholder="$t('schedule.remiderTime')">
                 </el-time-select>
-              </div>
-
+              </div> -->
 
               <div class="title-name" style="margin-top: 30px;"><span style="color: #c60957">*</span> 發送至</div>
               <div class="send_content_row">
@@ -510,7 +506,9 @@ export default {
       
       pickerOptions: {
         disabledDate(time) {
-            return Date.now() >= time.getTime()  ;
+          var day1 = new Date();
+          var yesterday = day1.setTime(day1.getTime()-24*60*60*1000);
+            return yesterday > time.getTime()  ;
           }
       },
       
@@ -710,7 +708,19 @@ export default {
       }
 
     },
+
+    pad2(n){
+      return (n < 10 ? '0' : '') + n;
+    },
     async sendInstantTask(){
+      var t = new Date()
+      var date = new Date(t);
+      var hour = this.pad2(date.getHours())
+      var min = ":00"
+      var sec = ":00"
+
+      this.remindTimePoint = hour + min +sec
+
       var t = this.remindDate + " " + this.remindTimePoint + " " + "GMT+00:00"
       var gmt = new Date(t).getTime()
       var param = {
@@ -864,6 +874,11 @@ export default {
           url: URL.createObjectURL(files[0]),
           type: 4,
           size:files[0].size,
+          oriName: `${files[0].name}`
+        }
+        if(files[0].size > maxSize){
+          util.notify('檔案大於 4MB，請重新上傳', 'warning', 3000);
+          return
         }
         self.createFile(files[0],objpdf);
         self.attachFileList.push(objpdf);
@@ -874,6 +889,11 @@ export default {
           url: URL.createObjectURL(files[0]),
           type: 5,
           size: files[0].size,
+          oriName: `${files[0].name}`
+        }
+        if(files[0].size > maxSize){
+          util.notify('檔案大於 4MB，請重新上傳', 'warning', 3000);
+          return
         }
         self.createFile(files[0],objxlsx);
         self.attachFileList.push(objxlsx);
@@ -884,6 +904,11 @@ export default {
           url: URL.createObjectURL(files[0]),
           type: 6,
           size: files[0].size,
+          oriName: `${files[0].name}`
+        }
+        if(files[0].size > maxSize){
+          util.notify('檔案大於 4MB，請重新上傳', 'warning', 3000);
+          return
         }
         self.createFile(files[0],objdocument);
         self.attachFileList.push(objdocument);
@@ -1321,7 +1346,7 @@ export default {
     align-items: center
     
   .attach_file
-    width: 100px
+    width: 110px
     height: 120px
     background: #f4f4f4
     border-radius: 5px
@@ -1330,6 +1355,11 @@ export default {
     justify-content: center
     align-items: center
     color: #999
+    font-size: 11px
+    padding: 0 5px
+    span
+      line-height: 1.2
+      word-break: break-all
     
     img
       width: 40%

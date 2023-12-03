@@ -517,7 +517,8 @@ export default {
           instantId: i.instantRequest.id,
           scheduleName : i.instantRequest.msgContent.taskName,
           inspectReport: i.instantRequest.msgContent.inspectName,
-          executeTs: this.getdate(i.instantRequest.msgContent.remindTime),
+          executeTs: this.getdate((i.instantRequest.msgContent.remindTime)),
+          executeTs: i.instantRequest.msgContent.remindTime,
           sender: i.instantRequest.msgContent.userName,
           sendTs: this.getdate(i.instantRequest.ts),
           readStatus: `${i.readMsg}/${i.totalMsg}`
@@ -631,14 +632,11 @@ export default {
     },
     handdleAttachInfo(val){
       console.log('val handdleAttachInfo >> ', val);
-      
       this.showBroadcastAttach = true
       val.attachments.forEach( i => {
         if(typeof(i.fileSize) == "number"){
-      
-          i.fileSize = i.fileSize > 1024000 ? `${(i.fileSize/1024000).toFixed(1)} mb` : `${(i.fileSize/1000).toFixed(1)} kb`
+          i.fileSize = i.fileSize > 1024000 ? `${(i.fileSize/1024000).toFixed(1)} mb` : `${(i.fileSize/1000).toFixed(0)} kb`
         }
-        
       })
       this.attachTableData = [...val.attachments]
     },
