@@ -517,7 +517,7 @@ export default {
           instantId: i.instantRequest.id,
           scheduleName : i.instantRequest.msgContent.taskName,
           inspectReport: i.instantRequest.msgContent.inspectName,
-          executeTs: this.getdate(i.instantRequest.msgContent.remindTime),
+          executeTs: this.getUTCdate(i.instantRequest.msgContent.remindTime),
           sender: i.instantRequest.msgContent.userName,
           sendTs: this.getdate(i.instantRequest.ts),
           readStatus: `${i.readMsg}/${i.totalMsg}`
@@ -608,6 +608,17 @@ export default {
       var sec = this.pad2(date.getSeconds())
       return year + "-"+ month +"-"+ day +" "+ hour +":"+ min +":"+ sec
     },
+
+    getUTCdate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getUTCMonth()+1);
+      var day = this.pad2(date.getUTCDate());
+      var year= date.getUTCFullYear();
+      var hour = this.pad2(date.getUTCHours())
+      var min = this.pad2(date.getUTCMinutes())
+      var sec = this.pad2(date.getUTCSeconds())
+      return year + "-"+ month +"-"+ day +" "+ hour +":"+ min +":"+ sec
+    },
     async getUserInfo(){
       await getAllUserInfoNoAuth().then(res=>{
           this.userInfo = res.data
@@ -631,14 +642,11 @@ export default {
     },
     handdleAttachInfo(val){
       console.log('val handdleAttachInfo >> ', val);
-      
       this.showBroadcastAttach = true
       val.attachments.forEach( i => {
         if(typeof(i.fileSize) == "number"){
-      
-          i.fileSize = i.fileSize > 1024000 ? `${(i.fileSize/1024000).toFixed(1)} mb` : `${(i.fileSize/1000).toFixed(1)} kb`
+          i.fileSize = i.fileSize > 1024000 ? `${(i.fileSize/1024000).toFixed(1)} mb` : `${(i.fileSize/1000).toFixed(0)} kb`
         }
-        
       })
       this.attachTableData = [...val.attachments]
     },

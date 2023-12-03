@@ -883,7 +883,9 @@ export default{
     },
     async getPersonScheduleData(){
       var param = {
-        taskGroupUuid: this.scheduleStatus.taskGroupUuid
+        taskGroupUuid: this.scheduleStatus.taskGroupUuid,
+        userId: this.scheduleStatus.userId
+
         }
       await scheduleRESTful.getPersonScheduleData(param).then(res =>{
           if(res.errCode == 0){
