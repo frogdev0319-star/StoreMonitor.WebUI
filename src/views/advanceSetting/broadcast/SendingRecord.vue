@@ -517,8 +517,7 @@ export default {
           instantId: i.instantRequest.id,
           scheduleName : i.instantRequest.msgContent.taskName,
           inspectReport: i.instantRequest.msgContent.inspectName,
-          executeTs: this.getdate((i.instantRequest.msgContent.remindTime)),
-          executeTs: i.instantRequest.msgContent.remindTime,
+          executeTs: this.getUTCdate(i.instantRequest.msgContent.remindTime),
           sender: i.instantRequest.msgContent.userName,
           sendTs: this.getdate(i.instantRequest.ts),
           readStatus: `${i.readMsg}/${i.totalMsg}`
@@ -607,6 +606,17 @@ export default {
       var hour = this.pad2(date.getHours())
       var min = this.pad2(date.getMinutes())
       var sec = this.pad2(date.getSeconds())
+      return year + "-"+ month +"-"+ day +" "+ hour +":"+ min +":"+ sec
+    },
+
+    getUTCdate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getUTCMonth()+1);
+      var day = this.pad2(date.getUTCDate());
+      var year= date.getUTCFullYear();
+      var hour = this.pad2(date.getUTCHours())
+      var min = this.pad2(date.getUTCMinutes())
+      var sec = this.pad2(date.getUTCSeconds())
       return year + "-"+ month +"-"+ day +" "+ hour +":"+ min +":"+ sec
     },
     async getUserInfo(){

@@ -1,7 +1,7 @@
 <template>
   <div>
-      <div class="el-table-content" @tab-click="onTabClick">
-        <el-tabs  v-model="activeName" >
+      <div class="el-table-content" >
+        <el-tabs  v-model="activeName" @tab-click="onTabClick">
           <!-- 公告訊息 -->
           <el-tab-pane label="公告訊息" name="0">
             <div class="send_content" v-loading="isLoadingData">
@@ -399,7 +399,7 @@
                         :preview-src-list="getAuditImgList(index)"/>
                     </div>
                   </div>
-                  <div v-if="attFileCount < 10" class="attach-add" @click="$refs.auditfile.click()">
+                  <div v-if="attachFileList.length < 10" class="attach-add" @click="$refs.auditfile.click()">
                     <input 
                       type="file" 
                       style="display: none" 
@@ -574,6 +574,8 @@ export default {
 
     onTabClick(){
       console.log('tabClick :>> ');
+      this.attachFileList = []
+      
     },
 
     getBriefStoreData() {
