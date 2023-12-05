@@ -103,7 +103,7 @@
                     font-size: 12px; 
                     text-align: right;
                     font-weight: bold;
-                    "> 發送人員數量： {{ handleSelectedArray.length }}</div>
+                    "> 發送人員數量： <b> {{ handleSelectedArray.length }}</b></div>
                     <el-tooltip
                       v-if="handleSelectedArray.length > 0"
                       class="date-time-tooltip"
@@ -633,7 +633,14 @@ export default {
         tempAry = [...tempAry, ...i.content]
       })
       var resultAry = [...new Set(tempAry)]
-      return resultAry
+      console.log('this.userList :>> ', this.userList);
+      var showNameAry = []
+      resultAry.forEach(i => {
+        this.userList.forEach( u => {
+          if(i == u.userId) showNameAry.push(u.userName)
+        })
+      })
+      return showNameAry
     }
   },
   watch:{
