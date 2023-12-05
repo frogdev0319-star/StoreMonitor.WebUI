@@ -104,6 +104,18 @@
                     text-align: right;
                     font-weight: bold;
                     "> 發送人員數量： {{ handleSelectedArray.length }}</div>
+                    <el-tooltip
+                      v-if="handleSelectedArray.length > 0"
+                      class="date-time-tooltip"
+                      effect="light"
+                      placement="bottom-end">
+                      <div slot="content">
+                        <div class="staffName" v-for="n in handleSelectedArray">
+                          <p style="line-height: 1.05; color: #555;">{{ n }}</p>
+                        </div>
+                      </div>
+                      <i class="iconfont icon-bangzhu iconbangzhu"/>
+                    </el-tooltip>
               </div>
     
               <!-- <span style="font-size: 11px;">發送人員數量  
