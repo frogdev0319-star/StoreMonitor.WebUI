@@ -1453,7 +1453,7 @@ $h1:#292e36;
             width:100%;
             height:100%;
             margin: auto;
-            padding: 0 34px 42px 34px;
+            // padding: 0 34px 42px 34px;
             .rate-video-dialog{
               border-radius: 5px;
             }
