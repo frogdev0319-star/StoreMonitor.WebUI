@@ -132,6 +132,7 @@
             <div class="forAttachement" @click="showAttach(row)" v-if="row.attachments.length > 0">
                 <img src=".../../../static/img/RiAttachment.svg"  alt="" >
             </div>
+            <!-- <div class="" v-else> -- </div> -->
           </template>
 
           <template v-else-if="_item.readStatus" >

@@ -96,6 +96,22 @@
                 </el-select>
               </div>
 
+              <div class="send_content_row">
+                <div class="row_title" style="width: 6%;"></div>
+                <div style="
+                    width: 50%; color: #999; 
+                    font-size: 12px; 
+                    text-align: right;
+                    font-weight: bold;
+                    "> 發送人員數量： {{ handleSelectedArray.length }}</div>
+              </div>
+    
+              <!-- <span style="font-size: 11px;">發送人員數量  
+                {{ totalSendingArray[0].content.length + totalSendingArray[1].content.length +  totalSendingArray[2].content.length}}
+              </span> <br>
+              <pre style="font-size: 11px; text-align: left;"> 發送人員 :{{ totalSendingArray }}</pre>
+              -->
+
 
               <div class="title-name" style="margin-top: 30px;"> 發送訊息</div>
               <div class="send_content_row">
@@ -131,8 +147,11 @@
                     <!--video-->
                     <div v-if="imgItem.type===1" class="img-content">
                       <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
-                      <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon" @click="playAttachVideo(imgItem,index)">
-                      <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
+                      <div class="attach_video">
+                        <img :src="startIcon"  class="start-icon" @click="playAttachVideo(imgItem,index)">
+                        <!-- <span>{{imgItem.oriName}}</span> -->
+                        <!-- <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle"> -->
+                      </div>
                     </div>
                     <div v-else-if="imgItem.type===2" class="img-content">
                       <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
@@ -386,11 +405,22 @@
                 <div class="attach-area" style="width: 100%;">
                   <div v-for="(imgItem,index) in attachFileList" :key="'img'+index" class="source-details" >
                     <!--video-->
-                      <div v-if="imgItem.type===1" class="img-content">
-                        <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
-                        <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon" @click="playAttachVideo(imgItem,index)">
-                        <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
+                    <div v-if="imgItem.type===1" class="img-content">
+                      <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
+                      <div class="attach_video">
+                        <img :src="startIcon"  class="start-icon" @click="playAttachVideo(imgItem,index)">
+                        <!-- <span>{{imgItem.oriName}}</span> -->
+                        <!-- <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle"> -->
                       </div>
+                    </div>
+                    <div v-else-if="imgItem.type===2" class="img-content">
+                      <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
+                      <el-image
+                        :src="imgItem.src"
+                        class="imgLittle"
+                        :preview-src-list="getAuditImgList(index)"/>
+                    </div>
+                    
                     <div v-else-if="imgItem.type===2" class="img-content">
                       <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
                       <el-image
@@ -429,6 +459,34 @@
           <el-progress :percentage="Math.round(uploadingnumOfPic/totalnumOfPic*100)"/>
         </div>
       </el-dialog>
+
+      <!-- video dialog -->
+      <el-dialog
+        v-if="dialogAttachVideo"
+        :title="$t('eventView.view')"
+        :visible.sync="dialogAttachVideo"
+        :close-on-click-modal="false"
+        width="850px"
+        height="834px"
+        top="12%"
+        class="rate-video-dialog"
+        @close="stopCommentVideo">
+        <div slot="title" class="dialog-title">{{$t('eventView.view')}}</div>
+        <div class="video-dialog-content" style="overflow:hidden;">
+          <div class="video-content" >
+            <video
+              id="previewAttVideo"
+              height="83%"
+              width="90%"
+              prload
+              controls
+              autoplay
+              class="video-js vjs-fill"/>
+          </div>
+        </div>
+      </el-dialog>
+
+
       
     </div>
   </div>
@@ -462,23 +520,7 @@ export default {
       canSendInstantEvent: true,
       isLoadingData: false,
       activeName: "0",
-      aaa: '',
-      XXXD: [ 
-        {
-          "storeId": "4C7dPRwgEvAa",
-          "name": "Macy",
-          "city": "New York",
-          "province": "NY 10001",
-          "country": "USA",
-          "userId": null,
-          "tagIds": [],
-          "timeZone": "-10",
-          "status": 61,
-          "typeList": []
-        }
-      ],
 
-      
       storeList: [],
       titleList: [],
       userList: [],
@@ -529,6 +571,11 @@ export default {
       bucketVideo: '',
       bucketImage: '',
       addAttIcon: require('../../../../static/img/icon_attachment.svg'),
+      videoSrc: require('../../../../static/img/monitor.png'),
+      inspectSrc: require('../../../../static/img/remote_patrol.png'),
+      insiteInspectSrc: require('../../../../static/img/onsite_patrol.png'),
+      startIcon: require('../../../../static/img/play_icon.png'),
+      videoImgSrc: require('../../../../static/img/video_thumbnail.png'),
       uploadProgress: false,
       totalnumOfPic: 0,
       uploadingnumOfPic: 0,
@@ -539,7 +586,24 @@ export default {
       showInputLimit_b1: false,
       showInputLimit_c1: false,
 
+      dialogAttachVideo: false,
 
+      totalSendingArray: [
+        {
+          tag: "dep",
+          content: []
+        },
+        {
+          tag: "title",
+          content: []
+        },
+        {
+          tag: "staff",
+          content: []
+        },
+      ],
+      totalSendingNum: 0,
+   
     }
   },
   mounted() {
@@ -551,6 +615,14 @@ export default {
   },
   computed: {
     // ...mapGetters({ accountChanged: 'accountChanged' })
+    handleSelectedArray(){
+      var tempAry = []
+      this.totalSendingArray.forEach(i => {
+        tempAry = [...tempAry, ...i.content]
+      })
+      var resultAry = [...new Set(tempAry)]
+      return resultAry
+    }
   },
   watch:{
     // accountChanged(val) {
@@ -562,6 +634,33 @@ export default {
       this.inspectTypeList = this.inspectTypeList.filter( i => i.mode === val)
       this.inspectionName = this.inspectTypeList[0].id
     },
+
+    selectedInstantBroadcastbranch(val){
+      console.log('val :>> ', val);
+      console.log('this.departList :>> ', this.departList);
+      var selectedBranch =[]
+      val.forEach(i => {
+        var tempBranch = this.departList.filter( d => d.defineId == i)
+        selectedBranch = [...selectedBranch, ...tempBranch[0].contents]
+      })
+      this.totalSendingArray[0].content = [...selectedBranch]
+    },
+    selectInstantBroadcastTitle(val){
+      console.log('val :>> ', val);
+      var selectedTitles = []
+      val.forEach(i => {
+        var tempTitles = this.titleList.filter( d => d.defineId == i)
+        selectedTitles = [...selectedTitles, ...tempTitles[0].contents]
+      })
+      this.totalSendingArray[1].content = [...selectedTitles]
+    },
+    selectedInstantBroadcastStaff(val){
+      console.log('val :>> ', val);
+      this.totalSendingArray[2].content = [...val]
+    },
+    
+
+
   },
   methods: {
     async init(){
@@ -671,7 +770,7 @@ export default {
 
       var param = {
         requestContent: {
-          titleIds: [this.selectInstantEventTitle],
+          titleIds: [...this.selectInstantEventTitle],
           storeIds: [this.selectedInstantEventStore]
         },
         msgContent: {
@@ -830,6 +929,7 @@ export default {
     doAddAttachment(e){
       const self = this;
       const maxSize = 4*1024*1024; //不能超過4MB
+      const maxVideoSize = 10*1024*1024; 
       var files = e.target.files || e.dataTransfer.files;
       console.log("choose file::::::::",files);
       var fileName = files[0].name;
@@ -865,7 +965,11 @@ export default {
           url: URL.createObjectURL(files[0]),
           type: 1,
           size:files[0].size,
-          
+          oriName: `${files[0].name}`
+        }
+        if(files[0].size > maxVideoSize){
+          util.notify('檔案大於 10MB，請重新上傳', 'warning', 3000);
+          return
         }
         self.createFile(files[0],objvideo);
         self.attachFileList.push(objvideo);
@@ -948,6 +1052,8 @@ export default {
     },
 
     playAttachVideo(item, index) {
+      console.log('play :>> ');
+      console.log('item :>> ', item);
       const self = this;
       self.dialogAttachVideo = true;
       self.$nextTick(function() {
@@ -1033,7 +1139,7 @@ export default {
             name: i.name,
             mode: i.mode
           }))
-          console.log(' this.allInspectTypeList =========>>>> ',  this.allInspectTypeList)
+          // console.log(' this.allInspectTypeList =========>>>> ',  this.allInspectTypeList)
           
           this.inspectTypeList = this.allInspectTypeList.filter(i => i.mode == 1)
           this.inspectionName = this.inspectTypeList[0].id
@@ -1200,7 +1306,37 @@ export default {
           width: auto
           height: 120px
 
-        
+        .attach_video
+          width: 110px
+          height: 120px
+          border-radius: 5px
+          cursor: pointer
+          display: flex
+          flex-direction: column
+          justify-content: center
+          align-items: center
+          background: url(('../../../../static/img/video_thumbnail.png'))
+          background-position:  center center
+          font-size: 12px
+          color: #FFF
+          span
+            word-break: break-all
+            line-height: 1.2
+          .start-icon
+            width: 40px
+            margin-bottom: 5px
+
+          .imgLittle
+            width: auto
+            height: 120px
+            border-radius: 5px
+
+  .dialog-title
+    text-align: left
+    font-size: 20px
+    padding-left: 20px
+    color: #484848
+  
 
 
 
@@ -1266,11 +1402,6 @@ export default {
         color:#FFF
 
 
-
-
-
-
-    
   .alert-popup
     .el-dialog__header
       color: #c60957
@@ -1298,55 +1429,7 @@ export default {
   .el-table
     border: none !important
     
-  // .el-button--primary
-  //   color: #fff
-  //   background-color: #190
-  //   border-color: #190
 
-
-
-    .forDescription
-      position: relative
-      &:hover
-        .showDescription
-          display: block
-      .shortdescription
-        overflow: hidden
-        text-overflow: ellipsis
-        white-space: nowrap
-        width: 200px
-      .showDescription
-        position: fixed
-        width: 500px
-        height: fit-content
-        font-size: 13px
-        line-height: 1.5
-        padding: 10px
-        background: rgba(0,0,0,.75)
-        color: #fff
-        border-radius: 3px
-        z-index: 1000
-        display: none
-
-  .forWorkflowsSwitch
-    display: flex
-    flex-direction: row
-    justify-content: center
-    align-items: center
-    
-  .width-fit
-    width: max-content !important
-  
-  .pagination_row
-    //position: absolute;
-    height: 30px
-    margin: 30px 0
-    margin-right: calc(20/1920*100vw)
-    display: flex
-    flex-direction: row
-    justify-content: flex-end
-    align-items: center
-    
   .attach_file
     width: 110px
     height: 120px

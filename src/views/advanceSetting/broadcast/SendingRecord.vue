@@ -33,6 +33,7 @@
       </div>
       
       <div class="el-table-content" >
+        
         <el-tabs  v-model="activeName" @tab-click="onTabClick">
             <el-tab-pane
               v-for="(item,index) in tableDataList"
@@ -59,7 +60,7 @@
                   @onCellClick="showReadStatus"
                 />
               </div>
-
+              
               <!-- pagination -->
               <div class="page-area">
                 <div class="pagination_row"  v-if="totalEvents > 0" > 
@@ -238,7 +239,7 @@ export default {
       total: 50,
       currentPage: 1,
       curSizeNum: 10,
-      sizeNum: 2,
+      sizeNum: 10,
       totalEvents: 0,
 
       inputSearchValue: '',
@@ -409,6 +410,9 @@ export default {
     async onTabClick(val){
       var n =  Number(val.index)
       this.currentPage = 1
+      this.curSizeNum = 10
+      this.sizeNum = 10
+      
       this.actionType = n
       await this.getTable(n)
     },
@@ -647,6 +651,8 @@ export default {
         if(typeof(i.fileSize) == "number"){
           i.fileSize = i.fileSize > 1024000 ? `${(i.fileSize/1024000).toFixed(1)} mb` : `${(i.fileSize/1000).toFixed(0)} kb`
         }
+        i.fileName = i.fileName.split("_" ).pop()
+        
       })
       this.attachTableData = [...val.attachments]
     },
@@ -709,11 +715,8 @@ export default {
       console.log('pageInfo', pageInfo)
       this.currentPage = pageInfo.page
       this.curSizeNum = pageInfo.size;
+      this.sizeNum = pageInfo.size
       this.getTable(this.actionType)
-      // this.init()
-      // if(this.inputSearchValue.trim()=="") this.getWorkflowList(this.apiBody);
-      // else this.setTableBySearch()
-
     },
 
   },
