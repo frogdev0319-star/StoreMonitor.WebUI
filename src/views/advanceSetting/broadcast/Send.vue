@@ -103,7 +103,7 @@
                     font-size: 12px; 
                     text-align: right;
                     font-weight: bold;
-                    "> 發送人員數量： {{ handleSelectedArray.length }}</div>
+                    "> 發送人員數量： <b> {{ handleSelectedArray.length }}</b></div>
                     <el-tooltip
                       v-if="handleSelectedArray.length > 0"
                       class="date-time-tooltip"
@@ -212,8 +212,6 @@
                   </div>
                 </div>
               </div>
-
-
             </div>
           </el-tab-pane>
 
@@ -553,11 +551,10 @@ export default {
       ],
       allInspectTypeList: [],
       inspectTypeList: [],
-      
+      today: '',
       remindDate:'',
       remindTimePoint:'',
       remindStyle:[],
-      
       pickerOptions: {
         disabledDate(time) {
           var day1 = new Date();
@@ -615,15 +612,24 @@ export default {
         },
       ],
       totalSendingNum: 0,
-   
+  
     }
   },
   mounted() {
     
   },
   created() {
+    // this.remindDate = new Date()
     this.init()
     this.getUpLoadBucketInfo();
+
+    var date = new Date();
+    var month = this.pad2(date.getMonth()+1);
+    var day = this.pad2(date.getDate());
+    var year= date.getFullYear();
+    this.remindDate = year + "-"+ month +"-"+ day
+    this.today = year + "-"+ month +"-"+ day
+
   },
   computed: {
     // ...mapGetters({ accountChanged: 'accountChanged' })
@@ -633,7 +639,14 @@ export default {
         tempAry = [...tempAry, ...i.content]
       })
       var resultAry = [...new Set(tempAry)]
-      return resultAry
+      // console.log('this.userList :>> ', this.userList);
+      var showNameAry = []
+      resultAry.forEach(i => {
+        this.userList.forEach( u => {
+          if(i == u.userId) showNameAry.push(u.userName)
+        })
+      })
+      return showNameAry
     }
   },
   watch:{
@@ -684,9 +697,7 @@ export default {
     },
 
     onTabClick(){
-      console.log('tabClick :>> ');
       this.attachFileList = []
-      
     },
 
     getBriefStoreData() {
@@ -727,7 +738,7 @@ export default {
       if(res.errCode ==0){
         this.titleList = res.data;
       }
-      console.log('this.titleList :>> ',this.titleList);
+      // console.log('this.titleList :>> ',this.titleList);
     },
 
     async submitInstantEvent(){
@@ -807,7 +818,7 @@ export default {
         this.selectedInstantTaskStore = [];
         this.selectedInstantTaskStaff = [];
         this.taskName = '';
-        this.remindDate = '';
+        this.remindDate = this.today;
         this.remindTimePoint = '';
         this.inspectionName = this.inspectTypeList[0].id
 
@@ -819,12 +830,12 @@ export default {
         util.notify('發送失敗！', 'warning', 3000);
         return false;
       }
-
     },
 
     pad2(n){
       return (n < 10 ? '0' : '') + n;
     },
+
     async sendInstantTask(){
       var t = new Date()
       var date = new Date(t);

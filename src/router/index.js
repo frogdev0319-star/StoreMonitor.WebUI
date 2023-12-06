@@ -639,7 +639,7 @@ export const navbarRoute = {
         name: 'inspectListSetting',
         component: resolve => require(['@/views/setting/routeInspection/RouteInspection'], resolve),
         meta: {
-          keepAlive: true, 
+          keepAlive: false, 
         },
         hidden: false
       },
@@ -649,7 +649,7 @@ export const navbarRoute = {
         hidden: true,
         component: resolve => require(['@/views/setting/routeInspection/AddRuteInspect'], resolve),
         meta: {
-          keepAlive: true, 
+          keepAlive: false, 
         },
       },
       {
@@ -659,7 +659,6 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/routeInspection/SetRuleInspect'], resolve),
         meta: {
           keepAlive: false, 
-
         },
       },
       {

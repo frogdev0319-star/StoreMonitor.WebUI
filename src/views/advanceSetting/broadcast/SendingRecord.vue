@@ -58,6 +58,7 @@
                   :cellStyle="{backgroundColor: '#fff !important'}"
                   @showAttachDialog="handdleAttachInfo"
                   @onCellClick="showReadStatus"
+                  @sortChange="sortChange"
                 />
               </div>
               
@@ -74,6 +75,7 @@
                     layout = "total, prev, pager, next, sizes, slot"
                     @sizeChange="handlePagination"
                     @currentChange="handlePagination"
+                    
                   />
                 </div>
               </div>
@@ -131,6 +133,20 @@
     >
       <div class="dialog-slot">
         <div class="dialog-content">
+          <el-select 
+            v-model="withReadStatus"
+            style="width: 100%; margin-bottom: 10px;"
+            placeholder="請選擇讀取狀態" 
+            filterable
+            @change="filterRadStatus"
+            >
+            <el-option
+              v-for="(item, index) in isReadStatus"
+              :key = index
+              :label="item.label"
+              :value="item.value" 
+              />
+          </el-select>
           <div class="" style="width: 460px; margin-bottom: 30px;">
             <table-only
               ref="elTP"
@@ -195,6 +211,10 @@ export default {
       activeName: "0",
       actionType: 0,
       dateValue:[],
+      curOrder: {
+        direction: "desc",
+        property: "sendTs"
+      } ,
       showBroadcastAttach: false,
       showBroadcastReadStatus: false,
       attachTableData: [],
@@ -213,6 +233,7 @@ export default {
           'maxWidth': 200,
         },
       ],
+      oriReadStatusTableData: [],
       readStatusTableData: [],
       readStatusList:[
         {
@@ -281,6 +302,7 @@ export default {
               'label': '發送時間',
               'width': 200,
               'maxWidth': 200,
+              'sortable': 'custom',
             },
             {
               'prop': 'readStatus',
@@ -303,12 +325,14 @@ export default {
               'label': '排程名稱',
               'width': 50,
               'maxWidth': 50,
+              'sortable': 'custom',
             },
             {
               'prop': 'inspectReport',
               'label': '巡檢表',
               'width': 200,
               'maxWidth': 200,
+              'sortable': 'custom',
             },
             {
               'prop': 'executeTs',
@@ -327,6 +351,7 @@ export default {
               'label': '發送時間',
               'width': 200,
               'maxWidth': 200,
+              'sortable': 'custom',
             },
             {
               'prop': 'readStatus',
@@ -367,6 +392,7 @@ export default {
               'label': '發送時間',
               'width': 200,
               'maxWidth': 200,
+              'sortable': 'custom',
             },
             {
               'prop': 'readStatus',
@@ -378,6 +404,23 @@ export default {
           ],
         },
       ],
+      
+      withReadStatus: false,
+      isReadStatus: [
+        {
+          value : -1,
+          label: '全部'
+        },
+        {
+          value : true,
+          label: '已讀'
+        },
+        {
+          value : false,
+          label: '未讀'
+        },
+      
+      ]
 
   
     }
@@ -412,10 +455,37 @@ export default {
       this.currentPage = 1
       this.curSizeNum = 10
       this.sizeNum = 10
+      this.curOrder.direction = "desc"
       
       this.actionType = n
       await this.getTable(n)
     },
+
+    sortChange(sortOrder) {
+      const self = this;
+      const order = sortOrder.direction;
+      console.log("report sort:",sortOrder);
+      console.log("report order:",order);
+
+      this.curOrder = sortOrder
+
+      // if (order === 'asc') {
+      //   self.params.order = {
+      //     'direction': 'asc',
+      //     'property': sortOrder.property === 'datestr' ? 'ts' : sortOrder.property
+      //   };
+      // } else if (order === 'desc') {
+      //   self.params.order = {
+      //     'direction': 'desc',
+      //     'property': sortOrder.property === 'datestr' ? 'ts' : sortOrder.property
+      //   };
+      // } else {
+      //   self.params.order = {};
+      // }
+      console.log('this.actionType :>> ', this.actionType);
+      this.getTable(this.actionType)
+    },
+
 
     getTable(typeN){
       this.isLoadingData = true
@@ -442,8 +512,8 @@ export default {
             size: this.curSizeNum
         },
         order: {
-            direction: "desc",
-            property: "ts"
+            direction: this.curOrder.direction,
+            property: this.curOrder.property
         }
       }
       await getImmediateBroadcastTable(param).then(res=>{
@@ -497,8 +567,8 @@ export default {
             size: this.curSizeNum
         },
         order: {
-            direction: "desc",
-            property: "ts"
+          direction: this.curOrder.direction,
+          property: this.curOrder.property
         }
       }
       await getImmediateTaskTable(param).then(res=>{
@@ -550,8 +620,8 @@ export default {
             size: this.curSizeNum
         },
         order: {
-            direction: "desc",
-            property: "ts"
+          direction: this.curOrder.direction,
+          property: this.curOrder.property
         }
       }
       await getImmediateEventTable(param).then(res=>{
@@ -673,6 +743,7 @@ export default {
           instantId: val.row.instantId
         }
         await getImmediateBroadcastReadStatus(needId).then(res=>{
+          this.oriReadStatusTableData = res.data
           this.readStatusTableData = res.data
           this.isLoadingData = false
         }).catch(err => {
@@ -686,6 +757,7 @@ export default {
           instantId: val.row.instantId
         }
         await getImmediateTaskReadStatus(needId).then(res=>{
+          this.oriReadStatusTableData = res.data
           this.readStatusTableData = res.data
           this.isLoadingData = false
         }).catch(err => {
@@ -700,6 +772,7 @@ export default {
           instantId: val.row.instantId
         }
         await getImmediateEventReadStatus(needId).then(res=>{
+          this.oriReadStatusTableData = res.data
           this.readStatusTableData = res.data
           this.isLoadingData = false
         }).catch(err => {
@@ -708,6 +781,9 @@ export default {
         });
         
       }
+
+      this.withReadStatus = false
+      this.readStatusTableData = this.oriReadStatusTableData.filter(i => i.isRead == this.withReadStatus)
       this.showBroadcastReadStatus = true
     },
 
@@ -718,6 +794,20 @@ export default {
       this.sizeNum = pageInfo.size
       this.getTable(this.actionType)
     },
+
+    filterRadStatus(val){
+      console.log('val :>> ', val);
+      console.log('this.withReadStatus :>> ', this.withReadStatus);
+      console.log('this.readStatusTableData :>> ', this.readStatusTableData);
+
+      if(val == -1){
+        this.readStatusTableData = this.oriReadStatusTableData
+      }
+      else{
+        this.readStatusTableData = this.oriReadStatusTableData.filter(i => i.isRead == val)
+      }
+    
+    }
 
   },
 };

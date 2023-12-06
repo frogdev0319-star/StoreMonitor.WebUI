@@ -199,6 +199,7 @@
                 <template slot-scope="scope">
                   <img v-if="scope.row.sourceType === 0" :src="videoSrc" class="sourceType-icon">
                   <img v-else-if="scope.row.sourceType === 1" :src="inspectSrc" class="sourceType-icon">
+                  <img v-else-if="scope.row.sourceType === 3" :src="immediateInspectSrc" class="sourceType-icon">
                   <img v-else :src="insiteInspectSrc" class="sourceType-icon" style="width:15px;">
                   <span class="event-subject">{{ scope.row.subject }}</span>
                 </template>
@@ -371,6 +372,8 @@ export default {
       activeName: '0',
       videoSrc: require('../../../static/img/monitor.png'),
       inspectSrc: require('../../../static/img/remote_patrol.png'),
+      immediateInspectSrc: require('../../../static/img/immediate_patrol.png'),
+
       insiteInspectSrc: require('../../../static/img/onsite_patrol.png'),
       attachmentVideo: require('../../../static/img/photo.png'),
       attachmentImg: require('../../../static/img/photo.png'),
