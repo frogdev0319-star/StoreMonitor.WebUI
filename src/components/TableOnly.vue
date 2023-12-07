@@ -1043,7 +1043,12 @@ export default {
   .forAttachement
     cursor: pointer
     width: 25px
+    display: flex
+    flex-direction: row
+    justify-content: center
+    align-items: center
     transition: all .2s
+
     img 
       width: 25px
       
