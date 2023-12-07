@@ -702,7 +702,7 @@ export default {
       this.showBroadcastAttach = true
       val.attachments.forEach( i => {
         if(typeof(i.fileSize) == "number"){
-          i.fileSize = i.fileSize > 1024000 ? `${(i.fileSize/1024000).toFixed(1)} mb` : `${(i.fileSize/1000).toFixed(0)} kb`
+          i.fileSize = i.fileSize > 1048579 ? `${(i.fileSize/1048579).toFixed(1)} mb` : `${(i.fileSize/1024).toFixed(0)} kb`
         }
         i.fileName = i.fileName.split("_" ).pop()
         
