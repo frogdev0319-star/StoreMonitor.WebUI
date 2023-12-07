@@ -95,7 +95,7 @@
     >
       <div class="dialog-slot">
         <div class="dialog-content">
-          <div class="" style="width: 460px; margin-bottom: 30px;">
+          <div class="" style="width: 100%; margin-bottom: 30px;">
             <table-only
               ref="elTP"
               class="attach_list_table"
@@ -132,7 +132,7 @@
       :showButton=" false"
     >
       <div class="dialog-slot">
-        <div class="dialog-content">
+        <div class="dialog-content" style="width: 100%">
           <el-select 
             v-model="withReadStatus"
             style="width: 100%; margin-bottom: 10px;"
@@ -147,10 +147,10 @@
               :value="item.value" 
               />
           </el-select>
-          <div class="" style="width: 460px; margin-bottom: 30px;">
+          <div class="" style="width: 100%; margin-bottom: 30px;">
             <table-only
               ref="elTP"
-              class="sendingrecord_table"
+              class="read_status_table"
               :column-data="readStatusList"
               :table-data="readStatusTableData"
               :highlight-current-row= "false"
@@ -336,7 +336,7 @@ export default {
             },
             {
               'prop': 'executeTs',
-              'label': '執行日期 | 提醒時間',
+              'label': '執行日期',
               'width': 200,
               'maxWidth': 200,
             },
@@ -419,10 +419,7 @@ export default {
           value : false,
           label: '未讀'
         },
-      
       ]
-
-  
     }
   },
   mounted() {},
@@ -468,20 +465,6 @@ export default {
       console.log("report order:",order);
 
       this.curOrder = sortOrder
-
-      // if (order === 'asc') {
-      //   self.params.order = {
-      //     'direction': 'asc',
-      //     'property': sortOrder.property === 'datestr' ? 'ts' : sortOrder.property
-      //   };
-      // } else if (order === 'desc') {
-      //   self.params.order = {
-      //     'direction': 'desc',
-      //     'property': sortOrder.property === 'datestr' ? 'ts' : sortOrder.property
-      //   };
-      // } else {
-      //   self.params.order = {};
-      // }
       console.log('this.actionType :>> ', this.actionType);
       this.getTable(this.actionType)
     },
@@ -691,7 +674,7 @@ export default {
       var hour = this.pad2(date.getUTCHours())
       var min = this.pad2(date.getUTCMinutes())
       var sec = this.pad2(date.getUTCSeconds())
-      return year + "-"+ month +"-"+ day +" "+ hour +":"+ min +":"+ sec
+      return year + "-"+ month +"-"+ day 
     },
     async getUserInfo(){
       await getAllUserInfoNoAuth().then(res=>{
@@ -817,24 +800,34 @@ export default {
   .sendingrecord_table
     .table .el-table
       padding: 10px 0
-      
     .el-table--mini
       background: #FFF !important
       box-shadow: none !important
+      max-height: none !important
     td, th
       padding-left: 0 !important
       .cell
         padding: 5px 0px !important
         padding-left: 12px !important
+        word-break: break-word !important
+        text-align: left !important
         span
           line-height: 20px !important
+          text-align: left !important
       &:nth-child(1)
         width: 20% !important
         .cell
           padding-left: 12px !important
-  
+
 
   .broadcast_table
+    .table .el-table
+      padding: 10px 0
+      max-height: none !important
+    .el-table--mini
+      background: #FFF !important
+      box-shadow: none !important
+      max-height: none !important
     td, th
       &:nth-child(2)
         width: 30% !important
@@ -846,28 +839,54 @@ export default {
         padding-left: 12px !important
         .cell
           padding-left: 12px !important
-
     .el-table .cell
       text-align: left !important
+      word-break: break-word !important
       
 
 
-  .attach_list_table
-    .el-table__header-wrapper
-      .el-table__header
-        width: auto !important
-    .el-table__body-wrapper
-      .el-table__body
-        width: auto !important
+  .read_status_table, 
+    .table .el-table
+      padding: 10px 0
     .el-table--mini
       background: #FFF !important
       box-shadow: none !important
+      overflow: auto !important
     td, th
+      padding-left: 0 !important
+      .cell
+        padding: 5px 0px !important
+        padding-left: 12px !important
+        text-align: left !important
+        span
+          line-height: 20px !important
       &:nth-child(1)
-        padding-left: 0 !important
-        width: 70% !important
-        .el-table .cell
-          padding-left: 0 !important      
+        width: 20% !important
+        .cell
+          padding-left: 12px !important
+    
+  .attach_list_table
+    .table .el-table
+      padding: 10px 0
+    .el-table--mini
+      background: #FFF !important
+      box-shadow: none !important
+      overflow: auto !important
+    td, th
+      padding-left: 0 !important
+      .cell
+        padding: 5px 0px !important
+        padding-left: 12px !important
+        text-align: left !important
+        word-break: break-word !important
+        span
+          line-height: 20px !important
+      &:first-child
+        width: 75% !important
+        .cell
+          padding-left: 12px !important
+  
+
 
 
   .el-table-content
