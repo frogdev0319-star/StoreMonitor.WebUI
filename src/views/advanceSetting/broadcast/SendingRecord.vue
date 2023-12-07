@@ -85,7 +85,7 @@
         </div>
 
     <dialog-pop
-      title="附件"
+      :title= "$t('immediatePush.attachment')"
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
@@ -94,7 +94,7 @@
       :showButton=" false"
     >
       <div class="dialog-slot">
-        <div class="dialog-content">
+        <div class="dialog-content" style="width: 100%; ">
           <div class="" style="width: 100%; margin-bottom: 30px;">
             <table-only
               ref="elTP"
@@ -123,7 +123,7 @@
     </dialog-pop>
     
     <dialog-pop
-      title="讀取狀態"
+      :title= "$t('immediatePush.readStatus')"
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
@@ -136,7 +136,7 @@
           <el-select 
             v-model="withReadStatus"
             style="width: 100%; margin-bottom: 10px;"
-            placeholder="請選擇讀取狀態" 
+            :placeholder= "$t('immediatePush.readStatus')"
             filterable
             @change="filterRadStatus"
             >
@@ -221,14 +221,14 @@ export default {
       attachDataList:[
         {
           'prop': 'fileName',
-          'label': '檔案名稱',
+          'label': this.$t('immediatePush.fileName'),
           'width': 50,
           'maxWidth': 50,
           'isCellClick': true
         },
         {
           'prop': 'fileSize',
-          'label': '檔案大小',
+          'label': this.$t('immediatePush.fileSize'),
           'width': 200,
           'maxWidth': 200,
         },
@@ -238,19 +238,19 @@ export default {
       readStatusList:[
         {
           'prop': 'userName',
-          'label': '人員',
+          'label': this.$t('immediatePush.staff'),
           'width': 50,
           'maxWidth': 50,
         },
         {
           'prop': 'titleName',
-          'label': '職務',
+          'label': this.$t('immediatePush.position'),
           'width': 200,
           'maxWidth': 200,
         },
         {
           'prop': 'isRead',
-          'label': '狀態',
+          'label': this.$t('immediatePush.status'),
           'width': 200,
           'maxWidth': 200,
           'readStatus': true
@@ -267,46 +267,46 @@ export default {
       defaultSort:{order:'descending', prop:'updateTs'},
       tableDataList:[
         {
-          label: '公告訊息',
+          label: this.$t('immediatePush.broadcast'),
           name: '0',
           taskCount: 0,
           tableData: [],
           columnData: [
             {
               'prop': 'bulletinSubject',
-              'label': '標題',
+              'label': this.$t('immediatePush.messageTitle'),
               'width': 50,
               'maxWidth': 50,
             },
             {
               'prop': 'bulletinContent',
-              'label': '內容',
+              'label': this.$t('immediatePush.messageContent'),
               'width': 200,
               'maxWidth': 200,
             },
             {
               'prop': 'attachments',
-              'label': '附件',
+              'label': this.$t('immediatePush.attachment'),
               'width': 200,
               'maxWidth': 200,
               'forAttachement': true
             },
             {
               'prop': 'sender',
-              'label': '發送人',
+              'label': this.$t('immediatePush.sender'),
               'width': 200,
               'maxWidth': 200,
             },
             {
               'prop': 'sendTs',
-              'label': '發送時間',
+              'label': this.$t('immediatePush.sendingTime'),
               'width': 200,
               'maxWidth': 200,
               'sortable': 'custom',
             },
             {
               'prop': 'readStatus',
-              'label': '讀取狀態',
+              'label': this.$t('immediatePush.readStatus'),
               'width': 200,
               'maxWidth': 200,
               'isCellClick': true
@@ -315,47 +315,47 @@ export default {
           ],
         },
         {
-          label: '即時排程',
+          label:  this.$t('immediatePush.immediateTask'),
           name: '1',
           taskCount: 0,
           tableData: [],
           columnData: [
             {
               'prop': 'scheduleName',
-              'label': '排程名稱',
+              'label':  this.$t('immediatePush.scheduleName'),
               'width': 50,
               'maxWidth': 50,
               'sortable': 'custom',
             },
             {
               'prop': 'inspectReport',
-              'label': '巡檢表',
+              'label':  this.$t('immediatePush.inspectionName'),
               'width': 200,
               'maxWidth': 200,
               'sortable': 'custom',
             },
             {
               'prop': 'executeTs',
-              'label': '執行日期',
+              'label':  this.$t('immediatePush.excetionDate'),
               'width': 200,
               'maxWidth': 200,
             },
             {
               'prop': 'sender',
-              'label': '發送人',
+              'label':  this.$t('immediatePush.sender'),
               'width': 200,
               'maxWidth': 200,
             },
             {
               'prop': 'sendTs',
-              'label': '發送時間',
+              'label':  this.$t('immediatePush.sendingTime'),
               'width': 200,
               'maxWidth': 200,
               'sortable': 'custom',
             },
             {
               'prop': 'readStatus',
-              'label': '讀取狀態',
+              'label':  this.$t('immediatePush.readStatus'),
               'width': 200,
               'maxWidth': 200,
               'isCellClick': true
@@ -363,40 +363,40 @@ export default {
           ],
         },
         {
-          label: '即時事件',
+          label:  this.$t('immediatePush.immediateEvent'),
           name: '2',
           taskCount: 0,
           tableData: [],
           columnData: [
             {
               'prop': 'eventName',
-              'label': '事件名稱',
+              'label':  this.$t('immediatePush.eventName'),
               'width': 50,
               'maxWidth': 50,
             },
             {
               'prop': 'attachments',
-              'label': '附件',
+              'label':  this.$t('immediatePush.attachment'),
               'width': 200,
               'maxWidth': 200,
               'forAttachement': true
             },
             {
               'prop': 'sender',
-              'label': '發送人',
+              'label':  this.$t('immediatePush.sender'),
               'width': 200,
               'maxWidth': 200,
             },
             {
               'prop': 'sendTs',
-              'label': '發送時間',
+              'label':  this.$t('immediatePush.sendingTime'),
               'width': 200,
               'maxWidth': 200,
               'sortable': 'custom',
             },
             {
               'prop': 'readStatus',
-              'label': '讀取狀態',
+              'label':  this.$t('immediatePush.readStatus'),
               'width': 200,
               'maxWidth': 200,
               'isCellClick': true
@@ -409,15 +409,15 @@ export default {
       isReadStatus: [
         {
           value : -1,
-          label: '全部'
+          label: this.$t('immediatePush.all'),
         },
         {
           value : true,
-          label: '已讀'
+          label:this.$t('immediatePush.read'),
         },
         {
           value : false,
-          label: '未讀'
+          label: this.$t('immediatePush.notRead'),
         },
       ]
     }
