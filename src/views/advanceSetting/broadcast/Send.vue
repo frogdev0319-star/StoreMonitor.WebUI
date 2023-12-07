@@ -3,7 +3,7 @@
       <div class="el-table-content" >
         <el-tabs  v-model="activeName" @tab-click="onTabClick">
           <!-- 公告訊息 -->
-          <el-tab-pane label="公告訊息" name="0">
+          <el-tab-pane :label="$t('immediatePush.broadcast')" name="0">
             <div class="send_content" v-loading="isLoadingData">
 
               <div class="submit_btn" >
@@ -17,20 +17,20 @@
                     && (selectedInstantBroadcastStore.length == 0 || selectInstantBroadcastTitle.length == 0 ) " 
                   >
                 <div class="button-area" style="width: 80px; height: 20px;">
-                    <span>發送公告</span>
+                    <span>{{$t('immediatePush.sendBroadcast')}} </span>
                   </div>
                 </delay-button>
               </div>
 
 
-              <div class="title-name"> 發送至</div>
-              <div class="subtitle_name" style="margin-top: 20px;">群組對象</div>
+              <div class="title-name"> {{$t('immediatePush.sendBTo')}}</div>
+              <div class="subtitle_name" style="margin-top: 20px;"> {{$t('immediatePush.groupObject')}}</div>
               <div class="send_content_row">
-                <div class="row_title"><span style="color: #c60957">* </span>門店</div>
+                <div class="row_title"><span style="color: #c60957">* </span>{{$t('immediatePush.store')}}</div>
                 <el-select
                   v-model="selectedInstantBroadcastStore"
                   style="width: 50%;"
-                  placeholder="請選擇門店" 
+                  :placeholder="$t('immediatePush.selectStore')" 
                   filterable
                   multiple
                   >
@@ -43,11 +43,11 @@
                 </el-select>
               </div>
               <div class="send_content_row">
-                <div class="row_title">部門</div>
+                <div class="row_title">{{$t('immediatePush.department')}}</div>
                 <el-select
                   v-model="selectedInstantBroadcastbranch"
                   style="width: 50%;"
-                  placeholder="請選擇部門" 
+                  :placeholder="$t('immediatePush.selectDepartment')" 
                   filterable
                   multiple
                   >
@@ -60,11 +60,11 @@
                 </el-select>
               </div>
               <div class="send_content_row">
-                <div class="row_title"><span style="color: #c60957">* </span>職務</div>
+                <div class="row_title"><span style="color: #c60957">* </span>{{$t('immediatePush.position')}}</div>
                 <el-select 
                   v-model="selectInstantBroadcastTitle"
                   style="width: 50%;"
-                  placeholder="請選擇職務" 
+                  :placeholder="$t('immediatePush.selectPosition')" 
                   filterable
                   multiple
                   >
@@ -77,13 +77,13 @@
                 </el-select>
               </div>
 
-              <div class="subtitle_name" style="margin-top: 10px;">特定對象</div>
+              <div class="subtitle_name" style="margin-top: 10px;">{{$t('immediatePush.specificObject')}}</div>
               <div class="send_content_row">
-                <div class="row_title">人員</div>
+                <div class="row_title">{{$t('immediatePush.staff')}}</div>
                 <el-select
                   v-model="selectedInstantBroadcastStaff"
                   style="width: 50%;"
-                  placeholder="請選擇人員" 
+                  :placeholder="$t('immediatePush.selectStaff')" 
                   filterable
                   multiple
                   >
@@ -103,7 +103,7 @@
                     font-size: 12px; 
                     text-align: right;
                     font-weight: bold;
-                    "> 發送人員數量： <b> {{ handleSelectedArray.length }}</b></div>
+                    "> {{$t('immediatePush.numberOfSenders')}} <b> {{ handleSelectedArray.length }}</b></div>
                     <el-tooltip
                       v-if="handleSelectedArray.length > 0"
                       class="date-time-tooltip"
@@ -117,28 +117,22 @@
                       <i class="iconfont icon-bangzhu iconbangzhu"/>
                     </el-tooltip>
               </div>
-    
-              <!-- <span style="font-size: 11px;">發送人員數量  
-                {{ totalSendingArray[0].content.length + totalSendingArray[1].content.length +  totalSendingArray[2].content.length}}
-              </span> <br>
-              <pre style="font-size: 11px; text-align: left;"> 發送人員 :{{ totalSendingArray }}</pre>
-              -->
 
 
-              <div class="title-name" style="margin-top: 30px;"> 發送訊息</div>
+              <div class="title-name" style="margin-top: 30px;"> {{$t('immediatePush.message')}} </div>
               <div class="send_content_row">
-                <div class="row_title"><span style="color: #c60957">* </span> 標題</div>
+                <div class="row_title"><span style="color: #c60957">* </span> {{$t('immediatePush.messageTitle')}}</div>
                 <el-input
                   v-model="broadcastTitle"
                   style="width: 50%;"
                   ref="nodeName"
-                  placeholder="請輸入標題"
+                  :placeholder="$t('immediatePush.inputMessageTitle')"
                   @input="(val) => itemInputChanged_a1(val, 50)"
                 />
-                <span class="notice" v-if="showInputLimit_a1"> 最多可輸入 50 個字元 </span>
+                <span class="notice" v-if="showInputLimit_a1">  {{$t('immediatePush.maxInput')}} 50 {{$t('immediatePush.character')}} </span>
               </div>
               <div class="send_content_row">
-                <div class="row_title"><span style="color: #c60957">* </span> 內容</div>
+                <div class="row_title"><span style="color: #c60957">* </span>  {{$t('immediatePush.messageContent')}} </div>
                 <el-input
                   v-model="broadcastContent"
                   style="width: 50%; "
@@ -148,11 +142,11 @@
                   :autosize="{ minRows: 2, maxRows: 10}"
                   @input="(val) => itemInputChanged_a2(val, 500)"
                 />
-                <span class="notice" v-if="showInputLimit_a2"> 最多可輸入 500 個字元 </span>
+                <span class="notice" v-if="showInputLimit_a2"> {{$t('immediatePush.maxInput')}} 500 {{$t('immediatePush.character')}} </span>
               </div>
               
               <div class="send_content_row" >
-                <div class="row_title"> 附件</div>
+                <div class="row_title"> {{$t('immediatePush.attachment')}}</div>
                 <!-- <div class="attachments"> 選擇檔案</div> -->
                 <div class="attach-area" style="width: 100%;">
                   <div v-for="(imgItem,index) in attachFileList" :key="'img'+index" class="source-details" >
@@ -207,7 +201,7 @@
                       ref="attachFiles" />
                     <div style="height:16px; display: flex; flex-direction: row; align-items: center;">
                       <img :src="addAttIcon" widht="16px" height="16px" style="border-radius:10px;"/>
-                      <div class="att-txt">選擇檔案</div>
+                      <div class="att-txt">{{$t('immediatePush.selectFile')}}</div>
                     </div>
                   </div>
                 </div>
@@ -216,7 +210,7 @@
           </el-tab-pane>
 
           <!-- 即時排程 -->
-          <el-tab-pane label="即時排程" name="1">
+          <el-tab-pane :label="$t('immediatePush.immediateTask')" name="1">
             <div class="send_content" v-loading="isLoadingData"  style="padding-bottom: 40px;">
               <div class="submit_btn" >
                 <delay-button 
@@ -230,30 +224,30 @@
                     || selectedInstantTaskStaff.length == 0 " 
                   >
                 <div class="button-area" style="width: 80px; height: 20px;">
-                    <span>發送排程</span>
+                    <span>{{$t('immediatePush.sendTask')}}</span>
                   </div>
                 </delay-button>
               </div>
 
-              <div class="title-name"> 發送排程</div>
+              <div class="title-name">{{$t('immediatePush.sendTask')}}</div>
               <div class="send_content_row">
-                <div class="row_title"><span style="color: #c60957">* </span> 排程名稱</div>
+                <div class="row_title"><span style="color: #c60957">* </span> {{$t('immediatePush.taskName')}}</div>
                 <el-input
                   v-model="taskName"
-                  placeholder="請輸入排程名稱"
+                  :placeholder="$t('immediatePush.inputTaskName')"
                   style="width: 50%;"
                   @input="(val) => itemInputChanged_b1(val, 20)"
                   />
-                  <span class="notice" v-if="showInputLimit_b1"> 最多可輸入 20 個字元 </span>
+                  <span class="notice" v-if="showInputLimit_b1"> {{$t('immediatePush.maxInput')}} 20 {{$t('immediatePush.character')}} </span>
               </div>
 
               <!-- 巡檢表 -->
               <div class="send_content_row">
-                <div class="row_title"><span style="color: #c60957">* </span> 巡檢表</div>
+                <div class="row_title"><span style="color: #c60957">* </span> {{$t('immediatePush.inspectionName')}} </div>
                 <el-select
                   v-model="inspectionMode"
                   style="width: 25%;"
-                  placeholder="巡檢表"
+                  :placeholder="$t('immediatePush.inspectionName')"
                   filterable
                   >
                   <el-option
@@ -267,7 +261,7 @@
                 <el-select 
                   v-model="inspectionName"
                   style="width: 25%;"
-                  placeholder="巡檢表名稱"
+                  :placeholder="$t('immediatePush.inspectionName')"
                   filterable
                   >
                   <el-option
@@ -281,7 +275,7 @@
 
               <!-- 執行日期 -->
               <div class="send_content_row">
-                <div class="row_title"> <span style="color: #c60957">* </span> 執行日期</div>
+                <div class="row_title"> <span style="color: #c60957">* </span> {{$t('immediatePush.excetionDate')}}</div>
                 <el-date-picker
                   v-model="remindDate"
                   style="width: 50%;"
@@ -306,14 +300,14 @@
                 </el-time-select>
               </div> -->
 
-              <div class="title-name" style="margin-top: 30px;"><span style="color: #c60957">*</span> 發送至</div>
+              <div class="title-name" style="margin-top: 30px;"><span style="color: #c60957">*</span>  {{$t('immediatePush.sendBTo')}}</div>
               <div class="send_content_row">
                 <!-- 門店 -->
-                <div class="row_title">門店</div>
+                <div class="row_title"> {{$t('immediatePush.store')}}</div>
                 <el-select
                   v-model="selectedInstantTaskStore"
                   style="width: 50%;"
-                  placeholder="請選擇門店" 
+                  :placeholder="$t('immediatePush.selectStore')" 
                   filterable
                   multiple
                   >
@@ -327,11 +321,11 @@
               </div>
               <!-- 人員 -->
               <div class="send_content_row" >
-                <div class="row_title">人員</div>
+                <div class="row_title">{{$t('immediatePush.staff')}}</div>
                 <el-select
                   v-model="selectedInstantTaskStaff"
                   style="width: 50%;"
-                  placeholder="請選擇人員" 
+                  :placeholder="$t('immediatePush.selectStaff')" 
                   filterable
                   multiple
                   >
@@ -347,7 +341,7 @@
           </el-tab-pane>
 
           <!-- 即時事件 -->
-          <el-tab-pane label="即時事件" name="2">
+          <el-tab-pane :label="$t('immediatePush.immediateEvent')" name="2">
             <div class="send_content" v-loading="isLoadingData">
               <!-- 發送事件 -->
               <div class="submit_btn" >
@@ -360,18 +354,18 @@
                     || eventName == '' " 
                 >
                 <div class="button-area" style="width: 80px; height: 20px;">
-                    <span>發送事件</span>
+                    <span>{{$t('immediatePush.sendEvent')}}</span>
                   </div>
                 </delay-button>
               </div>
 
-              <div class="title-name"><span style="color: #c60957">* </span> 發送對象</div>
+              <div class="title-name"><span style="color: #c60957">* </span> {{$t('immediatePush.sendObject')}}</div>
               <div class="send_content_row">
-                <div class="row_title">門店</div> 
+                <div class="row_title">{{$t('immediatePush.store')}}</div> 
                 <el-select
                   v-model="selectedInstantEventStore"
                   style="width: 50%;"
-                  placeholder="請選擇門店" 
+                  :placeholder="$t('immediatePush.selectStore')" 
                   filterable
                   >
                   <el-option
@@ -383,11 +377,11 @@
                 </el-select>
               </div>
               <div class="send_content_row">
-                <div class="row_title">職務</div>
+                <div class="row_title">{{$t('immediatePush.position')}}</div>
                 <el-select 
                   v-model="selectInstantEventTitle"
                   style="width: 50%;"
-                  placeholder="請選擇職務" 
+                  :placeholder="$t('immediatePush.selectPosition')" 
                   filterable
                   multiple
                   >
@@ -401,16 +395,16 @@
               </div>
 
 
-              <div class="title-name" style="margin-top: 30px;"> 發送事件</div>
+              <div class="title-name" style="margin-top: 30px;"> {{$t('immediatePush.sendEvent')}}</div>
               <div class="send_content_row">
-                <div class="row_title"> <span style="color: #c60957">* </span>事件名稱</div>
+                <div class="row_title"> <span style="color: #c60957">* </span>{{$t('immediatePush.eventName')}}</div>
                 <el-input
                   v-model="eventName"
                   style="width: 50%;"
                   />
               </div>
               <div class="send_content_row" >
-                <div class="row_title"> 附件</div>
+                <div class="row_title"> {{$t('immediatePush.attachment')}}</div>
                 <!-- <div class="attachments"> 選擇檔案</div> -->
                 <div class="attach-area" style="width: 100%;">
                   <div v-for="(imgItem,index) in attachFileList" :key="'img'+index" class="source-details" >
@@ -449,7 +443,7 @@
                       ref="auditfile" />
                     <div style="height:16px; display: flex; flex-direction: row; align-items: center;">
                       <img :src="addAttIcon" widht="16px" height="16px" style="border-radius:10px;"/>
-                      <div class="att-txt">選擇檔案</div>
+                      <div class="att-txt"> {{$t('immediatePush.selectFile')}}</div>
                     </div>
                   </div>
                 </div>
@@ -542,11 +536,11 @@ export default {
       inspectionStyle: [
         {
           value : 1,
-          label: '現場巡檢'
+          label: this.$t('scheduleView.onsitePatrol')
         },
         {
           value : 0,
-          label: '遠端巡檢'
+          label: this.$t('scheduleView.remotePatrol')
         },
       ],
       allInspectTypeList: [],
