@@ -1636,7 +1636,6 @@ export default{
         "viewReportbyFormExecutionPermissions":"依表單執行權限檢視報告",
         "viewReportsByStorePermissions":"依門店權限檢視報告 ",
     },
-
     "immediatePush":{
         "broadcast": "公告訊息",
         "sendBroadcast": "發送公告",
@@ -1682,7 +1681,6 @@ export default{
         "read": "已讀",
         "notRead": "未讀",
         "storeMonitoring": "門店監控",
-
     }
 
 }
