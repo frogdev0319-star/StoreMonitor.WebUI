@@ -433,12 +433,8 @@ export default {
         { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
         { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') },
 
-        { 'mode': 2, 'label': '門店監控' },
-        { 'mode': 3, 'label': '即時事件' }
-
-        // { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') },
-        // { 'mode': 2, 'label': this.$t('remotePatrol.remotePatrol') },
-        // { 'mode': 3, 'label': '即時事件' }
+        { 'mode': 2, 'label': this.$t('immediatePush.storeMonitoring') },
+        { 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')  }
       ],
       inspectId: [],
       inspectTableList: [],
