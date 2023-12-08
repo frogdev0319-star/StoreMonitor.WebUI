@@ -1681,6 +1681,8 @@ export default{
         "all": "全部",
         "read": "已讀",
         "notRead": "未讀",
+        "storeMonitoring": "門店監控",
+
     }
 
 }
