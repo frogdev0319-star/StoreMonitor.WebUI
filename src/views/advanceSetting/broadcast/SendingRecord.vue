@@ -62,16 +62,16 @@
                 />
               </div>
               
+        
               <!-- pagination -->
               <div class="page-area">
                 <div class="pagination_row"  v-if="totalEvents > 0" > 
                   <div class="pageSizeTitle" style="color: #666">共有 <b style="font-size: 16px"> {{totalEvents}} </b> {{ $t('remotePatrol.numReports') }}</div>
-
                   <tbl-pagination-only
                     :btn-style="{backgroundColor:'transparent'}"
                     :total="total"
                     :current-page="currentPage"
-                    :page-size="sizeNum"
+                    :pagesize="sizeNum"
                     layout = "total, prev, pager, next, sizes, slot"
                     @sizeChange="handlePagination"
                     @currentChange="handlePagination"
@@ -451,11 +451,15 @@ export default {
       var n =  Number(val.index)
       this.currentPage = 1
       this.curSizeNum = 10
-      this.sizeNum = 10
+      this.sizeNum = this.curSizeNum
+      
       this.curOrder.direction = "desc"
       
+
+
       this.actionType = n
       await this.getTable(n)
+    
     },
 
     sortChange(sortOrder) {
@@ -486,6 +490,7 @@ export default {
     async getInsantBroadcastTable(){
       this.isLoadingData = true
       console.log('this.dateValue 0', this.dateValue)
+      console.log('this.curSizeNum', this.curSizeNum)
       var param = {
         beginTs: this.dateValue[0],
         endTs: this.dateValue[1],
@@ -777,6 +782,8 @@ export default {
       this.sizeNum = pageInfo.size
       this.getTable(this.actionType)
     },
+
+
 
     filterRadStatus(val){
       console.log('val :>> ', val);

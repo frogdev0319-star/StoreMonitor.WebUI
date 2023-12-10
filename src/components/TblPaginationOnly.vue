@@ -18,6 +18,7 @@
           </el-select>
         </div>
 
+
     <!--<el-pagination
       :current-page="currentPage"
       :page-sizes="[10, 20, 50, 100]"
@@ -50,7 +51,7 @@ export default {
     pagesize: {
       type: Number,
       default: 10,
-      required: false
+      required: true
     },
     currentPage: {
       type: Number,
