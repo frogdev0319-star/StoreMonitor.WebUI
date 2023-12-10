@@ -81,9 +81,17 @@ export const getImmediateEventTable = data => {
     data
   });
 };
+
 export const getImmediateEventReadStatus = data => {
   return request({
     url: `${version}/instant/notify/event/read/status`,
+    method: 'post',
+    data
+  });
+};
+export const broadcastCheck = data => {
+  return request({
+    url: `${version}/instant/notify/broadcast/check`,
     method: 'post',
     data
   });

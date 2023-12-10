@@ -444,7 +444,6 @@ export default {
       sourceType: 0
     };
   },
-
   computed: {
     tableHieght() {
       if (this.windowHeight > 800) {

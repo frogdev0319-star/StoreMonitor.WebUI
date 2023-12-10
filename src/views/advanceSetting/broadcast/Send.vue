@@ -22,7 +22,7 @@
                 </delay-button>
               </div>
 
-
+   
               <div class="title-name"> {{$t('immediatePush.sendBTo')}}</div>
               <div class="subtitle_name" style="margin-top: 20px;"> {{$t('immediatePush.groupObject')}}</div>
               <div class="send_content_row">
@@ -42,6 +42,7 @@
                     />
                 </el-select>
               </div>
+              <!-- 部門 -->
               <div class="send_content_row">
                 <div class="row_title">{{$t('immediatePush.department')}}</div>
                 <el-select
@@ -59,6 +60,7 @@
                     />
                 </el-select>
               </div>
+              <!-- 職務 -->
               <div class="send_content_row">
                 <div class="row_title"><span style="color: #c60957">* </span>{{$t('immediatePush.position')}}</div>
                 <el-select 
@@ -103,14 +105,14 @@
                     font-size: 12px; 
                     text-align: right;
                     font-weight: bold;
-                    "> {{$t('immediatePush.numberOfSenders')}} <b> {{ handleSelectedArray.length }}</b></div>
+                    "> {{$t('immediatePush.numberOfSenders')}} <b> {{ showHandleSelectedArray.length }}</b></div>
                     <el-tooltip
-                      v-if="handleSelectedArray.length > 0"
+                      v-if="showHandleSelectedArray.length > 0"
                       class="date-time-tooltip"
                       effect="light"
                       placement="bottom-end">
                       <div slot="content">
-                        <div class="staffName" v-for="n in handleSelectedArray">
+                        <div class="staffName" v-for="n in showHandleSelectedArray">
                           <p style="line-height: 1.05; color: #555;">{{ n }}</p>
                         </div>
                       </div>
@@ -502,7 +504,8 @@ import { getUserInfo, getDepartAll, getAllUserInfoNoAuth, getDepart} from '@/api
 import {
   sendImmediateBroadcast,
   sendImmediateTask, 
-  sendImmediateEvent
+  sendImmediateEvent,
+  broadcastCheck
 } from '@/api/advanceSetting';
 import { GetInspectTagListAll } from '@/api/inspect';
 import filterString from '@/common/filterString.js';
@@ -590,7 +593,6 @@ export default {
       showInputLimit_c1: false,
 
       dialogAttachVideo: false,
-
       totalSendingArray: [
         {
           tag: "dep",
@@ -606,7 +608,8 @@ export default {
         },
       ],
       totalSendingNum: 0,
-  
+      
+      handleSelectedArray: [],
     }
   },
   mounted() {
@@ -627,15 +630,16 @@ export default {
   },
   computed: {
     // ...mapGetters({ accountChanged: 'accountChanged' })
-    handleSelectedArray(){
-      var tempAry = []
-      this.totalSendingArray.forEach(i => {
-        tempAry = [...tempAry, ...i.content]
-      })
-      var resultAry = [...new Set(tempAry)]
+
+    showHandleSelectedArray(){
+      // var tempAry = []
+      // this.totalSendingArray.forEach(i => {
+      //   tempAry = [...tempAry, ...i.content]
+      // })
+      // var resultAry = [...new Set(tempAry)]
       // console.log('this.userList :>> ', this.userList);
       var showNameAry = []
-      resultAry.forEach(i => {
+      this.handleSelectedArray.forEach(i => {
         this.userList.forEach( u => {
           if(i == u.userId) showNameAry.push(u.userName)
         })
@@ -654,29 +658,65 @@ export default {
       this.inspectionName = this.inspectTypeList[0].id
     },
 
-    selectedInstantBroadcastbranch(val){
-      console.log('val :>> ', val);
-      console.log('this.departList :>> ', this.departList);
-      var selectedBranch =[]
-      val.forEach(i => {
-        var tempBranch = this.departList.filter( d => d.defineId == i)
-        selectedBranch = [...selectedBranch, ...tempBranch[0].contents]
-      })
-      this.totalSendingArray[0].content = [...selectedBranch]
+
+    async selectedInstantBroadcastStore(val){
+      if(val.length > 0 ) {
+        let res  = await this.broadcastStaffCheck();
+        console.log('res a>> ', res);
+        this.handleSelectedArray = [...res.data]
+      }
     },
-    selectInstantBroadcastTitle(val){
-      console.log('val :>> ', val);
-      var selectedTitles = []
-      val.forEach(i => {
-        var tempTitles = this.titleList.filter( d => d.defineId == i)
-        selectedTitles = [...selectedTitles, ...tempTitles[0].contents]
-      })
-      this.totalSendingArray[1].content = [...selectedTitles]
+
+    async selectedInstantBroadcastbranch(val){
+      if( this.selectedInstantBroadcastStore.length > 0) {
+        let res  = await this.broadcastStaffCheck();
+        console.log('res b>> ', res);
+        this.handleSelectedArray = [...res.data]
+      }
     },
-    selectedInstantBroadcastStaff(val){
-      console.log('val :>> ', val);
-      this.totalSendingArray[2].content = [...val]
+    
+    async selectInstantBroadcastTitle(val){
+      if( this.selectedInstantBroadcastStore.length > 0) {
+        let res  = await this.broadcastStaffCheck();
+        console.log('res c>> ', res);
+        this.handleSelectedArray = [...res.data]
+      }
     },
+    async selectedInstantBroadcastStaff(val){
+      if(this.selectedInstantBroadcastStore.length > 0) {
+        let res  = await this.broadcastStaffCheck();
+        console.log('res d>> ', res);
+        this.handleSelectedArray = [...res.data]
+      }
+    }
+
+
+
+
+
+    // selectedInstantBroadcastbranch(val){
+    //   console.log('val :>> ', val);
+    //   console.log('this.departList :>> ', this.departList);
+    //   var selectedBranch =[]
+    //   val.forEach(i => {
+    //     var tempBranch = this.departList.filter( d => d.defineId == i)
+    //     selectedBranch = [...selectedBranch, ...tempBranch[0].contents]
+    //   })
+    //   this.totalSendingArray[0].content = [...selectedBranch]
+    // },
+    // selectInstantBroadcastTitle(val){
+    //   console.log('val :>> ', val);
+    //   var selectedTitles = []
+    //   val.forEach(i => {
+    //     var tempTitles = this.titleList.filter( d => d.defineId == i)
+    //     selectedTitles = [...selectedTitles, ...tempTitles[0].contents]
+    //   })
+    //   this.totalSendingArray[1].content = [...selectedTitles]
+    // },
+    // selectedInstantBroadcastStaff(val){
+    //   console.log('val :>> ', val);
+    //   this.totalSendingArray[2].content = [...val]
+    // },
     
 
 
@@ -689,6 +729,27 @@ export default {
       await this.getUserInfo()
       await this.getDepartAll()
     },
+
+    
+    broadcastStaffCheck(){
+      var params = {
+          titleIds: [...this.selectInstantBroadcastTitle],
+          storeIds: [...this.selectedInstantBroadcastStore],
+          depIds: [...this.selectedInstantBroadcastbranch],
+          userIds: [...this.selectedInstantBroadcastStaff]
+      }
+      return new Promise((resolve, reject) => {
+        broadcastCheck(params).then(res => {
+          const errMsg = res.errMsg;
+          if (errMsg != undefined && errMsg === 'Success') {
+            resolve(res);
+          }
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
 
     onTabClick(){
       this.attachFileList = []

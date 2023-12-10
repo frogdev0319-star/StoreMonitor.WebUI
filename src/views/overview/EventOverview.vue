@@ -231,6 +231,10 @@ export default {
         {
           'type': this.$t('overview.storeMonitor'),
           'percent': '0%'
+        },
+        {
+          'type': this.$t('immediatePush.immediateEvent'),
+          'percent': '0%'
         }
       ],
       statusLegend: [
@@ -445,32 +449,46 @@ export default {
       let remoteEventNum = 0;
       let onsiteEventNum = 0;
       let storeEventNum = 0;
+      let immediateEventNum = 0;
 
       let sumEvent = 0;
       let seriesData = 0;
+
+      console.log('sourcePieList !!!:>> ', sourcePieList);
+      console.log('jsonArray 1 !!!:>> ', jsonArray);
       sourcePieList.forEach((item, index) => {
         sumEvent += item.numOfEvent;
         if (index === 0) {
           storeEventNum = item.numOfEvent;
-        } else if (index === 1) {
+        }
+        else if (index === 1) {
           remoteEventNum = item.numOfEvent;
-        } else if (index === 2) {
+        } 
+        else if (index === 2) {
           onsiteEventNum = item.numOfEvent;
         }
+        else if (index === 3) {
+          immediateEventNum = item.numOfEvent;
+        }
       });
-      const totalArray = [remoteEventNum, onsiteEventNum, storeEventNum];
+      const totalArray = [remoteEventNum, onsiteEventNum, storeEventNum, immediateEventNum];
       jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
       jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
       jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
+      jsonArray[3].percent = util.getPercentValue(totalArray, 3, 2);
+      
+      console.log('jsonArray 2 !!!:>> ', jsonArray);
       if (sumEvent !== 0) {
         seriesData = [
           { value: remoteEventNum, name: self.$t('overview.remotePatrol') },
           { value: onsiteEventNum, name: self.$t('overview.onsitePatrol') },
-          { value: storeEventNum, name: self.$t('overview.storeMonitor') }
+          { value: storeEventNum, name: self.$t('overview.storeMonitor') },
+          { value: immediateEventNum, name: self.$t('immediatePush.immediateEvent') }
         ];
       } else {
         seriesData = [];
       }
+
       self.eventSourceOptions = {
         tooltip: {
           trigger: 'item',
@@ -531,7 +549,7 @@ export default {
                 borderWidth:5,
                 borderColor:'#FFF',
                 color: function(params) {
-                  const colorList = ['#7bd8eb', '#7b9feb', '#5274bb'];
+                  const colorList = ['#7bd8eb', '#7b9feb', '#5274bb', '#1d469b'];
                   return colorList[params.dataIndex];
                 }
               }

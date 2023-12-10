@@ -299,7 +299,6 @@ export default {
         { 'mode': 2, 'label': this.$t('immediatePush.storeMonitoring') },
         { 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')  }
       ],
-
       curAppraise: -1,
       appraiseList: [
         { 'status': -1, 'label': this.$t('remotePatrol.all') },
