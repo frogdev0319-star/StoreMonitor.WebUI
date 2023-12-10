@@ -299,7 +299,6 @@ export default {
         { 'mode': 2, 'label': this.$t('immediatePush.storeMonitoring') },
         { 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')  }
       ],
-
       curAppraise: -1,
       appraiseList: [
         { 'status': -1, 'label': this.$t('remotePatrol.all') },
@@ -508,8 +507,8 @@ export default {
 
 
       if(this.curReportType == -1){ self.params.sourceType = null}
-      else if(this.curReportType == 0){self.params.sourceType = 2}
-      else if(this.curReportType == 1){self.params.sourceType = 1}
+      else if(this.curReportType == 0){self.params.sourceType = 1}
+      else if(this.curReportType == 1){self.params.sourceType = 2}
       else if(this.curReportType == 2){self.params.sourceType = 0}
       else if(this.curReportType == 3){self.params.sourceType = 3}
       

@@ -437,6 +437,10 @@ $ignored: #b9c6d2;
                 .label-2 {
                   background-color: $ignored;
                 }
+                .label-3 {
+                  background-color: #1d469b;
+                }
+                
               }
             }
             .en-labels {
@@ -986,6 +990,9 @@ $ignored: #b9c6d2;
                 .label-2{
                   background-color: $store;
                 }
+                .label-3 {
+                  background-color: #1d469b;
+                }
               }
             }
             .en-label{
@@ -1084,6 +1091,9 @@ $ignored: #b9c6d2;
         }
         .label-2 {
           background-color: $closed;
+        }
+        .label-3 {
+          background-color: #1d469b;
         }
       }
       .store-status-panel{

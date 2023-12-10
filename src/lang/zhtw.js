@@ -1651,7 +1651,7 @@ export default{
         "numberOfSenders": "發送人員數量：",
         "message": "發送訊息",
         "messageTitle": "標題",
-        "inputMessageTitle": "請輸入標題標題",
+        "inputMessageTitle": "請輸入標題",
         "maxInput": "最多可輸入",
         "character": "個字元",
         "messageContent": "內容",
