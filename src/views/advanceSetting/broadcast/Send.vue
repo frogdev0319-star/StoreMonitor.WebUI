@@ -403,7 +403,10 @@
                 <el-input
                   v-model="eventName"
                   style="width: 50%;"
+                  @input="(val) => itemInputChanged_c1(val, 50)"
                   />
+                  <span class="notice" v-if="showInputLimit_a1">  {{$t('immediatePush.maxInput')}} 50 {{$t('immediatePush.character')}} </span>
+
               </div>
               <div class="send_content_row" >
                 <div class="row_title"> {{$t('immediatePush.attachment')}}</div>
@@ -1272,6 +1275,16 @@ export default {
         this.showInputLimit_b1 = true
       } else {
         this.showInputLimit_b1 = false
+      }
+    },
+    itemInputChanged_c1(val, n){
+      const content = filterString.all(val, n);
+      this.eventName = content
+      const length = filterString.getContentLength(val);
+      if(length > n) {
+        this.showInputLimit_a1 = true
+      } else {
+        this.showInputLimit_a1 = false
       }
     },
   },
