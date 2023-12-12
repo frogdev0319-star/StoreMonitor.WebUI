@@ -22,7 +22,6 @@
                 </delay-button>
               </div>
 
-   
               <div class="title-name"> {{$t('immediatePush.sendBTo')}}</div>
               <div class="subtitle_name" style="margin-top: 20px;"> {{$t('immediatePush.groupObject')}}</div>
               <div class="send_content_row">
@@ -173,15 +172,39 @@
                       <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
                       <div class="attach_file">
                         <img src="../../../../static/img/MdiFilePdfOutline.svg" alt="">
-                        <span>{{imgItem.oriName}}</span>
+                        <span 
+                          style="
+                                margin: 0;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                display: -webkit-box;
+                                -webkit-line-clamp: 2;
+                                -webkit-box-orient: vertical;
+                              "
+                          >
+                          {{imgItem.oriName.split(".pdf").shift()}}
+                        </span>
+                        
+                          
                       </div>
                     </div>
-                    <!-- .xslx -->
+                    <!-- .xlsx -->
                     <div v-else-if="imgItem.type===5" class="img-content">
                       <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
                       <div class="attach_file">
                         <img src="../../../../static/img/IconParkSolidExcel.svg" alt="">
-                        <span>{{imgItem.oriName}}</span>
+                        <span 
+                          style="
+                                margin: 0;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                display: -webkit-box;
+                                -webkit-line-clamp: 2;
+                                -webkit-box-orient: vertical;
+                              "
+                          >
+                          {{imgItem.oriName.split(".xlsx").shift()}}
+                        </span>
                       </div>
                     </div>
                     <!-- .docx -->
@@ -189,7 +212,18 @@
                       <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
                       <div class="attach_file">
                         <img src="../../../../static/img/MaterialSymbolsDocsOutline.svg" alt="">
-                        <span>{{imgItem.oriName}}</span>
+                        <span 
+                          style="
+                                margin: 0;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                display: -webkit-box;
+                                -webkit-line-clamp: 2;
+                                -webkit-box-orient: vertical;
+                              "
+                          >
+                          {{imgItem.oriName.split(".docx").shift()}}
+                        </span>
                       </div>
                     </div>
                   </div>

@@ -623,8 +623,6 @@ export default {
       this.tableDataList[Number(this.activeName)].page = 1;
       console.log('this.searchParams ~~~~~~~>> ', this.searchParams);
 
-
-
       if(this.searchParams['searchFrom']=='PatrolPersonStat'){
         delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
         this.searchParams['searchFrom'] = '';
@@ -1052,7 +1050,7 @@ export default {
           storeId: storeId
         },
         like: like,
-        searchMysteryMode:self.searchParams.searchMysteryMode
+        searchMysteryMode:self.searchParams.searchMysteryMode,
       };
       if(storeId!='-1'){
         params['clause']['storeId'] = storeId
@@ -1074,6 +1072,12 @@ export default {
           params.clause['subject'] =  this.searchParams.searchParams.clause.subject;
         }
       }
+
+      if(this.curReportType == -1){params.sourceType = null}
+      else if(this.curReportType == 0){params.sourceType = 2}
+      else if(this.curReportType == 1){params.sourceType = 1}
+      else if(this.curReportType == 2){params.sourceType = 0}
+      else if(this.curReportType == 3){params.sourceType = 3}
 
       //delete params.clause['status'];
       if (storeId.length === 0) {
