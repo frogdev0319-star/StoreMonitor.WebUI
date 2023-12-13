@@ -709,7 +709,7 @@ export default {
         if(typeof(i.fileSize) == "number"){
           i.fileSize = i.fileSize > 1048579 ? `${(i.fileSize/1048579).toFixed(1)} mb` : `${(i.fileSize/1024).toFixed(0)} kb`
         }
-        i.fileName = i.fileName.split("_" ).pop()
+        // i.fileName = i.fileName.split("_" ).pop()
         
       })
       this.attachTableData = [...val.attachments]
