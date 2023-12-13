@@ -2,7 +2,9 @@
   <el-row class="el-rate-container">
     <el-col :span="12" :style="{'height':windowHeight*0.82+'px','overflow-y': 'auto'}" class="lside">
       <div class="title-content">
-        <img  :src="sourceSrc"  :class="(event.sourceType!=2)?'title-img':'title-img-inside'" >
+        <img  
+          :src="sourceSrc"  
+          :class="(event.sourceType!=2) ? 'title-img' : 'title-img-inside'" >
         <el-tooltip effect="light" placement="bottom">
           <div slot="content">{{ event.eventTitle }}</div>
           <div class="event-title">{{ event.eventTitle }}</div>
@@ -476,6 +478,7 @@ export default {
       videoSrc: require('../../../../static/img/monitor.png'),
       inspectSrc: require('../../../../static/img/remote_patrol.png'),
       insiteInspectSrc: require('../../../../static/img/onsite_patrol.png'),
+      immediateInspectSrc: require('../../../../static/img/immediate_patrol.png'),
       startIcon: require('../../../../static/img/play_icon.png'),
       videoImgSrc: require('../../../../static/img/video_thumbnail.png'),
       cameraImg: require('../../../../static/img/icon_camera.svg'),
@@ -560,6 +563,7 @@ export default {
         case 0: src = this.videoSrc; break;
         case 1: src = this.inspectSrc; break;
         case 2: src = this.insiteInspectSrc; break;
+        case 3: src = this.immediateInspectSrc; break;
       }
       return src;
     },
