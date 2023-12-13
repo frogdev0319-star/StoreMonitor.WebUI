@@ -255,7 +255,7 @@
                 <tbl-pagination-only
                 :total="total"
                 :current-page="page"
-                :page-size="sizeNum"
+                :pagesize="sizeNum"
                 layout = "prev,pager, next,sizes,slot"
                 @sizeChange="sizeChange"
                 @currentChange="currentChange"
@@ -735,9 +735,13 @@ export default {
 
       // self.params.searchMysteryMode = 0
 
-      if(this.curReportType == -1){ self.params.sourceType = null}
-      else if(this.curReportType == 0){self.params.sourceType = 2}
-      else if(this.curReportType == 1){self.params.sourceType = 1}
+      if(this.curReportType == -1){ 
+        self.params.sourceType = null
+        self.params.inspectTagIds = []
+
+      }
+      else if(this.curReportType == 0){self.params.sourceType = 1}
+      else if(this.curReportType == 1){self.params.sourceType = 2}
       else if(this.curReportType == 2){self.params.sourceType = 0}
       else if(this.curReportType == 3){self.params.sourceType = 3}
       
@@ -1073,7 +1077,10 @@ export default {
         }
       }
 
-      if(this.curReportType == -1){params.sourceType = null}
+      if(this.curReportType == -1){
+        params.sourceType = null
+        params.inspectTagIds = []
+      }
       else if(this.curReportType == 0){params.sourceType = 2}
       else if(this.curReportType == 1){params.sourceType = 1}
       else if(this.curReportType == 2){params.sourceType = 0}
@@ -1088,7 +1095,7 @@ export default {
       } else {
         eventRESTful.GetEventCountByStatus(params).then(res => {
           const data = res.data;
-          //console.log("GetEventCountByStatus > data:",data);
+          console.log("GetEventCountByStatus > data:",data);
           let numOfEventTotal = 0;
           for (let i = 0; i < 4; i++) {
             self.tableDataList[i].eventCount = data[i].numOfEvent;

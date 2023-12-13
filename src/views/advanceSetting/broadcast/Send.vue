@@ -1062,7 +1062,7 @@ export default {
       }
       if(files[0].type.includes("image")){
         var objImg={
-          fileName:`${self.bucketImage}/inspect_${util.getCurTimeStr()}_${files[0].name}`,
+          fileName: files[0].name.replace("#", "_").replace("?", "-"),
           src:'',
           url:'',
           file:'',
@@ -1075,12 +1075,12 @@ export default {
       else if(files[0].type.includes("video")){
         console.log("choose file:",fileName);
         var objvideo={
-          fileName:`${self.bucketVideo}/inspect_${util.getCurTimeStr()}_${files[0].name}`,
+          fileName: files[0].name.replace("#", "_").replace("?", "-"),
           src:'',
           url: URL.createObjectURL(files[0]),
           type: 1,
           size:files[0].size,
-          oriName: `${files[0].name}`
+          oriName: files[0].name.replace("#", "_").replace("?", "-")
         }
         if(files[0].size > maxVideoSize){
           util.notify('檔案大於 10MB，請重新上傳', 'warning', 3000);
@@ -1090,12 +1090,13 @@ export default {
         self.attachFileList.push(objvideo);
       }
       else if(files[0].type.includes("pdf")){
+      
         var objpdf= {
-          fileName:`${self.bucketPdf}/inspect_${util.getCurTimeStr()}_${files[0].name}`,
+          fileName: files[0].name.replace("#", "_").replace("?", "-"),
           url: URL.createObjectURL(files[0]),
           type: 4,
           size:files[0].size,
-          oriName: `${files[0].name}`
+          oriName: files[0].name.replace("#", "_").replace("?", "-"),
         }
         if(files[0].size > maxSize){
           util.notify('檔案大於 4MB，請重新上傳', 'warning', 3000);
@@ -1106,11 +1107,11 @@ export default {
       }
       else if(files[0].type.includes("sheet")){
         var objxlsx= {
-          fileName:`${self.bucketXslx}/inspect_${util.getCurTimeStr()}_${files[0].name}`,
+          fileName: files[0].name.replace("#", "_").replace("?", "-"),
           url: URL.createObjectURL(files[0]),
           type: 5,
           size: files[0].size,
-          oriName: `${files[0].name}`
+          oriName:  files[0].name.replace("#", "_").replace("?", "-")
         }
         if(files[0].size > maxSize){
           util.notify('檔案大於 4MB，請重新上傳', 'warning', 3000);
@@ -1121,11 +1122,12 @@ export default {
       }
       else if(files[0].type.includes("document")){
         var objdocument= {
-          fileName:`${self.bucketDocx}/inspect_${util.getCurTimeStr()}_${files[0].name}`,
+          // fileName:`${self.bucketDocx}/inspect_${util.getCurTimeStr()}_${files[0].name}`,
+          fileName: files[0].name.replace("#", "_").replace("?", "-"),
           url: URL.createObjectURL(files[0]),
           type: 6,
           size: files[0].size,
-          oriName: `${files[0].name}`
+          oriName:  files[0].name.replace("#", "_").replace("?", "-")
         }
         if(files[0].size > maxSize){
           util.notify('檔案大於 4MB，請重新上傳', 'warning', 3000);
