@@ -213,7 +213,7 @@ export default {
       dateValue:[],
       curOrder: {
         direction: "desc",
-        property: "sendTs"
+        property: "ts"
       } ,
       showBroadcastAttach: false,
       showBroadcastReadStatus: false,
@@ -298,7 +298,7 @@ export default {
               'maxWidth': 200,
             },
             {
-              'prop': 'sendTs',
+              'prop': 'ts',
               'label': this.$t('immediatePush.sendingTime'),
               'width': 200,
               'maxWidth': 200,
@@ -321,14 +321,14 @@ export default {
           tableData: [],
           columnData: [
             {
-              'prop': 'scheduleName',
+              'prop': 'taskName',
               'label':  this.$t('immediatePush.scheduleName'),
               'width': 50,
               'maxWidth': 50,
               'sortable': 'custom',
             },
             {
-              'prop': 'inspectReport',
+              'prop': 'inspectTable',
               'label':  this.$t('immediatePush.inspectionName'),
               'width': 200,
               'maxWidth': 200,
@@ -347,7 +347,7 @@ export default {
               'maxWidth': 200,
             },
             {
-              'prop': 'sendTs',
+              'prop': 'ts',
               'label':  this.$t('immediatePush.sendingTime'),
               'width': 200,
               'maxWidth': 200,
@@ -388,7 +388,7 @@ export default {
               'maxWidth': 200,
             },
             {
-              'prop': 'sendTs',
+              'prop': 'ts',
               'label':  this.$t('immediatePush.sendingTime'),
               'width': 200,
               'maxWidth': 200,
@@ -520,7 +520,7 @@ export default {
           bulletinContent: i.instantRequest.msgContent.broadcastContent,
           attachments: i.instantRequest.msgContent.attachments,
           sender: i.instantRequest.userName,
-          sendTs: this.getdate(i.instantRequest.ts),
+          ts: this.getdate(i.instantRequest.ts),
           readStatus: `${i.readMsg}/${i.totalMsg}`
           
         }))
@@ -577,11 +577,11 @@ export default {
         })
         this.tableDataList[1].tableData = res.data.content.map(i => ({
           instantId: i.instantRequest.id,
-          scheduleName : i.instantRequest.msgContent.taskName,
-          inspectReport: i.instantRequest.msgContent.inspectName,
+          taskName : i.instantRequest.msgContent.taskName,
+          inspectTable: i.instantRequest.msgContent.inspectName,
           executeTs: this.getUTCdate(i.instantRequest.msgContent.remindTime),
           sender: i.instantRequest.msgContent.userName,
-          sendTs: this.getdate(i.instantRequest.ts),
+          ts: this.getdate(i.instantRequest.ts),
           readStatus: `${i.readMsg}/${i.totalMsg}`
         }))
         console.log('this.tableDataList[1].tableData =====>>>>>', this.tableDataList[1].tableData)
@@ -626,7 +626,7 @@ export default {
           eventName : i.instantRequest.msgContent.eventTitle,
           attachments: i.instantRequest.msgContent.attachments,
           sender: i.instantRequest.userName,
-          sendTs: this.getdate(i.instantRequest.ts),
+          ts: this.getdate(i.instantRequest.ts),
           readStatus: `${i.readMsg}/${i.totalMsg}`
         }))
         console.log('this.tableDataList[2].tableData =====>>>>>', this.tableDataList[2].tableData)

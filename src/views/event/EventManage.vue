@@ -737,8 +737,9 @@ export default {
 
       if(this.curReportType == -1){ 
         self.params.sourceType = null
-        self.params.inspectTagIds = []
-
+        if(this.inspectId[0] == -1){
+          self.params.inspectTagIds = []
+        }
       }
       else if(this.curReportType == 0){self.params.sourceType = 1}
       else if(this.curReportType == 1){self.params.sourceType = 2}
@@ -1079,10 +1080,12 @@ export default {
 
       if(this.curReportType == -1){
         params.sourceType = null
-        params.inspectTagIds = []
+        if(this.inspectId[0] == -1){
+          params.inspectTagIds = []
+        }
       }
-      else if(this.curReportType == 0){params.sourceType = 2}
-      else if(this.curReportType == 1){params.sourceType = 1}
+      else if(this.curReportType == 0){params.sourceType = 1}
+      else if(this.curReportType == 1){params.sourceType = 2}
       else if(this.curReportType == 2){params.sourceType = 0}
       else if(this.curReportType == 3){params.sourceType = 3}
 
