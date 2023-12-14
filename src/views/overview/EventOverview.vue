@@ -570,12 +570,15 @@ export default {
       let pendingEventNum = 0;
       let doneEventNum = 0;
       let closedEventNum = 0;
+      let rejectEventNum = 0;
 
       let sumEvent = 0;
       let seriesData = [];
       
       var tempCloseNum_A = 0
       var tempCloseNum_B = 0
+
+      var UnprocessedEventNum = 0
 
       statusPieList.forEach((item, index) => {
         sumEvent += item.numOfEvent;
@@ -588,20 +591,24 @@ export default {
         else if (index === 2) {
           tempCloseNum_A = item.numOfEvent;
         }
+        else if (index === 3) {
+          rejectEventNum = item.numOfEvent;
+        }
         else if (index === 4) {
           tempCloseNum_B = item.numOfEvent;
         }
       });
       
       closedEventNum = tempCloseNum_A + tempCloseNum_B
+      UnprocessedEventNum = pendingEventNum + rejectEventNum
 
-      const totalArray = [pendingEventNum, doneEventNum, closedEventNum];
+      const totalArray = [UnprocessedEventNum, doneEventNum, closedEventNum];
       jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
       jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
       jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
       if (sumEvent !== 0) {
         seriesData = [
-          { value: pendingEventNum, name: self.$t('overview.pendingEvent') },
+          { value: UnprocessedEventNum, name: self.$t('overview.pendingEvent') },
           { value: doneEventNum, name: self.$t('overview.processedEvent') },
           { value: closedEventNum, name: self.$t('overview.closedEvents') }
         ];
@@ -722,9 +729,10 @@ export default {
       const { axisArray, colorArray, seriesData } = self.getEventRankingInfoSetting();
       const rankingOption = self.getEventRankingOption(colorArray, seriesData);
 
-      console.log('rankingOption 1 ~~~~~>', rankingOption)
-      console.log('seriesData ~~~~~>', seriesData)
-
+      // console.log('rankingOption 1 ~~~~~>', rankingOption)
+      // console.log('seriesData ~~~~~>', seriesData)
+      // console.log('self.rankType; ~~~~~>', self.rankType)
+      
       try {
         const rankingResult = await self.getEventStatsRanking(params);
         console.log('rankingResult ~~~~~>', rankingResult)
@@ -738,7 +746,7 @@ export default {
             const itemArray = [];
             itemArray.push(item.storeName);
             if (self.rankType === 3) {
-              itemArray.push(item.numOfUnprocessed);
+              itemArray.push(item.numOfUnprocessed + item.numOfRejected);
               itemArray.push(item.numOfInprocess);
               itemArray.push(item.numOfProcessed);
             } 

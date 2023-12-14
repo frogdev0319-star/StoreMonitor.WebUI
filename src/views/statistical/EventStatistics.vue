@@ -1826,7 +1826,7 @@ export default {
         });
         const filterVal = ['province', 'city', 'groupName', 'storeGroup', 'storeType','code', 'numOfTotal', 'numOfUnprocessed', 'numOfInprocess',
           'numOfProcessed', 'numOfRejected','completedRate'];
-        const curData = that.eventTableData;
+        const curData = this.allEventTableData;
         const data = that.formatJson(filterVal, curData);
         const fileName = this.compareType+'_Inspection event' + '_' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
