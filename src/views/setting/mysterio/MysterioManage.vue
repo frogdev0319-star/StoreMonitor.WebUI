@@ -518,6 +518,17 @@ export default {
     }
 }
 </script>
+<style lang="sass">
+  .table-person
+    .el-table
+      // padding: 10px 0
+      overflow: auto !important
+      // .el-table--mini
+      //   background: #FFF !important
+      //   box-shadow: none !important
+        
+
+</style>
 
 <style scoped lang="scss">
 .title-table{
