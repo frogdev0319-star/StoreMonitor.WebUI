@@ -63,7 +63,7 @@
                 :btn-style="{backgroundColor:'transparent'}"
                 :total="curTotalPage"
                 :current-page="curPage"
-                :page-size.sync="curSizeNum"
+                :pagesize.sync="curSizeNum"
                 layout = "prev,pager, next,sizes,slot"
                 @sizeChange="sizeChange"
                 @currentChange="currentChange"

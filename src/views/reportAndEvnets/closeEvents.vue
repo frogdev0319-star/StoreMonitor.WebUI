@@ -1084,8 +1084,8 @@ export default {
 
     .cell-class .cell
       text-align: left  !important
-  .el-table__body-wrapper
-    max-height: fit-content !important
+  // .el-table__body-wrapper
+  //   max-height: fit-content !important
 
 </style>
 
@@ -1310,7 +1310,7 @@ $filterWidth: (100%-706);
           background-color: #fff;
           padding-left: 12px;
           padding-right: 12px;
-          max-height: fit-content !important
+          // max-height: fit-content !important
         }
       }
     }
