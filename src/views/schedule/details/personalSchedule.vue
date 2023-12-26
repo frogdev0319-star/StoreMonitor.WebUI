@@ -25,11 +25,7 @@
             </delay-button>
         </div>
         <div class="scheduleLlist-area">
-                
-
-            
             <div class="buttons">
-
                 <delay-button
                     class="storevue-button-empty add_button" 
                     @click="addNewSchedule">
@@ -38,8 +34,6 @@
                         <span>{{$t('schedule.addSchedule')}}</span>
                     </div>
                 </delay-button>
-
-            
                 <delay-button
                     class="storevue-button-empty del_button" 
                     :disabled="!enableDeleteBtn" 
@@ -48,10 +42,7 @@
                         <span>{{$t('scheduleView.delete')}}</span>
                     </div>
                 </delay-button>
-
-
             </div>
-
 
             <table-only
                 ref="elTP"
@@ -343,7 +334,11 @@ export default{
         onConfirmDeleteSch(){
             console.log("SelSchedulId:",this.SelSchedulId);
             this.showConfirmDelete = false;
-            scheduleRESTful.deletePersonTaskList({taskGroupUuidArray:this.SelSchedulId}).then(res=>{
+            let params = {
+                taskGroupUuidArray: this.SelSchedulId,
+                userId: this.userId,
+            }
+            scheduleRESTful.deletePersonTaskList(params).then(res=>{
                 if(res.errCode==0){
                     this.doSearchScheduleList();
                 }else{
@@ -363,11 +358,14 @@ export default{
             };
             console.log("handleOperation params:",params);
             sessionStorage.setItem('scheduleParams', JSON.stringify(params))
-            console.log('row :>> ', row);
             
+            let copyParams = {
+                taskGroupUuid: row.taskGroupUuid,
+                userId: this.userId,
+            }
             switch(method){
                 case 'copy':{
-                    this.doCopyScheduleTask(row.taskGroupUuid);
+                    this.doCopyScheduleTask(copyParams);
                     break;
                 }
                 case 'set':{
@@ -394,9 +392,9 @@ export default{
             self.curPage = 1;
             self.doSearchScheduleList();
         },
-        doCopyScheduleTask(taskGroupUuid){
+        doCopyScheduleTask(copyParams){
             this.isLoadingData = true
-            scheduleRESTful.CopySchedulePersonSchedule({taskGroupUuid}).then(res => {
+            scheduleRESTful.CopySchedulePersonSchedule(copyParams).then(res => {
                 if(res.errCode==0){
                     this.doSearchScheduleList();
                 }

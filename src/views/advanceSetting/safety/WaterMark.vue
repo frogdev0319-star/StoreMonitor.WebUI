@@ -53,7 +53,7 @@
                     style="width: 200px;  margin: 0 20px ;"
                     @input="(val) => itemInputChanged_overall(val)"
                     />
-                  <span class="text_limit_sign" v-if="showInputLimit_overallItem">最多可輸入 12 個字元 </span>
+                  <span class="text_limit_sign" v-if="showInputLimit_overallItem">最多可輸入 32 個字元 </span>
                 </div>
 
               </div>
@@ -364,10 +364,10 @@ export default {
 
 
     itemInputChanged_overall(val){
-      const content = filterString.all(val, 12);
+      const content = filterString.all(val, 32);
       this.defineText = content
       const length = filterString.getContentLength(val);
-      if(length > 12) {
+      if(length > 32) {
         this.showInputLimit_overallItem = true
       } else {
         this.showInputLimit_overallItem = false
