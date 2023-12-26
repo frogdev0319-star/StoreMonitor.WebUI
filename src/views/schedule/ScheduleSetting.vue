@@ -30,7 +30,7 @@
         </div>
         <table-only
             ref="elTP"
-            class="table-white"
+            class="table-white sch_table"
             table-themes="white"
             :column-data="columnData"
             :table-data="tableData"
@@ -316,8 +316,14 @@ export default{
   }
 }
 </script>
+<style lang="sass">
+.sch_table
+  .el-table .cell 
+    text-align: left !important
+</style>
 
 <style lang="scss" scoped>
+
 .ScheduleContainer{
     width:100%;
 

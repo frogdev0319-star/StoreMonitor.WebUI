@@ -50,7 +50,7 @@
                     v-model="defineText"
                     :disabled = "!isSwitchOn || showTextStatus == false"
                     :placeholder="$t('audit.workFlows.defineItem')"
-                    style="width: 200px;  margin: 0 20px ;"
+                    style="width: 300px;  margin: 0 20px ;"
                     @input="(val) => itemInputChanged_overall(val)"
                     />
                   <span class="text_limit_sign" v-if="showInputLimit_overallItem">最多可輸入 32 個字元 </span>
