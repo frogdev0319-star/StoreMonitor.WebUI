@@ -495,7 +495,7 @@ export default{
       "startingScore":"扣分起始分數：",
       "storeGroup":"地點群組",
       "storeMaxAttach":"影像圖片不能為空，最多支援插入10個。",
-      "storeName":"地點名稱：",
+      "storeName":"地點名稱",
       "storeSelect":"選擇地點",
       "storeTag":"標籤",
       "storeType":"地點類型",
