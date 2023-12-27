@@ -299,7 +299,8 @@ export default {
         // 門店監控
         { 'mode': 2, 'label': this.$t('immediatePush.storeMonitoring') },
         // 即時事件
-        { 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')  }
+        // --- storeVue 關閉 即時事件 ----
+        // { 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')  }
       ],
       curAppraise: -1,
       appraiseList: [
@@ -346,11 +347,9 @@ export default {
       searchParams: {},
       ifSearchData: true,
       isScore:true,
-
-   
-
       inspectStatus:'',
-      totalEvents: 0
+      totalEvents: 0,
+      hasAdvanced: false
     };
   },
 
@@ -396,6 +395,11 @@ export default {
     
   },
 
+  async mounted() {
+    var userInfo = await this.$store.dispatch("GetUserAuthorities");
+    this.hasAdvanced = userInfo.data.isSystemAdvanced
+    this.hasAdvanced ? this.reportTypeList.push({ 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')}) : null
+  },
 
   methods: {
     async initData() {

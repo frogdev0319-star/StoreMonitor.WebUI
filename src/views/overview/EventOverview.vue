@@ -232,10 +232,10 @@ export default {
           'type': this.$t('overview.storeMonitor'),
           'percent': '0%'
         },
-        {
-          'type': this.$t('immediatePush.immediateEvent'),
-          'percent': '0%'
-        }
+        // {
+        //   'type': this.$t('immediatePush.immediateEvent'),
+        //   'percent': '0%'
+        // }
       ],
       statusLegend: [
         {
@@ -305,7 +305,8 @@ export default {
       ],
       echartAxiasColor: '#e3e9f4',
       echartBackground: 'rgba(30,34,52,0.75)',
-      fontFamily: 'Roboto, Microsoft YaHei'
+      fontFamily: 'Roboto, Microsoft YaHei',
+      hasAdvanced: false
     };
   },
 
@@ -329,10 +330,18 @@ export default {
     }
   },
 
-  created() {
+  async created() {
     this.getBriefStoreData();
     this.getSearchParams();
     this.getEventOverviewData();
+
+    var userInfo = await this.$store.dispatch("GetUserAuthorities");
+    this.hasAdvanced = userInfo.data.isSystemAdvanced
+    this.hasAdvanced ? this.sourceLegend.push({'type': this.$t('immediatePush.immediateEvent'), 'percent': '0%'}) : null
+  },
+
+  async mounted() {
+    
   },
 
   beforeDestroy() {
@@ -467,7 +476,7 @@ export default {
         else if (index === 2) {
           onsiteEventNum = item.numOfEvent;
         }
-        else if (index === 3) {
+        else if (index === 3 && this.hasAdvanced) {
           immediateEventNum = item.numOfEvent;
         }
       });
@@ -475,7 +484,7 @@ export default {
       jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
       jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
       jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
-      jsonArray[3].percent = util.getPercentValue(totalArray, 3, 2);
+      if(jsonArray[3] && this.hasAdvanced) jsonArray[3].percent = util.getPercentValue(totalArray, 3, 2)
       
       console.log('jsonArray 2 !!!:>> ', jsonArray);
       if (sumEvent !== 0) {
@@ -549,7 +558,7 @@ export default {
                 borderWidth:5,
                 borderColor:'#FFF',
                 color: function(params) {
-                  const colorList = ['#7bd8eb', '#7b9feb', '#5274bb', '#1d469b'];
+                  const colorList = ['#7bd8eb', '#7b9feb', '#5274bb', '#1d469b']; 
                   return colorList[params.dataIndex];
                 }
               }
