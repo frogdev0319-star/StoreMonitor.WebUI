@@ -2,6 +2,8 @@
   <div :style="{'minHeight':windowHeight-118+'px'}" class="el-event-content">
     <div class="el-event-header">
       <div class="el-area">
+
+
         <store-filter
           :cached-params="searchParams"
           path = "eventManage"
@@ -432,16 +434,17 @@ export default {
         { 'mode': -1, 'label': this.$t('remotePatrol.all') },
         { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
         { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') },
-
         { 'mode': 2, 'label': this.$t('immediatePush.storeMonitoring') },
-        { 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')  }
+        
+        // { 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')  } 
       ],
       inspectId: [],
       inspectTableList: [],
       inspectCatch:[],
       storeList:[],
       selectStoreList:[],
-      sourceType: 0
+      sourceType: 0,
+      hasAdvanced: false
     };
   },
   computed: {
@@ -499,6 +502,11 @@ export default {
     if (windowHeight > 800) {
       self.tableHeight = 770 + 'px';
     }
+
+    var userInfo = await this.$store.dispatch("GetUserAuthorities");
+    this.hasAdvanced = userInfo.data.isSystemAdvanced
+    this.hasAdvanced ? this.reportTypeList.push({ 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')}) : null
+    
   },
 
   activated() {
