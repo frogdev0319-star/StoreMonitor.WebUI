@@ -1,8 +1,8 @@
 <template>
     <div class="page-container mysterio-page paper">
         <div v-if="isLoadingData" class="empty-content">
-          <img :src="loadingGif" class="loading_rotate">
-          <span class="empty-text">{{ $t('remotePatrol.loading') }}</span>
+            <img :src="loadingGif" class="loading_rotate">
+            <span class="empty-text">{{ $t('remotePatrol.loading') }}</span>
         </div>
         <div v-else>
             <div class="mysterio-title padding flex-center">
@@ -98,8 +98,8 @@
                     :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
                     :tableHeight = "760"
                     :cellStyle="{'backgroundColor': '#fff !important'}"    
-                     @sortChange="handleSortChange"         
-                     @handleOperation="handleOperation"             
+                    @sortChange="handleSortChange"         
+                    @handleOperation="handleOperation"             
                 />
                 <div style="width:100%; margin-top:12px;height:31px;">
                     <tbl-pagination-only
@@ -246,7 +246,10 @@ export default {
                         storeId:store.storeId,
                         label:store.name,
                         value:store.storeId,
-                        inspectList:{remote:{label:"遠程",options:[]},onSite:{label:"現場",options:[]}}
+                        inspectList:{
+													// remote:{label:"遠程",options:[]},
+													onSite:{label:"現場",options:[]}
+												}
                     }
                     
                     store.appliedInspect.map(insp=>{
@@ -255,10 +258,15 @@ export default {
                             label:insp.name,
                             value:insp.id
                         }
-                        if(insp.mode==0)
-                            storeObj.inspectList.remote.options.push(inspObj);
-                        else
-                            storeObj.inspectList.onSite.options.push(inspObj);
+												
+												if(insp.mode !==0)
+													storeObj.inspectList.onSite.options.push(inspObj);
+
+												// ==== 2024 sprint1 遠端巡檢關閉 ====
+                        // if(insp.mode==0)
+                        //   storeObj.inspectList.remote.options.push(inspObj);
+                        // else
+                        //   storeObj.inspectList.onSite.options.push(inspObj);
                     })
                     
                     storeList.push(storeObj);

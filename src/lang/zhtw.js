@@ -139,7 +139,8 @@ export default{
     "DataSecurity":"資料安全",
     "InstantPush":"即時推播",
     "Send":"發送推播",
-    "SendingRecord":"發送紀錄"
+    "SendingRecord":"發送紀錄",
+    "downloadManagement": "下載管理"
     
   },
   "overview":{
@@ -1681,7 +1682,11 @@ export default{
         "read": "已讀",
         "notRead": "未讀",
         "storeMonitoring": "門店監控",
+    },
+    "downloadManagement":{
+        "message": "檔案匯出中，請至下載管理查看"
     }
+
 
 }
 

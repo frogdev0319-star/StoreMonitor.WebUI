@@ -211,6 +211,35 @@ export const navbarRoute = {
     return eventRoute;
   },
 
+  // 下載管理
+  getDownloadManagement(){
+    const downloadManagemenRoute = {
+      id:9,
+      path: '/home',
+      name: 'downloadManagement',
+      component: Home,
+      iconCls: 'iconfont icon-shijian',
+      styles: 'font-size:22px',
+      leaf: true,
+      isReadOnly: false,
+      hidden: false,
+      children: []
+    };
+    !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && downloadManagemenRoute.children.push(
+      {
+        path: '/downloadManagement',
+        name: 'downloadManagement',
+        component: resolve => require(['@/views/downloadManagement/DownloadManagement'], resolve),
+        meta: {
+          keepAlive: true, // the component is't to be cache.
+          requireAuth: true
+        }
+      },
+    ) && primaryPathesList.push('/downloadManagement');
+    return downloadManagemenRoute;
+
+  },
+
   // 報告與事件
   getReportAndEvent(){
     const reportAndEventRoute = {
@@ -277,6 +306,8 @@ export const navbarRoute = {
     ) && primaryPathesList.push('/deleteReport', '/closeEvents', '/operationRecord', '/needDeleteReport', '/needUpdateEvent');
     return reportAndEventRoute;
   },
+
+
 
 
   // 簽核管理
@@ -776,7 +807,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/mysterio/MysterioSetting'], resolve),
         hidden: true,
       },
-    ) && primaryPathesList.push('/mysterio', '/mysteriosetting');
+    ) && primaryPathesList.push('/mysterio', '/mysterioSetting');
     return systemSettingRoute;
   },
 
@@ -823,7 +854,7 @@ export const navbarRoute = {
   //即時推播
   getInstantPush(){
     const instantPushRoute = {
-      id: 7,
+      id: 8,
       path: '/home',
       name: 'InstantPush',
       component: Home,
@@ -871,19 +902,20 @@ export const navbarRoute = {
       component: resolve => require(['@/views/setting/device/Dash/NvrDeviceMgmt'], resolve)
     }) && primaryPathesList.push('/dashDevice');
 
-    !PermissionHelper.advancedMode && util.getVideoAuthority(2) && deviceRoutes.push(
-      {
-        path: '/ezvizDevice',
-        name: 'ezvizDevice',
-        component: resolve => require(['@/views/setting/device/Ezviz/EzvizAccount'], resolve)
-      },
-      {
-        path: '/ezvizeDeviceSetting',
-        name: 'deviceSetting',
-        component: resolve => require(['@/views/setting/device/Ezviz/EzvizDeviceMgmt'], resolve),
-        hidden: true
-      }
-    ) && primaryPathesList.push('/ezvizDevice', '/ezvizeDeviceSetting');
+    // ==== 2024 sprint1 關閉遠端巡檢 ====
+    // !PermissionHelper.advancedMode && util.getVideoAuthority(2) && deviceRoutes.push(
+    //   {
+    //     path: '/ezvizDevice',
+    //     name: 'ezvizDevice',
+    //     component: resolve => require(['@/views/setting/device/Ezviz/EzvizAccount'], resolve)
+    //   },
+    //   {
+    //     path: '/ezvizeDeviceSetting',
+    //     name: 'deviceSetting',
+    //     component: resolve => require(['@/views/setting/device/Ezviz/EzvizDeviceMgmt'], resolve),
+    //     hidden: true
+    //   }
+    // ) && primaryPathesList.push('/ezvizDevice', '/ezvizeDeviceSetting');
 
     !PermissionHelper.advancedMode && util.getVideoAuthority(3) && deviceRoutes.push(
       {
