@@ -141,7 +141,7 @@ export default{
     "Send":"發送推播",
     "SendingRecord":"發送紀錄",
     "downloadManagement": "下載管理"
-
+    
   },
   "overview":{
       "DangerousLess":"立即督導＜60%",
@@ -1680,14 +1680,10 @@ export default{
         "all": "全部",
         "read": "已讀",
         "notRead": "未讀",
-<<<<<<< HEAD
         "storeMonitoring": "地點監控",
-=======
-        "storeMonitoring": "門店監控",
     },
     "downloadManagement":{
         "message": "檔案匯出中，請至下載管理查看"
->>>>>>> dev-2024sprint1
     }
 
 
