@@ -588,12 +588,7 @@ export default {
       }).catch(err => {
         console.log('err :>> ', err.errCode);
       })
-
     },
-
-
-
-
 
     getReportList(p) {
       console.log("1.Get Report List")
@@ -604,13 +599,12 @@ export default {
         filter:p.filter,
         order:p.order,
         inspectTagId: p.inspectTagId != '-1' ? p.inspectTagId : null, 
-        searchMysteryMode : PermissionHelper.enableMimicMode ? 1 : p.searchMysteryMode
+        searchMysteryMode : PermissionHelper.enableMimicMode ? 1 : p.searchMysteryMode,
+        sourceType : 1
       }
 
-      console.log('params ~~~~~>> ', params);
       const self = this;
       params.endTs = params.endTs - params.endTs % 1000 + 999;
-
       if (params.clause.storeId.length === 0) {
         // console.log("No Data")
         // this.setNoData();
@@ -620,16 +614,18 @@ export default {
 
       console.log("***current user:",this.$store.getters.userId);
       if(PermissionHelper.enableMimicMode){
-        
         params['submitter'] = this.$store.getters.userId; 
       }else if(params.searchMysteryMode!=-1 && p.submitters && p.submitters!='-1' && p.submitters.length>0){
         var obj = {...p.clause};
         obj['submitter'] = p.submitters;
         params['clause'] = obj;
       }
+
+      // ==== 2024 sprint1 遠端巡檢關閉 ====
+      params['clause'].mode = 1;
       
       return new Promise((resolve) => {
-        //console.log("params:",params);
+        console.log("params~~~~~>>",params);
         getInspectReportList(params).then(async(res) => {
           const errCode = res.errCode;
           let data = [];
@@ -974,7 +970,7 @@ export default {
       const inspectList = [];
       inspectArr.forEach(_item => {
         if (self.curReportType === -1) {
-          if (!newArr.includes(_item.id)) {
+          if (!newArr.includes(_item.id) && _item.mode !== 0 ) {
             newArr.push(_item.id);
             inspectList.push(_item);
           }

@@ -12,6 +12,9 @@
     <div class="last-row"> 
       <div v-if="isInspectItem || isPatrol" class="inspect-div">
         <div class="tag-label">{{ $t('overview.patrolLists') }}</div>
+
+        <!-- 巡檢表 -->
+        
         <div class="tag-select">
           <el-select
             v-model="inspectList"
@@ -28,6 +31,7 @@
           </el-select>
         </div>
       </div>
+
       <div v-if="showDateSelector">
         <date-time-selector class="time-selector" @change="dateChange"/>
       </div>
@@ -165,7 +169,6 @@ export default {
 
   methods: {
     dateChange(val) {
-
       this.dateValue = val;
       const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
       const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
@@ -235,9 +238,7 @@ export default {
         this.inspectList = '' ;
         this.inspectTypeList = []
       }  
-    
     },
-
 
     async searchData() {
       console.log('searchData go:>> ');
@@ -247,8 +248,7 @@ export default {
         this.inspectList = inspectArr[0].id
         console.log('inspectArr ~~~~~~> ', inspectArr);
       }
-      
-
+  
       this.params.storeIds = this.storeFilterObj.filterStoreIds;
       console.log("Search Data",this.storeFilterObj)
       console.log('this.inspectList ~~~~~~>', this.inspectList)
@@ -342,8 +342,9 @@ export default {
       const self = this;
       return new Promise((resolve, reject) => {
         inpectRESTful.GetInspectTagList().then(res => {
-          const data = res.data;
-          self.inspectTypeList = res.data;
+          const data = res.data.filter(i => i.mode == 1);
+          self.inspectTypeList = data;
+
           resolve(data);
         }).catch(err => {
           reject(err);

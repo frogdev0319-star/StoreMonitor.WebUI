@@ -10,8 +10,13 @@
                     {{ item.name }}
                 </div>
             </div>
-            <div v-show="currentTab != 'NotInspected'" class="operation-btns" :class="getLangStyleValue(operationBtnClass)">
+            <div 
+              style="margin-right: 30px;"
+              v-show="currentTab != 'NotInspected'" 
+              class="operation-btns" 
+              :class="getLangStyleValue(operationBtnClass)">
                 <delay-button
+                    
                     :class="getLangStyleValue(exportBtnClass)"
                     class="export-btn"
                     type="default"
@@ -25,8 +30,9 @@
                 </delay-button>
             </div>
         </div>
-        <div v-if="currentTab=='Detail'" class="insep-detail-tbl">
+        <div v-if="currentTab=='Detail'" class="insep-detail-tbl" style="width: 95%">
             <el-table
+              v-loading="isLoading"
               :data="detailTbl.table_data"
               :highlight-current-row="true"
               :header-cell-style="{height:'47px',backgroundColor: '#EFF3F5',border:'none',fontSize:'12px'}"
@@ -45,7 +51,7 @@
                 >
                 <template slot-scope="{row}">
                     <template v-if="_item.isCellClick">
-                        <span style="cursor:pointer;color:#006ab7;" @click="handleEmitDetailRowClick(row)">{{ row[_item.prop]}}</span>
+                        <span style="cursor:pointer;color:#006ab7;" @click="handleEmitDetailRowClick(row)">{{ row[_item.prop]}} </span>
                     </template>
                     <template v-else>
                         <span>{{ row[_item.prop]}}</span>
@@ -75,6 +81,7 @@
         </div>
         <div v-if="currentTab=='Event'" class="insep-detail-tbl">
             <el-table
+              v-loading="isLoading"
               :data="eventTbl.table_data"
               :highlight-current-row="true"
               :header-cell-style="{height:'47px',backgroundColor: '#EFF3F5',border:'none',fontSize:'12px'}"
@@ -157,6 +164,7 @@ export default {
             lang: this.$i18n.locale,
             exportPng: require('../../static/img/excel.png'),
             currentTab:'Detail',
+            isLoading: false,
             tabs:[{value:'Detail',name:this.$t('statistics.patrolPerson.Detail')},
                     {value:'NotInspected',name:this.$t('statistics.patrolPerson.NotInspected')},
                     {value:'Event',name:this.$t('statistics.patrolPerson.uploadedEvent')}
@@ -307,6 +315,7 @@ export default {
                 {key:'ja-JP',value:'ja-export-btn'},{key:'ko-KR',value:'ko-export-btn'},{key:'vi-VN',value:'vi-export-btn'},
                 {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
             ],
+            
         };
     },
     created(){
@@ -330,6 +339,7 @@ export default {
         //this.$emit('click', item)
       },
       getReportList() {
+        this.isLoading = true
         const self = this;
         self.submitterName = "";
         let params = {
@@ -342,33 +352,34 @@ export default {
                 const errCode = res.errCode;
                 let data = [];
                 if (errCode === 0) {
-                    data = res.data.content;
+                    data = res.data.content.filter(i => i.mode == 1);
                 }
                 //console.log("data:",data);
                 const temp = [];
                 data.forEach(item => {
-                        const reportObj = {};
-                        reportObj.id = item.id;
-                        reportObj.date = util.getDateStr(item.ts);
-                        reportObj.storeName = item.storeName;
-                        reportObj.tagName = item.tagName;
-                        reportObj.submitterName = item.submitterName;
-                        reportObj.submitter = item.submitter;
-                        reportObj.totalScore = item.totalScore;
-                        reportObj.mode = item.mode;
-                        reportObj.status = item.status;
-                        reportObj.detail = self.$t('statistics.patrolPerson.seeDetail')
-                        temp.push(reportObj);
-                    });
-                    if(temp.length>0){
-                        self.submitterName = temp[0].submitterName;
-                        self.detailTbl.all_data = temp;
-                        self.detailTbl.total = Math.ceil(temp.length/this.detailTbl.sizeNum);
-                        this.setDetailTableData();
-                    }
-                    resolve(temp);
-                }).catch(err => {
-                console.log('InspectReportList-getReportList: ' + err);
+                    const reportObj = {};
+                    reportObj.id = item.id;
+                    reportObj.date = util.getDateStr(item.ts);
+                    reportObj.storeName = item.storeName;
+                    reportObj.tagName = item.tagName;
+                    reportObj.submitterName = item.submitterName;
+                    reportObj.submitter = item.submitter;
+                    reportObj.totalScore = item.totalScore;
+                    reportObj.mode = item.mode;
+                    reportObj.status = item.status;
+                    reportObj.detail = self.$t('statistics.patrolPerson.seeDetail')
+                    temp.push(reportObj);
+                  });
+                  if(temp.length>0){
+                    self.submitterName = temp[0].submitterName;
+                    self.detailTbl.all_data = temp;
+                    self.detailTbl.total = Math.ceil(temp.length/this.detailTbl.sizeNum);
+                    this.setDetailTableData();
+                  }
+                  resolve(temp);
+                  this.isLoading = false
+              }).catch(err => {
+              console.log('InspectReportList-getReportList: ' + err);
             });
         });
       },
@@ -552,6 +563,7 @@ export default {
         });
       },
       getEventCompletedRate(){
+        this.isLoading = true
         const self = this;
         let params = {
           beginTs: this.beginTs, 
@@ -645,6 +657,7 @@ export default {
                 this.eventTbl.all_data = temp;
                 this.eventTbl.total =Math.ceil(temp.length/this.eventTbl.sizeNum);
                 this.setEventTableData();
+                this.isLoading = false
                 resolve(temp);
             }).catch(err => {
               console.log('InspectReportList-getReportList: ' + err);

@@ -9,43 +9,28 @@
         <template v-slot:others>
           <div class="last-row"  style="justify-content: flex-start">
 
-            <!-- 總評類型 -->
-            <!-- <span style="margin-right: 16px; font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.resultType') }}</span>
-            <el-select
-              v-model="curAppraise"
-              :placeholder="$t('remotePatrol.all')"
-              size="mini"
-              class="el-province "
-            >
-              <el-option
-              v-for="item in appraiseList"
-                :key="item.status"
-                :label="item.label"
-                :value="item.status"/>
-            </el-select> -->
-
             <!-- 報表類型 -->
             <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.reportType') }}</span>
             <div class="flex-center report-type-area">
-            <el-select
-              v-model="curReportType"
-              class="el-province"
-              :placeholder="$t('remotePatrol.all')"
-              size="mini"
-              style="margin-right:0px;border:none;"
-              @change="getInspectList"
-            >
-              <el-option
-                v-for="item in reportTypeList"
-                :key="item.mode"
-                :label="item.label"
-                :value="item.mode"/>
-            </el-select>
+              <el-select
+                v-model="curReportType"
+                class="el-province"
+                :placeholder="$t('remotePatrol.all')"
+                size="mini"
+                style="margin-right:0px;border:none;"
+                @change="getInspectList"
+              >
+                <el-option
+                  v-for="item in reportTypeList"
+                  :key="item.mode"
+                  :label="item.label"
+                  :value="item.mode"/>
+              </el-select>
             
-            <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" />
+              <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" />
               <el-select
                 class="el-province"
-                style="margin-left:0px;border:none;border-radius:0px;"
+                style="margin-left:0px;border:none;border-radius:0px; width: 100%;"
               v-model="inspectId"
               :placeholder="$t('insSettingView.selectPost')"
               size="mini">
@@ -294,7 +279,7 @@ export default {
       curReportType: -1,
       reportTypeList: [
         { 'mode': -1, 'label': this.$t('remotePatrol.all') },
-        { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
+        // { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
         { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') },
         // 門店監控
         { 'mode': 2, 'label': this.$t('immediatePush.storeMonitoring') },
@@ -905,16 +890,19 @@ export default {
       const inspectList = [];
       inspectArr.forEach(_item => {
         if (self.curReportType === -1) {
-          if (!newArr.includes(_item.id)) {
+          // ==== 2024 sprint1 遠端巡檢關閉 ====
+          if (!newArr.includes(_item.id) && _item.mode !== 0) {
             newArr.push(_item.id);
             inspectList.push(_item);
           }
-        } else if (self.curReportType === 0) {
-          if (!newArr.includes(_item.id) && _item.mode === 0) {
-            newArr.push(_item.id);
-            inspectList.push(_item);
-          }
-        } else if (self.curReportType === 1) {
+        } 
+        // else if (self.curReportType === 0) {
+        //   if (!newArr.includes(_item.id) && _item.mode === 0) {
+        //     newArr.push(_item.id);
+        //     inspectList.push(_item);
+        //   }
+        // } 
+        else if (self.curReportType === 1) {
           if (!newArr.includes(_item.id) && _item.mode === 1) {
             newArr.push(_item.id);
             inspectList.push(_item);

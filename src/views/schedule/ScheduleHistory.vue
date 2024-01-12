@@ -178,10 +178,10 @@ export default{
           'width': 300,
           'maxWidth': 300,
           'isExpand': false,
-          'hasIcon':{
-              icon:require('@/../static/img/table-help.png'),
-              tooltipContent: this.$t('schedule.tagInfo')
-          }
+          // 'hasIcon':{
+          //     icon:require('@/../static/img/table-help.png'),
+          //     tooltipContent: this.$t('schedule.tagInfo')
+          // }
         },
         {
           'prop': 'reportTsStr',
@@ -397,10 +397,10 @@ export default{
             item.reportDeleteTs = this.getdate(item.reportDeleteTs)
 
             let obj = {...item};
-            let mode = item.inspectTagMode==0?self.$t('remotePatrol.remotePatrol'):self.$t('remotePatrol.onsitePatrol');
+            let mode = item.inspectTagMode == 0 ? self.$t('remotePatrol.remotePatrol') : self.$t('remotePatrol.onsitePatrol');
             obj['squence'] = idx;
             obj['store']= item.storeName+'\n'+item.storeTimeZone;
-            obj['tagNameMode'] = mode+'\n'+item.inspectTagName;
+            obj['tagNameMode'] = item.inspectTagName;
             obj['remindTimeStr']=(item.remindTime==0) ? '--' : self.$moment.utc(self.$moment(item.remindTime)).format("YYYY/MM/DD");//util.getDateStr(item.taskStart),
             // obj['remindTimeStr']=(item.remindTime==0) ?' -' : this.getdateOnlyDate(item.remindTime)
             // obj['reportTsStr']=(item.reportTs==0) ?'-' : self.$moment.utc(self.$moment(item.reportTs)).format("YYYY/MM/DD hh:mm:ss");//util.getDateStr(item.taskFinal),
