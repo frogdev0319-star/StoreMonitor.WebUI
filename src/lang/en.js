@@ -136,6 +136,11 @@ export default{
         "InstantPush":"Instant Push",
         "send":"Send",
         "sendingRecord":"sending Record",
+<<<<<<< HEAD
+=======
+        "downloadManagement": "Download Management"
+
+>>>>>>> dev-2024sprint1
     },
     "overview":{
         "DangerousLess":"Pool Ratio＜60%",

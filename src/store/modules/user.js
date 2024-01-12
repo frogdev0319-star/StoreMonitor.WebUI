@@ -458,7 +458,11 @@ const user = {
             if(reportAndEventRoute.children.length > 0 && !PermissionHelper.enableMimicMode) accessedRoutes.push(reportAndEventRoute);
           }
           
-          
+          // 下載管理
+          const downloadManagemenRoute = navbarRoute.getDownloadManagement();
+          downloadManagemenRoute.children.length > 0 ? accessedRoutes.push(downloadManagemenRoute) : '';
+
+
           // 系統設定
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();
           systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';

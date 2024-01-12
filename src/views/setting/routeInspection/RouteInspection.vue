@@ -38,6 +38,7 @@
         :style="{'min-height':varyWindowWidth - 250 +'px'}"
         :element-loading-text="$t('insSettingView.loadingbindstore')"
         class="el-route-tabs loading_area self-loading">
+
         <el-tabs
           id="en-patrltabs-content"
           v-model="activeName"
@@ -63,7 +64,6 @@
                     <el-select
                       v-model="patrolActive"
                       class="device-select"
-
                       size="mini"
                       @change="handleClickPatrol"
                       placeholder="">
@@ -313,7 +313,10 @@ export default {
   },
   data() {
     return {
-      elTableData: [{ label: '现场巡检', data: [] }, { label: '远程巡检', data: [] }],
+      // ==== 2024 sprint1 遠端巡檢關閉 ====
+      // elTableData: [{ label: '现场巡检', data: [] }, { label: '远程巡检', data: [] }],
+      
+      elTableData: [{ label: '现场巡检', data: [] }],
       loadingGif: require('../../../../static/img/loading.svg'),
       WeightingSetting:require('../../../../static/img/ic_WeightingSetting_blue.svg'),
       radioList: [

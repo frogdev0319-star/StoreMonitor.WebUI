@@ -136,6 +136,7 @@ export default{
     "InstantPush":"即时推播",
     "send":"发送推播",
     "sendingRecord":"发送纪录",
+    "downloadManagement": "下載管理",
   },
   "overview":{
       "DangerousLess":"立即督导＜60%",

@@ -134,10 +134,10 @@ export default{
             'width': 300,
             'maxWidth': 300,
             'isExpand': false,
-            'hasIcon':{
-                icon:require('@/../static/img/table-help.png'),
-                tooltipContent:this.$t('schedule.tagInfo')
-            }
+            // 'hasIcon':{
+            //     icon:require('@/../static/img/table-help.png'),
+            //     tooltipContent:this.$t('schedule.tagInfo')
+            // }
         },
         {
             'prop': 'taskCounts',
@@ -267,21 +267,20 @@ export default{
                 order:{
                     direction:this.defaultSort.order=='ascending'? 'asc':'desc',
                     property:this.defaultSort.prop=="taskStartStr"?"taskStart":(this.defaultSort.prop=="taskFinalStr"?"taskFinal":this.defaultSort.prop),
-                }
+                },
             }
             if(self.inputSearchValue.trim()!=""){
                 params["keyword"] = self.inputSearchValue;
             }
             scheduleRESTful.getPersonTaskList(params).then(res=>{
                 var userData = [];
-
                 if(res.errCode == 0){
+                    // ==== 2024 sprint1 遠端巡檢關閉 ====
+                    // var onlyOnsitePatrol = res.data.content.filter( i => i.tagMode == 1 )
                     res.data.content.map(item =>{
-                    //const mapUser = self.doMapUser(item.userId);
-                    //console.log("mapUser:",mapUser);
                     let obj = {...item};
-                    let mode = item.tagMode==0?self.$t('remotePatrol.remotePatrol'):self.$t('remotePatrol.onsitePatrol');
-                    obj['tagNameMode'] = mode+'\n'+item.tagName;
+                    let mode = item.tagMode == 0 ? self.$t('remotePatrol.remotePatrol') : self.$t('remotePatrol.onsitePatrol');
+                    obj['tagNameMode'] = mode + "--"+ item.tagName;
                     //obj['updateTs']=item.updateTime,
                     obj['taskStartStr']=(item.taskStart==0)?'-':self.$moment.utc(self.$moment(item.taskStart)).format("YYYY/MM/DD");//util.getDateStr(item.taskStart),
                     //console.log(">>>taskStartStr:",self.$moment.utc(self.$moment(item.taskStart)).format("YYYY/MM/DD hh:mm:ss"));
@@ -292,6 +291,8 @@ export default{
                     });
                     self.tableData = [];
                     self.tableData = userData;
+
+                    console.log('self.tableData :>> ', self.tableData);
                     self.total = res.data.totalPages;
                     self.isLoadingData = false;
                 

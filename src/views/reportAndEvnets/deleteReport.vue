@@ -10,11 +10,13 @@
           <div class="last-row" >
 
             <!-- 總評類型 -->
+            <div class="">
             <span style="margin-right: 16px; font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.resultType') }}</span>
             <el-select
               v-model="curAppraise"
               :placeholder="$t('remotePatrol.all')"
               size="mini"
+              style="width: calc(260/1440*100vw); margin-right: 60px;"
               class="el-province "
             >
               <el-option
@@ -23,38 +25,44 @@
                 :label="item.label"
                 :value="item.status"/>
             </el-select>
+            </div>
 
-            <!-- 報表類型 -->
-            <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.reportType') }}</span>
-            <div class="flex-center report-type-area">
-            <el-select
-              v-model="curReportType"
-              class="el-province"
-              :placeholder="$t('remotePatrol.all')"
-              size="mini"
-              style="margin-right:0px;border:none;"
-              @change="getInspectList"
-            >
-              <el-option
-                v-for="item in reportTypeList"
-                :key="item.mode"
-                :label="item.label"
-                :value="item.mode"/>
-            </el-select>
-            
-            <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" />
-              <el-select
+
+            <!-- 巡檢表 -->
+            <div class="flex-center">
+              <span style="margin-right: 16px;font-size:calc(15/1920*100vw);">巡檢表</span>
+              <div class="flex-center report-type-area">
+
+              <!-- // ==== 2024 sprint1 遠端巡檢關閉 ==== -->
+              <!-- <el-select
+                v-model="curReportType"
                 class="el-province"
-                style="margin-left:0px;border:none;border-radius:0px;"
-                v-model="inspectId"
-                :placeholder="$t('insSettingView.selectPost')"
-                size="mini">
-              <el-option
-                v-for="item in inspectTableList"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"/>
-            </el-select>
+                :placeholder="$t('remotePatrol.all')"
+                size="mini"
+                style="margin-right:0px;border:none;"
+                @change="getInspectList"
+              >
+                <el-option
+                  v-for="item in reportTypeList"
+                  :key="item.mode"
+                  :label="item.label"
+                  :value="item.mode"/>
+              </el-select> -->
+              
+              <!-- <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" /> -->
+                <el-select
+                  class="el-province"
+                  style="width: 100% ; margin-left:0px;border:none;border-radius:0px;"
+                  v-model="inspectId"
+                  :placeholder="$t('insSettingView.selectPost')"
+                  size="mini">
+                <el-option
+                  v-for="item in inspectTableList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"/>
+              </el-select>
+              </div>
             </div>
           </div>
         </template>
@@ -580,12 +588,7 @@ export default {
       }).catch(err => {
         console.log('err :>> ', err.errCode);
       })
-
     },
-
-
-
-
 
     getReportList(p) {
       console.log("1.Get Report List")
@@ -596,13 +599,12 @@ export default {
         filter:p.filter,
         order:p.order,
         inspectTagId: p.inspectTagId != '-1' ? p.inspectTagId : null, 
-        searchMysteryMode : PermissionHelper.enableMimicMode ? 1 : p.searchMysteryMode
+        searchMysteryMode : PermissionHelper.enableMimicMode ? 1 : p.searchMysteryMode,
+        sourceType : 1
       }
 
-      console.log('params ~~~~~>> ', params);
       const self = this;
       params.endTs = params.endTs - params.endTs % 1000 + 999;
-
       if (params.clause.storeId.length === 0) {
         // console.log("No Data")
         // this.setNoData();
@@ -612,16 +614,18 @@ export default {
 
       console.log("***current user:",this.$store.getters.userId);
       if(PermissionHelper.enableMimicMode){
-        
         params['submitter'] = this.$store.getters.userId; 
       }else if(params.searchMysteryMode!=-1 && p.submitters && p.submitters!='-1' && p.submitters.length>0){
         var obj = {...p.clause};
         obj['submitter'] = p.submitters;
         params['clause'] = obj;
       }
+
+      // ==== 2024 sprint1 遠端巡檢關閉 ====
+      params['clause'].mode = 1;
       
       return new Promise((resolve) => {
-        //console.log("params:",params);
+        console.log("params~~~~~>>",params);
         getInspectReportList(params).then(async(res) => {
           const errCode = res.errCode;
           let data = [];
@@ -960,20 +964,25 @@ export default {
     async getInspectList() {
       const self = this;
       const inspectArr = PermissionHelper.enableMimicMode ? await self.getTagMytery() : await self.getTagAll();
+
+      console.log('inspectArr ---->> ', inspectArr);
       const newArr = [];
       const inspectList = [];
       inspectArr.forEach(_item => {
         if (self.curReportType === -1) {
-          if (!newArr.includes(_item.id)) {
+          if (!newArr.includes(_item.id) && _item.mode !== 0 ) {
             newArr.push(_item.id);
             inspectList.push(_item);
           }
-        } else if (self.curReportType === 0) {
-          if (!newArr.includes(_item.id) && _item.mode === 0) {
-            newArr.push(_item.id);
-            inspectList.push(_item);
-          }
-        } else if (self.curReportType === 1) {
+        }
+        // ==== 2024 sprint1 遠端巡檢關閉 ====
+        // else if (self.curReportType === 0) {
+        //   if (!newArr.includes(_item.id) && _item.mode === 0) {
+        //     newArr.push(_item.id);
+        //     inspectList.push(_item);
+        //   }
+        // } 
+        else if (self.curReportType === 1) {
           if (!newArr.includes(_item.id) && _item.mode === 1) {
             newArr.push(_item.id);
             inspectList.push(_item);
@@ -1212,7 +1221,7 @@ $filterWidth: (100%-706);
   
 }
 .report-type-area{
-    width:calc(346/1440*100vw);
+    width:calc(260/1440*100vw);
     height: calc(36/1920*100vw);
     background-color: #FFF;
     border-radius: 5px;
@@ -1576,11 +1585,10 @@ $filterWidth: (100%-706);
       display: flex;
       flex-direction: row;
       width:100%;
-      margin-left: 42px;
       height: 36px;
       align-items: flex-start;
       align-items:center;
-      justify-content: space-between;
+      justify-content: flex-end;
       padding-right: (180/1920*100vw);
 }
     .time-selector{

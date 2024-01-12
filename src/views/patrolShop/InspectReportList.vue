@@ -137,6 +137,7 @@
                     style="width:auto;min-width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
                     @click.native="export2Excel"
                     >{{ $t('eventView.exportReportDetail') }}</el-dropdown-item>
+
                   <el-dropdown-item
                     class="dropdown-item"
                     style=" width:auto;min-width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw); font-size:calc(14/1920*100vw);"
@@ -239,7 +240,7 @@
           :btn-style="{backgroundColor:'transparent'}"
           :total="total"
           :current-page="page"
-          :page-size="sizeNum"
+          :pagesize="sizeNum"
           layout = "prev,pager, next,sizes,slot"
           @sizeChange="sizeChange"
           @currentChange="currentChange"
@@ -271,6 +272,21 @@
         {{this.$t('remotePatrol.exportExcelAllNotice2')}}
       </div>
     </dialog-pop>
+
+    <DownloadDialogPop
+      :title="$t('downloadManagement.message')"
+      :visible="showExportMassage"
+      :showCancelbtn="false"
+      @confirmHandler="showExportMassage = false"
+      @goToPage="$router.push({name: 'downloadManagement',});"
+      >
+      
+      <!-- <div class="noticeDialog">
+        檔案匯出中，請至下載管理查看
+      </div> -->
+    </DownloadDialogPop>
+
+
   </div>
 </template>
 <script>
@@ -294,6 +310,7 @@ import { getInspectReportInfo} from '@/api/inspect';//為了取是否有設置�
 import TableOnly from '@/components/TableOnly';
 import PermissionHelper from '@/api/PermissionHelper';
 import DialogPop from '@/components/DialogPop';
+import DownloadDialogPop from '@/components/DownloadDialogPop';
 export default {
   name: 'InspectReportList',
   components: {
@@ -303,7 +320,8 @@ export default {
     StoreFilter,
     TblPaginationOnly,
     TableOnly,
-    DialogPop
+    DialogPop,
+    DownloadDialogPop
   },
   data() {
     return {
@@ -533,6 +551,7 @@ export default {
       isScore:true,
       showExportAllWarn:false,
       showExportAllNotice:false,
+      showExportMassage: false,
 
       inspectStatus:'',
       totalElements: 0
@@ -641,9 +660,6 @@ export default {
       var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,inspectTagId:p.inspectTagId,filter:p.filter}
       params.endTs = params.endTs - params.endTs % 1000 + 999;
       if (params.clause.storeId.length === 0) {
-        // console.log("No Data")
-        // this.setNoData();
-        // return [];
         params.clause.storeId.push(-1)
       }
       console.log("SearchParams:",params);
@@ -653,78 +669,67 @@ export default {
       }
       return reportIds;
     },
+
     async export2ExcelAll(){
+    
       const self = this;
       if(self.inspectId == -1 || self.params.inspectTagId==null){
         self.ExportAllMsg = this.$t('remotePatrol.selectOnlyOneInspect');
         self.showExportAllWarn = true;
         return;
       }
-      self.showExportAllNotice = true;
-      const reportIds = await this.doGetSearchConditionsReportIds();
-      console.log("reportIds:",reportIds);
-      const params = {
-        beginTs:self.params.beginTs,
-        endTs:self.params.endTs,
-        inspectTagId:self.params.inspectTagId,
-        reportIds:reportIds
-      };
-      const tHeader = [
-        this.$t('remotePatrol.regionI'),
-        this.$t('remotePatrol.regionII'),
-        this.$t('remotePatrol.storeName'),
-        this.$t('remotePatrol.storeCode'),
-        this.$t('remotePatrol.inspectName'),//巡檢表名稱
-        this.$t('remotePatrol.category'),
-        this.$t('insSettingView.subCategory'),
-        this.$t('overview.items'),
-        this.$t('remotePatrol.inspectItemScore'),
-        this.$t('remotePatrol.patrolResult'),
-        this.$t('remotePatrol.inspectTotalScore'),//報告總分inspectSummary
-        this.$t('remotePatrol.inspectSummary'), //巡檢總評
-        this.$t('eventView.submitter'), //送出人
-        this.$t('remotePatrol.exportAllDetail'),// 詳情
-        this.$t('audit.inceptionRpt.attachment'),
-        this.$t('titleView.description'),
-        this.$t('remotePatrol.signatureInfo'), //簽到資訊-地圖link
-        this.$t('remotePatrol.signInTime'),
-        '巡檢花費時間',
-        this.$t('remotePatrol.createRptDT'),
-        ];
-      
-      downLoadInspectReportEntireDetail(params).then(res => {
-        console.log("res:",res);
-        const that = this;
-        require.ensure([], async() => {
-          const { export_json_to_excel } = require('@/excel/Export2Excel');
-          const filterVal = ['province','city','storename','code', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 
-          'totlascore','status','submitter', 'detail', 'attachment','comment','singinmap','signints','timediff', 'reportts'];
-          const curData = res.data;
-          const tagName = that.inspectTableList.find(item=>item.id ==self.params.inspectTagId ).name;
-          const data = that.formatJson(filterVal, curData);
-          const fileName = tagName+'_'+that.$t('remotePatrol.entailReportExcelList') + '_' + util.getCurDateStr();
-          export_json_to_excel(tHeader, data, fileName);
-        });
-        /*const blob = new Blob([res], {
-          type: 'text/plain'//'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        });
-        var reader = new FileReader();
-        reader.onload = function (e) {
-            console.log("e:",e.target.result);
-        }
-        reader.readAsText(blob)
-        const objectUrl = URL.createObjectURL(blob);
-        console.log(objectUrl);
-        const url = objectUrl;
-        self.downLoadSrc = url;
-        var link = document.createElement('a');
-        link.href = url;
-        link.download = "temp.csv";
-        link.click();*/
-      }).catch(err => {
-        console.log('RouteInspection-downItem: ' + err);
-      });
+
+      this.showExportMassage = true
+
+      // self.showExportAllNotice = true;
+      // const reportIds = await this.doGetSearchConditionsReportIds();
+      // console.log("reportIds:",reportIds);
+      // const params = {
+      //   beginTs:self.params.beginTs,
+      //   endTs:self.params.endTs,
+      //   inspectTagId:self.params.inspectTagId,
+      //   reportIds:reportIds
+      // };
+      // const tHeader = [
+      //   this.$t('remotePatrol.regionI'),
+      //   this.$t('remotePatrol.regionII'),
+      //   this.$t('remotePatrol.storeName'),
+      //   this.$t('remotePatrol.storeCode'),
+      //   this.$t('remotePatrol.inspectName'),//巡檢表名稱
+      //   this.$t('remotePatrol.category'),
+      //   this.$t('insSettingView.subCategory'),
+      //   this.$t('overview.items'),
+      //   this.$t('remotePatrol.inspectItemScore'),
+      //   this.$t('remotePatrol.patrolResult'),
+      //   this.$t('remotePatrol.inspectTotalScore'),//報告總分inspectSummary
+      //   this.$t('remotePatrol.inspectSummary'), //巡檢總評
+      //   this.$t('eventView.submitter'), //送出人
+      //   this.$t('remotePatrol.exportAllDetail'),// 詳情
+      //   this.$t('audit.inceptionRpt.attachment'),
+      //   this.$t('titleView.description'),
+      //   this.$t('remotePatrol.signatureInfo'), //簽到資訊-地圖link
+      //   this.$t('remotePatrol.signInTime'),
+      //   '巡檢花費時間',
+      //   this.$t('remotePatrol.createRptDT'),
+      //   ];
+      // downLoadInspectReportEntireDetail(params).then(res => {
+      //   console.log("res:",res);
+      //   const that = this;
+      //   require.ensure([], async() => {
+      //     const { export_json_to_excel } = require('@/excel/Export2Excel');
+      //     const filterVal = ['province','city','storename','code', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 
+      //     'totlascore','status','submitter', 'detail', 'attachment','comment','singinmap','signints','timediff', 'reportts'];
+      //     const curData = res.data;
+      //     const tagName = that.inspectTableList.find(item=>item.id ==self.params.inspectTagId ).name;
+      //     const data = that.formatJson(filterVal, curData);
+      //     const fileName = tagName +'_'+ 'Full_report_details';
+      //     export_json_to_excel(tHeader, data, fileName);
+      //   });
+      // }).catch(err => {
+      //   console.log('RouteInspection-downItem: ' + err);
+      // });
     },
+
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => v[j]));
     },

@@ -8,75 +8,77 @@
     </div>
     <div class="el-overview">
       <el-row class="first-row paper">
+        <!-- KPI指標 -->
         <el-col :span="4" class="kpi-list">
           <div class="title">{{ $t('overview.kpiIndex') }}</div>
           <div class="kpi-content">
             <div v-for="(item,index) in eventKPIs" :key="index" class="event-list">
-              <div class="event-title">{{ item.eventTitle }}</div>
+              <div class="event-title">{{ item.eventTitlez }}</div>
               <div class="event-num">{{ item.eventNum }}</div>
             </div>
           </div>
         </el-col>
 
-        <!-- 各門店事件趨勢分析 -->
-        <el-col :span="isEnSpan? 13: 14" class="store-events">
-          <div class="title">{{ $t('overview.eventTrends') }} </div>
-          <div class="region-result">
-            <div class="store-list">
-              <span class="store-name">{{ $t('overview.selectStores') }}</span>
-              <el-select class="storevue-select" v-model="curStore" style="width: 200px" size="mini" @change="changeStore">
-                <el-option
-                  v-for="item in storeDataList"
-                  :key="item.storeId"
-                  :label="item.label"
-                  :value="item.storeId"
-                />
-              </el-select>
+        <div class="for_flex">
+          <!-- 各門店事件趨勢分析 -->
+          <el-col :span="isEnSpan ? 13 :20" class="store-events" style="width: 100%;">
+            <div class="title">{{ $t('overview.eventTrends') }} </div>
+            <div class="region-result">
+              <div class="store-list">
+                <span class="store-name">{{ $t('overview.selectStores') }}</span>
+                <el-select class="storevue-select" v-model="curStore" style="width: 200px" size="mini" @change="changeStore">
+                  <el-option
+                    v-for="item in storeDataList"
+                    :key="item.storeId"
+                    :label="item.label"
+                    :value="item.storeId"
+                  />
+                </el-select>
+              </div>
+              <div class="charts-content">
+                <v-chart
+                  ref="storeEventRef"
+                  :options="storeEventsOptions"
+                  autoresize
+                  class="result-content"/>
+              </div>
             </div>
-            <div class="charts-content">
-              <v-chart
-                ref="storeEventRef"
-                :options="storeEventsOptions"
-                autoresize
-                class="result-content"/>
+          </el-col>
+          
+          <!-- 事件來源 -->
+          <el-col :span="isEnSpan ? 7 : 6" class="source-list" v-if="hasAdvanced">
+            <div class="title">
+              <span class="area-title">{{ $t('overview.eventSource') }}</span>
             </div>
-          </div>
-
-        </el-col>
-        
-        <!-- 事件來源 -->
-        <el-col :span="isEnSpan ? 7 : 6" class="source-list">
-          <div class="title">
-            <span class="area-title">{{ $t('overview.eventSource') }}</span>
-          </div>
-          <div class="pct-content">
-            <div class="pie-area">
-            <div class="pie-div">
-              <div class="pct-panel">
-                  <v-chart
+            <div class="pct-content">
+              <div class="pie-area">
+              <div class="pie-div">
+                <div class="pct-panel">
+                    <v-chart
                       ref="eventSourceRef"
                       autoresize
                       :options="eventSourceOptions"
                       class="chart-content"
-                  />
+                    />
+                </div>
+                </div>
               </div>
-              </div>
-            </div>
-            <div class="pct-nums">
-              <div
-                v-for="(item, index) in sourcePerArray"
-                :class="lang === 'en'? 'en-label' : ''"
-                :key="index"
-                class="content-labels">
-                <div class="excellent_nums">{{ item.percent }}%</div>
-                <div class="excellent_labels">
-                  <span :class="`label-` + index" class="labels excellent-label"/>
-                  <span class="label-desc">{{ item.type }}</span>
+              <div class="pct-nums">
+                <div
+                  v-for="(item, index) in sourcePerArray"
+                  :class="lang === 'en'? 'en-label' : ''"
+                  :key="index"
+                  class="content-labels">
+                  <div class="excellent_nums">{{ item.percent }}%</div>
+                  <div class="excellent_labels">
+                    <span :class="`label-` + index" class="labels excellent-label"/>
+                    <span class="label-desc">{{ item.type }}</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </el-col>
+          </el-col>
+        </div>
       </el-row>
 
       <!-- 事件處理狀態 -->
@@ -220,18 +222,18 @@ export default {
         }
       ],
       sourceLegend: [
-        {
-          'type': this.$t('overview.remotePatrol'),
-          'percent': '0%'
-        },
+        // {
+        //   'type': this.$t('overview.remotePatrol'),
+        //   'percent': '0%'
+        // },
         {
           'type': this.$t('overview.onsitePatrol'),
           'percent': '0%'
         },
-        {
-          'type': this.$t('overview.storeMonitor'),
-          'percent': '0%'
-        },
+        // {
+        //   'type': this.$t('overview.storeMonitor'),
+        //   'percent': '0%'
+        // },
         // {
         //   'type': this.$t('immediatePush.immediateEvent'),
         //   'percent': '0%'
@@ -467,31 +469,24 @@ export default {
       console.log('jsonArray 1 !!!:>> ', jsonArray);
       sourcePieList.forEach((item, index) => {
         sumEvent += item.numOfEvent;
-        if (index === 0) {
-          storeEventNum = item.numOfEvent;
-        }
-        else if (index === 1) {
+        if (index === 2) {
           remoteEventNum = item.numOfEvent;
-        } 
-        else if (index === 2) {
-          onsiteEventNum = item.numOfEvent;
         }
         else if (index === 3 && this.hasAdvanced) {
           immediateEventNum = item.numOfEvent;
-        }
+        } 
+
       });
-      const totalArray = [remoteEventNum, onsiteEventNum, storeEventNum, immediateEventNum];
+      const totalArray = [remoteEventNum, immediateEventNum];
       jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
-      jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
-      jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
-      if(jsonArray[3] && this.hasAdvanced) jsonArray[3].percent = util.getPercentValue(totalArray, 3, 2)
+      if(jsonArray[1] && this.hasAdvanced) jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2)
       
       console.log('jsonArray 2 !!!:>> ', jsonArray);
       if (sumEvent !== 0) {
         seriesData = [
           { value: remoteEventNum, name: self.$t('overview.remotePatrol') },
-          { value: onsiteEventNum, name: self.$t('overview.onsitePatrol') },
-          { value: storeEventNum, name: self.$t('overview.storeMonitor') },
+          // { value: onsiteEventNum, name: self.$t('overview.onsitePatrol') },
+          // { value: storeEventNum, name: self.$t('overview.storeMonitor') },
           { value: immediateEventNum, name: self.$t('immediatePush.immediateEvent') }
         ];
       } else {
@@ -558,7 +553,7 @@ export default {
                 borderWidth:5,
                 borderColor:'#FFF',
                 color: function(params) {
-                  const colorList = ['#7bd8eb', '#7b9feb', '#5274bb', '#1d469b']; 
+                  const colorList = ['#7b9feb', '#5274bb']; 
                   return colorList[params.dataIndex];
                 }
               }
@@ -1130,6 +1125,14 @@ export default {
 
 </script>
 
+<style lang="sass">
+  .for_flex
+    display: flex
+    flex-direction: row
+    justify-content: flex-start
+    align-items: flex-start
+
+</style>
 <style lang="scss" scoped>
   @import "../../assets/sass/overview.scss";
 </style>

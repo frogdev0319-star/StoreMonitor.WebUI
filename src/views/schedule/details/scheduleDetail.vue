@@ -42,13 +42,12 @@
                 style="margin-right: 30px; position: absolute; bottom: -20px ; left: 92px" 
                 v-if="showInputLimit"> {{$t('schedule.maxCharacter')}} 
               </span>
-              
             </div>
 
-            <!-- 排程名稱 -->
+            <!-- 巡檢表 -->
             <div class="flex-row" style="margin-right: 30px">
               <div class="title-name"><span style="color: #c60957">* </span> 巡檢表</div>
-              <div class="title-status" style="margin-right: 10px"> 
+              <!-- <div class="title-status" style="margin-right: 10px"> 
                 <el-select
                   v-model="inspectionMode" 
                   placeholder="巡檢表"
@@ -62,7 +61,7 @@
                     :value="_item.value"
                   />
                 </el-select>
-              </div>
+              </div> -->
               <div class="title-status"> 
                 <el-select
                   v-model="inspectionName" 
@@ -627,10 +626,10 @@ export default{
       inspectionMode:'',
       inspectionName:'',
       inspectionStyle: [
-        {
-          value : 1,
-          label: '現場巡檢'
-        },
+        // {
+        //   value : 1,
+        //   label: '現場巡檢'
+        // },
         {
           value : 0,
           label: '遠端巡檢'
@@ -830,7 +829,6 @@ export default{
       }
       else if(this.scheduleStatus.action == "addSchedule"){
         this.canEditInspection = false
-
         this.hasScheduleData = false
         this.inspectionMode = 1
         var tempN = this.allInspectTypeList.filter( i => i.mode === 1)

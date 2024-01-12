@@ -1,58 +1,12 @@
 <template>
   <div class="flex-column" style="height: calc(100% - 20px)">
-    <div>
-      <store-filter
-        :cached-params="searchParams"
-        :is-patrol = "false"
-        @storeChange = "onStoreChange"
-      >
-        <template v-slot:others>
-          <div class="last-row"  style="justify-content: flex-start">
-
-            <!-- 報表類型 -->
-            <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.reportType') }}</span>
-            <div class="flex-center report-type-area">
-              <el-select
-                v-model="curReportType"
-                class="el-province"
-                :placeholder="$t('remotePatrol.all')"
-                size="mini"
-                style="margin-right:0px;border:none;"
-                @change="getInspectList"
-              >
-                <el-option
-                  v-for="item in reportTypeList"
-                  :key="item.mode"
-                  :label="item.label"
-                  :value="item.mode"/>
-              </el-select>
-            
-              <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" />
-              <el-select
-                class="el-province"
-                style="margin-left:0px;border:none;border-radius:0px; width: 100%;"
-              v-model="inspectId"
-              :placeholder="$t('insSettingView.selectPost')"
-              size="mini">
-              <el-option
-                v-for="item in inspectTableList"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"/>
-            </el-select>
-            </div>
-          </div>
-        </template>
-      </store-filter>
-    </div>
-
     <div id="el-containter" class="flex-column spacer" style="margin-left:0px">
       <div class="report-header">
         <div class="flex-center" style="padding-top: 0;">
-          <date-time-selector
+          <!-- <date-time-selector
             class="time-selector"
             @change="dateChange" 
-            :dateTimeValue = dateValue /> 
+            :dateTimeValue = dateValue />  -->
           <div class="flex-center fullWidth" style="margin-left: 20px">
             <div class="search-content flex-center" style="margin-right: 20px">
               <div class="search-label">{{ $t('remotePatrol.keywords') }}</div>
@@ -75,7 +29,7 @@
       <div class="report-content loading spacer paper">
         <div
           v-loading="isLoading"
-          v-if="eventTableData.length !== 0"
+      
           :element-loading-text="$t('insSettingView.loadingbindstore')"
           class="card-content self-loading ">
 
@@ -84,8 +38,8 @@
             <table-only
               ref="elTP"
               class="table-white table_style"
-              :column-data="reportInfoTable"
-              :table-data="eventTableData"
+              :column-data="downloadInfoTable"
+              :table-data="downloadTableData"
               :highlight-current-row= "true"
               :is-loading-data="isLoading"
               :tableAction ="columnOperationData"
@@ -100,13 +54,13 @@
             />
           </div>
         </div>
-        <div
+        <!-- <div
           v-loading="isLoading"
           v-else
           :element-loading-text="$t('insSettingView.loadingbindstore')"
           class="card-content self-loading">
           <div class="empty-content">{{ noData }} </div>
-        </div>
+        </div> -->
         
         <div class="el-pat"  v-if="eventTableData.length > 0">
           <div class="pageSizeTitle" style="color: #666">共有 <b style="font-size: 16px"> {{totalEvents}} </b> {{ $t('remotePatrol.numReports') }}</div>
@@ -123,7 +77,7 @@
         </div>
       </div>
     </div>
-    <dialog-pop
+    <!-- <dialog-pop
       title="修改已結案事件"
       :append-to-body="true"
       :close-on-click-modal="false"
@@ -136,7 +90,7 @@
       <div class="dialog-slot">
         <div class="dialog-content">請確認是否變更狀態為 <span style="color: red;"> <b>未處理</b></span>   ? </div>
       </div>
-    </dialog-pop>
+    </dialog-pop> -->
 
 
   </div>
@@ -187,67 +141,55 @@ export default {
       ShowCard: true,
       isHoverList: false,
       isHoverCard: false,
+			reportTableData: [],
       eventTableData: [],
+			
 
-
-      reportTableData: [],
-      reportInfoTable: [
+      downloadTableData: [],
+      downloadInfoTable: [
         {
           'prop': 'subject',
-          'label': this.$t('eventView.name'),
+          'label': '報表類型',
           'sortable': false,
           'width': '140',
           'maxWidth': '150',
         },
         {
           'prop': 'inspectTagName',
-          'label': this.$t('overview.patrolLists'),
+          'label': '條件',
           'sortable': false,
           'width': '140',
           'maxWidth': '140',
         },
         {
-          'prop': 'assigneeName',
-          'label': this.$t('eventView.submitter'),
+          'prop': 'inspectTagName',
+          'label': '檔案名稱',
           'sortable': false,
           'width': '140',
           'maxWidth': '140',
         },
         {
-          'prop': 'ts',
-          'label': this.$t('eventView.createTs'),
+          'prop': 'aaa',
+          'label': '狀態',
           'sortable': false,
           'width': '140',
           'maxWidth': '140',
         },
         {
-          'prop': 'province',
-          'label': this.$t('remotePatrol.regionI'),
+          'prop': 'aaa',
+          'label': '匯出時間',
           'sortable': false,
           'width': '140',
           'maxWidth': '140',
         },
         {
-          'prop': 'city',
-          'label': this.$t('remotePatrol.regionII'),
-          'sortable':false,
+          'prop': 'aaa',
+          'label': '匯出人',
+          'sortable': false,
           'width': '140',
-          'maxWidth': '150',
+          'maxWidth': '140',
         },
-        {
-          'prop': 'storeName',
-          'label': this.$t('eventView.stores'),
-          'sortable': false,
-          'width': '145',
-          'maxWidth': '180',
-        },
-        {
-          'prop': 'code',
-          'label': this.$t('remotePatrol.code'),
-          'sortable': false,
-          'width': '145',
-          'maxWidth': '180',
-        },
+
       ],
       columnOperationData: {
         label: this.$t('deviceView.operation'),
@@ -279,7 +221,7 @@ export default {
       curReportType: -1,
       reportTypeList: [
         { 'mode': -1, 'label': this.$t('remotePatrol.all') },
-        // { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
+        { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
         { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') },
         // 門店監控
         { 'mode': 2, 'label': this.$t('immediatePush.storeMonitoring') },
@@ -377,14 +319,14 @@ export default {
     }
     self.$route.meta.isBack = false;
     self.isFirstLoad = false;
-    
   },
-
   async mounted() {
     var userInfo = await this.$store.dispatch("GetUserAuthorities");
     this.hasAdvanced = userInfo.data.isSystemAdvanced
     this.hasAdvanced ? this.reportTypeList.push({ 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')}) : null
   },
+
+
 
   methods: {
     async initData() {
@@ -400,12 +342,17 @@ export default {
       this.showStoreContent = false;
       this.checkAllStore = false;
       this.curReportType = -1;
-    
+  
       await this.getSearchParams();
       await this.getInspectList();
       await this.searchData();
       
     },
+
+
+
+
+		
     async getEvents(params){
       this.isLoading = true;
       await getEventList(params).then(res=>{
@@ -779,10 +726,6 @@ export default {
     // },
 
     
-
-
-
-
     setNoData() {
       this.eventTableData = [];
       this.total = 0;
@@ -890,19 +833,16 @@ export default {
       const inspectList = [];
       inspectArr.forEach(_item => {
         if (self.curReportType === -1) {
-          // ==== 2024 sprint1 遠端巡檢關閉 ====
-          if (!newArr.includes(_item.id) && _item.mode !== 0) {
+          if (!newArr.includes(_item.id)) {
             newArr.push(_item.id);
             inspectList.push(_item);
           }
-        } 
-        // else if (self.curReportType === 0) {
-        //   if (!newArr.includes(_item.id) && _item.mode === 0) {
-        //     newArr.push(_item.id);
-        //     inspectList.push(_item);
-        //   }
-        // } 
-        else if (self.curReportType === 1) {
+        } else if (self.curReportType === 0) {
+          if (!newArr.includes(_item.id) && _item.mode === 0) {
+            newArr.push(_item.id);
+            inspectList.push(_item);
+          }
+        } else if (self.curReportType === 1) {
           if (!newArr.includes(_item.id) && _item.mode === 1) {
             newArr.push(_item.id);
             inspectList.push(_item);
@@ -1003,19 +943,7 @@ export default {
     },
     
 
-    onStoreChange(storeObj) {
-      console.log("On Store Changed")
-      // console.log(storeObj)
-      this.storeStr = storeObj.storeStr;
-      this.storeFilterObj = storeObj;
-      this.ifSearchData && this.searchData();
-      this.ifSearchData = false;
-    },
 
-    getReportListOfCard() {
-      this.ShowCard = true;
-      this.checkSortType(this.curSortType);
-    }
   },
 
   beforeRouteEnter(to, from, next) {
