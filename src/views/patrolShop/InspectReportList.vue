@@ -303,8 +303,10 @@ import {
       downLoadInspectReportEntireDetail,
       getAllReportIds,
       GetMysteryInspectTagList ,
-      getInspectStatus
+      getInspectStatus,
+      getInspectReportInfo
     } from '@/api/inspect';
+import {exportEntireJson} from '@/api/exportExcel';
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
 import StoreFilter from '@/components/StoreFilter';
@@ -313,7 +315,6 @@ import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DateTimeSelector from '@/components/DateTimeSelector';
 import SelectedStores from "@/components/SelectedStores";
 import TblPaginationOnly from '@/components/TblPaginationOnly';
-import { getInspectReportInfo} from '@/api/inspect';//為了取是否有設置評分
 import TableOnly from '@/components/TableOnly';
 import PermissionHelper from '@/api/PermissionHelper';
 import DialogPop from '@/components/DialogPop';
@@ -424,10 +425,10 @@ export default {
           'width': 100,
           'maxWidth': 100,
           'isExpand': false,
-          'hasIcon':{
-            icon:require('@/../static/img/table-help.png'),
-            tooltipContent : this.$t('remotePatrol.tableInspection')
-          }
+          // 'hasIcon':{
+          //   icon:require('@/../static/img/table-help.png'),
+          //   tooltipContent : this.$t('remotePatrol.tableInspection')
+          // }
         },
         // {
         //   'prop': 'modeText',
@@ -653,6 +654,7 @@ export default {
           'modeText', 'status', 'totalScore', 'datestr', 'signstr'];
         let curData = [];
         curData = await that.getReportList_({...that.params, filter: {page: 0, size: 1000}});
+        console.log('object :>> ', object);
         const data = that.formatJson(filterVal, curData);
         const fileName = that.$t('remotePatrol.reportExcelList') + '-' + util.getCurDateStr();
         sessionStorage.setItem('!merge', true);
@@ -677,7 +679,7 @@ export default {
       return reportIds;
     },
 
-    async export2ExcelAll(){
+   async export2ExcelAll(){
     
       const self = this;
       if(self.inspectId == -1 || self.params.inspectTagId==null){
@@ -685,56 +687,67 @@ export default {
         self.showExportAllWarn = true;
         return;
       }
+      // this.showExportMassage = true
+      // var ExpAllReportIds = this.reportList.map( i => i.id)
+      // var ExpAllParams = {
+      //   beginTs: this.params.beginTs,
+      //   endTs:  this.params.endTs,
+      //   inspectTagId: this.params.inspectTagId,
+      //   reportIds: ExpAllReportIds
+      // }
 
-      this.showExportMassage = true
+      // exportEntireJson(ExpAllParams).then(res=>{
+      //   console.log('res :>> ', res);
+      // })
 
-      // self.showExportAllNotice = true;
-      // const reportIds = await this.doGetSearchConditionsReportIds();
-      // console.log("reportIds:",reportIds);
-      // const params = {
-      //   beginTs:self.params.beginTs,
-      //   endTs:self.params.endTs,
-      //   inspectTagId:self.params.inspectTagId,
-      //   reportIds:reportIds
-      // };
-      // const tHeader = [
-      //   this.$t('remotePatrol.regionI'),
-      //   this.$t('remotePatrol.regionII'),
-      //   this.$t('remotePatrol.storeName'),
-      //   this.$t('remotePatrol.storeCode'),
-      //   this.$t('remotePatrol.inspectName'),//巡檢表名稱
-      //   this.$t('remotePatrol.category'),
-      //   this.$t('insSettingView.subCategory'),
-      //   this.$t('overview.items'),
-      //   this.$t('remotePatrol.inspectItemScore'),
-      //   this.$t('remotePatrol.patrolResult'),
-      //   this.$t('remotePatrol.inspectTotalScore'),//報告總分inspectSummary
-      //   this.$t('remotePatrol.inspectSummary'), //巡檢總評
-      //   this.$t('eventView.submitter'), //送出人
-      //   this.$t('remotePatrol.exportAllDetail'),// 詳情
-      //   this.$t('audit.inceptionRpt.attachment'),
-      //   this.$t('titleView.description'),
-      //   this.$t('remotePatrol.signatureInfo'), //簽到資訊-地圖link
-      //   this.$t('remotePatrol.signInTime'),
-      //   '巡檢花費時間',
-      //   this.$t('remotePatrol.createRptDT'),
-      //   ];
-      // downLoadInspectReportEntireDetail(params).then(res => {
-      //   console.log("res:",res);
-      //   const that = this;
-      //   require.ensure([], async() => {
-      //     const { export_json_to_excel } = require('@/excel/Export2Excel');
-      //     const filterVal = ['province','city','storename','code', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 
-      //     'totlascore','status','submitter', 'detail', 'attachment','comment','singinmap','signints','timediff', 'reportts'];
-      //     const curData = res.data;
-      //     const tagName = that.inspectTableList.find(item=>item.id ==self.params.inspectTagId ).name;
-      //     const data = that.formatJson(filterVal, curData);
-      //     const fileName = tagName +'_'+ 'Full_report_details';
-      //     export_json_to_excel(tHeader, data, fileName);
-      //   });
-      // }).catch(err => {
-      //   console.log('RouteInspection-downItem: ' + err);
-      // });
+
+      self.showExportAllNotice = true;
+      const reportIds = await this.doGetSearchConditionsReportIds();
+      console.log("reportIds:",reportIds);
+      const params = {
+        beginTs:self.params.beginTs,
+        endTs:self.params.endTs,
+        inspectTagId:self.params.inspectTagId,
+        reportIds:reportIds
+      };
+      const tHeader = [
+        this.$t('remotePatrol.regionI'),
+        this.$t('remotePatrol.regionII'),
+        this.$t('remotePatrol.storeName'),
+        this.$t('remotePatrol.storeCode'),
+        this.$t('remotePatrol.inspectName'),//巡檢表名稱
+        this.$t('remotePatrol.category'),
+        this.$t('insSettingView.subCategory'),
+        this.$t('overview.items'),
+        this.$t('remotePatrol.inspectItemScore'),
+        this.$t('remotePatrol.patrolResult'),
+        this.$t('remotePatrol.inspectTotalScore'),//報告總分inspectSummary
+        this.$t('remotePatrol.inspectSummary'), //巡檢總評
+        this.$t('eventView.submitter'), //送出人
+        this.$t('remotePatrol.exportAllDetail'),// 詳情
+        this.$t('audit.inceptionRpt.attachment'),
+        this.$t('titleView.description'),
+        this.$t('remotePatrol.signatureInfo'), //簽到資訊-地圖link
+        this.$t('remotePatrol.signInTime'),
+        '巡檢花費時間',
+        this.$t('remotePatrol.createRptDT'),
+        ];
+      downLoadInspectReportEntireDetail(params).then(res => {
+        console.log("res:",res);
+        const that = this;
+        require.ensure([], async() => {
+          const { export_json_to_excel } = require('@/excel/Export2Excel');
+          const filterVal = ['province','city','storename','code', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 
+          'totlascore','status','submitter', 'detail', 'attachment','comment','singinmap','signints','timediff', 'reportts'];
+          const curData = res.data;
+          const tagName = that.inspectTableList.find(item=>item.id ==self.params.inspectTagId ).name;
+          const data = that.formatJson(filterVal, curData);
+          const fileName = tagName +'_'+ 'Full_report_details';
+          export_json_to_excel(tHeader, data, fileName);
+        });
+      }).catch(err => {
+        console.log('RouteInspection-downItem: ' + err);
+      });
     },
 
     formatJson(filterVal, jsonData) {
@@ -915,7 +928,7 @@ export default {
             tableObj.code = item.code ? item.code : '--';
 
             tableObj.modeText = item.mode === 0 ? self.$t('overview.remotePatrol') : self.$t('overview.onsitePatrol')
-            tableObj.tagName = item.tagName + '\n' + tableObj.modeText;
+            tableObj.tagName = item.tagName ;
 
             tableObj.id = item.id;
             tableObj.datestr = util.getDateStr(item.ts);
@@ -1189,7 +1202,7 @@ export default {
           delete this.inspectStatus.update_user_id
           console.log('this.inspectStatus~~~~~ :>> ', this.inspectStatus);
 
-            if(this.inspectStatus.is_customize_2 == false){
+          if(this.inspectStatus.is_customize_2 == false){
             this.inspectStatus.status_2 = this.$t('overview.echartGood')
           }
           if(this.inspectStatus.is_customize_1 == false){
