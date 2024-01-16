@@ -282,7 +282,7 @@ export default {
         // { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
         { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') },
         // 門店監控
-        { 'mode': 2, 'label': this.$t('immediatePush.storeMonitoring') },
+        // { 'mode': 2, 'label': this.$t('immediatePush.storeMonitoring') },
         // 即時事件
         // --- storeVue 關閉 即時事件 ----
         // { 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')  }
@@ -498,8 +498,8 @@ export default {
 
 
       if(this.curReportType == -1){ self.params.sourceType = null}
-      else if(this.curReportType == 0){self.params.sourceType = 2}
-      else if(this.curReportType == 1){self.params.sourceType = 1}
+      else if(this.curReportType == 0){self.params.sourceType = 1}
+      else if(this.curReportType == 1){self.params.sourceType = 2}
       else if(this.curReportType == 2){self.params.sourceType = 0}
       else if(this.curReportType == 3){self.params.sourceType = 3}
       

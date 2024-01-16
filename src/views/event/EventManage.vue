@@ -2,8 +2,6 @@
   <div :style="{'minHeight':windowHeight-118+'px'}" class="el-event-content">
     <div class="el-event-header">
       <div class="el-area">
-
-
         <store-filter
           :cached-params="searchParams"
           path = "eventManage"
@@ -11,7 +9,7 @@
         >
         <template v-slot:others>
             <div class="last-row" >
-              <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.reportType') }}</span>
+              <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">巡檢表</span>
               <div class="flex-center report-type-area">
                 <el-select
                   v-model="curReportType"
@@ -432,10 +430,9 @@ export default {
       curReportType: -1,
       reportTypeList: [
         { 'mode': -1, 'label': this.$t('remotePatrol.all') },
-        { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
+        // { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
         { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') },
-        { 'mode': 2, 'label': this.$t('immediatePush.storeMonitoring') },
-        
+        // { 'mode': 2, 'label': this.$t('immediatePush.storeMonitoring') },
         // { 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')  } 
       ],
       inspectId: [],
@@ -1449,7 +1446,7 @@ export default {
       const inspectList = [];
       inspectArr.forEach(_item => {
         if (self.curReportType === -1) {
-          if (!newArr.includes(_item.id)) {
+          if (!newArr.includes(_item.id) && _item.mode !== 0) {
             newArr.push(_item.id);
             inspectList.push(
               {
@@ -1459,17 +1456,17 @@ export default {
             );
           }
         }
-        else if (self.curReportType === 0) {
-          if (!newArr.includes(_item.id) && _item.mode === 0) {
-            newArr.push(_item.id);
-            inspectList.push(
-              {
-                label: _item.name,
-                value: _item.id
-              }
-            );
-          }
-        }
+        // else if (self.curReportType === 0) {
+        //   if (!newArr.includes(_item.id) && _item.mode === 0) {
+        //     newArr.push(_item.id);
+        //     inspectList.push(
+        //       {
+        //         label: _item.name,
+        //         value: _item.id
+        //       }
+        //     );
+        //   }
+        // }
         else if (self.curReportType === 1) {
           if (!newArr.includes(_item.id) && _item.mode === 1) {
             newArr.push(_item.id);
@@ -1483,10 +1480,7 @@ export default {
         }
         else if (self.curReportType === 2 || self.curReportType === 3) {
           console.log('curReportType === 2 || 3')
-        
-          
         }
-        
       });
 
       self.inspectTableList = inspectList;
