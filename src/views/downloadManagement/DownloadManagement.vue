@@ -25,11 +25,15 @@
         </div>
         <!-- <selected-stores :store-str="storeStr"/> -->
       </div>
+      <div class="aaa" style="width: 300px;">
+        <el-button type="primary" @click="qqq"> 下載 </el-button>
+      </div>
+      
 
       <div class="report-content loading spacer paper">
         <div
           v-loading="isLoading"
-      
+    
           :element-loading-text="$t('insSettingView.loadingbindstore')"
           class="card-content self-loading ">
 
@@ -96,6 +100,9 @@
   </div>
 </template>
 <script>
+import {ggghhh} from '@/api/exportExcel';
+import axios from 'axios';
+
 import { 
   getInspectReportList, 
   GetInspectTagList,
@@ -329,6 +336,47 @@ export default {
 
 
   methods: {
+
+    getExcel() {
+      return new Promise((resolve, reject) => {
+        axios.get('https://iservice.ichenprocin.dsmynas.com/storemonitor/api/v1.0/download/request/file/download?id=33').then(res => {
+          const data = res.data;
+          console.log('data :>> ', data);
+          resolve(res.data);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
+
+    qqq(){
+
+      var data = this.getExcel() 
+
+      console.log('data :>> ', data);
+      require.ensure([], async() => {
+        const { export_json_to_excel } = require('@/excel/Export2Excel');
+        const tHeader = []
+        // const filterVal = ['province', 'city', 'storeName', 'code', 'storeType', 'submitterName', 'tagName',
+        //   'modeText', 'status', 'totalScore', 'datestr', 'signstr'];
+        // let curData = [];
+        // curData = await that.getReportList_({...that.params, filter: {page: 0, size: 1000}});
+        // console.log('object :>> ', object);
+        // const data = that.formatJson(filterVal, curData);
+        const fileName = 'aaa-1';
+        export_json_to_excel(tHeader, data, fileName);
+      });
+
+
+    },
+
+
+
+
+
+
+
     async initData() {
       
       this.searchInput = '';

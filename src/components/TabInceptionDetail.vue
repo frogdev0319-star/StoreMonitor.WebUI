@@ -85,10 +85,10 @@
               :data="eventTbl.table_data"
               :highlight-current-row="true"
               :header-cell-style="{height:'47px',backgroundColor: '#EFF3F5',border:'none',fontSize:'12px'}"
-              :cell-style="{height:'62px', backgroundColor: '#EFF3F5',border:'none',fontSize:'15px',borderBottom:'1px solid rgba(172,174,177,0.3)',color:'#484848'}"
+              :cell-style="{height:'50px', backgroundColor: '#EFF3F5',border:'none',fontSize:'12px',borderBottom:'1px solid rgba(172,174,177,0.3)',color:'#484848'}"
               :empty-text="$t('deviceView.noData')"
               align="left"
-              style="width: 100%"
+              style="width: 100%;"
               class="tbl-TabInspecDetail"
             >
                 <el-table-column
@@ -686,6 +686,13 @@ export default {
     
 }
 </script>
+<style lang="sass">
+.insep-detail-tbl
+  .el-table__row
+    .cell
+      span
+        font-size: 13px !important
+</style>
 
 <style lang="scss" scoped>
   .tab-area{
@@ -772,11 +779,19 @@ export default {
         border: none !important;
         box-shadow: none !important;
         &::before{
-             background-color: transparent;
+          background-color: transparent;
         }
         &::after{
-             background-color: transparent;
+          background-color: transparent;
         }
+      .el-table__row{
+        .active-name-btn{
+          span{
+            font-size: 12px !important;
+          }
+        }
+        
+      }
     }
     .table{
       margin: 0 calc(24/1920*100vw);
@@ -792,10 +807,10 @@ export default {
             border: none !important;
             box-shadow: none !important;
             &::before{
-                 background-color: transparent;
+              background-color: transparent;
             }
             &::after{
-                 background-color: transparent;
+              background-color: transparent;
             }
         }
         /deep/
