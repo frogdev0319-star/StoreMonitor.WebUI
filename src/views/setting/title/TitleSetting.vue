@@ -173,37 +173,37 @@ export default {
               roleName: this.$t('route.remotePatrol'),
               checked: false,
               disabled: false,
-              visabled:true
+              visabled: false
             },
             {
               roleName: this.$t('overview.onsitePatrol'),
               checked: false,
               disabled: false,
-              visabled:true
+              visabled: true
             },
             {
               roleName: this.$t('route.reports'),
               checked: false,
               disabled: false,
-              visabled:true
+              visabled: true
             },
             {
               roleName: this.$t('route.patrolPlan'),
               checked: false,
               disabled: false,
-              visabled:false
+              visabled: false
             },
             {
               roleName: this.$t('route.storeMonitor'),
               checked: false,
               disabled: false,
-              visabled:true
+              visabled: false
             },
             {
               roleName: this.$t('route.transactionMonitor'),
               checked: false,
               disabled: false,
-              visabled:false
+              visabled: false
             }
           ]
         },
