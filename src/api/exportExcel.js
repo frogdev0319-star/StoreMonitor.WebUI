@@ -7,6 +7,17 @@ import Environment from '@/common/environment';
 const version = Environment.VERSION;
 const version3 = 'v3.0';
 
+
+export const getDownloadList = data => {
+  return request({
+    url: `v1.0/download/request/list`,
+    method: 'post',
+    data
+  });
+};
+
+
+
 export const exportEntireJson = data => {
   return request({
     url: `v1.0/download/request/report/export/entire/json`,
@@ -14,3 +25,6 @@ export const exportEntireJson = data => {
     data
   });
 };
+
+
+

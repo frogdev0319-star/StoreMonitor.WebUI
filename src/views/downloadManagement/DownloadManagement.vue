@@ -7,6 +7,39 @@
             class="time-selector"
             @change="dateChange" 
             :dateTimeValue = dateValue />  -->
+            <span style="margin-right: 16px; font-size:calc(15/1920*100vw);width:110px;">報表類型</span>
+            <div class="report_type" >
+              <el-select
+                v-model="reportType"
+                :placeholder="$t('remotePatrol.all')"
+                size="mini"
+                style="width: calc(200/1440*100vw); "
+                class="el-province"
+                @change="searchRequestTypeItems"
+              >
+                <el-option
+                v-for="item in reportDownloadList"
+                  :key="item.type"
+                  :label="item.label"
+                  :value="item.type"/>
+              </el-select>
+              <div style="width: 2px; border: #999;"></div> 
+              <el-select
+                v-model="reportRequestType"
+                size="mini"
+                style="width: calc(200/1440*100vw); margin-right: 60px;"
+                class="el-province "
+              >
+                <el-option
+                v-for="item in reportRequestTypeList"
+                  :key="item.requestType"
+                  :label="item.label"
+                  :value="item.requestType"/>
+              </el-select>
+          </div>
+
+          {{ reportRequestType }}
+
           <div class="flex-center fullWidth" style="margin-left: 20px">
             <div class="search-content flex-center" style="margin-right: 20px">
               <div class="search-label">{{ $t('remotePatrol.keywords') }}</div>
@@ -17,7 +50,7 @@
               class="storevue-button-search"
               type="primary"
               size="mini"
-              @click="searchData"
+              @click="searchDownloadData"
             >
               <span style="margin-right: 0">{{ $t('remotePatrol.search') }}</span>
             </el-button>
@@ -25,10 +58,7 @@
         </div>
         <!-- <selected-stores :store-str="storeStr"/> -->
       </div>
-      <div class="aaa" style="width: 300px;">
-        <el-button type="primary" @click="qqq"> 下載 </el-button>
-      </div>
-      
+
 
       <div class="report-content loading spacer paper">
         <div
@@ -38,10 +68,10 @@
           class="card-content self-loading ">
 
           <!-- 報告列表 -->
-          <div class="list-table for_pre">
+          <div class="list-table">
             <table-only
               ref="elTP"
-              class="table-white table_style"
+              class="table-white download_list_table"
               :column-data="downloadInfoTable"
               :table-data="downloadTableData"
               :highlight-current-row= "true"
@@ -53,7 +83,6 @@
               :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '6px',}" 
               :tableHeight = "760"
               :cellStyle="{backgroundColor: '#fff !important'}"
-              @sortChange="sortChange"
               @handleOperation="handleEmitOperation"
             />
           </div>
@@ -81,27 +110,15 @@
         </div>
       </div>
     </div>
-    <!-- <dialog-pop
-      title="修改已結案事件"
-      :append-to-body="true"
-      :close-on-click-modal="false"
-      :show-close="false"
-      :visible="showUpdateEvent"
-      :isWarning="true"
-      @cancelHandler="cancelUpdate()"
-      @confirmHandler="confirmUpdate(updateEventId)"
-    >
-      <div class="dialog-slot">
-        <div class="dialog-content">請確認是否變更狀態為 <span style="color: red;"> <b>未處理</b></span>   ? </div>
-      </div>
-    </dialog-pop> -->
+
 
 
   </div>
 </template>
 <script>
-import {ggghhh} from '@/api/exportExcel';
+
 import axios from 'axios';
+import {getDownloadList} from '@/api/exportExcel';
 
 import { 
   getInspectReportList, 
@@ -127,8 +144,10 @@ import { getInspectReportInfo} from '@/api/inspect';//為了取是否有設置�
 import TableOnly from '@/components/TableOnly';
 import PermissionHelper from '@/api/PermissionHelper';
 import DialogPop from '@/components/DialogPop';
+const XLSX = require('xlsx');
+
 export default {
-  name: 'InspectReportList',
+  name: 'DownloadManagement',
   components: {
     DateTimeSelector,
     SelectedStores,
@@ -142,56 +161,45 @@ export default {
     return {
       varyWindowWidth: window.innerWidth,
       varyWindowHeight: window.innerHeight,
-      searchContent: false,
       
-      curSortType: 0,
-      ShowCard: true,
-      isHoverList: false,
-      isHoverCard: false,
+    
 			reportTableData: [],
       eventTableData: [],
 			
-
+      isLoading: false,
       downloadTableData: [],
       downloadInfoTable: [
         {
-          'prop': 'subject',
+          'prop': 'inspect',
           'label': '報表類型',
           'sortable': false,
           'width': '140',
           'maxWidth': '150',
         },
         {
-          'prop': 'inspectTagName',
+          'prop': 'condition',
           'label': '條件',
           'sortable': false,
           'width': '140',
           'maxWidth': '140',
         },
         {
-          'prop': 'inspectTagName',
+          'prop': 'fileName',
           'label': '檔案名稱',
           'sortable': false,
           'width': '140',
           'maxWidth': '140',
         },
         {
-          'prop': 'aaa',
+          'prop': 'status',
           'label': '狀態',
           'sortable': false,
           'width': '140',
           'maxWidth': '140',
         },
         {
-          'prop': 'aaa',
+          'prop': 'ts',
           'label': '匯出時間',
-          'sortable': false,
-          'width': '140',
-          'maxWidth': '140',
-        },
-        {
-          'prop': 'aaa',
-          'label': '匯出人',
           'sortable': false,
           'width': '140',
           'maxWidth': '140',
@@ -215,81 +223,96 @@ export default {
           }
         ]
       },
+      reportDownloadList: [
+        { type: -1, 
+          label: '全部' ,
+        },
+        { 
+          type: 1, 
+          label: '巡店管理 - 巡檢報告' ,
+          content: [
+            { requestType: 1001, label: '報告完整匯出'},
+            { requestType: 1002, label: '報告明細匯出'},
+            { requestType: 1003, label: '報告詳情 - Excel匯出'},
+          ]
+        },
+        { 
+          type: 2, 
+          label: '事件管理',
+          content: [
+            { requestType: 2001, label: '未處理事件'},
+            { requestType: 2002, label: '已處理事件'},
+            { requestType: 2003, label: '已結案事件'},
+            { requestType: 2004, label: '返回事件'},
+            { requestType: 2005, label: '全部事件'},
+          ]
+        },
+        { 
+          type: 3, 
+          label: '統計分析 - 巡店考評統計',
+          content: [
+            { requestType: 3001, label: '考評結果分布'},
+            { requestType: 3002, label: '考評得分分布'},
+            { requestType: 3003, label: '考評達標率'},
+          ]
+        },
+        { 
+          type: 4, 
+          label: '統計分析 - 巡檢項統計',
+          content: [
+            { requestType: 4001, label: '重要巡檢項 評估詳情'},
+          ]
+        },
+        { 
+          type: 5, 
+          label: '統計分析 - 巡檢人員統計',
+          content: [
+            { requestType: 5001, label: '巡檢人員統計列表'},
+            { requestType: 5002, label: '巡檢詳情'},
+            { requestType: 5003, label: '已送出事件結案率'},
+          ]
+        },
+        { 
+          type: 6, 
+          label: '事件處理統計',
+          content: [
+            { requestType: 6001, label: '地點事件'},
+            { requestType: 6002, label: '全部 事件佔比'},
+            { requestType: 6003, label: '全部事件涉及地點'},
+          ]
+        },
+        { 
+          type: 7, 
+          label: '排程管理 - 排程紀錄',
+          content: [
+            { requestType: 7001, label: '匯出Excel'},
+          ]
+        },
+      ],
+      allList: [],
+      params: {},
+      reportType: -1,
+      reportRequestTypeList: [],
+      reportRequestType: '',
+
       showUpdateEvent: false,
       updateEventId: '',
       total: 10,
       currentPage: 1,
       curSizeNum: 10,
       sizeNum: 50,
-      storeList: [],
+
       searchInput: '',
       sizeNum: 10,
       dateValue: [],
-      curReportType: -1,
-      reportTypeList: [
-        { 'mode': -1, 'label': this.$t('remotePatrol.all') },
-        { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
-        { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') },
-        // 門店監控
-        { 'mode': 2, 'label': this.$t('immediatePush.storeMonitoring') },
-        // 即時事件
-        // --- storeVue 關閉 即時事件 ----
-        // { 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')  }
-      ],
-      curAppraise: -1,
-      appraiseList: [
-        { 'status': -1, 'label': this.$t('remotePatrol.all') },
-        { 'status': 0, 'label': this.$t('remotePatrol.dangerous') }, //poor
-        { 'status': 1, 'label': this.$t('remotePatrol.improve') }, //fair
-        { 'status': 2, 'label': this.$t('overview.echartGood') } //good
-      ],
-      storeStr: '',
-      
-      params: {},
       storeDataList: [],
-      storeIdList: [],
-      lang: this.$i18n.locale,
-      isFirstLoad: false,
-      storeName: '',
-      showMonthDrap: false,
-      showStoreContent: false,
-      checkAllStore: false,
       noData: this.$t('deviceView.noData'),
       showStoreInfo: false,
-      cellClass: 'report-cell-class',
-      headerClass: 'report-header-class',
-      exportReportHeader: [this.$t('remotePatrol.regionI'),
-        this.$t('remotePatrol.regionII'),
-        this.$t('remotePatrol.patrolStore'),
-        this.$t('remotePatrol.code'),
-        this.$t('remotePatrol.storeType'),
-        this.$t('scheduleView.InspectPerson'),
-        this.$t('overview.patrolLists'),
-        this.$t('remotePatrol.patrolWay'),
-        this.$t('remotePatrol.patrolResult'),
-        this.$t('remotePatrol.patrolScore'),
-        this.$t('remotePatrol.patrolDate'),
-        this.$t('remotePatrol.signInTime')
-      ],
-      inspectId: '',
-      inspectTableList: [],
-      isLoading: false,
-      ifSaveParams: false,
-      ifGetParamsFromCash: false,
-      inspectCatch: '',
-      storeFilterObj: {},
-      searchParams: {},
-      ifSearchData: true,
-      isScore:true,
-      inspectStatus:'',
-      totalEvents: 0,
       hasAdvanced: false
     };
   },
 
-  created() {
-    this.isFirstLoad = true;
-  },
+  
   computed: {
     iconSrcHeight() {
       return (this.varyWindowWidth / 1920) * 50;
@@ -307,36 +330,32 @@ export default {
           self.$route.meta.keepAlive = true;
         },
         300);
-        self.ifSaveParams = true;
-        self.ifSearchData = true;
       }
     },
     mimicModeChanged(val){
         console.log("mimicMode val:",val);
         this.isLoading = true;
         this.ifSearchData = true;
-        this.getInspectList();
-        //this.initData();
     }
+
+    
   },
-  activated() {
-    const self = this;
-    if (!self.$route.meta.isBack || self.isFirstLoad) {
-      self.initData();
-    }
-    self.$route.meta.isBack = false;
-    self.isFirstLoad = false;
+  created() {
+    this.reportDownloadList.forEach(i => {
+      if(i.content){
+        this.allList = [...this.allList, ...i.content]
+      }
+    })
+    this.reportRequestTypeList = this.allList
+    this.initData()
   },
   async mounted() {
     var userInfo = await this.$store.dispatch("GetUserAuthorities");
     this.hasAdvanced = userInfo.data.isSystemAdvanced
-    this.hasAdvanced ? this.reportTypeList.push({ 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')}) : null
   },
-
-
+  
 
   methods: {
-
     getExcel() {
       return new Promise((resolve, reject) => {
         axios.get('https://iservice.ichenprocin.dsmynas.com/storemonitor/api/v1.0/download/request/file/download?id=33').then(res => {
@@ -350,69 +369,61 @@ export default {
     },
 
 
-    qqq(){
-
-      var data = this.getExcel() 
-
-      console.log('data :>> ', data);
-      require.ensure([], async() => {
-        const { export_json_to_excel } = require('@/excel/Export2Excel');
-        const tHeader = []
-        // const filterVal = ['province', 'city', 'storeName', 'code', 'storeType', 'submitterName', 'tagName',
-        //   'modeText', 'status', 'totalScore', 'datestr', 'signstr'];
-        // let curData = [];
-        // curData = await that.getReportList_({...that.params, filter: {page: 0, size: 1000}});
-        // console.log('object :>> ', object);
-        // const data = that.formatJson(filterVal, curData);
-        const fileName = 'aaa-1';
-        export_json_to_excel(tHeader, data, fileName);
-      });
-
-
-    },
-
-
-
-
-
 
 
     async initData() {
-      
       this.searchInput = '';
       this.storeStr = '';
       this.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24,
         new Date(this.$moment(new Date()).endOf('day'))];
       this.reportList = [];
-      this.curSortType = 0;
-      this.storeName = '';
-      this.showMonthDrap = false;
-      this.showStoreContent = false;
-      this.checkAllStore = false;
-      this.curReportType = -1;
-  
-      await this.getSearchParams();
-      await this.getInspectList();
-      await this.searchData();
+
+      await this.searchRequestTypeItems()
+      await this.getDownloadTable()
       
     },
 
+    pad2(n){
+      return (n < 10 ? '0' : '') + n;
+    },
+    getdate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return year + "/"+ month +"/"+ day
+    },
 
-
-
-		
-    async getEvents(params){
+    async getDownloadTable(){
       this.isLoading = true;
-      await getEventList(params).then(res=>{
-        console.log('res.data --->', res.data)
-  
-        this.totalEvents = res.data.totalElements
-        this.total = res.data.totalPages
+
+      var params = {
+        beginTs: 1702224000000,
+        endTs: 1704815999999,
+        filter: {
+            page: 0,
+            size: 10
+        },
+        order: {
+            direction: "desc",
+            property: "ts"
+        }
+      }
+
+      await getDownloadList(params).then(res=>{
+        console.log('res.data.content --->', res.data.content)
         
-        this.eventTableData = res.data.content
-        this.eventTableData.forEach(i => {
-          i.ts = util.getDateStr(i.ts)
+        res.data.content.forEach(i => {
+          var tempReport = this.allList.find(r => r.requestType == i.requestType)
+          i.inspect = tempReport.label
+          i.fileName = i.downloadContent.fileName
+          i.condition = this.getdate(i.searchStartTs) + ' - ' + this.getdate(i.searchEndTs) + '\n' + i.inspect + '\n' + i.locale
+          i.ts =  this.getdate(i.ts)
         })
+        this.downloadTableData = res.data.content
   
         this.isLoading = false;
       }).catch(err => {
@@ -421,93 +432,21 @@ export default {
       });
     },
 
-    searchData() {
-      console.log("Search Data" + this.dateValue)
-      const self = this;
-      const val = self.dateValue;
-      if (val.length === 0) return;
-      const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
-      const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
-      self.params["beginTs"] = start;
-      self.params["endTs"] = end;
-      self.page = 1;
-      const clause = {
-        status: [2,4],
-        storeId: [...this.storeFilterObj.filterStoreIds]
-      };
-
-
-      // if (self.curReportType != null && self.curReportType !== -1) {
-      //   clause.mode = self.curReportType;
-      // }
-      // if (self.curAppraise != null && self.curAppraise !== -1) {
-      //   clause.status = self.curAppraise;
-      // }
-      self.params.clause = clause;
-      self.params.inspectTagIds  = []
-
-      var curInspectId = self.inspectId === '-1' ? '' : self.inspectId;
-      if(curInspectId !== '') self.params.inspectTagIds .push(curInspectId)
-
-      
-      const search = self.searchInput.trim();
-      if (search.length !== 0) {
-        self.params.like = {
-          subject: search,
-          assignerName: search,
-          storeName: search
-        };
-      } else {
-        self.params.like = {};
+    searchRequestTypeItems(value){
+      if(this.reportType == -1 ){
+        this.reportRequestTypeList = this.allList
+        console.log('this.allList :>> ', this.allList);
+      }else {
+        this.reportRequestTypeList = [...this.reportDownloadList[value].content]
       }
-      
-      if(self.params.jump){ //跳轉
-          console.log("1.ump to ")
-          self.params.jump = false;
-          self.dateValue = [new Date().setTime(this.params.beginTs), new Date().setTime(this.params.endTs)];
-          self.params.searchMysteryMode = this.params.searchMysteryMode;
-          self.params.submitter = this.params.submitters;
-          //this.saveSearchParams();
-          //this.searchData();
-          // console.log("searchData>>>>SearchParams:",self.params)
-          this.ifSearchData = false;
-        }else{
-          // console.log("searchData>>>>no jump:",self.params)
-          self.params.searchMysteryMode = PermissionHelper.enableMimicMode ? 1 : -1;
-        }
-      
-      
-
-      self.params.filter = { page: 0, size: self.sizeNum };
-      self.params.order = { 
-        direction: "desc",
-        property: "ts"
-      };
-  
-      delete self.params.curStore
-      delete self.params.filterStoreIds
-      delete self.params.storeStr
-      delete self.params.storeGroupString
-      delete self.params.storeTypeString
-      delete self.params.curSelectedStore
-
-
-      if(this.curReportType == -1){ self.params.sourceType = null}
-      else if(this.curReportType == 0){self.params.sourceType = 2}
-      else if(this.curReportType == 1){self.params.sourceType = 1}
-      else if(this.curReportType == 2){self.params.sourceType = 0}
-      else if(this.curReportType == 3){self.params.sourceType = 3}
-      
-      if (self.params.clause.storeId.length === 0) {
-        console.log("No Data")
-        this.setNoData();
-        return;
-      }
-      console.log("###",self.params)
-      self.saveSearchParams();
-      self.getEvents(self.params);
+      this.reportRequestType = this.reportRequestTypeList[0].requestType
     },
 
+
+
+    searchDownloadData(){
+      console.log('searchDownloadData :>> ');
+    },
 
     handleEmitOperation(val){
       console.log('val' , val)
@@ -563,177 +502,6 @@ export default {
     },
 
 
-    getReportList(p) {
-      console.log("1.Get Report List" , p)
-      var params = {
-        beginTs:p.beginTs,
-        endTs:p.endTs,
-        clause:p.clause,
-        like:p.like,
-        filter:p.filter,
-        order:p.order,
-        inspectTagId: p.inspectTagId != '-1' ? p.inspectTagId : null, 
-        searchMysteryMode : PermissionHelper.enableMimicMode ? 1 : p.searchMysteryMode
-      }
-      console.log('params ~~~~~>> ', params);
-      const self = this;
-      params.endTs = params.endTs - params.endTs % 1000 + 999;
-      if (params.clause.storeId.length === 0) {
-        console.log("No Data")
-        this.setNoData();
-        return;
-      }
-      console.log("***current user:",this.$store.getters.userId);
-      if(PermissionHelper.enableMimicMode){
-        
-        params['submitter'] = this.$store.getters.userId; 
-      }else if(params.searchMysteryMode!=-1 && p.submitters && p.submitters!='-1' && p.submitters.length>0){
-        var obj = {...p.clause};
-        obj['submitter'] = p.submitters;
-        params['clause'] = obj;
-      }
-      
-      return new Promise((resolve) => {
-        //console.log("params:",params);
-        getInspectReportList(params).then(async(res) => {
-          const errCode = res.errCode;
-          let data = [];
-          if (errCode === 0) {
-            data = res.data.content;
-            this.totalElements = res.data.totalElements
-          } 
-          const temp = [];
-          const tempTable = [];
-          self.isLoading = true;
-
-          
-          for(const item of data){
-            const tableObj = {};
-            tableObj.province = item.province 
-            tableObj.city = item.city;
-
-            tableObj.storeName = item.storeName 
-            tableObj.code = item.code ? item.code : '--';
-
-            tableObj.modeText = item.mode === 0 ? self.$t('overview.remotePatrol') : self.$t('overview.onsitePatrol')
-            tableObj.tagName = item.tagName ;
-
-            tableObj.id = item.id;
-            tableObj.datestr = util.getDateStr(item.ts);
-            tableObj.signstr = item.check_in_ts == 0 || !item.check_in_ts ? '--' : util.getDateStr(item.check_in_ts);
-            tableObj.submitterName = item.submitterName;
-            tableObj.submitter = item.submitter;
-            tableObj.routeObj = item;
-            tableObj.mode = item.mode;
-            tableObj.totalScore = item.type === 1 ? "--" : item.totalScore;
-            
-            tableObj.standard = item.standard;
-            tableObj.standardMsg = util.setStandardMsg(tableObj.standard);
-            tableObj.statusCode = item.status; 
-            
-            let storeType = '';
-            item.tags.length !== 0 ? item.tags.forEach((_item, _index) => {
-              const isuu = _index === item.tags.length - 1 ? '' : ', \n';
-              storeType += _item + isuu;
-            }) : storeType = '--';
-
-            tableObj.storeType = storeType;
-            self.storeList.forEach(_item => {
-              if (item.storeId === _item.storeId) {
-                tableObj.province = _item.province;
-                tableObj.city = _item.city;
-              }
-            });
-            const statusAndIconObj = self.getIconSrc(item.status);
-            tableObj.status = statusAndIconObj.status;
-            tableObj.iconSrc = statusAndIconObj.iconSrc;
-            tempTable.push(tableObj);
-          }
-
-          self.reportTableData = tempTable;
-          // self.total = res.data.totalPages
-          self.isLoading = false;
-          if (temp.length === 0) {
-            self.noData = self.$t('deviceView.noData');
-          }
-          resolve(temp);
-        }).catch(err => {
-        });
-      });
-    },
-
-    getReportInfo(reportId){
-      return new Promise((resolve) => {
-        getInspectReportInfo({ reportIds: [reportId] }).then(res=>{
-          var allRemarkItemsFlag = true;
-          if (res.errCode === 0 && res.data.length > 0) {
-            allRemarkItemsFlag = (res.data[0].info.type != 1);
-          }
-          resolve(allRemarkItemsFlag);
-        }).catch(err => {
-          console.log('InspectReportList-getReportInfo: ' + err);
-        });
-      });
-    },
-
-    getIconSrc(status) {
-      const statusAndLangAndIconMap = [
-        {
-          status: 0,
-          statusStr: this.inspectStatus.status_0, // Poor
-          children: [{
-            'zh': require('../../../static/img/dangerous_cn.png'),
-            'zhtw': require('../../../static/img/dangerous_tw.png'),
-            'en': require('../../../static/img/dangerous_en.png'),
-            'ja-JP': require('../../../static/img/dangerous_ja.png'),
-            'ko-KR': require('../../../static/img/dangerous_ko.png')
-          }]
-        },
-        {
-          status: 1,
-          statusStr: this.inspectStatus.status_1, // Fair
-          children: [{
-            'zh': require('../../../static/img/improved_cn.png'),
-            'zhtw': require('../../../static/img/improved_cn.png'),
-            'en': require('../../../static/img/improved_en.png'),
-            'ja-JP': require('../../../static/img/improved_ja.png'),
-            'ko-KR': require('../../../static/img/improved_ko.png')
-          }]
-        },
-        {
-          status: 2,
-          statusStr: this.inspectStatus.status_2, // Good
-          children: [{
-            'zh': require('../../../static/img/good_cn.png'),
-            'zhtw': require('../../../static/img/good_cn.png'),
-            'en': require('../../../static/img/good_en.png'),
-            'ja-JP': require('../../../static/img/good_ja.png'),
-            'ko-KR': require('../../../static/img/good_ko.png')
-          }]
-        }
-      ];
-
-      const statusAndIconObj = {};
-      const filterMap = statusAndLangAndIconMap.filter(map => map.status === status);
-      if (filterMap.length > 0) {
-        statusAndIconObj.status = filterMap[0].statusStr;
-        for (const lang in filterMap[0].children[0]) {
-          if (lang === this.lang) {
-            statusAndIconObj.iconSrc = filterMap[0].children[0][lang];
-          }
-        }
-      }
-      return statusAndIconObj;
-    },
-
-    getInitReportList() {
-      if ( (typeof this.params.clause.status !='undefined') && this.params.clause.status == -1) {
-        delete this.params.clause.status
-      }
-      this.params.filter = { page: 0, size: this.sizeNum };
-      console.log("*getInitReportList:",this.params);
-      this.getReportList(this.params);
-    },
 
     dateChange(val) {
       const self = this;
@@ -759,281 +527,43 @@ export default {
 
     },
 
-    // currentChange(val) {
-    //   const self = this;
-    //   self.page = val.page;
-    //   self.params.filter = { page: val.page - 1, size: self.sizeNum };
-    //   self.getReportList(self.params);
-    // },
 
-    // sizeChange(val) {
-    //   const self = this;
-    //   self.sizeNum = val.size;
-    //   self.params.filter = { page: 0, size: val.size };
-    //   self.getReportList(self.params);
-    // },
+
+
+
+
 
     
-    setNoData() {
-      this.eventTableData = [];
-      this.total = 0;
-      this.isLoading = false;
-      this.noData = this.$t('deviceView.noData');
-    },
 
-    checkSortType(typeId,notupdate) {
-      const self = this;
-      switch (typeId) {
-        case 0: self.params.order = { direction: 'desc', property: 'ts' }; break;
-        case 1: self.params.order = { direction: 'asc', property: 'status' }; break;
-        case 2: self.params.order = { direction: 'asc', property: 'storeName' }; break;
-      }
-      if(!notupdate)
-        self.getReportList(self.params);
-    },
 
-    clickReport(item, index) {
-      const self = this;
-      sessionStorage.setItem('report_data', JSON.stringify(item.routeObj));
-      self.$router.push({ name: 'reportDetails', params: { data: item.routeObj }});
-    },
-
-    sortChange(sortOrder) {
-      const self = this;
-      const order = sortOrder.direction;
-      console.log("report sort:",sortOrder);
-      console.log("report order:",order);
-      if (order === 'asc') {
-        self.params.order = {
-          'direction': 'asc',
-          'property': sortOrder.property === 'datestr' ? 'ts' : sortOrder.property
-        };
-      } else if (order === 'desc') {
-        self.params.order = {
-          'direction': 'desc',
-          'property': sortOrder.property === 'datestr' ? 'ts' : sortOrder.property
-        };
-      } else {
-        self.params.order = {};
-      }
-      self.searchData();
-    },
-
-    getTagAll() {
-      return new Promise((resolve, reject) => {
-        GetInspectTagList().then(res => {
-          const data = res.data;
-          resolve(data);
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
-
-    getTagMytery() {
-      return new Promise((resolve, reject) => {
-        GetMysteryInspectTagList().then(res => {
-          const data = res.data;
-          resolve(data);
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
     
-    getInspectStatus() {
-      return new Promise((resolve, reject) => {
-        getInspectStatus().then(res => {
-          resolve(res);
-          this.inspectStatus = res.data.settingContent.general_setting_inspect_status_name
-          delete this.inspectStatus.update_time
-          delete this.inspectStatus.update_user_id
-          console.log('this.inspectStatus~~~~~ :>> ', this.inspectStatus);
 
-            if(this.inspectStatus.is_customize_2 == false){
-            this.inspectStatus.status_2 = this.$t('overview.echartGood')
-          }
-          if(this.inspectStatus.is_customize_1 == false){
-            this.inspectStatus.status_1 = this.$t('overview.improve')
-          }
-          if(this.inspectStatus.is_customize_0 == false){
-            this.inspectStatus.status_0 = this.$t('overview.danger')
-          }
-
-          
-          this.appraiseList.forEach(item =>{
-            if(item.status === 0) {item.label = this.inspectStatus.status_0}
-            else if(item.status === 1) {item.label = this.inspectStatus.status_1}
-            else if(item.status === 2) {item.label = this.inspectStatus.status_2}
-          })
-
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
-
-
-    async getInspectList() {
-      const self = this;
-      const inspectArr = PermissionHelper.enableMimicMode ? await self.getTagMytery() : await self.getTagAll();
-      const newArr = [];
-      const inspectList = [];
-      inspectArr.forEach(_item => {
-        if (self.curReportType === -1) {
-          if (!newArr.includes(_item.id)) {
-            newArr.push(_item.id);
-            inspectList.push(_item);
-          }
-        } else if (self.curReportType === 0) {
-          if (!newArr.includes(_item.id) && _item.mode === 0) {
-            newArr.push(_item.id);
-            inspectList.push(_item);
-          }
-        } else if (self.curReportType === 1) {
-          if (!newArr.includes(_item.id) && _item.mode === 1) {
-            newArr.push(_item.id);
-            inspectList.push(_item);
-          }
-        }
-        else if (self.curReportType === 2 || self.curReportType === 3) {
-          console.log('curReportType === 2 || 3')
-        }
-      });
-      self.inspectTableList = inspectList;
-      self.inspectTableList.length > 0 && self.inspectTableList.unshift({ id: '-1', name: self.$t('remotePatrol.all') });
-      if (inspectList.length !== 0) {
-        self.inspectId = self.ifGetParamsFromCash ? self.inspectCatch : self.inspectTableList[0].id;
-      } else {
-        self.inspectId = '';
-      }
-      self.getInitReportList();
-    },
-
-    saveSearchParams() {
-      console.log("Save Search Params")
-      let tempsearchParamsObj = this.storeFilterObj;
-      console.log('tempsearchParamsObj :>> ', tempsearchParamsObj);
-      tempsearchParamsObj.curReportType = this.curReportType;
-
-      if(!tempsearchParamsObj.clause){
-        tempsearchParamsObj.clause={
-          storeId: this.storeFilterObj.filterStoreIds,
-          status:this.curAppraise
-        }
-      }
-      else{
-        tempsearchParamsObj.clause = this.params.clause
-      }
-      tempsearchParamsObj.inspectTagId = this.inspectId;
-      //
-      const searchParamsObj = {
-        path: 'closeEvents',
-        params: tempsearchParamsObj
-      };
-      SearchConditionUtil.saveSearchCondition(searchParamsObj);
-    },
-
-    getSearchParams() {
-      // clause
-      // console.log("Get SEarch Parameter");
-      let searchParams = JSON.parse(JSON.stringify(SearchConditionUtil.getSearchCondition('closeEvents')));
-      console.log("getSearchParams>>>>searchParams:",searchParams);
-      this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
-
-      if (Object.keys(searchParams).length > 0) {
-        
-        this.storeFilterObj = searchParams;
-        this.params = searchParams;
-        console.log("Get Old Params")
-        console.log(searchParams)
-        this.order = searchParams.order;
-        this.filter = searchParams.filter;
-      
-        this.checkSortType(this.curSortType,true);
-        console.log("searchParams.clause.status:",searchParams.clause.status);
-        this.curAppraise = (typeof searchParams.clause.status=='undefined') ? -1:searchParams.clause.status;
-        this.curReportType = searchParams.curReportType;
-        this.inspectCatch = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
-        this.searchParams = searchParams;
-        this.ifGetParamsFromCash = true;
-        this.inspectId = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
-        if(!searchParams.curProvince){
-          searchParams.curProvince =[];
-        }
-        if(!searchParams.curCity){
-          searchParams.curCity =[];
-        }
-        
-        if(searchParams.jump){ //跳轉
-          console.log("Jump to ")
-          //this.params.jump = false;
-          this.dateValue = [new Date().setTime(this.params.beginTs), new Date().setTime(this.params.endTs)];
-          console.log("searchParams.searchMysteryMode:",searchParams.searchMysteryMode);
-          this.params.searchMysteryMode = searchParams.searchMysteryMode;
-          this.params.submitter = this.params.submitters;
-          //this.saveSearchParams();
-          console.log("getSearchParams>>>this.params:",this.params);
-          this.searchData();
-        }else{
-          this.params.searchMysteryMode = PermissionHelper.enableMimicMode ? 1 : -1;
-        }
-        
-      } else {
-        this.params.filter = { page: 0, size: this.sizeNum };
-        this.params.clause = { storeId: [] };
-        this.ifGetParamsFromCash = false;
-        this.curAppraise =-1;
-        this.searchParams = {};
-      }
-      if(!this.params.beginTs)this.params.beginTs = this.dateValue[0].valueOf();
-      if(!this.params.endTs)this.params.endTs = this.dateValue[1].valueOf();
-    },
-    
 
 
   },
 
-  beforeRouteEnter(to, from, next) {
-    to.meta.keepAlive = true;
-    if (from.name === 'reportDetails' && to.name === 'reports') {
-      to.meta.isBack = true;
-      next();
-    } else {
-      to.meta.isBack = false;
-      next();
-    }
-  },
 
-  beforeRouteLeave(to, from, next) {
-    if (to.name !== 'reportDetails') {
-      from.meta.keepAlive = false;
-      next();
-    } else {
-      from.meta.keepAlive = true;
-      next();
-    }
-  }
 
 };
 </script>
 
 
 <style lang="sass">
-  .ignoreSign
-    width: fit-content
-    border-radius: 4px
-    font-size: 12px
-    color: #989ca0
-    background: #EFEFEF
-    padding: 5px
-  .table_style
+
+  .report_type
+    display: flex
+    flex-direction: row
+    align-items: flex-end
+    justify-content: flex-end
+
+  .download_list_table
     background: #FFF
     .row-class
       th
         &:nth-child(1)
           padding-left: 0 !important
       td
+        vertical-align: center
         &:nth-child(1)
           .cell
             padding-left: 10% !important
@@ -1044,6 +574,9 @@ export default {
             span
               // background: #9872 !important
               // white-space: pre !important
+        &:nth-child(2)
+          .cell
+            white-space: pre !important
             
     .el-table th div
       padding-left: 10px !important
@@ -1052,10 +585,12 @@ export default {
 
     .cell-class .cell
       text-align: left  !important
+      
   // .el-table__body-wrapper
   //   max-height: fit-content !important
 
 </style>
+
 
 <style lang="scss" scoped>
 $red:#f31d65;
