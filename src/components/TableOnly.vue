@@ -212,7 +212,7 @@
           <div class="flex-center" >
               <img 
                 :key="index"
-                class="child-space"
+                class="child-space hover_effect"
                 :class="index === 2 && item.icon.indexOf('disabled') !== -1 && scope.row.scope === 0 ? `${item.icon} icon-disabled` : item.icon"
                 v-for="(item,index) in tableAction.operation" 
                 :src="`./static/img/table-${item.methods}.png`" 
@@ -803,6 +803,7 @@ export default {
 };
 </script>
 
+
 <style lang="scss" scoped>
   @import "../assets/sass/stastical.scss";
   .tbl-style{
@@ -1059,6 +1060,10 @@ export default {
   .is_read
     color: #59AB22 !important
   
-
+  .hover_effect
+    transition: all .2s
+    cursor: pointer
+    &:hover
+      transform: scale(1.2)
 </style>
 

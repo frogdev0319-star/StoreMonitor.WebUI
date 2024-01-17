@@ -56,14 +56,20 @@
             </el-button>
           </div>
         </div>
-        <!-- <selected-stores :store-str="storeStr"/> -->
       </div>
 
 
       <div class="report-content loading spacer paper">
+        <div class="clear_btn">
+          <delay-button @click="clearAll">
+            <div class="button-area">
+              <i class="iconfont el-icon-delete-solid"/>
+              <span>全部清空</span>
+            </div>
+          </delay-button>
+        </div>
         <div
           v-loading="isLoading"
-    
           :element-loading-text="$t('insSettingView.loadingbindstore')"
           class="card-content self-loading ">
 
@@ -213,13 +219,11 @@ export default {
         operation: [
           {
             lable: '',
-            icon: 'icon-doc',
-            methods: 'doc'
+            methods: 'download'
           },
           {
             lable: '',
-            icon: 'icon-edit',
-            methods: 'edit'
+            methods: 'delete'
           }
         ]
       },
@@ -451,11 +455,11 @@ export default {
     handleEmitOperation(val){
       console.log('val' , val)
       switch (val.method) {
-        case  'doc':
-          this.handleEventDoc(val)
+        case  'download':
+          console.log('download')
           break;
 
-        case'edit':
+        case 'delete':
           this.showUpdateEvent = true
           this.updateEventId = val.row.id
           break;
@@ -465,14 +469,7 @@ export default {
       }
     },
 
-    handleEventDoc(val){
-      console.log('val :>> ', val);
-      this.event = val.row;
-      sessionStorage.setItem('needUpdateEvent', true);
-      sessionStorage.setItem('event', JSON.stringify(this.event));
-      sessionStorage.setItem('queryparams', JSON.stringify(this.params));
-      this.$router.push({ name: 'needUpdateEvent', params: { event: this.event }});
-    },
+  
   
     cancelUpdate(){
       this.showUpdateEvent = false
@@ -527,6 +524,9 @@ export default {
 
     },
 
+    clearAll(){
+      console.log('clear all ')
+    },
 
 
 
@@ -584,10 +584,22 @@ export default {
       text-align: left  !important
 
     .cell-class .cell
+      padding: 5px 
       text-align: left  !important
       
-  // .el-table__body-wrapper
-  //   max-height: fit-content !important
+
+  .clear_btn
+    width: 100%
+    display: flex
+    flex-direction: row
+    align-items: center
+    justify-content: flex-end
+    border-bottom: 1px solid #ececec
+    padding: 15px 15px
+
+  .button-area
+    height: 23px
+    padding: 0 5px
 
 </style>
 
