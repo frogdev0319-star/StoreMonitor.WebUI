@@ -17,7 +17,7 @@ export const getDownloadList = data => {
 };
 
 
-
+// [1001]
 export const exportEntireJson = data => {
   return request({
     url: `v1.0/download/request/report/export/entire/json`,
@@ -26,5 +26,12 @@ export const exportEntireJson = data => {
   });
 };
 
-
+// [1002]
+export const exportReportList = data => {
+  return request({
+    url: `v1.0/download/request/report/list`,
+    method: 'post',
+    data
+  });
+};
 

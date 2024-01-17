@@ -151,18 +151,6 @@
                     @click.native="export2ExcelAll">{{ $t('eventView.exportEntailReport') }}</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
-              <!--<delay-button
-                :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                class="export-report-btn"
-                type="primary"
-                size="mini"
-                @click="export2Excel"
-              >
-                <div class="button-area">
-                  <img :src="exportPng" class="icon-excel">
-                  <span>{{ $t('eventView.exportReport') }}</span>
-                </div>
-              </delay-button>-->
             </div>
           </div>
 
@@ -306,7 +294,7 @@ import {
       getInspectStatus,
       getInspectReportInfo
     } from '@/api/inspect';
-import {exportEntireJson} from '@/api/exportExcel';
+import {exportEntireJson, exportReportList} from '@/api/exportExcel';
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
 import StoreFilter from '@/components/StoreFilter';
@@ -639,29 +627,115 @@ export default {
         util.notify(that.$t('remotePatrol.emptyReportList'), 'warning', 3000);
         return false;
       }
-      // const start = typeof (that.dateValue[0]) === 'object' ? that.dateValue[0].getTime() : that.dateValue[0];
-      // const end = typeof (that.dateValue[1]) === 'object' ? that.dateValue[1].getTime() : that.dateValue[1];
-      // that.params.beginTs = start;
-      // that.params.endTs = end;
-      // that.params.filter = { page: 0, size: that.total };
-      // const storeIds = this.storeFilterObj.filterStoreIds;
-      // that.params.clause = { storeId: storeIds };
-      // console.log(that.params)
-      require.ensure([], async() => {
-        const { export_json_to_excel } = require('@/excel/Export2Excel');
-        const tHeader = that.exportReportHeader;
-        const filterVal = ['province', 'city', 'storeName', 'code', 'storeType', 'submitterName', 'tagName',
-          'modeText', 'status', 'totalScore', 'datestr', 'signstr'];
-        let curData = [];
-        curData = await that.getReportList_({...that.params, filter: {page: 0, size: 1000}});
-        console.log('object :>> ', object);
-        const data = that.formatJson(filterVal, curData);
-        const fileName = that.$t('remotePatrol.reportExcelList') + '-' + util.getCurDateStr();
-        sessionStorage.setItem('!merge', true);
-        export_json_to_excel(tHeader, data, fileName);
-        sessionStorage.removeItem('!merge');
-      });
+
+      this.showExportMassage = true
+      var ExpAllReportIds = this.reportList.map( i => i.id)
+      var ExpAllParams = {
+        beginTs: this.params.beginTs,
+        endTs:  this.params.endTs,
+        clause: this.params.clause,
+        like: {},
+        filter: {
+            page: 0,
+            size: 1000
+        },
+        order: {
+          direction: "desc",
+          property: "ts"
+        }
+      }
+
+      exportReportList(ExpAllParams).then(res=>{
+        console.log('res :>> ', res);
+      })
+
+      // require.ensure([], async() => {
+      //   const { export_json_to_excel } = require('@/excel/Export2Excel');
+      //   const tHeader = that.exportReportHeader;
+      //   const filterVal = ['province', 'city', 'storeName', 'code', 'storeType', 'submitterName', 'tagName',
+      //     'modeText', 'status', 'totalScore', 'datestr', 'signstr'];
+      //   let curData = [];
+      //   curData = await that.getReportList_({...that.params, filter: {page: 0, size: 1000}});
+      //   const data = that.formatJson(filterVal, curData);
+      //   const fileName = that.$t('remotePatrol.reportExcelList') + '-' + util.getCurDateStr();
+      //   sessionStorage.setItem('!merge', true);
+      //   export_json_to_excel(tHeader, data, fileName);
+      //   sessionStorage.removeItem('!merge');
+      // });
     },
+
+    
+    async export2ExcelAll(){
+      const self = this;
+      if(self.inspectId == -1 || self.params.inspectTagId==null){
+        self.ExportAllMsg = this.$t('remotePatrol.selectOnlyOneInspect');
+        self.showExportAllWarn = true;
+        return;
+      }
+
+      this.showExportMassage = true
+      var ExpAllReportIds = this.reportList.map( i => i.id)
+      var ExpAllParams = {
+        beginTs: this.params.beginTs,
+        endTs:  this.params.endTs,
+        inspectTagId: this.params.inspectTagId,
+        reportIds: ExpAllReportIds
+      }
+
+      exportEntireJson(ExpAllParams).then(res=>{
+        console.log('res :>> ', res);
+      })
+
+
+      // self.showExportAllNotice = true;
+      // const reportIds = await this.doGetSearchConditionsReportIds();
+      // console.log("reportIds:",reportIds);
+      // const params = {
+      //   beginTs:self.params.beginTs,
+      //   endTs:self.params.endTs,
+      //   inspectTagId:self.params.inspectTagId,
+      //   reportIds:reportIds
+      // };
+      // const tHeader = [
+      //   this.$t('remotePatrol.regionI'),
+      //   this.$t('remotePatrol.regionII'),
+      //   this.$t('remotePatrol.storeName'),
+      //   this.$t('remotePatrol.storeCode'),
+      //   this.$t('remotePatrol.inspectName'),//巡檢表名稱
+      //   this.$t('remotePatrol.category'),
+      //   this.$t('insSettingView.subCategory'),
+      //   this.$t('overview.items'),
+      //   this.$t('remotePatrol.inspectItemScore'),
+      //   this.$t('remotePatrol.patrolResult'),
+      //   this.$t('remotePatrol.inspectTotalScore'),//報告總分inspectSummary
+      //   this.$t('remotePatrol.inspectSummary'), //巡檢總評
+      //   this.$t('eventView.submitter'), //送出人
+      //   this.$t('remotePatrol.exportAllDetail'),// 詳情
+      //   this.$t('audit.inceptionRpt.attachment'),
+      //   this.$t('titleView.description'),
+      //   this.$t('remotePatrol.signatureInfo'), //簽到資訊-地圖link
+      //   this.$t('remotePatrol.signInTime'),
+      //   '巡檢花費時間',
+      //   this.$t('remotePatrol.createRptDT'),
+      //   ];
+      // downLoadInspectReportEntireDetail(params).then(res => {
+      //   console.log("res:",res);
+      //   const that = this;
+      //   require.ensure([], async() => {
+      //     const { export_json_to_excel } = require('@/excel/Export2Excel');
+      //     const filterVal = ['province','city','storename','code', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 
+      //     'totlascore','status','submitter', 'detail', 'attachment','comment','singinmap','signints','timediff', 'reportts'];
+      //     const curData = res.data;
+      //     const tagName = that.inspectTableList.find(item=>item.id ==self.params.inspectTagId ).name;
+      //     const data = that.formatJson(filterVal, curData);
+      //     const fileName = tagName +'_'+ 'Full_report_details';
+      //     export_json_to_excel(tHeader, data, fileName);
+      //   });
+      // }).catch(err => {
+      //   console.log('RouteInspection-downItem: ' + err);
+      // });
+    },
+
     async doGetSearchConditionsReportIds(){
       const self = this;
       var reportIds = [];
@@ -679,76 +753,7 @@ export default {
       return reportIds;
     },
 
-   async export2ExcelAll(){
-    
-      const self = this;
-      if(self.inspectId == -1 || self.params.inspectTagId==null){
-        self.ExportAllMsg = this.$t('remotePatrol.selectOnlyOneInspect');
-        self.showExportAllWarn = true;
-        return;
-      }
-      // this.showExportMassage = true
-      // var ExpAllReportIds = this.reportList.map( i => i.id)
-      // var ExpAllParams = {
-      //   beginTs: this.params.beginTs,
-      //   endTs:  this.params.endTs,
-      //   inspectTagId: this.params.inspectTagId,
-      //   reportIds: ExpAllReportIds
-      // }
 
-      // exportEntireJson(ExpAllParams).then(res=>{
-      //   console.log('res :>> ', res);
-      // })
-
-
-      self.showExportAllNotice = true;
-      const reportIds = await this.doGetSearchConditionsReportIds();
-      console.log("reportIds:",reportIds);
-      const params = {
-        beginTs:self.params.beginTs,
-        endTs:self.params.endTs,
-        inspectTagId:self.params.inspectTagId,
-        reportIds:reportIds
-      };
-      const tHeader = [
-        this.$t('remotePatrol.regionI'),
-        this.$t('remotePatrol.regionII'),
-        this.$t('remotePatrol.storeName'),
-        this.$t('remotePatrol.storeCode'),
-        this.$t('remotePatrol.inspectName'),//巡檢表名稱
-        this.$t('remotePatrol.category'),
-        this.$t('insSettingView.subCategory'),
-        this.$t('overview.items'),
-        this.$t('remotePatrol.inspectItemScore'),
-        this.$t('remotePatrol.patrolResult'),
-        this.$t('remotePatrol.inspectTotalScore'),//報告總分inspectSummary
-        this.$t('remotePatrol.inspectSummary'), //巡檢總評
-        this.$t('eventView.submitter'), //送出人
-        this.$t('remotePatrol.exportAllDetail'),// 詳情
-        this.$t('audit.inceptionRpt.attachment'),
-        this.$t('titleView.description'),
-        this.$t('remotePatrol.signatureInfo'), //簽到資訊-地圖link
-        this.$t('remotePatrol.signInTime'),
-        '巡檢花費時間',
-        this.$t('remotePatrol.createRptDT'),
-        ];
-      downLoadInspectReportEntireDetail(params).then(res => {
-        console.log("res:",res);
-        const that = this;
-        require.ensure([], async() => {
-          const { export_json_to_excel } = require('@/excel/Export2Excel');
-          const filterVal = ['province','city','storename','code', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 
-          'totlascore','status','submitter', 'detail', 'attachment','comment','singinmap','signints','timediff', 'reportts'];
-          const curData = res.data;
-          const tagName = that.inspectTableList.find(item=>item.id ==self.params.inspectTagId ).name;
-          const data = that.formatJson(filterVal, curData);
-          const fileName = tagName +'_'+ 'Full_report_details';
-          export_json_to_excel(tHeader, data, fileName);
-        });
-      }).catch(err => {
-        console.log('RouteInspection-downItem: ' + err);
-      });
-    },
 
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => v[j]));
