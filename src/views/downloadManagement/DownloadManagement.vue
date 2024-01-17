@@ -7,7 +7,7 @@
             class="time-selector"
             @change="dateChange" 
             :dateTimeValue = dateValue />  -->
-            <span style="margin-right: 16px; font-size:calc(15/1920*100vw);width:110px;">報表類型</span>
+            <span style="margin-right: 16px; font-size:calc(15/1920*100vw);width:10%;">報表類型</span>
             <div class="report_type" >
               <el-select
                 v-model="reportType"

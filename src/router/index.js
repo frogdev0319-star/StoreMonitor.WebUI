@@ -112,6 +112,7 @@ export const navbarRoute = {
       {
         path: '/reinspection',
         name: 'remotePatrol',
+        hidden: true,
         component: resolve => require(['@/views/patrolShop/ReInspection'], resolve),
         meta: {
           requireAuth: true,
@@ -136,6 +137,7 @@ export const navbarRoute = {
       {
         path: '/storemonitor',
         name: 'storeMonitor',
+        hidden: true,
         component: resolve => require(['@/views/patrolShop/StoreMonitor'], resolve),
         meta: {
           requireAuth: true,
