@@ -715,6 +715,15 @@
     >
       <p>{{ $t('insSettingView.isExportPDF') }}......</p>
     </dialog-pop>
+    <DownloadDialogPop
+        :title="$t('downloadManagement.message')"
+        :visible="showExportMassage"
+        :showCancelbtn="false"
+        @confirmHandler="showExportMassage = false"
+        @goToPage="$router.push({name: 'downloadManagement',});"
+        >
+    </DownloadDialogPop>
+    </div>
   </div>
 </template>
 
@@ -724,6 +733,11 @@ import { mapGetters } from 'vuex';
 import util from '@/common/util.js';
 import { getEventStatsOverStoreV2, getEventStatsOverStore,getEventStatsOverWithGroup } from '@/api/eventOverview';
 import { getInspectItemStatsOverview, getInspectItemStatsOverGroup, getInspectStatsItemOverStore} from '@/api/inspectOverview';
+import {
+  exportStatisticsEventGroup,
+  exportStatisticsInspectOverview,
+  exportStatisticsInspectStore
+} from '@/api/exportExcel';
 import html2canvas from 'html2canvas';
 import Lodash from 'lodash';
 import SearchComponent from '@/components/SearchComponent';
@@ -738,6 +752,7 @@ import SearchConditionUtil from '@/common/SearchConditionUtil';
 import vm from '@/main.js';
 import PermissionHelper from '@/api/PermissionHelper';
 import { message } from '@/common/singleton-message';
+import DownloadDialogPop from '@/components/DownloadDialogPop';
 export default {
   name: 'EventStatistics',
   components: {
@@ -747,7 +762,8 @@ export default {
     SearchComponent,
     AreaSelected,TypeSelectArea,
     TableOnly,
-    TblPaginationOnly
+    TblPaginationOnly,
+    DownloadDialogPop
   },
   mixins: [resize],
   data() {
@@ -1147,7 +1163,8 @@ export default {
       ],
       WindowWidth:util.getWindowWidth(),
       compareGroupAndTypeId:[],
-      inspectName : ''
+      inspectName : '',
+      showExportMassage: false
     };
   },
 
@@ -1820,19 +1837,26 @@ export default {
         util.notify(that.$t('overview.emptyEventList'), 'warning', 3000);
         return false;
       }
-      require.ensure([], async() => {
-        const { export_json_to_excel } = require('@/excel/Export2Excel');
-        const tHeader = [];
-        this.eventInfoData.forEach(item=>{
-          tHeader.push(item.label);
-        });
-        const filterVal = ['province', 'city', 'groupName', 'storeGroup', 'storeType','code', 'numOfTotal', 'numOfUnprocessed', 'numOfInprocess',
-          'numOfProcessed', 'numOfRejected','completedRate'];
-        const curData = this.allEventTableData;
-        const data = that.formatJson(filterVal, curData);
-        const fileName = this.compareType+'_Inspection event' + '_' + util.getCurDateStr();
-        export_json_to_excel(tHeader, data, fileName);
-      });
+
+      this.params.filter = { page: 0, size: 99999}
+      this.showExportMassage = true
+      exportStatisticsEventGroup(this.params).then(res=>{
+        console.log('res :>> ', res);
+      })
+
+      // require.ensure([], async() => {
+      //   const { export_json_to_excel } = require('@/excel/Export2Excel');
+      //   const tHeader = [];
+      //   this.eventInfoData.forEach(item=>{
+      //     tHeader.push(item.label);
+      //   });
+      //   const filterVal = ['province', 'city', 'groupName', 'storeGroup', 'storeType','code', 'numOfTotal', 'numOfUnprocessed', 'numOfInprocess',
+      //     'numOfProcessed', 'numOfRejected','completedRate'];
+      //   const curData = this.allEventTableData;
+      //   const data = that.formatJson(filterVal, curData);
+      //   const fileName = this.compareType+'_Inspection event' + '_' + util.getCurDateStr();
+      //   export_json_to_excel(tHeader, data, fileName);
+      // });
     },
 
     handlePageAndSizeChange(pageObj) { //改變一頁顯示
@@ -2188,24 +2212,32 @@ export default {
       self.eventItemTable.total =Math.ceil( self.eventItemTable.itemAllData.length/self.eventItemTable.sizeNum );
       self.eventItemTable.table_data = [...self.eventItemTable.itemAllData.slice((self.eventItemTable.page - 1)* self.eventItemTable.sizeNum, self.eventItemTable.page* self.eventItemTable.sizeNum)];
     },
+
     export2Excel_eventItem() {
       const self = this;
       if (self.eventItemTable.itemAllData.length === 0) {
         util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
         return false;
       }
-      require.ensure([], async() => {
-        const { export_json_to_excel } = require('@/excel/Export2Excel');
-        const tHeader = [];
-        self.eventItemTable.column_data.forEach(item=>{
-          tHeader.push(item.label);
-        });
-        const filterVal = ['groupName', 'itemName', 'numOfUnqualified', 'percentage', 'numOfStore'];
-        const curData = self.eventItemTable.itemAllData;
-        const data = self.formatJson(filterVal, curData);
-        const fileName = (this.selEventItem == -1 ? this.inspectName:this.selEventItemName)+'_Inspection item event' + '_' + util.getCurDateStr();
-        export_json_to_excel(tHeader, data, fileName);
-      });
+      this.params.itemIds = this.allEventItemIds
+      this.params.filter = { page: 0, size: 99999}
+      this.showExportMassage = true
+      exportStatisticsInspectOverview(this.params).then(res=>{
+        console.log('res :>> ', res);
+      })
+
+      // require.ensure([], async() => {
+      //   const { export_json_to_excel } = require('@/excel/Export2Excel');
+      //   const tHeader = [];
+      //   self.eventItemTable.column_data.forEach(item=>{
+      //     tHeader.push(item.label);
+      //   });
+      //   const filterVal = ['groupName', 'itemName', 'numOfUnqualified', 'percentage', 'numOfStore'];
+      //   const curData = self.eventItemTable.itemAllData;
+      //   const data = self.formatJson(filterVal, curData);
+      //   const fileName = (this.selEventItem == -1 ? this.inspectName:this.selEventItemName)+'_Inspection item event' + '_' + util.getCurDateStr();
+      //   export_json_to_excel(tHeader, data, fileName);
+      // });
     },
 
     handlePageAndSizeChange_eventItem(pageObj) {
@@ -2281,20 +2313,27 @@ export default {
         util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
         return false;
       }
-      require.ensure([], async() => {
-        const { export_json_to_excel } = require('@/excel/Export2Excel');
-        const tHeader = [];
-        const filterVal =[];
-        self.eventInvolveTable.column_data.forEach(item=>{
-          tHeader.push(item.label);
-          filterVal.push(item.prop);
-        });
-        //const filterVal = ['province', 'city', 'name', 'percentage', 'numOfStores'];
-        const curData = self.eventInvolveTable.itemAllData;
-        const data = self.formatJson(filterVal, curData);
-        const fileName = 'Store_Inspection item event' + '_' + util.getCurDateStr();
-        export_json_to_excel(tHeader, data, fileName);
-      });
+
+      this.params.filter = { page: 0, size: 99999}
+      this.showExportMassage = true
+      exportScheduleRecord(this.params).then(res=>{
+        console.log('res :>> ', res);
+      })
+
+      // require.ensure([], async() => {
+      //   const { export_json_to_excel } = require('@/excel/Export2Excel');
+      //   const tHeader = [];
+      //   const filterVal =[];
+      //   self.eventInvolveTable.column_data.forEach(item=>{
+      //     tHeader.push(item.label);
+      //     filterVal.push(item.prop);
+      //   });
+      //   //const filterVal = ['province', 'city', 'name', 'percentage', 'numOfStores'];
+      //   const curData = self.eventInvolveTable.itemAllData;
+      //   const data = self.formatJson(filterVal, curData);
+      //   const fileName = 'Store_Inspection item event' + '_' + util.getCurDateStr();
+      //   export_json_to_excel(tHeader, data, fileName);
+      // });
     },
 
     handlePageAndSizeChange_eventStores(pageObj) {
