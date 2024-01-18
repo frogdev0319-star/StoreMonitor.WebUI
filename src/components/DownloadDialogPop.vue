@@ -17,8 +17,8 @@
 		</template>
 
     <div v-if="showButton" slot="footer">
-      <el-button class="confirm-btn" size="mini" type="primary" @click="goToPage">
-				前往查看
+      <el-button class="confirm-btn" style="width: fit-content; padding: 0 12px" size="mini" type="primary" @click="goToPage">
+				前往下載管理
       </el-button>
       <el-button class="confirm-btn" style="background: #999; color: #FFF;" size="mini" @click="confirmHandler">
         {{ confirmText }}

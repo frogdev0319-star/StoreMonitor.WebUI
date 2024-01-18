@@ -273,6 +273,16 @@
     :dialog-closed="showBachCloseDialog"
     @confirmed="confirmBachClose"
     @canceled="showBachCloseDialog = false"/>
+
+    <DownloadDialogPop
+      :title="$t('downloadManagement.message')"
+      :visible="showExportMassage"
+      :showCancelbtn="false"
+      @confirmHandler="showExportMassage = false"
+      @goToPage="$router.push({name: 'downloadManagement',});"
+      >
+    </DownloadDialogPop>
+
   </div>
 </template>
 
@@ -285,6 +295,7 @@ import { getCookie } from '@/common/auth';
 import { isLoginIn } from '@/api/login';
 import { mapGetters } from 'vuex';
 import { getBriefStoreList } from '@/api/store';
+import {exportEventList} from '@/api/exportExcel';
 import MultiSelect from '@/components/MultiSelect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import LimitSelect from '@/components/LimitSelect';
@@ -296,6 +307,7 @@ import SelectedStores from '@/components/SelectedStores';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
 import DialogVue from '@/components/DialogVue';
 import PermissionHelper from '@/api/PermissionHelper';
+import DownloadDialogPop from '@/components/DownloadDialogPop';
 
 export default {
   name: 'EventManage',
@@ -308,7 +320,8 @@ export default {
     MultiSelect,
     RegionMultiSelect,
     TblPaginationOnly,
-    DialogVue
+    DialogVue,
+    DownloadDialogPop
   },
 
   data() {
@@ -441,7 +454,8 @@ export default {
       storeList:[],
       selectStoreList:[],
       sourceType: 0,
-      hasAdvanced: false
+      hasAdvanced: false,
+      showExportMassage: false
     };
   },
   computed: {
@@ -1182,19 +1196,28 @@ export default {
       try {
         const ret = await that.isLoginIn();
         if (ret.data != undefined && ret.data.isLogin) {
+          
           const tabIndex = Number(that.activeName);
           if (that.tableDataList[tabIndex].tableData.length === 0) {
             util.notify(this.$t('eventView.noEvents'), 'warning', 3 * 1000);
             return false;
           }
-          require.ensure([], async() => {
-            const { export_json_to_excel } = require('@/excel/Export2Excel');
-            const tHeader = that.exportDataHeader;
-            const filterVal = ['subject', 'inspectTagName', 'assignerName', 'ts', 'province', 'city', 'storeName', 'code'];
-            const curData = await that.getExportData();
-            const data = that.formatJson(filterVal, curData);
-            export_json_to_excel(tHeader, data, that.getExportFileName());
-          });
+
+          this.showExportMassage = true
+          console.log('this.params :>> ', this.params);
+          exportEventList(this.params).then(res=>{
+            console.log('res :>> ', res);
+          })
+
+          // require.ensure([], async() => {
+          //   const { export_json_to_excel } = require('@/excel/Export2Excel');
+          //   const tHeader = that.exportDataHeader;
+          //   const filterVal = ['subject', 'inspectTagName', 'assignerName', 'ts', 'province', 'city', 'storeName', 'code'];
+          //   const curData = await that.getExportData();
+          //   const data = that.formatJson(filterVal, curData);
+          //   export_json_to_excel(tHeader, data, that.getExportFileName());
+          // });
+
         } else {
           const url = sessionStorage.getItem('LoginURL');
           window.location.href = url;

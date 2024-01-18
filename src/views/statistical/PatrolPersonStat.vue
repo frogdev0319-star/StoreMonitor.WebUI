@@ -147,6 +147,15 @@
     >
       <p>{{ $t('insSettingView.isExportPDF') }}......</p>
     </dialog-pop>
+    <DownloadDialogPop
+      :title="$t('downloadManagement.message')"
+      :visible="showExportMassage"
+      :showCancelbtn="false"
+      @confirmHandler="showExportMassage = false"
+      @goToPage="$router.push({name: 'downloadManagement',});"
+      >
+    </DownloadDialogPop>
+
   </div>
 </template>
 
@@ -156,10 +165,15 @@ import { mapGetters } from 'vuex';
 import util from '@/common/util.js';
 import filterString from '@/common/filterString';
 import resize from '@/components/mixins/echartResize';
-
 import {
   getInspectStatsOverPersonV3
 } from '@/api/inspectOverview';
+import {
+  exportStatisticsPerson, 
+  exportStatisticsReportList , 
+  exportStatisticsEventComment
+} from '@/api/exportExcel';
+
 import TableOnly from '@/components/TableOnly';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
 import DelayButton from '@/components/DelayButton';
@@ -173,6 +187,8 @@ import MultiSelect from '@/components/MultiSelect2';
 import TabInceptionDetail from '@/components/TabInceptionDetail'
 import html2canvas from 'html2canvas';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
+import DownloadDialogPop from '@/components/DownloadDialogPop';
+
 export default {
   name: 'PatrolPersonStat',
 
@@ -184,7 +200,8 @@ export default {
     DateTimeSelector,
     RegionMultiSelect,
     TabInceptionDetail,
-    TblPaginationOnly
+    TblPaginationOnly,
+    DownloadDialogPop
   },
   mixins: [resize],
   data() {
@@ -304,6 +321,7 @@ export default {
       isMystery: false,
       positionDisabled: false,
       isLoading:  false,
+      showExportMassage: false,
     }
   },
 
@@ -482,22 +500,35 @@ export default {
         util.notify(that.$t('statistics.emptyInsRecordList'), 'warning', 3000);
         return false;
       }
-      require.ensure([], async() => {
-        const { export_json_to_excel } = require('@/excel/Export2Excel');
-        const tHeader=[];
-        const filterVal = [];
-        this.insRecordColData.map(item=>{
-          if(item.prop!='detail'){
-            tHeader.push(item.label);
-            filterVal.push(item.prop);
-          }
-        })
-        const curData = that.allInsRecordData//insRecordTableData;
-        const data = that.formatJson(filterVal, curData);
-        const fileName = 'Inspection record_' +  util.getCurDateStr();
-        export_json_to_excel(tHeader, data, fileName);
-      });
+
+      console.log('this.params :>> ', this.params);
+      this.params.filter = {page: 0, size: 99999}
+      this.showExportMassage = true
+
+      exportStatisticsPerson(this.params).then(res=>{
+        console.log('res :>> ', res);
+      })
+
+      
+
+      // require.ensure([], async() => {
+      //   const { export_json_to_excel } = require('@/excel/Export2Excel');
+      //   const tHeader=[];
+      //   const filterVal = [];
+      //   this.insRecordColData.map(item=>{
+      //     if(item.prop!='detail'){
+      //       tHeader.push(item.label);
+      //       filterVal.push(item.prop);
+      //     }
+      //   })
+      //   const curData = that.allInsRecordData//insRecordTableData;
+      //   const data = that.formatJson(filterVal, curData);
+      //   const fileName = 'Inspection record_' +  util.getCurDateStr();
+      //   export_json_to_excel(tHeader, data, fileName);
+      // });
     },
+
+
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => v[j]));
     },
@@ -679,7 +710,7 @@ export default {
         height: 30px;
         align-items: center;
         padding:0;
-        justify-content: space-between;
+        justify-content: flex-end;
       }
     }
       

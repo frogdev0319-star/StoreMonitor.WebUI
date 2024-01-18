@@ -101,8 +101,8 @@
           <div class="empty-content">{{ noData }} </div>
         </div> -->
         
-        <div class="el-pat"  v-if="eventTableData.length > 0">
-          <div class="pageSizeTitle" style="color: #666">共有 <b style="font-size: 16px"> {{totalEvents}} </b> {{ $t('remotePatrol.numReports') }}</div>
+        <div class="el-pat"  v-if="downloadTableData.length > 0">
+          <div class="pageSizeTitle" style="color: #666">共有 <b style="font-size: 16px"> {{totalElements}} </b> {{ $t('remotePatrol.numReports') }}</div>
     
           <tbl-pagination-only
             :btn-style="{backgroundColor:'transparent'}"
@@ -247,7 +247,7 @@ export default {
             { requestType: 2001, label: '未處理事件'},
             { requestType: 2002, label: '已處理事件'},
             { requestType: 2003, label: '已結案事件'},
-            { requestType: 2004, label: '返回事件'},
+            { requestType: 2004, label: '退回事件'},
             { requestType: 2005, label: '全部事件'},
           ]
         },
@@ -289,7 +289,7 @@ export default {
           type: 7, 
           label: '排程管理 - 排程紀錄',
           content: [
-            { requestType: 7001, label: '匯出Excel'},
+            { requestType: 7001, label: '排程紀錄 匯出Excel'},
           ]
         },
       ],
@@ -305,6 +305,7 @@ export default {
       currentPage: 1,
       curSizeNum: 10,
       sizeNum: 50,
+      totalElements: 0,
 
       searchInput: '',
       sizeNum: 10,
@@ -337,12 +338,11 @@ export default {
       }
     },
     mimicModeChanged(val){
-        console.log("mimicMode val:",val);
-        this.isLoading = true;
-        this.ifSearchData = true;
+      console.log("mimicMode val:",val);
+      this.isLoading = true;
+      this.ifSearchData = true;
     }
 
-    
   },
   created() {
     this.reportDownloadList.forEach(i => {
@@ -371,8 +371,6 @@ export default {
         });
       });
     },
-
-
 
 
     async initData() {
@@ -426,8 +424,15 @@ export default {
           i.fileName = i.downloadContent.fileName
           i.condition = this.getdate(i.searchStartTs) + ' - ' + this.getdate(i.searchEndTs) + '\n' + i.inspect + '\n' + i.locale
           i.ts =  this.getdate(i.ts)
+
+          if(i.status == -1 ) i.status = '失敗'
+          else if(i.status == 0) i.status = '處理中'
+          else if(i.status == 1) i.status = '完成'
+
+
         })
         this.downloadTableData = res.data.content
+        this.totalElements = res.data.totalElements
   
         this.isLoading = false;
       }).catch(err => {

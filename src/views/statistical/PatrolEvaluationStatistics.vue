@@ -465,6 +465,15 @@
     <dialog-pop :title="$t('insSettingView.export')" :append-to-body="true" :close-on-click-modal="false" :visible="ispdf" :show-button="false" :show-close="false" class="LoadDialog">
         <p>{{ $t('insSettingView.isExportPDF') }}......</p>
     </dialog-pop>
+
+    <DownloadDialogPop
+        :title="$t('downloadManagement.message')"
+        :visible="showExportMassage"
+        :showCancelbtn="false"
+        @confirmHandler="showExportMassage = false"
+        @goToPage="$router.push({name: 'downloadManagement',});"
+        >
+    </DownloadDialogPop>
 </div>
 </template>
 
@@ -486,6 +495,7 @@ import {
     GetInspectTagListAll,
     getInspectStatus
 } from '@/api/inspect';
+import {exportStatisticsReport} from '@/api/exportExcel';
 
 import SearchComponent from '@/components/SearchComponent';
 import resize from '@/components/mixins/echartResize';
@@ -500,6 +510,7 @@ import html2canvas from 'html2canvas';
 import "../../assets/sass/util.scss";
 import PermissionHelper from '@/api/PermissionHelper';
 import { message } from '@/common/singleton-message';
+import DownloadDialogPop from '@/components/DownloadDialogPop';
 export default {
     name: 'PatrolEvaluationSta',
     components: {
@@ -511,7 +522,8 @@ export default {
         TablePagination,
         TypeSelectArea,
         TableOnly,
-        TblPaginationOnly
+        TblPaginationOnly,
+        DownloadDialogPop
     },
     mixins: [resize],
     data() {
@@ -1290,6 +1302,7 @@ export default {
             curSubmitter:'-1',
             allStoreId: [],
             bigScore: 0,
+            showExportMassage: false,
         };
     },
 
@@ -1828,23 +1841,28 @@ export default {
                     });
                 }
             }
-            require.ensure([], async () => {
-                const {
-                    export_json_to_excel
-                } = require('@/excel/Export2Excel');
 
-                self.exportPart1DataHeader[8] = self.inspectStatus.status_2
-                self.exportPart1DataHeader[9] = self.inspectStatus.status_1
-                self.exportPart1DataHeader[10] = self.inspectStatus.status_0
+            this.showExportMassage = true
+            exportStatisticsReport(params).then(res=>{
+                console.log('res :>> ', res);
+            })
+            // require.ensure([], async () => {
+            //     const {
+            //         export_json_to_excel
+            //     } = require('@/excel/Export2Excel');
 
-                console.log('self.exportPart1DataHeader :>> ', self.exportPart1DataHeader);
-                const tHeader = self.exportPart1DataHeader;
-                const filterVal = ['province', 'city', 'groupName', 'storeGroup', 'storeType', 'code', 'submitters', 'numOfReport', 'numOfQualified', 'numOfImproved','numOfDangerous'
-                ];
-                const data = that.formatJson(filterVal, content);
-                const fileName = (this.part1.indexRegion==-1?this.$t('statistics.event.seeAll'):this.part1.content[this.part1.indexRegion].groupName) + '_Inspection evaluation result_' + util.getCurrentTime();
-                export_json_to_excel(tHeader, data, fileName);
-            });
+            //     self.exportPart1DataHeader[8] = self.inspectStatus.status_2
+            //     self.exportPart1DataHeader[9] = self.inspectStatus.status_1
+            //     self.exportPart1DataHeader[10] = self.inspectStatus.status_0
+
+            //     console.log('self.exportPart1DataHeader :>> ', self.exportPart1DataHeader);
+            //     const tHeader = self.exportPart1DataHeader;
+            //     const filterVal = ['province', 'city', 'groupName', 'storeGroup', 'storeType', 'code', 'submitters', 'numOfReport', 'numOfQualified', 'numOfImproved','numOfDangerous'
+            //     ];
+            //     const data = that.formatJson(filterVal, content);
+            //     const fileName = (this.part1.indexRegion==-1?this.$t('statistics.event.seeAll'):this.part1.content[this.part1.indexRegion].groupName) + '_Inspection evaluation result_' + util.getCurrentTime();
+            //     export_json_to_excel(tHeader, data, fileName);
+            // });
         },
         
         async exportStore2ExcelPart2() {
@@ -1913,16 +1931,22 @@ export default {
                     });
                 }
             }
-            require.ensure([], async () => {
-                const {
-                    export_json_to_excel
-                } = require('@/excel/Export2Excel');
-                const tHeader = that.exportPart2DataHeader;
-                const filterVal = ['province', 'city', 'groupName', 'storeGroup', 'storeType', 'code', 'submitters', 'numOfReport', 'averageScore', 'rank'];
-                const data = that.formatJson(filterVal, content);
-                const fileName = (this.part2.indexRegion==-1?this.$t('statistics.event.seeAll'):this.part2.content[this.part2.indexRegion].groupName )+ '_Inspection score_' + util.getCurrentTime();
-                export_json_to_excel(tHeader, data, fileName);
-            });
+
+            this.showExportMassage = true
+            exportStatisticsReport(params).then(res=>{
+                console.log('res :>> ', res);
+            })
+
+            // require.ensure([], async () => {
+            //     const {
+            //         export_json_to_excel
+            //     } = require('@/excel/Export2Excel');
+            //     const tHeader = that.exportPart2DataHeader;
+            //     const filterVal = ['province', 'city', 'groupName', 'storeGroup', 'storeType', 'code', 'submitters', 'numOfReport', 'averageScore', 'rank'];
+            //     const data = that.formatJson(filterVal, content);
+            //     const fileName = (this.part2.indexRegion==-1?this.$t('statistics.event.seeAll'):this.part2.content[this.part2.indexRegion].groupName )+ '_Inspection score_' + util.getCurrentTime();
+            //     export_json_to_excel(tHeader, data, fileName);
+            // });
         },
         async exportStore2ExcelPart3() {
             const self = this;
@@ -1990,19 +2014,25 @@ export default {
                     });
                 }
             }
-            require.ensure([], async () => {
-                const {
-                    export_json_to_excel
-                } = require('@/excel/Export2Excel');
-                const tHeader = that.exportPart3DataHeader;
-                const filterVal = ['province', 'city', 'groupName', 'storeGroup', 'storeType', 'code', 'submitters', 'numOfReport', 'numOfStandard',
-                    'standardRate', 'rank'
-                ];
-                const self = this;
-                const data = that.formatJson(filterVal, content);
-                const fileName =(this.part3.indexRegion==-1?this.$t('statistics.event.seeAll'):this.part3.content[this.part3.indexRegion].groupName )+ '_Inspection compliance_' + util.getCurrentTime();
-                export_json_to_excel(tHeader, data, fileName);
-            });
+
+            this.showExportMassage = true
+            exportStatisticsReport(params).then(res=>{
+                console.log('res :>> ', res);
+            })
+            
+            // require.ensure([], async () => {
+            //     const {
+            //         export_json_to_excel
+            //     } = require('@/excel/Export2Excel');
+            //     const tHeader = that.exportPart3DataHeader;
+            //     const filterVal = ['province', 'city', 'groupName', 'storeGroup', 'storeType', 'code', 'submitters', 'numOfReport', 'numOfStandard',
+            //         'standardRate', 'rank'
+            //     ];
+            //     const self = this;
+            //     const data = that.formatJson(filterVal, content);
+            //     const fileName =(this.part3.indexRegion==-1?this.$t('statistics.event.seeAll'):this.part3.content[this.part3.indexRegion].groupName )+ '_Inspection compliance_' + util.getCurrentTime();
+            //     export_json_to_excel(tHeader, data, fileName);
+            // });
         },
 
         formatJson(filterVal, jsonData) {

@@ -1683,7 +1683,7 @@ export default{
         "storeMonitoring": "地點監控",
     },
     "downloadManagement":{
-        "message": "檔案匯出中，請至下載管理查看"
+        "message": "檔案匯出中，請至「下載管理」查看。"
     }
 
 

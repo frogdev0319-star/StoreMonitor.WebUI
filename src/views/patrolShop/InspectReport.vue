@@ -67,12 +67,9 @@
             {{ $t('remotePatrol.confirm') }}
           </el-button>
       </div>
-
-      
       </div>
     </div>
   </dialog-pop>
-
 
   <div ref="printPDF" class="report-container" :class="{'print': isexportPDF}">
     <div style="display: none">
@@ -712,6 +709,15 @@
             {{warnWorkflowUnbind}}
       </div>
     </dialog-pop>
+
+    <DownloadDialogPop
+      :title="$t('downloadManagement.message')"
+      :visible="showExportMassage"
+      :showCancelbtn="false"
+      @confirmHandler="showExportMassage = false"
+      @goToPage="$router.push({name: 'downloadManagement',});"
+      >
+    </DownloadDialogPop>
   </div>
 </div>
 </template>
@@ -724,6 +730,7 @@ import {
   getInspectStatus,
   checkOutInspectItemV3
 } from '@/api/inspect';
+import {exportEntireJsonUnit} from '@/api/exportExcel';
 import { CancelWorkflow,taskDrawback,GetTaskInfo } from '@/api/workflow';
 import {getDetailedStoreInfo} from '@/api/store';
 import { deleteReport} from '@/api/reportAndEvent';
@@ -740,6 +747,7 @@ import DescriptionText from '@/components/DescriptionText';
 import echartResize from '@/components/mixins/echartResize';
 import i18n from '@/lang/index';
 import DialogPop from '@/components/DialogPop.vue';
+import DownloadDialogPop from '@/components/DownloadDialogPop';
 
 export default {
   name: 'InspectReport',
@@ -749,6 +757,7 @@ export default {
     AudioVue,
     DelayButton,
     DialogPop,
+    DownloadDialogPop,
     'v-chart': ECharts
   },
 
@@ -868,7 +877,8 @@ export default {
       passWord: '',
       deleteReportId: '',
       canDeleteReport: false,
-      needDeleteReport: false
+      needDeleteReport: false,
+      showExportMassage: false
       
     };
   },
@@ -1459,51 +1469,65 @@ export default {
     handleDownExcel(){
       console.log("download excel!!!");
       console.log("reportIds:",this.report.reportId);
+      // const params = {
+      //   beginTs:this.reportData.ts,
+      //   endTs:this.reportData.ts,
+      //   inspectTagId:this.reportData.tagId,
+      //   reportIds:[this.report.reportId]
+      // };
+
+
+      this.showExportMassage = true
       const params = {
         beginTs:this.reportData.ts,
         endTs:this.reportData.ts,
         inspectTagId:this.reportData.tagId,
         reportIds:[this.report.reportId]
-      };
-      const tHeader = [
-        this.$t('remotePatrol.regionI'),
-        this.$t('remotePatrol.regionII'),
-        this.$t('remotePatrol.storeName'),
-        this.$t('remotePatrol.storeCode'),
-        this.$t('remotePatrol.inspectName'),//巡檢表名稱
-        this.$t('remotePatrol.category'),
-        this.$t('insSettingView.subCategory'),
-        this.$t('overview.items'),
-        this.$t('remotePatrol.inspectItemScore'),
-        this.$t('remotePatrol.patrolResult'),
-        this.$t('remotePatrol.inspectTotalScore'),//報告總分inspectSummary
-        this.$t('remotePatrol.inspectSummary'), //巡檢總評
-        this.$t('eventView.submitter'), //送出人
-        this.$t('remotePatrol.exportAllDetail'),// 詳情
-        this.$t('audit.inceptionRpt.attachment'),
-        this.$t('titleView.description'),
-        this.$t('remotePatrol.signatureInfo'), //簽到資訊-地圖link
-        this.$t('remotePatrol.signInTime'),
-        this.$t('remotePatrol.createRptDT'),
-        this.$t('remotePatrol.patrolTime'),
-        ];
+      }
 
-      downLoadInspectReportEntireDetail(params).then(res => {
-        console.log("res:",res);
-        const that = this;
-        require.ensure([], async() => {
-          const { export_json_to_excel } = require('@/excel/Export2Excel');
-          const filterVal = ['province','city','storename','code', 'tagname', 'group', 'item', 'inspectitem','itemscore','result',
-          'totlascore','status','submitter', 'detail', 'attachment','comment','singinmap','signints','reportts', 'timediff'];
-          const curData = res.data;
-          const tagName = this.report.tagName;
-          const data = that.formatJson(filterVal, curData);
-          const fileName = this.report.storeName+'_'+tagName+'_'+that.$t('remotePatrol.details') + '_' + util.getCurDateStr();
-          export_json_to_excel(tHeader, data, fileName);
-        });
-      }).catch(err => {
-        console.log('RouteInspection-downItem: ' + err);
-      });
+      exportEntireJsonUnit(params).then(res=>{
+        console.log('res :>> ', res);
+      })
+
+      // const tHeader = [
+      //   this.$t('remotePatrol.regionI'),
+      //   this.$t('remotePatrol.regionII'),
+      //   this.$t('remotePatrol.storeName'),
+      //   this.$t('remotePatrol.storeCode'),
+      //   this.$t('remotePatrol.inspectName'),//巡檢表名稱
+      //   this.$t('remotePatrol.category'),
+      //   this.$t('insSettingView.subCategory'),
+      //   this.$t('overview.items'),
+      //   this.$t('remotePatrol.inspectItemScore'),
+      //   this.$t('remotePatrol.patrolResult'),
+      //   this.$t('remotePatrol.inspectTotalScore'),//報告總分inspectSummary
+      //   this.$t('remotePatrol.inspectSummary'), //巡檢總評
+      //   this.$t('eventView.submitter'), //送出人
+      //   this.$t('remotePatrol.exportAllDetail'),// 詳情
+      //   this.$t('audit.inceptionRpt.attachment'),
+      //   this.$t('titleView.description'),
+      //   this.$t('remotePatrol.signatureInfo'), //簽到資訊-地圖link
+      //   this.$t('remotePatrol.signInTime'),
+      //   this.$t('remotePatrol.createRptDT'),
+      //   this.$t('remotePatrol.patrolTime'),
+      //   ];
+
+      // downLoadInspectReportEntireDetail(params).then(res => {
+      //   console.log("res:",res);
+      //   const that = this;
+      //   require.ensure([], async() => {
+      //     const { export_json_to_excel } = require('@/excel/Export2Excel');
+      //     const filterVal = ['province','city','storename','code', 'tagname', 'group', 'item', 'inspectitem','itemscore','result',
+      //     'totlascore','status','submitter', 'detail', 'attachment','comment','singinmap','signints','reportts', 'timediff'];
+      //     const curData = res.data;
+      //     const tagName = this.report.tagName;
+      //     const data = that.formatJson(filterVal, curData);
+      //     const fileName = this.report.storeName+'_'+tagName+'_'+that.$t('remotePatrol.details') + '_' + util.getCurDateStr();
+      //     export_json_to_excel(tHeader, data, fileName);
+      //   });
+      // }).catch(err => {
+      //   console.log('RouteInspection-downItem: ' + err);
+      // });
     },
     handleDown() {
       const self = this;

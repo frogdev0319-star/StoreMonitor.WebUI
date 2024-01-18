@@ -76,7 +76,7 @@
                       <span>{{ $t('statistics.titleAvgScore') }}</span>
                   </el-row>
                 </el-col>
-                </el-col>
+              </el-col>
           </el-row>
 
           <el-row  :span="24" class="partition" style="height:320px;;padding-right:40px;width:calc(100% - 40px)">
@@ -84,10 +84,10 @@
               <v-chart @click='clickPart3Bar' ref="storeChart" :options="part3.barRegionOption"  autoresize
                             :style="{width:part3.barRegionOption?part3.barRegionOption.width :'100%',height:'100%'}" />
               <div style="position:absolute;right:0px;top:0px" @click='changePart3RegionOrder'>
-                      <div class="button-area" >
-                          <span style="color:#acaeb1">{{ part3.regionOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
-                          <img :src='part3.regionOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
-                      </div>
+                <div class="button-area" >
+                    <span style="color:#acaeb1">{{ part3.regionOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
+                    <img :src='part3.regionOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
+                </div>
               </div>
             </el-col>
           </el-row >
@@ -194,6 +194,14 @@
     >
       <p>{{ $t('insSettingView.isExportPDF') }}......</p>
     </dialog-pop>
+    <DownloadDialogPop
+      :title="$t('downloadManagement.message')"
+      :visible="showExportMassage"
+      :showCancelbtn="false"
+      @confirmHandler="showExportMassage = false"
+      @goToPage="$router.push({name: 'downloadManagement',});"
+      >
+    </DownloadDialogPop>
   </div>
 </template>
 <script>
@@ -208,6 +216,8 @@ import {
   getInspectStatsItemOverGroup
 } from '@/api/inspectOverview';
 import { GetInspectTagList,getInspectItemList  } from '@/api/inspect';
+import {exportStatisticsInspectItemOverview} from '@/api/exportExcel';
+
 import SearchComponent from '@/components/SearchComponent';
 import resize from '@/components/mixins/echartResize';
 import TablePagination from '@/components/TablePagination_V2';
@@ -219,6 +229,7 @@ import TableOnly from '@/components/TableOnly';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import html2canvas from 'html2canvas';
+import DownloadDialogPop from '@/components/DownloadDialogPop';
 export default {
   name: 'PatrolEvaluationSta',
 
@@ -232,12 +243,13 @@ export default {
     InspectItemSelect,
     TypeSelectArea,
     TableOnly,
-    TblPaginationOnly
+    TblPaginationOnly,
+    DownloadDialogPop
   },
   mixins: [resize],
   data() {
     return {
-      componentsProps: "",
+      componentsProps: {},
       path:"inspectItemStatistics",
       pdfSrc_avg1:"",
       inspectSubTitle: this.$t('statistics.itemAverageScore'),
@@ -798,6 +810,7 @@ export default {
         {key:'ja-JP',value:'ja-export-btn'},{key:'ko-KR',value:'ko-export-btn'},{key:'vi-VN',value:'vi-export-btn'},
         {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
       ],
+      showExportMassage: false
     };
   },
 
@@ -1068,48 +1081,60 @@ export default {
 
         }
         params.inspectTagId = self.params.inspectId;
-            params.filter={
-              page:0,
-              size:params.storeIds.length
-            }
-            if (params.storeIds.length === 0) {
-              util.notify(self.$t('overview.emptyStoreList'), 'warning', 3000);
-              return false;
-            }
-            if(this.inspectItem){
-              params.itemIds = this.inspectItem.item.ids
-            }
-            const storeResult = await this.getInspectStatsItemOverGroup(params);
-            if (storeResult.errCode === 0) {
-              const result = storeResult.data;
-              if (result) {
-                  content = result.content
-              }
-            }
+        params.filter={
+          page:0,
+          size:params.storeIds.length
+        }
+        if (params.storeIds.length === 0) {
+          util.notify(self.$t('overview.emptyStoreList'), 'warning', 3000);
+          return false;
+        }
 
+        
+        if(this.inspectItem){
+          params.itemIds = this.inspectItem.item.ids
+        }
+        const storeResult = await this.getInspectStatsItemOverGroup(params);
+        if (storeResult.errCode === 0) {
+          const result = storeResult.data;
+          if (result) {
+              content = result.content
+          }
+        }
       }
-      console.log("Export")
-      console.log(content)
+      console.log("params" , params)
+      console.log("content" , content)
+      params.itemIds = this.inspectItem.item.ids
+      params.filter = {page: 0, size: 99999}
+
       content.forEach((item,i)=>{
-          item.rank= i+1;
-            if(item.storeRegion)item.storeGroup = item.storeRegion.toString();
-              if(item.storeBranchType)item.storeType = item.storeBranchType.toString();
-              if(item.submitters)item.storeSubmitters = item.submitters.toString();
-              if(item.code=='')item.code='- -'
-              if(item.storeGroup=='')item.storeGroup='- -'
-              if(item.storeType=='')item.storeType='- -'
+        item.rank= i+1;
+          if(item.storeRegion)item.storeGroup = item.storeRegion.toString();
+            if(item.storeBranchType)item.storeType = item.storeBranchType.toString();
+            if(item.submitters)item.storeSubmitters = item.submitters.toString();
+            if(item.code=='')item.code='- -'
+            if(item.storeGroup=='')item.storeGroup='- -'
+            if(item.storeType=='')item.storeType='- -'
 
       });
-      require.ensure([], async() => {
-        const { export_json_to_excel } = require('@/excel/Export2Excel');
-        const tHeader = that.exportPart3DataHeader;
-        const filterVal = ['province', 'city', 'groupName','storeGroup','storeType', 'code', 'numOfTotal', 'averageScore', 'rank'];
-        const self = this;
-        const data = that.formatJson(filterVal, content);
-        const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
-        const fileName = (this.part3.indexRegion==-1?this.$t('statistics.event.seeAll'):this.part3.content[this.part3.indexRegion].groupName ) + '_Inspection item score_' + util.getCurrentTime();
-        export_json_to_excel(tHeader, data, fileName);
-      });
+      
+      // itemIds
+      this.showExportMassage = true
+      exportStatisticsInspectItemOverview(params).then(res=>{
+        console.log('res :>> ', res);
+      })
+
+
+      // require.ensure([], async() => {
+      //   const { export_json_to_excel } = require('@/excel/Export2Excel');
+      //   const tHeader = that.exportPart3DataHeader;
+      //   const filterVal = ['province', 'city', 'groupName','storeGroup','storeType', 'code', 'numOfTotal', 'averageScore', 'rank'];
+      //   const self = this;
+      //   const data = that.formatJson(filterVal, content);
+      //   const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
+      //   const fileName = (this.part3.indexRegion==-1?this.$t('statistics.event.seeAll'):this.part3.content[this.part3.indexRegion].groupName ) + '_Inspection item score_' + util.getCurrentTime();
+      //   export_json_to_excel(tHeader, data, fileName);
+      // });
     },
 
     formatJson(filterVal, jsonData) {
