@@ -108,7 +108,7 @@
             :btn-style="{backgroundColor:'transparent'}"
             :total="total"
             :current-page="currentPage"
-            :page-size="sizeNum"
+            :pagesize="sizeNum"
             layout = "prev,pager, next,sizes,slot"
             @sizeChange="handlePagination"
             @currentChange="handlePagination"
@@ -116,37 +116,20 @@
         </div>
       </div>
     </div>
-
-
-
   </div>
 </template>
 <script>
 
 import axios from 'axios';
 import {getDownloadList} from '@/api/exportExcel';
-
-import { 
-  getInspectReportList, 
-  GetInspectTagList,
-  downLoadInspectReportEntireDetail,
-  getAllReportIds,
-  GetMysteryInspectTagList ,
-  getInspectStatus
-} from '@/api/inspect';
-
-import {getEventList,} from '@/api/event';
 import {handleEventStatus} from '@/api/reportAndEvent';
-
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
 import StoreFilter from '@/components/StoreFilter';
 import DelayButton from '@/components/DelayButton';
-import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DateTimeSelector from '@/components/DateTimeSelector';
 import SelectedStores from "@/components/SelectedStores";
 import TblPaginationOnly from '@/components/TblPaginationOnly';
-import { getInspectReportInfo} from '@/api/inspect';//為了取是否有設置評分
 import TableOnly from '@/components/TableOnly';
 import PermissionHelper from '@/api/PermissionHelper';
 import DialogPop from '@/components/DialogPop';
@@ -360,17 +343,7 @@ export default {
   
 
   methods: {
-    getExcel() {
-      return new Promise((resolve, reject) => {
-        axios.get('https://iservice.ichenprocin.dsmynas.com/storemonitor/api/v1.0/download/request/file/download?id=33').then(res => {
-          const data = res.data;
-          console.log('data :>> ', data);
-          resolve(res.data);
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
+    
 
 
     async initData() {
@@ -461,12 +434,11 @@ export default {
       console.log('val' , val)
       switch (val.method) {
         case  'download':
-          console.log('download')
+          this.handleDownload()
           break;
 
         case 'delete':
           this.showUpdateEvent = true
-          this.updateEventId = val.row.id
           break;
       
         default:
@@ -474,7 +446,73 @@ export default {
       }
     },
 
-  
+    
+    handleDownload() {
+      return new Promise((resolve, reject) => {
+        axios.get('https://preview-inspection.wise-iservice.com/storemonitor/api/v1.0/download/request/file/download?id=78').then(res => {
+          const data = res.data.data;
+          console.log('data :>> ', data);
+          this.aaa(data)
+
+          resolve(res.data);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
+
+
+    aaa(data){
+      var bindata = window.atob(data);
+      window.location.href = "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64" + bindata
+      },
+
+
+    convertBase64ToExcel(data){
+      console.log('download!!!')
+      var contentType = 'application/vnd.ms-excel';
+      var blob1 = this.b64toBlob(data, contentType);
+      console.log('blob1', blob1)
+
+      var blobUrl1 = URL.createObjectURL(blob1);
+      console.log('blobUrl1', blobUrl1)
+      // window.open(blobUrl1);
+      window.location.href = blobUrl1
+    },
+
+    b64toBlob(b64Data, contentType, sliceSize) {
+      console.log('b64toBlob')
+      contentType = contentType || '';
+      sliceSize = sliceSize || 512;
+
+      var byteCharacters = window.atob(b64Data);
+      console.log('byteCharacters', byteCharacters)
+      
+      var byteArrays = [];
+
+      for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+        var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+        var byteNumbers = new Array(slice.length);
+        for (var i = 0; i < slice.length; i++) {
+          byteNumbers[i] = slice.charCodeAt(i);
+        }
+
+        var byteArray = new Uint8Array(byteNumbers);
+
+        byteArrays.push(byteArray);
+      }
+
+      console.log('byteArrays', byteArrays)
+      var blob = new Blob(byteArrays, {type: contentType});
+      console.log('blob', blob)
+      return blob;
+    },
+
+
+
+
   
     cancelUpdate(){
       this.showUpdateEvent = false
