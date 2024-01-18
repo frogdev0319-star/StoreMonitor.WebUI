@@ -12,11 +12,10 @@
             </div>
             <div 
               style="margin-right: 30px;"
-              v-show="currentTab != 'NotInspected'" 
+              v-show="currentTab != 'NotInspected'"
               class="operation-btns" 
               :class="getLangStyleValue(operationBtnClass)">
                 <delay-button
-                    
                     :class="getLangStyleValue(exportBtnClass)"
                     class="export-btn"
                     type="default"
@@ -118,6 +117,14 @@
                 @currentChange="handlePageAndSizeChange_event"
             />
         </div>
+        <DownloadDialogPop
+          :title="$t('downloadManagement.message')"
+          :visible="showExportMassage"
+          :showCancelbtn="false"
+          @confirmHandler="showExportMassage = false"
+          @goToPage="$router.push({name: 'downloadManagement',});"
+          >
+        </DownloadDialogPop>
     </div>
 </template>
 
@@ -125,16 +132,23 @@
 import TablePagination from '@/components/TablePagination_V2';
 import { getInspectReportList, getNotInspectStoresByPerson, statisticsGetInspectReportList } from '@/api/inspect';
 import {GetEventAndCommentList , StatisticsGetEventAndCommentList} from '@/api/event';
+import {
+  exportStatisticsPerson, 
+  exportStatisticsReportList , 
+  exportStatisticsEventComment
+} from '@/api/exportExcel';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import util from '@/common/util';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
 import PermissionHelper from '@/api/PermissionHelper';
 import { message } from '@/common/singleton-message';
 import DelayButton from '@/components/DelayButton';
+import DownloadDialogPop from '@/components/DownloadDialogPop';
 export default {
     name:'TabInceptionDetail',
     components: {
         DelayButton,
+        DownloadDialogPop,
         'table-pagination':TablePagination,TblPaginationOnly
     },
     props:{
@@ -315,7 +329,7 @@ export default {
                 {key:'ja-JP',value:'ja-export-btn'},{key:'ko-KR',value:'ko-export-btn'},{key:'vi-VN',value:'vi-export-btn'},
                 {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
             ],
-            
+            showExportMassage: false,
         };
     },
     created(){
@@ -402,33 +416,72 @@ export default {
         const self = this;
         let table = "", fileName="";
         if(this.currentTab == "Detail"){
+            console.log('detail :>> ');
             table = self.detailTbl;
             fileName =  table.table_data[0].submitterName+ '_Inspection detail_' + util.getCurDateStr();
+
+            let params = {
+              beginTs: this.beginTs,
+              endTs: this.endTs,
+              clause:{ submitter: this.submitter }, 
+              order: {
+                direction: "asc", 
+                property: "storeId"
+              }, 
+              filter: {page: 0, size: 99999},
+              searchMysteryMode: this.isMystery ? 1 : 0
+            };
+
+            this.showExportMassage = true
+            exportStatisticsReportList(params).then(res=>{
+              console.log('res :>> ', res);
+            })
+
         }else if(this.currentTab == "Event"){
+            console.log('Event :>> ');
             table = self.eventTbl;
             fileName =  self.submitterName+ '_Inspection event_' + util.getCurDateStr();
+
+            let params = {
+              beginTs: this.beginTs,
+              endTs: this.endTs,
+              clause: {assigner: this.submitter},
+              order: {
+                direction: "asc", 
+                property: "storeId"
+              },  
+              filter: {page: 0, size: 99999},
+              searchMysteryMode: this.isMystery ? 1 : 0
+            };
+
+            this.showExportMassage = true
+            exportStatisticsEventComment(params).then(res=>{
+              console.log('res :>> ', res);
+            })
+
         }
 
         if (table.table_data.length === 0) {
             util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
             return false;
         }
-        require.ensure([], async() => {
-            const { export_json_to_excel } = require('@/excel/Export2Excel');
-            const tHeader = [];
-            const filterVal =[];
-            table.column_data.forEach(item=>{
-                if(item.prop != 'detail'){
-                    tHeader.push(item.label);
-                    filterVal.push(item.prop);
-                }
-            });
-            //const filterVal = ['province', 'city', 'name', 'percentage', 'numOfStores'];
-            const curData = table.all_data;
-            const data = self.formatJson(filterVal, curData);
-            //const fileName =  table_data[0].submitterName+ '_Inspection detail_' + util.getCurDateStr();
-            export_json_to_excel(tHeader, data, fileName);
-        });
+
+        // require.ensure([], async() => {
+        //     const { export_json_to_excel } = require('@/excel/Export2Excel');
+        //     const tHeader = [];
+        //     const filterVal =[];
+        //     table.column_data.forEach(item=>{
+        //         if(item.prop != 'detail'){
+        //             tHeader.push(item.label);
+        //             filterVal.push(item.prop);
+        //         }
+        //     });
+        //     //const filterVal = ['province', 'city', 'name', 'percentage', 'numOfStores'];
+        //     const curData = table.all_data;
+        //     const data = self.formatJson(filterVal, curData);
+        //     //const fileName =  table_data[0].submitterName+ '_Inspection detail_' + util.getCurDateStr();
+        //     export_json_to_excel(tHeader, data, fileName);
+        // });
       },
       handleEmitDetailRowClick(row){ //去巡檢報告詳情
           if(!PermissionHelper.enableInspectReport()){

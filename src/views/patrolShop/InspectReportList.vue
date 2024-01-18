@@ -627,9 +627,7 @@ export default {
         util.notify(that.$t('remotePatrol.emptyReportList'), 'warning', 3000);
         return false;
       }
-
       this.showExportMassage = true
-      var ExpAllReportIds = this.reportList.map( i => i.id)
       var ExpAllParams = {
         beginTs: this.params.beginTs,
         endTs:  this.params.endTs,
@@ -644,7 +642,6 @@ export default {
           property: "ts"
         }
       }
-
       exportReportList(ExpAllParams).then(res=>{
         console.log('res :>> ', res);
       })

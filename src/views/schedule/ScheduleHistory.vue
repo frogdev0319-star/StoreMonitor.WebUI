@@ -88,7 +88,7 @@
                 :btn-style="{backgroundColor:'transparent'}"
                 :total="total"
                 :current-page="curPage"
-                :page-size="curSizeNum"
+                :pagesize="curSizeNum"
                 layout = "prev,pager, next,sizes,slot"
                 @sizeChange="sizeChange"
                 @currentChange="currentChange"
@@ -115,22 +115,40 @@
         @confirmHandler="showExportExcelWarning = false"
         >
       </dialog-pop>
+      <DownloadDialogPop
+        :title="$t('downloadManagement.message')"
+        :visible="showExportMassage"
+        :showCancelbtn="false"
+        @confirmHandler="showExportMassage = false"
+        @goToPage="$router.push({name: 'downloadManagement',});"
+        >
+    </DownloadDialogPop>
     </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
 import {scheduleRESTful} from '@/api/index';
+import {exportScheduleRecord} from '@/api/exportExcel';
+
 import DateTimeSelector from '@/components/DateTimeSelector';import TableOnly from '@/components/TableOnly';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
 import DelayButton from '@/components/DelayButton';
 import DialogPop from '@/components/DialogPop'
 import util from '@/common/util';
 import vm from '@/main.js';
+import DownloadDialogPop from '@/components/DownloadDialogPop';
 
 export default{
   name: 'ScheduleHistory',
-  components: {DateTimeSelector,TableOnly,TblPaginationOnly,DelayButton,DialogPop},
+  components: {
+    DateTimeSelector,
+    TableOnly,
+    TblPaginationOnly,
+    DelayButton,
+    DialogPop,
+    DownloadDialogPop
+  },
   data(){
     return {
       firstLoad:true,
@@ -256,6 +274,7 @@ export default{
       ],
       showExportExcelNotice:false,
       showExportExcelWarning:false,
+      showExportMassage: false
     }
   },
   computed: {
@@ -516,6 +535,11 @@ export default{
         this.SelScheduleTask = val;
       }
     },
+
+    formatJson(filterVal, jsonData) {
+      return jsonData.map(v => filterVal.map(j => v[j]));
+    },
+
     export2Excel(){
       if(this.SelScheduleTask.length>0){
         this.SelScheduleTask.sort((a, b) => { return a['squence'] - b['squence']; });
@@ -561,21 +585,25 @@ export default{
             processMode
           ]);
         })
-        require.ensure([], async() => {
-            const { export_json_to_excel } = require('@/excel/Export2Excel');
-            export_json_to_excel(tHeader, exportData, fileName);
-          });
+
+        this.showExportMassage = true
+        // exportScheduleRecord(params).then(res=>{
+        //   console.log('res :>> ', res);
+        // })
+
+        
+        // require.ensure([], async() => {
+        //   const { export_json_to_excel } = require('@/excel/Export2Excel');
+        //   export_json_to_excel(tHeader, exportData, fileName);
+        // });
         
       }else{
         this.showExportExcelWarning = true;
-        
       }
     },
-    formatJson(filterVal, jsonData) {
-      return jsonData.map(v => filterVal.map(j => v[j]));
-    },
+
     exportAll(){
-      this.showExportExcelNotice = true;
+      // this.showExportExcelNotice = true;
       const fileName = this.$t('schedule.scheduleHistory')+"_"+util.getCurDateStr();
       const tHeader = [
         this.$t('audit.workFlows.workFlowsCreatedUser'),
@@ -612,18 +640,24 @@ export default{
       if(this.inputSearchValue.trim()!=""){
         params['keyword']=this.inputSearchValue;
       }
-      scheduleRESTful.exportScheduleTaskHistory(params).then(res => {
-        require.ensure([], async() => {
-          const { export_json_to_excel } = require('@/excel/Export2Excel');
-          const filterVal = ['creatorName', 'taskName','storeName','storeTimeZone','remindTs', 'inspectTagMode', 'inspectTagName', 'reportTs', 'submitterName',
-          'taskStatus','reportStatus'];
-          const curData = res.data.content;
-          const data = self.formatJson(filterVal, curData);
-          export_json_to_excel(tHeader, data, fileName);
-        });
-      }).catch(err => {
-        console.log('RouteInspection-downItem: ' + err);
-      });
+
+      this.showExportMassage = true
+      exportScheduleRecord(params).then(res=>{
+        console.log('res :>> ', res);
+      })
+
+      // scheduleRESTful.exportScheduleTaskHistory(params).then(res => {
+      //   require.ensure([], async() => {
+      //     const { export_json_to_excel } = require('@/excel/Export2Excel');
+      //     const filterVal = ['creatorName', 'taskName','storeName','storeTimeZone','remindTs', 'inspectTagMode', 'inspectTagName', 'reportTs', 'submitterName',
+      //     'taskStatus','reportStatus'];
+      //     const curData = res.data.content;
+      //     const data = self.formatJson(filterVal, curData);
+      //     export_json_to_excel(tHeader, data, fileName);
+      //   });
+      // }).catch(err => {
+      //   console.log('RouteInspection-downItem: ' + err);
+      // });
     }
   }
 }
