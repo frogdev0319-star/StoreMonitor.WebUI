@@ -61,7 +61,7 @@
 
       <div class="report-content loading spacer paper">
         <div class="clear_btn">
-          <delay-button @click="clearAll">
+          <delay-button @click="showDeleteAllDialog = true">
             <div class="button-area">
               <i class="iconfont el-icon-delete-solid"/>
               <span>全部清空</span>
@@ -117,12 +117,50 @@
         </div>
       </div>
     </div>
+    
+    <dialog-pop
+      title="確認刪除"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :visible="showDeleteDialog"
+      :isWarning="true"
+      @cancelHandler="cancelDelete()"
+      @confirmHandler="confirmDelete(updateEventId)"
+    >
+      <div class="dialog-slot">
+        <div class="dialog-content">請確認是否刪除此項目? </div>
+      </div>
+    </dialog-pop>
+
+    <dialog-pop
+      title="確認刪除"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :visible="showDeleteAllDialog"
+      :isWarning="true"
+      @cancelHandler="showDeleteAllDialog = false"
+      @confirmHandler="clearAll()"
+    >
+      <div class="dialog-slot">
+        <div class="dialog-content">請確認是否刪全部項目? </div>
+      </div>
+    </dialog-pop>
+
+
+
   </div>
 </template>
 <script>
 
 import axios from 'axios';
-import {getDownloadList} from '@/api/exportExcel';
+import {
+  getDownloadList,
+  deleteDownloadList,
+  deleteAll,
+  downloadFile
+} from '@/api/exportExcel';
 import {handleEventStatus} from '@/api/reportAndEvent';
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
@@ -283,7 +321,8 @@ export default {
       reportRequestTypeList: [],
       reportRequestType: '',
 
-      showUpdateEvent: false,
+      showDeleteDialog: false,
+      showDeleteAllDialog: false,
       updateEventId: '',
 
       total: 10,
@@ -300,9 +339,10 @@ export default {
       noData: this.$t('deviceView.noData'),
       showStoreInfo: false,
       hasAdvanced: false,
+      deleteId: 0,
       params : {
-        beginTs: 1702224000000,
-        endTs: 1704815999999,
+        // beginTs: 1704931200000,
+        // endTs: 1705708800000,
         filter: {
             page: 0,
             size: 10
@@ -388,7 +428,7 @@ export default {
     async getDownloadTable(params){
       this.isLoading = true;
       await getDownloadList(params).then(res=>{
-        console.log('res.data.content --->', res.data.content)
+        console.log('res.data --->', res.data)
         
         res.data.content.forEach(i => {
           var tempReport = this.allList.find(r => r.requestType == i.requestType)
@@ -401,10 +441,10 @@ export default {
           else if(i.status == 0) i.status = '處理中'
           else if(i.status == 1) i.status = '完成'
 
-
         })
         this.downloadTableData = res.data.content
         this.totalElements = res.data.totalElements
+        this.total = res.data.totalPages
   
         this.isLoading = false;
       }).catch(err => {
@@ -436,51 +476,75 @@ export default {
           break;
 
         case 'delete':
-          this.showUpdateEvent = true
+          this.deleteId = val.row.id
+          this.showDeleteDialog = true
           break;
       
         default:
           break;
       }
     },
-
-    
     handleDownload(val) {
       console.log('val ~~~~>> ', val);
-      // return new Promise((resolve, reject) => {
-      //   axios.get('https://preview-inspection.wise-iservice.com/storemonitor/api/v1.0/download/request/file/download?id=78').then(res => {
-      //     const data = res.data.data;
-      //     this.downloadFile(data)
-      //     resolve(res.data);
-      //   }).catch(err => {
-      //     reject(err);
-      //   });
-      // });
-    },
-
-    downloadFile(b64data){
-      var mediaType="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,";
-      var a = document.createElement('a');
-      a.href = mediaType + b64data;
-      window.location.href = a.href
-    },
-
-
-    cancelUpdate(){
-      this.showUpdateEvent = false
-    },
-
-    confirmUpdate(updateEventId){
-      var rowID = {eventId: updateEventId}
-      this.showUpdateEvent = false
-      this.isLoading = true;   
-      handleEventStatus(rowID).then(res=>{
-        console.log('res :>> ', res);
-        this.getEvents(this.params);
+      var downloadId = val.row.id
+      console.log('downloadId :>> ', downloadId);
+      downloadFile(downloadId).then(res=>{
+        console.log('res.data :>> ', res.data);
+        if(!res.data.zip){
+          const b64data = res.data.data
+          const fileName = res.data.fileName
+          this.downloadFile(b64data, fileName)
+        }else{
+          const b64data = res.data.data
+          const fileName = res.data.fileName
+          this.downloadZip(b64data, fileName)
+        }
+        resolve(res.data);
       }).catch(err => {
         this.isLoading = false;
       })
     },
+
+    downloadFile(b64data, fileName){
+      var mediaType="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,";
+      var link = document.createElement('a');
+      link.href = mediaType + b64data;
+      link.download = fileName
+      link.click()
+      // window.location.href = link.href
+    },
+    downloadZip(b64data, fileName){
+      var mediaType="data:application/x-zip-compressed;base64,";
+      var link = document.createElement('a');
+      link.href = mediaType + b64data;
+      link.download = fileName
+      link.click()
+    },
+
+
+    cancelDelete(){
+      this.showDeleteDialog = false
+    },
+    confirmDelete(updateEventId){
+      this.showDeleteDialog = false
+      this.isLoading = true;   
+      var del = {id : this.deleteId}
+      deleteDownloadList(del).then(res=>{
+        this.getDownloadTable(this.params)
+      }).catch(err => {
+        this.isLoading = false;
+      })
+    },
+    clearAll(){
+      deleteAll().then(res=>{
+        this.showDeleteAllDialog = false
+        this.isLoading = true;  
+        this.getDownloadTable(this.params)
+      }).catch(err => {
+        this.isLoading = false;
+      })
+    },
+
 
 
     cellStyle({ row, column, rowIndex, columnIndex }) {
@@ -521,10 +585,7 @@ export default {
 
     },
 
-    clearAll(){
-      console.log('clear all ')
-    },
-
+    
   },
 
 

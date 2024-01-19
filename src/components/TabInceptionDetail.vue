@@ -418,8 +418,11 @@ export default {
         if(this.currentTab == "Detail"){
             console.log('detail :>> ');
             table = self.detailTbl;
-            fileName =  table.table_data[0].submitterName+ '_Inspection detail_' + util.getCurDateStr();
-
+            if (table.table_data.length === 0) {
+                util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
+                return false;
+            }
+            
             let params = {
               beginTs: this.beginTs,
               endTs: this.endTs,
@@ -440,7 +443,10 @@ export default {
         }else if(this.currentTab == "Event"){
             console.log('Event :>> ');
             table = self.eventTbl;
-            fileName =  self.submitterName+ '_Inspection event_' + util.getCurDateStr();
+            if (table.table_data.length === 0) {
+                util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
+                return false;
+            }
 
             let params = {
               beginTs: this.beginTs,

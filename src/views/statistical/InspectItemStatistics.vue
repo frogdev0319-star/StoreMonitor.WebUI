@@ -1118,7 +1118,7 @@ export default {
 
       });
       
-      // itemIds
+      params.filter = {page: 0, size: 99999}
       this.showExportMassage = true
       exportStatisticsInspectItemOverview(params).then(res=>{
         console.log('res :>> ', res);
