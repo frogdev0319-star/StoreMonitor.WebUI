@@ -69,6 +69,7 @@
           </delay-button>
         </div>
         <div
+          v-if="downloadTableData.length !== 0"
           v-loading="isLoading"
           :element-loading-text="$t('insSettingView.loadingbindstore')"
           class="card-content self-loading ">
@@ -93,13 +94,13 @@
             />
           </div>
         </div>
-        <!-- <div
-          v-loading="isLoading"
+        <div
           v-else
+          v-loading="isLoading"
           :element-loading-text="$t('insSettingView.loadingbindstore')"
           class="card-content self-loading">
           <div class="empty-content">{{ noData }} </div>
-        </div> -->
+        </div>
         
         <div class="el-pat"  v-if="downloadTableData.length > 0">
           <div class="pageSizeTitle" style="color: #666">共有 <b style="font-size: 16px"> {{totalElements}} </b> {{ $t('remotePatrol.numReports') }}</div>
@@ -284,10 +285,12 @@ export default {
 
       showUpdateEvent: false,
       updateEventId: '',
+
       total: 10,
       currentPage: 1,
       curSizeNum: 10,
       sizeNum: 50,
+
       totalElements: 0,
 
       searchInput: '',
@@ -296,7 +299,19 @@ export default {
       storeDataList: [],
       noData: this.$t('deviceView.noData'),
       showStoreInfo: false,
-      hasAdvanced: false
+      hasAdvanced: false,
+      params : {
+        beginTs: 1702224000000,
+        endTs: 1704815999999,
+        filter: {
+            page: 0,
+            size: 10
+        },
+        order: {
+            direction: "desc",
+            property: "ts"
+        }
+      }
     };
   },
 
@@ -343,8 +358,6 @@ export default {
   
 
   methods: {
-    
-
 
     async initData() {
       this.searchInput = '';
@@ -354,7 +367,7 @@ export default {
       this.reportList = [];
 
       await this.searchRequestTypeItems()
-      await this.getDownloadTable()
+      await this.getDownloadTable(this.params)
       
     },
 
@@ -372,22 +385,8 @@ export default {
       return year + "/"+ month +"/"+ day
     },
 
-    async getDownloadTable(){
+    async getDownloadTable(params){
       this.isLoading = true;
-
-      var params = {
-        beginTs: 1702224000000,
-        endTs: 1704815999999,
-        filter: {
-            page: 0,
-            size: 10
-        },
-        order: {
-            direction: "desc",
-            property: "ts"
-        }
-      }
-
       await getDownloadList(params).then(res=>{
         console.log('res.data.content --->', res.data.content)
         
@@ -431,10 +430,9 @@ export default {
     },
 
     handleEmitOperation(val){
-      console.log('val' , val)
       switch (val.method) {
         case  'download':
-          this.handleDownload()
+          this.handleDownload(val)
           break;
 
         case 'delete':
@@ -447,73 +445,27 @@ export default {
     },
 
     
-    handleDownload() {
-      return new Promise((resolve, reject) => {
-        axios.get('https://preview-inspection.wise-iservice.com/storemonitor/api/v1.0/download/request/file/download?id=78').then(res => {
-          const data = res.data.data;
-          console.log('data :>> ', data);
-          this.aaa(data)
+    handleDownload(val) {
+      console.log('val ~~~~>> ', val);
+      // return new Promise((resolve, reject) => {
+      //   axios.get('https://preview-inspection.wise-iservice.com/storemonitor/api/v1.0/download/request/file/download?id=78').then(res => {
+      //     const data = res.data.data;
+      //     this.downloadFile(data)
+      //     resolve(res.data);
+      //   }).catch(err => {
+      //     reject(err);
+      //   });
+      // });
+    },
 
-          resolve(res.data);
-        }).catch(err => {
-          reject(err);
-        });
-      });
+    downloadFile(b64data){
+      var mediaType="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,";
+      var a = document.createElement('a');
+      a.href = mediaType + b64data;
+      window.location.href = a.href
     },
 
 
-
-    aaa(data){
-      var bindata = window.atob(data);
-      window.location.href = "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64" + bindata
-      },
-
-
-    convertBase64ToExcel(data){
-      console.log('download!!!')
-      var contentType = 'application/vnd.ms-excel';
-      var blob1 = this.b64toBlob(data, contentType);
-      console.log('blob1', blob1)
-
-      var blobUrl1 = URL.createObjectURL(blob1);
-      console.log('blobUrl1', blobUrl1)
-      // window.open(blobUrl1);
-      window.location.href = blobUrl1
-    },
-
-    b64toBlob(b64Data, contentType, sliceSize) {
-      console.log('b64toBlob')
-      contentType = contentType || '';
-      sliceSize = sliceSize || 512;
-
-      var byteCharacters = window.atob(b64Data);
-      console.log('byteCharacters', byteCharacters)
-      
-      var byteArrays = [];
-
-      for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-        var slice = byteCharacters.slice(offset, offset + sliceSize);
-
-        var byteNumbers = new Array(slice.length);
-        for (var i = 0; i < slice.length; i++) {
-          byteNumbers[i] = slice.charCodeAt(i);
-        }
-
-        var byteArray = new Uint8Array(byteNumbers);
-
-        byteArrays.push(byteArray);
-      }
-
-      console.log('byteArrays', byteArrays)
-      var blob = new Blob(byteArrays, {type: contentType});
-      console.log('blob', blob)
-      return blob;
-    },
-
-
-
-
-  
     cancelUpdate(){
       this.showUpdateEvent = false
     },
@@ -555,12 +507,14 @@ export default {
     handlePagination(pageInfo){
       console.log('pageInfo ~~~~~>> ', pageInfo);
       console.log('this.params ~~~~~>> ', this.params);
+      this.isLoading = true;
+      
       this.currentPage = pageInfo.page
       this.curSizeNum = pageInfo.size;
       
       this.params.filter.page = pageInfo.page - 1
       this.params.filter.size = pageInfo.size
-      this.getEvents(this.params)
+      this.getDownloadTable(this.params)
 
       // if(this.inputSearchValue.trim()=="") this.getWorkflowList(this.apiBody);
       // else this.setTableBySearch()
@@ -570,18 +524,6 @@ export default {
     clearAll(){
       console.log('clear all ')
     },
-
-
-
-
-
-
-    
-
-
-    
-
-
 
   },
 
