@@ -38,8 +38,6 @@
               </el-select>
           </div>
 
-          {{ reportRequestType }}
-
           <div class="flex-center fullWidth" style="margin-left: 20px">
             <div class="search-content flex-center" style="margin-right: 20px">
               <div class="search-label">{{ $t('remotePatrol.keywords') }}</div>
@@ -316,7 +314,6 @@ export default {
         },
       ],
       allList: [],
-      params: {},
       reportType: -1,
       reportRequestTypeList: [],
       reportRequestType: '',
@@ -350,7 +347,8 @@ export default {
         order: {
             direction: "desc",
             property: "ts"
-        }
+        },
+        keyword	: ''
       }
     };
   },
@@ -388,6 +386,7 @@ export default {
         this.allList = [...this.allList, ...i.content]
       }
     })
+    this.allList.unshift({requestType : -1 , label : "全部"})
     this.reportRequestTypeList = this.allList
     this.initData()
   },
@@ -398,7 +397,6 @@ export default {
   
 
   methods: {
-
     async initData() {
       this.searchInput = '';
       this.storeStr = '';
@@ -453,10 +451,10 @@ export default {
       });
     },
 
-    searchRequestTypeItems(value){
+    searchRequestTypeItems(value){    
       if(this.reportType == -1 ){
         this.reportRequestTypeList = this.allList
-        console.log('this.allList :>> ', this.allList);
+        console.log('this.allList :>> ', this.allList); 
       }else {
         this.reportRequestTypeList = [...this.reportDownloadList[value].content]
       }
@@ -464,9 +462,18 @@ export default {
     },
 
 
-
     searchDownloadData(){
-      console.log('searchDownloadData :>> ');
+      console.log('this.reportRequestType', this.reportRequestType)
+
+      if(this.reportRequestType == -1){ 
+        this.params.requestType	 = -1
+      } else {
+        this.params.requestType	 = this.reportRequestType
+      }
+      console.log('this.searchInput', this.searchInput)
+      this.params.keyword = this.searchInput
+      console.log('this.params', this.params)
+      this.getDownloadTable(this.params)
     },
 
     handleEmitOperation(val){
