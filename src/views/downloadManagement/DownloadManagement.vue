@@ -38,8 +38,6 @@
               </el-select>
           </div>
 
-          {{ reportRequestType }}
-
           <div class="flex-center fullWidth" style="margin-left: 20px">
             <div class="search-content flex-center" style="margin-right: 20px">
               <div class="search-label">{{ $t('remotePatrol.keywords') }}</div>
@@ -61,7 +59,7 @@
 
       <div class="report-content loading spacer paper">
         <div class="clear_btn">
-          <delay-button @click="clearAll">
+          <delay-button @click="showDeleteAllDialog = true">
             <div class="button-area">
               <i class="iconfont el-icon-delete-solid"/>
               <span>全部清空</span>
@@ -69,6 +67,7 @@
           </delay-button>
         </div>
         <div
+          v-if="downloadTableData.length !== 0"
           v-loading="isLoading"
           :element-loading-text="$t('insSettingView.loadingbindstore')"
           class="card-content self-loading ">
@@ -93,13 +92,13 @@
             />
           </div>
         </div>
-        <!-- <div
-          v-loading="isLoading"
+        <div
           v-else
+          v-loading="isLoading"
           :element-loading-text="$t('insSettingView.loadingbindstore')"
           class="card-content self-loading">
           <div class="empty-content">{{ noData }} </div>
-        </div> -->
+        </div>
         
         <div class="el-pat"  v-if="downloadTableData.length > 0">
           <div class="pageSizeTitle" style="color: #666">共有 <b style="font-size: 16px"> {{totalElements}} </b> {{ $t('remotePatrol.numReports') }}</div>
@@ -116,12 +115,50 @@
         </div>
       </div>
     </div>
+    
+    <dialog-pop
+      title="確認刪除"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :visible="showDeleteDialog"
+      :isWarning="true"
+      @cancelHandler="cancelDelete()"
+      @confirmHandler="confirmDelete(updateEventId)"
+    >
+      <div class="dialog-slot">
+        <div class="dialog-content">請確認是否刪除此項目? </div>
+      </div>
+    </dialog-pop>
+
+    <dialog-pop
+      title="確認刪除"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :visible="showDeleteAllDialog"
+      :isWarning="true"
+      @cancelHandler="showDeleteAllDialog = false"
+      @confirmHandler="clearAll()"
+    >
+      <div class="dialog-slot">
+        <div class="dialog-content">請確認是否刪全部項目? </div>
+      </div>
+    </dialog-pop>
+
+
+
   </div>
 </template>
 <script>
 
 import axios from 'axios';
-import {getDownloadList} from '@/api/exportExcel';
+import {
+  getDownloadList,
+  deleteDownloadList,
+  deleteAll,
+  downloadFile
+} from '@/api/exportExcel';
 import {handleEventStatus} from '@/api/reportAndEvent';
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
@@ -277,17 +314,19 @@ export default {
         },
       ],
       allList: [],
-      params: {},
       reportType: -1,
       reportRequestTypeList: [],
       reportRequestType: '',
 
-      showUpdateEvent: false,
+      showDeleteDialog: false,
+      showDeleteAllDialog: false,
       updateEventId: '',
+
       total: 10,
       currentPage: 1,
       curSizeNum: 10,
       sizeNum: 50,
+
       totalElements: 0,
 
       searchInput: '',
@@ -296,7 +335,21 @@ export default {
       storeDataList: [],
       noData: this.$t('deviceView.noData'),
       showStoreInfo: false,
-      hasAdvanced: false
+      hasAdvanced: false,
+      deleteId: 0,
+      params : {
+        // beginTs: 1704931200000,
+        // endTs: 1705708800000,
+        filter: {
+            page: 0,
+            size: 10
+        },
+        order: {
+            direction: "desc",
+            property: "ts"
+        },
+        keyword	: ''
+      }
     };
   },
 
@@ -333,6 +386,7 @@ export default {
         this.allList = [...this.allList, ...i.content]
       }
     })
+    this.allList.unshift({requestType : -1 , label : "全部"})
     this.reportRequestTypeList = this.allList
     this.initData()
   },
@@ -343,9 +397,6 @@ export default {
   
 
   methods: {
-    
-
-
     async initData() {
       this.searchInput = '';
       this.storeStr = '';
@@ -354,7 +405,7 @@ export default {
       this.reportList = [];
 
       await this.searchRequestTypeItems()
-      await this.getDownloadTable()
+      await this.getDownloadTable(this.params)
       
     },
 
@@ -372,24 +423,10 @@ export default {
       return year + "/"+ month +"/"+ day
     },
 
-    async getDownloadTable(){
+    async getDownloadTable(params){
       this.isLoading = true;
-
-      var params = {
-        beginTs: 1702224000000,
-        endTs: 1704815999999,
-        filter: {
-            page: 0,
-            size: 10
-        },
-        order: {
-            direction: "desc",
-            property: "ts"
-        }
-      }
-
       await getDownloadList(params).then(res=>{
-        console.log('res.data.content --->', res.data.content)
+        console.log('res.data --->', res.data)
         
         res.data.content.forEach(i => {
           var tempReport = this.allList.find(r => r.requestType == i.requestType)
@@ -402,10 +439,10 @@ export default {
           else if(i.status == 0) i.status = '處理中'
           else if(i.status == 1) i.status = '完成'
 
-
         })
         this.downloadTableData = res.data.content
         this.totalElements = res.data.totalElements
+        this.total = res.data.totalPages
   
         this.isLoading = false;
       }).catch(err => {
@@ -414,10 +451,10 @@ export default {
       });
     },
 
-    searchRequestTypeItems(value){
+    searchRequestTypeItems(value){    
       if(this.reportType == -1 ){
         this.reportRequestTypeList = this.allList
-        console.log('this.allList :>> ', this.allList);
+        console.log('this.allList :>> ', this.allList); 
       }else {
         this.reportRequestTypeList = [...this.reportDownloadList[value].content]
       }
@@ -425,110 +462,96 @@ export default {
     },
 
 
-
     searchDownloadData(){
-      console.log('searchDownloadData :>> ');
+      console.log('this.reportRequestType', this.reportRequestType)
+
+      if(this.reportRequestType == -1){ 
+        this.params.requestType	 = -1
+      } else {
+        this.params.requestType	 = this.reportRequestType
+      }
+      console.log('this.searchInput', this.searchInput)
+      this.params.keyword = this.searchInput
+      console.log('this.params', this.params)
+      this.getDownloadTable(this.params)
     },
 
     handleEmitOperation(val){
-      console.log('val' , val)
       switch (val.method) {
         case  'download':
-          this.handleDownload()
+          this.handleDownload(val)
           break;
 
         case 'delete':
-          this.showUpdateEvent = true
+          this.deleteId = val.row.id
+          this.showDeleteDialog = true
           break;
       
         default:
           break;
       }
     },
-
-    
-    handleDownload() {
-      return new Promise((resolve, reject) => {
-        axios.get('https://preview-inspection.wise-iservice.com/storemonitor/api/v1.0/download/request/file/download?id=78').then(res => {
-          const data = res.data.data;
-          console.log('data :>> ', data);
-          this.aaa(data)
-
-          resolve(res.data);
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
-
-
-
-    aaa(data){
-      var bindata = window.atob(data);
-      window.location.href = "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64" + bindata
-      },
-
-
-    convertBase64ToExcel(data){
-      console.log('download!!!')
-      var contentType = 'application/vnd.ms-excel';
-      var blob1 = this.b64toBlob(data, contentType);
-      console.log('blob1', blob1)
-
-      var blobUrl1 = URL.createObjectURL(blob1);
-      console.log('blobUrl1', blobUrl1)
-      // window.open(blobUrl1);
-      window.location.href = blobUrl1
-    },
-
-    b64toBlob(b64Data, contentType, sliceSize) {
-      console.log('b64toBlob')
-      contentType = contentType || '';
-      sliceSize = sliceSize || 512;
-
-      var byteCharacters = window.atob(b64Data);
-      console.log('byteCharacters', byteCharacters)
-      
-      var byteArrays = [];
-
-      for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-        var slice = byteCharacters.slice(offset, offset + sliceSize);
-
-        var byteNumbers = new Array(slice.length);
-        for (var i = 0; i < slice.length; i++) {
-          byteNumbers[i] = slice.charCodeAt(i);
+    handleDownload(val) {
+      console.log('val ~~~~>> ', val);
+      var downloadId = val.row.id
+      console.log('downloadId :>> ', downloadId);
+      downloadFile(downloadId).then(res=>{
+        console.log('res.data :>> ', res.data);
+        if(!res.data.zip){
+          const b64data = res.data.data
+          const fileName = res.data.fileName
+          this.downloadFile(b64data, fileName)
+        }else{
+          const b64data = res.data.data
+          const fileName = res.data.fileName
+          this.downloadZip(b64data, fileName)
         }
-
-        var byteArray = new Uint8Array(byteNumbers);
-
-        byteArrays.push(byteArray);
-      }
-
-      console.log('byteArrays', byteArrays)
-      var blob = new Blob(byteArrays, {type: contentType});
-      console.log('blob', blob)
-      return blob;
-    },
-
-
-
-
-  
-    cancelUpdate(){
-      this.showUpdateEvent = false
-    },
-
-    confirmUpdate(updateEventId){
-      var rowID = {eventId: updateEventId}
-      this.showUpdateEvent = false
-      this.isLoading = true;   
-      handleEventStatus(rowID).then(res=>{
-        console.log('res :>> ', res);
-        this.getEvents(this.params);
+        resolve(res.data);
       }).catch(err => {
         this.isLoading = false;
       })
     },
+
+    downloadFile(b64data, fileName){
+      var mediaType="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,";
+      var link = document.createElement('a');
+      link.href = mediaType + b64data;
+      link.download = fileName
+      link.click()
+      // window.location.href = link.href
+    },
+    downloadZip(b64data, fileName){
+      var mediaType="data:application/x-zip-compressed;base64,";
+      var link = document.createElement('a');
+      link.href = mediaType + b64data;
+      link.download = fileName
+      link.click()
+    },
+
+
+    cancelDelete(){
+      this.showDeleteDialog = false
+    },
+    confirmDelete(updateEventId){
+      this.showDeleteDialog = false
+      this.isLoading = true;   
+      var del = {id : this.deleteId}
+      deleteDownloadList(del).then(res=>{
+        this.getDownloadTable(this.params)
+      }).catch(err => {
+        this.isLoading = false;
+      })
+    },
+    clearAll(){
+      deleteAll().then(res=>{
+        this.showDeleteAllDialog = false
+        this.isLoading = true;  
+        this.getDownloadTable(this.params)
+      }).catch(err => {
+        this.isLoading = false;
+      })
+    },
+
 
 
     cellStyle({ row, column, rowIndex, columnIndex }) {
@@ -555,34 +578,21 @@ export default {
     handlePagination(pageInfo){
       console.log('pageInfo ~~~~~>> ', pageInfo);
       console.log('this.params ~~~~~>> ', this.params);
+      this.isLoading = true;
+      
       this.currentPage = pageInfo.page
       this.curSizeNum = pageInfo.size;
       
       this.params.filter.page = pageInfo.page - 1
       this.params.filter.size = pageInfo.size
-      this.getEvents(this.params)
+      this.getDownloadTable(this.params)
 
       // if(this.inputSearchValue.trim()=="") this.getWorkflowList(this.apiBody);
       // else this.setTableBySearch()
 
     },
 
-    clearAll(){
-      console.log('clear all ')
-    },
-
-
-
-
-
-
     
-
-
-    
-
-
-
   },
 
 

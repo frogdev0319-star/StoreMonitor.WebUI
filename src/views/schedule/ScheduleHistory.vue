@@ -274,7 +274,8 @@ export default{
       ],
       showExportExcelNotice:false,
       showExportExcelWarning:false,
-      showExportMassage: false
+      showExportMassage: false,
+      downloadRecordsIds: []
     }
   },
   computed: {
@@ -534,6 +535,10 @@ export default{
       if(val.length>0){
         this.SelScheduleTask = val;
       }
+
+      this.downloadRecordsIds = val.map(i => i = i.recordId)
+      console.log('this.downloadRecordsIds :>> ', this.downloadRecordsIds);
+
     },
 
     formatJson(filterVal, jsonData) {
@@ -542,55 +547,77 @@ export default{
 
     export2Excel(){
       if(this.SelScheduleTask.length>0){
-        this.SelScheduleTask.sort((a, b) => { return a['squence'] - b['squence']; });
-        this.showExportExcelNotice = true;
-        const tHeader = [
-          this.$t('audit.workFlows.workFlowsCreatedUser'),
-          this.$t('schedule.schName'),
-          this.$t('remotePatrol.storeName'),
-          this.$t('schedule.storeTimeZone'),
-          this.$t('schedule.schExeDate'),
-          this.$t('schedule.inceptionMode'),
-          this.$t('statistics.patrolPerson.tagName'),//巡檢表名稱
-          this.$t('schedule.reportUploadDate'),
-          this.$t('schedule.incepPerson'),
-          this.$t('audit.workFlows.workFlowsStauts'),
-          this.$t('route.reports')
-        ];
-        var exportData = [];
-        const fileName = this.$t('schedule.scheduleHistory')+"_"+util.getCurDateStr();
-        this.SelScheduleTask.map(item=>{
-          let processMode = "";
-          if(item.isProcessing){//簽核中
-              processMode = this.$t('schedule.isProcessing');
-          }else{
-            if(item.reportId==-1){//無
-              processMode = this.$t('schedule.NA');
-            }else{
-              processMode = this.$t('schedule.generated');
-            }
-          }
-          let status = this.schStatusList.filter(status => status.mode==item.status)[0].label;
-          exportData.push([
-            item.creatorName,
-            item.taskName,
-            item.storeName,
-            item.storeTimeZone,
-            item.remindTimeStr,
-            item.inspectTagMode==0?this.$t('remotePatrol.remotePatrol'):this.$t('remotePatrol.onsitePatrol'),
-            item.inspectTagName,
-            item.reportTsStr,
-            item.submitterName,
-            status,
-            processMode
-          ]);
-        })
+        // this.SelScheduleTask.sort((a, b) => { return a['squence'] - b['squence']; });
+        // this.showExportExcelNotice = true;
+        // const tHeader = [
+        //   this.$t('audit.workFlows.workFlowsCreatedUser'),
+        //   this.$t('schedule.schName'),
+        //   this.$t('remotePatrol.storeName'),
+        //   this.$t('schedule.storeTimeZone'),
+        //   this.$t('schedule.schExeDate'),
+        //   this.$t('schedule.inceptionMode'),
+        //   this.$t('statistics.patrolPerson.tagName'),//巡檢表名稱
+        //   this.$t('schedule.reportUploadDate'),
+        //   this.$t('schedule.incepPerson'),
+        //   this.$t('audit.workFlows.workFlowsStauts'),
+        //   this.$t('route.reports')
+        // ];
+        // var exportData = [];
+        // const fileName = this.$t('schedule.scheduleHistory')+"_"+util.getCurDateStr();
+        // this.SelScheduleTask.map(item=>{
+        //   let processMode = "";
+        //   if(item.isProcessing){//簽核中
+        //       processMode = this.$t('schedule.isProcessing');
+        //   }else{
+        //     if(item.reportId==-1){//無
+        //       processMode = this.$t('schedule.NA');
+        //     }else{
+        //       processMode = this.$t('schedule.generated');
+        //     }
+        //   }
+        //   let status = this.schStatusList.filter(status => status.mode==item.status)[0].label;
+        //   exportData.push([
+        //     item.creatorName,
+        //     item.taskName,
+        //     item.storeName,
+        //     item.storeTimeZone,
+        //     item.remindTimeStr,
+        //     item.inspectTagMode==0?this.$t('remotePatrol.remotePatrol'):this.$t('remotePatrol.onsitePatrol'),
+        //     item.inspectTagName,
+        //     item.reportTsStr,
+        //     item.submitterName,
+        //     status,
+        //     processMode
+        //   ]);
+        // })
+        const self = this;
+        let order = {
+          direction:this.defaultSort.order=='ascending'? 'asc':'desc',
+          property:self.defaultSort.prop
+        };
+        if(self.defaultSort.prop=="reportTsStr") order.property = "reportTs";
+        else if(self.defaultSort.prop=="remindTimeStr") order.property = "remindTs";
+        let beginTs = self.$moment.utc(self.$moment(self.dateValue[0])).valueOf();
+        let endTs = self.$moment.utc(self.$moment(self.dateValue[1])).valueOf();
+        const params={
+          status:this.curSchStatus,
+          beginTs,
+          endTs,
+          filter:{
+            page:0,
+            size:99999 //全部
+          },
+          order,
+          recordsIds : this.downloadRecordsIds
+        };
+        if(this.inputSearchValue.trim()!=""){
+          params['keyword']=this.inputSearchValue;
+        }
 
         this.showExportMassage = true
-        // exportScheduleRecord(params).then(res=>{
-        //   console.log('res :>> ', res);
-        // })
-
+        exportScheduleRecord(params).then(res=>{
+          console.log('res :>> ', res);
+        })
         
         // require.ensure([], async() => {
         //   const { export_json_to_excel } = require('@/excel/Export2Excel');
@@ -604,20 +631,20 @@ export default{
 
     exportAll(){
       // this.showExportExcelNotice = true;
-      const fileName = this.$t('schedule.scheduleHistory')+"_"+util.getCurDateStr();
-      const tHeader = [
-        this.$t('audit.workFlows.workFlowsCreatedUser'),
-        this.$t('schedule.schName'),
-        this.$t('remotePatrol.storeName'),
-        this.$t('schedule.storeTimeZone'),
-        this.$t('schedule.schExeDate'),
-        this.$t('schedule.inceptionMode'),
-        this.$t('statistics.patrolPerson.tagName'),//巡檢表名稱
-        this.$t('schedule.reportUploadDate'),
-        this.$t('schedule.incepPerson'),
-        this.$t('audit.workFlows.workFlowsStauts'),
-        this.$t('route.reports')
-      ];
+      // const fileName = this.$t('schedule.scheduleHistory')+"_"+util.getCurDateStr();
+      // const tHeader = [
+      //   this.$t('audit.workFlows.workFlowsCreatedUser'),
+      //   this.$t('schedule.schName'),
+      //   this.$t('remotePatrol.storeName'),
+      //   this.$t('schedule.storeTimeZone'),
+      //   this.$t('schedule.schExeDate'),
+      //   this.$t('schedule.inceptionMode'),
+      //   this.$t('statistics.patrolPerson.tagName'),//巡檢表名稱
+      //   this.$t('schedule.reportUploadDate'),
+      //   this.$t('schedule.incepPerson'),
+      //   this.$t('audit.workFlows.workFlowsStauts'),
+      //   this.$t('route.reports')
+      // ];
       const self = this;
       let order = {
         direction:this.defaultSort.order=='ascending'? 'asc':'desc',

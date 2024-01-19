@@ -635,7 +635,7 @@ export default {
         like: {},
         filter: {
             page: 0,
-            size: 1000
+            size: 99999
         },
         order: {
           direction: "desc",
@@ -676,7 +676,8 @@ export default {
         beginTs: this.params.beginTs,
         endTs:  this.params.endTs,
         inspectTagId: this.params.inspectTagId,
-        reportIds: ExpAllReportIds
+        reportIds: ExpAllReportIds,
+        filter : {page: 0, size: 99999}
       }
 
       exportEntireJson(ExpAllParams).then(res=>{

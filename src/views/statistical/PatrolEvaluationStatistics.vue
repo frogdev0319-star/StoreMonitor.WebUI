@@ -1842,6 +1842,7 @@ export default {
                 }
             }
 
+            params.filter = {page: 0, size: 99999}
             this.showExportMassage = true
             exportStatisticsReport(params).then(res=>{
                 console.log('res :>> ', res);
@@ -1931,7 +1932,7 @@ export default {
                     });
                 }
             }
-
+            params.filter = {page: 0, size: 99999}
             this.showExportMassage = true
             exportStatisticsReport(params).then(res=>{
                 console.log('res :>> ', res);
@@ -2014,7 +2015,7 @@ export default {
                     });
                 }
             }
-
+            params.filter = {page: 0, size: 99999}
             this.showExportMassage = true
             exportStatisticsReport(params).then(res=>{
                 console.log('res :>> ', res);

@@ -16,6 +16,30 @@ export const getDownloadList = data => {
   });
 };
 
+export const deleteDownloadList = data => {
+  return request({
+    url: `v1.0/download/request/delete`,
+    method: 'post',
+    data
+  });
+};
+
+export const deleteAll = data => {
+  return request({
+    url: `v1.0/download/request/delete/all`,
+    method: 'post',
+    data
+  });
+};
+
+export const downloadFile = params => {
+  return request({
+    url: `v1.0/download/request/file/download?id=${params}`,
+    method: 'get',
+    params
+  });
+};
+
 
 // [1001]
 export const exportEntireJson = data => {

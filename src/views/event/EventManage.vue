@@ -1203,6 +1203,7 @@ export default {
             return false;
           }
 
+          this.params.filter = {page: 0, size: 99999}
           this.showExportMassage = true
           console.log('this.params :>> ', this.params);
           exportEventList(this.params).then(res=>{

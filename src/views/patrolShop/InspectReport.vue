@@ -1482,7 +1482,7 @@ export default {
         beginTs:this.reportData.ts,
         endTs:this.reportData.ts,
         inspectTagId:this.reportData.tagId,
-        reportIds:[this.report.reportId]
+        reportIds:[this.report.reportId],
       }
 
       exportEntireJsonUnit(params).then(res=>{
