@@ -497,7 +497,7 @@ export default {
     export2Excel() {
       const that = this;
       if (that.insRecordTableData.length === 0) {
-        util.notify(that.$t('statistics.emptyInsRecordList'), 'warning', 3000);
+        util.notify("表格資料為空！請重新搜尋條件", 'warning', 3 * 1000);
         return false;
       }
 

@@ -1118,6 +1118,11 @@ export default {
 
       });
       
+      if (content.length == 0) {
+          util.notify("表格資料為空！請重新搜尋條件", 'warning', 3 * 1000);
+          return false;
+      }
+      
       params.filter = {page: 0, size: 99999}
       this.showExportMassage = true
       exportStatisticsInspectItemOverview(params).then(res=>{

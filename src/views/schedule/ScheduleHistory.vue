@@ -546,6 +546,10 @@ export default{
     },
 
     export2Excel(){
+      if (this.tableData.length == 0) {
+          util.notify("表格資料為空！請重新搜尋條件", 'warning', 3 * 1000);
+          return false;
+        }
       if(this.SelScheduleTask.length>0){
         // this.SelScheduleTask.sort((a, b) => { return a['squence'] - b['squence']; });
         // this.showExportExcelNotice = true;
@@ -614,6 +618,11 @@ export default{
           params['keyword']=this.inputSearchValue;
         }
 
+        if (this.tableData.length == 0) {
+          util.notify("表格資料為空！請重新搜尋條件", 'warning', 3 * 1000);
+          return false;
+        }
+        
         this.showExportMassage = true
         exportScheduleRecord(params).then(res=>{
           console.log('res :>> ', res);
@@ -667,6 +676,11 @@ export default{
       if(this.inputSearchValue.trim()!=""){
         params['keyword']=this.inputSearchValue;
       }
+
+      if (this.tableData.length == 0) {
+          util.notify("表格資料為空！請重新搜尋條件", 'warning', 3 * 1000);
+          return false;
+        }
 
       this.showExportMassage = true
       exportScheduleRecord(params).then(res=>{

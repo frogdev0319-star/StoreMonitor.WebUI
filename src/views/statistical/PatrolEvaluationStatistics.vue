@@ -1843,6 +1843,10 @@ export default {
                 }
             }
 
+            if (storeResult.data.content.length == 0) {
+                util.notify("表格資料為空！請重新搜尋條件", 'warning', 3 * 1000);
+                return false;
+            }
             params.filter = {page: 0, size: 99999}
             this.showExportMassage = true
             exportStatisticsReport(params).then(res=>{
@@ -1933,6 +1937,11 @@ export default {
                     });
                 }
             }
+
+            if (storeResult.data.content.length == 0) {
+                util.notify("表格資料為空！請重新搜尋條件", 'warning', 3 * 1000);
+                return false;
+            }
             params.filter = {page: 0, size: 99999}
             this.showExportMassage = true
             exportStatisticsReport(params).then(res=>{
@@ -2015,6 +2024,10 @@ export default {
                         if (item.storeType == '') item.storeType = '- -'
                     });
                 }
+            }
+            if (storeResult.data.content.length == 0) {
+                util.notify("表格資料為空！請重新搜尋條件", 'warning', 3 * 1000);
+                return false;
             }
             params.filter = {page: 0, size: 99999}
             this.showExportMassage = true
