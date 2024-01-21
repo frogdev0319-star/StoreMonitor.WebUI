@@ -81,7 +81,7 @@
               :table-data="downloadTableData"
               :highlight-current-row= "true"
               :is-loading-data="isLoading"
-              :tableAction ="columnOperationData"
+              :tableDownloadAction ="columnOperationData"
               :allowRowExpand = "false"
               :showBorder = "false"
               :default-sort = "{prop: 'datestr', order: 'descending'}"
@@ -217,7 +217,7 @@ export default {
           'maxWidth': '140',
         },
         {
-          'prop': 'status',
+          'prop': 'status_showing',
           'label': '狀態',
           'sortable': false,
           'width': '140',
@@ -435,9 +435,9 @@ export default {
           i.condition = this.getdate(i.searchStartTs) + ' - ' + this.getdate(i.searchEndTs) + '\n' + i.inspect + '\n' + i.locale
           i.ts =  this.getdate(i.ts)
 
-          if(i.status == -1 ) i.status = '失敗'
-          else if(i.status == 0) i.status = '處理中'
-          else if(i.status == 1) i.status = '完成'
+          if(i.status == -1 ) i.status_showing = '失敗'
+          else if(i.status == 0) i.status_showing = '處理中'
+          else if(i.status == 1) i.status_showing = '完成'
 
         })
         this.downloadTableData = res.data.content

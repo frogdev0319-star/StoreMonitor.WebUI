@@ -225,6 +225,29 @@
       </el-table-column>
 
 
+      <!-- download -->
+      <el-table-column
+        v-if="tableDownloadAction.label"
+        :min-width="tableDownloadAction.minWidth"
+        :label="tableDownloadAction.label"
+        class-name="small-padding fixed-width"
+        :render-header="renderHeader"
+        >
+        <template slot-scope="scope">
+          <div class="flex-center" >
+              <img 
+                :key="index"
+                class="child-space hover_effect"
+                :class="scope.row.status == -1 || scope.row.status == 0 ? `${item.icon} icon-disabled ` : item.icon"
+                v-for="(item,index) in tableDownloadAction.operation" 
+                :src="`./static/img/table-${item.methods}.png`" 
+                @click="handleOperationButton(item.methods, scope.row, scope.$index)"
+                height="24px"
+                width="24px"
+              />
+          </div>
+        </template>
+      </el-table-column>
 
       <!-- workflow 操作 -->
       <el-table-column
@@ -371,6 +394,12 @@ export default {
       }
     },
     tableAction: {
+      type: Object,
+      default: () => {
+        return {};
+      }
+    },
+    tableDownloadAction: {
       type: Object,
       default: () => {
         return {};
@@ -1016,6 +1045,10 @@ export default {
 </style>
 
 <style lang="sass" >
+  .icon-disabled
+    pointer-events: none
+    opacity: .4
+
   .move
       display: flex
       flex-direction: row
