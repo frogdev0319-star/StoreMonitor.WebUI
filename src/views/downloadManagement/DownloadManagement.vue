@@ -438,6 +438,7 @@ export default {
           if(i.status == -1 ) i.status_showing = '失敗'
           else if(i.status == 0) i.status_showing = '處理中'
           else if(i.status == 1) i.status_showing = '完成'
+          else if(i.status == 2) i.status_showing = '已失效'
 
         })
         this.downloadTableData = res.data.content

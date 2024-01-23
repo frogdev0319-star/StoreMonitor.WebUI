@@ -13,7 +13,7 @@
           <div class="title">{{ $t('overview.kpiIndex') }}</div>
           <div class="kpi-content">
             <div v-for="(item,index) in eventKPIs" :key="index" class="event-list">
-              <div class="event-title">{{ item.eventTitlez }}</div>
+              <div class="event-title">{{ item.eventTitle }}</div>
               <div class="event-num">{{ item.eventNum }}</div>
             </div>
           </div>
@@ -21,7 +21,7 @@
 
         <div class="for_flex">
           <!-- 各門店事件趨勢分析 -->
-          <el-col :span="isEnSpan ? 13 :20" class="store-events" style="width: 100%;">
+          <el-col :span="isEnSpan ? 13 :20" class="store-events" style="width: 68%;" :class="{widewidth : !hasAdvanced}">
             <div class="title">{{ $t('overview.eventTrends') }} </div>
             <div class="region-result">
               <div class="store-list">
@@ -48,7 +48,7 @@
           <!-- 事件來源 -->
           <el-col :span="isEnSpan ? 7 : 6" class="source-list" v-if="hasAdvanced">
             <div class="title">
-              <span class="area-title">{{ $t('overview.eventSource') }}</span>
+              <span class="area-title">{{ $t('overview.eventSource') }} </span>
             </div>
             <div class="pct-content">
               <div class="pie-area">
@@ -317,7 +317,7 @@ export default {
   },
 
   watch: {
-    accountChanged(val) {
+    async accountChanged(val) {
       const self = this;
       if (val !== 0) {
         self.timeMode = 1;
@@ -328,6 +328,9 @@ export default {
         self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
         self.getSearchParams();
         self.getEventOverviewData();
+
+        var userInfo = await this.$store.dispatch("GetUserAuthorities");
+        self.hasAdvanced = userInfo.data.isSystemAdvanced
       }
     }
   },
@@ -470,22 +473,22 @@ export default {
       sourcePieList.forEach((item, index) => {
         sumEvent += item.numOfEvent;
         if (index === 2) {
-          remoteEventNum = item.numOfEvent;
+          onsiteEventNum = item.numOfEvent;
         }
         else if (index === 3 && this.hasAdvanced) {
           immediateEventNum = item.numOfEvent;
         } 
 
       });
-      const totalArray = [remoteEventNum, immediateEventNum];
+      const totalArray = [onsiteEventNum, immediateEventNum];
       jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
       if(jsonArray[1] && this.hasAdvanced) jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2)
       
       console.log('jsonArray 2 !!!:>> ', jsonArray);
       if (sumEvent !== 0) {
         seriesData = [
-          { value: remoteEventNum, name: self.$t('overview.remotePatrol') },
-          // { value: onsiteEventNum, name: self.$t('overview.onsitePatrol') },
+          // { value: remoteEventNum, name: self.$t('overview.remotePatrol') },
+          { value: onsiteEventNum, name: self.$t('overview.onsitePatrol') },
           // { value: storeEventNum, name: self.$t('overview.storeMonitor') },
           { value: immediateEventNum, name: self.$t('immediatePush.immediateEvent') }
         ];
@@ -1131,6 +1134,8 @@ export default {
     flex-direction: row
     justify-content: flex-start
     align-items: flex-start
+  .widewidth
+    width: 100% !important
 
 </style>
 <style lang="scss" scoped>
