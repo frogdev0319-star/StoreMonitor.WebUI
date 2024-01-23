@@ -238,7 +238,7 @@
               <img 
                 :key="index"
                 class="child-space hover_effect"
-                :class="scope.row.status == -1 || scope.row.status == 0 ? `${item.icon} icon-disabled ` : item.icon"
+                :class="scope.row.status == -1 || scope.row.status == 0 || scope.row.status == 2 ? `${item.icon} icon-disabled ` : item.icon"
                 v-for="(item,index) in tableDownloadAction.operation" 
                 :src="`./static/img/table-${item.methods}.png`" 
                 @click="handleOperationButton(item.methods, scope.row, scope.$index)"

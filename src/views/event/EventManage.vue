@@ -83,6 +83,7 @@
           <span>{{ $t('eventView.exportReport') }}</span>
         </div>
       </delay-button>
+      {{ tableDataList }}
       <el-tabs :id="getLangStyleValue(tabContentId)"  v-model="activeName" @tab-click="handleTabClick">
         <el-tab-pane
           v-for="(item,index) in tableDataList"
