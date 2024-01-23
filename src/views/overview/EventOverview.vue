@@ -473,22 +473,22 @@ export default {
       sourcePieList.forEach((item, index) => {
         sumEvent += item.numOfEvent;
         if (index === 2) {
-          remoteEventNum = item.numOfEvent;
+          onsiteEventNum = item.numOfEvent;
         }
         else if (index === 3 && this.hasAdvanced) {
           immediateEventNum = item.numOfEvent;
         } 
 
       });
-      const totalArray = [remoteEventNum, immediateEventNum];
+      const totalArray = [onsiteEventNum, immediateEventNum];
       jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
       if(jsonArray[1] && this.hasAdvanced) jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2)
       
       console.log('jsonArray 2 !!!:>> ', jsonArray);
       if (sumEvent !== 0) {
         seriesData = [
-          { value: remoteEventNum, name: self.$t('overview.remotePatrol') },
-          // { value: onsiteEventNum, name: self.$t('overview.onsitePatrol') },
+          // { value: remoteEventNum, name: self.$t('overview.remotePatrol') },
+          { value: onsiteEventNum, name: self.$t('overview.onsitePatrol') },
           // { value: storeEventNum, name: self.$t('overview.storeMonitor') },
           { value: immediateEventNum, name: self.$t('immediatePush.immediateEvent') }
         ];
