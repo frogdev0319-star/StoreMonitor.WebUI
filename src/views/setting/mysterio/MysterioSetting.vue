@@ -57,16 +57,11 @@
                                 v-model="selInspectVaule"
                                 @change="onChangeSelectedInspect"
                                 size="mini">
-                                <el-option-group
-                                    v-for="group in storeDataList[selStoreIndex].inspectList"
-                                    :key="group.label"
-                                    :label="group.label">
-                                    <el-option v-for="(sitem) in group.options"
+                                    <el-option v-for="(sitem) in storeDataList[selStoreIndex].inspectList.onSite.options"
                                         :key="sitem.inspId"
                                         :label="sitem.label"
                                         :value="{value:sitem.inspId,label:sitem.label}"
                                     />
-                                </el-option-group>
                             </el-select>
                         </div>
                     </div>
@@ -138,71 +133,71 @@ export default {
     name: 'MysterioSetting',
     components: {DelayButton,DialogPop,TableOnly,TblPaginationOnly },
     data() {
-      return {
-        isLoadingData: true,
-        loadingGif: require('@/../static/img/loading.svg'),
-        iconDelete:require('@/../static/img/ic_delete_blue.svg'),
-        iconAdd:require('@/../static/img/add_icon.png'),
-        storeSettingArray:[],
-        storeDataList:[],
-        selStoreValue:{value:null,label:""},
-        selStoreId:null,
-        selStoreName:"",
-        selStoreIndex:0,
-        selInspectVaule:{value:null,label:""},
-        selInspectId:null,
-        selInspecName:"",
-        userId:null,
-        inspectDisable:true,
-        total:0,
-        curPage:1,
-        curSizeNum:10,
-        defaultSort:{prop: 'storeName', order: 'ascending'},
-        allTableData:[],
-        tableData:[],
-        columnData:[{
-            'prop': 'storeName',
-            'label': this.$t('remotePatrol.stores'),
-            'sortable': true,
-            'width': 200,
-            'maxWidth': 200,
-            'isExpand': false
-          },
-          {
-            'prop': 'incetionTag',
-            'label': this.$t('overview.patrolLists'),
-            'sortable': true,
-            'width': 360,
-            'maxWidth': 360,
-            'isExpand': false
-          }],
-          columnOperationData: {
-          label: this.$t('mysterio.authDelete'),
-          minWidth: '50',
-          align: 'left',
-          operation: [
+        return {
+            isLoadingData: true,
+            loadingGif: require('@/../static/img/loading.svg'),
+            iconDelete:require('@/../static/img/ic_delete_blue.svg'),
+            iconAdd:require('@/../static/img/add_icon.png'),
+            storeSettingArray:[],
+            storeDataList:[],
+            selStoreValue:{value:null,label:""},
+            selStoreId:null,
+            selStoreName:"",
+            selStoreIndex:0,
+            selInspectVaule:{value:null,label:""},
+            selInspectId:null,
+            selInspecName:"",
+            userId:null,
+            inspectDisable:true,
+            total:0,
+            curPage:1,
+            curSizeNum:10,
+            defaultSort:{prop: 'storeName', order: 'ascending'},
+            allTableData:[],
+            tableData:[],
+            columnData:[{
+                'prop': 'storeName',
+                'label': this.$t('remotePatrol.stores'),
+                'sortable': true,
+                'width': 200,
+                'maxWidth': 200,
+                'isExpand': false
+            },
             {
-              lable: '',
-              icon: 'icon-delete',
-              methods: 'delete'
-            }
-          ]
-        },
-        showItemExitedDialog:false,
-        warnningTitle:"",
-        nickName:"",
-        showInputLimit:false
-      };
+                'prop': 'incetionTag',
+                'label': this.$t('overview.patrolLists'),
+                'sortable': true,
+                'width': 360,
+                'maxWidth': 360,
+                'isExpand': false
+            }],
+            columnOperationData: {
+            label: this.$t('mysterio.authDelete'),
+            minWidth: '50',
+            align: 'left',
+            operation: [
+                {
+                lable: '',
+                icon: 'icon-delete',
+                methods: 'delete'
+                }
+            ]
+            },
+            showItemExitedDialog:false,
+            warnningTitle:"",
+            nickName:"",
+            showInputLimit:false
+        };
     },
 
     computed: {
-      ...mapGetters({ accountChanged: 'accountChanged' })
+        ...mapGetters({ accountChanged: 'accountChanged' })
     },
 
     watch: {
-      accountChanged(val) {
-        val !== 0 && this.init();
-      }
+        accountChanged(val) {
+            val !== 0 && this.init();
+        }
     },
 
     created() {
@@ -247,9 +242,9 @@ export default {
                         label:store.name,
                         value:store.storeId,
                         inspectList:{
-													// remote:{label:"遠程",options:[]},
-													onSite:{label:"現場",options:[]}
-												}
+                            // remote:{label:"遠程",options:[]},
+                            onSite:{label:"現場",options:[]}
+                        }
                     }
                     
                     store.appliedInspect.map(insp=>{
@@ -259,10 +254,10 @@ export default {
                             value:insp.id
                         }
 												
-												if(insp.mode !==0)
-													storeObj.inspectList.onSite.options.push(inspObj);
+                        if(insp.mode !==0)
+                            storeObj.inspectList.onSite.options.push(inspObj);
 
-												// ==== 2024 sprint1 遠端巡檢關閉 ====
+                        // ==== 2024 sprint1 遠端巡檢關閉 ====
                         // if(insp.mode==0)
                         //   storeObj.inspectList.remote.options.push(inspObj);
                         // else
@@ -391,7 +386,7 @@ export default {
                 return;
             }
             if(!this.selInspectId){
-               this.warnningTitle = this.$t('mysterio.pleaseChooseTag');
+                this.warnningTitle = this.$t('mysterio.pleaseChooseTag');
                 this.showItemExitedDialog = true;
                 return;
             }
@@ -414,7 +409,7 @@ export default {
             console.log('List row =====>> ', row);
             switch(method){
                 case 'delete':{
-                  this.deleteAuth(row);
+                    this.deleteAuth(row);
                 break;      
                 }
                 default: {

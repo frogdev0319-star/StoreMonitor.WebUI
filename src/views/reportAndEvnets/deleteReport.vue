@@ -318,13 +318,13 @@ export default {
           'width': '140',
           'maxWidth': '140',
         },
-        {
-          'prop': 'modeText',
-          'label': '巡檢方式',
-          'sortable':false,
-          'width': '140',
-          'maxWidth': '150',
-        },
+        // {
+        //   'prop': 'modeText',
+        //   'label': '巡檢方式',
+        //   'sortable':false,
+        //   'width': '140',
+        //   'maxWidth': '150',
+        // },
         {
           'prop': 'tagName',
           'label': '巡檢表',
