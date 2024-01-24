@@ -10,9 +10,10 @@
           <div class="last-row"  style="justify-content: flex-start">
 
             <!-- 報表類型 -->
-            <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.reportType') }}</span>
+            <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">巡檢表</span>
             <div class="flex-center report-type-area">
               <el-select
+                v-if="hasAdvanced"
                 v-model="curReportType"
                 class="el-province"
                 :placeholder="$t('remotePatrol.all')"
@@ -27,7 +28,7 @@
                   :value="item.mode"/>
               </el-select>
             
-              <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" />
+              <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" v-if="hasAdvanced"/>
               <el-select
                 class="el-province"
                 style="margin-left:0px;border:none;border-radius:0px; width: 100%;"
@@ -349,7 +350,7 @@ export default {
   },
 
   watch: {
-    accountChanged(val) {
+    async accountChanged(val) {
       const self = this;
       if (val !== 0) {
         self.storeDataList = [];
@@ -360,6 +361,8 @@ export default {
         300);
         self.ifSaveParams = true;
         self.ifSearchData = true;
+        var userInfo = await this.$store.dispatch("GetUserAuthorities");
+        self.hasAdvanced = userInfo.data.isSystemAdvanced
       }
     },
     mimicModeChanged(val){
