@@ -280,7 +280,7 @@ export default{
                     res.data.content.map(item =>{
                     let obj = {...item};
                     let mode = item.tagMode == 0 ? self.$t('remotePatrol.remotePatrol') : self.$t('remotePatrol.onsitePatrol');
-                    obj['tagNameMode'] = mode + "--"+ item.tagName;
+                    obj['tagNameMode'] = item.tagName;
                     //obj['updateTs']=item.updateTime,
                     obj['taskStartStr']=(item.taskStart==0)?'-':self.$moment.utc(self.$moment(item.taskStart)).format("YYYY/MM/DD");//util.getDateStr(item.taskStart),
                     //console.log(">>>taskStartStr:",self.$moment.utc(self.$moment(item.taskStart)).format("YYYY/MM/DD hh:mm:ss"));

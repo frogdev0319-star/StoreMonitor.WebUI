@@ -353,7 +353,7 @@ export default {
               roleName: this.$t('route.deviceManage'),
               checked: false,
               disabled: false,
-              visabled: true
+              visabled: false
             },
             {
               roleName: '通用設定',
