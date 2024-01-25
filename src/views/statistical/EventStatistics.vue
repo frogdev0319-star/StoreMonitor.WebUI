@@ -184,7 +184,7 @@
         <el-row class="second-row" id="imgTest_second" style="box-shadow:none;">
           <el-col :span="24" class="kpi-list">
             <div class="head">
-              <div class="title">{{ $t('statistics.event.incepItemEvent') }}aaa</div>
+              <div class="title">{{ $t('statistics.event.incepItemEvent') }}</div>
               <div :style="WindowWidth>1600?{}:{'marginRight':'30px'}">
               <TypeSelectArea
                   path="eventStatistics"
