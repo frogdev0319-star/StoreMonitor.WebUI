@@ -1129,7 +1129,7 @@ export default {
                     'maxWidth': '100'
                 },
                 {
-                    'prop': 'rankbystandardrate',
+                    'prop': 'rankByAverageScore',
                     'label': this.$t('statistics.rank'),
                     'sortable': 'custom',
                     'pdfwidth': '12%',

@@ -669,17 +669,25 @@ export default {
         self.showExportAllWarn = true;
         return;
       }
+      // console.log('this.params :>> ', this.params);
+      // console.log('this.inspectTableList :>> ', this.inspectTableList);
+      // console.log('this.storeFilterObj :>> ', this.storeFilterObj);
+      const conTableName =  this.inspectTableList.find( i => i.id == this.params.inspectTagId).name
+      const conStoreName = this.storeFilterObj.curStore[0] == -1 ? "全部地點" : this.storeFilterObj.storeStr
 
+      const reportIds = await this.doGetSearchConditionsReportIds();
       this.showExportMassage = true
-      var ExpAllReportIds = this.reportList.map( i => i.id)
       var ExpAllParams = {
         beginTs: this.params.beginTs,
         endTs:  this.params.endTs,
         inspectTagId: this.params.inspectTagId,
-        reportIds: ExpAllReportIds,
-        filter : {page: 0, size: 99999}
+        reportIds: reportIds,
+        filter : {page: 0, size: 99999},
+        conTableName,
+        conStoreName
       }
 
+      // console.log('ExpAllParams :>> ', ExpAllParams);
       exportEntireJson(ExpAllParams).then(res=>{
         console.log('res :>> ', res);
       })
