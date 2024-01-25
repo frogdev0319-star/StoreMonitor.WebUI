@@ -142,7 +142,7 @@
       @confirmHandler="clearAll()"
     >
       <div class="dialog-slot">
-        <div class="dialog-content">請確認是否刪全部項目? </div>
+        <div class="dialog-content">是否確認清空下載列表? </div>
       </div>
     </dialog-pop>
 
@@ -420,20 +420,31 @@ export default {
       var hour = this.pad2(date.getHours())
       var min = this.pad2(date.getMinutes())
       var sec = this.pad2(date.getSeconds())
-      return year + "/"+ month +"/"+ day
+      return year + "/"+ month +"/"+ day 
+    },
+    
+    getAllDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return year + "/"+ month +"/"+ day +" "+ hour +":"+ min +":"+ sec
     },
 
     async getDownloadTable(params){
       this.isLoading = true;
       await getDownloadList(params).then(res=>{
-        console.log('res.data --->', res.data)
+        // console.log('res.data --->', res.data)
         
         res.data.content.forEach(i => {
           var tempReport = this.allList.find(r => r.requestType == i.requestType)
           i.inspect = tempReport.label
           i.fileName = i.downloadContent.fileName
           i.condition = this.getdate(i.searchStartTs) + ' - ' + this.getdate(i.searchEndTs) + '\n' + i.inspect + '\n' + i.locale
-          i.ts =  this.getdate(i.ts)
+          i.ts =  this.getAllDate(i.ts)
 
           if(i.status == -1 ) i.status_showing = '失敗'
           else if(i.status == 0) i.status_showing = '處理中'
