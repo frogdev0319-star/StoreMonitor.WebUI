@@ -1046,15 +1046,23 @@ export default {
       params.endTs = self.params.endTs;
       params.groupMode = 0;
       params.order={
-            direction:"desc",
-            property: "averageScore",
-          }
-       //console.log(this.part3.content[this.part3.indexRegion])
-        if(this.part3.compareType == 'stores'){
-          content = this.part3.indexRegion==-1?this.part3.content: [this.part3.content[this.part3.indexRegion]];
-        }
-        else{
-        params.storeIds = this.part3.indexRegion==-1 ?this.params.storeIds:this.part3.content[this.part3.indexRegion].list;
+        direction:"desc",
+        property: "averageScore",
+      }
+    
+
+      var needStoreId = null
+      if(this.part3.compareType == 'stores'){
+        console.log('stores :>> ');
+        console.log('this.part3 :>> ', this.part3);
+        console.log(this.part3.content[this.part3.indexRegion])
+
+        content = this.part3.indexRegion == -1 ? this.part3.content : [this.part3.content[this.part3.indexRegion]];
+        var needStoreId = this.part3.indexRegion == -1 ? [] : [this.part3.originArray.find( i => i.label == content[0].groupName).storeId]
+        console.log('needStoreId :>> ', needStoreId);
+      }
+      else{
+        params.storeIds = this.part3.indexRegion == -1 ? this.params.storeIds : this.part3.content[this.part3.indexRegion].list;
         if(this.part3.compareType == 'position'||this.part3.compareType == 'users'){
           params.storeIds = self.params.storeIds;
           params.searchMysteryMode = 0
@@ -1094,7 +1102,10 @@ export default {
         if(this.inspectItem){
           params.itemIds = this.inspectItem.item.ids
         }
+        console.log('params XXXDDD :>> ', params);
         const storeResult = await this.getInspectStatsItemOverGroup(params);
+        console.log("storeResult" , storeResult)
+
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
           if (result) {
@@ -1102,10 +1113,14 @@ export default {
           }
         }
       }
-      console.log("params" , params)
-      console.log("content" , content)
+      
       params.itemIds = this.inspectItem.item.ids
       params.filter = {page: 0, size: 99999}
+      params.storeIds = needStoreId
+      params.fileName = "4001"
+    
+      console.log("params" , params)
+      console.log("content" , content)
 
       content.forEach((item,i)=>{
         item.rank= i+1;
@@ -1126,7 +1141,7 @@ export default {
       params.filter = {page: 0, size: 99999}
       this.showExportMassage = true
       exportStatisticsInspectItemOverview(params).then(res=>{
-        console.log('res :>> ', res);
+        console.log('res [4001]:>> ', res);
       })
 
 
@@ -2207,13 +2222,13 @@ export default {
           regionLabel.push(this.maxLabel(item.groupName))
         });
         
-        console.log('totalAvgScore //////>> ', totalAvgScore);
-        console.log('count //////>> ', count);
+        // console.log('totalAvgScore //////>> ', totalAvgScore);
+        // console.log('count //////>> ', count);
 
         if(count > 0){
           totalAvgScore = (totalAvgScore/count).toFixed(1);
           this.totalAvgScore = totalAvgScore;
-          console.log('this.totalAvgScore //////>> ', this.totalAvgScore);
+          // console.log('this.totalAvgScore //////>> ', this.totalAvgScore);
         }
       }
 

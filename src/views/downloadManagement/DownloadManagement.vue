@@ -2,12 +2,12 @@
   <div class="flex-column" style="height: calc(100% - 20px)">
     <div id="el-containter" class="flex-column spacer" style="margin-left:0px">
       <div class="report-header">
-        <div class="flex-center" style="padding-top: 0;">
+        <div class="search_row" style="padding-top: 0;">
           <!-- <date-time-selector
             class="time-selector"
             @change="dateChange" 
             :dateTimeValue = dateValue />  -->
-            <span style="margin-right: 16px; font-size:calc(15/1920*100vw);width:10%;">報表類型</span>
+            <span style="margin-right: 16px; margin-top: 5px;font-size:calc(15/1920*100vw);width:10%;">報表類型</span>
             <div class="report_type" >
               <el-select
                 v-model="reportType"
@@ -27,11 +27,13 @@
               <el-select
                 v-model="reportRequestType"
                 size="mini"
-                style="width: calc(200/1440*100vw); margin-right: 60px;"
-                class="el-province "
+                style="width: calc(350/1440*100vw); margin-right: 60px;"
+                class="el-province"
+                filterable
+                multiple
               >
                 <el-option
-                v-for="item in reportRequestTypeList"
+                  v-for="item in reportRequestTypeList"
                   :key="item.requestType"
                   :label="item.label"
                   :value="item.requestType"/>
@@ -316,7 +318,7 @@ export default {
       allList: [],
       reportType: -1,
       reportRequestTypeList: [],
-      reportRequestType: '',
+      reportRequestType: [],
 
       showDeleteDialog: false,
       showDeleteAllDialog: false,
@@ -348,7 +350,8 @@ export default {
             direction: "desc",
             property: "ts"
         },
-        keyword	: ''
+        keyword	: '',
+        requestType	: []
       }
     };
   },
@@ -386,7 +389,7 @@ export default {
         this.allList = [...this.allList, ...i.content]
       }
     })
-    this.allList.unshift({requestType : -1 , label : "全部"})
+    // this.allList.unshift({requestType : -1 , label : "全部"})
     this.reportRequestTypeList = this.allList
     this.initData()
   },
@@ -463,14 +466,15 @@ export default {
       });
     },
 
-    searchRequestTypeItems(value){    
+    searchRequestTypeItems(value){ 
+      this.reportRequestType = []
       if(this.reportType == -1 ){
         this.reportRequestTypeList = this.allList
         console.log('this.allList :>> ', this.allList); 
       }else {
         this.reportRequestTypeList = [...this.reportDownloadList[value].content]
       }
-      this.reportRequestType = this.reportRequestTypeList[0].requestType
+      // this.reportRequestType = this.reportRequestTypeList[0].requestType
     },
 
 
@@ -614,12 +618,16 @@ export default {
 
 
 <style lang="sass">
-
+  .search_row
+    display: flex
+    flex-direction: row
+    align-items: flex-start
+    justify-content: flex-start
   .report_type
     display: flex
     flex-direction: row
-    align-items: flex-end
-    justify-content: flex-end
+    align-items: flex-start
+    justify-content: flex-start
 
   .download_list_table
     background: #FFF
