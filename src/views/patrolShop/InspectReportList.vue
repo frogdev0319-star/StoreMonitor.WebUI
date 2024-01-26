@@ -621,6 +621,44 @@ export default {
       
     },
 
+
+    pad2(n){
+      return (n < 10 ? '0' : '') + n;
+    },
+    getAllDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return year + month + day + hour + min + sec
+    },
+    getDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return year + month + day 
+    },
+    getOnlyDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return  month + day 
+    },
+
+
+
+
     async export2Excel() {
       const that = this;
       if (that.reportList.length === 0) {
@@ -675,6 +713,11 @@ export default {
       const conTableName =  this.inspectTableList.find( i => i.id == this.params.inspectTagId).name
       const conStoreName = this.storeFilterObj.curStore[0] == -1 ? "全部地點" : this.storeFilterObj.storeStr
 
+      const now = new Date()
+      var nowTs = this.getAllDate(now)
+      var tsbegin = this.getDate(this.dateValue[0])
+      var tsEnd = this.getOnlyDate(this.dateValue[1])
+
       const reportIds = await this.doGetSearchConditionsReportIds();
       this.showExportMassage = true
       var ExpAllParams = {
@@ -684,12 +727,12 @@ export default {
         reportIds: reportIds,
         filter : {page: 0, size: 99999},
         conTableName,
-        conStoreName
+        conStoreName,
+        fileName : nowTs + "-" + conTableName + "_Full_report_details-" + tsbegin + tsEnd
       }
-
-      // console.log('ExpAllParams :>> ', ExpAllParams);
+      console.log('ExpAllParams :>> ', ExpAllParams);
       exportEntireJson(ExpAllParams).then(res=>{
-        console.log('res :>> ', res);
+        console.log('res [1001]:>> ', res);
       })
 
 

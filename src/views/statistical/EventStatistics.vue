@@ -2314,10 +2314,17 @@ export default {
         return false;
       }
 
-      this.params.filter = { page: 0, size: 99999}
+      let params = {
+        beginTs: this.params.beginTs,
+        endTs: this.params.endTs,
+        itemId: this.eventInvolveItemId,
+        storeIds: this.compareIds2 
+      };
+
       this.showExportMassage = true
-      exportScheduleRecord(this.params).then(res=>{
-        console.log('res :>> ', res);
+      exportStatisticsInspectStore(params).then(res=>{
+        console.log('res [6003]:>> ', res);
+
       })
 
       // require.ensure([], async() => {
