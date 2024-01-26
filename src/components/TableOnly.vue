@@ -234,18 +234,25 @@
         :render-header="renderHeader"
         >
         <template slot-scope="scope">
-          <div class="flex-center" >
-              <img 
-                :key="index"
-                class="child-space hover_effect"
-                :class="scope.row.status == -1 || scope.row.status == 0 || scope.row.status == 2 ? `${item.icon} icon-disabled ` : item.icon"
-                v-for="(item,index) in tableDownloadAction.operation" 
-                :src="`./static/img/table-${item.methods}.png`" 
-                @click="handleOperationButton(item.methods, scope.row, scope.$index)"
-                height="24px"
-                width="24px"
-              />
-          </div>
+          
+            <div class="flex-center" >
+              
+              <div style="margin-right: 10px;" v-for="(item,index) in tableDownloadAction.operation" :key="index">
+                  <el-tooltip class="item flex-center" effect="dark" content="下載連結於3天後失效，請即時下載" placement="left"  :disabled="index == 1">
+                  <img 
+                    class="child-space hover_effect"
+                    :class="scope.row.status == -1 || scope.row.status == 0 || scope.row.status == 2 ? `${item.icon} icon-disabled ` : item.icon"
+                    :src="`./static/img/table-${item.methods}.png`" 
+                    @click="handleOperationButton(item.methods, scope.row, scope.$index)"
+                    height="24px"
+                    width="24px"
+                  />
+                </el-tooltip>
+              </div>
+              
+            </div>
+          
+        
         </template>
       </el-table-column>
 
