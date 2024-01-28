@@ -1195,6 +1195,40 @@ export default {
       return fileName;
     },
 
+    pad2(n){
+      return (n < 10 ? '0' : '') + n;
+    },
+    getAllDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return year + month + day + hour + min + sec
+    },
+    getDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return year + month + day 
+    },
+    getOnlyDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return  month + day 
+    },
+
     async export2Excel() {
       const that = this;
       try {
@@ -1208,8 +1242,31 @@ export default {
           }
 
           this.params.filter = {page: 0, size: 99999}
-          this.showExportMassage = true
+          
           console.log('this.params :>> ', this.params);
+
+          const now = new Date()
+          var nowTs = this.getAllDate(now)
+          var tsbegin = this.getDate(this.dateValue[0])
+          var tsEnd = this.getOnlyDate(this.dateValue[1])
+
+          if(this.params.clause.status === 0) {
+            var fileName = nowTs + "-Unhandled_events-" + tsbegin + tsEnd
+          } 
+          else if(this.params.clause.status == 1){
+            var fileName = nowTs + "-Handled_events-" + tsbegin + tsEnd
+          }
+          else if(this.params.clause.status == 3){
+            var fileName = nowTs + "-Returned_events-" + tsbegin + tsEnd
+          }
+          else if(this.params.clause.status.length == 0){
+            var fileName = nowTs + "-All_events-" + tsbegin + tsEnd
+          }
+          else{
+            var fileName = nowTs + "-Closed_events-" + tsbegin + tsEnd
+          }
+          this.params.fileName = fileName
+          this.showExportMassage = true
           exportEventList(this.params).then(res=>{
             console.log('res :>> ', res);
           })

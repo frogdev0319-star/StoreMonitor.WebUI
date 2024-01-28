@@ -501,8 +501,16 @@ export default {
         return false;
       }
 
-      console.log('this.params :>> ', this.params);
+
+      const now = new Date()
+      var nowTs = this.getAllDate(now)
+      var tsbegin = this.getDate(this.params.beginTs)
+      var tsEnd = this.getOnlyDate(this.params.endTs)
+
+      this.params.fileName = nowTs + "-Inspection_record-" + tsbegin + tsEnd
       this.params.filter = {page: 0, size: 99999}
+      console.log('this.params :>> ', this.params);
+      
       this.showExportMassage = true
 
       exportStatisticsPerson(this.params).then(res=>{
@@ -528,6 +536,39 @@ export default {
       // });
     },
 
+    pad2(n){
+      return (n < 10 ? '0' : '') + n;
+    },
+    getAllDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return year + month + day + hour + min + sec
+    },
+    getDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return year + month + day 
+    },
+    getOnlyDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return  month + day 
+    },
 
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => v[j]));

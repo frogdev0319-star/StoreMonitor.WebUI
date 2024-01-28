@@ -255,7 +255,7 @@ export default {
         },
         { 
           type: 1, 
-          label: '巡店管理 - 巡檢報告' ,
+          label: '巡檢管理-巡檢報告' ,
           content: [
             { requestType: 1001, label: '報告完整匯出'},
             { requestType: 1002, label: '報告明細匯出'},
@@ -275,7 +275,7 @@ export default {
         },
         { 
           type: 3, 
-          label: '統計分析 - 巡店考評統計',
+          label: '統計分析-巡店考評統計',
           content: [
             { requestType: 3001, label: '考評結果分布'},
             { requestType: 3002, label: '考評得分分布'},
@@ -284,14 +284,14 @@ export default {
         },
         { 
           type: 4, 
-          label: '統計分析 - 巡檢項統計',
+          label: '統計分析-巡檢考評統計',
           content: [
-            { requestType: 4001, label: '重要巡檢項 評估詳情'},
+            { requestType: 4001, label: '評估詳情'},
           ]
         },
         { 
           type: 5, 
-          label: '統計分析 - 巡檢人員統計',
+          label: '統計分析-巡檢人員統計',
           content: [
             { requestType: 5001, label: '巡檢人員統計列表'},
             { requestType: 5002, label: '巡檢詳情'},
@@ -300,16 +300,16 @@ export default {
         },
         { 
           type: 6, 
-          label: '事件處理統計',
+          label: '統計分析-事件處理統計',
           content: [
             { requestType: 6001, label: '地點事件'},
-            { requestType: 6002, label: '全部 事件佔比'},
-            { requestType: 6003, label: '全部事件涉及地點'},
+            { requestType: 6002, label: '事件佔比'},
+            { requestType: 6003, label: '事件涉及地點'},
           ]
         },
         { 
           type: 7, 
-          label: '排程管理 - 排程紀錄',
+          label: '巡檢排程-排程紀錄',
           content: [
             { requestType: 7001, label: '排程紀錄 匯出Excel'},
           ]
@@ -445,7 +445,7 @@ export default {
         res.data.content.forEach(i => {
           var tempReport = this.allList.find(r => r.requestType == i.requestType)
           i.inspect = tempReport.label
-          i.fileName = i.downloadContent.fileName
+          i.fileName = i.requestContent.fileName
           i.condition = this.getdate(i.searchStartTs) + ' - ' + this.getdate(i.searchEndTs) + '\n' + i.inspect + '\n' + i.locale
           i.ts =  this.getAllDate(i.ts)
 

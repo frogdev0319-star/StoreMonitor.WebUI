@@ -666,6 +666,12 @@ export default {
         return false;
       }
       this.showExportMassage = true
+
+      const now = new Date()
+      var nowTs = this.getAllDate(now)
+      var tsbegin = this.getDate(this.dateValue[0])
+      var tsEnd = this.getOnlyDate(this.dateValue[1])
+
       var ExpAllParams = {
         beginTs: this.params.beginTs,
         endTs:  this.params.endTs,
@@ -678,11 +684,14 @@ export default {
         order: {
           direction: "desc",
           property: "ts"
-        }
+        },
+        fileName : nowTs + "-Inspection_report_list-" + tsbegin + tsEnd
       }
       exportReportList(ExpAllParams).then(res=>{
-        console.log('res :>> ', res);
+        console.log('res [1002]:>> ', res);
       })
+
+      // 匯出日期時間-Inspection_report list-搜尋範圍(YYYYMMDDMMDD)
 
       // require.ensure([], async() => {
       //   const { export_json_to_excel } = require('@/excel/Export2Excel');

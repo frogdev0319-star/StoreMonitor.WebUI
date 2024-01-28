@@ -289,7 +289,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.2.1.1
+                v3.2.1.2
                   &copy; {{ getFullYear }} Advantech Intelligent City
                   Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
@@ -1142,7 +1142,8 @@ export default {
           this.$router.push("/noRight");
         }
         else if (!availablePathesList.includes(this.$route.path)) {
-          this.$router.push(availablePathesList[0]);
+          console.log('availablePathesList', availablePathesList)
+          this.$router.push(availablePathesList[3]);
         } 
         else if(mimicModeChanged && this.$route.path=="/auditDetail" || this.$route.path=="/auditReportdetails"){
           this.$router.push("/audit");

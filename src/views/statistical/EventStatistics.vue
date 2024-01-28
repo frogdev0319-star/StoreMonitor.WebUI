@@ -1831,6 +1831,41 @@ export default {
       this.defaultSort.order === 'descending' ? this.allEventTableData.sort((a,b) => { return b[key] - a[key] })
                                 : this.allEventTableData.sort((a,b) => { return a[key] - b[key] });
     },
+
+    pad2(n){
+      return (n < 10 ? '0' : '') + n;
+    },
+    getAllDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return year + month + day + hour + min + sec
+    },
+    getDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return year + month + day 
+    },
+    getOnlyDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return  month + day 
+    },
+    
     export2Excel() {
       const that = this;
       if (that.eventTableData.length === 0) {
@@ -1838,11 +1873,20 @@ export default {
         return false;
       }
 
+      console.log('this.params', this.params)
+
+      const now = new Date()
+      var nowTs = this.getAllDate(now)
+      var tsbegin = this.getDate(this.params.beginTs)
+      var tsEnd = this.getOnlyDate(this.params.endTs)
+
+      this.params.fileName = nowTs + "-Inspection_event-" + tsbegin + tsEnd
       this.params.filter = { page: 0, size: 99999}
       this.showExportMassage = true
       exportStatisticsEventGroup(this.params).then(res=>{
         console.log('res :>> ', res);
       })
+
 
       // require.ensure([], async() => {
       //   const { export_json_to_excel } = require('@/excel/Export2Excel');
@@ -2219,9 +2263,17 @@ export default {
         util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
         return false;
       }
-      this.params.itemIds = this.allEventItemIds
+      const now = new Date()
+      var nowTs = this.getAllDate(now)
+      var tsbegin = this.getDate(this.params.beginTs)
+      var tsEnd = this.getOnlyDate(this.params.endTs)
+
+      this.params.fileName = nowTs + "-"+this.inspectName + "-Inspection_item_event-" + tsbegin + tsEnd
+      this.params.itemIds = this.selEventItemIds.length == 0 ? this.allEventItemIds : this.selEventItemIds
       this.params.filter = { page: 0, size: 99999}
       this.showExportMassage = true
+            
+      console.log('this.params', this.params)
       exportStatisticsInspectOverview(this.params).then(res=>{
         console.log('res :>> ', res);
       })
@@ -2314,11 +2366,18 @@ export default {
         return false;
       }
 
+      const now = new Date()
+      var nowTs = this.getAllDate(now)
+      var tsbegin = this.getDate(this.params.beginTs)
+      var tsEnd = this.getOnlyDate(this.params.endTs)
+
+
       let params = {
         beginTs: this.params.beginTs,
         endTs: this.params.endTs,
         itemId: this.eventInvolveItemId,
-        storeIds: this.compareIds2 
+        storeIds: this.compareIds2,
+        fileName: nowTs + "-Store_Inspection_item_event-" + tsbegin + tsEnd
       };
 
       this.showExportMassage = true
