@@ -1114,10 +1114,15 @@ export default {
         }
       }
       
+      const now = new Date()
+      var nowTs = this.getAllDate(now)
+      var tsbegin = this.getDate(this.params.beginTs)
+      var tsEnd = this.getOnlyDate(this.params.endTs)
+
       params.itemIds = this.inspectItem.item.ids
       params.filter = {page: 0, size: 99999}
       params.storeIds = needStoreId
-      params.fileName = "4001"
+      params.fileName = nowTs + "-Inspection_item_score-" + tsbegin + tsEnd
     
       console.log("params" , params)
       console.log("content" , content)
@@ -1137,8 +1142,7 @@ export default {
           util.notify("表格資料為空！請重新搜尋條件", 'warning', 3 * 1000);
           return false;
       }
-      
-      params.filter = {page: 0, size: 99999}
+  
       this.showExportMassage = true
       exportStatisticsInspectItemOverview(params).then(res=>{
         console.log('res [4001]:>> ', res);
@@ -1155,6 +1159,40 @@ export default {
       //   const fileName = (this.part3.indexRegion==-1?this.$t('statistics.event.seeAll'):this.part3.content[this.part3.indexRegion].groupName ) + '_Inspection item score_' + util.getCurrentTime();
       //   export_json_to_excel(tHeader, data, fileName);
       // });
+    },
+
+    pad2(n){
+      return (n < 10 ? '0' : '') + n;
+    },
+    getAllDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return year + month + day + hour + min + sec
+    },
+    getDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return year + month + day 
+    },
+    getOnlyDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return  month + day 
     },
 
     formatJson(filterVal, jsonData) {

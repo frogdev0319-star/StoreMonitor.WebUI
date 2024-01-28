@@ -1466,6 +1466,41 @@ export default {
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => v[j]));
     },
+
+    pad2(n){
+      return (n < 10 ? '0' : '') + n;
+    },
+    getAllDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return year + month + day + hour + min + sec
+    },
+    getDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return year + month + day 
+    },
+    getOnlyDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return  month + day 
+    },
+
     handleDownExcel(){
       console.log("download excel!!!");
       console.log("reportIds:",this.report.reportId);
@@ -1476,17 +1511,22 @@ export default {
       //   reportIds:[this.report.reportId]
       // };
 
+      const now = new Date()
+      var nowTs = this.getAllDate(now)
+
+      console.log('this.report', this.report)
 
       this.showExportMassage = true
       const params = {
-        beginTs:this.reportData.ts,
-        endTs:this.reportData.ts,
-        inspectTagId:this.reportData.tagId,
+        beginTs: this.reportData.ts,
+        endTs: this.reportData.ts,
+        inspectTagId: this.reportData.tagId,
         reportIds:[this.report.reportId],
+        fileName : nowTs + "-" + this.report.storeName + "_" + this.report.tagName + "Full_report_details" 
       }
 
       exportEntireJsonUnit(params).then(res=>{
-        console.log('res :>> ', res);
+        console.log('res [1003]:>> ', res);
       })
 
       // const tHeader = [
@@ -1529,6 +1569,8 @@ export default {
       //   console.log('RouteInspection-downItem: ' + err);
       // });
     },
+
+
     handleDown() {
       const self = this;
       if (self.hasAttachment !== 0) {

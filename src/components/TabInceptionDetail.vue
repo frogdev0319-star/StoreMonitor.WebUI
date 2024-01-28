@@ -335,142 +335,187 @@ export default {
     created(){
         this.getReportList()
     },
-    methods:{
-      getLangStyleValue(langArray){
-        return util.getLangStyleValue(langArray);
-      },
+  methods:{
+    getLangStyleValue(langArray){
+      return util.getLangStyleValue(langArray);
+    },
 
-      onClickBtn(item){
-        console.log('item :>> ', item);
-        this.currentTab = item;
-        if(item == "Detail"){
+    onClickBtn(item){
+      console.log('item :>> ', item);
+      this.currentTab = item;
+      if(item == "Detail"){
 
-        }else if(item == "NotInspected"){
-            this.getNotInspectedStores();
-        }else if(item == "Event"){
-            this.getEventCompletedRate();
-        }
-        //this.$emit('click', item)
-      },
-      getReportList() {
-        this.isLoading = true
-        const self = this;
-        self.submitterName = "";
-        let params = {
-          beginTs: this.beginTs,
-          endTs: this.endTs,clause:{"submitter":this.submitter}, 
-          searchMysteryMode: this.isMystery ? 1 : 0};
-        //console.log("params:",params);
-        return new Promise((resolve) => {
-            statisticsGetInspectReportList(params).then(res => {
-                const errCode = res.errCode;
-                let data = [];
-                if (errCode === 0) {
-                    data = res.data.content.filter(i => i.mode == 1);
+      }else if(item == "NotInspected"){
+          this.getNotInspectedStores();
+      }else if(item == "Event"){
+          this.getEventCompletedRate();
+      }
+      //this.$emit('click', item)
+    },
+    getReportList() {
+      this.isLoading = true
+      const self = this;
+      self.submitterName = "";
+      let params = {
+        beginTs: this.beginTs,
+        endTs: this.endTs,clause:{"submitter":this.submitter}, 
+        searchMysteryMode: this.isMystery ? 1 : 0};
+      //console.log("params:",params);
+      return new Promise((resolve) => {
+          statisticsGetInspectReportList(params).then(res => {
+              const errCode = res.errCode;
+              let data = [];
+              if (errCode === 0) {
+                  data = res.data.content.filter(i => i.mode == 1);
+              }
+              //console.log("data:",data);
+              const temp = [];
+              data.forEach(item => {
+                  const reportObj = {};
+                  reportObj.id = item.id;
+                  reportObj.date = util.getDateStr(item.ts);
+                  reportObj.storeName = item.storeName;
+                  reportObj.tagName = item.tagName;
+                  reportObj.submitterName = item.submitterName;
+                  reportObj.submitter = item.submitter;
+                  reportObj.totalScore = item.totalScore;
+                  reportObj.mode = item.mode;
+                  reportObj.status = item.status;
+                  reportObj.detail = self.$t('statistics.patrolPerson.seeDetail')
+                  temp.push(reportObj);
+                });
+                if(temp.length>0){
+                  self.submitterName = temp[0].submitterName;
+                  self.detailTbl.all_data = temp;
+                  self.detailTbl.total = Math.ceil(temp.length/this.detailTbl.sizeNum);
+                  this.setDetailTableData();
                 }
-                //console.log("data:",data);
-                const temp = [];
-                data.forEach(item => {
-                    const reportObj = {};
-                    reportObj.id = item.id;
-                    reportObj.date = util.getDateStr(item.ts);
-                    reportObj.storeName = item.storeName;
-                    reportObj.tagName = item.tagName;
-                    reportObj.submitterName = item.submitterName;
-                    reportObj.submitter = item.submitter;
-                    reportObj.totalScore = item.totalScore;
-                    reportObj.mode = item.mode;
-                    reportObj.status = item.status;
-                    reportObj.detail = self.$t('statistics.patrolPerson.seeDetail')
-                    temp.push(reportObj);
-                  });
-                  if(temp.length>0){
-                    self.submitterName = temp[0].submitterName;
-                    self.detailTbl.all_data = temp;
-                    self.detailTbl.total = Math.ceil(temp.length/this.detailTbl.sizeNum);
-                    this.setDetailTableData();
-                  }
-                  resolve(temp);
-                  this.isLoading = false
-              }).catch(err => {
-              console.log('InspectReportList-getReportList: ' + err);
-            });
-        });
-      },
-      setDetailTableData(){
+                resolve(temp);
+                this.isLoading = false
+            }).catch(err => {
+            console.log('InspectReportList-getReportList: ' + err);
+          });
+      });
+    },
+    setDetailTableData(){
         this.detailTbl.table_data = [];
         this.detailTbl.table_data = [...this.detailTbl.all_data.slice( (this.detailTbl.page - 1)* this.detailTbl.sizeNum, this.detailTbl.page* this.detailTbl.sizeNum)];
 
       },
-      handlePageAndSizeChange_detail(pageObj){
+    handlePageAndSizeChange_detail(pageObj){
         console.log("handlePageAndSizeChange_detail:",pageObj)
         const self = this;
         self.detailTbl.page = pageObj.page;
         self.detailTbl.sizeNum = pageObj.size;
         self.setDetailTableData();
       },
-      formatJson(filterVal, jsonData) {
+    formatJson(filterVal, jsonData) {
         return jsonData.map(v => filterVal.map(j => v[j]));
       },
-      export2Excel(){
-        const self = this;
-        let table = "", fileName="";
-        if(this.currentTab == "Detail"){
-            console.log('detail :>> ');
-            table = self.detailTbl;
-            if (table.table_data.length === 0) {
-                util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
-                return false;
-            }
-            
-            let params = {
-              beginTs: this.beginTs,
-              endTs: this.endTs,
-              clause:{ submitter: this.submitter }, 
-              order: {
-                direction: "asc", 
-                property: "storeId"
-              }, 
-              filter: {page: 0, size: 99999},
-              searchMysteryMode: this.isMystery ? 1 : 0
-            };
 
-            this.showExportMassage = true
-            exportStatisticsReportList(params).then(res=>{
-              console.log('res :>> ', res);
-            })
+    pad2(n){
+      return (n < 10 ? '0' : '') + n;
+    },
+    getAllDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return year + month + day + hour + min + sec
+    },
+    getDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return year + month + day 
+    },
+    getOnlyDate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return  month + day 
+    },
+    export2Excel(){
+      const self = this;
+      let table = "" 
+      let submitterName = self.detailTbl.table_data[0].submitterName;
+      if(this.currentTab == "Detail"){
+          console.log('detail :>> ');
+          table = self.detailTbl;
+          console.log('table', table)
+          if (table.table_data.length === 0) {
+              util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
+              return false;
+          }
+          
+          const now = new Date()
+          var nowTs = this.getAllDate(now)
+          var tsbegin = this.getDate(this.beginTs)
+          var tsEnd = this.getOnlyDate(this.endTs)
 
-        }else if(this.currentTab == "Event"){
-            console.log('Event :>> ');
-            table = self.eventTbl;
-            if (table.table_data.length === 0) {
-                util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
-                return false;
-            }
+          let params = {
+            beginTs: this.beginTs,
+            endTs: this.endTs,
+            clause:{ submitter: this.submitter }, 
+            order: {
+              direction: "asc", 
+              property: "storeId"
+            }, 
+            filter: {page: 0, size: 99999},
+            searchMysteryMode: this.isMystery ? 1 : 0,
+            fileName : nowTs + "-" + submitterName + "-Inspection_detail-" + tsbegin + tsEnd
 
-            let params = {
-              beginTs: this.beginTs,
-              endTs: this.endTs,
-              clause: {assigner: this.submitter},
-              order: {
-                direction: "asc", 
-                property: "storeId"
-              },  
-              filter: {page: 0, size: 99999},
-              searchMysteryMode: this.isMystery ? 1 : 0
-            };
+          };
 
-            this.showExportMassage = true
-            exportStatisticsEventComment(params).then(res=>{
-              console.log('res :>> ', res);
-            })
+          this.showExportMassage = true
+          exportStatisticsReportList(params).then(res=>{
+            console.log('res :>> ', res);
+          })
 
-        }
+      }else if(this.currentTab == "Event"){
+          console.log('Event :>> ');
+          table = self.eventTbl;
+          if (table.table_data.length === 0) {
+              util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
+              return false;
+          }
+          console.log('table', table)
 
-        if (table.table_data.length === 0) {
-            util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
-            return false;
-        }
+          const now = new Date()
+          var nowTs = this.getAllDate(now)
+          var tsbegin = this.getDate(this.beginTs)
+          var tsEnd = this.getOnlyDate(this.endTs)
+
+          let params = {
+            beginTs: this.beginTs,
+            endTs: this.endTs,
+            clause: {assigner: this.submitter},
+            order: {
+              direction: "asc", 
+              property: "storeId"
+            },  
+            filter: {page: 0, size: 99999},
+            searchMysteryMode: this.isMystery ? 1 : 0,
+            fileName : nowTs + "-" + submitterName + "-Inspection_event-" + tsbegin + tsEnd
+          };
+
+          this.showExportMassage = true
+          exportStatisticsEventComment(params).then(res=>{
+            console.log('res :>> ', res);
+          })
+
+      }
 
         // require.ensure([], async() => {
         //     const { export_json_to_excel } = require('@/excel/Export2Excel');
@@ -489,6 +534,8 @@ export default {
         //     export_json_to_excel(tHeader, data, fileName);
         // });
       },
+
+
       handleEmitDetailRowClick(row){ //去巡檢報告詳情
           if(!PermissionHelper.enableInspectReport()){
             message({

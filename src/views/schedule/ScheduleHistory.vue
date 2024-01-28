@@ -346,6 +346,38 @@ export default{
       return year + "-"+ month +"-"+ day 
     },
 
+    getAll_Date(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return year + month + day + hour + min + sec
+    },
+    get_Date(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return year + month + day 
+    },
+    getOnly_Date(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return  month + day 
+    },
+    
+
     searchKeyWords(){
       this.curPage = 1;
       this.doSearchScheduleHis()
@@ -603,6 +635,12 @@ export default{
         else if(self.defaultSort.prop=="remindTimeStr") order.property = "remindTs";
         let beginTs = self.$moment.utc(self.$moment(self.dateValue[0])).valueOf();
         let endTs = self.$moment.utc(self.$moment(self.dateValue[1])).valueOf();
+
+        const now = new Date()
+        var nowTs = this.getAll_Date(now)
+        var tsbegin = this.get_Date(beginTs)
+        var tsEnd = this.getOnly_Date(endTs)
+
         const params={
           status:this.curSchStatus,
           beginTs,
@@ -612,7 +650,9 @@ export default{
             size:99999 //全部
           },
           order,
-          recordsIds : this.downloadRecordsIds
+          recordsIds : this.downloadRecordsIds,
+          fileName : nowTs  + "-Scheduling_record-" + tsbegin + tsEnd
+
         };
         if(this.inputSearchValue.trim()!=""){
           params['keyword']=this.inputSearchValue;
@@ -663,6 +703,12 @@ export default{
       else if(self.defaultSort.prop=="remindTimeStr") order.property = "remindTs";
       let beginTs = self.$moment.utc(self.$moment(self.dateValue[0])).valueOf();
       let endTs = self.$moment.utc(self.$moment(self.dateValue[1])).valueOf();
+
+      const now = new Date()
+        var nowTs = this.getAll_Date(now)
+        var tsbegin = this.get_Date(beginTs)
+        var tsEnd = this.getOnly_Date(endTs)
+        
       const params={
         status:this.curSchStatus,
         beginTs,
@@ -671,7 +717,8 @@ export default{
           page:0,
           size:99999 //全部
         },
-        order
+        order,
+        fileName : nowTs  + "-Scheduling_record-" + tsbegin + tsEnd
       };
       if(this.inputSearchValue.trim()!=""){
         params['keyword']=this.inputSearchValue;

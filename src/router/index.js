@@ -233,7 +233,7 @@ export const navbarRoute = {
         name: 'downloadManagement',
         component: resolve => require(['@/views/downloadManagement/DownloadManagement'], resolve),
         meta: {
-          keepAlive: true, // the component is't to be cache.
+          // keepAlive: true, // the component is't to be cache.
           requireAuth: true
         }
       },
@@ -447,6 +447,7 @@ export const navbarRoute = {
         hidden: false,
         meta: {
           requireAuth: true,
+          
         }
       }
     ) && primaryPathesList.push('/patrolEvaluation');
@@ -589,7 +590,7 @@ export const navbarRoute = {
         name: 'ScheduleHistory',
         component: resolve => require(['@/views/schedule/ScheduleHistory'], resolve),
         meta: {
-          keepAlive: true, // the component is't to be cache.
+          // keepAlive: true, // the component is't to be cache.
           requireAuth: true
         },
         isReadOnly: false

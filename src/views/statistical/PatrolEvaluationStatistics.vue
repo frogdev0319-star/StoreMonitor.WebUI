@@ -1777,6 +1777,41 @@ export default {
             });
         },
 
+        pad2(n){
+            return (n < 10 ? '0' : '') + n;
+            },
+            getAllDate(t){
+            var date = new Date(t);
+            var month = this.pad2(date.getMonth()+1);
+            var day = this.pad2(date.getDate());
+            var year= date.getFullYear();
+            var hour = this.pad2(date.getHours())
+            var min = this.pad2(date.getMinutes())
+            var sec = this.pad2(date.getSeconds())
+            return year + month + day + hour + min + sec
+            },
+        getDate(t){
+            var date = new Date(t);
+            var month = this.pad2(date.getMonth()+1);
+            var day = this.pad2(date.getDate());
+            var year= date.getFullYear();
+            var hour = this.pad2(date.getHours())
+            var min = this.pad2(date.getMinutes())
+            var sec = this.pad2(date.getSeconds())
+            return year + month + day 
+        },
+        getOnlyDate(t){
+            var date = new Date(t);
+            var month = this.pad2(date.getMonth()+1);
+            var day = this.pad2(date.getDate());
+            var year= date.getFullYear();
+            var hour = this.pad2(date.getHours())
+            var min = this.pad2(date.getMinutes())
+            var sec = this.pad2(date.getSeconds())
+            return  month + day 
+        },
+            
+
         async exportStore2ExcelPart1() {
             const self = this;
             const that = this;
@@ -1847,7 +1882,15 @@ export default {
                 util.notify("表格資料為空！請重新搜尋條件", 'warning', 3 * 1000);
                 return false;
             }
+            
+            const now = new Date()
+            var nowTs = this.getAllDate(now)
+            var tsbegin = this.getDate(this.params.beginTs)
+            var tsEnd = this.getOnlyDate(this.params.endTs)
+            params.fileName = nowTs + "-Inspection_evaluation_result-" + tsbegin + tsEnd
             params.filter = {page: 0, size: 99999}
+
+
             this.showExportMassage = true
             exportStatisticsReport(params).then(res=>{
                 console.log('res :>> ', res);
@@ -1942,7 +1985,14 @@ export default {
                 util.notify("表格資料為空！請重新搜尋條件", 'warning', 3 * 1000);
                 return false;
             }
+
+            const now = new Date()
+            var nowTs = this.getAllDate(now)
+            var tsbegin = this.getDate(this.params.beginTs)
+            var tsEnd = this.getOnlyDate(this.params.endTs)
+            params.fileName = nowTs + "-Inspection_score-" + tsbegin + tsEnd
             params.filter = {page: 0, size: 99999}
+
             this.showExportMassage = true
             exportStatisticsReport(params).then(res=>{
                 console.log('res :>> ', res);
@@ -2029,7 +2079,14 @@ export default {
                 util.notify("表格資料為空！請重新搜尋條件", 'warning', 3 * 1000);
                 return false;
             }
+            
+            const now = new Date()
+            var nowTs = this.getAllDate(now)
+            var tsbegin = this.getDate(this.params.beginTs)
+            var tsEnd = this.getOnlyDate(this.params.endTs)
+            params.fileName = nowTs + "-Inspection_compliance-" + tsbegin + tsEnd
             params.filter = {page: 0, size: 99999}
+
             this.showExportMassage = true
             exportStatisticsReport(params).then(res=>{
                 console.log('res :>> ', res);
