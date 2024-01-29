@@ -273,7 +273,7 @@
       :visible="showExportMassage"
       :showCancelbtn="false"
       @confirmHandler="showExportMassage = false"
-      @goToPage="$router.push({name: 'downloadManagement',});"
+      @goToPage="gotoDownloadManagement"
       >
       
       <!-- <div class="noticeDialog">
@@ -656,8 +656,10 @@ export default {
       return  month + day 
     },
 
-
-
+    gotoDownloadManagement(){
+      this.$router.push({name: 'downloadManagement',});
+      this.showExportMassage = false
+    },
 
     async export2Excel() {
       const that = this;
@@ -685,7 +687,9 @@ export default {
           direction: "desc",
           property: "ts"
         },
-        fileName : nowTs + "-Inspection_report_list-" + tsbegin + tsEnd
+        fileName : nowTs + "-Inspection_report_list-" + tsbegin + tsEnd,
+        inspectTagId: this.params.inspectTagId ? this.params.inspectTagId : -1
+
       }
       exportReportList(ExpAllParams).then(res=>{
         console.log('res [1002]:>> ', res);
