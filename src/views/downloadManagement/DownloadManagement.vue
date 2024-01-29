@@ -155,6 +155,8 @@
 <script>
 
 import axios from 'axios';
+import { GetInspectTagList } from '@/api/inspect';
+import { getBriefStoreList, getStoreDefineGroup, getStoreList } from '@/api/store';
 import {
   getDownloadList,
   deleteDownloadList,
@@ -352,7 +354,9 @@ export default {
         },
         keyword	: '',
         requestType	: []
-      }
+      },
+      inspectTagList: [],
+      storeBriefList: []
     };
   },
 
@@ -407,10 +411,38 @@ export default {
         new Date(this.$moment(new Date()).endOf('day'))];
       this.reportList = [];
 
+      this.inspectTagList = await this.getInspectTag()
+      this.storeBriefList = await this.getBriefStoreData()
       await this.searchRequestTypeItems()
       await this.getDownloadTable(this.params)
-      
+  
+
     },
+
+    getInspectTag() {
+      return new Promise((resolve, reject) => {
+        GetInspectTagList().then(res => {
+          const data = res.data;
+          resolve(data);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
+    getBriefStoreData() {
+      return new Promise((resolve, reject) => {
+        getBriefStoreList().then(res => {
+          const errMsg = res.errMsg;
+          if (errMsg && errMsg === 'Success') {
+            resolve(res.data);
+          }
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
 
     pad2(n){
       return (n < 10 ? '0' : '') + n;
@@ -439,14 +471,42 @@ export default {
 
     async getDownloadTable(params){
       this.isLoading = true;
+      
+
       await getDownloadList(params).then(res=>{
         // console.log('res.data --->', res.data)
         
         res.data.content.forEach(i => {
           var tempReport = this.allList.find(r => r.requestType == i.requestType)
-          i.inspect = tempReport.label
+          var groupName = ""
+          this.reportDownloadList.forEach( q => {
+            if(q.content){
+              q.content.forEach( qq => {
+                if(qq.requestType == tempReport.requestType){ groupName = q.label}
+              })
+            }
+          })
+
+    
+
+          // this.storeBriefList
+          var storName = []
+          console.log('this.storeBriefList :>> ', this.storeBriefList);
+          if(i.requestContent.clause){
+            i.requestContent.clause.storeId.forEach( e => {
+              this.storeBriefList.forEach(u => {
+                if(e == u.storeId) storName.push(u.name)
+              })
+            })
+          }
+          console.log('storName :>> ', storName);
+        
+          const inspectName = "巡檢表: " + (i.requestContent.inspectTagId == -1 ? "全部" : this.inspectTagList.find(g => g.id == i.requestContent.inspectTagId).name)
+          const inspectStore = i.requestContent.clause ? "地點: " + storName.join(', ') : ""
+
+          // i.condition = this.getdate(i.searchStartTs) + ' - ' + this.getdate(i.searchEndTs) + '\n' + inspectName + '\n' + inspectStore
+          i.inspect = groupName + "\n" + tempReport.label
           i.fileName = i.requestContent.fileName
-          i.condition = this.getdate(i.searchStartTs) + ' - ' + this.getdate(i.searchEndTs) + '\n' + i.inspect + '\n' + i.locale
           i.ts =  this.getAllDate(i.ts)
 
           if(i.status == -1 ) i.status_showing = '失敗'
@@ -455,6 +515,8 @@ export default {
           else if(i.status == 2) i.status_showing = '已失效'
 
         })
+
+
         this.downloadTableData = res.data.content
         this.totalElements = res.data.totalElements
         this.total = res.data.totalPages
@@ -630,26 +692,37 @@ export default {
     justify-content: flex-start
 
   .download_list_table
-    background: #FFF
-    .row-class
-      th
-        &:nth-child(1)
-          padding-left: 0 !important
-      td
-        vertical-align: center
-        &:nth-child(1)
-          .cell
-            padding-left: 10% !important
-            padding: 10px !important
-            // text-overflow: ellipsis !important
-            // white-space: nowrap !important
-            // overflow: hidden !important
-            span
-              // background: #9872 !important
-              // white-space: pre !important
-        &:nth-child(2)
-          .cell
-            white-space: pre !important
+    .el-table
+      .el-table__header-wrapper
+        th
+          &:nth-child(1)
+            padding-left: 0 !important
+          // &:nth-child(4)
+          //   width: 20% !important
+
+      .el-table__body-wrapper
+        td
+          vertical-align: center
+          &:nth-child(1)
+            .cell
+              padding-left: 10% !important
+              padding: 10px !important
+              white-space: pre
+              // text-overflow: ellipsis !important
+              // white-space: nowrap !important
+              // overflow: hidden !important
+              span
+                // background: #9872 !important
+                // white-space: pre !important
+          &:nth-child(2)
+            .cell
+              white-space: pre-line
+          // &:nth-child(4)
+          //     width: 20% !important
+          //     background: #789 !important
+
+          
+
             
     .el-table th div
       padding-left: 10px !important

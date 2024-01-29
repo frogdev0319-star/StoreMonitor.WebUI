@@ -280,7 +280,7 @@
       :visible="showExportMassage"
       :showCancelbtn="false"
       @confirmHandler="showExportMassage = false"
-      @goToPage="$router.push({name: 'downloadManagement',});"
+      @goToPage="gotoDownloadManagement"
       >
     </DownloadDialogPop>
 
@@ -1229,6 +1229,12 @@ export default {
       return  month + day 
     },
 
+    gotoDownloadManagement(){
+      this.$router.push({name: 'downloadManagement',});
+      this.showExportMassage = false
+    },
+
+
     async export2Excel() {
       const that = this;
       try {
@@ -1266,6 +1272,10 @@ export default {
             var fileName = nowTs + "-Closed_events-" + tsbegin + tsEnd
           }
           this.params.fileName = fileName
+          this.params.inspectTagIds = this.params.inspectTagIds.length == 0 ?  -1 : this.params.inspectTagIds
+            
+
+
           this.showExportMassage = true
           exportEventList(this.params).then(res=>{
             console.log('res :>> ', res);
