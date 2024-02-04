@@ -1272,7 +1272,7 @@ export default {
             var fileName = nowTs + "-Closed_events-" + tsbegin + tsEnd
           }
           this.params.fileName = fileName
-          this.params.inspectTagIds = this.params.inspectTagIds.length == 0 ?  -1 : this.params.inspectTagIds
+          this.params.inspectTagIds = this.params.inspectTagIds.length == 0 ?  [] : this.params.inspectTagIds
             
 
 

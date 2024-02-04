@@ -674,7 +674,12 @@ export default {
       var tsbegin = this.getDate(this.dateValue[0])
       var tsEnd = this.getOnlyDate(this.dateValue[1])
 
-      var ExpAllParams = {
+      console.log('this.params', this.params)
+
+      const conTableName =  this.params.inspectTagId ? this.inspectTableList.find( i => i.id == this.params.inspectTagId).name : "全部"
+      const conStoreName = this.storeFilterObj.curStore[0] == -1 ? "全部地點" : this.storeFilterObj.storeStr
+
+      var ExpParams = {
         beginTs: this.params.beginTs,
         endTs:  this.params.endTs,
         clause: this.params.clause,
@@ -687,13 +692,19 @@ export default {
           direction: "desc",
           property: "ts"
         },
+        conTableName,
+        conStoreName,
         fileName : nowTs + "-Inspection_report_list-" + tsbegin + tsEnd,
         inspectTagId: this.params.inspectTagId ? this.params.inspectTagId : -1
 
       }
-      exportReportList(ExpAllParams).then(res=>{
+      console.log('ExpParams', ExpParams)
+      exportReportList(ExpParams).then(res=>{
         console.log('res [1002]:>> ', res);
       })
+
+
+
 
       // 匯出日期時間-Inspection_report list-搜尋範圍(YYYYMMDDMMDD)
 
@@ -737,11 +748,12 @@ export default {
         beginTs: this.params.beginTs,
         endTs:  this.params.endTs,
         inspectTagId: this.params.inspectTagId,
+        clause: this.params.clause,
         reportIds: reportIds,
         filter : {page: 0, size: 99999},
         conTableName,
         conStoreName,
-        fileName : nowTs + "-" + conTableName + "_Full_report_details-" + tsbegin + tsEnd
+        fileName : nowTs + "-" + conTableName + "_Full_report_details-" + tsbegin + tsEnd,
       }
       console.log('ExpAllParams :>> ', ExpAllParams);
       exportEntireJson(ExpAllParams).then(res=>{

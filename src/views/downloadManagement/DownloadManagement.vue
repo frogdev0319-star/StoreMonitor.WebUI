@@ -492,19 +492,50 @@ export default {
           // this.storeBriefList
           var storName = []
           console.log('this.storeBriefList :>> ', this.storeBriefList);
-          if(i.requestContent.clause){
-            i.requestContent.clause.storeId.forEach( e => {
-              this.storeBriefList.forEach(u => {
-                if(e == u.storeId) storName.push(u.name)
-              })
-            })
-          }
-          console.log('storName :>> ', storName);
-        
-          const inspectName = "巡檢表: " + (i.requestContent.inspectTagId == -1 ? "全部" : this.inspectTagList.find(g => g.id == i.requestContent.inspectTagId).name)
-          const inspectStore = i.requestContent.clause ? "地點: " + storName.join(', ') : ""
+          console.log('this.inspectTagList :>> ', this.inspectTagList);
 
-          // i.condition = this.getdate(i.searchStartTs) + ' - ' + this.getdate(i.searchEndTs) + '\n' + inspectName + '\n' + inspectStore
+          // if(i.requestContent.clause){
+          //   i.requestContent.clause.storeId.forEach( e => {
+          //     this.storeBriefList.forEach(u => {
+          //       if(e == u.storeId) storName.push(u.name)
+          //     })
+          //   })
+          // }
+
+
+          // var fineInspect = null
+          // if(i.requestContent.hasOwnProperty("inspectTagIds")){
+          //   if( i.requestContent.inspectTagIds.length == 0){
+          //     fineInspect = "全部"
+          //     console.log('fineInspect0', fineInspect)
+          //   } 
+          //   else{
+          //     var tempArray = []
+          //     this.inspectTagList.forEach( x => {
+          //       i.requestContent.inspectTagIds.forEach( y => {
+          //         if(x.id == y) tempArray.push(x.name)
+          //       })
+          //     })
+          //     fineInspect = tempArray.join(', ')
+          //   }
+            
+          // } 
+          // else if(i.requestContent.hasOwnProperty("inspectTagId") && i.requestContent.inspectTagId !== -1){
+          //   fineInspect = this.inspectTagList.filter(g => g.id == i.requestContent.inspectTagId)[0].name
+          //   console.log('fineInspect2', fineInspect)
+          // }
+          // const inspectName = "巡檢表: " + (i.requestContent.inspectTagId == -1 ? "全部" : fineInspect)
+
+          // var inspectStore = ""
+          // if(this.storeBriefList.length == storName.length){
+          //   inspectStore = "地點: 全部"
+          // } else {
+          //   inspectStore = i.requestContent.clause ? "地點: " + storName.join(', ') : ""
+          // }
+          const inspectName = "巡檢表: " + i.requestContent.conTableName
+          const inspectStore = "地點: " + i.requestContent.conStoreName
+
+          i.condition = this.getdate(i.searchStartTs) + ' - ' + this.getdate(i.searchEndTs) + '\n' + inspectName + '\n' + inspectStore
           i.inspect = groupName + "\n" + tempReport.label
           i.fileName = i.requestContent.fileName
           i.ts =  this.getAllDate(i.ts)
