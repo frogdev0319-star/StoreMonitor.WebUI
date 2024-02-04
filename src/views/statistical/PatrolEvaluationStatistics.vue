@@ -1890,11 +1890,15 @@ export default {
             params.fileName = nowTs + "-Inspection_evaluation_result-" + tsbegin + tsEnd
             params.filter = {page: 0, size: 99999}
 
+            console.log('params', params)
 
             this.showExportMassage = true
             exportStatisticsReport(params).then(res=>{
-                console.log('res :>> ', res);
+                console.log('res [3001]:>> ', res);
             })
+
+
+
             // require.ensure([], async () => {
             //     const {
             //         export_json_to_excel

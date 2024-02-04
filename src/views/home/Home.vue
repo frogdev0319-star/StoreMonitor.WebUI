@@ -265,7 +265,7 @@
             :class="wrapperAll ? 'content-wrapper-all' : 'content-wrapper'"
             :style="[
               showBorder ? { 'border-width': '0.5px' } : {},
-              $route.path === '/reinspection' || $route.path === '/storemonitor' || $route.path === '/report'
+              $route.path ===  '/report'
                 ? {
                     background:
                       '#f7f9fa url(./static/img/reinspection_bg.png) no-repeat 100% 0',
@@ -358,9 +358,7 @@ export default {
         "/routeinspection",
         "/storedetail",
         "/rate",
-        "/storemonitor",
         "/schedule",
-        "/reinspection",
         "/bindroute",
       ],
       wapper: false,
@@ -656,6 +654,7 @@ export default {
       var base = process.env.NODE_ENV === 'development' ? '' : '/storemonitor_ui/'
       this.currentUrl = url + base + ""
 
+
       if(this.showAdvanceMode){ 
           // this.$router.push('WaterMark');
           window.location.href = this.currentUrl + "waterMark";
@@ -667,10 +666,11 @@ export default {
         }
       
     },
+    
     changeMimicMode(){
-      if(this.$route.path=="/reinspection" && this.$store.getters.editReport){
+      if(this.$route.path=="/report" && this.$store.getters.editReport){
         this.EditRptchangeStoreObj.dialogCosed = true;
-      }else if(this.$route.path=="/reinspection" && this.$store.getters.editCount != 0){
+      }else if(this.$route.path=="/report" && this.$store.getters.editCount != 0){
         this.leaveObj.dialogCosed = true;
       }
       else{
@@ -1134,7 +1134,7 @@ export default {
         self.getAdvanceSettingStastus(result.data);
         self.getUserName(result.data);
         const availablePathesList = this.availabePathList;
-        // console.log('availablePathesList :>> ', availablePathesList);
+        console.log('availablePathesList :>> ', availablePathesList);
         
 
     
@@ -1144,7 +1144,7 @@ export default {
         }
         else if (!availablePathesList.includes(this.$route.path)) {
           console.log('availablePathesList', availablePathesList)
-          this.$router.push(availablePathesList[3]);
+          this.$router.push(availablePathesList[0]);
         } 
         else if(mimicModeChanged && this.$route.path=="/auditDetail" || this.$route.path=="/auditReportdetails"){
           this.$router.push("/audit");
