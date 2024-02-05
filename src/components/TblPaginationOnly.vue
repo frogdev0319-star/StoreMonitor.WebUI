@@ -6,7 +6,7 @@
     <div v-if="showPageSize" class="pageSizeTitle">{{$t('overview.pageSize')}}</div>
     <div v-if="showPageSize" class="pageSize-select" :class="getLangStyleValue(pageSelectClass)">
           <el-select
-            v-model="pagesize"
+            v-model="needPageSize"
             size="medium"
             class="el-pagesize"
             @change="handleSizeChange">
@@ -48,7 +48,7 @@ export default {
       default: 0,
       required: false
     },
-    pagesize: {
+    pageSize: {
       type: Number,
       default: 10,
       required: true
@@ -125,8 +125,12 @@ export default {
         {key:'en',value:'en-pageSize-select'},{key:'zh',value:'zh-pageSize-select'},{key:'zhtw',value:'zhTW-pageSize-select'},
         {key:'ja-JP',value:'ja-pageSize-select'},{key:'ko-KR',value:'ko-pageSize-select'},{key:'vi-VN',value:'vi-pageSize-select'},
         {key:'id-ID',value:'id-pageSize-select'},{key:'th-TH',value:'th-pageSize-select'}
-      ]
+      ],
+      needPageSize: 10
     }
+  },
+  created() {
+    // this.needPageSize = this.pageSize
   },
   methods:{
     getLangStyleValue(langArray){
@@ -135,17 +139,17 @@ export default {
     handleCurrentChange(currentPage) { 
       const pageObj = {
         page: currentPage,
-        size: this.pagesize
+        size: this.needPageSize
       };
       this.$emit('currentChange', pageObj);
     },
 
-    handleSizeChange(pageSize) {
-      console.log("handleSizeChange:",pageSize);
+    handleSizeChange(needPageSize) {
+      console.log("handleSizeChange:",needPageSize);
       
       const pageObj = {
         page: 1,
-        size: pageSize
+        size: needPageSize
       };
       this.$emit('sizeChange', pageObj);
     },

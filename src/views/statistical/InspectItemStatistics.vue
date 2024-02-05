@@ -156,7 +156,7 @@
                   <div style="width:100%; margin-top:12px;height:31px;" v-if="part3.storeTableData.length > 0">
                   <tbl-pagination-only
                     :total="part3.table.total"
-                    :pagesize="part3.table.sizeNum"
+                    :page-size="part3.table.sizeNum"
                     :current-page="part3.table.page"
                     layout = "prev,pager, next,sizes,slot"
                     @sizeChange="handlePageAndSizeChangePart3"
@@ -810,7 +810,8 @@ export default {
         {key:'ja-JP',value:'ja-export-btn'},{key:'ko-KR',value:'ko-export-btn'},{key:'vi-VN',value:'vi-export-btn'},
         {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
       ],
-      showExportMassage: false
+      showExportMassage: false,
+      searchStoreIds: []
     };
   },
 
@@ -1050,7 +1051,6 @@ export default {
         property: "averageScore",
       }
     
-
       var needStoreId = null
       if(this.part3.compareType == 'stores'){
         console.log('stores :>> ');
@@ -1059,7 +1059,6 @@ export default {
 
         content = this.part3.indexRegion == -1 ? this.part3.content : [this.part3.content[this.part3.indexRegion]];
         var needStoreId = this.part3.indexRegion == -1 ? [] : [this.part3.originArray.find( i => i.label == content[0].groupName).storeId]
-        console.log('needStoreId :>> ', needStoreId);
       }
       else{
         params.storeIds = this.part3.indexRegion == -1 ? this.params.storeIds : this.part3.content[this.part3.indexRegion].list;
@@ -1119,9 +1118,13 @@ export default {
       var tsbegin = this.getDate(this.params.beginTs)
       var tsEnd = this.getOnlyDate(this.params.endTs)
 
+
+      // console.log('this.searchStoreIds ~~~>> ', this.searchStoreIds);
+      // console.log('needStoreId ~~~>> ', needStoreId);
+
       params.itemIds = this.inspectItem.item.ids
       params.filter = {page: 0, size: 99999}
-      params.storeIds = needStoreId
+      params.storeIds = needStoreId.length == 0 ? this.searchStoreIds : needStoreId
       params.fileName = nowTs + "-Inspection_item_score-" + tsbegin + tsEnd
     
       console.log("params" , params)
@@ -1902,7 +1905,7 @@ export default {
           regionData.push({value,itemStyle: {
             color: '#7bd8eb',
           }})
-           regionLabel.push(this.maxLabel(item.groupName))
+          regionLabel.push(this.maxLabel(item.groupName))
         });
       }
       this.part1.storeTableData = content;
@@ -2363,7 +2366,8 @@ export default {
               size:(this.part3.storeMode==1) ?params.storeIds.length: this.part3.table.sizeNum
             }
 
-            console.log(params)
+            console.log("params---->>",params)
+            this.searchStoreIds = [...params.storeIds]
             if(params.storeIds.length == 0){
               this.part3.storeTableData = []
               this.getItemSubtitle()
@@ -2484,7 +2488,7 @@ export default {
         await this.drawPart1RegionBar();
     },
     async clickPart2Bar(event) {
-           if(this.part2.indexRegion == event.dataIndex){
+          if(this.part2.indexRegion == event.dataIndex){
             this.part2.indexRegion = -1;
         }
         else{
@@ -2494,7 +2498,7 @@ export default {
         await this.drawPart2RegionBar();
     },
     async clickPart3Bar(event) {
-         if(this.part3.indexRegion == event.dataIndex){
+        if(this.part3.indexRegion == event.dataIndex){
             this.part3.indexRegion = -1;
         }
         else{

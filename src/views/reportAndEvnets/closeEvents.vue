@@ -361,8 +361,15 @@ export default {
         300);
         self.ifSaveParams = true;
         self.ifSearchData = true;
+
         var userInfo = await this.$store.dispatch("GetUserAuthorities");
         self.hasAdvanced = userInfo.data.isSystemAdvanced
+        if(this.reportTypeList.some( i => i.mode == 3 )){
+          return
+        }
+        else {
+          this.hasAdvanced ? this.reportTypeList.push({ 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')}) : null
+        }
       }
     },
     mimicModeChanged(val){
@@ -386,12 +393,16 @@ export default {
   async mounted() {
     var userInfo = await this.$store.dispatch("GetUserAuthorities");
     this.hasAdvanced = userInfo.data.isSystemAdvanced
-    this.hasAdvanced ? this.reportTypeList.push({ 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')}) : null
+    if(this.reportTypeList.some( i => i.mode == 3 )){
+      return
+    }
+    else {
+      this.hasAdvanced ? this.reportTypeList.push({ 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')}) : null
+    }
   },
 
   methods: {
     async initData() {
-      
       this.searchInput = '';
       this.storeStr = '';
       this.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24,
@@ -409,6 +420,7 @@ export default {
       await this.searchData();
       
     },
+
     async getEvents(params){
       this.isLoading = true;
       await getEventList(params).then(res=>{

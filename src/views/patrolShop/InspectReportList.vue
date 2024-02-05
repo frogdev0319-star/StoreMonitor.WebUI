@@ -235,7 +235,7 @@
           :btn-style="{backgroundColor:'transparent'}"
           :total="total"
           :current-page="page"
-          :pagesize="sizeNum"
+          :page-size="sizeNum"
           layout = "prev,pager, next,sizes,slot"
           @sizeChange="sizeChange"
           @currentChange="currentChange"
@@ -321,6 +321,7 @@ export default {
   },
   data() {
     return {
+      white: 'grey',
       varyWindowWidth: window.innerWidth,
       varyWindowHeight: window.innerHeight,
       videoSrc: require('../../../static/img/monitor.png'),

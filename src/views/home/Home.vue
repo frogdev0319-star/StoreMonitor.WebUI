@@ -1134,7 +1134,7 @@ export default {
         self.getAdvanceSettingStastus(result.data);
         self.getUserName(result.data);
         const availablePathesList = this.availabePathList;
-        console.log('availablePathesList :>> ', availablePathesList);
+        // console.log('availablePathesList :>> ', availablePathesList);
         
 
     
