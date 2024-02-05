@@ -1,6 +1,6 @@
 <template>
   <div :style="{'minHeight':windowHeight-118+'px'}" class="el-event-content">
-    <div class="el-event-header">
+    <div class="el-event-header"> 
       <div class="el-area">
         <store-filter
           :cached-params="searchParams"
@@ -256,7 +256,7 @@
                 <tbl-pagination-only
                 :total="total"
                 :current-page="page"
-                :pagesize="sizeNum"
+                :page-size="sizeNum"
                 layout = "prev,pager, next,sizes,slot"
                 @sizeChange="sizeChange"
                 @currentChange="currentChange"
@@ -493,6 +493,13 @@ export default {
 
         var userInfo = await this.$store.dispatch("GetUserAuthorities");
         self.hasAdvanced = userInfo.data.isSystemAdvanced
+        if(this.reportTypeList.some( i => i.mode == 3 )){
+          return
+        }
+        else {
+          this.hasAdvanced ? this.reportTypeList.push({ 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')}) : null
+        }
+
 
       }
     },
@@ -520,7 +527,12 @@ export default {
 
     var userInfo = await this.$store.dispatch("GetUserAuthorities");
     this.hasAdvanced = userInfo.data.isSystemAdvanced
-    this.hasAdvanced ? this.reportTypeList.push({ 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')}) : null
+    if(this.reportTypeList.some( i => i.mode == 3 )){
+      return
+    }
+    else {
+      this.hasAdvanced ? this.reportTypeList.push({ 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')}) : null
+    }
     
   },
 

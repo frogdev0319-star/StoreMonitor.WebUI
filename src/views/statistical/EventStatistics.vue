@@ -2337,8 +2337,8 @@ export default {
         var obj = {...item};
         obj.id = item.storeId;
         obj.submitter=item.submitters.toString();
-        obj.storeRegionStr = item.storeRegion.toString();
-        obj.storeBranchTypeStr = item.storeBranchType.toString();
+        obj.storeRegionStr = item.storeBranchType.toString();
+        obj.storeBranchTypeStr = item.storeRegion.toString();
         obj.percentageStr = item.percentage+'%';
         self.eventInvolveTable.itemAllData.push(obj);
       });
@@ -2377,7 +2377,7 @@ export default {
         endTs: this.params.endTs,
         itemId: this.eventInvolveItemId,
         storeIds: this.compareIds2,
-        fileName: nowTs + "-Store_Inspection_item_event-" + tsbegin + tsEnd
+        fileName: nowTs + "-Inspection_item_event-" + tsbegin + tsEnd
       };
 
       this.showExportMassage = true

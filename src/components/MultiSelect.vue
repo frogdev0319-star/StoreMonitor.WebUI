@@ -70,7 +70,7 @@ export default {
       this.initData();
     },
     options(val){
-      this.selectedArray = [...this.selected];
+      if(this.selected) this.selectedArray = [...this.selected];
       this.initData();
     },
     dropdaownType(val){

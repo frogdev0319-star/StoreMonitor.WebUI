@@ -31,6 +31,7 @@
                 class="el-province"
                 filterable
                 multiple
+                @change="searchRequestReport"
               >
                 <el-option
                   v-for="item in reportRequestTypeList"
@@ -108,8 +109,8 @@
           <tbl-pagination-only
             :btn-style="{backgroundColor:'transparent'}"
             :total="total"
-            :current-page="currentPage"
-            :pagesize="sizeNum"
+            :currentPage="currentPage"
+            :page-size="sizeNum"
             layout = "prev,pager, next,sizes,slot"
             @sizeChange="handlePagination"
             @currentChange="handlePagination"
@@ -192,7 +193,7 @@ export default {
       varyWindowWidth: window.innerWidth,
       varyWindowHeight: window.innerHeight,
       
-    
+  
 			reportTableData: [],
       eventTableData: [],
 			
@@ -277,7 +278,7 @@ export default {
         },
         { 
           type: 3, 
-          label: '統計分析-巡店考評統計',
+          label: '統計分析-巡檢考評統計',
           content: [
             { requestType: 3001, label: '考評結果分布'},
             { requestType: 3002, label: '考評得分分布'},
@@ -286,7 +287,7 @@ export default {
         },
         { 
           type: 4, 
-          label: '統計分析-巡檢考評統計',
+          label: '統計分析-巡檢項統計',
           content: [
             { requestType: 4001, label: '評估詳情'},
           ]
@@ -487,12 +488,10 @@ export default {
             }
           })
 
-    
-
           // this.storeBriefList
-          var storName = []
-          console.log('this.storeBriefList :>> ', this.storeBriefList);
-          console.log('this.inspectTagList :>> ', this.inspectTagList);
+          // var storName = []
+          // console.log('this.storeBriefList :>> ', this.storeBriefList);
+          // console.log('this.inspectTagList :>> ', this.inspectTagList);
 
           // if(i.requestContent.clause){
           //   i.requestContent.clause.storeId.forEach( e => {
@@ -532,10 +531,11 @@ export default {
           // } else {
           //   inspectStore = i.requestContent.clause ? "地點: " + storName.join(', ') : ""
           // }
-          const inspectName = "巡檢表: " + i.requestContent.conTableName
-          const inspectStore = "地點: " + i.requestContent.conStoreName
+          const inspectTimeRange = "時間範圍: " + this.getdate(i.searchStartTs) + ' - ' + this.getdate(i.searchEndTs)
+          const inspectName = i.requestContent.conTableName == null ? "" : '\n' + "巡檢表: " + i.requestContent.conTableName
+          const inspectStore = i.requestContent.conStoreName == null ? "" : '\n' + "地點: " + i.requestContent.conStoreName
 
-          i.condition = this.getdate(i.searchStartTs) + ' - ' + this.getdate(i.searchEndTs) + '\n' + inspectName + '\n' + inspectStore
+          i.condition = inspectTimeRange + inspectName + inspectStore
           i.inspect = groupName + "\n" + tempReport.label
           i.fileName = i.requestContent.fileName
           i.ts =  this.getAllDate(i.ts)
@@ -566,17 +566,29 @@ export default {
         console.log('this.allList :>> ', this.allList); 
       }else {
         this.reportRequestTypeList = [...this.reportDownloadList[value].content]
+        console.log('this.reportDownloadList[value].content :>> ', this.reportDownloadList[value].content);
+        this.reportRequestType = this.reportRequestTypeList.map( i => i.requestType)
       }
+
       // this.reportRequestType = this.reportRequestTypeList[0].requestType
     },
 
+    searchRequestReport(){
+      console.log('aaa :>> ');
+      console.log('this.reportDownloadList XXDDD>> ', this.reportDownloadList);
+      if(this.reportRequestType.length == 0) {
+        this.reportType = -1
+        this.reportRequestTypeList = this.allList
+      }
+    },
 
     searchDownloadData(){
       console.log('this.reportRequestType', this.reportRequestType)
 
       if(this.reportRequestType == -1){ 
-        this.params.requestType	 = -1
-      } else {
+        this.params.requestType	= -1
+      }
+      else {
         this.params.requestType	 = this.reportRequestType
       }
       console.log('this.searchInput', this.searchInput)
@@ -690,8 +702,9 @@ export default {
       this.isLoading = true;
       
       this.currentPage = pageInfo.page
+      this.sizeNum = pageInfo.size
       this.curSizeNum = pageInfo.size;
-      
+    
       this.params.filter.page = pageInfo.page - 1
       this.params.filter.size = pageInfo.size
       this.getDownloadTable(this.params)
