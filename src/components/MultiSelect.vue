@@ -36,7 +36,8 @@ export default {
       default: () => []
     },
     selected: {
-      type: Array
+      type: Array,
+      default: () => []
     },
     alltype: {
       type: Number
