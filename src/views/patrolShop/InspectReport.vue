@@ -1485,19 +1485,12 @@ export default {
       var month = this.pad2(date.getMonth()+1);
       var day = this.pad2(date.getDate());
       var year= date.getFullYear();
-      var hour = this.pad2(date.getHours())
-      var min = this.pad2(date.getMinutes())
-      var sec = this.pad2(date.getSeconds())
       return year + month + day 
     },
     getOnlyDate(t){
       var date = new Date(t);
       var month = this.pad2(date.getMonth()+1);
       var day = this.pad2(date.getDate());
-      var year= date.getFullYear();
-      var hour = this.pad2(date.getHours())
-      var min = this.pad2(date.getMinutes())
-      var sec = this.pad2(date.getSeconds())
       return  month + day 
     },
 
@@ -1516,13 +1509,19 @@ export default {
 
       console.log('this.report', this.report)
 
+      const conTableName = this.report.tagName
+      const conStoreName = this.report.storeName
+
+
       this.showExportMassage = true
       const params = {
         beginTs: this.reportData.ts,
         endTs: this.reportData.ts,
         inspectTagId: this.reportData.tagId,
-        reportIds:[this.report.reportId],
-        fileName : nowTs + "-" + this.report.storeName + "_" + this.report.tagName + "Full_report_details" 
+        reportIds: [this.report.reportId],
+        fileName : nowTs + "-" + this.report.storeName + "_" + this.report.tagName + "Full_report_details" ,
+        conTableName,
+        conStoreName,
       }
 
       exportEntireJsonUnit(params).then(res=>{
