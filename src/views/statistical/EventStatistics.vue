@@ -738,6 +738,7 @@ import {
   exportStatisticsInspectOverview,
   exportStatisticsInspectStore
 } from '@/api/exportExcel';
+import { getBriefStoreList } from '@/api/store';
 import html2canvas from 'html2canvas';
 import Lodash from 'lodash';
 import SearchComponent from '@/components/SearchComponent';
@@ -1164,7 +1165,8 @@ export default {
       WindowWidth:util.getWindowWidth(),
       compareGroupAndTypeId:[],
       inspectName : '',
-      showExportMassage: false
+      showExportMassage: false,
+      filterData: [],
     };
   },
 
@@ -1191,9 +1193,21 @@ export default {
   },
 
   methods: {
-    cellCallbackFuc(){
+    cellCallbackFuc(){},
 
+    getBriefStoreData() {
+        return new Promise((resolve, reject) => {
+            getBriefStoreList().then(res => {
+            const errMsg = res.errMsg;
+            if (errMsg != undefined && errMsg === 'Success') {
+              resolve(res);
+            }
+            }).catch(err => {
+            reject(err);
+            });
+        });
     },
+
     getLangStyleValue(langArray){
       /*var lang_style = langArray.find( item => {return item.key==this.$i18n.locale});
       return lang_style.value;*/
@@ -1204,6 +1218,12 @@ export default {
       this.params.filter = { page: this.page - 1, size: this.sizeNum };
       this.params.order = this.order;
       this.getSearchParams();
+
+      let res  = await this.getBriefStoreData();
+      if(res.errCode ==0){
+          this.storeList = res.data;
+      }
+      
     },
     getSearchParams() {
       const searchParams = SearchConditionUtil.getSearchCondition('eventStatistics');
@@ -1231,6 +1251,8 @@ export default {
       this.timeMode = timeMode;
       this.inspectName = storePatrolLists;
       this.curCountry = this.params.curCountry;
+
+      console.log('this.params ~~~~XXXDDD', this.params)
       if(searchParams.inspectId && searchParams.inspectId!=''){
         //console.log(">>>>eventStatistics > this.params.inspectId:",searchParams.inspectId);
         this.inspectId = searchParams.inspectId;
@@ -1805,6 +1827,7 @@ export default {
     },
     doFilterEventListBySelBar(){
       let name = this.barActiveName;
+
       console.log("filter name:",name);
       let filterData = name==''? this.allEventTableData:this.allEventTableData.filter(item=>{
         if(this.compareType=="area1"){
@@ -1820,6 +1843,8 @@ export default {
         }
       });
       console.log("filterData:",filterData);
+      this.filterData  =  filterData
+
       this.doDrawEventChartMode(filterData);
       this.total =Math.ceil( filterData.length/this.sizeNum);
       this.eventTableData = [...filterData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
@@ -1873,17 +1898,39 @@ export default {
         return false;
       }
 
-      console.log('this.params', this.params)
-
+      var needParams = this.params
       const now = new Date()
       var nowTs = this.getAllDate(now)
-      var tsbegin = this.getDate(this.params.beginTs)
-      var tsEnd = this.getOnlyDate(this.params.endTs)
+      var tsbegin = this.getDate(needParams.beginTs)
+      var tsEnd = this.getOnlyDate(needParams.endTs)
 
-      this.params.fileName = nowTs + "-Inspection_event-" + tsbegin + tsEnd
-      this.params.filter = { page: 0, size: 99999}
+      needParams.fileName = nowTs + "-Inspection_event-" + tsbegin + tsEnd
+      needParams.filter = { page: 0, size: 99999}
+      if(this.filterData.length == 1){
+        needParams.storeIds = [this.filterData[0].id]
+      } else {
+        needParams.storeIds = [...this.params.storeIds]
+      }
+    
+      // console.log('this.storeList', this.storeList)
+      var tempinspectTagName = []
+      if(this.storeList.length == needParams.storeIds.length){
+        tempinspectTagName = ["全部"]
+      }
+      else{
+        needParams.storeIds.forEach( i => {
+          this.storeList.forEach( n => {
+              if(i == n.storeId) tempinspectTagName.push(n.name)
+          })
+        })
+      }
+
+      needParams.conTableName = needParams.inspectName
+      needParams.conStoreName = tempinspectTagName.join(', ')
+
+      console.log('needParams', needParams)
       this.showExportMassage = true
-      exportStatisticsEventGroup(this.params).then(res=>{
+      exportStatisticsEventGroup(needParams).then(res=>{
         console.log('res :>> ', res);
       })
 
@@ -2263,6 +2310,7 @@ export default {
         util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
         return false;
       }
+      
       const now = new Date()
       var nowTs = this.getAllDate(now)
       var tsbegin = this.getDate(this.params.beginTs)
@@ -2271,8 +2319,23 @@ export default {
       this.params.fileName = nowTs + "-"+this.inspectName + "-Inspection_item_event-" + tsbegin + tsEnd
       this.params.itemIds = this.selEventItemIds.length == 0 ? this.allEventItemIds : this.selEventItemIds
       this.params.filter = { page: 0, size: 99999}
+
+      var tempinspectTagName = []
+      if(this.storeList.length == this.params.storeIds.length){
+        tempinspectTagName = ["全部"]
+      }
+      else{
+        this.params.storeIds.forEach( i => {
+          this.storeList.forEach( n => {
+              if(i == n.storeId) tempinspectTagName.push(n.name)
+          })
+        })
+      }
+
+      this.params.conTableName = this.params.inspectName
+      this.params.conStoreName = tempinspectTagName.join(', ')
+
       this.showExportMassage = true
-            
       console.log('this.params', this.params)
       exportStatisticsInspectOverview(this.params).then(res=>{
         console.log('res :>> ', res);
@@ -2371,13 +2434,26 @@ export default {
       var tsbegin = this.getDate(this.params.beginTs)
       var tsEnd = this.getOnlyDate(this.params.endTs)
 
+      var tempinspectTagName = []
+      if(this.storeList.length == this.params.storeIds.length){
+        tempinspectTagName = ["全部"]
+      }
+      else{
+        this.params.storeIds.forEach( i => {
+          this.storeList.forEach( n => {
+              if(i == n.storeId) tempinspectTagName.push(n.name)
+          })
+        })
+      }
 
       let params = {
         beginTs: this.params.beginTs,
         endTs: this.params.endTs,
         itemId: this.eventInvolveItemId,
         storeIds: this.compareIds2,
-        fileName: nowTs + "-Inspection_item_event-" + tsbegin + tsEnd
+        fileName: nowTs + "-Inspection_item_event-" + tsbegin + tsEnd,
+        conTableName: this.params.inspectName,
+        conStoreName: tempinspectTagName.join(', ')
       };
 
       this.showExportMassage = true
