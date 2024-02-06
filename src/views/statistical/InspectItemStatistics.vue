@@ -1147,9 +1147,9 @@ export default {
       }
   
       this.showExportMassage = true
-      exportStatisticsInspectItemOverview(params).then(res=>{
-        console.log('res [4001]:>> ', res);
-      })
+      // exportStatisticsInspectItemOverview(params).then(res=>{
+      //   console.log('res [4001]:>> ', res);
+      // })
 
 
       // require.ensure([], async() => {

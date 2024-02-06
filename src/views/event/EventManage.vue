@@ -1259,10 +1259,10 @@ export default {
             return false;
           }
 
+          console.log('this.params :>> ', this.params);
           this.params.filter = {page: 0, size: 99999}
           
-          console.log('this.params :>> ', this.params);
-
+          
           const now = new Date()
           var nowTs = this.getAllDate(now)
           var tsbegin = this.getDate(this.dateValue[0])
@@ -1284,10 +1284,27 @@ export default {
             var fileName = nowTs + "-Closed_events-" + tsbegin + tsEnd
           }
           this.params.fileName = fileName
-          this.params.inspectTagIds = this.params.inspectTagIds.length == 0 ?  [] : this.params.inspectTagIds
-            
+          
+          var tempinspectTagName = []
+          
+          // console.log('this.inspectTableList :>> ', this.inspectTableList);
+          // console.log('this.storeList :>> ', this.storeList);
 
+          this.params.inspectTagIds = this.storeFilterObj.inspectTagId
+          if(this.params.inspectTagIds.length == 0 || this.params.inspectTagIds[0] == '-1'){
+            tempinspectTagName = ["全部"]
+            this.params.inspectTagIds = []
+          }
+          else{
+            this.params.inspectTagIds.forEach( i => {
+              this.inspectTableList.forEach( n => {
+                if(i == n.value) tempinspectTagName.push(n.label)
+              })
+            })
+          }
 
+          this.params.conTableName = tempinspectTagName.join(', ')
+          this.params.conStoreName = this.storeList.length == this.params.clause.storeId.length ? "全部地點" : this.storeFilterObj.storeStr
           this.showExportMassage = true
           exportEventList(this.params).then(res=>{
             console.log('res :>> ', res);

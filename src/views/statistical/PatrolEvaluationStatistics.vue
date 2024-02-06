@@ -496,7 +496,7 @@ import {
     getInspectStatus
 } from '@/api/inspect';
 import {exportStatisticsReport} from '@/api/exportExcel';
-
+import { getBriefStoreList } from '@/api/store';
 import SearchComponent from '@/components/SearchComponent';
 import resize from '@/components/mixins/echartResize';
 import TablePagination from '@/components/TablePagination_V2';
@@ -1303,6 +1303,8 @@ export default {
             allStoreId: [],
             bigScore: 0,
             showExportMassage: false,
+            inspectName: '',
+            storeList: []
         };
     },
 
@@ -1336,6 +1338,19 @@ export default {
     },
 
     methods: {
+        getBriefStoreData() {
+            return new Promise((resolve, reject) => {
+                getBriefStoreList().then(res => {
+                const errMsg = res.errMsg;
+                if (errMsg != undefined && errMsg === 'Success') {
+                    resolve(res);
+                }
+                }).catch(err => {
+                reject(err);
+                });
+            });
+        },
+
         getInspectStatus(){
             return new Promise((resolve, reject) => {
                 getInspectStatus().then(res => {
@@ -1889,8 +1904,22 @@ export default {
             params.fileName = nowTs + "-Inspection_evaluation_result-" + tsbegin + tsEnd
             params.filter = {page: 0, size: 99999}
 
-            console.log('params', params)
+            // console.log('this.storeList :>> ', this.storeList);
+            var tempinspectTagName = []
+            if(this.storeList.length == params.storeIds.length){
+                tempinspectTagName = ["全部"]
+            }
+            else{
+                params.storeIds.forEach( i => {
+                    this.storeList.forEach( n => {
+                        if(i == n.storeId) tempinspectTagName.push(n.name)
+                    })
+                })
+            }
+            params.conTableName = this.inspectName
+            params.conStoreName = tempinspectTagName.join(', ')
 
+            console.log('params', params)
             this.showExportMassage = true
             exportStatisticsReport(params).then(res=>{
                 console.log('res [3001]:>> ', res);
@@ -1996,6 +2025,20 @@ export default {
             params.fileName = nowTs + "-Inspection_score-" + tsbegin + tsEnd
             params.filter = {page: 0, size: 99999}
 
+            var tempinspectTagName = []
+            if(this.storeList.length == params.storeIds.length){
+                tempinspectTagName = ["全部"]
+            }
+            else{
+                params.storeIds.forEach( i => {
+                    this.storeList.forEach( n => {
+                        if(i == n.storeId) tempinspectTagName.push(n.name)
+                    })
+                })
+            }
+            params.conTableName = this.inspectName
+            params.conStoreName = tempinspectTagName.join(', ')
+
             this.showExportMassage = true
             exportStatisticsReport(params).then(res=>{
                 console.log('res :>> ', res);
@@ -2083,12 +2126,29 @@ export default {
                 return false;
             }
             
+
+
             const now = new Date()
             var nowTs = this.getAllDate(now)
             var tsbegin = this.getDate(this.params.beginTs)
             var tsEnd = this.getOnlyDate(this.params.endTs)
             params.fileName = nowTs + "-Inspection_compliance-" + tsbegin + tsEnd
             params.filter = {page: 0, size: 99999}
+
+            var tempinspectTagName = []
+            if(this.storeList.length == params.storeIds.length){
+                tempinspectTagName = ["全部"]
+            }
+            else{
+                params.storeIds.forEach( i => {
+                    this.storeList.forEach( n => {
+                        if(i == n.storeId) tempinspectTagName.push(n.name)
+                    })
+                })
+            }
+            params.conTableName = this.inspectName
+            params.conStoreName = tempinspectTagName.join(', ')
+
 
             this.showExportMassage = true
             exportStatisticsReport(params).then(res=>{
@@ -3739,8 +3799,8 @@ export default {
             //option.series[1].data = regionData2;
             self.regionsChartsOptions = option;
         },
-
-        initData() {
+ 
+        async initData() {
             console.log("PATG="+this.path)
             
             this.params = SearchConditionUtil.getSearchCondition("inspectEvalutionStatistics");
@@ -3752,6 +3812,11 @@ export default {
                 page: 0,
                 size: this.sizeNumStore
             };
+
+            let res  = await this.getBriefStoreData();
+            if(res.errCode ==0){
+                this.storeList = res.data;
+            }
         },
 
         adjustChart() {
@@ -4027,6 +4092,7 @@ export default {
             });
             console.log("@@filterTag:", filterTag);
             console.log("@@this.params:", this.params);
+            this.inspectName = filterTag[0].name
             
             if(this.params.storeIds.length == 0){
                 this.part3.standardScore = 'N/A'
