@@ -217,7 +217,7 @@ import {
 } from '@/api/inspectOverview';
 import { GetInspectTagList,getInspectItemList  } from '@/api/inspect';
 import {exportStatisticsInspectItemOverview} from '@/api/exportExcel';
-
+import { getBriefStoreList } from '@/api/store';
 import SearchComponent from '@/components/SearchComponent';
 import resize from '@/components/mixins/echartResize';
 import TablePagination from '@/components/TablePagination_V2';
@@ -811,7 +811,8 @@ export default {
         {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
       ],
       showExportMassage: false,
-      searchStoreIds: []
+      searchStoreIds: [],
+      storeList: []
     };
   },
 
@@ -837,6 +838,19 @@ export default {
   },
 
   methods: {
+    getBriefStoreData() {
+        return new Promise((resolve, reject) => {
+            getBriefStoreList().then(res => {
+            const errMsg = res.errMsg;
+            if (errMsg != undefined && errMsg === 'Success') {
+              resolve(res);
+            }
+            }).catch(err => {
+            reject(err);
+            });
+        });
+    },
+
     getLangStyleValue(langArray){
       //console.log('******',util.getLangStyleValue(langArray));
       return util.getLangStyleValue(langArray);
@@ -1055,7 +1069,7 @@ export default {
       if(this.part3.compareType == 'stores'){
         console.log('stores :>> ');
         console.log('this.part3 :>> ', this.part3);
-        console.log(this.part3.content[this.part3.indexRegion])
+        console.log("this.part3.content[this.part3.indexRegion]" ,this.part3.content[this.part3.indexRegion])
 
         content = this.part3.indexRegion == -1 ? this.part3.content : [this.part3.content[this.part3.indexRegion]];
         var needStoreId = this.part3.indexRegion == -1 ? [] : [this.part3.originArray.find( i => i.label == content[0].groupName).storeId]
@@ -1126,9 +1140,24 @@ export default {
       params.filter = {page: 0, size: 99999}
       params.storeIds = needStoreId.length == 0 ? this.searchStoreIds : needStoreId
       params.fileName = nowTs + "-Inspection_item_score-" + tsbegin + tsEnd
+
+    
+      var tempinspectTagName = []
+      if(this.storeList.length == params.storeIds.length){
+          tempinspectTagName = ["全部"]
+      }
+      else{
+          params.storeIds.forEach( i => {
+              this.storeList.forEach( n => {
+                  if(i == n.storeId) tempinspectTagName.push(n.name)
+              })
+          })
+      }
+      params.conTableName = this.inspectItem.item.tag
+      params.conStoreName = tempinspectTagName.join(', ')
     
       console.log("params" , params)
-      console.log("content" , content)
+      // console.log("content" , content)
 
       content.forEach((item,i)=>{
         item.rank= i+1;
@@ -1147,9 +1176,9 @@ export default {
       }
   
       this.showExportMassage = true
-      // exportStatisticsInspectItemOverview(params).then(res=>{
-      //   console.log('res [4001]:>> ', res);
-      // })
+      exportStatisticsInspectItemOverview(params).then(res=>{
+        console.log('res [4001]:>> ', res);
+      })
 
 
       // require.ensure([], async() => {
@@ -2545,7 +2574,7 @@ export default {
       self.regionsChartsOptions = option;
     },
 
-    initData() {
+    async initData() {
       this.params = SearchConditionUtil.getSearchCondition(this.path);
       this.params.filter = { page: 0, size: this.sizeNumStore };
       console.log("*initData > this.params",this.params);
@@ -2573,8 +2602,11 @@ export default {
               this.curInspectId = this.params.inspectId
             }
           });
-
       }
+      let res  = await this.getBriefStoreData();
+        if(res.errCode ==0){
+            this.storeList = res.data;
+        }
     },
 
     adjustChart() {

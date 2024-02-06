@@ -694,10 +694,8 @@ export default{
           this.showScheduleDataList = stores
           return
         } else {
-          
           // this.showScheduleDataList = this.ori_showScheduleDataList
           const results = [];
-
           this.showScheduleDataList.forEach((c) => {
             console.log('c :>> ', c);
             const match_stores = c.taskList.filter((s) => s.storeName.toLowerCase().indexOf(val.toLowerCase()) !== -1);
@@ -715,6 +713,8 @@ export default{
         else {
         this.showScheduleDataList = this.ori_showScheduleDataList
       }
+
+      
     }
   
   },
@@ -863,7 +863,6 @@ export default{
     async getBriefStoreList() {
       await getBriefStoreList().then(res => {
         this.storeList = res.data
-        console.log('this.storeList =========>>>> ', this.storeList);
         this.searchStoreData = [...this.storeList]
         
         console.log('this.searchStoreData =========>>>> ', this.searchStoreData);
@@ -872,10 +871,15 @@ export default{
         const pppSet = new Set(p)
         this.provinceAry = [...pppSet]
 
+        console.log('this.provinceAry  =========>>>>', this.provinceAry)
+
 
         var c = this.searchStoreData.map(c => c.city)
         const cccSet = new Set(c)
         this.cityAry = [...cccSet]
+
+        console.log('this.cityAry  =========>>>>', this.cityAry)
+    
       
       })
     },
@@ -909,9 +913,12 @@ export default{
             this.inspectionName = res.data[0].inspectTagId
             console.log('this.scheduleStatus =========>> 0000', this.scheduleStatus);
             console.log('this.scheduleDataList =========>> 0000', res.data);
+            console.log('this.searchStoreData =========>> 0000', this.searchStoreData);
 
 
-            var noRepeat =  this.searchStoreData.filter((item, index, array) => array.findIndex(s => item.city === s.city) === index)
+            var noRepeat =  this.searchStoreData.filter((item, index, array) => array.findIndex(s => (item.province === s.province && item.city === s.city)) === index)
+            // var noRepeat =  this.searchStoreData
+            console.log('noRepeat =========>> 1111', noRepeat)
             var newArr = noRepeat.map( s => ({
               city: s.city,
               province: s.province,
@@ -919,7 +926,7 @@ export default{
               taskList: []
             }))
 
-            console.log('newArr', newArr)
+          
             newArr.forEach(d => {
               this.scheduleDataList.forEach( g => {
                 g.hasRemindDate = false
@@ -932,6 +939,7 @@ export default{
               
             })
 
+            console.log('newArr =========>> 2222', newArr)
             this.showScheduleDataList = newArr
             this.ori_showScheduleDataList = newArr
             console.log('this.showScheduleDataList', this.showScheduleDataList)
@@ -1173,13 +1181,13 @@ export default{
 
       if(this.scheduleStatus.action == "addSchedule") {
         if(this.showScheduleDataList.length == 0){
-          var noRepeat =  this.searchStoreData.filter((item, index, array) => array.findIndex(s => item.city === s.city) === index)
+          var noRepeat =  this.searchStoreData.filter((item, index, array) => array.findIndex(s => (item.province === s.province && item.city === s.city)) === index)
             var newArr = noRepeat.map( s => ({
               city: s.city,
               province: s.province,
               checked: false,
               taskList: [],
-              
+              tempId: Math.random().toString(36).slice(2)
             }))
             console.log('newArr', newArr)
             newArr.forEach(d => {
@@ -1289,9 +1297,6 @@ export default{
           
         })
       })
-
-
-      
 
       this.handleSchedule = []
       this.showingEditStore = false
@@ -1419,12 +1424,16 @@ export default{
         })
       }
       else if(this.scheduleStatus.action == "editSchedule"){
-        let deltedId = this.handleSchedule.map(a => a.id)
+        let deltedId = this.handleSchedule.map(a => (a.id || a.tempId))
+      
         console.log('deltedId :>> ', deltedId);
-
+        console.log('this.handleSchedule :>> ', this.handleSchedule);
+        
         this.showScheduleDataList.forEach( i =>{
-          i.taskList = i.taskList.filter(b => !deltedId.includes(b.id))
+          i.taskList = i.taskList.filter(b => !deltedId.includes(b.id || b.tempId ))
         })
+        
+        
       }
       
       this.handleSchedule = []
