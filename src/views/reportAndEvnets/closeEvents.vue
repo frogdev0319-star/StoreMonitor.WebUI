@@ -355,10 +355,10 @@ export default {
       if (val !== 0) {
         self.storeDataList = [];
         self.initData();
-        window.setTimeout(function() {
-          self.$route.meta.keepAlive = true;
-        },
-        300);
+        // window.setTimeout(function() {
+        //   self.$route.meta.keepAlive = true;
+        // },
+        // 300);
         self.ifSaveParams = true;
         self.ifSearchData = true;
 
