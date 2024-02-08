@@ -3,14 +3,14 @@
         <div class="head">{{$t('statistics.event.top5')}}</div>
         <div class="table-area">
             <el-table
-              :data="table_data"
-              :highlight-current-row="false"
-              :header-cell-style="{height:'47px',backgroundColor: '#EFF3F5',border:'none',fontSize:'12px'}"
-              :cell-style="{height:'62px', backgroundColor: '#EFF3F5',border:'none',fontSize:'15px',borderBottom:'1px solid rgba(172,174,177,0.3)',color:'#484848'}"
-              :empty-text="$t('deviceView.noData')"
-              align="left"
-              :style="isexportPDF ? {'width':'800px'}:{'width': '100%'}"
-              class="tbl-IncepItemTop5"
+                :data="table_data"
+                :highlight-current-row="false"
+                :header-cell-style="{height:'47px',backgroundColor: '#EFF3F5',border:'none',fontSize:'12px'}"
+                :cell-style="{height:'62px', backgroundColor: '#EFF3F5',border:'none',fontSize:'15px',borderBottom:'1px solid rgba(172,174,177,0.3)',color:'#484848'}"
+                :empty-text="$t('deviceView.noData')"
+                align="left"
+                :style="isexportPDF ? {'width':'800px'}:{'width': '100%'}"
+                class="tbl-IncepItemTop5"
             >
                 <el-table-column
                     v-for="(_item,_index) in column_data"
@@ -145,48 +145,81 @@ export default {
             const result = await this.doGetEventList(params);
             //console.log("result:",result);
             this.eventData = result.data.content;
-            //console.log("eventData:",this.eventData);
-            let eventTotlal=this.eventData.length;
-            let unitCount = 0;
-            let curSubject = "",curTagName="";
-            let eventItem = [];
-            this.table_data=[{subject:'',inspectTagName:'',num:0,rate:''}];
-            //let eventObj={subject:'',inspectTagName:'',num:0,rate:''};
-            //this.eventData.forEach(((item,idx)=>{
-            for(var idx=0; idx<this.eventData.length;idx++){
-                var item = this.eventData[idx];
-                if(idx==0){
-                    curSubject = item.subject;
-                    curTagName = item.inspectTagName; 
-                }
-                if(item.subject!=curSubject){
-                    let eventObj ={
-                        subject : curSubject,
-                        inspectTagName : curTagName,
-                        num : unitCount,
-                        rate : ((unitCount/eventTotlal)*100).toFixed(0)+' %'
-                    };
-                    eventItem.push(eventObj);
-                    unitCount=0;
-                    curSubject = item.subject;
-                    curTagName = item.inspectTagName; 
-                }
-                unitCount +=1;
-                if(idx==this.eventData.length-1){
-                    let eventObj ={
-                        subject : curSubject,
-                        inspectTagName : curTagName,
-                        num : unitCount,
-                        rate : ((unitCount/eventTotlal)*100).toFixed(0)+' %'
-                    };
-                    eventItem.push(eventObj);
-                }
-            }//));
-            util.sortArrayByKeyDesc(eventItem,"num");
+            console.log("eventData:",this.eventData);
             
+            // let eventTotlal = this.eventData.length;
+            // let unitCount = 0;
+            // let curSubject = "",curTagName="";
+            // let eventItem = [];
+            this.table_data=[];
+
+            let eventArray = this.eventData.map( i => ({
+                subject : i.subject,
+                inspectTagName : i.inspectTagName,
+                num : 0,
+                rate : 0
+            }))
+
+            const allItems =  [...new Set(eventArray.map(item => JSON.stringify(item)))].map(item => JSON.parse(item));
+            console.log('allItems :>> ', allItems);
+        
+            var eventItem = this.eventData.reduce((array, item)=> {
+                // console.log('item :>> ', item);
+                array.forEach( i => {
+                    if(i.subject == item.subject){
+                        i.num = i.num + 1
+                    }
+                })
+                return array
+            }, allItems)
+
+            console.log('eventItem :>> ', eventItem);
+
+            // for(var idx=0; idx<this.eventData.length; idx++){
+            //     var item = this.eventData[idx];
+            //     if(idx==0){
+            //         curSubject = item.subject;
+            //         curTagName = item.inspectTagName; 
+            //     }
+                
+            //     // console.log('curSubject ooo>> ', curSubject, idx);
+            //     // console.log('curTagName ooo>> ', curTagName, idx);
+
+            //     if(item.subject!=curSubject){
+            //         let eventObj ={
+            //             subject : curSubject,
+            //             inspectTagName : curTagName,
+            //             num : unitCount,
+            //             rate : ((unitCount/eventTotlal)*100).toFixed(0)+' %'
+            //         };
+
+            //         // console.log('curSubject :>> ', curSubject, idx);
+            //         // console.log('curTagName :>> ', curTagName, idx);
+            //         // console.log('eventObj :>> ', eventObj , idx);
+
+            //         eventItem.push(eventObj);
+            //         unitCount=0;
+            //         curSubject = item.subject;
+            //         curTagName = item.inspectTagName; 
+            //     }
+            //     unitCount +=1;
+            //     if(idx==this.eventData.length-1){
+            //         let eventObj ={
+            //             subject : curSubject,
+            //             inspectTagName : curTagName,
+            //             num : unitCount,
+            //             rate : ((unitCount/eventTotlal)*100).toFixed(0)+' %'
+            //         };
+            //         eventItem.push(eventObj);
+            //     }
+            // }
+
+            console.log('eventItem ~~~~~>> ', eventItem);
+            util.sortArrayByKeyDesc(eventItem,"num");
             this.table_data = [...eventItem.slice( 0, (eventItem.length>5)?5:eventItem.length)];
             
         },
+
         cellClick(row,prop){
             //console.log("row:",row);
             if(!PermissionHelper.enableEventHandle() && 
@@ -252,10 +285,10 @@ export default {
             border: none !important;
             box-shadow: none !important;
             &::before{
-                 background-color: transparent;
+                background-color: transparent;
             }
             &::after{
-                 background-color: transparent;
+                background-color: transparent;
             }
         }
     }
@@ -269,10 +302,10 @@ export default {
             border: none !important;
             box-shadow: none !important;
             &::before{
-                 background-color: transparent;
+                background-color: transparent;
             }
             &::after{
-                 background-color: transparent;
+                background-color: transparent;
             }
         }
         /deep/
