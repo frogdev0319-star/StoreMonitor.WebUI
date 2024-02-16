@@ -593,6 +593,9 @@ export default {
       }
       console.log('this.searchInput', this.searchInput)
       this.params.keyword = this.searchInput
+      this.params.filter.page = 0
+      this.currentPage = 1
+
       console.log('this.params', this.params)
       this.getDownloadTable(this.params)
     },

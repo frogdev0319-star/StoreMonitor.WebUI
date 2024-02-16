@@ -49,7 +49,7 @@
           </div>
         </el-button>
       </div>
-      <div :style="{'height' : varyWindowHeight*0.63+'px'}" class="el-bind-content">
+      <div  class="el-bind-content">
         <div v-if="storeList.length === 0" :style="{'line-height': varyWindowHeight*0.63+'px'}">
           <div v-if="Havestore === 0|| resultHavestore && Havestore !== 0" class="bind-empty">
             <img :src="loadingGif" class="loading_rotate">
@@ -64,6 +64,7 @@
               {{ $t('insSettingView.hasBoundStoreNum', {tableName: tabName, allStoreNum: totalCount, boundStoreNum: storeCount}) }}
             </p>
           </div>
+          {{ storeList }}
           <div v-for="(item,index) in storeList" :key="index" class="device-group">
             <div class="device-all-checkbox">
               <el-checkbox v-model="item.checked" @change="choiceAllGroup(item)" class="storevue-checkbox-filled"/>
