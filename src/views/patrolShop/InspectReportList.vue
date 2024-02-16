@@ -678,7 +678,7 @@ export default {
       console.log('this.params', this.params)
 
       const conTableName =  this.params.inspectTagId ? this.inspectTableList.find( i => i.id == this.params.inspectTagId).name : "全部"
-      const conStoreName = this.storeFilterObj.curStore[0] == -1 ? "全部地點" : this.storeFilterObj.storeStr
+      const conStoreName = this.storeFilterObj.curStore[0] == -1 ? "全部" : this.storeFilterObj.storeStr
 
       var ExpParams = {
         beginTs: this.params.beginTs,
@@ -736,7 +736,7 @@ export default {
       // console.log('this.inspectTableList :>> ', this.inspectTableList);
       // console.log('this.storeFilterObj :>> ', this.storeFilterObj);
       const conTableName =  this.inspectTableList.find( i => i.id == this.params.inspectTagId).name
-      const conStoreName = this.storeFilterObj.curStore[0] == -1 ? "全部地點" : this.storeFilterObj.storeStr
+      const conStoreName = this.storeFilterObj.curStore[0] == -1 ? "全部" : this.storeFilterObj.storeStr
 
       const now = new Date()
       var nowTs = this.getAllDate(now)
