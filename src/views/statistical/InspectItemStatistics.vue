@@ -1140,6 +1140,7 @@ export default {
       params.filter = {page: 0, size: 99999}
       params.storeIds = needStoreId.length == 0 ? this.searchStoreIds : needStoreId
       params.fileName = nowTs + "-Inspection_item_score-" + tsbegin + tsEnd
+      params.requestTs = now.getTime()
 
     
       var tempinspectTagName = []

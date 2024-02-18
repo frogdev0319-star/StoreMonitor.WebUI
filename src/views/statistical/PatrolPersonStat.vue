@@ -510,6 +510,8 @@ export default {
       this.params.isMysteryMode = this.isMystery
       this.params.fileName = nowTs + "-Inspection_record-" + tsbegin + tsEnd
       this.params.filter = {page: 0, size: 99999}
+      this.params.requestTs = now.getTime()
+
       this.showExportMassage = true
 
       exportStatisticsPerson(this.params).then(res=>{

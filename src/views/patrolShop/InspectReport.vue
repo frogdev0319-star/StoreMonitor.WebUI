@@ -1522,6 +1522,8 @@ export default {
         fileName : nowTs + "-" + this.report.storeName + "_" + this.report.tagName + "Full_report_details" ,
         conTableName,
         conStoreName,
+        requestTs : now.getTime()
+        
       }
 
       exportEntireJsonUnit(params).then(res=>{

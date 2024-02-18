@@ -1903,6 +1903,7 @@ export default {
             var tsEnd = this.getOnlyDate(this.params.endTs)
             params.fileName = nowTs + "-Inspection_evaluation_result-" + tsbegin + tsEnd
             params.filter = {page: 0, size: 99999}
+            params.requestTs = now.getTime()
 
             // console.log('this.storeList :>> ', this.storeList);
             var tempinspectTagName = []
@@ -2024,6 +2025,7 @@ export default {
             var tsEnd = this.getOnlyDate(this.params.endTs)
             params.fileName = nowTs + "-Inspection_score-" + tsbegin + tsEnd
             params.filter = {page: 0, size: 99999}
+            params.requestTs = now.getTime()
 
             var tempinspectTagName = []
             if(this.storeList.length == params.storeIds.length){
@@ -2134,6 +2136,7 @@ export default {
             var tsEnd = this.getOnlyDate(this.params.endTs)
             params.fileName = nowTs + "-Inspection_compliance-" + tsbegin + tsEnd
             params.filter = {page: 0, size: 99999}
+            params.requestTs = now.getTime()
 
             var tempinspectTagName = []
             if(this.storeList.length == params.storeIds.length){

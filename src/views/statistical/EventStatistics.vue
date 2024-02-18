@@ -1927,6 +1927,7 @@ export default {
 
       needParams.conTableName = needParams.inspectName
       needParams.conStoreName = tempinspectTagName.join(', ')
+      needParams.requestTs = now.getTime()
 
       console.log('needParams', needParams)
       this.showExportMassage = true
@@ -2334,6 +2335,7 @@ export default {
 
       this.params.conTableName = this.params.inspectName
       this.params.conStoreName = tempinspectTagName.join(', ')
+      this.params.requestTs = now.getTime()
 
       this.showExportMassage = true
       console.log('this.params', this.params)
@@ -2453,7 +2455,8 @@ export default {
         storeIds: this.compareIds2,
         fileName: nowTs + "-Inspection_item_event-" + tsbegin + tsEnd,
         conTableName: this.params.inspectName,
-        conStoreName: tempinspectTagName.join(', ')
+        conStoreName: tempinspectTagName.join(', '),
+        requestTs : now.getTime()
       };
 
       this.showExportMassage = true

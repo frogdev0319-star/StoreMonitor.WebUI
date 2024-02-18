@@ -651,7 +651,8 @@ export default{
           },
           order,
           recordsIds : this.downloadRecordsIds,
-          fileName : nowTs  + "-Scheduling_record-" + tsbegin + tsEnd
+          fileName : nowTs  + "-Scheduling_record-" + tsbegin + tsEnd,
+          requestTs : now.getTime()
 
         };
         if(this.inputSearchValue.trim()!=""){
@@ -718,7 +719,8 @@ export default{
           size:99999 //全部
         },
         order,
-        fileName : nowTs  + "-Scheduling_record-" + tsbegin + tsEnd
+        fileName : nowTs  + "-Scheduling_record-" + tsbegin + tsEnd,
+        requestTs : now.getTime()
       };
       if(this.inputSearchValue.trim()!=""){
         params['keyword']=this.inputSearchValue;
