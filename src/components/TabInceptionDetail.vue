@@ -474,7 +474,8 @@ export default {
             }, 
             filter: {page: 0, size: 99999},
             searchMysteryMode: this.isMystery ? 1 : 0,
-            fileName : nowTs + "-" + submitterName + "-Inspection_detail-" + tsbegin + tsEnd
+            fileName : nowTs + "-" + submitterName + "-Inspection_detail-" + tsbegin + tsEnd,
+            requestTs : now.getTime()
 
           };
 
@@ -507,7 +508,8 @@ export default {
             },  
             filter: {page: 0, size: 99999},
             searchMysteryMode: this.isMystery ? 1 : 0,
-            fileName : nowTs + "-" + submitterName + "-Inspection_event-" + tsbegin + tsEnd
+            fileName : nowTs + "-" + submitterName + "-Inspection_event-" + tsbegin + tsEnd,
+            requestTs : now.getTime()
           };
 
           this.showExportMassage = true

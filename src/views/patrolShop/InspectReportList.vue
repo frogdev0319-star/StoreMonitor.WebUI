@@ -678,7 +678,7 @@ export default {
       console.log('this.params', this.params)
 
       const conTableName =  this.params.inspectTagId ? this.inspectTableList.find( i => i.id == this.params.inspectTagId).name : "全部"
-      const conStoreName = this.storeFilterObj.curStore[0] == -1 ? "全部" : this.storeFilterObj.storeStr
+      const conStoreName = this.params.clause.storeId.length == this.storeFilterObj.curStore.length ? "全部" : this.storeFilterObj.storeStr
 
       var ExpParams = {
         beginTs: this.params.beginTs,
@@ -696,7 +696,8 @@ export default {
         conTableName,
         conStoreName,
         fileName : nowTs + "-Inspection_report_list-" + tsbegin + tsEnd,
-        inspectTagId: this.params.inspectTagId ? this.params.inspectTagId : -1
+        inspectTagId: this.params.inspectTagId ? this.params.inspectTagId : -1,
+        requestTs : now.getTime()
 
       }
       console.log('ExpParams', ExpParams)
@@ -732,11 +733,13 @@ export default {
         self.showExportAllWarn = true;
         return;
       }
-      // console.log('this.params :>> ', this.params);
+      console.log('this.params :>> ', this.params);
       // console.log('this.inspectTableList :>> ', this.inspectTableList);
       // console.log('this.storeFilterObj :>> ', this.storeFilterObj);
+
+      console.log('this.storeFilterObj.curStore', this.storeFilterObj.curStore)
       const conTableName =  this.inspectTableList.find( i => i.id == this.params.inspectTagId).name
-      const conStoreName = this.storeFilterObj.curStore[0] == -1 ? "全部" : this.storeFilterObj.storeStr
+      const conStoreName = this.params.clause.storeId.length == this.storeFilterObj.curStore.length ? "全部" : this.storeFilterObj.storeStr
 
       const now = new Date()
       var nowTs = this.getAllDate(now)
@@ -755,6 +758,8 @@ export default {
         conTableName,
         conStoreName,
         fileName : nowTs + "-" + conTableName + "_Full_report_details-" + tsbegin + tsEnd,
+        requestTs : now.getTime()
+        
       }
       console.log('ExpAllParams :>> ', ExpAllParams);
       exportEntireJson(ExpAllParams).then(res=>{

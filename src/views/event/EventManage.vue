@@ -1305,6 +1305,8 @@ export default {
 
           this.params.conTableName = tempinspectTagName.join(', ')
           this.params.conStoreName = this.storeList.length == this.params.clause.storeId.length ? "全部" : this.storeFilterObj.storeStr
+          this.params.requestTs = now.getTime()
+          
           this.showExportMassage = true
           exportEventList(this.params).then(res=>{
             console.log('res :>> ', res);
