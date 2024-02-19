@@ -10,6 +10,7 @@
           <div class="last-row"  style="justify-content: flex-start">
 
             <!-- 報表類型 -->
+            
             <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{hasAdvanced ? "報表類型" : "巡檢表"}}</span>
             <div class="flex-center report-type-area">
               <el-select
@@ -45,9 +46,11 @@
           </div>
         </template>
       </store-filter>
+      {{ inspectTableList }}
     </div>
 
     <div id="el-containter" class="flex-column spacer" style="margin-left:0px">
+     
       <div class="report-header">
         <div class="flex-center" style="padding-top: 0;">
           <date-time-selector
@@ -364,12 +367,15 @@ export default {
 
         var userInfo = await this.$store.dispatch("GetUserAuthorities");
         self.hasAdvanced = userInfo.data.isSystemAdvanced
+        
+        console.log('this.reportTypeList :::::::===>> ', this.reportTypeList);
         if(this.reportTypeList.some( i => i.mode == 3 )){
           return
         }
         else {
           this.hasAdvanced ? this.reportTypeList.push({ 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')}) : null
         }
+        
       }
     },
     mimicModeChanged(val){
@@ -393,12 +399,17 @@ export default {
   async mounted() {
     var userInfo = await this.$store.dispatch("GetUserAuthorities");
     this.hasAdvanced = userInfo.data.isSystemAdvanced
+
     if(this.reportTypeList.some( i => i.mode == 3 )){
       return
     }
     else {
       this.hasAdvanced ? this.reportTypeList.push({ 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')}) : null
     }
+    await this.getInspectList();
+    console.log('mounted ~~~~~~~~~~~~~~>> ');
+    console.log('this.reportTypeList :>> ', this.reportTypeList);
+
   },
 
   methods: {
@@ -416,8 +427,8 @@ export default {
       this.curReportType = -1;
     
       await this.getSearchParams();
-      await this.getInspectList();
       await this.searchData();
+      await this.getInspectList();
       
     },
 
@@ -897,19 +908,25 @@ export default {
       });
     },
 
-
     async getInspectList() {
+      console.log('getInspectList :>>~~~~~~~~~~<<< ');
       const self = this;
       const inspectArr = PermissionHelper.enableMimicMode ? await self.getTagMytery() : await self.getTagAll();
+      console.log('inspectArr :>> ', inspectArr);
+
       const newArr = [];
       const inspectList = [];
       inspectArr.forEach(_item => {
+        
         if (self.curReportType === -1) {
           // ==== 2024 sprint1 遠端巡檢關閉 ====
+          console.log('>>>>>>>>>>> -1 :>> ');
+          
           if (!newArr.includes(_item.id) && _item.mode !== 0) {
             newArr.push(_item.id);
             inspectList.push(_item);
           }
+          
         } 
         // else if (self.curReportType === 0) {
         //   if (!newArr.includes(_item.id) && _item.mode === 0) {
@@ -918,6 +935,7 @@ export default {
         //   }
         // } 
         else if (self.curReportType === 1) {
+          console.log('>>>>>>>>>>> 1 :>> ');
           if (!newArr.includes(_item.id) && _item.mode === 1) {
             newArr.push(_item.id);
             inspectList.push(_item);
@@ -927,12 +945,17 @@ export default {
           console.log('curReportType === 2 || 3')
         }
       });
-      self.inspectTableList = inspectList;
-      self.inspectTableList.length > 0 && self.inspectTableList.unshift({ id: '-1', name: self.$t('remotePatrol.all') });
+      
+      this.inspectTableList = inspectList;
+      console.log('inspectListt ~~~~~~>> ', inspectList);
+      console.log('this.inspectTableList ~~~~~~>> ', this.inspectTableList);
+
+      if(this.inspectTableList.length > 0)  this.inspectTableList.unshift({ id: '-1', name: this.$t('remotePatrol.all') });
       if (inspectList.length !== 0) {
-        self.inspectId = self.ifGetParamsFromCash ? self.inspectCatch : self.inspectTableList[0].id;
-      } else {
-        self.inspectId = '';
+        this.inspectId = this.ifGetParamsFromCash ? this.inspectCatch : this.inspectTableList[0].id;
+      }
+      else {
+        this.inspectId = '';
       }
       self.getInitReportList();
     },
