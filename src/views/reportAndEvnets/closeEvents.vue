@@ -46,7 +46,6 @@
           </div>
         </template>
       </store-filter>
-      {{ inspectTableList }}
     </div>
 
     <div id="el-containter" class="flex-column spacer" style="margin-left:0px">

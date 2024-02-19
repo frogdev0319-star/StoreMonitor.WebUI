@@ -64,11 +64,10 @@
               {{ $t('insSettingView.hasBoundStoreNum', {tableName: tabName, allStoreNum: totalCount, boundStoreNum: storeCount}) }}
             </p>
           </div>
-          {{ storeList }}
           <div v-for="(item,index) in storeList" :key="index" class="device-group">
             <div class="device-all-checkbox">
               <el-checkbox v-model="item.checked" @change="choiceAllGroup(item)" class="storevue-checkbox-filled"/>
-              <span class="group-name">{{ item.cityName }}</span>
+              <span class="group-name">{{ item.province }} - {{ item.cityName }}</span>
             </div>
             <div class="device-content">
               <div v-for="(_item,_index) in item.itemData" :key="_index" class="device-detail">
@@ -265,41 +264,96 @@ export default {
       });
       self.allData = length === countItem;
     },
-
     async getStoreByCity(data) {
+      
       const self = this;
       const cityList = [];
+      const provinceList = [];
       const bindArr = [];
+
+      var needArry = []
+      
+
       const bindStoreId = await self.getBindStoreList();
       const storeIds = bindStoreId.data.length > 0 ? bindStoreId.data[0].storeIds : [];
-      data.forEach(item => {
-        if (cityList.indexOf(item.city) === -1) {
-          cityList.push(item.city);
+
+      console.log('data =====}}}}', data)
+      console.log('storeIds =====}}}}', storeIds)
+
+      // data.forEach( i => {
+      //   if (provinceList.indexOf(i.province) === -1) {
+      //     provinceList.push(i.province);
+      //   }
+      //   storeIds.forEach(_item => {
+      //     if (i.storeId === _item) {
+      //       bindArr.push(_item);
+      //     }
+      //   });
+      // })
+      // data.forEach(item => {
+      //   if (cityList.indexOf(item.city) === -1) {
+      //     cityList.push(item.city);
+      //   }
+      //   storeIds.forEach(_item => {
+      //     if (item.storeId === _item) {
+      //       bindArr.push(_item);
+      //     }
+      //   });
+      // });
+      
+
+      data.forEach( i => {
+        const obj = {};
+        if(needArry.indexOf(i.province) === -1 && needArry.indexOf(i.city) === -1){
+          obj.city = i.city
+          obj.province = i.province
+          
         }
+        needArry.push(obj)
+
         storeIds.forEach(_item => {
-          if (item.storeId === _item) {
+          if (i.storeId === _item) {
             bindArr.push(_item);
           }
         });
-      });
+        
+      })
+      
+      const allItems =  [...new Set(needArry.map(item => JSON.stringify(item)))].map(item => JSON.parse(item));
       self.storeCount = bindArr.length;
-      const temp = [];
-      cityList.forEach(item => {
-        const obj = {};
-        obj.city = item;
-        const _temp = [];
-        data.forEach(_item => {
-          if (item === _item.city) {
-            const _obj = {};
-            obj.province = _item.province;
-            _obj.storeName = _item.name;
-            _obj.storeId = _item.storeId;
-            _temp.push(_obj);
+
+      allItems.forEach( l => {
+        var tempItems = []
+        data.forEach( i => {
+          const obj = {};
+          if(i.province === l.province && i.city === l.city){
+            obj.storeName = i.name
+            obj.storeId = i.storeId
+            tempItems.push(obj)
           }
-        });
-        obj.store = _temp;
-        temp.push(obj);
-      });
+        })
+        l.store = tempItems
+      })
+
+      console.log('allItems =====}}}} ', allItems)
+      const temp = allItems;
+      // cityList.forEach(item => {
+      //   const obj = {};
+      //   obj.city = item;
+      //   const _temp = [];
+      //   data.forEach(_item => {
+      //     if (item === _item.city) {
+      //       const _obj = {};
+      //       obj.province = _item.province;
+      //       _obj.storeName = _item.name;
+      //       _obj.storeId = _item.storeId;
+      //       _temp.push(_obj);
+      //     }
+      //   });
+      //   obj.store = _temp;
+      //   temp.push(obj);
+      // });
+
       const groupTemp = [];
       temp.forEach(item => {
         const groupObj = {};
@@ -327,6 +381,7 @@ export default {
         groupObj.itemData = _temp;
         groupTemp.push(groupObj);
       });
+
       self.storeList = groupTemp;
       self.tempStoreList = groupTemp;
       let count = 0;
@@ -580,9 +635,10 @@ $h1:#292e36;
                     width: auto;
                     margin-top: calc(10/1920*100vw);
                     margin-bottom: calc(10/1920*100vw);
-                    min-width: calc(215/1920*100vw);
+                    margin-right: 60px;
+                    // min-width: calc(315/1920*100vw);
                     .device-name{
-                        margin-left: calc(20/1920*100vw);
+                        margin-left: 10px;
                         font-size: 14px;
                     }
                 }
