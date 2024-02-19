@@ -139,20 +139,25 @@ export default {
     handleCurrentChange(currentPage) { 
       const pageObj = {
         page: currentPage,
-        size: this.needPageSize
+        size: this.pageSize
       };
       this.$emit('currentChange', pageObj);
     },
 
     handleSizeChange(needPageSize) {
       console.log("handleSizeChange:",needPageSize);
+      console.log("this.pageSize:",this.pageSize);
       
+
+
       const pageObj = {
         page: 1,
         size: needPageSize
       };
+
       this.$emit('sizeChange', pageObj);
     },
+    
     handlePrevClick(){
       if(this.currentPage>1){
         this.handleCurrentChange(this.currentPage-1)

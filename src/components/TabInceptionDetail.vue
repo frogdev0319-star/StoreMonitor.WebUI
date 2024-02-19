@@ -61,7 +61,7 @@
             <tbl-pagination-only
               :total="detailTbl.total"
               :current-page="detailTbl.page"
-              :pagesize="detailTbl.sizeNum"
+              :page-size="detailTbl.sizeNum"
               :btnStyle="{'backgroundColor': '#EFF3F5'}"
               :showPageSize="false"
               @sizeChange="handlePageAndSizeChange_detail"
@@ -110,7 +110,7 @@
             <tbl-pagination-only
                 :total="eventTbl.total"
                 :current-page="eventTbl.page"
-                :pagesize="eventTbl.sizeNum"
+                :page-size="eventTbl.sizeNum"
                 :btnStyle="{'backgroundColor': '#EFF3F5'}"
                 :showPageSize="false"
                 @sizeChange="handlePageAndSizeChange_detail"
