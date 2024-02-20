@@ -919,7 +919,6 @@ export default {
         
         if (self.curReportType === -1) {
           // ==== 2024 sprint1 遠端巡檢關閉 ====
-          console.log('>>>>>>>>>>> -1 :>> ');
           
           if (!newArr.includes(_item.id) && _item.mode !== 0) {
             newArr.push(_item.id);
@@ -934,7 +933,6 @@ export default {
         //   }
         // } 
         else if (self.curReportType === 1) {
-          console.log('>>>>>>>>>>> 1 :>> ');
           if (!newArr.includes(_item.id) && _item.mode === 1) {
             newArr.push(_item.id);
             inspectList.push(_item);
@@ -946,8 +944,8 @@ export default {
       });
       
       this.inspectTableList = inspectList;
-      console.log('inspectListt ~~~~~~>> ', inspectList);
-      console.log('this.inspectTableList ~~~~~~>> ', this.inspectTableList);
+      // console.log('inspectListt ~~~~~~>> ', inspectList);
+      // console.log('this.inspectTableList ~~~~~~>> ', this.inspectTableList);
 
       if(this.inspectTableList.length > 0)  this.inspectTableList.unshift({ id: '-1', name: this.$t('remotePatrol.all') });
       if (inspectList.length !== 0) {
@@ -960,9 +958,7 @@ export default {
     },
 
     saveSearchParams() {
-      console.log("Save Search Params")
       let tempsearchParamsObj = this.storeFilterObj;
-      console.log('tempsearchParamsObj :>> ', tempsearchParamsObj);
       tempsearchParamsObj.curReportType = this.curReportType;
 
       if(!tempsearchParamsObj.clause){
@@ -987,7 +983,7 @@ export default {
       // clause
       // console.log("Get SEarch Parameter");
       let searchParams = JSON.parse(JSON.stringify(SearchConditionUtil.getSearchCondition('closeEvents')));
-      console.log("getSearchParams>>>>searchParams:",searchParams);
+      // console.log("getSearchParams>>>>searchParams:",searchParams);
       this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
 
       if (Object.keys(searchParams).length > 0) {
@@ -1000,7 +996,7 @@ export default {
         this.filter = searchParams.filter;
       
         this.checkSortType(this.curSortType,true);
-        console.log("searchParams.clause.status:",searchParams.clause.status);
+        // console.log("searchParams.clause.status:",searchParams.clause.status);
         this.curAppraise = (typeof searchParams.clause.status=='undefined') ? -1:searchParams.clause.status;
         this.curReportType = searchParams.curReportType;
         this.inspectCatch = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
