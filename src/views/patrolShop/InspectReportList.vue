@@ -716,6 +716,7 @@ export default {
         conTableName,
         conStoreName,
         fileName : nowTs + "-Inspection_report_list-" + tsbegin + tsEnd,
+        inspectTagId: this.params.inspectTagId ? this.params.inspectTagId : null,
         searchMysteryMode: this.params.searchMysteryMode ? this.params.searchMysteryMode : -1,
         requestTs : now.getTime()
 
@@ -724,9 +725,6 @@ export default {
       exportReportList(ExpParams).then(res=>{
         console.log('res [1002]:>> ', res);
       })
-
-
-
 
       // 匯出日期時間-Inspection_report list-搜尋範圍(YYYYMMDDMMDD)
 
