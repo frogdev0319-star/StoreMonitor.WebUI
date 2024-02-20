@@ -295,6 +295,7 @@ import {
       getInspectReportInfo
     } from '@/api/inspect';
 import {exportEntireJson, exportReportList} from '@/api/exportExcel';
+import { getBriefStoreList } from '@/api/store';
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
 import StoreFilter from '@/components/StoreFilter';
@@ -551,7 +552,8 @@ export default {
       showExportMassage: false,
 
       inspectStatus:'',
-      totalElements: 0
+      totalElements: 0,
+      allStoreList: []
     };
   },
 
@@ -601,7 +603,7 @@ export default {
   },
 
   methods: {
-    initData() {
+    async initData() {
       console.log("in initData");
       const self = this;
       self.isLoading = true;
@@ -619,6 +621,11 @@ export default {
       self.getSearchParams();
       self.getInspectList();
       self.getInspectStatus();
+
+      let res  = await this.getBriefStoreData();
+      if(res.errCode ==0){
+        this.allStoreList = res.data;
+      }
       
     },
 
@@ -657,6 +664,19 @@ export default {
       return  month + day 
     },
 
+    getBriefStoreData() {
+      return new Promise((resolve, reject) => {
+        getBriefStoreList().then(res => {
+          const errMsg = res.errMsg;
+          if (errMsg != undefined && errMsg === 'Success') {
+            resolve(res);
+          }
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
     gotoDownloadManagement(){
       this.$router.push({name: 'downloadManagement',});
       this.showExportMassage = false
@@ -674,11 +694,11 @@ export default {
       var nowTs = this.getAllDate(now)
       var tsbegin = this.getDate(this.dateValue[0])
       var tsEnd = this.getOnlyDate(this.dateValue[1])
-
-      console.log('this.params', this.params)
-
+      // if(this.storeFilterObj.curStore[0] === '-1') this.storeFilterObj.curStore.shift()
+      console.log('this.params.clause.storeId', this.params.clause.storeId)
+      console.log(' this.allStoreList',  this.allStoreList)
       const conTableName =  this.params.inspectTagId ? this.inspectTableList.find( i => i.id == this.params.inspectTagId).name : "全部"
-      const conStoreName = this.params.clause.storeId.length == this.storeFilterObj.curStore.length ? "全部" : this.storeFilterObj.storeStr
+      const conStoreName = this.params.clause.storeId.length == this.allStoreList.length ? "全部" : this.storeFilterObj.storeStr
 
       var ExpParams = {
         beginTs: this.params.beginTs,
@@ -696,7 +716,7 @@ export default {
         conTableName,
         conStoreName,
         fileName : nowTs + "-Inspection_report_list-" + tsbegin + tsEnd,
-        inspectTagId: this.params.inspectTagId ? this.params.inspectTagId : -1,
+        searchMysteryMode: this.params.searchMysteryMode ? this.params.searchMysteryMode : -1,
         requestTs : now.getTime()
 
       }
@@ -739,7 +759,7 @@ export default {
 
       console.log('this.storeFilterObj.curStore', this.storeFilterObj.curStore)
       const conTableName =  this.inspectTableList.find( i => i.id == this.params.inspectTagId).name
-      const conStoreName = this.params.clause.storeId.length == this.storeFilterObj.curStore.length ? "全部" : this.storeFilterObj.storeStr
+      const conStoreName = this.params.clause.storeId.length == this.allStoreList.length ? "全部" : this.storeFilterObj.storeStr
 
       const now = new Date()
       var nowTs = this.getAllDate(now)

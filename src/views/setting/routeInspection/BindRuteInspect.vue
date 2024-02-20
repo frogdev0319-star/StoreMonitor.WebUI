@@ -272,13 +272,11 @@ export default {
       const bindArr = [];
 
       var needArry = []
-      
-
       const bindStoreId = await self.getBindStoreList();
       const storeIds = bindStoreId.data.length > 0 ? bindStoreId.data[0].storeIds : [];
 
-      console.log('data =====}}}}', data)
-      console.log('storeIds =====}}}}', storeIds)
+      // console.log('data =====}}}}', data)
+      // console.log('storeIds =====}}}}', storeIds)
 
       // data.forEach( i => {
       //   if (provinceList.indexOf(i.province) === -1) {
@@ -310,7 +308,6 @@ export default {
           
         }
         needArry.push(obj)
-
         storeIds.forEach(_item => {
           if (i.storeId === _item) {
             bindArr.push(_item);
@@ -321,7 +318,6 @@ export default {
       
       const allItems =  [...new Set(needArry.map(item => JSON.stringify(item)))].map(item => JSON.parse(item));
       self.storeCount = bindArr.length;
-
       allItems.forEach( l => {
         var tempItems = []
         data.forEach( i => {
@@ -335,7 +331,6 @@ export default {
         l.store = tempItems
       })
 
-      console.log('allItems =====}}}} ', allItems)
       const temp = allItems;
       // cityList.forEach(item => {
       //   const obj = {};

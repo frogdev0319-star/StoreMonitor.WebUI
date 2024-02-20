@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-row class="container">
+    <el-row class="container" v-loading="loading">
       <div class="header">
         <div
           :class="logoClass"
@@ -289,7 +289,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.2.1.4
+                v3.2.1.5
                   &copy; {{ getFullYear }} Advantech Intelligent City
                   Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
@@ -392,6 +392,7 @@ export default {
         isWarning: false,
         dialogCosed: false
       },
+      loading: false
     };
   },
 
@@ -1127,10 +1128,12 @@ export default {
 
     async changeRoutes(mimicModeChanged=false, ) {
       //console.log("*Change Routes mimicModeChanged:",mimicModeChanged);
+      this.loading = true
+
       const self = this;
       const result = await self.$store.dispatch("GetUserAuthorities");
       console.log("changeRoutes resule:",result);
-
+    
       if (result.errCode === 0) {
         await self.$store.dispatch("generateRoutes");
         self.getAdvanceSettingStastus(result.data);
@@ -1158,6 +1161,7 @@ export default {
           this.$router.push(this.$route.path);
         }
       }
+      this.loading = false
     },
 
     async getAdvanceSettingStastus(result){
