@@ -631,6 +631,7 @@
                 />
               </div>
             </div>
+
             <div v-if="showInvolveTableArea" style="margin-top:100px;height: auto;">
               <div style="height: 1px;margin-left:calc(36/1440*100vw);margin-right: calc(24/1440*100vw);border-bottom: solid 1px #acaeb1;"></div>
               <div class="table-area" style="">
@@ -2402,8 +2403,8 @@ export default {
         var obj = {...item};
         obj.id = item.storeId;
         obj.submitter=item.submitters.toString();
-        obj.storeRegionStr = item.storeBranchType.toString();
-        obj.storeBranchTypeStr = item.storeRegion.toString();
+        obj.storeRegionStr = item.storeRegion.toString();
+        obj.storeBranchTypeStr = item.storeBranchType.toString();
         obj.percentageStr = item.percentage+'%';
         self.eventInvolveTable.itemAllData.push(obj);
       });
