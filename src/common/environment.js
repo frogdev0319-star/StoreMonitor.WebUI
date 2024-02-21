@@ -112,7 +112,6 @@ else if(data.SITE == 'iservice-preview'){
 }
 else{
   environJSON = _Environments.Preview;
-  // environJSON = _Environments.RC;
   isGlobalWebsite = true;
 }
 
