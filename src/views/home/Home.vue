@@ -640,6 +640,7 @@ export default {
 
   methods: {
     advanceMode(){
+      this.loading = true
       // console.log('this.userInfo.isSystemAdvanced :>> ', this.userInfo.isSystemAdvanced);
       this.showAdvanceMode = !this.showAdvanceMode
 
@@ -1126,8 +1127,6 @@ export default {
 
     async changeRoutes(mimicModeChanged=false, ) {
       //console.log("*Change Routes mimicModeChanged:",mimicModeChanged);
-      this.loading = true
-
       const self = this;
       const result = await self.$store.dispatch("GetUserAuthorities");
       console.log("changeRoutes resule:",result);
