@@ -613,21 +613,21 @@ export const navbarRoute = {
       children: []
     };
 
-    const deviceRoutes = this.getDeviceRoutes();
-    // console.log(deviceRoutes)
-    
-    !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableDeviceSetting() && deviceRoutes.length > 0 && systemSettingRoute.children.push(
-      {
-        path: '/device',
-        name: 'deviceManage',
-        hidden: false,
-        threeChild: true,
-        component: resolve => require(['@/views/setting/device/DevicesMgmt'], resolve),
-        meta: {
-          requireAuth: true
-        },
-        children: deviceRoutes
-      }) && primaryPathesList.push('/device');
+    // ==== 2024 sprint1 關閉遠端巡檢 ====
+    // const deviceRoutes = this.getDeviceRoutes();
+    // // console.log(deviceRoutes)
+    // !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableDeviceSetting() && deviceRoutes.length > 0 && systemSettingRoute.children.push(
+    //   {
+    //     path: '/device',
+    //     name: 'deviceManage',
+    //     hidden: false,
+    //     threeChild: true,
+    //     component: resolve => require(['@/views/setting/device/DevicesMgmt'], resolve),
+    //     meta: {
+    //       requireAuth: true
+    //     },
+    //     children: deviceRoutes
+    //   }) && primaryPathesList.push('/device');
 
     const inspectionRoute = {
       path: '/inspectionSetting',
@@ -920,25 +920,27 @@ export const navbarRoute = {
     //   }
     // ) && primaryPathesList.push('/ezvizDevice', '/ezvizeDeviceSetting');
 
-    !PermissionHelper.advancedMode && util.getVideoAuthority(3) && deviceRoutes.push(
-      {
-        path: '/beseyeAccount',
-        name: 'beseyeAccount',
-        component: resolve => require(['@/views/setting/device/Beseye/BeseyeAccount'], resolve)
-      },
-      {
-        path: '/beseyeDeviceSetting',
-        name: 'beseyeDeviceSetting',
-        component: resolve => require(['@/views/setting/device/Beseye/BeseyeDeviceMgmt'], resolve),
-        hidden: true
-      },
-      {
-        path: '/beseye/authorize',
-        name: 'auth',
-        component: resolve => require(['@/views/setting/device/Beseye/Authorize'], resolve),
-        hidden: true
-      }
-    ) && primaryPathesList.push('/beseyeAccount', '/beseyeDeviceSetting', '/beseye/authorize');
+    // !PermissionHelper.advancedMode && util.getVideoAuthority(3) && deviceRoutes.push(
+    //   {
+    //     path: '/beseyeAccount',
+    //     name: 'beseyeAccount',
+    //     component: resolve => require(['@/views/setting/device/Beseye/BeseyeAccount'], resolve)
+    //   },
+    //   {
+    //     path: '/beseyeDeviceSetting',
+    //     name: 'beseyeDeviceSetting',
+    //     component: resolve => require(['@/views/setting/device/Beseye/BeseyeDeviceMgmt'], resolve),
+    //     hidden: true
+    //   },
+    //   {
+    //     path: '/beseye/authorize',
+    //     name: 'auth',
+    //     component: resolve => require(['@/views/setting/device/Beseye/Authorize'], resolve),
+    //     hidden: true
+    //   }
+    // ) && primaryPathesList.push('/beseyeAccount', '/beseyeDeviceSetting', '/beseye/authorize');
+
+    
     /*
     util.getVideoAuthority(4) && deviceRoutes.push(
       {
