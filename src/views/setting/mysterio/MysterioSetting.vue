@@ -271,27 +271,7 @@ export default {
                 })
             });
         },
-        doMapStoreAndTag(storeId,inspId){
-            var mapData = {storeId:-1,storeName:"",inspId:-1,incetionTag:""};
-            var storeInfo = this.storeDataList.find(store => store.storeId == storeId);
-            if(storeInfo!=null){
-                mapData.storeId = storeInfo.storeId;
-                mapData.storeName = storeInfo.label;
-                var tag=null;
-                tag = storeInfo.inspectList.remote.options.find(it=>it.inspId==inspId);
-                if(tag==null){
-                    tag = storeInfo.inspectList.onSite.options.find(it=>it.inspId==inspId);
-                    if(tag){
-                        mapData.inspId = tag.inspId;
-                        mapData.incetionTag = tag.label;
-                    }
-                }else{
-                    mapData.inspId = tag.inspId;
-                    mapData.incetionTag = tag.label;
-                }
-            }
-            return mapData;
-        },
+        
         getAuthList(){
             const self = this;
             mysteroRESTful.getMysterySetting({userId:this.userId}).then(res=>{
@@ -310,6 +290,29 @@ export default {
                 self.isLoadingData = false;
             });
         },
+        doMapStoreAndTag(storeId,inspId){
+            var mapData = {storeId:-1,storeName:"",inspId:-1,incetionTag:""};
+            var storeInfo = this.storeDataList.find(store => store.storeId == storeId);
+            console.log('storeInfo ~~~~>> ' , storeInfo);
+            if(storeInfo!=null){
+                mapData.storeId = storeInfo.storeId;
+                mapData.storeName = storeInfo.label;
+                var tag = null;
+                tag = storeInfo.inspectList.onSite.options.find(it=>it.inspId==inspId);
+                if(tag==null){
+                    tag = storeInfo.inspectList.onSite.options.find(it=>it.inspId==inspId);
+                    if(tag){
+                        mapData.inspId = tag.inspId;
+                        mapData.incetionTag = tag.label;
+                    }
+                }else{
+                    mapData.inspId = tag.inspId;
+                    mapData.incetionTag = tag.label;
+                }
+            }
+            return mapData;
+        },
+
         setDataTable(){
             this.orderAllTableData();
             this.tableData = [];
