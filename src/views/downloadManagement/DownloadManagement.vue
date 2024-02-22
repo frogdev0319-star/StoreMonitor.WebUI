@@ -270,7 +270,7 @@ export default {
         },
         { 
           type: 2, 
-          label: this.$t('downloadManagement.inspectReport'),
+          label: this.$t('downloadManagement.eventMgn'),
           content: [
             { requestType: 2001, label: this.$t('downloadManagement.requestType_2001')},
             { requestType: 2002, label: this.$t('downloadManagement.requestType_2002')},
