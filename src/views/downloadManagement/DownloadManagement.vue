@@ -254,8 +254,9 @@ export default {
           }
         ]
       },
-      reportDownloadList: [
-        { type: -1, 
+      reportDownloadList: [],
+      oriReportDownloadList: [
+      { type: -1, 
           label: '全部' ,
         },
         { 
@@ -360,7 +361,7 @@ export default {
       },
       inspectTagList: [],
       storeBriefList: [],
-      isShowing: false
+      isShowing: false,
     };
   },
 
@@ -384,43 +385,40 @@ export default {
         300);
       }
 
-      getWhiteList().then(res => {
-        const data = res.data;
-        if (res.data) {
-          resolve(res);
-          commit('SET_WHITE_LIST', res.data);
-        } 
-      }).catch(err => {
-        reject(err);
-      });
-      const whiteList = this.$store.state.user.whiteList
-      const accountId = this.$store.state.user.accountId
-      console.log('whiteList!!!!!!!!!!!!!!!!!!!!', whiteList)
-      console.log('accountId !!!!!!!!!!!!!!!!!!!!', accountId)
-      this.isShowing = whiteList.some( i => i == accountId)
-      console.log('this.isShowing !!!!!!!!!!!!!!!!!!!! ', this.isShowing);
+      // this.allList = []
+      // getWhiteList().then(res => {
+      //   const data = res.data;
+      //   if (res.data) {
+      //     resolve(res);
+      //     commit('SET_WHITE_LIST', res.data);
+      //   } 
+      // }).catch(err => {
+      //   reject(err);
+      // });
+      // const whiteList = this.$store.state.user.whiteList
+      // const accountId = this.$store.state.user.accountId
+      // console.log('whiteList!!!!!!!!!!!!!!!!!!!! 2', whiteList)
+      // console.log('accountId !!!!!!!!!!!!!!!!!!!! 2', accountId)
+      // this.isShowing = whiteList.some( i => i == accountId)
+      // console.log('this.isShowing !!!!!!!!!!!!!!!!!!!! 2', this.isShowing);
 
-      var tempList = [...this.reportDownloadList]
+      
 
-      if(!this.isShowing) {
-        this.allList = []
-        tempList = this.reportDownloadList.filter( i => i.type !== 7)
-        tempList.forEach(i => {
-          if(i.content){
-            this.allList = [...this.allList, ...i.content]
-          }
-        })
-        this.reportRequestTypeList = []
-        this.reportRequestTypeList = this.allList
-      }
-      else{
-        this.reportDownloadList.forEach(i => {
-          if(i.content){
-            this.allList = [...this.allList, ...i.content]
-          }
-        })
-        this.reportRequestTypeList = this.allList
-      }
+      // if(!this.isShowing) {
+      //   this.reportDownloadList = this.reportDownloadList.filter( i => i.type !== 7)
+      // } else {
+      //   this.reportDownloadList = []
+      //   this.reportDownloadList = this.oriReportDownloadList
+      // }
+      // console.log('this.oriReportDownloadList', this.oriReportDownloadList)
+      // console.log('this.reportDownloadList', this.reportDownloadList)
+
+      // this.reportDownloadList.forEach(i => {
+      //   if(i.content){
+      //     this.allList = [...this.allList, ...i.content]
+      //   }
+      // })
+      // this.reportRequestTypeList = this.allList
 
       
 
@@ -433,31 +431,7 @@ export default {
 
   },
   created() {
-    getWhiteList().then(res => {
-        const data = res.data;
-        if (res.data) {
-          resolve(res);
-          commit('SET_WHITE_LIST', res.data);
-        } 
-      }).catch(err => {
-        reject(err);
-      });
-    const whiteList = this.$store.state.user.whiteList
-    const accountId = this.$store.state.user.accountId
-    console.log('whiteList!!!!!!!!!!!!!!!!!!!!', whiteList)
-    console.log('accountId !!!!!!!!!!!!!!!!!!!!', accountId)
-    this.isShowing = whiteList.some( i => i == accountId)
-    console.log('this.isShowing !!!!!!!!!!!!!!!!!!!! ', this.isShowing);
-    if(!this.isShowing) this.reportDownloadList = this.reportDownloadList.filter( i => i.type !== 7)
-
     
-    this.reportDownloadList.forEach(i => {
-      if(i.content){
-        this.allList = [...this.allList, ...i.content]
-      }
-    })
-    // this.allList.unshift({requestType : -1 , label : "全部"})
-    this.reportRequestTypeList = this.allList
     this.initData()
   },
 
@@ -473,12 +447,50 @@ export default {
       this.storeStr = '';
       this.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24,
         new Date(this.$moment(new Date()).endOf('day'))];
-      this.reportList = [];
+      
 
       this.inspectTagList = await this.getInspectTag()
       this.storeBriefList = await this.getBriefStoreData()
+      
+      await this.handleReportList()
       await this.searchRequestTypeItems()
       await this.getDownloadTable(this.params)
+    },
+
+    handleReportList(){
+      
+      this.reportDownloadList = [...this.oriReportDownloadList]
+      this.allList = [];
+      getWhiteList().then(res => {
+          const data = res.data;
+          if (res.data) {
+            resolve(res);
+            commit('SET_WHITE_LIST', res.data);
+          } 
+        }).catch(err => {
+          reject(err);
+        });
+      const whiteList = this.$store.state.user.whiteList
+      const accountId = this.$store.state.user.accountId
+      // console.log('whiteList!!!!!!!!!!!!!!!!!!!!', whiteList)
+      // console.log('accountId !!!!!!!!!!!!!!!!!!!!', accountId)
+      this.isShowing = whiteList.some( i => i == accountId)
+      // console.log('this.isShowing !!!!!!!!!!!!!!!!!!!! ', this.isShowing);
+      if(!this.isShowing) {
+          this.reportDownloadList = this.reportDownloadList.filter( i => i.type !== 7)
+      } else {
+        this.reportDownloadList = []
+        this.reportDownloadList = this.oriReportDownloadList
+      }
+      // console.log('this.oriReportDownloadList', this.oriReportDownloadList)
+      // console.log('this.reportDownloadList', this.reportDownloadList)
+
+      this.reportDownloadList.forEach(i => {
+        if(i.content){
+          this.allList = [...this.allList, ...i.content]
+        }
+      })
+      this.reportRequestTypeList = this.allList
     },
 
     getInspectTag() {
