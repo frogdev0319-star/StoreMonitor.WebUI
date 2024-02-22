@@ -7,7 +7,7 @@
             class="time-selector"
             @change="dateChange" 
             :dateTimeValue = dateValue />  -->
-            <span style="margin-right: 16px; margin-top: 5px;font-size:calc(15/1920*100vw);width:10%;">報表類型</span>
+            <span style="margin-right: 16px; margin-top: 5px;font-size:calc(15/1920*100vw);width:10%;">{{ $t('downloadManagement.reportType') }}</span>
             <div class="report_type" >
               <el-select
                 v-model="reportType"
@@ -65,7 +65,7 @@
           <delay-button @click="showDeleteAllDialog = true">
             <div class="button-area">
               <i class="iconfont el-icon-delete-solid"/>
-              <span>全部清空</span>
+              <span>{{$t('downloadManagement.clearAll')}}</span>
             </div>
           </delay-button>
         </div>
@@ -120,7 +120,7 @@
     </div>
     
     <dialog-pop
-      title="確認刪除"
+      :title="$t('downloadManagement.conformDel')"
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
@@ -130,12 +130,12 @@
       @confirmHandler="confirmDelete(updateEventId)"
     >
       <div class="dialog-slot">
-        <div class="dialog-content">請確認是否刪除此項目? </div>
+        <div class="dialog-content">{{$t('downloadManagement.deleteThisItem')}}? </div>
       </div>
     </dialog-pop>
 
     <dialog-pop
-      title="確認刪除"
+      :title="$t('downloadManagement.conformDel')"
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
@@ -145,7 +145,7 @@
       @confirmHandler="clearAll()"
     >
       <div class="dialog-slot">
-        <div class="dialog-content">是否確認清空下載列表? </div>
+        <div class="dialog-content">{{$t('downloadManagement.deleteAllItem')}}? </div>
       </div>
     </dialog-pop>
 
@@ -204,35 +204,35 @@ export default {
       downloadInfoTable: [
         {
           'prop': 'inspect',
-          'label': '報表類型',
+          'label': this.$t('downloadManagement.reportType'),
           'sortable': false,
           'width': '140',
           'maxWidth': '150',
         },
         {
           'prop': 'condition',
-          'label': '條件',
+          'label': this.$t('downloadManagement.condition'),
           'sortable': false,
           'width': '140',
           'maxWidth': '140',
         },
         {
           'prop': 'fileName',
-          'label': '檔案名稱',
+          'label': this.$t('downloadManagement.fileName'),
           'sortable': false,
           'width': '140',
           'maxWidth': '140',
         },
         {
           'prop': 'status_showing',
-          'label': '狀態',
+          'label': this.$t('downloadManagement.statusShowing'),
           'sortable': false,
           'width': '140',
           'maxWidth': '140',
         },
         {
           'prop': 'ts',
-          'label': '匯出時間',
+          'label': this.$t('downloadManagement.ts'),
           'sortable': false,
           'width': '140',
           'maxWidth': '140',
@@ -256,68 +256,68 @@ export default {
       },
       reportDownloadList: [],
       oriReportDownloadList: [
-      { type: -1, 
-          label: '全部' ,
+        { type: -1, 
+          label: this.$t('downloadManagement.all'),
         },
         { 
           type: 1, 
-          label: '巡檢管理-巡檢報告' ,
+          label: this.$t('downloadManagement.inspectReport'), 
           content: [
-            { requestType: 1001, label: '報告完整匯出'},
-            { requestType: 1002, label: '報告明細匯出'},
-            { requestType: 1003, label: '報告詳情 - Excel匯出'},
+            { requestType: 1001, label: this.$t('downloadManagement.requestType_1001')},
+            { requestType: 1002, label: this.$t('downloadManagement.requestType_1002')},
+            { requestType: 1003, label: this.$t('downloadManagement.requestType_1003')},
           ]
         },
         { 
           type: 2, 
-          label: '事件管理',
+          label: this.$t('downloadManagement.inspectReport'),
           content: [
-            { requestType: 2001, label: '未處理事件'},
-            { requestType: 2002, label: '已處理事件'},
-            { requestType: 2003, label: '已結案事件'},
-            { requestType: 2004, label: '退回事件'},
-            { requestType: 2005, label: '全部事件'},
+            { requestType: 2001, label: this.$t('downloadManagement.requestType_2001')},
+            { requestType: 2002, label: this.$t('downloadManagement.requestType_2002')},
+            { requestType: 2003, label: this.$t('downloadManagement.requestType_2003')},
+            { requestType: 2004, label: this.$t('downloadManagement.requestType_2004')},
+            { requestType: 2005, label: this.$t('downloadManagement.requestType_2005')},
           ]
         },
         { 
           type: 3, 
-          label: '統計分析-巡檢考評統計',
+          label: this.$t('downloadManagement.patrolEvaluation'),
           content: [
-            { requestType: 3001, label: '考評結果分布'},
-            { requestType: 3002, label: '考評得分分布'},
-            { requestType: 3003, label: '考評達標率'},
+            { requestType: 3001, label: this.$t('downloadManagement.requestType_3001')},
+            { requestType: 3002, label: this.$t('downloadManagement.requestType_3002')},
+            { requestType: 3003, label: this.$t('downloadManagement.requestType_3003')},
           ]
         },
         { 
           type: 4, 
-          label: '統計分析-巡檢項統計',
+          label: this.$t('downloadManagement.patrolItem'),
           content: [
-            { requestType: 4001, label: '評估詳情'},
+            { requestType: 4001, label: this.$t('downloadManagement.requestType_4001')},
           ]
         },
         { 
           type: 5, 
-          label: '統計分析-巡檢人員統計',
+          label: this.$t('downloadManagement.patrolPersonStat'),
           content: [
-            { requestType: 5001, label: '巡檢人員統計列表'},
-            { requestType: 5002, label: '巡檢詳情'},
-            { requestType: 5003, label: '已送出事件結案率'},
+            { requestType: 5001, label: this.$t('downloadManagement.requestType_5001')},
+            { requestType: 5002, label: this.$t('downloadManagement.requestType_5002')},
+            { requestType: 5003, label: this.$t('downloadManagement.requestType_5003')},
           ]
         },
         { 
           type: 6, 
-          label: '統計分析-事件處理統計',
+          label: this.$t('downloadManagement.eventStat'),
           content: [
-            { requestType: 6001, label: '地點事件'},
-            { requestType: 6002, label: '事件佔比'},
-            { requestType: 6003, label: '事件涉及地點'},
+            { requestType: 6001, label: this.$t('downloadManagement.requestType_6001')},
+            { requestType: 6002, label: this.$t('downloadManagement.requestType_6002')},
+            { requestType: 6003, label: this.$t('downloadManagement.requestType_6003')},
           ]
         },
         { 
           type: 7, 
-          label: '巡檢排程-排程紀錄',
+          label: this.$t('downloadManagement.scheduleHistory'),
           content: [
-            { requestType: 7001, label: '排程紀錄 匯出Excel'},
+            { requestType: 7001, label: this.$t('downloadManagement.requestType_7001')},
           ]
         },
       ],
@@ -604,19 +604,19 @@ export default {
           // } else {
           //   inspectStore = i.requestContent.clause ? "地點: " + storName.join(', ') : ""
           // }
-          const inspectTimeRange = "時間範圍: " + this.getdate(i.searchStartTs) + ' - ' + this.getdate(i.searchEndTs)
-          const inspectName = i.requestContent.conTableName == null ? "" : '\n' + "巡檢表: " + i.requestContent.conTableName
-          const inspectStore = i.requestContent.conStoreName == null ? "" : '\n' + "地點: " + i.requestContent.conStoreName
+          const inspectTimeRange = this.$t('downloadManagement.timeRange') + this.getdate(i.searchStartTs) + ' - ' + this.getdate(i.searchEndTs)
+          const inspectName = i.requestContent.conTableName == null ? "" : '\n' + this.$t('downloadManagement.inSpection') + i.requestContent.conTableName
+          const inspectStore = i.requestContent.conStoreName == null ? "" : '\n' + this.$t('downloadManagement.store') + i.requestContent.conStoreName
 
           i.condition = inspectTimeRange + inspectName + inspectStore
           i.inspect = groupName + "\n" + tempReport.label
           i.fileName = i.requestContent.fileName
           i.ts =  this.getAllDate(i.ts)
 
-          if(i.status == -1 ) i.status_showing = '失敗'
-          else if(i.status == 0) i.status_showing = '處理中'
-          else if(i.status == 1) i.status_showing = '完成'
-          else if(i.status == 2) i.status_showing = '已失效'
+          if(i.status == -1 ) i.status_showing = this.$t('downloadManagement.fail')
+          else if(i.status == 0) i.status_showing = this.$t('downloadManagement.Processing')
+          else if(i.status == 1) i.status_showing = this.$t('downloadManagement.done')
+          else if(i.status == 2) i.status_showing = this.$t('downloadManagement.expired')
 
         })
 
