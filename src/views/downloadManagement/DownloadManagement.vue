@@ -164,6 +164,8 @@ import {
   deleteAll,
   downloadFile
 } from '@/api/exportExcel';
+import { getWhiteList } from '@/api/scheduleTask';
+
 import {handleEventStatus} from '@/api/reportAndEvent';
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
@@ -357,7 +359,8 @@ export default {
         requestType	: []
       },
       inspectTagList: [],
-      storeBriefList: []
+      storeBriefList: [],
+      isShowing: false
     };
   },
 
@@ -380,6 +383,47 @@ export default {
         },
         300);
       }
+
+      getWhiteList().then(res => {
+        const data = res.data;
+        if (res.data) {
+          resolve(res);
+          commit('SET_WHITE_LIST', res.data);
+        } 
+      }).catch(err => {
+        reject(err);
+      });
+      const whiteList = this.$store.state.user.whiteList
+      const accountId = this.$store.state.user.accountId
+      console.log('whiteList!!!!!!!!!!!!!!!!!!!!', whiteList)
+      console.log('accountId !!!!!!!!!!!!!!!!!!!!', accountId)
+      this.isShowing = whiteList.some( i => i == accountId)
+      console.log('this.isShowing !!!!!!!!!!!!!!!!!!!! ', this.isShowing);
+
+      var tempList = [...this.reportDownloadList]
+
+      if(!this.isShowing) {
+        this.allList = []
+        tempList = this.reportDownloadList.filter( i => i.type !== 7)
+        tempList.forEach(i => {
+          if(i.content){
+            this.allList = [...this.allList, ...i.content]
+          }
+        })
+        this.reportRequestTypeList = []
+        this.reportRequestTypeList = this.allList
+      }
+      else{
+        this.reportDownloadList.forEach(i => {
+          if(i.content){
+            this.allList = [...this.allList, ...i.content]
+          }
+        })
+        this.reportRequestTypeList = this.allList
+      }
+
+      
+
     },
     mimicModeChanged(val){
       console.log("mimicMode val:",val);
@@ -389,6 +433,24 @@ export default {
 
   },
   created() {
+    getWhiteList().then(res => {
+        const data = res.data;
+        if (res.data) {
+          resolve(res);
+          commit('SET_WHITE_LIST', res.data);
+        } 
+      }).catch(err => {
+        reject(err);
+      });
+    const whiteList = this.$store.state.user.whiteList
+    const accountId = this.$store.state.user.accountId
+    console.log('whiteList!!!!!!!!!!!!!!!!!!!!', whiteList)
+    console.log('accountId !!!!!!!!!!!!!!!!!!!!', accountId)
+    this.isShowing = whiteList.some( i => i == accountId)
+    console.log('this.isShowing !!!!!!!!!!!!!!!!!!!! ', this.isShowing);
+    if(!this.isShowing) this.reportDownloadList = this.reportDownloadList.filter( i => i.type !== 7)
+
+    
     this.reportDownloadList.forEach(i => {
       if(i.content){
         this.allList = [...this.allList, ...i.content]
@@ -398,6 +460,7 @@ export default {
     this.reportRequestTypeList = this.allList
     this.initData()
   },
+
   async mounted() {
     var userInfo = await this.$store.dispatch("GetUserAuthorities");
     this.hasAdvanced = userInfo.data.isSystemAdvanced
@@ -416,8 +479,6 @@ export default {
       this.storeBriefList = await this.getBriefStoreData()
       await this.searchRequestTypeItems()
       await this.getDownloadTable(this.params)
-  
-
     },
 
     getInspectTag() {
@@ -574,7 +635,6 @@ export default {
     },
 
     searchRequestReport(){
-      console.log('aaa :>> ');
       console.log('this.reportDownloadList XXDDD>> ', this.reportDownloadList);
       if(this.reportRequestType.length == 0) {
         this.reportType = -1
