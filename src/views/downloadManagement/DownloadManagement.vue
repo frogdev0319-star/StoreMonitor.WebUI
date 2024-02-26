@@ -689,6 +689,11 @@ export default {
     },
     handleDownload(val) {
       console.log('val ~~~~>> ', val);
+      if(val.row.status == 2){
+        util.notify(this.$t('downloadManagement.fileExpired'), 'warning', 3000);
+        return
+      }
+
       var downloadId = val.row.id
       console.log('downloadId :>> ', downloadId);
       downloadFile(downloadId).then(res=>{
