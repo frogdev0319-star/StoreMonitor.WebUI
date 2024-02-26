@@ -236,7 +236,7 @@
         <template slot-scope="scope">
             <div class="flex-center" >
               <div style="margin-right: 10px;" v-for="(item,index) in tableDownloadAction.operation" :key="index">
-                  <el-tooltip class="item flex-center" effect="dark" content="下載連結於3天後失效，請即時下載" placement="left"  :disabled="index == 1">
+                  <el-tooltip class="item flex-center" effect="dark" :content="$t('downloadManagement.dayExpired')" placement="left"  :disabled="index == 1">
                   <img 
                     class="child-space hover_effect"
                     :class="(scope.row.status == -1 || scope.row.status == 0 || scope.row.status == 2) && index == 0 ? `${item.icon} icon-disabled ` : item.icon"
