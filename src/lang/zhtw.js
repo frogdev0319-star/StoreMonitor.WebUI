@@ -1728,6 +1728,8 @@ export default{
         "Processing": "處理中",
         "done": "完成",
         "expired": "已失效",
+        "fileExpired": "檔案已過期，請重新匯出",
+        
     }
 }
 
