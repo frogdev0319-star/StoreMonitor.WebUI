@@ -1729,7 +1729,40 @@ export default{
         "expired": "已失效",
         "fileExpired": "檔案已過期，請重新匯出",
         "dayExpired": "下載連結於3天後失效，請即時下載",
-        
+    },
+    "advance":{
+        "waterMarkSetting": "浮水印設定",
+        "on": "開啟",
+        "off": "關閉",
+        "showMarkSetting": "浮水印顯示",
+        "opiton": "請選擇",
+        "maxCharacter": "最多可輸入 32 個字元",
+        "textColor": "文字顏色",
+        "textSize": "文字大小",
+        "textPOsition": "浮水印位置",
+        "userName": "人員名稱",
+        "l": "大",
+        "m": "中",
+        "s": "小",
+        "topLeft": "左上",
+        "topCenter": "中上",
+        "topRight": "右上",
+        "centerLeft": "置左",
+        "center": "置中",
+        "centerRight": "置右",
+        "bottomLeft": "左下",
+        "bottomCenter": "中下",
+        "centebottomRightrLeft": "右下",
+        "inputName": "請輸入自定義名稱！",
+        "screenShots": "限制螢幕截圖",
+    },
+    "reportAndEvents":{
+        "reportType": "報表類型",
+        "inceptionTag": "巡檢表",
+        "modifyClosedEvents": "修改已結案事件",
+        "changeStatus": "請確認是否變更狀態為",
+        "unprocessed": "未處理",
     }
+
 }
 

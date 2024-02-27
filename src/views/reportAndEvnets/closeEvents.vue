@@ -11,7 +11,7 @@
 
             <!-- 報表類型 -->
             
-            <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{hasAdvanced ? "報表類型" : "巡檢表"}}</span>
+            <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{hasAdvanced ? $t('reportAndEvents.reportType') : $t('reportAndEvents.inceptionTag')}}</span>
             <div class="flex-center report-type-area">
               <el-select
                 v-if="hasAdvanced"
@@ -49,7 +49,7 @@
     </div>
 
     <div id="el-containter" class="flex-column spacer" style="margin-left:0px">
-     
+    
       <div class="report-header">
         <div class="flex-center" style="padding-top: 0;">
           <date-time-selector
@@ -127,7 +127,7 @@
       </div>
     </div>
     <dialog-pop
-      title="修改已結案事件"
+      :title="this.$t('reportAndEvents.modifyClosedEvents')"
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
@@ -137,7 +137,7 @@
       @confirmHandler="confirmUpdate(updateEventId)"
     >
       <div class="dialog-slot">
-        <div class="dialog-content">請確認是否變更狀態為 <span style="color: red;"> <b>未處理</b></span>   ? </div>
+        <div class="dialog-content">{{$t('reportAndEvents.changeStatus')}} <span style="color: red;"> <b>{{$t('reportAndEvents.unprocessed')}}</b></span>   ? </div>
       </div>
     </dialog-pop>
 
