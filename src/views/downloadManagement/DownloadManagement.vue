@@ -689,23 +689,30 @@ export default {
     },
     handleDownload(val) {
       console.log('val ~~~~>> ', val);
-      if(val.row.status == 2){
-        util.notify(this.$t('downloadManagement.fileExpired'), 'warning', 3000);
-        return
-      }
+      // if(val.row.status == 2){
+      //   util.notify(this.$t('downloadManagement.fileExpired'), 'warning', 3000);
+      //   return
+      // }
 
       var downloadId = val.row.id
       console.log('downloadId :>> ', downloadId);
       downloadFile(downloadId).then(res=>{
         console.log('res.data :>> ', res.data);
-        if(!res.data.zip){
+        if(res.errCode == 9001){
+          util.notify(this.$t('downloadManagement.fileExpired'), 'warning', 3000);
+          return
+        }
+        else {
+          if(!res.data.zip){
           const b64data = res.data.data
           const fileName = res.data.fileName
           this.downloadFile(b64data, fileName)
-        }else{
-          const b64data = res.data.data
-          const fileName = res.data.fileName
-          this.downloadZip(b64data, fileName)
+          }else{
+            const b64data = res.data.data
+            const fileName = res.data.fileName
+            this.downloadZip(b64data, fileName)
+          }
+
         }
         resolve(res.data);
       }).catch(err => {
