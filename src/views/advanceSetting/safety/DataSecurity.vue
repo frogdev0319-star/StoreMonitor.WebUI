@@ -10,7 +10,7 @@
 
     <div class="page-container report-setting paper" >
       <div class="setting-titles padding flex-center">
-        限制螢幕截圖
+        {{$t('advance.screenShots') }}
         <div class="spacer"></div>
       </div>
 
@@ -27,8 +27,8 @@
                     v-model="isSecurityOn"
                     active-color="#c60957"
                     inactive-color="#eee"
-                    active-text="開啟"
-                    inactive-text="關閉"
+                    :active-text="$t('advance.on')"
+                    :inactive-text="$t('advance.off')"
                   >
                   </el-switch>
                 </div>

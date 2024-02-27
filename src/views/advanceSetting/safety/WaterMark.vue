@@ -10,7 +10,7 @@
 
     <div class="page-container report-setting paper" >
       <div class="setting-titles padding flex-center">
-        浮水印設定
+        {{$t('advance.waterMarkSetting') }}
         <div class="spacer"></div>
       </div>
 
@@ -27,8 +27,8 @@
                     v-model="isSwitchOn"
                     active-color="#c60957"
                     inactive-color="#eee"
-                    active-text="開啟"
-                    inactive-text="關閉"
+                    :active-text="$t('advance.on')"
+                    :inactive-text="$t('advance.off')"
                   >
                   </el-switch>
                 </div>
@@ -36,7 +36,7 @@
               
               <div class="setting_row">
                 <div class="setting_item">
-                  <h6>浮水印顯示</h6>
+                  <h6> {{$t('advance.showMarkSetting') }}</h6>
                   <el-select v-model="showTextStatus" placeholder="請選擇" :disabled="!isSwitchOn">
                     <el-option
                       v-for="item in showText"
@@ -53,19 +53,19 @@
                     style="width: 300px;  margin: 0 20px ;"
                     @input="(val) => itemInputChanged_overall(val)"
                     />
-                  <span class="text_limit_sign" v-if="showInputLimit_overallItem">最多可輸入 32 個字元 </span>
+                  <span class="text_limit_sign" v-if="showInputLimit_overallItem"> {{$t('advance.maxCharacter') }} </span>
                 </div>
 
               </div>
               <div class="setting_row" style="margin-bottom: 40px;">
                 <div class="setting_item">
-                  <h6>文字顏色 </h6>
+                  <h6>{{$t('advance.textColor') }} </h6>
                   <el-color-picker v-model="color" show-alpha :disabled="!isSwitchOn"></el-color-picker>
                 </div>
 
                 <div class="setting_item">
-                  <h6>文字大小</h6>
-                  <el-select v-model="textSize" placeholder="請選擇" :disabled="!isSwitchOn">
+                  <h6>{{$t('advance.textSize') }} </h6>
+                  <el-select v-model="textSize" :placeholder="$t('advance.opiton')" :disabled="!isSwitchOn">
                     <el-option
                       v-for="item in textSizeSelect"
                       :key="item.value"
@@ -76,8 +76,8 @@
                     
                 </div>
                 <div class="setting_item">
-                  <h6>浮水印位置</h6> 
-                  <el-select v-model="textPosition" placeholder="請選擇" :disabled="!isSwitchOn">
+                  <h6>{{$t('advance.textPOsition') }}</h6> 
+                  <el-select v-model="textPosition" :placeholder="$t('advance.opiton')" :disabled="!isSwitchOn">
                     <el-option
                       v-for="item in textPositionSelect"
                       :key="item.value"
@@ -147,66 +147,66 @@ export default {
           label: this.$t('audit.workFlows.defineItem')
         }, {
           value: false,
-          label: '人員名稱'
+          label: this.$t('advance.userName')
         }
       ],
       color:'#FFFFFF',
-      textSize: "中",
+      textSize: this.$t('advance.m'),
       textSizeSelect:[
         {
           value: "26.4px",
-          label: "大",
+          label: this.$t('advance.l'),
           mobileSize: "66px"
 
         }, 
         {
           value: "17.6px",
-          label: "中",
+          label: this.$t('advance.m'),
           mobileSize: "44px"
         }, 
         {
           value: "8.8px",
-          label: "小",
+          label: this.$t('advance.s'),
           mobileSize: "22px"
         }
       ],
-      textPosition: '左上 ',
+      textPosition: this.$t('advance.topLeft'),
       textPositionSelect:[
         {
           value: "topLeft",
-          label: "左上"
+          label: this.$t('advance.topLeft')
         }, 
         {
           value: "topCenter",
-          label: "中上"
+          label: this.$t('advance.topCenter')
         }, 
         {
           value: "topRight",
-          label: "右上"
+          label: this.$t('advance.topRight')
         },
         {
           value: "centerLeft",
-          label: "置左"
+          label: this.$t('advance.centerLeft')
         },
         {
           value: "center",
-          label: "置中"
+          label: this.$t('advance.center')
         },
         {
           value: "centerRight",
-          label: "置右"
+          label: this.$t('advance.centerRight')
         },
         {
           value: "bottomLeft",
-          label: "左下"
+          label: this.$t('advance.bottomLeft')
         },
         {
           value: "bottomCenter",
-          label: "中下"
+          label: this.$t('advance.bottomCenter')
         },
         {
           value: "bottomRight",
-          label: "右下"
+          label: this.$t('advance.bottomRight')
         },
       ],
       
@@ -346,7 +346,7 @@ export default {
     async submit(){
       if(this.defineText == '' && this.showTextStatus){
         this.$refs.defineName.focus()
-        util.notify("請輸入自定義名稱！", 'error', 2000 );
+        util.notify(this.$t('advance.inputName'), 'error', 2000 );
         return false
       }
 
