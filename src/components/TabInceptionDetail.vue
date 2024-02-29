@@ -448,12 +448,14 @@ export default {
     },
     export2Excel(){
       const self = this;
+      console.log('self.detailTbl :>> ', self.detailTbl);
       let table = "" 
-      let submitterName = self.detailTbl.table_data[0].submitterName;
+      
+    
       if(this.currentTab == "Detail"){
           console.log('detail :>> ');
           table = self.detailTbl;
-          console.log('table', table)
+          console.log('table 1:>> ', table);
           if (table.table_data.length === 0) {
               util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
               return false;
@@ -463,7 +465,8 @@ export default {
           var nowTs = this.getAllDate(now)
           var tsbegin = this.getDate(this.beginTs)
           var tsEnd = this.getOnlyDate(this.endTs)
-
+          let submitterName = table.table_data[0].submitterName;
+          
           let params = {
             beginTs: this.beginTs,
             endTs: this.endTs,
@@ -487,17 +490,17 @@ export default {
       }else if(this.currentTab == "Event"){
           console.log('Event :>> ');
           table = self.eventTbl;
+          console.log('table 2:>> ', table);
           if (table.table_data.length === 0) {
               util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
               return false;
           }
-          console.log('table', table)
-
           const now = new Date()
           var nowTs = this.getAllDate(now)
           var tsbegin = this.getDate(this.beginTs)
           var tsEnd = this.getOnlyDate(this.endTs)
-
+          let assignerName = table.table_data[0].assignerName;
+    
           let params = {
             beginTs: this.beginTs,
             endTs: this.endTs,
@@ -508,7 +511,7 @@ export default {
             },  
             filter: {page: 0, size: 99999},
             searchMysteryMode: this.isMystery ? 1 : 0,
-            fileName : nowTs + "-" + submitterName + "-Inspection_event-" + tsbegin + tsEnd,
+            fileName : nowTs + "-" + assignerName + "-Inspection_event-" + tsbegin + tsEnd,
             requestTs : now.getTime()
           };
 
@@ -691,7 +694,7 @@ export default {
                 if (errCode === 0) {
                     data = res.data.content;
                 }
-                // console.log("data ~~~~~>",data);
+                console.log("data ~~~~~>",data);
                 const temp = []; 
                 let tempStorId = data.length > 0 ? data[0].storeId : "";
                 let tempStorName = data.length > 0 ? data[0].name : "";
@@ -702,11 +705,10 @@ export default {
                         const reportObj = {
                             id:tempStorId,
                             storeName:tempStorName,
-                            assignerName:item.assignerName,
+                            assignerName: item.assignerName,
                             Unprocessed,
                             Closed,
                             Inprocess,
-                            Processed,
                             Rejected,
                             Overdue,
                             Processed : Closed + Overdue,
@@ -721,7 +723,6 @@ export default {
                         tempStorName = item.name;
                         //assignerName = item.assignerName;
                     }
-                        
                     switch(item.status){
                       case 0:
                         Unprocessed+=1;
@@ -745,13 +746,14 @@ export default {
                         id: tempStorId,
                         storeId: tempStorId,
                         storeName: tempStorName,
-                        Overdue,
+                        assignerName: item.assignerName,
                         Unprocessed,
+                        Closed,
                         Inprocess,
                         Rejected,
-                        Processed,
-                        Closed,
+                        Overdue,
                         Processed : Closed + Overdue,
+
                         // completedRate:((Processed / (Unprocessed+Inprocess+Closed+Rejected+Overdue))*100).toFixed(1)+'%',
                         detail : this.$t('statistics.patrolPerson.seeDetail')
                       };
