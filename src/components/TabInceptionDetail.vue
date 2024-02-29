@@ -1,131 +1,131 @@
 <template>
-    <div>
-        <div class="tab-area">
-            <div class="names">
-                <div v-for="item in tabs"
-                    class="template-name"
-                    :class="{'active-name-btn' : currentTab === item.value}"
-                    :key="item.value"
-                    @click="onClickBtn(item.value)">
-                    {{ item.name }}
-                </div>
-            </div>
-            <div 
-              style="margin-right: 30px;"
-              v-show="currentTab != 'NotInspected'"
-              class="operation-btns" 
-              :class="getLangStyleValue(operationBtnClass)">
-                <delay-button
-                    :class="getLangStyleValue(exportBtnClass)"
-                    class="export-btn"
-                    type="default"
-                    size="mini"
-                    @click="export2Excel"
-                >
-                <div class="button-area">
-                    <img :src="exportPng" class="icon-excel">
-                    <span>{{ $t('eventView.exportReport') }}</span>
-                </div>
-                </delay-button>
-            </div>
-        </div>
-        <div v-if="currentTab=='Detail'" class="insep-detail-tbl" style="width: 95%">
-            <el-table
-              v-loading="isLoading"
-              :data="detailTbl.table_data"
-              :highlight-current-row="true"
-              :header-cell-style="{height:'47px',backgroundColor: '#EFF3F5',border:'none',fontSize:'12px'}"
-              :cell-style="{height:'62px', backgroundColor: '#EFF3F5',border:'none',fontSize:'15px',borderBottom:'1px solid rgba(172,174,177,0.3)',color:'#484848'}"
-              :empty-text="$t('deviceView.noData')"
-              align="left"
-              style="width: 100%"
-              class="tbl-TabInspecDetail"
-            >
-                <el-table-column
-                    v-for="(_item,_index) in detailTbl.column_data"
-                    :key="_index"
-                    :prop="_item.prop"
-                    :label="_item.label"
-                    :min-width="_item.width"
-                >
-                <template slot-scope="{row}">
-                    <template v-if="_item.isCellClick">
-                        <span style="cursor:pointer;color:#006ab7;" @click="handleEmitDetailRowClick(row)">{{ row[_item.prop]}} </span>
-                    </template>
-                    <template v-else>
-                        <span>{{ row[_item.prop]}}</span>
-                    </template>
-                </template>
-                </el-table-column>
-            </el-table>
-            <tbl-pagination-only
-              :total="detailTbl.total"
-              :current-page="detailTbl.page"
-              :page-size="detailTbl.sizeNum"
+  <div>
+      <div class="tab-area">
+          <div class="names">
+              <div v-for="item in tabs"
+                  class="template-name"
+                  :class="{'active-name-btn' : currentTab === item.value}"
+                  :key="item.value"
+                  @click="onClickBtn(item.value)">
+                  {{ item.name }}
+              </div>
+          </div>
+          <div 
+            style="margin-right: 30px;"
+            v-show="currentTab != 'NotInspected'"
+            class="operation-btns" 
+            :class="getLangStyleValue(operationBtnClass)">
+              <delay-button
+                  :class="getLangStyleValue(exportBtnClass)"
+                  class="export-btn"
+                  type="default"
+                  size="mini"
+                  @click="export2Excel"
+              >
+              <div class="button-area">
+                  <img :src="exportPng" class="icon-excel">
+                  <span>{{ $t('eventView.exportReport') }}</span>
+              </div>
+              </delay-button>
+          </div>
+      </div>
+      <div v-if="currentTab=='Detail'" class="insep-detail-tbl" style="width: 95%">
+          <el-table
+            v-loading="isLoading"
+            :data="detailTbl.table_data"
+            :highlight-current-row="true"
+            :header-cell-style="{height:'47px',backgroundColor: '#EFF3F5',border:'none',fontSize:'12px'}"
+            :cell-style="{height:'62px', backgroundColor: '#EFF3F5',border:'none',fontSize:'15px',borderBottom:'1px solid rgba(172,174,177,0.3)',color:'#484848'}"
+            :empty-text="$t('deviceView.noData')"
+            align="left"
+            style="width: 100%"
+            class="tbl-TabInspecDetail"
+          >
+              <el-table-column
+                  v-for="(_item,_index) in detailTbl.column_data"
+                  :key="_index"
+                  :prop="_item.prop"
+                  :label="_item.label"
+                  :min-width="_item.width"
+              >
+              <template slot-scope="{row}">
+                  <template v-if="_item.isCellClick">
+                      <span style="cursor:pointer;color:#006ab7;" @click="handleEmitDetailRowClick(row)">{{ row[_item.prop]}} </span>
+                  </template>
+                  <template v-else>
+                      <span>{{ row[_item.prop]}}</span>
+                  </template>
+              </template>
+              </el-table-column>
+          </el-table>
+          <tbl-pagination-only
+            :total="detailTbl.total"
+            :current-page="detailTbl.page"
+            :page-size="detailTbl.sizeNum"
+            :btnStyle="{'backgroundColor': '#EFF3F5'}"
+            :showPageSize="false"
+            @sizeChange="handlePageAndSizeChange_detail"
+            @currentChange="handlePageAndSizeChange_detail"
+          />
+      </div>
+      <div v-if="currentTab=='NotInspected'" class="not-inspected">
+          <el-row :gutter="20" type="flex" style=" flex-wrap: wrap;overflow-y:auto;" >
+              <el-col :span="6" v-for="(store) in notInspectedStores" :key="store.id"> 
+                  <div class="store-div">
+                      <img :src="shopImg" />
+                      <div class="store-name">{{store.storeName}}</div>
+                  </div>
+              </el-col>
+          </el-row>
+      </div>
+      <div v-if="currentTab=='Event'" class="insep-detail-tbl">
+          <el-table
+            v-loading="isLoading"
+            :data="eventTbl.table_data"
+            :highlight-current-row="true"
+            :header-cell-style="{height:'47px',backgroundColor: '#EFF3F5',border:'none',fontSize:'12px'}"
+            :cell-style="{height:'50px', backgroundColor: '#EFF3F5',border:'none',fontSize:'12px',borderBottom:'1px solid rgba(172,174,177,0.3)',color:'#484848'}"
+            :empty-text="$t('deviceView.noData')"
+            align="left"
+            style="width: 100%;"
+            class="tbl-TabInspecDetail"
+          >
+              <el-table-column
+                  v-for="(_item,_index) in eventTbl.column_data"
+                  :key="_index"
+                  :prop="_item.prop"
+                  :label="_item.label"
+                  :min-width="isexportPDF ? _item.pdfwidth : _item.width "
+              >
+              <template slot-scope="{row}">
+                  <template v-if="_item.isCellClick">
+                      <span style="cursor:pointer;color:#006ab7;" @click="handleEmitPersonEventRowClick(row)">{{ row[_item.prop]}}</span>
+                  </template>
+                  <template v-else>
+                      <span>{{ row[_item.prop]}}</span>
+                  </template>
+              </template>
+              </el-table-column>
+          </el-table>
+          <tbl-pagination-only
+              :total="eventTbl.total"
+              :current-page="eventTbl.page"
+              :page-size="eventTbl.sizeNum"
               :btnStyle="{'backgroundColor': '#EFF3F5'}"
               :showPageSize="false"
               @sizeChange="handlePageAndSizeChange_detail"
-              @currentChange="handlePageAndSizeChange_detail"
-            />
-        </div>
-        <div v-if="currentTab=='NotInspected'" class="not-inspected">
-            <el-row :gutter="20" type="flex" style=" flex-wrap: wrap;overflow-y:auto;" >
-                <el-col :span="6" v-for="(store) in notInspectedStores" :key="store.id"> 
-                    <div class="store-div">
-                        <img :src="shopImg" />
-                        <div class="store-name">{{store.storeName}}</div>
-                    </div>
-                </el-col>
-            </el-row>
-        </div>
-        <div v-if="currentTab=='Event'" class="insep-detail-tbl">
-            <el-table
-              v-loading="isLoading"
-              :data="eventTbl.table_data"
-              :highlight-current-row="true"
-              :header-cell-style="{height:'47px',backgroundColor: '#EFF3F5',border:'none',fontSize:'12px'}"
-              :cell-style="{height:'50px', backgroundColor: '#EFF3F5',border:'none',fontSize:'12px',borderBottom:'1px solid rgba(172,174,177,0.3)',color:'#484848'}"
-              :empty-text="$t('deviceView.noData')"
-              align="left"
-              style="width: 100%;"
-              class="tbl-TabInspecDetail"
-            >
-                <el-table-column
-                    v-for="(_item,_index) in eventTbl.column_data"
-                    :key="_index"
-                    :prop="_item.prop"
-                    :label="_item.label"
-                    :min-width="isexportPDF ? _item.pdfwidth : _item.width "
-                >
-                <template slot-scope="{row}">
-                    <template v-if="_item.isCellClick">
-                        <span style="cursor:pointer;color:#006ab7;" @click="handleEmitPersonEventRowClick(row)">{{ row[_item.prop]}}</span>
-                    </template>
-                    <template v-else>
-                        <span>{{ row[_item.prop]}}</span>
-                    </template>
-                </template>
-                </el-table-column>
-            </el-table>
-            <tbl-pagination-only
-                :total="eventTbl.total"
-                :current-page="eventTbl.page"
-                :page-size="eventTbl.sizeNum"
-                :btnStyle="{'backgroundColor': '#EFF3F5'}"
-                :showPageSize="false"
-                @sizeChange="handlePageAndSizeChange_detail"
-                @currentChange="handlePageAndSizeChange_event"
-            />
-        </div>
-        <DownloadDialogPop
-          :title="$t('downloadManagement.message')"
-          :visible="showExportMassage"
-          :showCancelbtn="false"
-          @confirmHandler="showExportMassage = false"
-          @goToPage="$router.push({name: 'downloadManagement',});"
-          >
-        </DownloadDialogPop>
-    </div>
+              @currentChange="handlePageAndSizeChange_event"
+          />
+      </div>
+      <DownloadDialogPop
+        :title="$t('downloadManagement.message')"
+        :visible="showExportMassage"
+        :showCancelbtn="false"
+        @confirmHandler="showExportMassage = false"
+        @goToPage="$router.push({name: 'downloadManagement',});"
+        >
+      </DownloadDialogPop>
+  </div>
 </template>
 
 <script>
@@ -133,9 +133,9 @@ import TablePagination from '@/components/TablePagination_V2';
 import { getInspectReportList, getNotInspectStoresByPerson, statisticsGetInspectReportList } from '@/api/inspect';
 import {GetEventAndCommentList , StatisticsGetEventAndCommentList} from '@/api/event';
 import {
-  exportStatisticsPerson, 
-  exportStatisticsReportList , 
-  exportStatisticsEventComment
+exportStatisticsPerson, 
+exportStatisticsReportList , 
+exportStatisticsEventComment
 } from '@/api/exportExcel';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import util from '@/common/util';
@@ -145,824 +145,824 @@ import { message } from '@/common/singleton-message';
 import DelayButton from '@/components/DelayButton';
 import DownloadDialogPop from '@/components/DownloadDialogPop';
 export default {
-    name:'TabInceptionDetail',
-    components: {
-        DelayButton,
-        DownloadDialogPop,
-        'table-pagination':TablePagination,TblPaginationOnly
-    },
-    props:{
-        submitter:{
-            type: String,
-            required: true
-        },
-        beginTs:{
-            type: Number,
-            required:true
-        },
-        endTs:{
-            type:Number,
-            required: true
-        },
-        isexportPDF: {
-            type: Boolean,
-            default: false
-        },
-        isMystery:{
-            type: Boolean,
-            default: false
-        }
-    },
-    data(){
-        return{
-            lang: this.$i18n.locale,
-            exportPng: require('../../static/img/excel.png'),
-            currentTab:'Detail',
-            isLoading: false,
-            tabs:[{value:'Detail',name:this.$t('statistics.patrolPerson.Detail')},
-                    {value:'NotInspected',name:this.$t('statistics.patrolPerson.NotInspected')},
-                    {value:'Event',name:this.$t('statistics.patrolPerson.uploadedEvent')}
-                ],
-            detailTbl:{
-                column_data:[
-                    {
-                    'prop': 'date',
-                    'label': this.$t('statistics.patrolPerson.ts'),
-                    'sortable': false,
-                    'width': '200',
-                    'maxWidth': '200',
-                    'pdfwidth': '11%',
-                    'isExpand': false
-                    },
-                    {
-                    'prop': 'storeName',
-                    'label': this.$t('statistics.patrolPerson.storeName'),
-                    'sortable': false,
-                    'width': '200',
-                    'maxWidth': '200',
-                    'pdfwidth': '11%',
-                    'isExpand':false
-                    },
-                    {
-                    'prop': 'tagName',
-                    'label': this.$t('statistics.patrolPerson.tagName'),
-                    'sortable': false,
-                    'width': '200',
-                    'maxWidth': '200',
-                    'pdfwidth': '11%',
-                    'isExpand':false
-                    },
-                    {
-                    'prop': 'totalScore',
-                    'label': this.$t('statistics.patrolPerson.totalScore'),
-                    'sortable': false,
-                    'width': '200',
-                    'maxWidth': '200',
-                    'pdfwidth': '11%',
-                    'isExpand':false
-                    },
-                    {
-                    'prop': 'detail',
-                    'label': this.$t('statistics.patrolPerson.operation'),
-                    'sortable': false,
-                    'width': '200',
-                    'maxWidth': '200',
-                    'pdfwidth': '12%',
-                    'isExpand':false,
-                    'isCellClick':true
-                    }
-                ],
-                all_data:[],
-                table_data:[],
-                defaultSort: { prop: 'numOfTotal', order: 'ascending' },
-                total:0,
-                sizeNum:5,
-                page:1,
-            },
-            notInspectedStores:[],
-            shopImg: require('../../static/img/statistics/ic_shop.svg'),
-            eventTbl:{
-                column_data:[
-                    {
-                    'prop': 'storeName',
-                    'label': this.$t('statistics.patrolPerson.storeName'),
-                    'sortable': false,
-                    'width': '140',
-                    'maxWidth': '140',
-                    'pdfwidth': '11%',
-                    'isExpand':false
-                    },
-                    {
-                    'prop': 'Unprocessed',
-                    'label': this.$t('statistics.patrolPerson.Unprocessed'),
-                    'sortable': true,
-                    'width': '140',
-                    'maxWidth': '140',
-                    'pdfwidth': '11%',
-                    'isExpand':false
-                    },
-                    {
-                    'prop': 'Inprocess',
-                    'label': this.$t('statistics.patrolPerson.Inprocess'),
-                    'sortable': true,
-                    'width': '140',
-                    'maxWidth': '140',
-                    'pdfwidth': '11%',
-                    'isExpand':false
-                    },
-                    {
-                    'prop': 'Rejected',
-                    'label': this.$t('statistics.patrolPerson.Rejected'),
-                    'sortable': true,
-                    'width': '140',
-                    'maxWidth': '140',
-                    'pdfwidth': '11%',
-                    'isExpand':false 
-                    },
-                    {
-                    'prop': 'Processed',
-                    'label': this.$t('statistics.patrolPerson.Processed'),
-                    'sortable': true,
-                    'width': '140',
-                    'maxWidth': '140',
-                    'pdfwidth': '11%',
-                    'isExpand':false 
-                    },
-                    {
-                    'prop': 'completedRate',
-                    'label': this.$t('statistics.patrolPerson.completedRate'),
-                    'sortable': true,
-                    'width': '140',
-                    'maxWidth': '140',
-                    'pdfwidth': '11%',
-                    'isExpand':false 
-                    },
-                    {
-                    'prop': 'detail',
-                    'label': this.$t('statistics.patrolPerson.operation'),
-                    'sortable': false,
-                    'width': '200',
-                    'maxWidth': '200',
-                    'pdfwidth': '12%',
-                    'isExpand':false,
-                    'isCellClick':true
-                    }
-                ],
-                all_data:[],
-                table_data:[],
-                defaultSort: { prop: 'numOfTotal', order: 'ascending' },
-                total:0,
-                sizeNum:5,
-                page:1
-            },
-            submitterName:"",
-            pageSizeOption:[
-                {value:5,label:"5 "+this.$t('overview.pageSizeUnit')},
-                {value:10,label:"10 "+this.$t('overview.pageSizeUnit')}],
-                operationBtnClass:[
-                {key:'en',value:'operation-btns-en'},{key:'zh',value:'operation-btns-zh'},{key:'zhtw',value:'operation-btns-zhTW'},
-                {key:'ja-JP',value:'operation-btns-ja'},{key:'ko-KR',value:'operation-btns-ko'},{key:'vi-VN',value:'operation-btns-vi'},
-                {key:'id-ID',value:'operation-btns-id'},{key:'th-TH',value:'operation-btns-th'}
-            ],
-            exportBtnClass:[
-                {key:'en',value:'en-export-btn'},{key:'zh',value:'zh-export-btn'},{key:'zhtw',value:'zhTW-export-btn'},
-                {key:'ja-JP',value:'ja-export-btn'},{key:'ko-KR',value:'ko-export-btn'},{key:'vi-VN',value:'vi-export-btn'},
-                {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
-            ],
-            showExportMassage: false,
-        };
-    },
-    created(){
-        this.getReportList()
-    },
-  methods:{
-    getLangStyleValue(langArray){
-      return util.getLangStyleValue(langArray);
-    },
-
-    onClickBtn(item){
-      console.log('item :>> ', item);
-      this.currentTab = item;
-      if(item == "Detail"){
-
-      }else if(item == "NotInspected"){
-          this.getNotInspectedStores();
-      }else if(item == "Event"){
-          this.getEventCompletedRate();
+  name:'TabInceptionDetail',
+  components: {
+      DelayButton,
+      DownloadDialogPop,
+      'table-pagination':TablePagination,TblPaginationOnly
+  },
+  props:{
+      submitter:{
+          type: String,
+          required: true
+      },
+      beginTs:{
+          type: Number,
+          required:true
+      },
+      endTs:{
+          type:Number,
+          required: true
+      },
+      isexportPDF: {
+          type: Boolean,
+          default: false
+      },
+      isMystery:{
+          type: Boolean,
+          default: false
       }
-      //this.$emit('click', item)
-    },
-    getReportList() {
-      this.isLoading = true
-      const self = this;
-      self.submitterName = "";
-      let params = {
-        beginTs: this.beginTs,
-        endTs: this.endTs,clause:{"submitter":this.submitter}, 
-        searchMysteryMode: this.isMystery ? 1 : 0};
-      //console.log("params:",params);
-      return new Promise((resolve) => {
-          statisticsGetInspectReportList(params).then(res => {
-              const errCode = res.errCode;
-              let data = [];
-              if (errCode === 0) {
-                  data = res.data.content.filter(i => i.mode == 1);
-              }
-              //console.log("data:",data);
-              const temp = [];
-              data.forEach(item => {
-                  const reportObj = {};
-                  reportObj.id = item.id;
-                  reportObj.date = util.getDateStr(item.ts);
-                  reportObj.storeName = item.storeName;
-                  reportObj.tagName = item.tagName;
-                  reportObj.submitterName = item.submitterName;
-                  reportObj.submitter = item.submitter;
-                  reportObj.totalScore = item.totalScore;
-                  reportObj.mode = item.mode;
-                  reportObj.status = item.status;
-                  reportObj.detail = self.$t('statistics.patrolPerson.seeDetail')
-                  temp.push(reportObj);
-                });
-                if(temp.length>0){
-                  self.submitterName = temp[0].submitterName;
-                  self.detailTbl.all_data = temp;
-                  self.detailTbl.total = Math.ceil(temp.length/this.detailTbl.sizeNum);
-                  this.setDetailTableData();
-                }
-                resolve(temp);
-                this.isLoading = false
-            }).catch(err => {
-            console.log('InspectReportList-getReportList: ' + err);
-          });
-      });
-    },
-    setDetailTableData(){
-        this.detailTbl.table_data = [];
-        this.detailTbl.table_data = [...this.detailTbl.all_data.slice( (this.detailTbl.page - 1)* this.detailTbl.sizeNum, this.detailTbl.page* this.detailTbl.sizeNum)];
+  },
+  data(){
+      return{
+          lang: this.$i18n.locale,
+          exportPng: require('../../static/img/excel.png'),
+          currentTab:'Detail',
+          isLoading: false,
+          tabs:[{value:'Detail',name:this.$t('statistics.patrolPerson.Detail')},
+                  {value:'NotInspected',name:this.$t('statistics.patrolPerson.NotInspected')},
+                  {value:'Event',name:this.$t('statistics.patrolPerson.uploadedEvent')}
+              ],
+          detailTbl:{
+              column_data:[
+                  {
+                  'prop': 'date',
+                  'label': this.$t('statistics.patrolPerson.ts'),
+                  'sortable': false,
+                  'width': '200',
+                  'maxWidth': '200',
+                  'pdfwidth': '11%',
+                  'isExpand': false
+                  },
+                  {
+                  'prop': 'storeName',
+                  'label': this.$t('statistics.patrolPerson.storeName'),
+                  'sortable': false,
+                  'width': '200',
+                  'maxWidth': '200',
+                  'pdfwidth': '11%',
+                  'isExpand':false
+                  },
+                  {
+                  'prop': 'tagName',
+                  'label': this.$t('statistics.patrolPerson.tagName'),
+                  'sortable': false,
+                  'width': '200',
+                  'maxWidth': '200',
+                  'pdfwidth': '11%',
+                  'isExpand':false
+                  },
+                  {
+                  'prop': 'totalScore',
+                  'label': this.$t('statistics.patrolPerson.totalScore'),
+                  'sortable': false,
+                  'width': '200',
+                  'maxWidth': '200',
+                  'pdfwidth': '11%',
+                  'isExpand':false
+                  },
+                  {
+                  'prop': 'detail',
+                  'label': this.$t('statistics.patrolPerson.operation'),
+                  'sortable': false,
+                  'width': '200',
+                  'maxWidth': '200',
+                  'pdfwidth': '12%',
+                  'isExpand':false,
+                  'isCellClick':true
+                  }
+              ],
+              all_data:[],
+              table_data:[],
+              defaultSort: { prop: 'numOfTotal', order: 'ascending' },
+              total:0,
+              sizeNum:5,
+              page:1,
+          },
+          notInspectedStores:[],
+          shopImg: require('../../static/img/statistics/ic_shop.svg'),
+          eventTbl:{
+              column_data:[
+                  {
+                  'prop': 'storeName',
+                  'label': this.$t('statistics.patrolPerson.storeName'),
+                  'sortable': false,
+                  'width': '140',
+                  'maxWidth': '140',
+                  'pdfwidth': '11%',
+                  'isExpand':false
+                  },
+                  {
+                  'prop': 'Unprocessed',
+                  'label': this.$t('statistics.patrolPerson.Unprocessed'),
+                  'sortable': true,
+                  'width': '140',
+                  'maxWidth': '140',
+                  'pdfwidth': '11%',
+                  'isExpand':false
+                  },
+                  {
+                  'prop': 'Inprocess',
+                  'label': this.$t('statistics.patrolPerson.Inprocess'),
+                  'sortable': true,
+                  'width': '140',
+                  'maxWidth': '140',
+                  'pdfwidth': '11%',
+                  'isExpand':false
+                  },
+                  {
+                  'prop': 'Rejected',
+                  'label': this.$t('statistics.patrolPerson.Rejected'),
+                  'sortable': true,
+                  'width': '140',
+                  'maxWidth': '140',
+                  'pdfwidth': '11%',
+                  'isExpand':false 
+                  },
+                  {
+                  'prop': 'Processed',
+                  'label': this.$t('statistics.patrolPerson.Processed'),
+                  'sortable': true,
+                  'width': '140',
+                  'maxWidth': '140',
+                  'pdfwidth': '11%',
+                  'isExpand':false 
+                  },
+                  {
+                  'prop': 'completedRate',
+                  'label': this.$t('statistics.patrolPerson.completedRate'),
+                  'sortable': true,
+                  'width': '140',
+                  'maxWidth': '140',
+                  'pdfwidth': '11%',
+                  'isExpand':false 
+                  },
+                  {
+                  'prop': 'detail',
+                  'label': this.$t('statistics.patrolPerson.operation'),
+                  'sortable': false,
+                  'width': '200',
+                  'maxWidth': '200',
+                  'pdfwidth': '12%',
+                  'isExpand':false,
+                  'isCellClick':true
+                  }
+              ],
+              all_data:[],
+              table_data:[],
+              defaultSort: { prop: 'numOfTotal', order: 'ascending' },
+              total:0,
+              sizeNum:5,
+              page:1
+          },
+          submitterName:"",
+          pageSizeOption:[
+              {value:5,label:"5 "+this.$t('overview.pageSizeUnit')},
+              {value:10,label:"10 "+this.$t('overview.pageSizeUnit')}],
+              operationBtnClass:[
+              {key:'en',value:'operation-btns-en'},{key:'zh',value:'operation-btns-zh'},{key:'zhtw',value:'operation-btns-zhTW'},
+              {key:'ja-JP',value:'operation-btns-ja'},{key:'ko-KR',value:'operation-btns-ko'},{key:'vi-VN',value:'operation-btns-vi'},
+              {key:'id-ID',value:'operation-btns-id'},{key:'th-TH',value:'operation-btns-th'}
+          ],
+          exportBtnClass:[
+              {key:'en',value:'en-export-btn'},{key:'zh',value:'zh-export-btn'},{key:'zhtw',value:'zhTW-export-btn'},
+              {key:'ja-JP',value:'ja-export-btn'},{key:'ko-KR',value:'ko-export-btn'},{key:'vi-VN',value:'vi-export-btn'},
+              {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
+          ],
+          showExportMassage: false,
+      };
+  },
+  created(){
+      this.getReportList()
+  },
+methods:{
+  getLangStyleValue(langArray){
+    return util.getLangStyleValue(langArray);
+  },
 
-      },
-    handlePageAndSizeChange_detail(pageObj){
-        console.log("handlePageAndSizeChange_detail:",pageObj)
-        const self = this;
-        self.detailTbl.page = pageObj.page;
-        self.detailTbl.sizeNum = pageObj.size;
-        self.setDetailTableData();
-      },
-    formatJson(filterVal, jsonData) {
-        return jsonData.map(v => filterVal.map(j => v[j]));
-      },
+  onClickBtn(item){
+    console.log('item :>> ', item);
+    this.currentTab = item;
+    if(item == "Detail"){
 
-    pad2(n){
-      return (n < 10 ? '0' : '') + n;
-    },
-    getAllDate(t){
-      var date = new Date(t);
-      var month = this.pad2(date.getMonth()+1);
-      var day = this.pad2(date.getDate());
-      var year= date.getFullYear();
-      var hour = this.pad2(date.getHours())
-      var min = this.pad2(date.getMinutes())
-      var sec = this.pad2(date.getSeconds())
-      return year + month + day + hour + min + sec
-    },
-    getDate(t){
-      var date = new Date(t);
-      var month = this.pad2(date.getMonth()+1);
-      var day = this.pad2(date.getDate());
-      var year= date.getFullYear();
-      var hour = this.pad2(date.getHours())
-      var min = this.pad2(date.getMinutes())
-      var sec = this.pad2(date.getSeconds())
-      return year + month + day 
-    },
-    getOnlyDate(t){
-      var date = new Date(t);
-      var month = this.pad2(date.getMonth()+1);
-      var day = this.pad2(date.getDate());
-      var year= date.getFullYear();
-      var hour = this.pad2(date.getHours())
-      var min = this.pad2(date.getMinutes())
-      var sec = this.pad2(date.getSeconds())
-      return  month + day 
-    },
-    export2Excel(){
-      const self = this;
-      console.log('self.detailTbl :>> ', self.detailTbl);
-      let table = "" 
-      
-    
-      if(this.currentTab == "Detail"){
-          console.log('detail :>> ');
-          table = self.detailTbl;
-          console.log('table 1:>> ', table);
-          if (table.table_data.length === 0) {
-              util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
-              return false;
-          }
-          
-          const now = new Date()
-          var nowTs = this.getAllDate(now)
-          var tsbegin = this.getDate(this.beginTs)
-          var tsEnd = this.getOnlyDate(this.endTs)
-          let submitterName = table.table_data[0].submitterName;
-          
-          let params = {
-            beginTs: this.beginTs,
-            endTs: this.endTs,
-            clause:{ submitter: this.submitter }, 
-            order: {
-              direction: "asc", 
-              property: "storeId"
-            }, 
-            filter: {page: 0, size: 99999},
-            searchMysteryMode: this.isMystery ? 1 : 0,
-            fileName : nowTs + "-" + submitterName + "-Inspection_detail-" + tsbegin + tsEnd,
-            requestTs : now.getTime()
-
-          };
-
-          this.showExportMassage = true
-          exportStatisticsReportList(params).then(res=>{
-            console.log('res :>> ', res);
-          })
-
-      }else if(this.currentTab == "Event"){
-          console.log('Event :>> ');
-          table = self.eventTbl;
-          console.log('table 2:>> ', table);
-          if (table.table_data.length === 0) {
-              util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
-              return false;
-          }
-          const now = new Date()
-          var nowTs = this.getAllDate(now)
-          var tsbegin = this.getDate(this.beginTs)
-          var tsEnd = this.getOnlyDate(this.endTs)
-          let assignerName = table.table_data[0].assignerName;
-    
-          let params = {
-            beginTs: this.beginTs,
-            endTs: this.endTs,
-            clause: {assigner: this.submitter},
-            order: {
-              direction: "asc", 
-              property: "storeId"
-            },  
-            filter: {page: 0, size: 99999},
-            searchMysteryMode: this.isMystery ? 1 : 0,
-            fileName : nowTs + "-" + assignerName + "-Inspection_event-" + tsbegin + tsEnd,
-            requestTs : now.getTime()
-          };
-
-          this.showExportMassage = true
-          exportStatisticsEventComment(params).then(res=>{
-            console.log('res :>> ', res);
-          })
-
-      }
-
-        // require.ensure([], async() => {
-        //     const { export_json_to_excel } = require('@/excel/Export2Excel');
-        //     const tHeader = [];
-        //     const filterVal =[];
-        //     table.column_data.forEach(item=>{
-        //         if(item.prop != 'detail'){
-        //             tHeader.push(item.label);
-        //             filterVal.push(item.prop);
-        //         }
-        //     });
-        //     //const filterVal = ['province', 'city', 'name', 'percentage', 'numOfStores'];
-        //     const curData = table.all_data;
-        //     const data = self.formatJson(filterVal, curData);
-        //     //const fileName =  table_data[0].submitterName+ '_Inspection detail_' + util.getCurDateStr();
-        //     export_json_to_excel(tHeader, data, fileName);
-        // });
-      },
-
-
-      handleEmitDetailRowClick(row){ //去巡檢報告詳情
-          if(!PermissionHelper.enableInspectReport()){
-            message({
-                message: this.$i18n.t('route.noReportAuthority'),
-                type: 'error',
-                duration: 5 * 1000
-                });
-            this.expands="";
-            this.expandRowKeys=[];
-            return;
-          }
-          const self = this;
-          const parsObj = {
-            id : row.id,
-            storeName : row.storeName,
-            status : row.status,
-            ts : row.date,
-            submitterName : row.submitterName,
-            tagName : row.tagName,
-            mode : row.mode,
-          };
-          sessionStorage.setItem('report_data', JSON.stringify(parsObj));
-          self.$router.push({ name: 'reportDetails', params: { data: parsObj }});
-      },
-      handleEmitPersonEventRowClick(row){ //进入事件列表界面，展示该门店该人员产生的事件
-        if(!PermissionHelper.enableEventHandle() && 
-          !PermissionHelper.enableEventClose() && 
-          !PermissionHelper.enableEventAdd() && 
-          !PermissionHelper.enableEventReturn()){
-            message({
-                message: this.$i18n.t('route.noEventAuthority'),
-                type: 'error',
-                duration: 5 * 1000
+    }else if(item == "NotInspected"){
+        this.getNotInspectedStores();
+    }else if(item == "Event"){
+        this.getEventCompletedRate();
+    }
+    //this.$emit('click', item)
+  },
+  getReportList() {
+    this.isLoading = true
+    const self = this;
+    self.submitterName = "";
+    let params = {
+      beginTs: this.beginTs,
+      endTs: this.endTs,clause:{"submitter":this.submitter}, 
+      searchMysteryMode: this.isMystery ? 1 : 0};
+    //console.log("params:",params);
+    return new Promise((resolve) => {
+        statisticsGetInspectReportList(params).then(res => {
+            const errCode = res.errCode;
+            let data = [];
+            if (errCode === 0) {
+                data = res.data.content.filter(i => i.mode == 1);
+            }
+            //console.log("data:",data);
+            const temp = [];
+            data.forEach(item => {
+                const reportObj = {};
+                reportObj.id = item.id;
+                reportObj.date = util.getDateStr(item.ts);
+                reportObj.storeName = item.storeName;
+                reportObj.tagName = item.tagName;
+                reportObj.submitterName = item.submitterName;
+                reportObj.submitter = item.submitter;
+                reportObj.totalScore = item.totalScore;
+                reportObj.mode = item.mode;
+                reportObj.status = item.status;
+                reportObj.detail = self.$t('statistics.patrolPerson.seeDetail')
+                temp.push(reportObj);
               });
-            return;
-          }
-        
-        const self = this;
-        var params = SearchConditionUtil.getSearchCondition('eventManage');
-        const rowItem = row;
-        
-        console.log("params~~~>>>", params)
-        console.log("rowItem~~~>>>", rowItem)
-        console.log("this.isMystery 1~~~>>>", this.isMystery)
-        
-
-        if(Object.keys(params).length > 0){
-          //searchParams.searchCondition = JSON.parse(JSON.stringify(this.params))
-          console.log("this.isMystery 2~~~>>>", this.isMystery)
-          params.searchParams.clause = {
-            assigner: this.submitter,
-            storeId: [rowItem.id],
-            status: []
-          };
-
-          
-          params.filterStoreIds = [rowItem.id];
-          params.curStore = [rowItem.id];
-          params.storeIds = [rowItem.id];
-
-          params.curCountry = "-1";
-          params.curProvince = [];
-          params.curCity = [];
-          params.inputSearchValue = "";
-          params.curState = [];
-          params.activeName = '4';
-          params.searchParams.filter ={ page: 0, size: 10 };
-          params.beginTs=this.beginTs;
-          params.endTs=this.endTs;
-          params.searchMysteryMode = this.isMystery ? 1 : 0;
-          params.searchFrom='PatrolPersonStat';
-
-        }else{
-          params ={
-            searchParams:{
-                filter:{ page: 0, size: 10 },
-                clause:{
-                  assigner:this.submitter,
-                  storeId:[rowItem.id],
-                  status:[]
-                }
-            },
-            filterStoreIds : [rowItem.id],
-            curStore : [rowItem.id],
-            storeIds: [rowItem.id],
-            curCountry:"-1",
-            curProvince:[],
-            curCity:[],
-            inputSearchValue:"",
-            curState:[],
-            activeName:'4',
-            beginTs:this.beginTs,
-            endTs:this.endTs,
-            searchMysteryMode: this.isMystery ? 1 : 0,
-            searchFrom:'PatrolPersonStat'
-          }
-        }
-
-        console.log("params 2 ~~>>>", params)
-        const searchConditon = {
-            path: 'eventManage',
-            params: params
-        };
-        SearchConditionUtil.saveSearchCondition(searchConditon);
-        self.$router.push({ name: 'eventManage', params: params});
-      },
-      getNotInspectedStores(){
-          const self = this;
-          let params = {beginTs:this.beginTs,endTs:this.endTs,submitters:[this.submitter],isMysteryMode:this.isMystery};
-          console.log("params:",params);
-          return new Promise((resolve) => {
-            getNotInspectStoresByPerson(params).then(res => {
-                const errCode = res.errCode;
-                let data = [];
-                if (errCode === 0) {
-                    data = res.data[0].storesNotInspected;
-                }
-                //console.log("data:",data);
-                const temp = [];
-                data.forEach(item => {
-                        const reportObj = {};
-                        reportObj.id = item.storeId;
-                        reportObj.storeName = item.name;
-                        temp.push(reportObj);
-                    });
-                    self.notInspectedStores = temp;
-                    resolve(temp);
-                }).catch(err => {
-                console.log('InspectReportList-getReportList: ' + err);
-            });
+              if(temp.length>0){
+                self.submitterName = temp[0].submitterName;
+                self.detailTbl.all_data = temp;
+                self.detailTbl.total = Math.ceil(temp.length/this.detailTbl.sizeNum);
+                this.setDetailTableData();
+              }
+              resolve(temp);
+              this.isLoading = false
+          }).catch(err => {
+          console.log('InspectReportList-getReportList: ' + err);
         });
-      },
-      getEventCompletedRate(){
-        this.isLoading = true
-        const self = this;
+    });
+  },
+  setDetailTableData(){
+      this.detailTbl.table_data = [];
+      this.detailTbl.table_data = [...this.detailTbl.all_data.slice( (this.detailTbl.page - 1)* this.detailTbl.sizeNum, this.detailTbl.page* this.detailTbl.sizeNum)];
+
+    },
+  handlePageAndSizeChange_detail(pageObj){
+      console.log("handlePageAndSizeChange_detail:",pageObj)
+      const self = this;
+      self.detailTbl.page = pageObj.page;
+      self.detailTbl.sizeNum = pageObj.size;
+      self.setDetailTableData();
+    },
+  formatJson(filterVal, jsonData) {
+      return jsonData.map(v => filterVal.map(j => v[j]));
+    },
+
+  pad2(n){
+    return (n < 10 ? '0' : '') + n;
+  },
+  getAllDate(t){
+    var date = new Date(t);
+    var month = this.pad2(date.getMonth()+1);
+    var day = this.pad2(date.getDate());
+    var year= date.getFullYear();
+    var hour = this.pad2(date.getHours())
+    var min = this.pad2(date.getMinutes())
+    var sec = this.pad2(date.getSeconds())
+    return year + month + day + hour + min + sec
+  },
+  getDate(t){
+    var date = new Date(t);
+    var month = this.pad2(date.getMonth()+1);
+    var day = this.pad2(date.getDate());
+    var year= date.getFullYear();
+    var hour = this.pad2(date.getHours())
+    var min = this.pad2(date.getMinutes())
+    var sec = this.pad2(date.getSeconds())
+    return year + month + day 
+  },
+  getOnlyDate(t){
+    var date = new Date(t);
+    var month = this.pad2(date.getMonth()+1);
+    var day = this.pad2(date.getDate());
+    var year= date.getFullYear();
+    var hour = this.pad2(date.getHours())
+    var min = this.pad2(date.getMinutes())
+    var sec = this.pad2(date.getSeconds())
+    return  month + day 
+  },
+  export2Excel(){
+    const self = this;
+    console.log('self.detailTbl :>> ', self.detailTbl);
+    let table = "" 
+    
+  
+    if(this.currentTab == "Detail"){
+        console.log('detail :>> ');
+        table = self.detailTbl;
+        console.log('table 1:>> ', table);
+        if (table.table_data.length === 0) {
+            util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
+            return false;
+        }
+        
+        const now = new Date()
+        var nowTs = this.getAllDate(now)
+        var tsbegin = this.getDate(this.beginTs)
+        var tsEnd = this.getOnlyDate(this.endTs)
+        let submitterName = table.table_data[0].submitterName;
+        
         let params = {
-          beginTs: this.beginTs, 
-          endTs: this.endTs, 
-          clause: {assigner: this.submitter}, 
+          beginTs: this.beginTs,
+          endTs: this.endTs,
+          clause:{ submitter: this.submitter }, 
           order: {
             direction: "asc", 
             property: "storeId"
           }, 
-          searchMysteryMode: this.isMystery ? 1 : 0
+          filter: {page: 0, size: 99999},
+          searchMysteryMode: this.isMystery ? 1 : 0,
+          fileName : nowTs + "-" + submitterName + "-Inspection_detail-" + tsbegin + tsEnd,
+          requestTs : now.getTime()
+
         };
 
+        this.showExportMassage = true
+        exportStatisticsReportList(params).then(res=>{
+          console.log('res :>> ', res);
+        })
+
+    }else if(this.currentTab == "Event"){
+        console.log('Event :>> ');
+        table = self.eventTbl;
+        console.log('table 2:>> ', table);
+        if (table.table_data.length === 0) {
+            util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
+            return false;
+        }
+        const now = new Date()
+        var nowTs = this.getAllDate(now)
+        var tsbegin = this.getDate(this.beginTs)
+        var tsEnd = this.getOnlyDate(this.endTs)
+        let assignerName = table.table_data[0].assignerName;
+  
+        let params = {
+          beginTs: this.beginTs,
+          endTs: this.endTs,
+          clause: {assigner: this.submitter},
+          order: {
+            direction: "asc", 
+            property: "storeId"
+          },  
+          filter: {page: 0, size: 99999},
+          searchMysteryMode: this.isMystery ? 1 : 0,
+          fileName : nowTs + "-" + assignerName + "-Inspection_event-" + tsbegin + tsEnd,
+          requestTs : now.getTime()
+        };
+
+        this.showExportMassage = true
+        exportStatisticsEventComment(params).then(res=>{
+          console.log('res :>> ', res);
+        })
+
+    }
+
+      // require.ensure([], async() => {
+      //     const { export_json_to_excel } = require('@/excel/Export2Excel');
+      //     const tHeader = [];
+      //     const filterVal =[];
+      //     table.column_data.forEach(item=>{
+      //         if(item.prop != 'detail'){
+      //             tHeader.push(item.label);
+      //             filterVal.push(item.prop);
+      //         }
+      //     });
+      //     //const filterVal = ['province', 'city', 'name', 'percentage', 'numOfStores'];
+      //     const curData = table.all_data;
+      //     const data = self.formatJson(filterVal, curData);
+      //     //const fileName =  table_data[0].submitterName+ '_Inspection detail_' + util.getCurDateStr();
+      //     export_json_to_excel(tHeader, data, fileName);
+      // });
+    },
+
+
+    handleEmitDetailRowClick(row){ //去巡檢報告詳情
+        if(!PermissionHelper.enableInspectReport()){
+          message({
+              message: this.$i18n.t('route.noReportAuthority'),
+              type: 'error',
+              duration: 5 * 1000
+              });
+          this.expands="";
+          this.expandRowKeys=[];
+          return;
+        }
+        const self = this;
+        const parsObj = {
+          id : row.id,
+          storeName : row.storeName,
+          status : row.status,
+          ts : row.date,
+          submitterName : row.submitterName,
+          tagName : row.tagName,
+          mode : row.mode,
+        };
+        sessionStorage.setItem('report_data', JSON.stringify(parsObj));
+        self.$router.push({ name: 'reportDetails', params: { data: parsObj }});
+    },
+    handleEmitPersonEventRowClick(row){ //进入事件列表界面，展示该门店该人员产生的事件
+      if(!PermissionHelper.enableEventHandle() && 
+        !PermissionHelper.enableEventClose() && 
+        !PermissionHelper.enableEventAdd() && 
+        !PermissionHelper.enableEventReturn()){
+          message({
+              message: this.$i18n.t('route.noEventAuthority'),
+              type: 'error',
+              duration: 5 * 1000
+            });
+          return;
+        }
+      
+      const self = this;
+      var params = SearchConditionUtil.getSearchCondition('eventManage');
+      const rowItem = row;
+      
+      console.log("params~~~>>>", params)
+      console.log("rowItem~~~>>>", rowItem)
+      console.log("this.isMystery 1~~~>>>", this.isMystery)
+      
+
+      if(Object.keys(params).length > 0){
+        //searchParams.searchCondition = JSON.parse(JSON.stringify(this.params))
+        console.log("this.isMystery 2~~~>>>", this.isMystery)
+        params.searchParams.clause = {
+          assigner: this.submitter,
+          storeId: [rowItem.id],
+          status: []
+        };
+
+        
+        params.filterStoreIds = [rowItem.id];
+        params.curStore = [rowItem.id];
+        params.storeIds = [rowItem.id];
+
+        params.curCountry = "-1";
+        params.curProvince = [];
+        params.curCity = [];
+        params.inputSearchValue = "";
+        params.curState = [];
+        params.activeName = '4';
+        params.searchParams.filter ={ page: 0, size: 10 };
+        params.beginTs=this.beginTs;
+        params.endTs=this.endTs;
+        params.searchMysteryMode = this.isMystery ? 1 : 0;
+        params.searchFrom='PatrolPersonStat';
+
+      }else{
+        params ={
+          searchParams:{
+              filter:{ page: 0, size: 10 },
+              clause:{
+                assigner:this.submitter,
+                storeId:[rowItem.id],
+                status:[]
+              }
+          },
+          filterStoreIds : [rowItem.id],
+          curStore : [rowItem.id],
+          storeIds: [rowItem.id],
+          curCountry:"-1",
+          curProvince:[],
+          curCity:[],
+          inputSearchValue:"",
+          curState:[],
+          activeName:'4',
+          beginTs:this.beginTs,
+          endTs:this.endTs,
+          searchMysteryMode: this.isMystery ? 1 : 0,
+          searchFrom:'PatrolPersonStat'
+        }
+      }
+
+      console.log("params 2 ~~>>>", params)
+      const searchConditon = {
+          path: 'eventManage',
+          params: params
+      };
+      SearchConditionUtil.saveSearchCondition(searchConditon);
+      self.$router.push({ name: 'eventManage', params: params});
+    },
+    getNotInspectedStores(){
+        const self = this;
+        let params = {beginTs:this.beginTs,endTs:this.endTs,submitters:[this.submitter],isMysteryMode:this.isMystery};
+        console.log("params:",params);
         return new Promise((resolve) => {
-            StatisticsGetEventAndCommentList(params).then(res => {
-                const errCode = res.errCode;
-                let data = [];
-                if (errCode === 0) {
-                    data = res.data.content;
-                }
-                console.log("data ~~~~~>",data);
-                const temp = []; 
-                let tempStorId = data.length > 0 ? data[0].storeId : "";
-                let tempStorName = data.length > 0 ? data[0].name : "";
-                // 0-Unprocessed,1-Inprocess,2-Processed,3-Rejected,4-Overdue
-                let Unprocessed = 0, Inprocess = 0, Processed= 0, Rejected = 0, Overdue = 0, Closed = 0;
-                data.forEach((item,idx) => {
-                    if(tempStorId !== item.storeId){
-                        const reportObj = {
-                            id:tempStorId,
-                            storeName:tempStorName,
-                            assignerName: item.assignerName,
-                            Unprocessed,
-                            Closed,
-                            Inprocess,
-                            Rejected,
-                            Overdue,
-                            Processed : Closed + Overdue,
-                            // completedRate:((Processed/(Unprocessed+Inprocess+Processed+Rejected+Overdue))*100).toFixed(1)+'%',
-                            detail : this.$t('statistics.patrolPerson.seeDetail')
-                        };
-                        reportObj.completedRate = ((reportObj.Processed / (reportObj.Unprocessed + reportObj.Inprocess + reportObj.Closed + reportObj.Rejected + reportObj.Overdue))*100).toFixed(1)+'%',
-                        temp.push(reportObj);
+          getNotInspectStoresByPerson(params).then(res => {
+              const errCode = res.errCode;
+              let data = [];
+              if (errCode === 0) {
+                  data = res.data[0].storesNotInspected;
+              }
+              //console.log("data:",data);
+              const temp = [];
+              data.forEach(item => {
+                      const reportObj = {};
+                      reportObj.id = item.storeId;
+                      reportObj.storeName = item.name;
+                      temp.push(reportObj);
+                  });
+                  self.notInspectedStores = temp;
+                  resolve(temp);
+              }).catch(err => {
+              console.log('InspectReportList-getReportList: ' + err);
+          });
+      });
+    },
+    getEventCompletedRate(){
+      this.isLoading = true
+      const self = this;
+      let params = {
+        beginTs: this.beginTs, 
+        endTs: this.endTs, 
+        clause: {assigner: this.submitter}, 
+        order: {
+          direction: "asc", 
+          property: "storeId"
+        }, 
+        searchMysteryMode: this.isMystery ? 1 : 0
+      };
 
-                        Unprocessed = 0; Inprocess = 0; Processed = 0; Rejected = 0; Overdue = 0; Closed = 0
-                        tempStorId = item.storeId;
-                        tempStorName = item.name;
-                        //assignerName = item.assignerName;
-                    }
-                    switch(item.status){
-                      case 0:
-                        Unprocessed+=1;
-                        break;
-                      case 1: 
-                        Inprocess+=1;
-                        break;
-                      case 2:
-                        Closed+=1; //結案
-                        break;
-                      case 3:   
-                        Rejected+=1;
-                        break;
-                      case 4:
-                        Overdue+=1;
-                        break;
-                    }
-
-                    if(idx == data.length - 1){
+      return new Promise((resolve) => {
+          StatisticsGetEventAndCommentList(params).then(res => {
+              const errCode = res.errCode;
+              let data = [];
+              if (errCode === 0) {
+                  data = res.data.content;
+              }
+              console.log("data ~~~~~>",data);
+              const temp = []; 
+              let tempStorId = data.length > 0 ? data[0].storeId : "";
+              let tempStorName = data.length > 0 ? data[0].name : "";
+              // 0-Unprocessed,1-Inprocess,2-Processed,3-Rejected,4-Overdue
+              let Unprocessed = 0, Inprocess = 0, Processed= 0, Rejected = 0, Overdue = 0, Closed = 0;
+              data.forEach((item,idx) => {
+                  if(tempStorId !== item.storeId){
                       const reportObj = {
-                        id: tempStorId,
-                        storeId: tempStorId,
-                        storeName: tempStorName,
-                        assignerName: item.assignerName,
-                        Unprocessed,
-                        Closed,
-                        Inprocess,
-                        Rejected,
-                        Overdue,
-                        Processed : Closed + Overdue,
-
-                        // completedRate:((Processed / (Unprocessed+Inprocess+Closed+Rejected+Overdue))*100).toFixed(1)+'%',
-                        detail : this.$t('statistics.patrolPerson.seeDetail')
+                          id:tempStorId,
+                          storeName:tempStorName,
+                          assignerName: item.assignerName,
+                          Unprocessed,
+                          Closed,
+                          Inprocess,
+                          Rejected,
+                          Overdue,
+                          Processed : Closed + Overdue,
+                          // completedRate:((Processed/(Unprocessed+Inprocess+Processed+Rejected+Overdue))*100).toFixed(1)+'%',
+                          detail : this.$t('statistics.patrolPerson.seeDetail')
                       };
                       reportObj.completedRate = ((reportObj.Processed / (reportObj.Unprocessed + reportObj.Inprocess + reportObj.Closed + reportObj.Rejected + reportObj.Overdue))*100).toFixed(1)+'%',
                       temp.push(reportObj);
-                    }
-                    
-                        
-                });
 
-                this.eventTbl.all_data = temp;
-                this.eventTbl.total =Math.ceil(temp.length/this.eventTbl.sizeNum);
-                this.setEventTableData();
-                this.isLoading = false
-                resolve(temp);
-            }).catch(err => {
-              console.log('InspectReportList-getReportList: ' + err);
-          });
+                      Unprocessed = 0; Inprocess = 0; Processed = 0; Rejected = 0; Overdue = 0; Closed = 0
+                      tempStorId = item.storeId;
+                      tempStorName = item.name;
+                      //assignerName = item.assignerName;
+                  }
+                  switch(item.status){
+                    case 0:
+                      Unprocessed+=1;
+                      break;
+                    case 1: 
+                      Inprocess+=1;
+                      break;
+                    case 2:
+                      Closed+=1; //結案
+                      break;
+                    case 3:   
+                      Rejected+=1;
+                      break;
+                    case 4:
+                      Overdue+=1;
+                      break;
+                  }
+
+                  if(idx == data.length - 1){
+                    const reportObj = {
+                      id: tempStorId,
+                      storeId: tempStorId,
+                      storeName: tempStorName,
+                      assignerName: item.assignerName,
+                      Unprocessed,
+                      Closed,
+                      Inprocess,
+                      Rejected,
+                      Overdue,
+                      Processed : Closed + Overdue,
+
+                      // completedRate:((Processed / (Unprocessed+Inprocess+Closed+Rejected+Overdue))*100).toFixed(1)+'%',
+                      detail : this.$t('statistics.patrolPerson.seeDetail')
+                    };
+                    reportObj.completedRate = ((reportObj.Processed / (reportObj.Unprocessed + reportObj.Inprocess + reportObj.Closed + reportObj.Rejected + reportObj.Overdue))*100).toFixed(1)+'%',
+                    temp.push(reportObj);
+                  }
+                  
+                      
+              });
+
+              this.eventTbl.all_data = temp;
+              this.eventTbl.total =Math.ceil(temp.length/this.eventTbl.sizeNum);
+              this.setEventTableData();
+              this.isLoading = false
+              resolve(temp);
+          }).catch(err => {
+            console.log('InspectReportList-getReportList: ' + err);
         });
-    
-      },
-
-      handleEmitComplitedRowClick(row){
-          const self = this;
-          //sessionStorage.setItem('report_data', JSON.stringify(row));
-        //self.$router.push({ name: 'EventStatistics', params: { data: row }});
-      },
-      setEventTableData(){
-        this.eventTbl.table_data = [];
-        this.eventTbl.table_data = [...this.eventTbl.all_data.slice( (this.eventTbl.page - 1)* this.eventTbl.sizeNum, this.eventTbl.page* this.eventTbl.sizeNum)];
-      },
-      handlePageAndSizeChange_event(pageObj){
-        const self = this;
-        self.eventTbl.page = pageObj.page;
-        self.eventTbl.sizeNum = pageObj.size;
-        self.setEventTableData();
-      }
+      });
+  
     },
-    
-    
+
+    handleEmitComplitedRowClick(row){
+        const self = this;
+        //sessionStorage.setItem('report_data', JSON.stringify(row));
+      //self.$router.push({ name: 'EventStatistics', params: { data: row }});
+    },
+    setEventTableData(){
+      this.eventTbl.table_data = [];
+      this.eventTbl.table_data = [...this.eventTbl.all_data.slice( (this.eventTbl.page - 1)* this.eventTbl.sizeNum, this.eventTbl.page* this.eventTbl.sizeNum)];
+    },
+    handlePageAndSizeChange_event(pageObj){
+      const self = this;
+      self.eventTbl.page = pageObj.page;
+      self.eventTbl.sizeNum = pageObj.size;
+      self.setEventTableData();
+    }
+  },
+  
+  
 }
 </script>
 <style lang="sass">
 .insep-detail-tbl
-  .el-table__row
-    .cell
-      span
-        font-size: 13px !important
+.el-table__row
+  .cell
+    span
+      font-size: 13px !important
 </style>
 
 <style lang="scss" scoped>
-  .tab-area{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    margin-right: 32px;
-    .names{
-        display: flex;
-        flex-direction: row;
-        padding: 0;
-    }
-    .operation-btns{
-        align-self: center;
-        display: flex;
-        flex-direction: row;
-        width:101px;
-        height: 30px;
-        align-items: center;
-        padding:0;
-        justify-content: space-between;
-        font-size: 13px;
-        margin-top: -5px;
-        cursor: pointer;
-        border-bottom:1px solid rgba(172,174,177,0.34);
-    }
-    .operation-btns-en{
-              width:calc(101/1440*100vw);
-            }
-            .operation-btns-zh{
-              width:calc(101/1440*100vw);
-            }
-            .operation-btns-zhTW{
-              width:calc(101/1440*100vw);
-            }
-            .operation-btns-ja{
-              width:calc(131/1440*100vw);
-            }
-            .operation-btns-ko{
-              width:calc(131/1440*100vw);
-            }
-            .operation-btns-vi{
-              width:calc(131/1440*100vw);
-            }
-            .operation-btns-th{
-              width:calc(131/1440*100vw);
-            }
-            .operation-btns-id{
-              width:calc(101/1440*100vw);
-            }
-    .ja-export-btn,
-    .en-export-btn,
-    .export-btn{
-      background-color: #EFF3F5;
-      color: #006ab7;
-    }
+.tab-area{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-right: 32px;
+  .names{
+      display: flex;
+      flex-direction: row;
+      padding: 0;
   }
-  .template-name{
-    cursor: pointer;
-    width: calc(120/1440*100vw);
-    height: 34px;
-    line-height: 34px;
-    color: #556679;
-    padding: 0 5px;
-    overflow: hidden;
-    text-align: center;
-    font-family: NotoSansCJKTC;
-    font-size: 13px;
-    font-weight: 500;
-    background-color: #EFF3F5;
-
+  .operation-btns{
+      align-self: center;
+      display: flex;
+      flex-direction: row;
+      width:101px;
+      height: 30px;
+      align-items: center;
+      padding:0;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-top: -5px;
+      cursor: pointer;
+      border-bottom:1px solid rgba(172,174,177,0.34);
   }
-  .active-name-btn{
-    color: #006ab7;
-    background-color: #f7f9fa;
-    border-radius: 4px;
-  }
-  .insep-detail-tbl{
-    background-color: #EFF3F5;
-    padding-top: 16.5px;
-    padding-bottom: 16.5px;
-    border-top:1px solid rgba(172,174,177,0.34);
-    .el-table{
-        border: none !important;
-        box-shadow: none !important;
-        &::before{
-          background-color: transparent;
-        }
-        &::after{
-          background-color: transparent;
-        }
-      .el-table__row{
-        .active-name-btn{
-          span{
-            font-size: 12px !important;
+  .operation-btns-en{
+            width:calc(101/1440*100vw);
           }
-        }
-        
-      }
-    }
-    .table{
-      margin: 0 calc(24/1920*100vw);
-      background-color: #EFF3F5;
-    }
-    .tbl-TabInspecDetail{
-        background-color: #EFF3F5;
-            tbody{
-                background-color: #EFF3F5;
-            }
-        /deep/
-        .el-table{
-            border: none !important;
-            box-shadow: none !important;
-            &::before{
-              background-color: transparent;
-            }
-            &::after{
-              background-color: transparent;
-            }
-        }
-        /deep/
-        .el-table--mini{
-            background-color: #EFF3F5;
-            border-radius: 5px;
-        }
-        /deep/
-        .cell-class{
-            background-color: #EFF3F5 !important;
-        }
-        
-    }
-  }
-  .not-inspected{
+          .operation-btns-zh{
+            width:calc(101/1440*100vw);
+          }
+          .operation-btns-zhTW{
+            width:calc(101/1440*100vw);
+          }
+          .operation-btns-ja{
+            width:calc(131/1440*100vw);
+          }
+          .operation-btns-ko{
+            width:calc(131/1440*100vw);
+          }
+          .operation-btns-vi{
+            width:calc(131/1440*100vw);
+          }
+          .operation-btns-th{
+            width:calc(131/1440*100vw);
+          }
+          .operation-btns-id{
+            width:calc(101/1440*100vw);
+          }
+  .ja-export-btn,
+  .en-export-btn,
+  .export-btn{
     background-color: #EFF3F5;
-    padding: 16.5px 24px;
-    max-height:300px;
-    overflow-y:auto;
-    border-top:1px solid rgba(172,174,177,0.34);
-    .store-div{
-        width: calc(220/1440*100vw);
-        height:40px;
-        display: flex;
-        flex-direction: row;
-        align-items:center;
-        background-color: #fff;
-        border: solid 1px #e6e6e6;
-        margin-top:16px;
-        img{
-            width:26px;
-            height: 26px;
-            align-self: center;
-            margin-left: 16px;
+    color: #006ab7;
+  }
+}
+.template-name{
+  cursor: pointer;
+  width: calc(120/1440*100vw);
+  height: 34px;
+  line-height: 34px;
+  color: #556679;
+  padding: 0 5px;
+  overflow: hidden;
+  text-align: center;
+  font-family: NotoSansCJKTC;
+  font-size: 13px;
+  font-weight: 500;
+  background-color: #EFF3F5;
+
+}
+.active-name-btn{
+  color: #006ab7;
+  background-color: #f7f9fa;
+  border-radius: 4px;
+}
+.insep-detail-tbl{
+  background-color: #EFF3F5;
+  padding-top: 16.5px;
+  padding-bottom: 16.5px;
+  border-top:1px solid rgba(172,174,177,0.34);
+  .el-table{
+      border: none !important;
+      box-shadow: none !important;
+      &::before{
+        background-color: transparent;
+      }
+      &::after{
+        background-color: transparent;
+      }
+    .el-table__row{
+      .active-name-btn{
+        span{
+          font-size: 12px !important;
         }
-        .store-name{
-            margin-left: 8px;
-            align-self: center;
-            color: #69727c;
-            font-size: 15px;
-            font-weight: normal;
-        }
+      }
+      
     }
   }
+  .table{
+    margin: 0 calc(24/1920*100vw);
+    background-color: #EFF3F5;
+  }
+  .tbl-TabInspecDetail{
+      background-color: #EFF3F5;
+          tbody{
+              background-color: #EFF3F5;
+          }
+      /deep/
+      .el-table{
+          border: none !important;
+          box-shadow: none !important;
+          &::before{
+            background-color: transparent;
+          }
+          &::after{
+            background-color: transparent;
+          }
+      }
+      /deep/
+      .el-table--mini{
+          background-color: #EFF3F5;
+          border-radius: 5px;
+      }
+      /deep/
+      .cell-class{
+          background-color: #EFF3F5 !important;
+      }
+      
+  }
+}
+.not-inspected{
+  background-color: #EFF3F5;
+  padding: 16.5px 24px;
+  max-height:300px;
+  overflow-y:auto;
+  border-top:1px solid rgba(172,174,177,0.34);
+  .store-div{
+      width: calc(220/1440*100vw);
+      height:40px;
+      display: flex;
+      flex-direction: row;
+      align-items:center;
+      background-color: #fff;
+      border: solid 1px #e6e6e6;
+      margin-top:16px;
+      img{
+          width:26px;
+          height: 26px;
+          align-self: center;
+          margin-left: 16px;
+      }
+      .store-name{
+          margin-left: 8px;
+          align-self: center;
+          color: #69727c;
+          font-size: 15px;
+          font-weight: normal;
+      }
+  }
+}
 </style>
