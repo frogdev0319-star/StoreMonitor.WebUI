@@ -12,19 +12,19 @@
       </div>
       <div class="basic-information flex" style="padding: 20px 0 20px 20px">
         <div style="width: 250px; display: flex; flex-direction: column">
-          <div class="flex-center spacer">
+          <!-- <div class="flex-center spacer">
             <div class="title-description spacer">{{ $t('titleView.canAccessVideo') }}</div>
             <el-switch v-model="ifAccessVideo"></el-switch>
-          </div>
-          <div class="flex-center spacer">
+          </div> -->
+          <div class="flex-center spacer" >
             <div class="title-description spacer">{{ $t('titleView.canReceiveMessage') }}</div>
             <el-switch v-model="ifReceiveMes"></el-switch>
           </div>
         </div>
         <hr class="hr-vertical" style="margin: 0 30px">
-        <div class="flex spacer">
+        <div class="flex flex-center spacer">
           <div class="title-description" style="margin-right: 20px">{{ $t('titleView.remarksContent') }}</div>
-          <div class="spacer">
+          <div class="spacer" style="margin-top: 10px;">
             <el-input
               v-model="infoForm.comment"
               :autosize="{minRows: 2, maxRows: 4}"
