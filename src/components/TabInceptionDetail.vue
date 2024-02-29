@@ -856,8 +856,8 @@ methods:{
   .ja-export-btn,
   .en-export-btn,
   .export-btn{
-    background-color: #EFF3F5;
-    color: #006ab7;
+    background-color: #EFF3F5 !important;
+    color: #006ab7 !important;
   }
 }
 .template-name{
