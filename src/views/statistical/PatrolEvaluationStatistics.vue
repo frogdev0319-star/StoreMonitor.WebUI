@@ -113,7 +113,7 @@
                                 <v-chart ref="itemsPie" @click="clickPart1Pie" :auto-resize="true" :options="part1.pieOption" class="chart-content" />
                             </div>
                             <div class="pct-nums">
-                                <div v-for="(item, index) in regionsPerArray" :class="index==part1.indexType? 'selected-labels': 'content-labels'" :key="item.type" @click="setPart1Type(index)">
+                                <div v-for="(item, index) in regionsPerArray" :class="index==part1.indexType? 'selected-labels': 'content-labels'" :key="item.type" @click="setPart1Type(index, item)">
                                     <div class="excellent_labels">
                                         <span :class="`label-` + index" class="labels excellent-label" />
                                         <span class="label-desc">{{ item.type }}</span>
@@ -123,6 +123,8 @@
                             </div>
                         </div>
                     </el-col>
+
+                    <!-- 柱狀圖 -->
                     <el-col :span="12" style="height:290px;padding-top:32px">
                         <div v-if="ispdf" style="overflow-x:hidden;overflow-y:hidden;height:100%;width:500px">
                             <v-chart ref="storeChart" autoresize :options="part1.barRegionOption" class="chart-content" width="500px" :style="{width:'500px',height:'100%'}" />
@@ -131,6 +133,8 @@
                             <v-chart @click='clickPart1Bar' ref="storeChart" :options="part1.barRegionOption" autoresize :style="{width:part1.barRegionOption?part1.barRegionOption.width :'100%',height:'100%'}" />
                         </div>
                     </el-col>
+
+                    <!-- 順序 -->
                     <div style="position:absolute;right:0px;top:32px" @click='changePart1RegionOrder'>
                         <div class="button-area">
                             <span style="color:#acaeb1">{{ part1.regionOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
@@ -139,6 +143,8 @@
                     </div>
                 </el-col>
             </el-row>
+
+
             <div class="subtitle-head">
                 <span class="title">
                     {{ $t('statistics.titles.storeEvalDetail') }}
@@ -178,7 +184,7 @@
                             :table-data="part1.storeTableData"
                             :total="part1.table.total"
                             :highlight-current-row="true"
-                            :pagesize="sizeNum"
+                            :page-size="sizeNum"
                             :current-page="page"
                             :is-event="false"
                             :default-sort="defaultSort"
@@ -193,7 +199,7 @@
                             />
                     </div>
                     <div style="width:100%; margin-top:12px;height:31px;">
-                        <tbl-pagination-only :total="part1.table.total" :pagesize="part1.table.sizeNum" :current-page="part1.table.page" layout="prev,pager, next,sizes,slot" @sizeChange="handlePageAndSizeChangePart1" @currentChange="handlePageAndSizeChangePart1" />
+                        <tbl-pagination-only :total="part1.table.total" :page-size="part1.table.sizeNum" :current-page="part1.table.page" layout="prev,pager, next,sizes,slot" @sizeChange="handlePageAndSizeChangePart1" @currentChange="handlePageAndSizeChangePart1" />
                     </div>
                 </div>
                 <div v-if="part1.storeMode==1" style="position:absolute;right:40px;top:30px;height:40px" @click='changePart1StoreOrder'>
@@ -296,7 +302,7 @@
                             :table-data="part2.storeTableData"
                             :total="part2.table.total"
                             :highlight-current-row="true"
-                            :pagesize="sizeNum"
+                            :page-size="sizeNum"
                             :current-page="page"
                             :is-event="false"
                             :default-sort="defaultSort"
@@ -313,7 +319,7 @@
                             />
                     </div>
                     <div style="width:100%; margin-top:12px;height:31px;" :style="{width:ispdf?'1280px':null}">
-                        <tbl-pagination-only :total="part2.table.total" :pagesize="part2.table.sizeNum" :current-page="part2.table.page" layout="prev,pager, next,sizes,slot" @sizeChange="handlePageAndSizeChangePart2" @currentChange="handlePageAndSizeChangePart2" />
+                        <tbl-pagination-only :total="part2.table.total" :page-size="part2.table.sizeNum" :current-page="part2.table.page" layout="prev,pager, next,sizes,slot" @sizeChange="handlePageAndSizeChangePart2" @currentChange="handlePageAndSizeChangePart2" />
                     </div>
                 </div>
                 <div v-if="part2.storeMode==1" style="position:absolute;right:40px;top:30px;height:40px" @click='changePart2StoreOrder'>
@@ -410,7 +416,7 @@
                             :table-data="part3.storeTableData"
                             :total="part3.table.total"
                             :highlight-current-row="true"
-                            :pagesize="sizeNum"
+                            :page-size="sizeNum"
                             :current-page="page"
                             :is-event="false"
                             :default-sort="defaultSort"
@@ -426,7 +432,7 @@
                             @onCellClick="onEvenListNumClickPart3" />
                     </div>
                     <div style="width:100%; margin-top:12px;height:31px;">
-                        <tbl-pagination-only :total="part3.table.total" :pagesize="part3.table.sizeNum" :current-page="part3.table.page" layout="prev,pager, next,sizes,slot" @sizeChange="handlePageAndSizeChange3" @currentChange="handlePageAndSizeChangePart3" />
+                        <tbl-pagination-only :total="part3.table.total" :page-size="part3.table.sizeNum" :current-page="part3.table.page" layout="prev,pager, next,sizes,slot" @sizeChange="handlePageAndSizeChange3" @currentChange="handlePageAndSizeChangePart3" />
                     </div>
                 </div>
                 <div v-if="part3.storeMode==1" style="position:absolute;right:40px;top:30px;height:40px" @click='changePart3StoreOrder'>
@@ -531,7 +537,7 @@ export default {
         return {
             page: null,
             total: null,
-            componentsProps: "",
+            componentsProps: {},
             sizeNum: null,
             expandCompProperties: "",
             htmlTitle: this.$t('overview.htmltopdfA'),
@@ -2812,13 +2818,15 @@ export default {
             self.regionsPerArray = jsonArray;
             this.drawPart1RegionBar();
         },
-        async drawPart1RegionBar() {
+
+        async drawPart1RegionBar(showingColor) {
+            console.log('showingColor ~~~~~~>> ', showingColor);
             console.log("Region Line")
             const self = this;
             const option = this.getInspectLineOption();
             const regionData = [];
             var regionLabel = [];
-
+            
             if (this.part1.content) {
                 this.part1.content.map((item, index) => {
                     let value = 0;
@@ -2853,7 +2861,7 @@ export default {
                         regionData.push({
                             value: item.value,
                             itemStyle: {
-                                color: '#f11e66',
+                                color: showingColor ? showingColor : "#1375bc",
                                 emphasis: {
                                     shadowBlur: 10,
                                     shadowOffsetX: 0,
@@ -2909,6 +2917,7 @@ export default {
             this.curSubmitter = '-1';
 
             console.log('option >>>>>>>', option)
+            // barRegionOption
             //console.log("getPart1StoreBar > this.part1.indexRegion:", this.part1.indexRegion);
             //console.log("getPart1StoreBar > this.part1.content:", this.part1.content);
             if (this.part1.content && (this.part1.content[this.part1.indexRegion] || this.part1.indexRegion==-1)) {
@@ -3016,7 +3025,6 @@ export default {
 
                 console.log("Content store bar")
                 content.forEach((item, index) => {
-                    console.log('item >>>>>',item)
                     item.storeGroup = item.storeRegion.toString();
                     item.storeType = item.storeBranchType.toString();
                     if (item.submitters) item.storeSubmitters = item.submitters.join(", ");
@@ -3044,7 +3052,6 @@ export default {
                     else
                         return a.value - b.value;
                 })
-                console.log(content)
                 content.map((item, index) => {
                     regionData.push({
                         value: item.value,
@@ -3718,20 +3725,28 @@ export default {
             return pieOption;
         },
         async clickPart1Pie(event) {
-            console.log("clickPart1Pie")
+            console.log("clickPart1Pie", event)
             if (this.part1.pieOption.series[0].data[event.dataIndex].value > 0) {
                 if(this.part1.indexType == event.dataIndex){
-                        this.part1.indexType = -1;
+                    this.part1.indexType = -1;
+                    var showingColor = "#1375bc"
                 }
                 else{
-                        this.part1.indexType = event.dataIndex;
+                    this.part1.indexType = event.dataIndex;
+                    var showingColor = event.color
                 }
                 this.part1.indexRegion = -1;
                 this.part1.table.page = 1;
-                await this.drawPart1RegionBar();
+                
+                
+                console.log('showingColor :>> ', showingColor);
+                await this.drawPart1RegionBar(showingColor);
             }
         },
+
+
         async clickPart1Bar(event) {
+            
             if(this.part1.indexRegion == event.dataIndex){
                 this.part1.indexRegion = -1;
             }
@@ -3742,17 +3757,17 @@ export default {
             await this.drawPart1RegionBar();
         },
         async clickPart2Bar(event) {
-               if(this.part2.indexRegion == event.dataIndex){
+            if(this.part2.indexRegion == event.dataIndex){
                 this.part2.indexRegion = -1;
             }
             else{
                 this.part2.indexRegion = event.dataIndex;
             }
-              this.part2.table.page = 1;
+            this.part2.table.page = 1;
             await this.drawPart2RegionBar();
         },
         async clickPart3Bar(event) {
-             if(this.part3.indexRegion == event.dataIndex){
+            if(this.part3.indexRegion == event.dataIndex){
                 this.part3.indexRegion = -1;
             }
             else{
@@ -4008,19 +4023,38 @@ export default {
             this.sizeNum = paramsObj.filter.size;
             this.page = paramsObj.filter.page + 1;
         },
-        async setPart1Type(index) {
+
+        async setPart1Type(index, item) {
+            console.log('index :>> ', index);
+            console.log('item :>> ', item);
             if (this.part1.pieOption.series[0].data[index].value > 0) {
                 if(this.part1.indexType == index){
-                        this.part1.indexType = -1;
+                    this.part1.indexType = -1;
                 }
                 else{
-                        this.part1.indexType = index;
+                    this.part1.indexType = index;
+                }
+                this.part1.indexRegion = -1;
+        
+
+                var showingColor = ''
+                if(this.part1.indexType == -1){
+                    showingColor = "#1375bc"
+                } 
+                else if(this.part1.indexType == 0){
+                    showingColor = "#f11e66"
+                }
+                else if(this.part1.indexType == 1){
+                    showingColor = "#f57848"
+                }
+                else if(this.part1.indexType == 2){
+                    showingColor = "#8fd92e"
                 }
 
-                this.part1.indexRegion = -1;
-                await this.drawPart1RegionBar();
+                await this.drawPart1RegionBar(showingColor);
             }
         },
+
         getInspectTagStandardScore() { //取得巡檢表達標分數
             const self = this;
             return new Promise((resolve, reject) => {
@@ -4117,6 +4151,9 @@ export default {
                 }
             }
         },
+        handlePageAndSizeChange3(){
+            console.log('handlePageAndSizeChange3 :>> ', handlePageAndSizeChange3);
+        }
     }
 };
 </script>
