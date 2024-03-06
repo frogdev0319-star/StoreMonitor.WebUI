@@ -556,7 +556,6 @@ export default {
     },
 
     getUserList(data) {
-      console.log("????---->",  data)
       this.userList = [];
       this.mysterioList = [];
       this.origianlUserList = [];
