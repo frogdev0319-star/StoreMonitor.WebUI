@@ -21,7 +21,6 @@
                 @emitSearch="emitSearch"
                 @setDefaultSortAndPage="setDefaultSortAndPage"
             />
-            <!-- @exportPdf="exportPdf" -->
         </el-col>
 
         <div class="statistics-content" id="imgTest_avg1" style="height:194px;margin-top:200px;box-shadow:none;" :style="{width:ispdf?'1280px':null}">
@@ -4017,9 +4016,7 @@ export default {
             this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
         },
 
-        // exportPdf(){
-        //     console.log('exportPdf ~~~~~~~>> ');
-        // },
+
         setDefaultSortAndPage(paramsObj) {
             this.defaultSort = paramsObj.defaultSort;
             this.order = this.params.order = paramsObj.order;
