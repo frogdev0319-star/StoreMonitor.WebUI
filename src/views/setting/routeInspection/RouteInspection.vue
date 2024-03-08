@@ -186,6 +186,12 @@
       </ul>
     </dialog-pop>
 
+    <!-- 刪除 巡檢表 -->
+    <!-- 
+      updateDeleteContentDialogFlag
+      hideDeleteContentDialog
+      confirmDelete 
+    -->
     <dialog-pop
       :title="$t('insSettingView.confirmDelete')"
       :append-to-body="true"
@@ -193,14 +199,39 @@
       :show-close="false"
       :visible="showSingleDeleteContent"
       :isWarning="true"
-      @visibleChangeHandler="updateDeleteContentDialogFlag"
-      @cancelHandler="hideDeleteContentDialog"
-      @confirmHandler="confirmDelete"
+      :showButton=" false"
     >
       <div class="dialog-slot">
-        <div class="dialog-content">{{ $t('insSettingView.confirmDelData') }} </div>
+        <div class="dialog-content">
+          <p> 巡檢表刪除後將無法復原，且無法再查看該巡檢表相關之報告與統計分析！請確認是否刪除？</p>
+          <div class="l_row">
+            <div style="margin-bottom: 5px ;">
+              <span style="color: red; ">*</span> 請輸入密碼確認刪除
+            </div>
+            <el-input
+              v-model="passWord"
+              show-password
+              ref="delay_day"
+              placeholder=""
+              class="input-name_short"
+              @input="addNum"
+              />
+          </div>
+          <div class="delete_btn_row">
+            <el-button class="cancel-btn" size="mini" @click="hideDeleteContentDialog">
+              {{ $t('remotePatrol.cancel') }}
+            </el-button>
+            <el-button :disabled="!canDeleteReport" class="confirm-btn" size="mini" type="primary" @click="confirmDelete">
+              {{ $t('remotePatrol.confirm') }}
+            </el-button>
+          </div>
+        </div>
       </div>
     </dialog-pop>
+
+
+
+
 
     <dialog-pop
       :title="$t('remotePatrol.prompt')"
@@ -364,6 +395,16 @@ export default {
       btnList: [
         {
           id: 0,
+          iconClass: 'iconfont icon-shanchu',
+          style: 'font-size:15px;width:24px;',
+          name: 'create',
+          btnTitle: '建立巡檢表',
+          enabled: false,
+          img:require('../../../../static/img/IcRoundPostAdd.svg')
+        },
+
+        {
+          id: 1,
           iconClass: 'iconfont icon-daoru',
           style: 'font-size:15px;width:24px;height:24px;',
           name: 'import',
@@ -372,7 +413,7 @@ export default {
           img:require('../../../../static/img/ic_import_blue.svg')
         },
         {
-          id: 0,
+          id: 2,
           iconClass: 'iconfont icon-daochu',
           style: 'font-size:15px;',
           name: 'export',
@@ -381,7 +422,7 @@ export default {
           img:require('../../../../static/img/ic_export_blue.svg')
         },
         {
-          id: 0,
+          id: 3,
           iconClass: 'iconfont icon-xiazai',
           style: 'font-size:15px;',
           name: 'download',
@@ -390,14 +431,14 @@ export default {
           img:require('../../../../static/img/ic_download_blue.svg')
         },
         {
-          id: 0,
+          id: 4,
           iconClass: 'iconfont icon-shanchu',
           style: 'font-size:15px;',
           name: 'delete',
           btnTitle: this.$t('scheduleView.delete'),
           enabled: false,
           img:require('../../../../static/img/ic_delete_blue.svg')
-        }
+        },
       ],
 
       tagList: ['远程巡检', '现场巡检'],
@@ -407,7 +448,10 @@ export default {
       taglangList: [this.$t('insSettingView.remotePatrol'), this.$t('insSettingView.onsitePatrol')],
       isLoading: true,
       showDragInfo: true,
-      weightOptions: []
+      weightOptions: [],
+      passWord: '',
+      changeNum: 0,
+      canDeleteReport: false,
     };
   },
 
@@ -427,7 +471,12 @@ export default {
         self.activeName = '0';
         self.getTagList('accountChanged');
       }
-    }
+    },
+
+    changeNum(val){
+      if(this.passWord !== '') this.canDeleteReport = true
+      else this.canDeleteReport = false
+    },
   },
 
   beforeRouteEnter(to, from, next) {
@@ -481,6 +530,13 @@ export default {
   },
 
   methods: {
+
+    addNum(){
+      this.changeNum += 1
+      console.log('this.changeNum :>> ', this.changeNum);
+    },
+
+
     onWeightChange (item, val) {
       var re = /^[0-9]+$/ ;
       if (re.test(Number(val))) {
@@ -1417,6 +1473,9 @@ export default {
       this.showBtnContent = !this.showBtnContent;
     },
 
+
+ 
+
     bindStore() {
       const self = this;
       const routeData = self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData;
@@ -1565,8 +1624,8 @@ export default {
         sessionStorage.setItem('TabPatrolIndex1', val.index);
       }
       self.loading = true;
-      self.btnList[1].enabled = true;
-      self.btnList[3].enabled = true;
+      self.btnList[2].enabled = true;
+      self.btnList[4].enabled = true;
       self.getTagList();
     },
 
@@ -1679,6 +1738,10 @@ export default {
       self.showSingleDeleteContent = false;
       self.getTagList('del');
     },
+    createItem(){
+      this.$router.push({ name: 'createInspect' });
+    },
+    
 
     importItem() {
       const self = this;
@@ -1721,8 +1784,8 @@ export default {
             const data = res.data.length > 0 ? res.data[0].storeIds : [];
             self.storeNum = data.length;
             self.loading = false;
-            self.btnList[1].enabled = false;
-            self.btnList[3].enabled = false;
+            self.btnList[2].enabled = false;
+            self.btnList[4].enabled = false;
           }
           self.isLoading = false;
         });
@@ -2452,10 +2515,11 @@ export default {
 
     handleNape(index) {
       switch (index) {
-        case 0: this.importItem(); break;
-        case 1: this.exportItem(); break;
-        case 2: this.downItem(); break;
-        case 3: this.delAllItem(); break;
+        case 0: this.createItem(); break;
+        case 1: this.importItem(); break;
+        case 2: this.exportItem(); break;
+        case 3: this.downItem(); break;
+        case 4: this.delAllItem(); break;
       }
     },
 
@@ -2754,6 +2818,24 @@ export default {
     padding: 0 10px;
     text-align: center;
   }
+</style>
+<style lang="sass" scoped>
+  .l_row
+    margin-bottom: 20px
+  .delete_btn_row
+    display: flex
+    flex-direction: row
+    align-items: flex-end
+    justify-content: flex-end
+    .cancel-btn
+    .confirm-btn
+      color: #FFF
+    .is-disabled
+      background-color: #dcdfe9
+      border-color: #dcdfe9
+      &:hover
+        background-color: #dcdfe9
+        border-color: #dcdfe9
 </style>
 <style lang="scss" scoped>
   $mainColor:#f31d65;

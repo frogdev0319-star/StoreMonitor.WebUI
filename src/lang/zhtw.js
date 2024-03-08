@@ -140,7 +140,8 @@ export default{
     "InstantPush":"即時推播",
     "Send":"發送推播",
     "SendingRecord":"發送紀錄",
-    "downloadManagement": "下載管理"
+    "downloadManagement": "下載管理",
+
     
   },
   "overview":{
