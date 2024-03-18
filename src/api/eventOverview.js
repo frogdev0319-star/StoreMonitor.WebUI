@@ -2,11 +2,11 @@ import request from '@/common/request';
 import Environment from '@/common/environment';
 const version = Environment.VERSION;
 
-export const getEventStatsOverview = params => {
+export const getEventStatsOverview = data => {
   return request({
     url: `${version}/statistics/event/overview`,
-    method: 'get',
-    params
+    method: 'post',
+    data
   });
 };
 

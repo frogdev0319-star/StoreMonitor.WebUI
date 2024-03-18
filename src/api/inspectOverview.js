@@ -2,14 +2,24 @@ import request from '@/common/request';
 import Environment from '@/common/environment';
 const version = Environment.VERSION;
 
-export const getInspectStatsOverview = params => {
-  console.log(`${version}/statistics/inspect/report/overview`)
+// export const getInspectStatsOverview = params => {
+//   console.log(`${version}/statistics/inspect/report/overview`)
+//   return request({
+//     url: `${version}/statistics/inspect/report/overview`,
+//     method: 'get',
+//     params
+//   });
+// };
+
+export const getInspectStatsOverview = data => {
   return request({
     url: `${version}/statistics/inspect/report/overview`,
-    method: 'get',
-    params
+    method: 'post',
+    data
   });
 };
+
+
 export const getInspectStatsOverviewV2 = data => {
   return request({
     url: `v2.0/statistics/inspect/report/overview`,
@@ -18,19 +28,20 @@ export const getInspectStatsOverviewV2 = data => {
   });
 };
 
-export const getInspectStatsOverStore = params => {
+
+export const getInspectStatsOverStore = data => {
   return request({
     url: `${version}/statistics/inspect/store`,
-    method: 'get',
-    params
+    method: 'post',
+    data
   });
 };
 
-export const getInspectStatsItemOverview = params => {
+export const getInspectStatsItemOverview = data => {
   return request({
     url: `${version}/statistics/inspect/item/overview`,
     method: 'post',
-    params
+    data
   });
 };
 
@@ -50,11 +61,11 @@ export const GetInspectStatsOverPerson = data => {
   });
 };
 
-export const getInspectStatsOverviewWithRegion = params => {
+export const getInspectStatsOverviewWithRegion = data => {
   return request({
     url: `${version}/statistics/inspect/report/region/overview`,
     method: 'post',
-    params
+    data
   });
 };
 
