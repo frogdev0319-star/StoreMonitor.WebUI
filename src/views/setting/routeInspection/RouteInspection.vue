@@ -211,7 +211,7 @@
             <el-input
               v-model="passWord"
               show-password
-              ref="delay_day"
+              ref="needPassword"
               placeholder=""
               class="input-name_short"
               @input="addNum"
@@ -324,6 +324,7 @@ import RouteDetail from '@/views/setting/routeInspection/RouteDetail';
 import { inpectRESTful, titleRESTful } from '@/api/index';
 import { validateInput } from '@/common/validate';
 import { isLoginIn } from '@/api/login';
+import { Encrypt } from '@/common/Aes'
 import { mapGetters } from 'vuex';
 import filterString from '@/common/filterString';
 import { getScheduleListService } from '@/api/schedule';
@@ -714,7 +715,7 @@ export default {
     async getTagList(val, sheetIndex) {
       const self = this;
       const TagData = await self.getTagAll();
-       console.log(">>>self.patrolActive:",self.patrolActive);
+      console.log(">>>self.patrolActive:",self.patrolActive);
       if (TagData.length != 0) {
         if (val == 'del' || self.$route.params.val == 'del') {
           if (Number(self.patrolActive) == TagData.length) {
@@ -1668,9 +1669,16 @@ export default {
         }
       }
       self.showSingleDeleteContent = true;
+      self.$refs.needPassword.focus()
+      
     },
 
+
+
     confirmDelete() {
+      this.showSingleDeleteContent = false;
+      this.isLoading = true
+      
       const self = this;
       const arrGroup = [];
       const arrItem = [];
@@ -1686,50 +1694,63 @@ export default {
       const paramsGroup = {
         'groupIds': arrGroup
       };
-      if (arrItem.length !== 0) {
-        inpectRESTful.deleteInspectItem(params).then(res => {
-          const code = res.errMsg;
-          if (code != undefined && code === 'Success') {
-            if (arrGroup.length !== 0) {
-              inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup => {
-                if (resGroup.errMsg === 'Success') {
-                  self.afterDeleteList();
-                }
-              });
-            } else {
-              self.afterDeleteList();
-            }
-          } else {
-            util.notify(self.$t('insSettingView.deleteInspectFail'), 'warning', 3000);
-            return false;
-          }
-        });
-      } else {
-        inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup => {
-          if (resGroup.errMsg === 'Success') {
-            self.afterDeleteList();
-          } else {
-            util.notify(self.$t('insSettingView.deleteInspectFail'), 'warning', 3000);
-            return false;
-          }
-        });
+
+      console.log(' self.tempdata :>> ',  self.tempdata);
+      console.log('params :>> ', params);
+      console.log('paramsGroup :>> ', paramsGroup);
+
+      var EncryptPassword = Encrypt(this.passWord)
+      const newParams = {
+        tableTagId: self.tempdata[0].inspectId,
+        password: EncryptPassword,
+        reason: "刪除巡檢表！",
       }
-    },
 
-    updateDeleteContentDialogFlag(val) {
-      this.showSingleDeleteContent = val;
-    },
+      inpectRESTful.newDeleteInspect(newParams).then(resGroup => {
+        if (resGroup.errMsg === 'Success') {
+          this.isLoading = false
+          self.afterDeleteList();
+          this.passWord = ''
+          this.canDeleteReport = false
+        } else {
+          this.isLoading = false
+          util.notify('密碼錯誤，請重新輸入！', 'error', 3000);
+          this.passWord = ''
+          this.canDeleteReport = false
+          return false;
+        }
+      });
 
-    hideDeleteContentDialog() {
-      this.showSingleDeleteContent = false;
-    },
 
-    updateShowInfoDialog(val) {
-      this.showFailInfo = val;
-    },
+      // if (arrItem.length !== 0) {
+      //   inpectRESTful.deleteInspectItem(params).then(res => {
+      //     const code = res.errMsg;
+      //     if (code != undefined && code === 'Success') {
+      //       if (arrGroup.length !== 0) {
+      //         inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup => {
+      //           if (resGroup.errMsg === 'Success') {
+      //             self.afterDeleteList();
+      //           }
+      //         });
+      //       } else {
+      //         self.afterDeleteList();
+      //       }
+      //     } else {
+      //       util.notify(self.$t('insSettingView.deleteInspectFail'), 'warning', 3000);
+      //       return false;
+      //     }
+      //   });
+      // } else {
+      //   inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup => {
+      //     if (resGroup.errMsg === 'Success') {
+      //       self.afterDeleteList();
+      //     } else {
+      //       util.notify(self.$t('insSettingView.deleteInspectFail'), 'warning', 3000);
+      //       return false;
+      //     }
+      //   });
+      // }
 
-    hideShowInfoDialog() {
-      this.showFailInfo = false;
     },
 
     afterDeleteList() {
@@ -1738,6 +1759,23 @@ export default {
       self.showSingleDeleteContent = false;
       self.getTagList('del');
     },
+
+
+    updateDeleteContentDialogFlag(val) {
+      this.showSingleDeleteContent = val;
+    },
+    hideDeleteContentDialog() {
+      this.passWord = ''
+      this.canDeleteReport = false
+      this.showSingleDeleteContent = false;
+    },
+    updateShowInfoDialog(val) {
+      this.showFailInfo = val;
+    },
+    hideShowInfoDialog() {
+      this.showFailInfo = false;
+    },
+
     createItem(){
       this.$router.push({ name: 'createInspect' });
     },

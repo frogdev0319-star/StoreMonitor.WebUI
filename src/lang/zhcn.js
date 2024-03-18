@@ -137,6 +137,7 @@ export default{
     "send":"发送推播",
     "sendingRecord":"发送纪录",
     "downloadManagement": "下載管理",
+    "createInspect": "建立巡檢表"
   },
   "overview":{
       "DangerousLess":"立即督导＜60%",

@@ -4,15 +4,74 @@
     <div class="error-text">
       {{ $t('route.noInspectionAccessRights') }}
     </div>
+
+
+    <dialog-pop
+      title="您的服務已轉移至iService Inpsection"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :visible="showDialog"
+      :isWarning="true"
+      :showButton=" false"
+    >
+      <div class="dialog-slot">
+        <div class="dialog-content">
+          <!-- <p> 您的服務已轉移至iService Inpsection</p> -->
+
+          
+          <div class="btn_row">
+            
+            <el-button class="go" type="primary" @click="confirmDelete">
+              <div class="el-icon-link icon"></div> 前往 iService
+            </el-button>
+          </div>
+        </div>
+      </div>
+    </dialog-pop>
+
+
+
   </div>
 </template>
 
 <script>
+import { accountInfo } from '@/api/login';
+import DialogPop from '@/components/DialogPop';
+
 export default {
   name: 'Error',
+  components: {
+    DialogPop,
+  },
   data() {
     return {
-      errorImgSource: require('../../../static/img/icon_error.png')
+      errorImgSource: require('../../../static/img/icon_error.png'),
+      showDialog: false
+    }
+  },
+  mounted() {
+    this.getAccountInfo()
+  },
+  methods: {
+  
+    getAccountInfo(){
+      var id = sessionStorage.getItem("accountId")
+      const accountId = {
+        accountId : id
+      }
+      accountInfo(accountId).then(res => {
+        if(res.data.isTransform && res.data.isiService){
+          this.showDialog =  true
+        }
+      }).catch(err => {
+        console.log('err :>> ', err);
+      });
+    },
+
+    confirmDelete(){
+      console.log('aaa :>> ');
+      window.location.href = "https://apps.wise-iservice.com/";
     }
   }
 };
@@ -36,4 +95,23 @@ export default {
     font-weight: bold;
     color: #424151;
   }
+</style>
+<style lang="sass" scoped>
+  .dialog-content
+    width: 100%
+  .btn_row
+    width: 100%
+    margin-top: 50px
+    margin-bottom: 20px
+    display: flex
+    flex-direction: column
+    align-items: center
+    justify-content: center
+
+
+    .go
+      width: fit-content
+      height: 40px !important
+      font-size: 14px
+      padding: 10px 20px
 </style>
