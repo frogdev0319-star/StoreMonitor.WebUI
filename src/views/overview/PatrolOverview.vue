@@ -6,7 +6,8 @@
         {{ $t('overview.totalStore', {storeNum: totalStoreNum}) }}
       </span>
 
-      <div class="store_title" style="margin-left: 30px; margin-right: 20px;">門店</div>
+      <!-- 選擇地點 -->
+      <div class="store_title" style="margin-left: 30px; margin-right: 20px;">{{ $t('overview.patrolStore')}}</div>
       <el-select
         v-model="selectedInstantBroadcastStore"
         style="width: 20%;"
@@ -23,7 +24,6 @@
       </el-select>
     </div>
 
-    
     <div class="el-overview">
       <el-row class="zone-row paper">
         <el-col :span="4" class="kpi-list">
@@ -341,6 +341,7 @@ export default {
 
       inspectStatus: '',
       selectedInstantBroadcastStore: [],
+      storeList: []
     };
   },
 
