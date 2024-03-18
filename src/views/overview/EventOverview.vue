@@ -44,12 +44,12 @@
             <div class="title">{{ $t('overview.eventTrends') }} </div>
             <div class="region-result">
               <div class="store-list">
-                <span class="store-name">{{ $t('overview.selectStores') }}</span>
+                <span class="store-name">{{ $t('overview.selectStores') }}</span> 
                 <el-select class="storevue-select" v-model="curStore" style="width: 200px" size="mini" @change="changeStore">
                   <el-option
                     v-for="item in storeDataList"
                     :key="item.storeId"
-                    :label="item.label"
+                    :label="item.name"
                     :value="item.storeId"
                   />
                 </el-select>
@@ -403,37 +403,53 @@ export default {
           const storeList = res.data;
           this.storeList = storeList
 
-          const tempStore = [];
-          storeList.forEach(item => {
-            const obj = {
-              storeId: item.storeId,
-              label: item.name,
-              value: item.name,
-              userId: item.userId,
-              checked: true
-            };
-            tempStore.push(obj);
-          });
-          
+          let tempStore = [];
+          if(this.selectedInstantStore.length == 0){
+            console.log('CCCCCC')
+            storeList.forEach(item => {
+              const obj = {
+                storeId: item.storeId,
+                label: item.name,
+                value: item.storeId,
+                userId: item.userId,
+                name: item.name,
+                checked: true
+              };
+              tempStore.push(obj);
+            });
+          } else {
+            console.log('storeList~~~~~>', storeList)
+            console.log(' this.selectedInstantStore~~~~~>',  this.selectedInstantStore)
+
+            var afterFilterData = []
+            storeList.forEach(item => {
+              this.selectedInstantStore.forEach( i => {
+                if( i == item.storeId) afterFilterData.push(item)
+              })
+            })
+            console.log('afterFilterData ===>', afterFilterData)
+            tempStore = []
+            tempStore = afterFilterData 
+          }
 
           if (tempStore.length > 0) {
             tempStore.unshift(
               {
                 storeId: '-1',
                 label: self.$t('overview.all'),
-                value: '-1'
+                value: '-1',
+                name:  self.$t('overview.all'),
               }
             );
           }
           self.storeDataList = tempStore;
-          
-
         }
       });
     },
 
     changeStore(val) {
       const self = this;
+      console.log('self.curStore', self.curStore)
       self.storeIds = [];
       if (val === '-1') {
         self.storeIds = [];
@@ -449,6 +465,7 @@ export default {
       this.getEventStatsStatics();
       this.getEventRankingInfo();
       this.getStoreEventStatics();
+      this.getBriefStoreData();
     },
 
     async getEventStatsStatics() {
@@ -938,6 +955,7 @@ export default {
       params = JSON.parse(JSON.stringify(self.params));
       params.storeIds = self.storeIds;
       params.timeMode = self.timeMode;
+
       const option = self.getStoreEventStaticsOption();
       try {
         const storeEventResult = await self.getStoreEventData(params);
@@ -1175,8 +1193,15 @@ export default {
     align-items: flex-start
   .widewidth
     width: 100% !important
-
 </style>
+
 <style lang="scss" scoped>
   @import "../../assets/sass/overview.scss";
+</style>
+
+<style lang="sass" scoped>
+  .overview-date
+    height: auto !important
+    line-height: initial !important
+    padding: 20px 0
 </style>
