@@ -81,3 +81,10 @@ export const getDepartAll = params => {
 
 
 
+export const accountInfo = data => {
+  return request({
+    url: `${version}/user/account/info`,
+    method: 'post',
+    data
+  });
+};

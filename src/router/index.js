@@ -692,9 +692,17 @@ export const navbarRoute = {
         name: 'bindStore',
         hidden: true,
         component: resolve => require(['@/views/setting/routeInspection/BindRuteInspect'], resolve),
-      }
+      },
+      {
+        path: '/createinspect',
+        name: 'createInspect',
+        hidden: true,
+        component: resolve => require(['@/views/setting/routeInspection/CreateInspect'], resolve),
+      },
 
-    ) && primaryPathesList.push('/routeinspection', '/addroute', '/setroute', '/bindroute');
+      
+
+    ) && primaryPathesList.push('/routeinspection', '/addroute', '/setroute', '/bindroute', '/createinspect');
 
     /*!PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleSetting() && inspectionRoute.children.push({
       path: '/patrolSchedule',

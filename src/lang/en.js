@@ -136,7 +136,8 @@ export default{
         "InstantPush":"Instant Push",
         "send":"Send",
         "sendingRecord":"sending Record",
-        "downloadManagement": "Download Management"
+        "downloadManagement": "Download Management",
+        "createInspect": "create Inspection"
 
     },
     "overview":{

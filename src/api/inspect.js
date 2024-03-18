@@ -109,6 +109,19 @@ export const deleteInspectItem = data => {
   });
 };
 
+
+
+export const newDeleteInspect = data => {
+  return request({
+    url: `${version}/system/advanced/tableTag/delete`,
+    method: 'post',
+    data
+  });
+};
+
+
+
+
 export const deleteInspect = async(params1, params2) => {
   const item = await request({ url: `${base}${itempath}/inspect/item/delete`, method: 'post', data: params1 });
   const group = await request({ url: `${base}${itempath}/inspect/group/delete`, method: 'post', data: params2 });

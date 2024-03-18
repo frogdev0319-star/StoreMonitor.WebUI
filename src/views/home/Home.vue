@@ -1029,12 +1029,6 @@ export default {
           parentBread: { path: "/closeEvents", name: "reportAndEventUpdated" },
         },
 
-
-
-
-
-
-
       ];
       const pathAndBreadMap = pathAndBreadMaps.find((map) =>
         map.paths.includes(currentRoute)
@@ -1106,7 +1100,6 @@ export default {
         util.notify(self.$t('route.noInspectionAccessRights'), 'warning', 3000);
         return ;
       }
-
       const params = {
         accountId: accountId,
       };
@@ -1177,7 +1170,10 @@ export default {
           ? result.userName.substr(0, 10) + "..."
           : result.userName;
       self.orgAccountId = result.accountId;
+      
       self.accountId = result.accountId;
+      // sessionStorage.setItem("accountId", self.accountId);
+
       var un = result.userName.split(' ');
       self.iconName = (un.lenght>1)? un[0].substr(0, 1)+un[1].substr(0, 1) : un[0].substr(0, 1);
       const accountId = result.accountId.toLowerCase();
