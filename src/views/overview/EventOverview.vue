@@ -5,6 +5,25 @@
       <span class="el-store">
         {{ $t('overview.totalStore', {storeNum: storeDataList.length-1}) }}
       </span>
+
+      <!-- 選擇地點 -->
+      <div class="store_title" style="margin-left: 30px; margin-right: 20px;">{{ $t('overview.patrolStore')}}</div>
+      <el-select
+        v-model="selectedInstantStore"
+        style="width: 30%;"
+        :placeholder="$t('immediatePush.selectStore')" 
+        filterable
+        multiple
+        @change="storeChange"
+        >
+        <el-option
+          v-for="item in storeList"
+          :key="item.storeId"
+          :label="item.name"
+          :value="item.storeId" 
+          />
+      </el-select>
+
     </div>
     <div class="el-overview">
       <el-row class="first-row paper">
@@ -308,7 +327,9 @@ export default {
       echartAxiasColor: '#e3e9f4',
       echartBackground: 'rgba(30,34,52,0.75)',
       fontFamily: 'Roboto, Microsoft YaHei',
-      hasAdvanced: false
+      hasAdvanced: false,
+      selectedInstantStore: [],
+      storeList: []
     };
   },
 
@@ -357,6 +378,11 @@ export default {
   },
 
   methods: {
+
+    storeChange(){
+      this.getEventOverviewData();
+    },
+
     dateChange(val) {
       this.dateValue = val;
       const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
@@ -375,6 +401,8 @@ export default {
         const errMsg = res.errMsg;
         if (errMsg && errMsg === 'Success') {
           const storeList = res.data;
+          this.storeList = storeList
+
           const tempStore = [];
           storeList.forEach(item => {
             const obj = {
@@ -386,6 +414,8 @@ export default {
             };
             tempStore.push(obj);
           });
+          
+
           if (tempStore.length > 0) {
             tempStore.unshift(
               {
@@ -396,6 +426,8 @@ export default {
             );
           }
           self.storeDataList = tempStore;
+          
+
         }
       });
     },
@@ -421,8 +453,15 @@ export default {
 
     async getEventStatsStatics() {
       const self = this;
+      
+      var overviewParam = {
+          beginTs: this.params.beginTs,
+          endTs: this.params.endTs,
+          storeIds: this.selectedInstantStore
+      }
+      console.log('overviewParam ~~~~~~>> ', overviewParam);
       try {
-        const eventResult = await self.getEventStatsOverview(self.params);
+        const eventResult = await self.getEventStatsOverview(overviewParam);
         if (eventResult.errCode === 0) {
           const result = eventResult.data;
           if (Object.keys(result).length > 0) {
@@ -729,10 +768,10 @@ export default {
     async getEventRankingInfo() { 
       const self = this;
       let params = {};
-      console.log('params ~~~~~>', params)
       params = JSON.parse(JSON.stringify(self.params));
       params.numOfStores = 5;
       params.rankType = self.rankType;
+      params.storeIds = this.selectedInstantStore
       const { axisArray, colorArray, seriesData } = self.getEventRankingInfoSetting();
       const rankingOption = self.getEventRankingOption(colorArray, seriesData);
 

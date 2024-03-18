@@ -1,7 +1,7 @@
 <template>
   <div class="el-overview-content">
     <div class="overview-date" style="margin-left:24px;">
-      <date-time-selector showTooltips="true" @change="dateChange"/>
+      <date-time-selector :showTooltips=true @change="dateChange"/>
       <span class="el-store">
         {{ $t('overview.totalStore', {storeNum: totalStoreNum}) }}
       </span>
@@ -9,11 +9,12 @@
       <!-- 選擇地點 -->
       <div class="store_title" style="margin-left: 30px; margin-right: 20px;">{{ $t('overview.patrolStore')}}</div>
       <el-select
-        v-model="selectedInstantBroadcastStore"
-        style="width: 20%;"
+        v-model="selectedInstantStore"
+        style="width: 30%;"
         :placeholder="$t('immediatePush.selectStore')" 
         filterable
         multiple
+        @change="storeChange"
         >
         <el-option
           v-for="item in storeList"
@@ -148,7 +149,7 @@
         </el-col>
         <el-col :span="18">
           <div class="focus-items paper">
-            <div class="title">{{ $t('overview.worstItems') }}</div>
+            <div class="title">{{ $t('overview.worstItems') }} </div>
             <el-row class="items-panel">
               <el-col :span="16" class="top-five-items">
                 <div v-if="itemsTopFive.length > 0" class="items-list">
@@ -236,6 +237,7 @@ import {
   getInspectStatsOverviewWithRegion,
   getInspectStatsOverRegion
 } from '@/api/inspectOverview';
+import { getBriefStoreList } from '@/api/store';
 import {
     getInspectStatus
 } from '@/api/inspect';
@@ -340,7 +342,7 @@ export default {
       fontFamily: 'NotoSansCJKtc,Roboto, Microsoft YaHei',
 
       inspectStatus: '',
-      selectedInstantBroadcastStore: [],
+      selectedInstantStore: [],
       storeList: []
     };
   },
@@ -357,7 +359,9 @@ export default {
         self.isEnSpan = false;
         self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
         self.currentIndex = 0;
-
+        self.selectedInstantStore = '';
+      
+        await this.getStore()
         await self.getInspectStatus();
         await self.getSearchParams();
         await self.getPatrolOverviewData();
@@ -367,6 +371,7 @@ export default {
   },
 
   async created() {
+    await this.getStore()
     await this.getInspectStatus();
     await this.getSearchParams();
     await this.getPatrolOverviewData();
@@ -406,6 +411,26 @@ export default {
           });
       });
     },
+
+    getBriefStoreData() {
+      return new Promise((resolve, reject) => {
+        getBriefStoreList().then(res => {
+          const errMsg = res.errMsg;
+          if (errMsg != undefined && errMsg === 'Success') {
+            resolve(res);
+          }
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+    async getStore(){
+      let res  = await this.getBriefStoreData();
+      if(res.errCode ==0){
+        this.storeList = res.data;
+      }
+    },
+
 
     renameTableLabel(){
       this.resultList[2] = this.inspectStatus.status_2
@@ -555,6 +580,8 @@ export default {
       let itemsParam = {};
       itemsParam = JSON.parse(JSON.stringify(self.params));
       itemsParam.itemId = self.curItemId;
+      itemsParam.storeIds = this.selectedInstantStore
+      
       const options = self.getItemRadarOption();
       try {
         const result = await self.getInspectItemsOverRegion(itemsParam);
@@ -715,6 +742,10 @@ export default {
       return radarOptions;
     },
 
+    storeChange(){
+      this.getPatrolOverviewData();
+    },
+
     dateChange(val) {
       this.dateValue = val;
       this.currentIndex = 0;
@@ -724,6 +755,10 @@ export default {
       this.timeMode = daysDiff <= 30 ? 1 : 2;
       this.params.beginTs = start;
       this.params.endTs = end;
+      
+      // 2024 sprint2 新增
+      // this.params.storeIds = [];
+
       this.saveSearchParams();
       this.getPatrolOverviewData();
     },
@@ -856,8 +891,16 @@ export default {
 
     async getStoreNumAndCycle() {
       const self = this;
+
+      var overviewParam = {
+          beginTs: this.params.beginTs,
+          endTs: this.params.endTs,
+          storeIds: this.selectedInstantStore
+      }
+      console.log('overviewParam ~~~~>> ', overviewParam);
+
       try {
-        const storeNumAndCycle = await self.getInspectStatsOverview(self.params);
+        const storeNumAndCycle = await self.getInspectStatsOverview(overviewParam);
         if (storeNumAndCycle.errCode === 0) {
           const result = storeNumAndCycle.data;
           if (result) {
@@ -913,8 +956,9 @@ export default {
       worstStoreObj.qualifiedRate = self.$t('overview.passRate') + ' ' + '0%';
       storesArray.push(worstStoreObj);
 
+    
       try {
-        const bestAndWorstStoreRes = await self.getInspectStatsOverStore(self.params);
+        const bestAndWorstStoreRes = await self.getInspectStatsOverStore(this.params);
         const errCode = bestAndWorstStoreRes.errCode;
         if (errCode === 0) {
           const resData = bestAndWorstStoreRes.data;
@@ -949,7 +993,13 @@ export default {
 
     async getInspectItems() {
       const self = this;
-      const inspectItems = await self.getInspectStatsItemInfo(self.params);
+      const overviewParam = {
+          beginTs: this.params.beginTs,
+          endTs: this.params.endTs,
+          storeIds: this.selectedInstantStore
+      }
+
+      const inspectItems = await self.getInspectStatsItemInfo(overviewParam);
       const ignorePer = 0;
       const errCode = inspectItems.errCode;
       const jsonArray = self.itemsLegend.slice(1);
@@ -1088,6 +1138,7 @@ export default {
       params = JSON.parse(JSON.stringify(self.params));
       params.lowestFirst = self.isWorstWork;
       params.numOfPerson = 5;
+      params.storeIds = this.selectedInstantStore;
       try {
         const result = await self.getInspectStatsOverPerson(params);
         const tempTaskList = [];
@@ -1124,8 +1175,13 @@ export default {
     async getPassRateAndCycle() {
       const self = this;
       const cycleOptions = self.getPassRateAndCycleOption();
+      var overviewParam = {
+          beginTs: this.params.beginTs,
+          endTs: this.params.endTs,
+          storeIds: this.selectedInstantStore
+      }
       try {
-        const result = await self.getPassRateAndInspectRate(self.params);
+        const result = await self.getPassRateAndInspectRate(overviewParam);
         self.regionResultList = result.data;
         const dangerRateMoreArray = [];
         const dangerRateLessArray = [];
@@ -1717,4 +1773,10 @@ export default {
 
 <style lang="scss" scoped>
   @import '../../assets/sass/overview.scss';
+</style>
+<style lang="sass" scoped>
+  .overview-date
+    height: auto !important
+    line-height: initial !important
+    padding: 20px 0
 </style>
