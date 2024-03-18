@@ -1026,12 +1026,6 @@ export default {
           parentBread: { path: "/closeEvents", name: "reportAndEventUpdated" },
         },
 
-
-
-
-
-
-
       ];
       const pathAndBreadMap = pathAndBreadMaps.find((map) =>
         map.paths.includes(currentRoute)

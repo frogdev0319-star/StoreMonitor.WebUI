@@ -7,7 +7,7 @@
 
 
     <dialog-pop
-      title="您的服務已轉移至iService Inpsection"
+      title="您的服務已轉移至 iService Inpsection"
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
@@ -70,7 +70,6 @@ export default {
     },
 
     confirmDelete(){
-      console.log('aaa :>> ');
       window.location.href = "https://apps.wise-iservice.com/";
     }
   }

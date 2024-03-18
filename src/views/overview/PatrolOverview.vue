@@ -5,7 +5,25 @@
       <span class="el-store">
         {{ $t('overview.totalStore', {storeNum: totalStoreNum}) }}
       </span>
+
+      <div class="store_title" style="margin-left: 30px; margin-right: 20px;">門店</div>
+      <el-select
+        v-model="selectedInstantBroadcastStore"
+        style="width: 20%;"
+        :placeholder="$t('immediatePush.selectStore')" 
+        filterable
+        multiple
+        >
+        <el-option
+          v-for="item in storeList"
+          :key="item.storeId"
+          :label="item.name"
+          :value="item.storeId" 
+          />
+      </el-select>
     </div>
+
+    
     <div class="el-overview">
       <el-row class="zone-row paper">
         <el-col :span="4" class="kpi-list">
@@ -321,7 +339,8 @@ export default {
       currentIndex: 0,
       fontFamily: 'NotoSansCJKtc,Roboto, Microsoft YaHei',
 
-      inspectStatus: ''
+      inspectStatus: '',
+      selectedInstantBroadcastStore: [],
     };
   },
 
