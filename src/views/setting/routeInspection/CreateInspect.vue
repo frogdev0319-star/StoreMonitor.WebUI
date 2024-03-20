@@ -343,6 +343,216 @@ export default {
 			calculation: 0,
       extraPoints: true,
 
+      initInspec : [
+        {
+            "name": "eventUnHandleNotify",
+            "category": "generalRule",
+            "value": true,
+            "extra": 12
+        },
+        {
+            "name": "includedInTotalScoreWithType1",
+            "category": "scoreRule",
+            "value": false
+        },
+        {
+            "name": "qualifiedForIgnoredWithType1",
+            "category": "scoreRule",
+            "value": false
+        },
+        {
+            "name": "qualifiedForIgnoredWithType2",
+            "category": "scoreRule",
+            "value": false
+        },
+        {
+            "name": "hundredMarkType",
+            "category": "scoreRule",
+            "value": 0
+        },
+        {
+            "name": "minScore",
+            "category": "scoreRule",
+            "value": 0
+        },
+        {
+            "name": "maxScore",
+            "category": "scoreRule",
+            "value": 100
+        },
+        {
+            "name": "baseScore",
+            "category": "scoreRule",
+            "value": 100
+        },
+        {
+            "name": "standardScore",
+            "category": "scoreRule",
+            "value": null
+        },
+        {
+            "name": "dangerousOnFailedItem",
+            "category": "generalRule",
+            "value": true
+        },
+        {
+            "name": "setting_isAutoMappingActivate",
+            "category": "generalRule",
+            "value": true
+        },
+        {
+            "name": "setting_autoMappingByTotalScore",
+            "category": "generalRule",
+            "value": false,
+            "extra": [
+                {
+                    "key": "mappingScore_bottom",
+                    "value": 50.5
+                },
+                {
+                    "key": "mappingScore_top",
+                    "value": 80.7
+                }
+            ]
+        },
+        {
+            "name": "setting_isShowDistrictSum",
+            "category": "generalRule",
+            "value": false
+        },
+        {
+            "name": "setting_isShowGroupSum",
+            "category": "generalRule",
+            "value": false
+        },
+        {
+            "name": "onSitePhotoOnly",
+            "category": "generalRule",
+            "value": true
+        },
+        {
+            "name": "onSiteSignature",
+            "category": "generalRule",
+            "value": true,
+            "extra": [
+                {
+                    "header": "",
+                    "optional": true
+                },
+                {
+                    "header": "",
+                    "optional": true
+                }
+            ]
+        },
+        {
+            "name": "checkin",
+            "category": "generalRule",
+            "value": false
+        },
+        {
+            "name": "itemOptionsForType1",
+            "category": "generalRule",
+            "value": "passFail",
+            "extra": [
+                {
+                  "key": "passFail",
+                  "items": [
+                    {
+                        "code": "pass",
+                        "name": "合格"
+                    },
+                    {
+                        "code": "fail",
+                        "name": "不合格"
+                    }
+                  ]
+                },
+                {
+                    "key": "yesNo",
+                    "items": [
+                        {
+                            "code": "pass",
+                            "name": "是"
+                        },
+                        {
+                            "code": "fail",
+                            "name": "否"
+                        }
+                    ]
+                },
+                {
+                    "key": "userDefined",
+                    "items": [
+                        {
+                            "code": "pass",
+                            "name": ""
+                        },
+                        {
+                            "code": "fail",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "itemOptionsForType3",
+            "category": "generalRule",
+            "value": "passFail",
+            "extra": [
+                {
+                    "key": "passFail",
+                    "items": [
+                        {
+                            "code": "pass",
+                            "name": "合格"
+                        },
+                        {
+                            "code": "fail",
+                            "name": "不合格"
+                        }
+                    ]
+                },
+                {
+                    "key": "yesNo",
+                    "items": [
+                        {
+                            "code": "pass",
+                            "name": "是"
+                        },
+                        {
+                            "code": "fail",
+                            "name": "否"
+                        }
+                    ]
+                },
+                {
+                    "key": "userDefined",
+                    "items": [
+                        {
+                            "code": "pass",
+                            "name": ""
+                        },
+                        {
+                            "code": "fail",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "workflow",
+            "category": "generalRule",
+            "value": {
+                "name": "GOGOGO",
+                "processDefinitionKey": "process_13dd953d-7311-4acd-80f0-481a05290fc2"
+            },
+            "extra": null
+        }
+    
+      ],
 
 
 
