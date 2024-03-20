@@ -12,12 +12,13 @@
       @change="changeSelect"
       @visible-change="visibileHandler">
       <el-option v-if="options.length > 0" :label="$t('scheduleView.all')" :disabled="allDisabled"
-                 value="-1" @click.native="selectAll"/>
+        value="-1" @click.native="selectAll"/>
       <el-option v-for="(item, index) in options" :key="index" :label="item.label"
-                 :value="item.value" :disabled="item.disabled"/>
+        :value="item.value" :disabled="item.disabled"/>
     </el-select>
     <el-input
       v-model="input"
+      :class="{ hide: noTextInput }"
       readonly
       class="input-class"/>
   </div>
@@ -52,6 +53,10 @@ export default {
     isPointCheck: {
       type: Boolean,
       default: false
+    },
+    noTextInput: {
+      type: Boolean,
+      default: true
     },
     Width:{
       type:Number,
@@ -286,7 +291,7 @@ export default {
     left: 0;
     top:0;
     z-index: 100;
-     text-overflow: ellipsis;
+    text-overflow: ellipsis;
   }
   >>> .el-select .el-input--medium .el-input__suffix{
     top:0px !important;
@@ -299,7 +304,7 @@ export default {
     position: relative;
     z-index: 1;
     background: transparent !important;
-    border: none;
+    /* border: none; */
     font-size: 15px;
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
@@ -360,4 +365,14 @@ export default {
     font-weight: normal;
     padding-right: 25px;
   }
+  
+</style>
+
+<style lang="sass">
+  .hide
+    pointer-events: none
+    .el-input__inner
+      border: 0px solid #FFF0 !important
+      background: #FFF0 !important
+    
 </style>

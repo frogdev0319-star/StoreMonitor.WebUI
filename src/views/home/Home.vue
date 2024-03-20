@@ -497,7 +497,7 @@ export default {
         { curPath: ["/reportdetails"], activePath: "/report" },
         { curPath: ["/rate"], activePath: "/event" },
         {
-          curPath: ["/bindroute", "/addroute", "/setroute"],
+          curPath: ["/bindroute", "/addroute", "/setroute", "/setroute" , "/createinspect"],
           activePath: "/routeinspection",
         },
         { curPath: ["/storedetail"], activePath: "/storemanage" },
@@ -835,6 +835,7 @@ export default {
         }
         case "/bindroute":
         case "/addroute":
+        case "/createinspect":
         case "/setroute": {
           this.setSecondBread(
             matched,
@@ -979,7 +980,7 @@ export default {
 
 
         {
-          paths: ["/addroute", "/setroute", "/bindroute"],
+          paths: ["/addroute", "/setroute", "/bindroute" , "/createinspect"],
           parentBread: { path: "/routeinspection", name: "inspectSetting" },
         },
         {

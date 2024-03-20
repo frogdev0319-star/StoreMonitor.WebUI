@@ -1,7 +1,7 @@
 <template>
   <div>
 		<div class="submit_btn" >
-      <delay-button type="filled" @click="submit">
+      <delay-button type="filled"  :disabled="tableTagName == ''" @click="submit">
         <div class="button-area" style="width: 80px; height: 20px;">
           <span>儲存</span>
         </div>
@@ -63,6 +63,7 @@
                   type="number"
                   :min="1"
                   class="input-name_short"
+                  @blur="inputChangeMin"
                   />
                   分
               </div>
@@ -77,6 +78,7 @@
                   :min="1"
                   class="input-name_short"
                   style="margin: 0 5px;"
+                  @blur="inputChangeMax"
                   />
                   分
               </div>
@@ -91,6 +93,7 @@
                   :min="1"
                   class="input-name_short"
                   style="margin: 0 5px;"
+                  @blur="inputChangeStandardScore"
                   />
                   分
               </div>
@@ -100,27 +103,31 @@
   
           <!-- 表單類型 -->
           <div class="send_content_row">
-            <div class="row_title"><span style="color: #c60957">* </span>表單類型</div>
+            <div class="row_title"><span style="color: #c60957">* </span>表單類型 </div>
             <el-select 
               v-model="tableTypeValue"
               style="width: 25%;"
+              @change="cheangeType"
               >
               <el-option
                 v-for="item in tableType"
                 :key="item.value"
                 :label="item.label"
                 :value="item.value" 
+                
                 />
-            </el-select>
+            </el-select> 
             <el-select 
               v-model="tableLayerValue"
               style="width: 25%;"
+              @change="cheangeType"
               >
               <el-option
                 v-for="item in tableLayer"
                 :key="item.value"
                 :label="item.label"
                 :value="item.value"  
+                
                 />
             </el-select>
           </div>
@@ -168,7 +175,18 @@
           
           <div class="send_content_row">
             <div class="row_title">職務權限 </div>
-            <el-select 
+              <region-multi-select
+                ref="multiState"
+                style="width: 50%; "
+                :selected="titleAuth"
+                :options="titleList"
+                :noTextInput = "true"
+                :all="$t('statistics.patrolPerson.dutyAll')"
+                class="position"
+                @changeInput="handleTitelChange"
+                />
+
+            <!-- <el-select 
               v-model="titleAuth"
               style="width: 50%;"
               filterable
@@ -180,7 +198,7 @@
                 :label="item.title"
                 :value="item.id" 
                 />
-            </el-select>
+            </el-select> -->
           </div>
         
           <div class="l-1" style="height: 1px; width: 100%; background: #ebebeb; margin: 20px 0;"></div>
@@ -271,6 +289,7 @@ import { GetInspectTagListAll, quickAdd } from '@/api/inspect';
 import filterString from '@/common/filterString.js';
 import { mapGetters } from 'vuex';
 import util from '@/common/util';
+import RegionMultiSelect from '@/components/RegionMultiSelect';
 import DateTimeSelector from '@/components/DateTimeSelector';
 import DelayButton from '@/components/DelayButton';
 import DialogPop from '@/components/DialogPop';
@@ -280,13 +299,14 @@ export default {
   components: {
     DateTimeSelector,
     DelayButton,
+    RegionMultiSelect,
     DialogPop
   },
   data() {
     return {
       isLoadingData: false,
       tableTagName: '',
-      formType: '',
+      formType: "A2",
 
       tableTypeValue: "t1",
       tableType:[
@@ -303,17 +323,20 @@ export default {
           value: "t3"
         }
       ],
-      tableLayerValue: "l1",
+      tableLayerValue: "l2",
       tableLayer: [
         {
-          label: "三階層表單",
+          label: "二階層表單",
           value: "l1"
         },
         {
-          label: "二階層表單",
+          label: "三階層表單",
           value: "l2"
         }
+        
       ],
+
+
       
       hundredMarkType: -1,
       minScore: 0,
@@ -507,7 +530,7 @@ export default {
       //   }
       // ],
 
-      titleAuth: "",
+      titleAuth: ["-1"],
       bindStoreIds: [],
       unbindStoreIds: [],
 
@@ -525,6 +548,7 @@ export default {
 
 
 
+        
 
 
 
@@ -536,8 +560,6 @@ export default {
 
 
 
-
-      inspectionMode: 1,
       inspectionName:'',
       inspectionStyle: [
         {
@@ -615,9 +637,7 @@ export default {
       handleSelectedArray: [],
     }
   },
-  mounted() {
-    
-  },
+  mounted() {},
   created() {
     // this.remindDate = new Date()
     this.init()
@@ -653,12 +673,6 @@ export default {
     // accountChanged(val) {
     //   val !== 0 && this.init();
     // },
-    inspectionMode(val){
-      console.log('inspectionMode val', val)
-      this.inspectTypeList = [...this.allInspectTypeList]
-      this.inspectTypeList = this.inspectTypeList.filter( i => i.mode === val)
-      this.inspectionName = this.inspectTypeList[0].id
-    },
 
 
   },
@@ -667,7 +681,7 @@ export default {
       await this.getStore()
       await this.getTitle()
       await this.getCountryStore();
-      // await this.getTagAll()
+      await this.getTagAll()
       // await this.getUserInfo()
       // await this.getDepartAll()
     },
@@ -675,10 +689,18 @@ export default {
 
     async submit(){
       console.log('submit :>> ');
-      
+
+      this.isLoadingData = true
+      var isReapet = this.allInspectTypeList.some( i => i.name == this.tableTagName)
+      if(isReapet) {
+        util.notify("巡檢表名稱名稱不可重複", 'error', 2000 );
+        this.isLoadingData = false
+        return
+      }
+
       this.params = {
         tableTagName: this.tableTagName,
-        formType: 'A1',
+        formType: this.formType,
         settings: [
           {
             name: "includedInTotalScoreWithType1", // default!!! 
@@ -863,51 +885,95 @@ export default {
         applyItems : []
       }
 
-
       quickAdd(this.params).then(res => {
         const errCode = res.errCode;
         console.log('errCode :>> ', errCode);
         if (errCode == 0) {
-          this.getTagAll()
-        
+          this.getTagAllNew()
         }
       }).catch(err => {
         reject(err);
       });
+    },
 
+    
+    // 取得巡檢表
+    getTagAllNew() {
+      GetInspectTagListAll().then(res => {
+        const data = res.data;
+        this.newInspectId = data[data.length-1].id
+
+        console.log('data :>> ', data);
+        console.log('this.newInspectId ~~~~>> ', this.newInspectId);
+        this.secondSummitData()
+
+      }).catch(err => {
+        reject(err);
+      });
+    },
+
+    secondSummitData(){
+      console.log('secondSummitData ~~~~~~>>>>')
+      const ruleData = {
+        inspectId: this.newInspectId,
+        routeName: this.tableTagName,
+        mode:1
+      }
+      sessionStorage.setItem('ruleData', JSON.stringify(ruleData));
+
+      const storeIdChecked = [];
+      const storeIdUnchecked = [];
+      this.storeList.forEach(item => {
+        item.itemData.forEach(_item => {
+          if (_item.checked) {
+            storeIdChecked.push(_item.storeId);
+          } else {
+            storeIdUnchecked.push(_item.storeId);
+          }
+        });
+      });
+      this.params.applyItems.push({
+        inspectId: this.newInspectId,
+        bindStoreIds: storeIdChecked,
+        unbindStoreIds: storeIdUnchecked
+      })
+
+      console.log('this.params.applyItems 2', this.params.applyItems)
+      quickAdd(this.params).then(res => {
+        const errCode = res.errCode;
+        this.isLoadingData = false
+        this.$router.push(
+          { name: 'inspectListSetting', 
+          // params: { data: routeData}
+        });
+      }).catch(err => {
+        reject(err);
+      });
     },
 
 
-      // 取得巡檢表
+
+
+
+
+    // init get Inspect
     getTagAll() {
       return new Promise((resolve, reject) => {
         GetInspectTagListAll().then(res => {
           const data = res.data;
           resolve(data);
-          this.newInspectId = data[data.length-1].id
-
-          console.log('data :>> ', data);
-          console.log('this.newInspectId ~~~~>> ', this.newInspectId);
-
-          this.params.applyItems[0].inspectId = this.newInspectId
-          this.params.applyItems[0].bindStoreIds = ["fqqn29sdRByv", "pUDMjz2GqSP5"] 
-
-          
-          this.secondSummitData()
-
+          this.allInspectTypeList = data.map(i => ({
+            id: i.id,
+            name: i.name,
+            mode: i.mode
+          }))
         }).catch(err => {
           reject(err);
         });
       });
     },
-    secondSummitData(){
-      quickAdd(this.params).then(res => {
-        const errCode = res.errCode;
-        console.log('errCode :>> ', errCode);
-      }).catch(err => {
-        reject(err);
-      });
-    },
+
+   
 
 
 
@@ -1070,9 +1136,31 @@ export default {
       self.allData = length === countItem;
     },
 
-    
+    handleTitelChange(titleAuth){
+      this.titleAuth = titleAuth
+    },
 
-
+    cheangeType(){
+      console.log('change')
+      if(this.tableTypeValue == 't1' && this.tableLayerValue == 'l1'){
+        this.formType = 'A1'
+      }
+      else if(this.tableTypeValue == 't1' && this.tableLayerValue == 'l2'){
+        this.formType = 'A2'
+      }
+      else if(this.tableTypeValue == 't2' && this.tableLayerValue == 'l1'){
+        this.formType = 'B1'
+      }
+      else if(this.tableTypeValue == 't2' && this.tableLayerValue == 'l2'){
+        this.formType = 'B2'
+      }
+      else if(this.tableTypeValue == 't3' && this.tableLayerValue == 'l1'){
+        this.formType = 'C1'
+      }
+      else if(this.tableTypeValue == 't3' && this.tableLayerValue == 'l2'){
+        this.formType = 'C2'
+      }
+    },
 
     getBriefStoreData() {
       return new Promise((resolve, reject) => {
@@ -1109,35 +1197,81 @@ export default {
     async getTitle(){
       let res  = await this.userTitleList();
       if(res.errCode ==0){
-        this.titleList = res.data;
+        this.titleList = res.data.map( i => ({
+          label: i.title,
+          value: i.id,
+        })
+        );
       }
-      console.log('this.titleList :>> ',this.titleList);
+      console.log('this.titleList ~~~~>> ',this.titleList);
     },
 
 
-     // 取得巡檢表
-    getTagAll() {
-      return new Promise((resolve, reject) => {
-        GetInspectTagListAll().then(res => {
-          const data = res.data;
-          resolve(data);
-          this.newInspectId = data[data.length-1].id
+ 
 
-          console.log('data :>> ', data);
-          console.log('this.newInspectId ~~~~>> ', this.newInspectId);
+    inputChangeMin(e) {
+      const self = this;
+      let minScore = self.getUtilScore(e.target.value);
+      // if(minScore == "") minScore = 0
 
-        }).catch(err => {
-          reject(err);
-        });
-      });
+      if(minScore === self.maxScore) minScore = minScore - 1
+      this.countNumMin()
+      this.countNumMax()
+      self.minScore = minScore
+      self.ScoreMsg = parseFloat(self.minScore) > parseFloat(self.maxScore);
+      self.MinScoreMsg = (self.hundredMarkType=='1' && self.baseScore.toString()=="");
     },
 
+    inputChangeMax(e) {
+      let maxScore = this.getUtilScore(e.target.value);
+      // if(maxScore < 1) maxScore = 1
 
+      if(this.minScore === maxScore) maxScore = maxScore + 1
+      this.countNumMin()
+      this.countNumMax()
 
+      if (this.hundredMarkType === '1') {
+        maxScore = parseFloat(maxScore) > parseFloat(this.baseScore) ? parseFloat(this.baseScore) : maxScore;
+      }
+      this.maxScore = maxScore;
+      this.standardScore = parseFloat(this.standardScore) > parseFloat(this.maxScore)
+        ? parseFloat(this.maxScore) : this.standardScore;
+      this.ScoreMsg = parseFloat(this.minScore) >= parseFloat(this.maxScore);
+    },
+    inputChangeStandardScore(e) {
+      let score = this.getUtilScore(e.target.value);
+      if (parseFloat(score) > parseFloat(this.maxScore)) {
+        score = parseFloat(this.maxScore);
+      } else if (parseFloat(score) < parseFloat(this.minScore)) {
+        score = parseFloat(this.minScore);
+      }
+      this.standardScore = score;
+    },
 
+    getUtilScore(val) {
+      val = val.replace(/[^-?\d\.]/g, '');
+      val = val.replace(/\.{2,}/g, '.');
+      val = val.replace('.', '$#$').replace(/\./g, '').replace('$#$', '.');
+      val = val.replace('-', '$#$').replace(/\-/g, '').replace('$#$', '-');
+      val = val.replace(/^(\-)*(\d+)\.(\d).*$/, '$1$2.$3');
+      if (val !== '-0' && !isNaN(val) && val.indexOf('.') < 0 && val != '') {
+        val = parseFloat(val);
+      }
+      return val;
+    },
+    countNumMin(){
+      var minScore = parseFloat(this.minScore)
+      var maxScore = parseFloat(this.maxScore)
 
-
-
+      var middleLow = (((maxScore - minScore) * .5) + minScore)
+      this.scoreMiddleLow = Number.isInteger(middleLow) ? middleLow.toFixed(0) : middleLow.toFixed(1)
+    },
+    countNumMax(){
+      var minScore = parseFloat(this.minScore)
+      var maxScore = parseFloat(this.maxScore)
+      var middleHeight = (((maxScore - minScore) * .8) + minScore)
+      this.scoreMiddleHeight = Number.isInteger(middleHeight) ? middleHeight.toFixed(0) : middleHeight.toFixed(1)
+    },
 
 
 
