@@ -15,10 +15,10 @@
           <div class="send_content_row" >
             <div class="row_title" ><span style="color: #c60957">* </span>巡檢表名稱</div>
             <el-input
-              v-model="broadcastTitle"
+              v-model="tableTagName"
               style="width: 50%;"
               ref="nodeName"
-              :placeholder="$t('immediatePush.inputMessageTitle')"
+              :placeholder="$t('insSettingView.enterListName')"
               @input="(val) => itemInputChanged_a1(val, 50)"
             />
             <span class="notice" v-if="showInputLimit_a1">  {{$t('immediatePush.maxInput')}} 50 {{$t('immediatePush.character')}} </span>
@@ -26,21 +26,37 @@
 
           <div class="send_content_row">
             <div class="row_title"><span style="color: #c60957">* </span> 考評總分計算方式</div>
-            <div class="overall_row" >
-              <el-radio-group class="storevue-radio radio_item" v-model="calculation" >
-                <el-radio :label="0" style=" width: fit-content; text-align: left; margin-right: 40px;" > 總分-比例制 </el-radio>
-                <el-radio :label="1" style=" width: fit-content;  margin-right: 40px;">加分制</el-radio>
-                <el-radio :label="2" style=" width: fit-content;">扣分制 </el-radio>
+            <div class="overall_row" > 
+              <el-radio-group class="storevue-radio radio_item" v-model="hundredMarkType" >
+                <el-radio :label="-1" style=" width: fit-content; text-align: left; margin-right: 40px;" > 總分-比例制 </el-radio>
+                <el-radio :label="0" style=" width: fit-content;  margin-right: 40px;">加分制</el-radio>
+                <el-radio :label="1" style=" width: fit-content;">扣分制 </el-radio>
               </el-radio-group>
             </div>
           </div>
           <!-- 考評總分範圍設定 -->
-          <div class="send_content_row" v-if="extraPoints">
+          <div class="send_content_row" >
+            <div class="overall_row" style="margin-right: 50px;" v-if="hundredMarkType == 1">
+              <div class="title-status">
+                <span style="color: #c60957">* </span> 扣分起始分數
+                <el-input
+                  v-model="baseScore"
+                  style="margin: 0 5px 0 10px;"
+                  ref="overDue_Day"
+                  placeholder=""
+                  type="number"
+                  :min="1"
+                  class="input-name_short"
+                  />
+                  分
+              </div>
+            </div>
+
             <div class="overall_row" >
               <div class="title-status">
                 <span style="color: #c60957">* </span> 考評總分範圍設定
                 <el-input
-                  v-model="aaa"
+                  v-model="minScore"
                   style="margin: 0 5px 0 10px;"
                   ref="overDue_Day"
                   placeholder=""
@@ -55,6 +71,7 @@
             <div class="overall_row" >
               <div class="title-status">
                 <el-input
+                  v-model="maxScore"
                   placeholder=""
                   type="number"
                   :min="1"
@@ -68,6 +85,7 @@
               <div class="title-status">
                 考評達標分
                 <el-input
+                  v-model="standardScore"
                   placeholder=""
                   type="number"
                   :min="1"
@@ -79,102 +97,40 @@
             </div>
           </div>
 
-          <!-- 扣分起始分數 -->
-          <div class="send_content_row" v-else>
-            <div class="overall_row" >
-              <div class="title-status">
-                <span style="color: #c60957">* </span> 扣分起始分數
-                <el-input
-                  v-model="aaa"
-                  style="margin: 0 5px;"
-                  ref="overDue_Day"
-                  placeholder=""
-                  type="number"
-                  :min="1"
-                  class="input-name_short"
-                  />
-                  分
-              </div>
-            </div>
-            <div class="overall_row" style="margin-left: 50px;">
-              <div class="title-status">
-                <span style="color: #c60957">* </span> 考評總分範圍設定
-                <el-input
-                  v-model="aaa"
-                  style="margin: 0 5px;"
-                  ref="overDue_Day"
-                  placeholder=""
-                  type="number"
-                  :min="1"
-                  class="input-name_short"
-                  />
-                  分
-              </div>
-            </div>
-              ~
-            <div class="overall_row" >
-              <div class="title-status">
-                <el-input
-                  placeholder=""
-                  type="number"
-                  :min="1"
-                  class="input-name_short"
-                  style="margin: 0 5px;"
-                  />
-                  分
-              </div>
-            </div>
-            <div class="overall_row" style="margin-left: 50px;">
-              <div class="title-status">
-                考評達標分
-                <el-input
-                  placeholder=""
-                  type="number"
-                  :min="1"
-                  class="input-name_short"
-                  style="margin: 0 5px;"
-                  />
-                  分
-              </div>
-            </div>
-          </div>
-
+  
           <!-- 表單類型 -->
           <div class="send_content_row">
             <div class="row_title"><span style="color: #c60957">* </span>表單類型</div>
             <el-select 
-              v-model="selectInstantBroadcastTitle"
+              v-model="tableTypeValue"
               style="width: 25%;"
-              filterable
-              multiple
               >
               <el-option
-                v-for="item in titleList"
-                :key="item.defineId"
-                :label="item.defineName"
-                :value="item.defineId" 
+                v-for="item in tableType"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value" 
                 />
             </el-select>
             <el-select 
-              v-model="selectInstantBroadcastTitle"
+              v-model="tableLayerValue"
               style="width: 25%;"
-              filterable
-              multiple
               >
               <el-option
-                v-for="item in titleList"
-                :key="item.defineId"
-                :label="item.defineName"
-                :value="item.defineId" 
+                v-for="item in tableLayer"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"  
                 />
             </el-select>
           </div>
+
           <!-- 其他設定 -->
           <div class="send_content_row">
             <div class="row_title">其他設定</div>
             <div class="role-all-checkbox"  style="margin-right: 30px">
               <el-checkbox
-                v-model="bbb"
+                v-model="qualifiedForIgnoredWithType"
                 class="storevue-checkbox-filled" 
                 style="margin-right: 8px"
               />
@@ -182,7 +138,7 @@
             </div>
             <div class="role-all-checkbox"   style="margin-right: 30px">
               <el-checkbox
-                v-model="bbb"
+                v-model="onSiteSignature"
                 class="storevue-checkbox-filled" 
                 style="margin-right: 8px"
               />
@@ -190,7 +146,7 @@
             </div>
             <div class="role-all-checkbox"   style="margin-right: 30px">
               <el-checkbox
-                v-model="bbb"
+                v-model="isShowDistrictSum"
                 class="storevue-checkbox-filled" 
                 style="margin-right: 8px"
               />
@@ -198,7 +154,7 @@
             </div>
             <div class="role-all-checkbox"  >
               <el-checkbox
-                v-model="bbb"
+                v-model="isShowGroupSum"
                 class="storevue-checkbox-filled" 
                 style="margin-right: 8px"
               />
@@ -206,67 +162,56 @@
             </div>
           </div>
 
-
-
           <!-- ///職務權限/// -->
           <div class="title-name" style="margin-top: 50px;">權限設定</div>
           <div class="subtitle_name" style="margin-top: 20px;">職務權限</div>
+          
           <div class="send_content_row">
-            <div class="row_title">職務權限</div>
+            <div class="row_title">職務權限 </div>
             <el-select 
-              v-model="selectInstantBroadcastTitle"
+              v-model="titleAuth"
               style="width: 50%;"
               filterable
               multiple
               >
               <el-option
                 v-for="item in titleList"
-                :key="item.defineId"
-                :label="item.defineName"
-                :value="item.defineId" 
+                :key="item.titleId"
+                :label="item.title"
+                :value="item.id" 
                 />
             </el-select>
           </div>
-
+        
+          <div class="l-1" style="height: 1px; width: 100%; background: #ebebeb; margin: 20px 0;"></div>
           <div class="subtitle_name" style="margin-top: 20px;">門店權限</div>
           <div class="send_content_row">
             <!-- 全部門店 -->
-            <div class="role-all-checkbox">
+            <div  v-if="storeList.length !== 0" class="role-all-checkbox">
               <el-checkbox
                 class="storevue-checkbox-filled" 
                 style="margin-right: 8px"
+                v-model="allData"
+                @change="choiceAll" 
               />
               <span class="group-name">綁定至所有地點</span>
             </div>
           </div>
 
-          <div class="send_content_row">
-            <div class="device-group">
-              <div class="device-all-checkbox">
-                <el-checkbox 
-                  class="storevue-checkbox-filled"
-                  />
-                <span class="group-name">桃園市 - 龜山區</span>
-              </div>
-              <div class="device-content">
-                <div  class="device-detail">
-                  <el-checkbox 
-                    class="storevue-checkbox-outlined"/>
-                  <span class="device-name">文德店文德店文德店</span>
-                </div>
-                <div  class="device-detail">
-                  <el-checkbox 
-                    class="storevue-checkbox-outlined"/>
-                  <span class="device-name">研華店</span>
-                </div>
-                <div  class="device-detail">
-                  <el-checkbox 
-                    class="storevue-checkbox-outlined"/>
-                  <span class="device-name">長庚店 </span>
-                </div>
-            
+          <!-- 個別地點 -->
+          <div class="store_content_row">
+            <div v-for="(item,index) in storeList" :key="index" class="device-group">
+            <div class="device-all-checkbox">
+              <el-checkbox v-model="item.checked" @change="choiceAllGroup(item)" class="storevue-checkbox-filled"/>
+              <span class="group-name">{{ item.province }} - {{ item.cityName }}</span>
+            </div>
+            <div class="device-content">
+              <div v-for="(_item,_index) in item.itemData" :key="_index" class="device-detail">
+                <el-checkbox v-model="_item.checked" @change="choiceAllDevice(index,item,_index,_item)" class="storevue-checkbox-outlined"/>
+                <span class="device-name">{{ _item.name }}</span>
               </div>
             </div>
+          </div>
           </div>
         </div>
 
@@ -313,6 +258,7 @@
 </template>
 <script>
 import { getBriefStoreList } from '@/api/store';
+import { getUserTitleList } from '@/api/title';
 import { getStorageInfo } from '@/api/event';
 import { getUserInfo, getDepartAll, getAllUserInfoNoAuth, getDepart} from '@/api/login';
 import {
@@ -321,7 +267,7 @@ import {
   sendImmediateEvent,
   broadcastCheck
 } from '@/api/advanceSetting';
-import { GetInspectTagListAll } from '@/api/inspect';
+import { GetInspectTagListAll, quickAdd } from '@/api/inspect';
 import filterString from '@/common/filterString.js';
 import { mapGetters } from 'vuex';
 import util from '@/common/util';
@@ -338,238 +284,259 @@ export default {
   },
   data() {
     return {
-      aaa: 0,
-      bbb:'',
-			calculation: 0,
-      extraPoints: true,
-
-      initInspec : [
-        {
-            "name": "eventUnHandleNotify",
-            "category": "generalRule",
-            "value": true,
-            "extra": 12
-        },
-        {
-            "name": "includedInTotalScoreWithType1",
-            "category": "scoreRule",
-            "value": false
-        },
-        {
-            "name": "qualifiedForIgnoredWithType1",
-            "category": "scoreRule",
-            "value": false
-        },
-        {
-            "name": "qualifiedForIgnoredWithType2",
-            "category": "scoreRule",
-            "value": false
-        },
-        {
-            "name": "hundredMarkType",
-            "category": "scoreRule",
-            "value": 0
-        },
-        {
-            "name": "minScore",
-            "category": "scoreRule",
-            "value": 0
-        },
-        {
-            "name": "maxScore",
-            "category": "scoreRule",
-            "value": 100
-        },
-        {
-            "name": "baseScore",
-            "category": "scoreRule",
-            "value": 100
-        },
-        {
-            "name": "standardScore",
-            "category": "scoreRule",
-            "value": null
-        },
-        {
-            "name": "dangerousOnFailedItem",
-            "category": "generalRule",
-            "value": true
-        },
-        {
-            "name": "setting_isAutoMappingActivate",
-            "category": "generalRule",
-            "value": true
-        },
-        {
-            "name": "setting_autoMappingByTotalScore",
-            "category": "generalRule",
-            "value": false,
-            "extra": [
-                {
-                    "key": "mappingScore_bottom",
-                    "value": 50.5
-                },
-                {
-                    "key": "mappingScore_top",
-                    "value": 80.7
-                }
-            ]
-        },
-        {
-            "name": "setting_isShowDistrictSum",
-            "category": "generalRule",
-            "value": false
-        },
-        {
-            "name": "setting_isShowGroupSum",
-            "category": "generalRule",
-            "value": false
-        },
-        {
-            "name": "onSitePhotoOnly",
-            "category": "generalRule",
-            "value": true
-        },
-        {
-            "name": "onSiteSignature",
-            "category": "generalRule",
-            "value": true,
-            "extra": [
-                {
-                    "header": "",
-                    "optional": true
-                },
-                {
-                    "header": "",
-                    "optional": true
-                }
-            ]
-        },
-        {
-            "name": "checkin",
-            "category": "generalRule",
-            "value": false
-        },
-        {
-            "name": "itemOptionsForType1",
-            "category": "generalRule",
-            "value": "passFail",
-            "extra": [
-                {
-                  "key": "passFail",
-                  "items": [
-                    {
-                        "code": "pass",
-                        "name": "合格"
-                    },
-                    {
-                        "code": "fail",
-                        "name": "不合格"
-                    }
-                  ]
-                },
-                {
-                    "key": "yesNo",
-                    "items": [
-                        {
-                            "code": "pass",
-                            "name": "是"
-                        },
-                        {
-                            "code": "fail",
-                            "name": "否"
-                        }
-                    ]
-                },
-                {
-                    "key": "userDefined",
-                    "items": [
-                        {
-                            "code": "pass",
-                            "name": ""
-                        },
-                        {
-                            "code": "fail",
-                            "name": ""
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "itemOptionsForType3",
-            "category": "generalRule",
-            "value": "passFail",
-            "extra": [
-                {
-                    "key": "passFail",
-                    "items": [
-                        {
-                            "code": "pass",
-                            "name": "合格"
-                        },
-                        {
-                            "code": "fail",
-                            "name": "不合格"
-                        }
-                    ]
-                },
-                {
-                    "key": "yesNo",
-                    "items": [
-                        {
-                            "code": "pass",
-                            "name": "是"
-                        },
-                        {
-                            "code": "fail",
-                            "name": "否"
-                        }
-                    ]
-                },
-                {
-                    "key": "userDefined",
-                    "items": [
-                        {
-                            "code": "pass",
-                            "name": ""
-                        },
-                        {
-                            "code": "fail",
-                            "name": ""
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "workflow",
-            "category": "generalRule",
-            "value": {
-                "name": "GOGOGO",
-                "processDefinitionKey": "process_13dd953d-7311-4acd-80f0-481a05290fc2"
-            },
-            "extra": null
-        }
-    
-      ],
-
-
-
-
-
-
-
-      canSendInstantEvent: true,
       isLoadingData: false,
-      activeName: "1",
+      tableTagName: '',
+      formType: '',
+
+      tableTypeValue: "t1",
+      tableType:[
+        {
+          label: "合格率評分項",
+          value: "t1"
+        },
+        {
+          label: "巡檢評分項",
+          value: "t2"
+        },
+        {
+          label: "附加評分項",
+          value: "t3"
+        }
+      ],
+      tableLayerValue: "l1",
+      tableLayer: [
+        {
+          label: "三階層表單",
+          value: "l1"
+        },
+        {
+          label: "二階層表單",
+          value: "l2"
+        }
+      ],
+      
+      hundredMarkType: -1,
+      minScore: 0,
+      maxScore: 100,
+      baseScore: 0,
+      standardScore: 100,
+      qualifiedForIgnoredWithType: true,
+      onSiteSignature:  true, 
+      isShowDistrictSum: true,
+      isShowGroupSum: true,
+      
+      // settings: [
+      //   {
+      //     name: "includedInTotalScoreWithType1", // default!!! 
+      //     value: false
+      //   },
+      //   {
+      //     name: "qualifiedForIgnoredWithType1", //tab1 忽略項視同得分
+      //     value: true
+      //   },
+      //   {
+      //     name: "qualifiedForIgnoredWithType2", //tab2 忽略項視同得分
+      //     value: true
+      //   },
+      //   {
+      //     name: "hundredMarkType",
+      //     value: -1    // -1 - original mark system ， 0 - hundred mark system 加分制, 1 - penalty point system 扣分制
+      //   },
+      //   {
+      //     name: "minScore", //考評總分範圍設定 min
+      //     value: 0
+      //   },
+      //   {
+      //     name: "maxScore", //考評總分範圍設定 max
+      //     value: 100
+      //   },
+      //   {
+      //     name: "baseScore", //扣分起始分數起始分數 
+      //     value: 100
+      //   },
+      //   {
+      //     name: "standardScore", //考評達標分, need less than maxScore
+      //     value: 100
+      //   },
+      //   {
+      //     name: "setting_isAutoMappingActivate", // 開啟依條件自動選取巡檢總評
+      //     category: "generalRule",
+      //     value: true
+      //   },
+      //   {
+      //     name: "setting_autoMappingByTotalScore", // 依分數條件自動選取
+      //     category: "generalRule",
+      //     value: true,
+      //     extra: [
+      //       {
+      //         key: "mappingScore_bottom", // 下標值
+      //         value: 55.0
+      //       },
+      //       {
+      //         key: "mappingScore_top", // 上標值
+      //         value: 90.0
+      //       }
+      //     ]
+      //   },
+      //   {
+      //     name: "setting_isShowDistrictSum", // 顯示區域計分
+      //     category: "generalRule",
+      //     value: false
+      //   },
+      //   {
+      //     name: "setting_isShowGroupSum", // 顯示巡檢類別計分
+      //     category: "generalRule",
+      //     value: true
+      //   },
+      //   {
+      //     name: "dangerousOnFailedItem",
+      //     value: true
+      //   },
+      //   {
+      //     name: "onSitePhotoOnly", // 現場拍照 default!!! 
+      //     category: "generalRule",
+      //     value: true
+      //   },
+      //   {
+      //     name: "onSiteSignature",
+      //     category: "generalRule",
+      //     value: true, //先簽到，再巡檢
+      //     extra: [
+      //       {
+      //         header: "簽名1",
+      //         optional: true
+      //       },
+      //     ]
+      //   },
+      //   {
+      //     name: "checkin",
+      //     category: "generalRule",
+      //     value: false
+      //   },
+      //   {
+      //     name: "itemOptionsForType1",
+      //     category: "generalRule",
+      //     value: "passFail",
+      //     extra: [
+      //       {
+      //         key: "passFail",
+      //         items: [
+      //           {
+      //             code: "pass",
+      //             name: "Pass"
+      //           },
+      //           {
+      //             code: "fail",
+      //             name: "Fail"
+      //           }
+      //         ]
+      //       },
+      //       {
+      //         key: "yesNo",
+      //         items: [
+      //             {
+      //               code: "pass",
+      //               name: "Yes"
+      //             },
+      //             {
+      //               code: "fail",
+      //               name: "No"
+      //             }
+      //         ]
+      //       },
+      //       {
+      //         key: "userDefined",
+      //         items: [
+      //           {
+      //             code: "pass",
+      //             name: ""
+      //           },
+      //           {
+      //             code: "fail",
+      //             name: ""
+      //           }
+      //         ]
+      //       }
+      //     ]
+      //   },
+      //   {
+      //     name: "itemOptionsForType3",
+      //     category: "generalRule",
+      //     value: "passFail",
+      //     extra: [
+      //       {
+      //           key: "passFail",
+      //           items: [
+      //             {
+      //               code: "pass",
+      //               name: "Pass"
+      //             },
+      //             {
+      //               cod: "fail",
+      //               name: "Fail"
+      //             }
+      //           ]
+      //       },
+      //       {
+      //           key: "yesNo",
+      //           items: [
+      //             {
+      //               code: "pass",
+      //               name: "Yes"
+      //             },
+      //             {
+      //               code: "fail",
+      //               name: "No"
+      //             }
+      //           ]
+      //       },
+      //       {
+      //           key: "userDefined",
+      //           items: [
+      //             {
+      //                 code: "pass",
+      //                 name: ""
+      //             },
+      //             {
+      //                 code: "fail",
+      //                 name: ""
+      //             }
+      //           ]
+      //         }
+      //     ]
+      //   }
+      // ],
+
+      titleAuth: "",
+      bindStoreIds: [],
+      unbindStoreIds: [],
 
       storeList: [],
       titleList: [],
       userList: [],
       departList: [],
+      tempStoreData: [],
+      allData: false,
+      newInspectId: '',
 
-      taskName: '',
+      params: {},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       inspectionMode: 1,
       inspectionName:'',
       inspectionStyle: [
@@ -654,7 +621,6 @@ export default {
   created() {
     // this.remindDate = new Date()
     this.init()
-    this.getUpLoadBucketInfo();
 
     var date = new Date();
     var month = this.pad2(date.getMonth()+1);
@@ -695,108 +661,418 @@ export default {
     },
 
 
-    async selectedInstantBroadcastStore(val){
-      if(val.length > 0 ) {
-        let res  = await this.broadcastStaffCheck();
-        console.log('res a>> ', res);
-        this.handleSelectedArray = [...res.data]
-      }
-    },
-
-    async selectedInstantBroadcastbranch(val){
-      if( this.selectedInstantBroadcastStore.length > 0) {
-        let res  = await this.broadcastStaffCheck();
-        console.log('res b>> ', res);
-        this.handleSelectedArray = [...res.data]
-      }
-    },
-    
-    async selectInstantBroadcastTitle(val){
-      if( this.selectedInstantBroadcastStore.length > 0) {
-        let res  = await this.broadcastStaffCheck();
-        console.log('res c>> ', res);
-        this.handleSelectedArray = [...res.data]
-      }
-    },
-    async selectedInstantBroadcastStaff(val){
-      if(this.selectedInstantBroadcastStore.length > 0) {
-        let res  = await this.broadcastStaffCheck();
-        console.log('res d>> ', res);
-        this.handleSelectedArray = [...res.data]
-      }
-    }
-
-
-
-
-
-    // selectedInstantBroadcastbranch(val){
-    //   console.log('val :>> ', val);
-    //   console.log('this.departList :>> ', this.departList);
-    //   var selectedBranch =[]
-    //   val.forEach(i => {
-    //     var tempBranch = this.departList.filter( d => d.defineId == i)
-    //     selectedBranch = [...selectedBranch, ...tempBranch[0].contents]
-    //   })
-    //   this.totalSendingArray[0].content = [...selectedBranch]
-    // },
-    // selectInstantBroadcastTitle(val){
-    //   console.log('val :>> ', val);
-    //   var selectedTitles = []
-    //   val.forEach(i => {
-    //     var tempTitles = this.titleList.filter( d => d.defineId == i)
-    //     selectedTitles = [...selectedTitles, ...tempTitles[0].contents]
-    //   })
-    //   this.totalSendingArray[1].content = [...selectedTitles]
-    // },
-    // selectedInstantBroadcastStaff(val){
-    //   console.log('val :>> ', val);
-    //   this.totalSendingArray[2].content = [...val]
-    // },
-    
-
-
   },
   methods: {
     async init(){
       await this.getStore()
       await this.getTitle()
-      await this.getTagAll()
-      await this.getUserInfo()
-      await this.getDepartAll()
+      await this.getCountryStore();
+      // await this.getTagAll()
+      // await this.getUserInfo()
+      // await this.getDepartAll()
     },
 
-    submit(){
+
+    async submit(){
       console.log('submit :>> ');
+      
+      this.params = {
+        tableTagName: this.tableTagName,
+        formType: 'A1',
+        settings: [
+          {
+            name: "includedInTotalScoreWithType1", // default!!! 
+            value: false
+          },
+          {
+            name: "qualifiedForIgnoredWithType1", //tab1 忽略項視同得分
+            value: this.qualifiedForIgnoredWithType
+          },
+          {
+            name: "this.qualifiedForIgnoredWithType2", //tab2 忽略項視同得分
+            value: this.qualifiedForIgnoredWithType
+          },
+          {
+            name: "hundredMarkType",
+            value: this.hundredMarkType    // -1 - original mark system ， 0 - hundred mark system 加分制, 1 - penalty point system 扣分制
+          },
+          {
+            name: "minScore", //考評總分範圍設定 min
+            value: this.minScore
+          },
+          {
+            name: "maxScore", //考評總分範圍設定 max
+            value: this.maxScore
+          },
+          {
+            name: "baseScore", //扣分起始分數起始分數 
+            value: this.baseScore
+          },
+          {
+            name: "standardScore", //考評達標分, need less than maxScore
+            value: this.standardScore
+          },
+          {
+            name: "setting_isAutoMappingActivate", // 開啟依條件自動選取巡檢總評
+            category: "generalRule",
+            value: true
+          },
+          {
+            name: "setting_autoMappingByTotalScore", // 依分數條件自動選取
+            category: "generalRule",
+            value: true,
+            extra: [
+              {
+                key: "mappingScore_bottom", // 下標值
+                value: 55.0
+              },
+              {
+                key: "mappingScore_top", // 上標值
+                value: 90.0
+              }
+            ]
+          },
+          {
+            name: "setting_isShowDistrictSum", // 顯示區域計分
+            category: "generalRule",
+            value: this.isShowDistrictSum
+          },
+          {
+            name: "setting_isShowGroupSum", // 顯示巡檢類別計分
+            category: "generalRule",
+            value: this.isShowGroupSum
+          },
+          {
+            name: "dangerousOnFailedItem",
+            value: true
+          },
+          {
+            name: "onSitePhotoOnly", // 現場拍照 default!!! 
+            category: "generalRule",
+            value: true
+          },
+          {
+            name: "onSiteSignature",
+            category: "generalRule",
+            value: this.onSiteSignature, //先簽到，再巡檢
+            extra: [
+              {
+                header: "簽名1",
+                optional: true
+              },
+            ]
+          },
+          {
+            name: "checkin",
+            category: "generalRule",
+            value: false
+          },
+          {
+            name: "itemOptionsForType1",
+            category: "generalRule",
+            value: "passFail",
+            extra: [
+              {
+                key: "passFail",
+                items: [
+                  {
+                    code: "pass",
+                    name: "Pass"
+                  },
+                  {
+                    code: "fail",
+                    name: "Fail"
+                  }
+                ]
+              },
+              {
+                key: "yesNo",
+                items: [
+                    {
+                      code: "pass",
+                      name: "Yes"
+                    },
+                    {
+                      code: "fail",
+                      name: "No"
+                    }
+                ]
+              },
+              {
+                key: "userDefined",
+                items: [
+                  {
+                    code: "pass",
+                    name: ""
+                  },
+                  {
+                    code: "fail",
+                    name: ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            name: "itemOptionsForType3",
+            category: "generalRule",
+            value: "passFail",
+            extra: [
+              {
+                  key: "passFail",
+                  items: [
+                    {
+                      code: "pass",
+                      name: "Pass"
+                    },
+                    {
+                      cod: "fail",
+                      name: "Fail"
+                    }
+                  ]
+              },
+              {
+                  key: "yesNo",
+                  items: [
+                    {
+                      code: "pass",
+                      name: "Yes"
+                    },
+                    {
+                      code: "fail",
+                      name: "No"
+                    }
+                  ]
+              },
+              {
+                  key: "userDefined",
+                  items: [
+                    {
+                        code: "pass",
+                        name: ""
+                    },
+                    {
+                        code: "fail",
+                        name: ""
+                    }
+                  ]
+                }
+            ]
+          }
+        ],
+        applyItems : []
+      }
+
+
+      quickAdd(this.params).then(res => {
+        const errCode = res.errCode;
+        console.log('errCode :>> ', errCode);
+        if (errCode == 0) {
+          this.getTagAll()
+        
+        }
+      }).catch(err => {
+        reject(err);
+      });
+
     },
 
 
-
-
-
-    broadcastStaffCheck(){
-      var params = {
-          titleIds: [...this.selectInstantBroadcastTitle],
-          storeIds: [...this.selectedInstantBroadcastStore],
-          depIds: [...this.selectedInstantBroadcastbranch],
-          userIds: [...this.selectedInstantBroadcastStaff]
-      }
+      // 取得巡檢表
+    getTagAll() {
       return new Promise((resolve, reject) => {
-        broadcastCheck(params).then(res => {
-          const errMsg = res.errMsg;
-          if (errMsg != undefined && errMsg === 'Success') {
-            resolve(res);
-          }
+        GetInspectTagListAll().then(res => {
+          const data = res.data;
+          resolve(data);
+          this.newInspectId = data[data.length-1].id
+
+          console.log('data :>> ', data);
+          console.log('this.newInspectId ~~~~>> ', this.newInspectId);
+
+          this.params.applyItems[0].inspectId = this.newInspectId
+          this.params.applyItems[0].bindStoreIds = ["fqqn29sdRByv", "pUDMjz2GqSP5"] 
+
+          
+          this.secondSummitData()
+
         }).catch(err => {
           reject(err);
         });
       });
     },
-
-
-    onTabClick(){
-      this.attachFileList = []
+    secondSummitData(){
+      quickAdd(this.params).then(res => {
+        const errCode = res.errCode;
+        console.log('errCode :>> ', errCode);
+      }).catch(err => {
+        reject(err);
+      });
     },
+
+
+
+
+    getBriefStoreData() {
+      return new Promise((resolve, reject) => {
+        getBriefStoreList().then(res => {
+          const errMsg = res.errMsg;
+          if (errMsg != undefined && errMsg === 'Success') {
+            resolve(res);
+          }
+        }).catch(res => {
+          resolve(res);
+        });
+      });
+    },
+
+    async getCountryStore() {
+      const self = this;
+      const data = await self.getBriefStoreData();
+      self.totalCount = data.data.length;
+      if (data.errCode === 0) {
+        self.tempStoreData = data.data;
+        self.getStoreByCity(data.data)
+      }
+    },
+
+    async getStoreByCity(data) {
+      const self = this;
+      const cityList = [];
+      const provinceList = [];
+      const bindArr = [];
+      var needArry = []
+
+      // const bindStoreId = await self.getBindStoreList();
+      // const storeIds = bindStoreId.data.length > 0 ? bindStoreId.data[0].storeIds : [];
+      const storeIds = [];
+      
+      data.forEach( i => {
+        const obj = {};
+        if(needArry.indexOf(i.province) === -1 && needArry.indexOf(i.city) === -1){
+          obj.city = i.city
+          obj.province = i.province
+          
+        }
+        needArry.push(obj)
+        storeIds.forEach(_item => {
+          if (i.storeId === _item) {
+            bindArr.push(_item);
+          }
+        });
+        
+      })
+      
+      const allItems =  [...new Set(needArry.map(item => JSON.stringify(item)))].map(item => JSON.parse(item));
+      self.storeCount = bindArr.length;
+      allItems.forEach( l => {
+        var tempItems = []
+        data.forEach( i => {
+          const obj = {};
+          if(i.province === l.province && i.city === l.city){
+            obj.storeName = i.name
+            obj.storeId = i.storeId
+            tempItems.push(obj)
+          }
+        })
+        l.store = tempItems
+      })
+
+      const temp = allItems;
+      const groupTemp = [];
+      temp.forEach(item => {
+        const groupObj = {};
+        groupObj.province = item.province;
+        groupObj.cityName = item.city;
+        const _temp = [];
+        let _tempCount = 0;
+        item.store.forEach(_item => {
+          const _obj = {};
+          if (storeIds.indexOf(_item.storeId) === -1) {
+            _obj.checked = false;
+          } else {
+            _obj.checked = true;
+            _tempCount++;
+          }
+          _obj.storeId = _item.storeId;
+          _obj.name = _item.storeName;
+          _temp.push(_obj);
+        });
+        if (_tempCount === item.store.length) {
+          groupObj.checked = true;
+        } else {
+          groupObj.checked = false;
+        }
+        groupObj.itemData = _temp;
+        groupTemp.push(groupObj);
+      });
+
+      self.storeList = groupTemp;
+      self.tempStoreList = groupTemp;
+
+      console.log('self.tempStoreList :>> ', self.tempStoreList);
+
+      let count = 0;
+      self.storeList.forEach(item => {
+        if (item.checked) {
+          count++;
+        }
+      });
+      if (count === self.storeList.length) {
+        self.allData = true;
+      } else {
+        self.allData = false;
+      }
+    },
+
+    choiceAll(val) {
+      const self = this;
+      self.storeList.forEach(item => {
+        item.checked = val;
+        item.itemData.forEach(_item => {
+          _item.checked = val;
+        });
+      });
+    },
+
+    choiceAllGroup(item) {
+      const self = this;
+      const obj = item;
+      item.itemData.forEach(item => {
+        item.checked = obj.checked;
+      });
+      const arr = [];
+      self.storeList.forEach(_item => {
+        if (_item.checked) {
+          arr.push(_item);
+        }
+      });
+      self.allData = self.storeList.length === arr.length;
+    },
+
+    choiceAllDevice(index, item) {
+      const self = this;
+      let count = 0;
+      item.itemData.forEach(itemS => {
+        if (itemS.checked) {
+          count++;
+        }
+      });
+      item.checked = count === item.itemData.length;
+      let length = 0, countItem = 0;
+      self.storeList.forEach(_item => {
+        length += _item.itemData.length;
+        _item.itemData.forEach(itemS => {
+          if (itemS.checked) {
+            countItem++;
+          }
+        });
+      });
+      self.allData = length === countItem;
+    },
+
+    
+
+
 
     getBriefStoreData() {
       return new Promise((resolve, reject) => {
@@ -817,9 +1093,9 @@ export default {
       }
     },
 
-    getDepart(){
+    userTitleList(){
       return new Promise((resolve, reject) => {
-        getDepart({ type: 1 }).then(res => {
+        getUserTitleList({ type: 1 }).then(res => {
           const errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
             resolve(res);
@@ -830,448 +1106,51 @@ export default {
       });
 
     },
-
     async getTitle(){
-      let res  = await this.getDepart();
+      let res  = await this.userTitleList();
       if(res.errCode ==0){
         this.titleList = res.data;
       }
-      // console.log('this.titleList :>> ',this.titleList);
-    },
-
-    async submitInstantEvent(){
-      const statusNameRes = await this.sendInstantEvent();
-      if (statusNameRes.errCode == 0) {
-        this.selectedInstantEventStore = '' 
-        this.selectInstantEventTitle =[]
-        this.eventName= ''
-        this.attachFileList = []
-        this.isLoadingData = false
-        this.uploadProgress = false
-        util.notify('發送成功', 'success', 3000);
-        return false;
-      } else {
-        this.isLoadingData = false
-        util.notify('發送失敗，目前無門店權限！', 'warning', 3000);
-        return false;
-      }
-    },
-    async sendInstantEvent(){
-      this.isLoadingData = true
-      const self = this;
-      const attachment_des = [];
-      //上傳附件
-      self.uploadingnumOfPic = 0;
-      self.totalnumOfPic = self.attachFileList.length;
-      self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
-      const storageParams = {};
-      storageParams.storeId = this.selectedInstantEventStore;
-      await getStorageInfo(storageParams).then(res => {
-        if (res.errCode === 0) {
-          self.oss = res.data;
-        }
-      });
-      for(let idx=0; idx<self.attachFileList.length;idx++){
-        await self.upLoadFile(self.attachFileList[idx]).then((url) => {
-          self.uploadingnumOfPic++;
-          const auditImgObj = {
-            fileName: self.attachFileList[idx].fileName,
-            fileSize: self.attachFileList[idx].size,
-            mediaType: self.attachFileList[idx].type,
-            url: url,
-            ts: Date.now(),
-          };
-          attachment_des.push(auditImgObj);
-        }).catch((err) => {
-          console.log("uploade file error:",err)
-          upload++;
-        });
-      }
-      console.log('attachment_des ----->> ', attachment_des)
-
-      var param = {
-        requestContent: {
-          titleIds: [...this.selectInstantEventTitle],
-          storeIds: [this.selectedInstantEventStore]
-        },
-        msgContent: {
-            eventTitle: this.eventName,
-            attachments: [...attachment_des]
-        }
-      }
-      console.log('param :>> ', param);
-      return new Promise((resolve, reject) => {
-        sendImmediateEvent(param).then(res => {
-          resolve(res);
-        }).catch(err => {
-          reject(err);
-        });
-      });
+      console.log('this.titleList :>> ',this.titleList);
     },
 
 
-    async submitInstantTask(){
-      const statusNameRes = await this.sendInstantTask();
-      if (statusNameRes.errCode == 0) {
-        this.selectedInstantTaskStore = [];
-        this.selectedInstantTaskStaff = [];
-        this.taskName = '';
-        this.remindDate = this.today;
-        this.remindTimePoint = '';
-        this.inspectionName = this.inspectTypeList[0].id
-
-        this.isLoadingData = false
-        util.notify('發送成功', 'success', 3000);
-        return ;
-      } else {
-        this.isLoadingData = false
-        util.notify('發送失敗！', 'warning', 3000);
-        return false;
-      }
-    },
-
-    pad2(n){
-      return (n < 10 ? '0' : '') + n;
-    },
-
-    async sendInstantTask(){
-      var t = new Date()
-      var date = new Date(t);
-      var hour = this.pad2(date.getHours())
-      var min = ":00"
-      var sec = ":00"
-
-      this.remindTimePoint = hour + min +sec
-
-      var t = this.remindDate + " " + this.remindTimePoint + " " + "GMT+00:00"
-      var gmt = new Date(t).getTime()
-      var param = {
-        requestContent: {
-          storeIds: [...this.selectedInstantTaskStore],
-          userIds: [...this.selectedInstantTaskStaff]
-      },
-      msgContent: {
-          taskName: this.taskName,
-          remindTime: gmt,
-          inspectTagId: this.inspectionName,
-      }
-    }
-    console.log('param ~~~~~~~~>>>>>>', param)
-    return new Promise((resolve, reject) => {
-      sendImmediateTask(param).then(res => {
-          resolve(res);
-        }).catch(err => {
-          reject(err);
-        });
-      });
-
-    },
-
-
-    async submitInstantBroadcast(){
-      const statusNameRes = await this.sendInstantBroadcast();
-      if (statusNameRes.errCode == 0) {
-        this.selectedInstantBroadcastStore= []
-        this.selectedInstantBroadcastbranch= []
-        this.selectInstantBroadcastTitle= []
-        this.selectedInstantBroadcastStaff= []
-        this.broadcastTitle= ''
-        this.broadcastContent= ''
-        this.attachFileList = []
-        this.uploadProgress = false
-        this.isLoadingData = false
-        util.notify('發送成功', 'success', 3000);
-        return ;
-      } else {
-        this.isLoadingData = false
-        util.notify('發送失敗！', 'warning', 3000);
-        return false;
-      }
-
-    },
-
-    async sendInstantBroadcast(){
-      this.isLoadingData = true
-      const self = this;
-      const attachment_des = [];
-      //上傳附件
-      self.uploadingnumOfPic = 0;
-      self.totalnumOfPic = self.attachFileList.length;
-      self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
-      const storageParams = {};
-      storageParams.storeId = this.selectedInstantEventStore;
-      await getStorageInfo(storageParams).then(res => {
-        if (res.errCode === 0) {
-          self.oss = res.data;
-        }
-      });
-      for(let idx=0; idx<self.attachFileList.length;idx++){
-        await self.upLoadFile(self.attachFileList[idx]).then((url) => {
-          self.uploadingnumOfPic++;
-          const auditImgObj = {
-            fileName: self.attachFileList[idx].fileName,
-            fileSize: self.attachFileList[idx].size,
-            mediaType: self.attachFileList[idx].type,
-            url: url,
-            ts: Date.now(),
-          };
-          attachment_des.push(auditImgObj);
-        }).catch((err) => {
-          console.log("uploade file error:",err)
-          upload++;
-        });
-      }
-      console.log('attachment_des ----->> ', attachment_des)
-
-      var param = {
-        requestContent: {
-          titleIds: [...this.selectInstantBroadcastTitle],
-          storeIds: [...this.selectedInstantBroadcastStore],
-          depIds: [...this.selectedInstantBroadcastbranch],
-          userIds: [...this.selectedInstantBroadcastStaff]
-        },
-        msgContent: {
-          broadcastTitle: this.broadcastTitle,
-          broadcastContent: this.broadcastContent,
-          attachments: [...attachment_des]
-        }
-    }
-    console.log('param ~~~~~~~~>>>>>>', param)
-    return new Promise((resolve, reject) => {
-      sendImmediateBroadcast(param).then(res => {
-          resolve(res);
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
-    
-
-    doAddAttachment(e){
-      const self = this;
-      const maxSize = 4*1024*1024; //不能超過4MB
-      const maxVideoSize = 10*1024*1024; 
-      var files = e.target.files || e.dataTransfer.files;
-      console.log("choose file::::::::",files);
-      var fileName = files[0].name;
-      if (!files.length)
-        return;
-      /*
-      if(self.attFileCount==10){
-        util.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
-        return;
-      }
-      */
-      if(files[0].type.includes("video") && self.videoAttFileCount==2){
-        util.notify(self.$t('eventView.maximumAttVedio'), 'warning', 3000);
-        return;
-      }
-      if(files[0].type.includes("image")){
-        var objImg={
-          fileName: files[0].name.replace("#", "_").replace("?", "-"),
-          src:'',
-          url:'',
-          file:'',
-          type: 2,
-          size: files[0].size,
-        };
-        self.createFile(files[0],objImg);
-        self.attachFileList.push(objImg);
-      }
-      else if(files[0].type.includes("video")){
-        console.log("choose file:",fileName);
-        var objvideo={
-          fileName: files[0].name.replace("#", "_").replace("?", "-"),
-          src:'',
-          url: URL.createObjectURL(files[0]),
-          type: 1,
-          size:files[0].size,
-          oriName: files[0].name.replace("#", "_").replace("?", "-")
-        }
-        if(files[0].size > maxVideoSize){
-          util.notify('檔案大於 10MB，請重新上傳', 'warning', 3000);
-          return
-        }
-        self.createFile(files[0],objvideo);
-        self.attachFileList.push(objvideo);
-      }
-      else if(files[0].type.includes("pdf")){
-      
-        var objpdf= {
-          fileName: files[0].name.replace("#", "_").replace("?", "-"),
-          url: URL.createObjectURL(files[0]),
-          type: 4,
-          size:files[0].size,
-          oriName: files[0].name.replace("#", "_").replace("?", "-"),
-        }
-        if(files[0].size > maxSize){
-          util.notify('檔案大於 4MB，請重新上傳', 'warning', 3000);
-          return
-        }
-        self.createFile(files[0],objpdf);
-        self.attachFileList.push(objpdf);
-      }
-      else if(files[0].type.includes("sheet")){
-        var objxlsx= {
-          fileName: files[0].name.replace("#", "_").replace("?", "-"),
-          url: URL.createObjectURL(files[0]),
-          type: 5,
-          size: files[0].size,
-          oriName:  files[0].name.replace("#", "_").replace("?", "-")
-        }
-        if(files[0].size > maxSize){
-          util.notify('檔案大於 4MB，請重新上傳', 'warning', 3000);
-          return
-        }
-        self.createFile(files[0],objxlsx);
-        self.attachFileList.push(objxlsx);
-      }
-      else if(files[0].type.includes("document")){
-        var objdocument= {
-          // fileName:`${self.bucketDocx}/inspect_${util.getCurTimeStr()}_${files[0].name}`,
-          fileName: files[0].name.replace("#", "_").replace("?", "-"),
-          url: URL.createObjectURL(files[0]),
-          type: 6,
-          size: files[0].size,
-          oriName:  files[0].name.replace("#", "_").replace("?", "-")
-        }
-        if(files[0].size > maxSize){
-          util.notify('檔案大於 4MB，請重新上傳', 'warning', 3000);
-          return
-        }
-        self.createFile(files[0],objdocument);
-        self.attachFileList.push(objdocument);
-      }
-
-      console.log('self.attachFileList :>> ', self.attachFileList);
-      self.$refs.auditfile.value = '';
-    },
-    createFile(file, objFile) {
-      //var image = new Image();
-      console.log(objFile);
-      var reader = new FileReader();
-      reader.onload = (e) => {
-        console.log("e:",e);
-        objFile.src = e.target.result;
-        objFile.file = util.base64ToBlob(e.target.result);
-        console.log(objFile.file);
-      };
-      reader.readAsDataURL(file);
-    },
-    getAuditImgList(index) {
-      const arr = [];
-      let i = 0;
-      for (i; i < this.attachFileList.length; i++) {
-        arr.push(this.attachFileList[i + index]);
-        if (i + index >= this.attachFileList.length - 1) {
-          index = 0 - (i + 1);
-        }
-      }
-      return arr.map(source => source.src);
-    },
-    deleteImg({item, index}) {
-      const self = this;
-      self.attachFileList.splice(index, 1);
-    },
-
-    playAttachVideo(item, index) {
-      console.log('play :>> ');
-      console.log('item :>> ', item);
-      const self = this;
-      self.dialogAttachVideo = true;
-      self.$nextTick(function() {
-        var video = document.getElementById('previewAttVideo');
-        video.setAttribute("src",item.url);
-      });
-    },
-    getFileUrl(fileName) {
-      const self = this;
-      const bucketName = self.oss.ossBucketName;
-      const endpoint = self.oss.ossEndPoint;
-      const key = fileName;
-      if (self.oss.ossVendor === 2) {
-        return `https://${endpoint}/${bucketName}/${fileName}`;
-      } else {
-        return `http://${bucketName}.${endpoint}/${fileName}`;
-      }
-    },
-    upLoadFile(fileItem) {
-      const self = this;
-      self.percentage = 0;
-      if (self.oss.ossVendor === null) {
-        self.oss.ossVendor = 1; // 1 -aliyun  2-azure
-      }
-      if (self.oss.ossVendor === 1) {
-        const OSS = require('ali-oss');
-        const client = new OSS({
-          region: self.oss.ossEndPoint.slice(0, self.oss.ossEndPoint.indexOf('.')),
-          accessKeyId: self.oss.ossAccessKeyId,
-          accessKeySecret: self.oss.ossAccessKeySecret,
-          // bucket: 'viumo-'+self.accountId,
-          bucket: self.oss.ossBucketName
-        });
-        const name = fileItem.fileName;
-        return new Promise((resolve, reject) => {
-          client.put(name, fileItem.file, {
-            progress: function * (percentage, cpt) {
-              self.percentage = percentage;
-            }
-          })
-            .then((results) => {
-              const url = self.getFileUrl(results.name);
-              resolve(url);
-            })
-            .catch((err) => {
-              reject(err);
-            });
-        });
-      } else {
-        const url = `https://${self.oss.ossEndPoint}/${self.oss.ossBucketName}${self.oss.ossAccessKeySecret}`;
-        const containerURL = new azblob.ContainerURL(url, azblob.StorageURL.newPipeline(new azblob.AnonymousCredential()));
-        const blockBlobURL = azblob.BlockBlobURL.fromContainerURL(containerURL, fileItem.fileName);
-        return new Promise((resolve, reject) => {
-          azblob.uploadBrowserDataToBlockBlob(azblob.Aborter.none, fileItem.file, blockBlobURL)
-            .then((results) => {
-              const url = self.getFileUrl(fileItem.fileName);
-              resolve(url);
-            })
-            .catch((error) => {
-              reject(error);
-            });
-        });
-      }
-    },
-    getUpLoadBucketInfo() {
-      const self = this;
-      self.bucketVideo = 'video' + '/' + util.getCurDate2Str();
-      self.bucketImage = 'image' + '/' + util.getCurDate2Str();
-      self.bucketPdf = 'pdf' + '/' + util.getCurDate2Str();
-      self.bucketXslx = 'xslx' + '/' + util.getCurDate2Str();
-      self.bucketDocx = 'docx' + '/' + util.getCurDate2Str();
-    },
-
-    // 取得巡檢表
+     // 取得巡檢表
     getTagAll() {
       return new Promise((resolve, reject) => {
         GetInspectTagListAll().then(res => {
           const data = res.data;
           resolve(data);
+          this.newInspectId = data[data.length-1].id
 
-          this.allInspectTypeList = data.map(i => ({
-            id: i.id,
-            name: i.name,
-            mode: i.mode
-          }))
-          console.log(' this.allInspectTypeList =========>>>> ',  this.allInspectTypeList)
-          
-          this.inspectTypeList = this.allInspectTypeList.filter(i => i.mode == 1)
-          this.inspectionName = this.inspectTypeList[0].id
-          
+          console.log('data :>> ', data);
+          console.log('this.newInspectId ~~~~>> ', this.newInspectId);
+
         }).catch(err => {
           reject(err);
         });
       });
     },
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+    pad2(n){
+      return (n < 10 ? '0' : '') + n;
+    },
+
+
+   
 
     async getUserInfo(){
       await getAllUserInfoNoAuth().then(res=>{
@@ -1288,6 +1167,8 @@ export default {
         });
     },
 
+
+
     itemInputChanged_a1(val, n){
       const content = filterString.all(val, n);
       this.broadcastTitle = content
@@ -1299,36 +1180,7 @@ export default {
       }
     },
     
-    itemInputChanged_a2(val, n){
-      const content = filterString.all(val, n);
-      this.broadcastContent = content
-      const length = filterString.getContentLength(val);
-      if(length > n) {
-        this.showInputLimit_a2 = true
-      } else {
-        this.showInputLimit_a2 = false
-      }
-    },
-    itemInputChanged_b1(val, n){
-      const content = filterString.all(val, n);
-      this.taskName = content
-      const length = filterString.getContentLength(val);
-      if(length > n) {
-        this.showInputLimit_b1 = true
-      } else {
-        this.showInputLimit_b1 = false
-      }
-    },
-    itemInputChanged_c1(val, n){
-      const content = filterString.all(val, n);
-      this.eventName = content
-      const length = filterString.getContentLength(val);
-      if(length > n) {
-        this.showInputLimit_a1 = true
-      } else {
-        this.showInputLimit_a1 = false
-      }
-    },
+
   },
 };
 </script>
@@ -1384,6 +1236,7 @@ export default {
       margin-left: 30px
       margin-bottom: 10px
       font-weight: bolder
+
     .send_content_row
       display: flex
       flex-direction: row
@@ -1409,20 +1262,18 @@ export default {
         align-items: center
         .group-name
           line-height: 1
-      .attachments
-        width: 100px
-        height: 30px
-        background: #006ab7
-        color: #FFF
-        border-radius: 3px
-        display: flex
-        flex-direction: row
-        justify-content: center
-        align-items: center
-        cursor: pointer
-      
+    
+    .store_content_row
+      display: flex
+      flex-direction: column
+      justify-content: flex-start
+      align-items: center
+      margin-left: 30px
+      font-size: calc(16/1920*100vw)
+      padding: 15px 0
       .device-group
         width: 100%
+        margin-bottom: 30px
         display: flex
         flex-direction: column
         justify-content: flex-start
@@ -1432,7 +1283,6 @@ export default {
           margin-left: 8px
         .device-all-checkbox
           margin-bottom: 15px
-        
         .device-content
           width: calc( 100% - 30px )
           margin-left: 30px
@@ -1451,109 +1301,7 @@ export default {
               margin-left: 8px
           
 
-  
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-  .attach-area
-    display: flex
-    flex-wrap: wrap
-    align-content: flex-start
-    align-self: flex-start
-    width: calc(478/1440*100vw)
-    margin-top: 15px
-    margin-left: 16px
-    margin-right: 19px
-    margin-bottom: 10px
-    .attach-add
-      height: 120px
-      width: 120px
-      border-radius: 5px
-      box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1)
-      display: flex
-      flex-direction: row
-      justify-content: center
-      align-items: center
-      cursor: pointer
-      .att-txt
-        font-size: 12px
-        color: #006ab7
-        margin-left: 3px
-    .source-details
-      margin-right: 12px
-      margin-bottom: 12px
-      .img-content
-        position: relative
-        transition: all .3s
-        &:hover
-          transform: scale(1.1)
-        .el-icon-close
-          width: 21px
-          height: 21px
-          border-radius: 50%
-          background: rgba(0,0,0,.5)
-          color: #FFF
-          display: flex
-          flex-direction: row
-          justify-content: center
-          align-items: center
-          transition: all .3s
-          position: absolute
-          z-index: 100
-          right: 2px
-          top: 2px
-          cursor: pointer
-            
-
-        .el-image
-          width: auto
-          height: 120px
-
-        .attach_video
-          width: 110px
-          height: 120px
-          border-radius: 5px
-          cursor: pointer
-          display: flex
-          flex-direction: column
-          justify-content: center
-          align-items: center
-          background: url(('../../../../static/img/video_thumbnail.png'))
-          background-position:  center center
-          font-size: 12px
-          color: #FFF
-          span
-            word-break: break-all
-            line-height: 1.2
-          .start-icon
-            width: 40px
-            margin-bottom: 5px
-
-          .imgLittle
-            width: auto
-            height: 120px
-            border-radius: 5px
-
-  .dialog-title
-    text-align: left
-    font-size: 20px
-    padding-left: 20px
-    color: #484848
-  
-
-
-      
   .el-table-content
     width: 100%
     background-color: #fff
@@ -1571,9 +1319,6 @@ export default {
           padding-left: 12px
           padding-right: 12px
 
-
-
- 
   .button-area
     height: 23px
     padding: 0 5px
@@ -1581,29 +1326,6 @@ export default {
 
 
 
-  .attach_file
-    width: 110px
-    height: 120px
-    background: #f4f4f4
-    border-radius: 5px
-    display: flex
-    flex-direction: column
-    justify-content: center
-    align-items: center
-    color: #999
-    font-size: 11px
-    padding: 0 5px
-    span
-      line-height: 1.2
-      word-break: break-all
-    
-    img
-      width: 40%
-      margin-bottom: 5px
-  .notice
-    color: red
-    font-size: 12px
-    margin: 5px 0 0 5px
-    margin-left: 10px
+  
 </style>
 

@@ -322,9 +322,6 @@ export const getAllReportIds = data => {
   });
 };
 
-
-
-
 export const getInspectStatus = params => {
   return request({
     url: `${version}/general/setting/get`,
@@ -338,6 +335,16 @@ export const updateInspectStatus = data => {
   return request({
     // url: `${version}/general/setting/inspect/status/name/update`,
     url: `${version}/general/setting/update`,
+    method: 'post',
+    data
+  });
+}
+
+
+
+export const quickAdd = data => {
+  return request({
+    url: `${version}/inspect/report/table/quickAdd`,
     method: 'post',
     data
   });
