@@ -696,7 +696,20 @@ export default {
         util.notify("巡檢表名稱名稱不可重複", 'error', 2000 );
         this.isLoadingData = false
         return
-      }
+      } 
+
+      const storeIdChecked = [];
+      const storeIdUnchecked = [];
+      this.storeList.forEach(item => {
+        item.itemData.forEach(_item => {
+          if (_item.checked) {
+            storeIdChecked.push(_item.storeId);
+          } else {
+            storeIdUnchecked.push(_item.storeId);
+          }
+        });
+      });
+
 
       this.params = {
         tableTagName: this.tableTagName,
@@ -882,14 +895,24 @@ export default {
             ]
           }
         ],
-        applyItems : []
+        titleIds: this.titleAuth,
+        applyItems : [
+          {
+            bindStoreIds: storeIdChecked,
+            unbindStoreIds: storeIdUnchecked
+          }
+        ]
       }
 
       quickAdd(this.params).then(res => {
         const errCode = res.errCode;
         console.log('errCode :>> ', errCode);
         if (errCode == 0) {
-          this.getTagAllNew()
+          this.isLoadingData = false
+          this.$router.push(
+            { name: 'inspectListSetting', 
+            // params: { data: routeData}
+          });
         }
       }).catch(err => {
         reject(err);
@@ -898,60 +921,58 @@ export default {
 
     
     // 取得巡檢表
-    getTagAllNew() {
-      GetInspectTagListAll().then(res => {
-        const data = res.data;
-        this.newInspectId = data[data.length-1].id
+    // getTagAllNew() {
+    //   GetInspectTagListAll().then(res => {
+    //     const data = res.data;
+    //     this.newInspectId = data[data.length-1].id
 
-        console.log('data :>> ', data);
-        console.log('this.newInspectId ~~~~>> ', this.newInspectId);
-        this.secondSummitData()
+    //     console.log('data :>> ', data);
+    //     console.log('this.newInspectId ~~~~>> ', this.newInspectId);
+    //     this.secondSummitData()
 
-      }).catch(err => {
-        reject(err);
-      });
-    },
+    //   }).catch(err => {
+    //     reject(err);
+    //   });
+    // },
 
-    secondSummitData(){
-      console.log('secondSummitData ~~~~~~>>>>')
-      const ruleData = {
-        inspectId: this.newInspectId,
-        routeName: this.tableTagName,
-        mode:1
-      }
-      sessionStorage.setItem('ruleData', JSON.stringify(ruleData));
+    // secondSummitData(){
+    //   console.log('secondSummitData ~~~~~~>>>>')
+    //   const ruleData = {
+    //     inspectId: this.newInspectId,
+    //     routeName: this.tableTagName,
+    //     mode:1
+    //   }
+    //   sessionStorage.setItem('ruleData', JSON.stringify(ruleData));
 
-      const storeIdChecked = [];
-      const storeIdUnchecked = [];
-      this.storeList.forEach(item => {
-        item.itemData.forEach(_item => {
-          if (_item.checked) {
-            storeIdChecked.push(_item.storeId);
-          } else {
-            storeIdUnchecked.push(_item.storeId);
-          }
-        });
-      });
-      this.params.applyItems.push({
-        inspectId: this.newInspectId,
-        bindStoreIds: storeIdChecked,
-        unbindStoreIds: storeIdUnchecked
-      })
+    //   const storeIdChecked = [];
+    //   const storeIdUnchecked = [];
+    //   this.storeList.forEach(item => {
+    //     item.itemData.forEach(_item => {
+    //       if (_item.checked) {
+    //         storeIdChecked.push(_item.storeId);
+    //       } else {
+    //         storeIdUnchecked.push(_item.storeId);
+    //       }
+    //     });
+    //   });
+    //   this.params.applyItems.push({
+    //     inspectId: this.newInspectId,
+    //     bindStoreIds: storeIdChecked,
+    //     unbindStoreIds: storeIdUnchecked
+    //   })
 
-      console.log('this.params.applyItems 2', this.params.applyItems)
-      quickAdd(this.params).then(res => {
-        const errCode = res.errCode;
-        this.isLoadingData = false
-        this.$router.push(
-          { name: 'inspectListSetting', 
-          // params: { data: routeData}
-        });
-      }).catch(err => {
-        reject(err);
-      });
-    },
-
-
+    //   console.log('this.params.applyItems 2', this.params.applyItems)
+    //   quickAdd(this.params).then(res => {
+    //     const errCode = res.errCode;
+    //     this.isLoadingData = false
+    //     this.$router.push(
+    //       { name: 'inspectListSetting', 
+    //       // params: { data: routeData}
+    //     });
+    //   }).catch(err => {
+    //     reject(err);
+    //   });
+    // },
 
 
 
