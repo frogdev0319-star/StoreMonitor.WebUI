@@ -233,43 +233,7 @@
           </div>
         </div>
 
-        <!-- uploadProgress -->
-        <!-- <el-dialog :visible.sync="uploadProgress" :close-on-click-modal="false" width="510px" top="35vh" left="40vh" class="AddSumupLoad">
-        <div class="body-content">
-          <p>{{ $t('remotePatrol.uploading') }}</p>
-          <p style="margin-bottom:15px;">
-            {{ $t('remotePatrol.uploadInfo', {totalNum: totalnumOfPic, uploadedNum: uploadingnumOfPic}) }}
-          </p>
-          <el-progress :percentage="Math.round(uploadingnumOfPic/totalnumOfPic*100)"/>
-        </div>
-      </el-dialog> -->
-
-      <!-- video dialog -->
-      <!-- <el-dialog
-        v-if="dialogAttachVideo"
-        :title="$t('eventView.view')"
-        :visible.sync="dialogAttachVideo"
-        :close-on-click-modal="false"
-        width="850px"
-        height="834px"
-        top="12%"
-        class="rate-video-dialog"
-        @close="stopCommentVideo">
-        <div slot="title" class="dialog-title">{{$t('eventView.view')}}</div>
-        <div class="video-dialog-content" style="overflow:hidden;">
-          <div class="video-content" >
-            <video
-              id="previewAttVideo"
-              height="83%"
-              width="90%"
-              prload
-              controls
-              autoplay
-              class="video-js vjs-fill"/>
-          </div>
-        </div>
-      </el-dialog> -->
-
+       
       
     </div>
   </div>
@@ -543,139 +507,20 @@ export default {
       newInspectId: '',
 
       params: {},
-
-
-
-
-
-        
-
-
-
-
-
-
-
-
-
-
-
-      inspectionName:'',
-      inspectionStyle: [
-        {
-          value : 1,
-          label: this.$t('scheduleView.onsitePatrol')
-        },
-        {
-          value : 0,
-          label: this.$t('scheduleView.remotePatrol')
-        },
-      ],
       allInspectTypeList: [],
-      inspectTypeList: [],
-      today: '',
-      remindDate:'',
-      remindTimePoint:'',
-      remindStyle:[],
-      pickerOptions: {
-        disabledDate(time) {
-          var day1 = new Date();
-          var yesterday = day1.setTime(day1.getTime()-24*60*60*1000);
-            return yesterday > time.getTime()  ;
-          }
-      },
-      
-      selectedInstantBroadcastStore: [],
-      selectedInstantBroadcastbranch: [],
-      selectInstantBroadcastTitle: [],
-      selectedInstantBroadcastStaff: [],
+
+
       broadcastTitle: '',
-      broadcastContent: '',
-
-      selectedInstantTaskStore: [],
-      selectedInstantTaskStaff: [],
-      selectedInstantEventStore: "",
-      selectInstantEventTitle : [],
-      eventName:'',
-      attFileCount: 0,
-      attachFileList:[],
-      bucketVideo: '',
-      bucketImage: '',
-      addAttIcon: require('../../../../static/img/icon_attachment.svg'),
-      videoSrc: require('../../../../static/img/monitor.png'),
-      inspectSrc: require('../../../../static/img/remote_patrol.png'),
-      insiteInspectSrc: require('../../../../static/img/onsite_patrol.png'),
-      startIcon: require('../../../../static/img/play_icon.png'),
-      videoImgSrc: require('../../../../static/img/video_thumbnail.png'),
-      uploadProgress: false,
-      totalnumOfPic: 0,
-      uploadingnumOfPic: 0,
-      oss: null,
-
-      showInputLimit_a1: false,
-      showInputLimit_a2: false,
-      showInputLimit_b1: false,
-      showInputLimit_c1: false,
-
-      dialogAttachVideo: false,
-      totalSendingArray: [
-        {
-          tag: "dep",
-          content: []
-        },
-        {
-          tag: "title",
-          content: []
-        },
-        {
-          tag: "staff",
-          content: []
-        },
-      ],
-      totalSendingNum: 0,
-      
-      handleSelectedArray: [],
     }
   },
   mounted() {},
   created() {
-    // this.remindDate = new Date()
     this.init()
-
-    var date = new Date();
-    var month = this.pad2(date.getMonth()+1);
-    var day = this.pad2(date.getDate());
-    var year= date.getFullYear();
-    this.remindDate = year + "-"+ month +"-"+ day
-    this.today = year + "-"+ month +"-"+ day
-
   },
   computed: {
     // ...mapGetters({ accountChanged: 'accountChanged' })
-
-    showHandleSelectedArray(){
-      // var tempAry = []
-      // this.totalSendingArray.forEach(i => {
-      //   tempAry = [...tempAry, ...i.content]
-      // })
-      // var resultAry = [...new Set(tempAry)]
-      // console.log('this.userList :>> ', this.userList);
-      var showNameAry = []
-      this.handleSelectedArray.forEach(i => {
-        this.userList.forEach( u => {
-          if(i == u.userId) showNameAry.push(u.userName)
-        })
-      })
-      return showNameAry
-    }
   },
-  watch:{
-    // accountChanged(val) {
-    //   val !== 0 && this.init();
-    // },
-
-
-  },
+  watch:{},
   methods: {
     async init(){
       await this.getStore()
@@ -994,10 +839,6 @@ export default {
       });
     },
 
-   
-
-
-
 
     getBriefStoreData() {
       return new Promise((resolve, reject) => {
@@ -1295,17 +1136,10 @@ export default {
     },
 
 
-
-    
-
-
-
     pad2(n){
       return (n < 10 ? '0' : '') + n;
     },
 
-
-   
 
     async getUserInfo(){
       await getAllUserInfoNoAuth().then(res=>{
@@ -1321,7 +1155,6 @@ export default {
           console.log('error' + err);
         });
     },
-
 
 
     itemInputChanged_a1(val, n){
