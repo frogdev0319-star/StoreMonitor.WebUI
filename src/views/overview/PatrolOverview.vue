@@ -147,9 +147,10 @@
             </div>
           </div>
         </el-col>
+        <!-- 缺失項目TOP5 -->
         <el-col :span="18">
           <div class="focus-items paper">
-            <div class="title">{{ $t('overview.worstItems') }} </div>
+            <div class="title">{{ $t('overview.worstItems') }}  </div>
             <el-row class="items-panel">
               <el-col :span="16" class="top-five-items">
                 <div v-if="itemsTopFive.length > 0" class="items-list">
@@ -171,7 +172,7 @@
                         :class="item.isClick?'item-process':'inactive-item-process'"
                         color="#f59249"/>
                     </div>
-                    <div class="ranking-num">{{ item.numOfUnqualified }}</div>
+                    <div class="ranking-num">{{ item.numOfUnqualified }} </div>
                   </div>
                 </div>
                 <div v-else class="top-five-empty">
