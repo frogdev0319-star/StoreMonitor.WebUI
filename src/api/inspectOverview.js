@@ -31,7 +31,7 @@ export const getInspectStatsOverviewV2 = data => {
 
 export const getInspectStatsOverStore = data => {
   return request({
-    url: `${version}/statistics/inspect/store`,
+    url: `v2.0/statistics/inspect/store`,
     method: 'post',
     data
   });
