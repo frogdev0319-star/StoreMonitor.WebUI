@@ -956,8 +956,9 @@ export default {
       worstStoreObj.iconSrc = self.worstStoreIcon;
       worstStoreObj.qualifiedRate = self.$t('overview.passRate') + ' ' + '0%';
       storesArray.push(worstStoreObj);
+      this.params.storeIds = this.selectedInstantStore
 
-    
+
       try {
         const bestAndWorstStoreRes = await self.getInspectStatsOverStore(this.params);
         const errCode = bestAndWorstStoreRes.errCode;
@@ -1511,6 +1512,8 @@ export default {
       params = JSON.parse(JSON.stringify(self.params));
       params.region = 1;
       params.timeMode = self.timeMode;
+      params.storeIds = this.selectedInstantStore
+
       const result = await self.getInspectResultOverRegion(params);
       if (result.errCode === 0) {
         const resultData = result.data;

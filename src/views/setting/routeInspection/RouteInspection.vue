@@ -511,6 +511,7 @@ export default {
   mounted() {
     const self = this;
     const InspectHistory = self.$store.getters.InspectHistory;
+    console.log('InspectHistory >>>>>>> ', InspectHistory);
     if (InspectHistory != null) {
       self.activeName = InspectHistory.activeName;
       self.patrolActive = InspectHistory.patrolActive;
@@ -715,7 +716,12 @@ export default {
     async getTagList(val, sheetIndex) {
       const self = this;
       const TagData = await self.getTagAll();
-      console.log(">>>self.patrolActive:",self.patrolActive);
+      
+      console.log('val >>>>>>> ', val);
+      console.log('sheetIndex >>>>>>> ', sheetIndex);
+      console.log('TagData >>>>>>> ', TagData);
+      console.log("self.patrolActive >>>>>>>",self.patrolActive);
+
       if (TagData.length != 0) {
         if (val == 'del' || self.$route.params.val == 'del') {
           if (Number(self.patrolActive) == TagData.length) {
@@ -731,6 +737,8 @@ export default {
         } else {
           tagIndex = Number(self.patrolActive);
         }
+
+
         if (self.activeName === '0') {
           sessionStorage.setItem('TabPatrolIndex0', tagIndex);
         } else if (self.activeName === '1') {
