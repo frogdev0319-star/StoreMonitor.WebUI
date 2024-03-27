@@ -499,6 +499,7 @@ export default {
           }else{
             this.cantDeleteAlert = true
             this.cantDeleteList = row.inspectTagName.replaceAll(',', '、')
+            console.log('row.inspectTagName :>> ', row);
             
           }
           break;      

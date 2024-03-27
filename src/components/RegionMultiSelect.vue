@@ -13,8 +13,12 @@
       @visible-change="visibileHandler">
       <el-option v-if="options.length > 0" :label="$t('scheduleView.all')" :disabled="allDisabled"
         value="-1" @click.native="selectAll"/>
-      <el-option v-for="(item, index) in options" :key="index" :label="item.label"
-        :value="item.value" :disabled="item.disabled"/>
+      <el-option 
+        v-for="(item, index) in options" 
+        :key="index" 
+        :label="item.label"
+        :value="item.value" 
+        :disabled="item.disabled"/>
     </el-select>
     <el-input
       v-model="input"

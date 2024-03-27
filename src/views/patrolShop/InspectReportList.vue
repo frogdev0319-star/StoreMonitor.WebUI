@@ -694,9 +694,8 @@ export default {
       var nowTs = this.getAllDate(now)
       var tsbegin = this.getDate(this.dateValue[0])
       var tsEnd = this.getOnlyDate(this.dateValue[1])
-      // if(this.storeFilterObj.curStore[0] === '-1') this.storeFilterObj.curStore.shift()
-      console.log('this.params.clause.storeId', this.params.clause.storeId)
-      console.log(' this.allStoreList',  this.allStoreList)
+      // console.log('this.params.clause.storeId', this.params.clause.storeId)
+      // console.log(' this.allStoreList',  this.allStoreList)
       const conTableName =  this.params.inspectTagId ? this.inspectTableList.find( i => i.id == this.params.inspectTagId).name : "全部"
       const conStoreName = this.params.clause.storeId.length == this.allStoreList.length ? "全部" : this.storeFilterObj.storeStr
 
@@ -838,7 +837,14 @@ export default {
       const self = this;
       var reportIds = [];
       var p = self.params;
-      var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,inspectTagId:p.inspectTagId,filter:p.filter}
+      var params = {
+        beginTs:p.beginTs,
+        endTs:p.endTs,
+        clause:p.clause,
+        like:p.like,
+        inspectTagId:p.inspectTagId,
+        filter:p.filter
+      }
       params.endTs = params.endTs - params.endTs % 1000 + 999;
       if (params.clause.storeId.length === 0) {
         params.clause.storeId.push(-1)
@@ -870,8 +876,15 @@ export default {
     getReportList_(p) {
       console.log("2.Get Report List")
       console.log(p)
-      var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,
-      inspectTagId:p.inspectTagId!='-1'?p.inspectTagId:null}
+      var params = {
+        beginTs:p.beginTs,
+        endTs:p.endTs,
+        clause:p.clause,
+        like:p.like,
+        filter:p.filter,
+        order:p.order,
+        inspectTagId: p.inspectTagId !='-1' ? p.inspectTagId:null 
+      }
       const self = this;
       params.endTs = params.endTs - params.endTs % 1000 + 999;
       if (params.clause.storeId.length === 0) {

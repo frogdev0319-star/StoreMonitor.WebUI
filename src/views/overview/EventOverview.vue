@@ -6,9 +6,19 @@
         {{ $t('overview.totalStore', {storeNum: storeDataList.length-1}) }}
       </span>
 
-      <!-- 選擇地點 -->
+      <!-- 巡檢地點 -->
       <div class="store_title" style="margin-left: 30px; margin-right: 20px;">{{ $t('overview.patrolStore')}}</div>
-      <el-select
+      <region-multi-select
+        ref="multiState"
+        style="width: 30%; "
+        :selected="selectedInstantStore"
+        :options="storeList"
+        :noTextInput = "true"
+        :all="$t('remotePatrol.allStores')"
+        class="position"
+        @changeInput="storeChange"
+        />
+      <!-- <el-select
         v-model="selectedInstantStore"
         style="width: 30%;"
         :placeholder="$t('immediatePush.selectStore')" 
@@ -22,7 +32,7 @@
           :label="item.name"
           :value="item.storeId" 
           />
-      </el-select>
+      </el-select> -->
 
     </div>
     <div class="el-overview">
@@ -174,6 +184,7 @@ import { getEventStatsOverview, getEventStatsRankInfo, getEventStatsOverStore } 
 import resize from '@/components/mixins/echartResize';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DateTimeSelector from '@/components/DateTimeSelector';
+import RegionMultiSelect from '@/components/RegionMultiSelect';
 import jsCookie from 'js-cookie';
 
 export default {
@@ -181,6 +192,7 @@ export default {
 
   components: {
     DateTimeSelector,
+    RegionMultiSelect,
     'v-chart': ECharts
   },
 
@@ -357,9 +369,9 @@ export default {
   },
 
   async created() {
-    this.getBriefStoreData();
-    this.getSearchParams();
-    this.getEventOverviewData();
+    await this.getBriefStoreData();
+    await this.getSearchParams();
+    await this.getEventOverviewData();
 
     var userInfo = await this.$store.dispatch("GetUserAuthorities");
     this.hasAdvanced = userInfo.data.isSystemAdvanced
@@ -379,7 +391,8 @@ export default {
 
   methods: {
 
-    storeChange(){
+    storeChange(selectedInstantStore){
+      this.selectedInstantStore = selectedInstantStore
       this.getEventOverviewData();
     },
 
@@ -401,11 +414,19 @@ export default {
         const errMsg = res.errMsg;
         if (errMsg && errMsg === 'Success') {
           const storeList = res.data;
+          storeList.forEach( i => {
+            i.value = i.storeId;
+            i.label = i.name
+          })
           this.storeList = storeList
+          // this.selectedInstantStore = storeList.map( i => i.value)
+          
+
+          console.log('storeList XDXD~~~~~>', storeList)
+          console.log(' this.selectedInstantStore~~~~~>',  this.selectedInstantStore)
 
           let tempStore = [];
           if(this.selectedInstantStore.length == 0){
-            console.log('CCCCCC')
             storeList.forEach(item => {
               const obj = {
                 storeId: item.storeId,
@@ -418,9 +439,8 @@ export default {
               tempStore.push(obj);
             });
           } else {
-            console.log('storeList~~~~~>', storeList)
-            console.log(' this.selectedInstantStore~~~~~>',  this.selectedInstantStore)
-
+            
+            
             var afterFilterData = []
             storeList.forEach(item => {
               this.selectedInstantStore.forEach( i => {
@@ -442,7 +462,9 @@ export default {
               }
             );
           }
+          console.log('tempStore ~~~~~> ', tempStore);
           self.storeDataList = tempStore;
+          
         }
       });
     },
@@ -524,8 +546,8 @@ export default {
       let sumEvent = 0;
       let seriesData = 0;
 
-      console.log('sourcePieList !!!:>> ', sourcePieList);
-      console.log('jsonArray 1 !!!:>> ', jsonArray);
+      // console.log('sourcePieList !!!:>> ', sourcePieList);
+      // console.log('jsonArray 1 !!!:>> ', jsonArray);
       sourcePieList.forEach((item, index) => {
         sumEvent += item.numOfEvent;
         if (index === 2) {
@@ -540,7 +562,7 @@ export default {
       jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
       if(jsonArray[1] && this.hasAdvanced) jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2)
       
-      console.log('jsonArray 2 !!!:>> ', jsonArray);
+      // console.log('jsonArray 2 !!!:>> ', jsonArray);
       if (sumEvent !== 0) {
         seriesData = [
           // { value: remoteEventNum, name: self.$t('overview.remotePatrol') },
