@@ -28,8 +28,8 @@
             <div class="row_title"><span style="color: #c60957">* </span> 考評總分計算方式</div>
             <div class="overall_row" > 
               <el-radio-group class="storevue-radio radio_item" v-model="hundredMarkType" >
-                <el-radio :label="-1" style=" width: fit-content; text-align: left; margin-right: 40px;" > 總分-比例制 </el-radio>
-                <el-radio :label="0" style=" width: fit-content;  margin-right: 40px;">加分制</el-radio>
+                <el-radio :label="0" style=" width: fit-content; text-align: left; margin-right: 40px;" > 總分-比例制 </el-radio>
+                <el-radio :label="-1" style=" width: fit-content;  margin-right: 40px;">加分制</el-radio>
                 <el-radio :label="1" style=" width: fit-content;">扣分制 </el-radio>
               </el-radio-group>
             </div>
@@ -42,11 +42,11 @@
                 <el-input
                   v-model="baseScore"
                   style="margin: 0 5px 0 10px;"
-                  ref="overDue_Day"
-                  placeholder=""
+                  ref="basescore"
+                  :placeholder="$t('insSettingView.setMinScore')"
                   type="number"
-                  :min="1"
                   class="input-name_short"
+                  @blur="inputChangeBaseScore"
                   />
                   分
               </div>
@@ -58,10 +58,9 @@
                 <el-input
                   v-model="minScore"
                   style="margin: 0 5px 0 10px;"
-                  ref="overDue_Day"
+                  ref="minscore"
                   placeholder=""
                   type="number"
-                  :min="1"
                   class="input-name_short"
                   @blur="inputChangeMin"
                   />
@@ -73,9 +72,9 @@
               <div class="title-status">
                 <el-input
                   v-model="maxScore"
+                  ref="maxscore"
                   placeholder=""
                   type="number"
-                  :min="1"
                   class="input-name_short"
                   style="margin: 0 5px;"
                   @blur="inputChangeMax"
@@ -90,7 +89,6 @@
                   v-model="standardScore"
                   placeholder=""
                   type="number"
-                  :min="1"
                   class="input-name_short"
                   style="margin: 0 5px;"
                   @blur="inputChangeStandardScore"
@@ -140,10 +138,11 @@
                 v-model="qualifiedForIgnoredWithType"
                 class="storevue-checkbox-filled" 
                 style="margin-right: 8px"
+                :disabled="tableTypeValue =='t3' "
               />
               <span class="group-name">忽略項視同得分</span>
             </div>
-            <div class="role-all-checkbox"   style="margin-right: 30px">
+            <div class="role-all-checkbox"  style="margin-right: 30px">
               <el-checkbox
                 v-model="onSiteSignature"
                 class="storevue-checkbox-filled" 
@@ -185,24 +184,10 @@
                 class="position"
                 @changeInput="handleTitelChange"
                 />
-
-            <!-- <el-select 
-              v-model="titleAuth"
-              style="width: 50%;"
-              filterable
-              multiple
-              >
-              <el-option
-                v-for="item in titleList"
-                :key="item.titleId"
-                :label="item.title"
-                :value="item.id" 
-                />
-            </el-select> -->
           </div>
         
           <div class="l-1" style="height: 1px; width: 100%; background: #ebebeb; margin: 20px 0;"></div>
-          <div class="subtitle_name" style="margin-top: 20px;">門店權限</div>
+          <div class="subtitle_name" style="margin-top: 20px;"> {{ $t('mysterio.storeAuth') }}</div>
           <div class="send_content_row">
             <!-- 全部門店 -->
             <div  v-if="storeList.length !== 0" class="role-all-checkbox">
@@ -232,9 +217,6 @@
           </div>
           </div>
         </div>
-
-       
-      
     </div>
   </div>
 </template>
@@ -297,204 +279,20 @@ export default {
           label: "三階層表單",
           value: "l2"
         }
-        
       ],
 
-
-      
       hundredMarkType: -1,
       minScore: 0,
       maxScore: 100,
-      baseScore: 0,
-      standardScore: 100,
+      baseScore: 100,
+      standardScore: '',
       qualifiedForIgnoredWithType: true,
       onSiteSignature:  true, 
       isShowDistrictSum: true,
       isShowGroupSum: true,
-      
-      // settings: [
-      //   {
-      //     name: "includedInTotalScoreWithType1", // default!!! 
-      //     value: false
-      //   },
-      //   {
-      //     name: "qualifiedForIgnoredWithType1", //tab1 忽略項視同得分
-      //     value: true
-      //   },
-      //   {
-      //     name: "qualifiedForIgnoredWithType2", //tab2 忽略項視同得分
-      //     value: true
-      //   },
-      //   {
-      //     name: "hundredMarkType",
-      //     value: -1    // -1 - original mark system ， 0 - hundred mark system 加分制, 1 - penalty point system 扣分制
-      //   },
-      //   {
-      //     name: "minScore", //考評總分範圍設定 min
-      //     value: 0
-      //   },
-      //   {
-      //     name: "maxScore", //考評總分範圍設定 max
-      //     value: 100
-      //   },
-      //   {
-      //     name: "baseScore", //扣分起始分數起始分數 
-      //     value: 100
-      //   },
-      //   {
-      //     name: "standardScore", //考評達標分, need less than maxScore
-      //     value: 100
-      //   },
-      //   {
-      //     name: "setting_isAutoMappingActivate", // 開啟依條件自動選取巡檢總評
-      //     category: "generalRule",
-      //     value: true
-      //   },
-      //   {
-      //     name: "setting_autoMappingByTotalScore", // 依分數條件自動選取
-      //     category: "generalRule",
-      //     value: true,
-      //     extra: [
-      //       {
-      //         key: "mappingScore_bottom", // 下標值
-      //         value: 55.0
-      //       },
-      //       {
-      //         key: "mappingScore_top", // 上標值
-      //         value: 90.0
-      //       }
-      //     ]
-      //   },
-      //   {
-      //     name: "setting_isShowDistrictSum", // 顯示區域計分
-      //     category: "generalRule",
-      //     value: false
-      //   },
-      //   {
-      //     name: "setting_isShowGroupSum", // 顯示巡檢類別計分
-      //     category: "generalRule",
-      //     value: true
-      //   },
-      //   {
-      //     name: "dangerousOnFailedItem",
-      //     value: true
-      //   },
-      //   {
-      //     name: "onSitePhotoOnly", // 現場拍照 default!!! 
-      //     category: "generalRule",
-      //     value: true
-      //   },
-      //   {
-      //     name: "onSiteSignature",
-      //     category: "generalRule",
-      //     value: true, //先簽到，再巡檢
-      //     extra: [
-      //       {
-      //         header: "簽名1",
-      //         optional: true
-      //       },
-      //     ]
-      //   },
-      //   {
-      //     name: "checkin",
-      //     category: "generalRule",
-      //     value: false
-      //   },
-      //   {
-      //     name: "itemOptionsForType1",
-      //     category: "generalRule",
-      //     value: "passFail",
-      //     extra: [
-      //       {
-      //         key: "passFail",
-      //         items: [
-      //           {
-      //             code: "pass",
-      //             name: "Pass"
-      //           },
-      //           {
-      //             code: "fail",
-      //             name: "Fail"
-      //           }
-      //         ]
-      //       },
-      //       {
-      //         key: "yesNo",
-      //         items: [
-      //             {
-      //               code: "pass",
-      //               name: "Yes"
-      //             },
-      //             {
-      //               code: "fail",
-      //               name: "No"
-      //             }
-      //         ]
-      //       },
-      //       {
-      //         key: "userDefined",
-      //         items: [
-      //           {
-      //             code: "pass",
-      //             name: ""
-      //           },
-      //           {
-      //             code: "fail",
-      //             name: ""
-      //           }
-      //         ]
-      //       }
-      //     ]
-      //   },
-      //   {
-      //     name: "itemOptionsForType3",
-      //     category: "generalRule",
-      //     value: "passFail",
-      //     extra: [
-      //       {
-      //           key: "passFail",
-      //           items: [
-      //             {
-      //               code: "pass",
-      //               name: "Pass"
-      //             },
-      //             {
-      //               cod: "fail",
-      //               name: "Fail"
-      //             }
-      //           ]
-      //       },
-      //       {
-      //           key: "yesNo",
-      //           items: [
-      //             {
-      //               code: "pass",
-      //               name: "Yes"
-      //             },
-      //             {
-      //               code: "fail",
-      //               name: "No"
-      //             }
-      //           ]
-      //       },
-      //       {
-      //           key: "userDefined",
-      //           items: [
-      //             {
-      //                 code: "pass",
-      //                 name: ""
-      //             },
-      //             {
-      //                 code: "fail",
-      //                 name: ""
-      //             }
-      //           ]
-      //         }
-      //     ]
-      //   }
-      // ],
-
-      titleAuth: ["-1"],
+    
+  
+      titleAuth: [],
       bindStoreIds: [],
       unbindStoreIds: [],
 
@@ -509,13 +307,14 @@ export default {
       params: {},
       allInspectTypeList: [],
 
-
       broadcastTitle: '',
+      showInputLimit_a1: '',
     }
   },
   mounted() {},
   created() {
     this.init()
+    
   },
   computed: {
     // ...mapGetters({ accountChanged: 'accountChanged' })
@@ -527,10 +326,10 @@ export default {
       await this.getTitle()
       await this.getCountryStore();
       await this.getTagAll()
+    
       // await this.getUserInfo()
       // await this.getDepartAll()
     },
-
 
     async submit(){
       console.log('submit :>> ');
@@ -540,6 +339,27 @@ export default {
       if(isReapet) {
         util.notify("巡檢表名稱名稱不可重複", 'error', 2000 );
         this.isLoadingData = false
+        return
+      } 
+
+      if(this.baseScore.toString()=="" && this.hundredMarkType == 1) {
+        util.notify("扣分起始分數不可為空", 'error', 2000 );
+        this.isLoadingData = false
+        this.$refs.basescore.focus()
+        return
+      } 
+
+      if(this.minScore.toString()=="" ) {
+        util.notify("考評總分範圍最低分數不可為空", 'error', 2000 );
+        this.isLoadingData = false
+        this.$refs.minscore.focus()
+        return
+      } 
+
+      if(this.maxScore.toString()=="" ) {
+        util.notify("考評總分範圍最高分數不可為空", 'error', 2000 );
+        this.isLoadingData = false
+        this.$refs.maxscore.focus()
         return
       } 
 
@@ -569,12 +389,12 @@ export default {
             value: this.qualifiedForIgnoredWithType
           },
           {
-            name: "this.qualifiedForIgnoredWithType2", //tab2 忽略項視同得分
+            name: "qualifiedForIgnoredWithType2", //tab2 忽略項視同得分
             value: this.qualifiedForIgnoredWithType
           },
           {
             name: "hundredMarkType",
-            value: this.hundredMarkType    // -1 - original mark system ， 0 - hundred mark system 加分制, 1 - penalty point system 扣分制
+            value: this.hundredMarkType    // 0 - original mark system ， -1 - hundred mark system 加分制, 1 - penalty point system 扣分制
           },
           {
             name: "minScore", //考評總分範圍設定 min
@@ -595,7 +415,7 @@ export default {
           {
             name: "setting_isAutoMappingActivate", // 開啟依條件自動選取巡檢總評
             category: "generalRule",
-            value: true
+            value: false
           },
           {
             name: "setting_autoMappingByTotalScore", // 依分數條件自動選取
@@ -629,12 +449,12 @@ export default {
           {
             name: "onSitePhotoOnly", // 現場拍照 default!!! 
             category: "generalRule",
-            value: true
+            value: false
           },
           {
             name: "onSiteSignature",
             category: "generalRule",
-            value: this.onSiteSignature, //先簽到，再巡檢
+            value: true, 
             extra: [
               {
                 header: "簽名1",
@@ -643,9 +463,9 @@ export default {
             ]
           },
           {
-            name: "checkin",
+            name: "checkin", //先簽到，再巡檢
             category: "generalRule",
-            value: false
+            value: this.onSiteSignature
           },
           {
             name: "itemOptionsForType1",
@@ -657,11 +477,11 @@ export default {
                 items: [
                   {
                     code: "pass",
-                    name: "Pass"
+                    name: this.$t('remotePatrol.pass')
                   },
                   {
                     code: "fail",
-                    name: "Fail"
+                    name: this.$t('remotePatrol.failed')
                   }
                 ]
               },
@@ -670,11 +490,11 @@ export default {
                 items: [
                     {
                       code: "pass",
-                      name: "Yes"
+                      name: "是"
                     },
                     {
                       code: "fail",
-                      name: "No"
+                      name: "否"
                     }
                 ]
               },
@@ -703,11 +523,11 @@ export default {
                   items: [
                     {
                       code: "pass",
-                      name: "Pass"
+                      name: this.$t('remotePatrol.pass')
                     },
                     {
                       cod: "fail",
-                      name: "Fail"
+                      name: this.$t('remotePatrol.failed')
                     }
                   ]
               },
@@ -716,11 +536,11 @@ export default {
                   items: [
                     {
                       code: "pass",
-                      name: "Yes"
+                      name: "是"
                     },
                     {
                       code: "fail",
-                      name: "No"
+                      name: "否"
                     }
                   ]
               },
@@ -764,64 +584,7 @@ export default {
       });
     },
 
-    
-    // 取得巡檢表
-    // getTagAllNew() {
-    //   GetInspectTagListAll().then(res => {
-    //     const data = res.data;
-    //     this.newInspectId = data[data.length-1].id
-
-    //     console.log('data :>> ', data);
-    //     console.log('this.newInspectId ~~~~>> ', this.newInspectId);
-    //     this.secondSummitData()
-
-    //   }).catch(err => {
-    //     reject(err);
-    //   });
-    // },
-
-    // secondSummitData(){
-    //   console.log('secondSummitData ~~~~~~>>>>')
-    //   const ruleData = {
-    //     inspectId: this.newInspectId,
-    //     routeName: this.tableTagName,
-    //     mode:1
-    //   }
-    //   sessionStorage.setItem('ruleData', JSON.stringify(ruleData));
-
-    //   const storeIdChecked = [];
-    //   const storeIdUnchecked = [];
-    //   this.storeList.forEach(item => {
-    //     item.itemData.forEach(_item => {
-    //       if (_item.checked) {
-    //         storeIdChecked.push(_item.storeId);
-    //       } else {
-    //         storeIdUnchecked.push(_item.storeId);
-    //       }
-    //     });
-    //   });
-    //   this.params.applyItems.push({
-    //     inspectId: this.newInspectId,
-    //     bindStoreIds: storeIdChecked,
-    //     unbindStoreIds: storeIdUnchecked
-    //   })
-
-    //   console.log('this.params.applyItems 2', this.params.applyItems)
-    //   quickAdd(this.params).then(res => {
-    //     const errCode = res.errCode;
-    //     this.isLoadingData = false
-    //     this.$router.push(
-    //       { name: 'inspectListSetting', 
-    //       // params: { data: routeData}
-    //     });
-    //   }).catch(err => {
-    //     reject(err);
-    //   });
-    // },
-
-
-
-
+  
     // init get Inspect
     getTagAll() {
       return new Promise((resolve, reject) => {
@@ -915,28 +678,22 @@ export default {
         let _tempCount = 0;
         item.store.forEach(_item => {
           const _obj = {};
-          if (storeIds.indexOf(_item.storeId) === -1) {
-            _obj.checked = false;
-          } else {
+          
             _obj.checked = true;
             _tempCount++;
-          }
+          
           _obj.storeId = _item.storeId;
           _obj.name = _item.storeName;
           _temp.push(_obj);
         });
-        if (_tempCount === item.store.length) {
-          groupObj.checked = true;
-        } else {
-          groupObj.checked = false;
-        }
+        
+        groupObj.checked = true;
         groupObj.itemData = _temp;
         groupTemp.push(groupObj);
       });
 
       self.storeList = groupTemp;
       self.tempStoreList = groupTemp;
-
       console.log('self.tempStoreList :>> ', self.tempStoreList);
 
       let count = 0;
@@ -1065,41 +822,41 @@ export default {
         })
         );
       }
-      console.log('this.titleList ~~~~>> ',this.titleList);
+      this.titleAuth = res.data.map( i => i.id)
+      // console.log('this.titleList ~~~~>> ',this.titleList);
+      // console.log('this.titleAuth :>> ', this.titleAuth);
     },
 
-
- 
+    inputChangeBaseScore(e) {
+      this.baseScore = this.getUtilScore(e.target.value);
+      this.maxScore = parseFloat(this.maxScore) > parseFloat(this.baseScore)
+        ? parseFloat(this.baseScore) : this.maxScore;
+      this.standardScore = parseFloat(this.standardScore) > parseFloat(this.maxScore)
+        ? parseFloat(this.maxScore) : this.standardScore;
+    },
 
     inputChangeMin(e) {
       const self = this;
       let minScore = self.getUtilScore(e.target.value);
-      // if(minScore == "") minScore = 0
-
       if(minScore === self.maxScore) minScore = minScore - 1
       this.countNumMin()
       this.countNumMax()
       self.minScore = minScore
-      self.ScoreMsg = parseFloat(self.minScore) > parseFloat(self.maxScore);
-      self.MinScoreMsg = (self.hundredMarkType=='1' && self.baseScore.toString()=="");
     },
 
     inputChangeMax(e) {
       let maxScore = this.getUtilScore(e.target.value);
-      // if(maxScore < 1) maxScore = 1
-
       if(this.minScore === maxScore) maxScore = maxScore + 1
       this.countNumMin()
       this.countNumMax()
-
-      if (this.hundredMarkType === '1') {
+      if (this.hundredMarkType == 1) {
         maxScore = parseFloat(maxScore) > parseFloat(this.baseScore) ? parseFloat(this.baseScore) : maxScore;
       }
       this.maxScore = maxScore;
       this.standardScore = parseFloat(this.standardScore) > parseFloat(this.maxScore)
         ? parseFloat(this.maxScore) : this.standardScore;
-      this.ScoreMsg = parseFloat(this.minScore) >= parseFloat(this.maxScore);
     },
+
     inputChangeStandardScore(e) {
       let score = this.getUtilScore(e.target.value);
       if (parseFloat(score) > parseFloat(this.maxScore)) {
@@ -1121,10 +878,10 @@ export default {
       }
       return val;
     },
+
     countNumMin(){
       var minScore = parseFloat(this.minScore)
       var maxScore = parseFloat(this.maxScore)
-
       var middleLow = (((maxScore - minScore) * .5) + minScore)
       this.scoreMiddleLow = Number.isInteger(middleLow) ? middleLow.toFixed(0) : middleLow.toFixed(1)
     },

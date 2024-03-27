@@ -21,13 +21,13 @@
           <p class="rule-item">
             <el-checkbox class="storevue-checkbox-outlined" v-model="qualifiedForIgnoredWithType1">
               <span>
-                {{ $t('insSettingView.tab1IgnoredQualified') }}
+                {{ $t('insSettingView.tab1IgnoredQualified') }} 
               </span>
             </el-checkbox>
           </p>
           <p class="rule-item">
             <el-checkbox class="storevue-checkbox-outlined" v-model="qualifiedForIgnoredWithType2">
-              <span>{{ $t('insSettingView.tab2IgnoredQualified') }}</span>
+              <span>{{ $t('insSettingView.tab2IgnoredQualified') }} </span>
             </el-checkbox>
           </p>
           <p class="rule-score">
@@ -781,7 +781,6 @@ export default {
             { name: 'maxScore', value: parseFloat(self.maxScore) },
             { name: 'baseScore', value: parseFloat(self.baseScore) },
             { name: 'standardScore', value: parseFloat(self.standardScore) },
-
 
             { name: 'setting_isAutoMappingActivate',
               category: "generalRule",

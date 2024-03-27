@@ -294,7 +294,7 @@
                     </div>
                 </div>
 
-                <div v-else style="main-rgtop:20.5px;height:100%;" :style="{width:ispdf?'1280px':null}">
+                <div v-else style="margin-top:20.5px;height:100%;" :style="{width:ispdf?'1280px':null}">
                     <div style="margin-top:20.5px;padding-right:10px;">
                         <table-only ref="elTP"
                             :column-data="part2StoreInfoTableCol"
@@ -2817,7 +2817,6 @@ export default {
             self.regionsPerArray = jsonArray;
             this.drawPart1RegionBar();
         },
-
         async drawPart1RegionBar(showingColor) {
             console.log('showingColor ~~~~~~>> ', showingColor);
             console.log("Region Line")
@@ -2860,7 +2859,7 @@ export default {
                         regionData.push({
                             value: item.value,
                             itemStyle: {
-                                color: showingColor ? showingColor : "#1375bc",
+                                color: showingColor ? showingColor : "#7bd8eb",
                                 emphasis: {
                                     shadowBlur: 10,
                                     shadowOffsetX: 0,
@@ -3728,7 +3727,7 @@ export default {
             if (this.part1.pieOption.series[0].data[event.dataIndex].value > 0) {
                 if(this.part1.indexType == event.dataIndex){
                     this.part1.indexType = -1;
-                    var showingColor = "#1375bc"
+                    var showingColor = "#7bd8eb"
                 }
                 else{
                     this.part1.indexType = event.dataIndex;
