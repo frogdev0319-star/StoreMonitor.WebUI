@@ -55,7 +55,12 @@
             <div class="region-result">
               <div class="store-list">
                 <span class="store-name">{{ $t('overview.selectStores') }}</span> 
-                <el-select class="storevue-select" v-model="curStore" style="width: 200px" size="mini" @change="changeStore">
+                <el-select 
+                  class="storevue-select" 
+                  v-model="curStore" 
+                  style="width: 200px" 
+                  size="mini" 
+                  @change="changeStore">
                   <el-option
                     v-for="item in storeDataList"
                     :key="item.storeId"
@@ -391,8 +396,20 @@ export default {
 
   methods: {
 
+    async getEventOverviewData() {
+      this.daysRangeList = util.getDaysRangeList(this.params.beginTs,  this.params.endTs, this.timeMode);
+      
+      await this.getEventRankingInfo();
+      await this.getStoreEventStatics();
+      await this.getEventStatsStatics();
+      await this.handleSelector()
+    },
+
     storeChange(selectedInstantStore){
+      console.log('selectedInstantStore ~~~~~~> ', selectedInstantStore);
       this.selectedInstantStore = selectedInstantStore
+      this.storeIds = selectedInstantStore.filter(i => i !== "-1")
+      console.log('this.storeIds :>> ', this.storeIds);
       this.getEventOverviewData();
     },
 
@@ -419,84 +436,84 @@ export default {
             i.label = i.name
           })
           this.storeList = storeList
-          // this.selectedInstantStore = storeList.map( i => i.value)
-          
+          this.selectedInstantStore = storeList.map( i => i.storeId)
 
           console.log('storeList XDXD~~~~~>', storeList)
-          console.log(' this.selectedInstantStore~~~~~>',  this.selectedInstantStore)
+          console.log('this.selectedInstantStore~~~~~>',  this.selectedInstantStore)
 
-          let tempStore = [];
-          if(this.selectedInstantStore.length == 0){
-            storeList.forEach(item => {
-              const obj = {
-                storeId: item.storeId,
-                label: item.name,
-                value: item.storeId,
-                userId: item.userId,
-                name: item.name,
-                checked: true
-              };
-              tempStore.push(obj);
-            });
-          } else {
-            
-            
-            var afterFilterData = []
-            storeList.forEach(item => {
-              this.selectedInstantStore.forEach( i => {
-                if( i == item.storeId) afterFilterData.push(item)
-              })
-            })
-            console.log('afterFilterData ===>', afterFilterData)
-            tempStore = []
-            tempStore = afterFilterData 
-          }
-
-          if (tempStore.length > 0) {
-            tempStore.unshift(
-              {
-                storeId: '-1',
-                label: self.$t('overview.all'),
-                value: '-1',
-                name:  self.$t('overview.all'),
-              }
-            );
-          }
-          console.log('tempStore ~~~~~> ', tempStore);
-          self.storeDataList = tempStore;
-          
         }
       });
     },
+
+
+    handleSelector(){
+      let tempStore = [];
+      if(this.selectedInstantStore.length == 0){
+        this.storeList.forEach(item => {
+          const obj = {
+            storeId: item.storeId,
+            label: item.name,
+            value: item.storeId,
+            userId: item.userId,
+            name: item.name,
+            checked: true
+          };
+          tempStore.push(obj);
+        });
+      } else {
+        var afterFilterData = []
+        this.storeList.forEach(item => {
+          this.selectedInstantStore.forEach( i => {
+            if( i == item.storeId) afterFilterData.push(item)
+          })
+        })
+        console.log('afterFilterData ===>', afterFilterData)
+        tempStore = []
+        tempStore = afterFilterData 
+      }
+
+      if (tempStore.length > 0) {
+        tempStore.unshift(
+          {
+            storeId: '-1',
+            label: this.$t('overview.all'),
+            value: '-1',
+            name:  this.$t('overview.all'),
+          }
+        );
+      }
+      // console.log('tempStore ~~~~~> ', tempStore);
+      this.storeDataList = tempStore;
+    },
+
 
     changeStore(val) {
       const self = this;
       console.log('self.curStore', self.curStore)
       self.storeIds = [];
+      
       if (val === '-1') {
-        self.storeIds = [];
+        self.storeIds = this.selectedInstantStore.filter(i => i !== "-1");
       } else {
         self.storeIds.push(self.curStore);
       }
+
+      
+      console.log('this.selectedInstantStore :>> ', this.selectedInstantStore);
+      console.log('self.storeIds :>> ', self.storeIds);
+
       self.saveSearchParams();
       self.getStoreEventStatics();
     },
 
-    getEventOverviewData() {
-      this.daysRangeList = util.getDaysRangeList(this.params.beginTs,  this.params.endTs, this.timeMode);
-      this.getEventStatsStatics();
-      this.getEventRankingInfo();
-      this.getStoreEventStatics();
-      this.getBriefStoreData();
-    },
+    
 
     async getEventStatsStatics() {
       const self = this;
-      
       var overviewParam = {
-          beginTs: this.params.beginTs,
-          endTs: this.params.endTs,
-          storeIds: this.selectedInstantStore
+        beginTs: this.params.beginTs,
+        endTs: this.params.endTs,
+        storeIds: this.selectedInstantStore
       }
       console.log('overviewParam ~~~~~~>> ', overviewParam);
       try {
@@ -650,7 +667,7 @@ export default {
       const jsonArray = self.statusLegend;
       const statusPieList = self.eventByStatus;
 
-      console.log('statusPieList ~~~>>>', statusPieList)
+      // console.log('statusPieList ~~~>>>', statusPieList)
 
       let pendingEventNum = 0;
       let doneEventNum = 0;
@@ -820,7 +837,6 @@ export default {
       
       try {
         const rankingResult = await self.getEventStatsRanking(params);
-        console.log('rankingResult ~~~~~>', rankingResult)
 
         if (rankingResult.errCode === 0) {
           const result = rankingResult.data;
@@ -849,12 +865,11 @@ export default {
           rankingOption.dataset.source = [];
         }
 
-        console.log('rankingOption 2 ~~~~~>', rankingOption)
         
         self.storeStatusOptions = rankingOption;
       } catch (e) {
         self.storeStatusOptions = rankingOption;
-        console.log('EventOverview-getEventRankingInfo:' + e);
+        // console.log('EventOverview-getEventRankingInfo:' + e);
       }
     },
 
@@ -984,8 +999,7 @@ export default {
         if (storeEventResult.errCode === 0) {
           const result = storeEventResult.data;
           
-          console.log('result :>> ', result.data);
-
+          // console.log('result :>> ', result.data);
 
           self.storeEventList = result;
           const soureceList = [];
@@ -996,7 +1010,7 @@ export default {
           result.forEach((item, index) => {
             const storeList = item.stores;
 
-            console.log('storeList :>> ', storeList, index);
+            // console.log('storeList :>> ', storeList, index);
 
             storeList.forEach(_item => {
               sumOfNewEvents += _item.numOfNewEvents;
@@ -1004,9 +1018,9 @@ export default {
               sumOfClosedEvents += _item.numOfClosedEvents;
             });
 
-            console.log('sumOfNewEvents :>> ', sumOfNewEvents);
-            console.log('sumOfProcessedEvents :>> ', sumOfProcessedEvents);
-            console.log('sumOfClosedEvents :>> ', sumOfClosedEvents);
+            // console.log('sumOfNewEvents :>> ', sumOfNewEvents);
+            // console.log('sumOfProcessedEvents :>> ', sumOfProcessedEvents);
+            // console.log('sumOfClosedEvents :>> ', sumOfClosedEvents);
 
             const itemArray = [];
             itemArray.push(self.daysRangeList[index]);
@@ -1015,7 +1029,7 @@ export default {
             itemArray.push(sumOfClosedEvents);  
             soureceList.push(itemArray);
 
-            console.log('itemArray :>> ', itemArray);
+            // console.log('itemArray :>> ', itemArray);
             
           });
           option.dataset.source = soureceList;
