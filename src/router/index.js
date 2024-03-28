@@ -133,25 +133,25 @@ export const navbarRoute = {
     //     component: resolve => require(['@/views/patrolShop/ReInspectDealPage'], resolve)
     //   }
     // ) && primaryPathesList.push('/reinspection', '/reinspect/confirmrein', '/reinspect/submit');
-    !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableStoreMonitor() && patrolRoute.children.push(
-      {
-        path: '/storemonitor',
-        name: 'storeMonitor',
-        hidden: true,
-        component: resolve => require(['@/views/patrolShop/StoreMonitor'], resolve),
-        meta: {
-          requireAuth: true,
-          keepAlive: true
-        },
-        isReadOnly: false
-      },
-      {
-        path: '/storemonitor/submit',
-        name: 'storeSubEvent',
-        hidden: true,
-        component: resolve => require(['@/views/patrolShop/StoreSuccessPage'], resolve)
-      }
-    ) && primaryPathesList.push('/storemonitor', '/storemonitor/submit');
+    // !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableStoreMonitor() && patrolRoute.children.push(
+    //   {
+    //     path: '/storemonitor',
+    //     name: 'storeMonitor',
+    //     hidden: true,
+    //     component: resolve => require(['@/views/patrolShop/StoreMonitor'], resolve),
+    //     meta: {
+    //       requireAuth: true,
+    //       keepAlive: true
+    //     },
+    //     isReadOnly: false
+    //   },
+    //   {
+    //     path: '/storemonitor/submit',
+    //     name: 'storeSubEvent',
+    //     hidden: true,
+    //     component: resolve => require(['@/views/patrolShop/StoreSuccessPage'], resolve)
+    //   }
+    // ) && primaryPathesList.push('/storemonitor', '/storemonitor/submit');
     !PermissionHelper.advancedMode && (PermissionHelper.enableMimicMode || PermissionHelper.enableInspectReport()) && patrolRoute.children.push(
       {
         path: '/report',
