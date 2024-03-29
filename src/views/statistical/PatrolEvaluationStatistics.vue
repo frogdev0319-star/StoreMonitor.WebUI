@@ -64,8 +64,8 @@
                 <!-- 巡檢平均得分 -->
                 <el-col :span="8" class="division">
                     <el-col class="text-area">
-                        <el-row class="top">
-                            <span class="mainTitle">{{ bigScore > 0 ? bigScore : 'N/A'}}</span>
+                        <el-row class="top"> 
+                            <span class="mainTitle">{{ bigScore !== -9999 ? bigScore : "N/A" }}</span>
                             <span class="unit">{{ $t('statistics.overview.avg_unit') }}</span>
                         </el-row>
                         <el-row class="subtitlehead">
@@ -248,8 +248,8 @@
                 <el-col v-if='part2.standardScore!=-9999' :span="4" class="division" />
                 <el-col :span="8" class="division">
                     <el-col class="text-area">
-                        <el-row class="top">
-                            <span class="mainTitle">{{part2.averageScore >=0 ? part2.averageScore : 'N/A'}} </span>
+                        <el-row class="top"> 
+                            <span class="mainTitle">{{part2.averageScore !== -9999 ?  part2.averageScore : 'N/A' }} </span>
                             <span class="unit">{{ $t('statistics.score') }}</span>
                         </el-row>
                         <el-row class="subtitlehead">
@@ -445,22 +445,22 @@
 
     <div id="pdf-area" v-if="ispdf" ref="printPDF" class="statistics-container">
         <div style="width:1280px;">
-            <div class="statistics-content-pdf" style="height: 194px;marginTop:20px;box-shadow:none;">
+            <div class="statistics-content-pdf" style="height: 194px;margin-top:20px;box-shadow:none;">
                 <div id="img_avg1">
                     <img :src="pdfSrc_avg1" style="display: block;width:100%;height: auto;">
                 </div>
             </div>
-            <div class="statistics-content-pdf" style="height: 900px;marginTop:20px;box-shadow:none;">
+            <div class="statistics-content-pdf" style="height: 900px;margin-top:20px;box-shadow:none;">
                 <div id="img_avg2">
                     <img :src="pdfSrc_avg2" style="display: block;width:100%;height: auto;">
                 </div>
             </div>
-            <div class="statistics-content-pdf" style="height:1010px;marginTop:20px;box-shadow:none;">
+            <div class="statistics-content-pdf" style="height:1010px;margin-top:20px;box-shadow:none;">
                 <div id="img_avg3">
                     <img :src="pdfSrc_avg3" style="display: block;width:100%;height: auto;">
                 </div>
             </div>
-            <div v-if="part3.standardScore!=-9999" class="statistics-content-pdf" style="marginTop:20px;box-shadow:none;">
+            <div v-if="part3.standardScore!=-9999" class="statistics-content-pdf" style="margin-top:20px;box-shadow:none;">
                 <div id="img_avg4">
                     <img :src="pdfSrc_avg4" style="display: block;width:100%;height: auto;">
                 </div>
@@ -3174,7 +3174,7 @@ export default {
                     })
 
 
-                    this.part2.averageScore = totalStandard > 0 ? Math.round(totalStandard / totalReport) : -9999;
+                    this.part2.averageScore = Math.round(totalStandard / totalReport);
                     
                     this.part2.indexRegion = -1;
                     this.drawPart2RegionBar();
@@ -3207,13 +3207,10 @@ export default {
                         totalReport += item.numOfReport;
                         totalStandard += item.averageScore * item.numOfReport;
                     })
-                    this.bigScore = totalStandard > 0 ? Math.round(totalStandard / totalReport) : -9999;
-                    console.log('this.bigScore :>> ', this.bigScore);
+                    // this.bigScore = totalStandard > 0 ? Math.round(totalStandard / totalReport) : -9999;
+                    this.bigScore =  Math.round(totalStandard / totalReport) 
                 }
             }
-
-            
-            
         },
 
 

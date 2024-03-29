@@ -50,7 +50,7 @@
 
         <div class="for_flex">
           <!-- 各門店事件趨勢分析 -->
-          <el-col :span="isEnSpan ? 13 :20" class="store-events" style="width: 68%;" :class="{widewidth : !hasAdvanced}">
+          <el-col :span="isEnSpan ? 13 :20" class="store-events" style="width: 68%;" :class="{widewidth : !isLicensePro}">
             <div class="title">{{ $t('overview.eventTrends') }} </div>
             <div class="region-result">
               <div class="store-list">
@@ -80,7 +80,7 @@
           </el-col>
           
           <!-- 事件來源 -->
-          <el-col :span="isEnSpan ? 7 : 6" class="source-list" v-if="hasAdvanced">
+          <el-col :span="isEnSpan ? 7 : 6" class="source-list" v-if="isLicensePro">
             <div class="title">
               <span class="area-title">{{ $t('overview.eventSource') }} </span>
             </div>
@@ -345,6 +345,7 @@ export default {
       echartBackground: 'rgba(30,34,52,0.75)',
       fontFamily: 'Roboto, Microsoft YaHei',
       hasAdvanced: false,
+      isLicensePro: false,
       selectedInstantStore: [],
       storeList: []
     };
@@ -362,30 +363,33 @@ export default {
         self.rankType = 3;
         self.checkAllStore = true;
         self.storeIds = [];
-        self.getBriefStoreData();
         self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
-        self.getSearchParams();
-        self.getEventOverviewData();
+        // await self.getSearchParams();
+        await self.getBriefStoreData();
+        await self.saveSearchParams();
+        await self.getEventOverviewData();
+        
 
-        var userInfo = await this.$store.dispatch("GetUserAuthorities");
+        var userInfo = await self.$store.dispatch("GetUserAuthorities");
         self.hasAdvanced = userInfo.data.isSystemAdvanced
+        self.isLicensePro = userInfo.data.isLicensePro
       }
     }
   },
 
   async created() {
-    await this.getBriefStoreData();
-    await this.getSearchParams();
-    await this.getEventOverviewData();
+    // await this.getBriefStoreData();
+    // await this.getEventOverviewData();
 
+    await this.getSearchParams();
     var userInfo = await this.$store.dispatch("GetUserAuthorities");
     this.hasAdvanced = userInfo.data.isSystemAdvanced
+    this.isLicensePro = userInfo.data.isLicensePro
     this.hasAdvanced ? this.sourceLegend.push({'type': this.$t('immediatePush.immediateEvent'), 'percent': '0%'}) : null
+  
   },
 
-  async mounted() {
-    
-  },
+  async mounted() {},
 
   beforeDestroy() {
     this.$refs.storeEventRef && this.$refs.storeEventRef.dispose();
@@ -395,25 +399,23 @@ export default {
   },
 
   methods: {
-
     async getEventOverviewData() {
       this.daysRangeList = util.getDaysRangeList(this.params.beginTs,  this.params.endTs, this.timeMode);
-      
-      await this.getEventRankingInfo();
       await this.getStoreEventStatics();
       await this.getEventStatsStatics();
+      await this.getEventRankingInfo();
       await this.handleSelector()
     },
 
     storeChange(selectedInstantStore){
-      console.log('selectedInstantStore ~~~~~~> ', selectedInstantStore);
       this.selectedInstantStore = selectedInstantStore
       this.storeIds = selectedInstantStore.filter(i => i !== "-1")
-      console.log('this.storeIds :>> ', this.storeIds);
+      this.curStore = "-1"
       this.getEventOverviewData();
     },
 
-    dateChange(val) {
+    async dateChange(val) {
+      console.log('dateChange !!!!!!! :>>');
       this.dateValue = val;
       const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
       const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
@@ -421,13 +423,14 @@ export default {
       this.timeMode = daysDiff <= 30 ? 1 : 2;
       this.params.beginTs = start;
       this.params.endTs = end;
-      this.saveSearchParams();
-      this.getEventOverviewData();
+      await this.getBriefStoreData();
+      await this.saveSearchParams();
+      await this.getEventOverviewData();
     },
 
-    getBriefStoreData() {
+    async getBriefStoreData() {
       const self = this;
-      getBriefStoreList().then(res => {
+      await getBriefStoreList().then(res => {
         const errMsg = res.errMsg;
         if (errMsg && errMsg === 'Success') {
           const storeList = res.data;
@@ -437,14 +440,14 @@ export default {
           })
           this.storeList = storeList
           this.selectedInstantStore = storeList.map( i => i.storeId)
+          this.storeIds = this.selectedInstantStore.filter(i => i !== "-1");
 
-          console.log('storeList XDXD~~~~~>', storeList)
-          console.log('this.selectedInstantStore~~~~~>',  this.selectedInstantStore)
-
+          // console.log('storeList ~~~~~>', storeList)
+          // console.log('this.selectedInstantStore~~~~~>',  this.selectedInstantStore)
+          // console.log('this.storeIds~~~~~>',  this.storeIds)
         }
       });
     },
-
 
     handleSelector(){
       let tempStore = [];
@@ -498,7 +501,6 @@ export default {
         self.storeIds.push(self.curStore);
       }
 
-      
       console.log('this.selectedInstantStore :>> ', this.selectedInstantStore);
       console.log('self.storeIds :>> ', self.storeIds);
 
@@ -515,7 +517,7 @@ export default {
         endTs: this.params.endTs,
         storeIds: this.selectedInstantStore
       }
-      console.log('overviewParam ~~~~~~>> ', overviewParam);
+      // console.log('overviewParam ~~~~~~>> ', overviewParam);
       try {
         const eventResult = await self.getEventStatsOverview(overviewParam);
         if (eventResult.errCode === 0) {
@@ -822,15 +824,17 @@ export default {
     },
 
     async getEventRankingInfo() { 
+      
       const self = this;
       let params = {};
       params = JSON.parse(JSON.stringify(self.params));
       params.numOfStores = 5;
       params.rankType = self.rankType;
-      params.storeIds = this.selectedInstantStore
+      params.storeIds = this.selectedInstantStore.filter(i => i !== "-1")
       const { axisArray, colorArray, seriesData } = self.getEventRankingInfoSetting();
       const rankingOption = self.getEventRankingOption(colorArray, seriesData);
 
+      // console.log('params.storeIds DDDDDDDDD:>> ', params.storeIds);
       // console.log('rankingOption 1 ~~~~~>', rankingOption)
       // console.log('seriesData ~~~~~>', seriesData)
       // console.log('self.rankType; ~~~~~>', self.rankType)
@@ -988,10 +992,13 @@ export default {
     
     async getStoreEventStatics() {
       const self = this;
+      
       let params = {};
       params = JSON.parse(JSON.stringify(self.params));
       params.storeIds = self.storeIds;
       params.timeMode = self.timeMode;
+      
+      // console.log('this.storeIds DDDDDDD:>> ', this.storeIds);
 
       const option = self.getStoreEventStaticsOption();
       try {
@@ -1229,6 +1236,9 @@ export default {
     align-items: flex-start
   .widewidth
     width: 100% !important
+  .el-input--medium .el-input__inner
+    // height: 30px !important
+    height: calc(36 / 1920* 100vw) !important
 </style>
 
 <style lang="scss" scoped>

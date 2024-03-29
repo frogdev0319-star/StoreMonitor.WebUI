@@ -312,7 +312,7 @@ export default {
   }
   .input-class2{
     height:35px;
-    background-color:#ff0;
+    /* background-color:#ff0; */
     width: calc(100% - 30px);
     position: absolute;
     top: 0;
