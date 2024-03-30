@@ -7,8 +7,9 @@
       </span>
 
       <!-- 選擇地點 -->
-      <div class="store_title" style="margin-left: 30px; margin-right: 20px;">{{ $t('overview.patrolStore')}}</div>
+      <div class="store_title" style="margin-left: 30px; margin-right: 20px;"  v-if="isiService">{{ $t('overview.patrolStore')}}</div>
       <el-select
+        v-if="isiService"
         v-model="selectedInstantStore"
         style="width: 30%;"
         :placeholder="$t('immediatePush.selectStore')" 
@@ -239,6 +240,7 @@ import {
   getInspectStatsOverRegion
 } from '@/api/inspectOverview';
 import { getBriefStoreList } from '@/api/store';
+import { accountInfo } from '@/api/login';
 import {
     getInspectStatus
 } from '@/api/inspect';
@@ -259,6 +261,7 @@ export default {
 
   data() {
     return {
+      isiService: false,
       dateValue: [this.$moment().startOf('month').toDate(), this.$moment(new Date()).endOf('d').toDate()],
       taskList: [],
       isWorstArea: true,
@@ -344,7 +347,9 @@ export default {
 
       inspectStatus: '',
       selectedInstantStore: [],
-      storeList: []
+      storeList: [],
+      
+      
     };
   },
 
@@ -376,8 +381,12 @@ export default {
     await this.getInspectStatus();
     await this.getSearchParams();
     await this.getPatrolOverviewData();
+    this.getAccountInfo()
   },
-
+  mounted() {
+    
+  },
+  
   beforeDestroy() {
     this.$refs.storeChart && this.$refs.storeChart.dispose();
     this.$refs.itemsPie && this.$refs.itemsPie.dispose();
@@ -386,6 +395,25 @@ export default {
   },
 
   methods: {
+    getAccountInfo(){
+      var id = sessionStorage.getItem("accountId")
+      const accountId = {
+        accountId : id
+      }
+      accountInfo(accountId).then(res => {
+
+        console.log('res.data !!!', res.data)
+        console.log('res.data.isTransform', res.data.isTransform)
+        console.log('res.data.isiService', res.data.isiService)
+
+        this.isiService = res.data.isiService
+        console.log('this.isiService ', this.isiService )
+        // if(res.data.isTransform){
+        //   this.showDialog =  true
+        // }
+      })
+    },
+    
     getInspectStatus(){
       return new Promise((resolve, reject) => {
           getInspectStatus().then(res => {

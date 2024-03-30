@@ -327,6 +327,7 @@ import { isLoginIn } from '@/api/login';
 import { Encrypt } from '@/common/Aes'
 import { mapGetters } from 'vuex';
 import filterString from '@/common/filterString';
+import { accountInfo } from '@/api/login';
 import { getScheduleListService } from '@/api/schedule';
 import Environment from '@/common/environment';
 import DelayButton from '@/components/DelayButton';
@@ -394,15 +395,7 @@ export default {
       allPassWeightEmpty: true,
       weightSwitch: false,
       btnList: [
-        {
-          id: 0,
-          iconClass: 'iconfont icon-shanchu',
-          style: 'font-size:15px;width:24px;',
-          name: 'create',
-          btnTitle: '建立巡檢表',
-          enabled: false,
-          img:require('../../../../static/img/IcRoundPostAdd.svg')
-        },
+       
 
         {
           id: 1,
@@ -453,6 +446,7 @@ export default {
       passWord: '',
       changeNum: 0,
       canDeleteReport: false,
+      isiService: false
     };
   },
 
@@ -528,10 +522,42 @@ export default {
     }
     self.getTagList();
     self.initData();
+    self.getAccountInfo()
     document.getElementById('inspectSetting').addEventListener('mousedown', this.notShowDragInfo, false);
   },
 
   methods: {
+
+    async getAccountInfo(){
+      var id = sessionStorage.getItem("accountId")
+      const accountId = {
+        accountId : id
+      }
+      await accountInfo(accountId).then(res => {
+
+        console.log('res.data', res.data)
+        console.log('res.data.isTransform', res.data.isTransform)
+        console.log('res.data.isiService', res.data.isiService)
+
+        this.isiService = res.data.isiService
+        const createInspect = {
+          id: 0,
+          iconClass: 'iconfont icon-shanchu',
+          style: 'font-size:15px;width:24px;',
+          name: 'create',
+          btnTitle: '建立巡檢表',
+          enabled: false,
+          img:require('../../../../static/img/IcRoundPostAdd.svg')
+        }
+
+        if( this.isiService) {
+          this.btnList.unshift(createInspect)
+        }
+
+      }).catch(err => {
+        console.log('err :>> ', err);
+      });
+    },
 
     addNum(){
       this.changeNum += 1
@@ -2560,7 +2586,7 @@ export default {
     },
 
     handleNape(index) {
-      switch (index) {
+      switch (index ) {
         case 0: this.createItem(); break;
         case 1: this.importItem(); break;
         case 2: this.exportItem(); break;

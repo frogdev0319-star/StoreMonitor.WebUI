@@ -7,8 +7,9 @@
       </span>
 
       <!-- 巡檢地點 -->
-      <div class="store_title" style="margin-left: 30px; margin-right: 20px;">{{ $t('overview.patrolStore')}}</div>
+      <div class="store_title" style="margin-left: 30px; margin-right: 20px;" v-if="isiService">{{ $t('overview.patrolStore')}}</div>
       <region-multi-select
+      v-if="isiService"
         ref="multiState"
         style="width: 30%; "
         :selected="selectedInstantStore"
@@ -185,6 +186,7 @@ import ECharts from 'vue-echarts';
 import util from '@/common/util.js';
 import { getBriefStoreList } from '@/api/store';
 import { mapGetters } from 'vuex';
+import { accountInfo } from '@/api/login';
 import { getEventStatsOverview, getEventStatsRankInfo, getEventStatsOverStore } from '@/api/eventOverview';
 import resize from '@/components/mixins/echartResize';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
@@ -347,7 +349,8 @@ export default {
       hasAdvanced: false,
       isLicensePro: false,
       selectedInstantStore: [],
-      storeList: []
+      storeList: [],
+      isiService: false
     };
   },
 
@@ -386,6 +389,8 @@ export default {
     this.hasAdvanced = userInfo.data.isSystemAdvanced
     this.isLicensePro = userInfo.data.isLicensePro
     this.hasAdvanced ? this.sourceLegend.push({'type': this.$t('immediatePush.immediateEvent'), 'percent': '0%'}) : null
+
+    this.getAccountInfo()
   
   },
 
@@ -399,6 +404,28 @@ export default {
   },
 
   methods: {
+
+    async getAccountInfo(){
+      var id = sessionStorage.getItem("accountId")
+      const accountId = {
+        accountId : id
+      }
+      await accountInfo(accountId).then(res => {
+
+        console.log('res.data', res.data)
+        console.log('res.data.isTransform', res.data.isTransform)
+        console.log('res.data.isiService', res.data.isiService)
+
+        this.isiService = res.data.isiService
+        // if(res.data.isTransform){
+        //   this.showDialog =  true
+        // }
+      }).catch(err => {
+        console.log('err :>> ', err);
+      });
+    },
+
+
     async getEventOverviewData() {
       this.daysRangeList = util.getDaysRangeList(this.params.beginTs,  this.params.endTs, this.timeMode);
       await this.getStoreEventStatics();
