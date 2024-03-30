@@ -61,7 +61,11 @@ export default {
         accountId : id
       }
       accountInfo(accountId).then(res => {
-        if(res.data.isTransform && res.data.isiService){
+
+        console.log('res.data', res.data)
+        console.log('res.data.isTransform', res.data.isTransform)
+        console.log('res.data.isiService', res.data.isiService)
+        if(res.data.isTransform){
           this.showDialog =  true
         }
       }).catch(err => {
