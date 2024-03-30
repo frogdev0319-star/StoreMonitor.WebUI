@@ -11,7 +11,7 @@
           @change="importfxx(this)" >
         <div
           v-for="(item,index) in btnList"
-          v-if="item.show"
+          v-show="item.show"
           :key="index"
           :disabled="item.enabled"
           style="display:flex;flex-direction:row;margin-right: 16px; line-height: 24px;cursor:pointer;"
