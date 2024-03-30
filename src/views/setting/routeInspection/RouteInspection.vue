@@ -11,6 +11,7 @@
           @change="importfxx(this)" >
         <div
           v-for="(item,index) in btnList"
+          v-if="item.show"
           :key="index"
           :disabled="item.enabled"
           style="display:flex;flex-direction:row;margin-right: 16px; line-height: 24px;cursor:pointer;"
@@ -395,7 +396,16 @@ export default {
       allPassWeightEmpty: true,
       weightSwitch: false,
       btnList: [
-       
+        {
+          id: 0,
+          iconClass: 'iconfont icon-shanchu',
+          style: 'font-size:15px;width:24px;',
+          name: 'create',
+          btnTitle: '建立巡檢表',
+          enabled: false,
+          img:require('../../../../static/img/IcRoundPostAdd.svg'),
+          show: true
+        },
 
         {
           id: 1,
@@ -404,7 +414,8 @@ export default {
           name: 'import',
           btnTitle: this.$t('insSettingView.import'),
           enabled: false,
-          img:require('../../../../static/img/ic_import_blue.svg')
+          img:require('../../../../static/img/ic_import_blue.svg'),
+          show: true
         },
         {
           id: 2,
@@ -413,7 +424,8 @@ export default {
           name: 'export',
           btnTitle: this.$t('insSettingView.export'),
           enabled: false,
-          img:require('../../../../static/img/ic_export_blue.svg')
+          img:require('../../../../static/img/ic_export_blue.svg'),
+          show: true
         },
         {
           id: 3,
@@ -422,7 +434,8 @@ export default {
           name: 'download',
           btnTitle: this.$t('insSettingView.download'),
           enabled: false,
-          img:require('../../../../static/img/ic_download_blue.svg')
+          img:require('../../../../static/img/ic_download_blue.svg'),
+          show: true
         },
         {
           id: 4,
@@ -431,7 +444,8 @@ export default {
           name: 'delete',
           btnTitle: this.$t('scheduleView.delete'),
           enabled: false,
-          img:require('../../../../static/img/ic_delete_blue.svg')
+          img:require('../../../../static/img/ic_delete_blue.svg'),
+          show: true
         },
       ],
 
@@ -534,25 +548,17 @@ export default {
         accountId : id
       }
       await accountInfo(accountId).then(res => {
-
-        console.log('res.data', res.data)
-        console.log('res.data.isTransform', res.data.isTransform)
-        console.log('res.data.isiService', res.data.isiService)
+        // console.log('res.data', res.data)
+        // console.log('res.data.isTransform', res.data.isTransform)
+        // console.log('res.data.isiService', res.data.isiService)
 
         this.isiService = res.data.isiService
-        const createInspect = {
-          id: 0,
-          iconClass: 'iconfont icon-shanchu',
-          style: 'font-size:15px;width:24px;',
-          name: 'create',
-          btnTitle: '建立巡檢表',
-          enabled: false,
-          img:require('../../../../static/img/IcRoundPostAdd.svg')
-        }
+        console.log('this.isiService', this.isiService)
 
-        if( this.isiService) {
-          this.btnList.unshift(createInspect)
-        }
+        this.btnList[0].show = this.isiService
+        // if(!this.isiService) {
+        //   this.btnList.shift()
+        // }
 
       }).catch(err => {
         console.log('err :>> ', err);
