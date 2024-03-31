@@ -332,8 +332,6 @@ export default {
     },
 
     async submit(){
-      console.log('submit :>> ');
-
       this.isLoadingData = true
       var isReapet = this.allInspectTypeList.some( i => i.name == this.tableTagName)
       if(isReapet) {
@@ -571,9 +569,19 @@ export default {
 
       quickAdd(this.params).then(res => {
         const errCode = res.errCode;
+      
         console.log('errCode :>> ', errCode);
         if (errCode == 0) {
           this.isLoadingData = false
+          const inspectId = res.data.inspectId
+
+          const newIsp = {
+              inspectId: inspectId,
+              routeName: this.tableTagName,
+              mode: this.allInspectTypeList.length
+          }
+          sessionStorage.setItem('newInspect', JSON.stringify(newIsp));
+
           this.$router.push(
             { name: 'inspectListSetting', 
             // params: { data: routeData}
@@ -924,8 +932,6 @@ export default {
         this.showInputLimit_a1 = false
       }
     },
-    
-
   },
 };
 </script>

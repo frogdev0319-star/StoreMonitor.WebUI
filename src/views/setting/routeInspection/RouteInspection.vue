@@ -477,6 +477,7 @@ export default {
       if (val !== 0) {
         sessionStorage.removeItem('TabPatrolIndex0');
         sessionStorage.removeItem('TabPatrolIndex1');
+        sessionStorage.removeItem('newInspect');
         self.activeName = '0';
         self.getTagList('accountChanged');
       }
@@ -512,6 +513,7 @@ export default {
       sessionStorage.removeItem('TabPatrolIndex0');
       sessionStorage.removeItem('TabPatrolIndex1');
       sessionStorage.removeItem('TabIndex');
+      sessionStorage.removeItem('newInspect');
       next();
     }
   },
@@ -520,20 +522,41 @@ export default {
     const self = this;
     const InspectHistory = self.$store.getters.InspectHistory;
     console.log('InspectHistory >>>>>>> ', InspectHistory);
+
+    const newInspect = JSON.parse(sessionStorage.getItem('newInspect'));
+    console.log('newInspect', newInspect)
+    // self.patrolActive = "8"
+
     if (InspectHistory != null) {
       self.activeName = InspectHistory.activeName;
       self.patrolActive = InspectHistory.patrolActive;
     } else {
       const tabIndex = sessionStorage.getItem('TabIndex');
+      console.log('tabIndex  ~~~> 1', tabIndex)
+    
       if (tabIndex !== null) {
         self.activeName = tabIndex;
+        console.log('tabIndex ~~~> 2', tabIndex)
         if (self.activeName === '0') {
           self.patrolActive = sessionStorage.getItem('TabPatrolIndex0');
         } else if (self.activeName === '1') {
           self.patrolActive = sessionStorage.getItem('TabPatrolIndex1');
         }
       }
+
+      if(newInspect){
+        self.patrolActive = newInspect.mode.toString()
+      }
     }
+
+    // 
+    // if(newInspect){
+    //   tagIndex = newInspect.mode
+    // }
+    // console.log('tagIndex --->', tagIndex)
+
+
+
     self.getTagList();
     self.initData();
     self.getAccountInfo()
@@ -548,18 +571,8 @@ export default {
         accountId : id
       }
       await accountInfo(accountId).then(res => {
-        // console.log('res.data', res.data)
-        // console.log('res.data.isTransform', res.data.isTransform)
-        // console.log('res.data.isiService', res.data.isiService)
-
         this.isiService = res.data.isiService
-        console.log('this.isiService', this.isiService)
-
         this.btnList[0].show = this.isiService
-        // if(!this.isiService) {
-        //   this.btnList.shift()
-        // }
-
       }).catch(err => {
         console.log('err :>> ', err);
       });
@@ -749,6 +762,7 @@ export default {
       const self = this;
       const TagData = await self.getTagAll();
       
+      console.log('self.activeName', self.activeName)
       console.log('val >>>>>>> ', val);
       console.log('sheetIndex >>>>>>> ', sheetIndex);
       console.log('TagData >>>>>>> ', TagData);
@@ -776,9 +790,18 @@ export default {
         } else if (self.activeName === '1') {
           sessionStorage.setItem('TabPatrolIndex1', tagIndex);
         }
+
+      
+   
+
+
+
         const params = {
           inspectId: TagData[tagIndex].id
         };
+
+        // console.log('params.inspectId', params.inspectId)
+
         const NapeData = await self.getNapeList(params);
         const tempAllData = [];
         const obj = {};
