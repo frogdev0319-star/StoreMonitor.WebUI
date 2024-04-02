@@ -7,7 +7,7 @@
 
 
     <dialog-pop
-      title="您的服務已轉移至 iService Inpsection"
+      title="您的服務已轉移至 iService Inspection"
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
@@ -55,16 +55,16 @@ export default {
   },
   methods: {
   
-    getAccountInfo(){
-      var id = sessionStorage.getItem("accountId")
-      const accountId = {
-        accountId : id
-      }
-      accountInfo(accountId).then(res => {
+    async getAccountInfo(){
 
-        console.log('res.data', res.data)
-        console.log('res.data.isTransform', res.data.isTransform)
-        console.log('res.data.isiService', res.data.isiService)
+      const result = await this.$store.dispatch("GetUserAuthorities");
+      const accountId = {
+        accountId : result.data.accountId
+      }
+      await accountInfo(accountId).then(res => {
+        // console.log('res.data', res.data)
+        // console.log('res.data.isTransform', res.data.isTransform)
+        // console.log('res.data.isiService', res.data.isiService)
         if(res.data.isTransform){
           this.showDialog =  true
         }
