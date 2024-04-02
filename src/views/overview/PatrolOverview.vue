@@ -3,12 +3,24 @@
     <div class="overview-date" style="margin-left:24px;">
       <date-time-selector :showTooltips=true @change="dateChange"/>
       <span class="el-store">
-        {{ $t('overview.totalStore', {storeNum: totalStoreNum}) }}
+        <!-- {{ $t('overview.totalStore', {storeNum: totalStoreNum}) }} -->
+        {{ $t('overview.totalStore', {storeNum: storeList.length}) }}
       </span>
 
       <!-- 選擇地點 -->
       <div class="store_title" style="margin-left: 30px; margin-right: 20px;"  v-if="isiService">{{ $t('overview.patrolStore')}}</div>
-      <el-select
+      <region-multi-select
+        v-if="isiService"
+        ref="multiState"
+        style="width: 30%; "
+        :selected="selectedInstantStore"
+        :options="storeList"
+        :noTextInput = "true"
+        :all="$t('remotePatrol.allStores')"
+        class="position"
+        @changeInput="storeChange"
+        />
+      <!-- <el-select
         v-if="isiService"
         v-model="selectedInstantStore"
         style="width: 30%;"
@@ -23,7 +35,7 @@
           :label="item.name"
           :value="item.storeId" 
           />
-      </el-select>
+      </el-select> -->
     </div>
 
     <div class="el-overview">
@@ -66,9 +78,10 @@
           </div>
         </el-col>
 
+        <!-- 重點關注區域 -->
         <el-col :span="6" class="focus-list">
           <div class="title flex-center">
-            <span v-if="isWorstArea" class="area-title">{{ $t('overview.worstRegion') }}</span>
+            <span v-if="isWorstArea" class="area-title">{{ $t('overview.worstRegion') }} </span>
             <span v-else class="area-title">{{ $t('overview.bestRegion') }}</span>
             <span class="arrows" @click="changBestAndWorst">
               <span v-if="isWorstArea" class="order-span">{{ $t('overview.descendingOrder') }}</span>
@@ -244,6 +257,7 @@ import { accountInfo } from '@/api/login';
 import {
     getInspectStatus
 } from '@/api/inspect';
+import RegionMultiSelect from '@/components/RegionMultiSelect';
 import { mapGetters } from 'vuex';
 import resize from '@/components/mixins/echartResize';
 import SearchConditionUtil from '@/common/SearchConditionUtil.js';
@@ -254,6 +268,7 @@ export default {
 
   components: {
     DateTimeSelector,
+    RegionMultiSelect,
     'v-chart': ECharts
   },
 
@@ -367,7 +382,7 @@ export default {
         self.currentIndex = 0;
         self.selectedInstantStore = '';
       
-        await this.getStore()
+        await this.getBriefStoreData()
         await self.getInspectStatus();
         await self.getSearchParams();
         await self.getPatrolOverviewData();
@@ -377,7 +392,7 @@ export default {
   },
 
   async created() {
-    await this.getStore()
+    await this.getBriefStoreData()
     await this.getInspectStatus();
     await this.getSearchParams();
     await this.getPatrolOverviewData();
@@ -402,9 +417,9 @@ export default {
       }
       accountInfo(accountId).then(res => {
 
-        console.log('res.data !!!', res.data)
-        console.log('res.data.isTransform', res.data.isTransform)
-        console.log('res.data.isiService', res.data.isiService)
+        // console.log('res.data !!!', res.data)
+        // console.log('res.data.isTransform', res.data.isTransform)
+        // console.log('res.data.isiService', res.data.isiService)
 
         this.isiService = res.data.isiService
         console.log('this.isiService ', this.isiService )
@@ -440,25 +455,40 @@ export default {
           });
       });
     },
-
-    getBriefStoreData() {
-      return new Promise((resolve, reject) => {
-        getBriefStoreList().then(res => {
-          const errMsg = res.errMsg;
-          if (errMsg != undefined && errMsg === 'Success') {
-            resolve(res);
-          }
-        }).catch(err => {
-          reject(err);
-        });
+    async getBriefStoreData() {
+      const self = this;
+      await getBriefStoreList().then(res => {
+        const errMsg = res.errMsg;
+        if (errMsg && errMsg === 'Success') {
+          const storeList = res.data;
+          storeList.forEach( i => {
+            i.value = i.storeId;
+            i.label = i.name
+          })
+          this.storeList = storeList
+          this.selectedInstantStore = storeList.map( i => i.storeId)
+          this.storeIds = this.selectedInstantStore.filter(i => i !== "-1");
+        }
       });
     },
-    async getStore(){
-      let res  = await this.getBriefStoreData();
-      if(res.errCode ==0){
-        this.storeList = res.data;
-      }
-    },
+    // getBriefStoreData() {
+    //   return new Promise((resolve, reject) => {
+    //     getBriefStoreList().then(res => {
+    //       const errMsg = res.errMsg;
+    //       if (errMsg != undefined && errMsg === 'Success') {
+    //         resolve(res);
+    //       }
+    //     }).catch(err => {
+    //       reject(err);
+    //     });
+    //   });
+    // },
+    // async getStore(){
+    //   let res  = await this.getBriefStoreData();
+    //   if(res.errCode ==0){
+    //     this.storeList = res.data;
+    //   }
+    // },
 
 
     renameTableLabel(){
@@ -771,9 +801,17 @@ export default {
       return radarOptions;
     },
 
-    storeChange(){
+    // storeChange(){
+    //   this.getPatrolOverviewData();
+    // },
+
+    storeChange(selectedInstantStore){
+      this.selectedInstantStore = selectedInstantStore
+      this.storeIds = selectedInstantStore.filter(i => i !== "-1")
       this.getPatrolOverviewData();
     },
+
+
 
     dateChange(val) {
       this.dateValue = val;
@@ -1530,6 +1568,7 @@ export default {
     },
 
     async getRegionInspectResult() {
+      // xAxis
       const self = this;
       self.dataMap = {};
       self.regionInspectListData = [];
@@ -1559,13 +1598,27 @@ export default {
           self.totalGroupNum = groupSize;
           self.totalGroupNum > 1 ? self.showNextGroup = true : self.showNextGroup = false;
           const tempRegions = util.groupArrayOnSize(regions, self.showRegionNum);
-          self.regionGroups = tempRegions;
-          const regionList = [];
-          tempRegions[0].forEach((item) => {
-            regionList.push(item.region);
-          });
-          self.regionList = regionList;
-          regionOption.baseOption.xAxis[0].data = self.regionList;
+
+          console.log('this.selectedInstantStore *--->> ', this.selectedInstantStore);
+          console.log('tempRegions *--->> ', tempRegions);
+          console.log('this.storeList *--->> ', this.storeList);
+
+          // filter province
+          let result = this.storeList.filter((e) => {
+              return this.selectedInstantStore.indexOf(e.storeId) > -1
+            })
+          let tempProvince = result.map( i => i = i.province)
+          let SelectProvice = [...new Set(tempProvince)]
+
+          // self.regionGroups = tempRegions;
+          // const regionList = [];
+          // tempRegions[0].forEach((item) => {
+          //   regionList.push(item.region);
+          // });
+          // self.regionList = regionList;
+
+          
+          regionOption.baseOption.xAxis[0].data = SelectProvice;
           resultData.forEach((item) => {
             const dateTime = item.ts;
             const region = item.regions;
@@ -1619,6 +1672,8 @@ export default {
         self.regionChartEmpty = true;
       }
       self.storeOptions = regionOption;
+      console.log('self.storeOptions *--->> ', self.storeOptions);
+
     },
 
     getRegionInspectOption() {

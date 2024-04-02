@@ -783,9 +783,11 @@ export default {
       }
       else if(this.tableTypeValue == 't3' && this.tableLayerValue == 'l1'){
         this.formType = 'C1'
+        this.qualifiedForIgnoredWithType = false
       }
       else if(this.tableTypeValue == 't3' && this.tableLayerValue == 'l2'){
         this.formType = 'C2'
+        this.qualifiedForIgnoredWithType = false
       }
     },
 
