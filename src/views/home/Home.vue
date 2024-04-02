@@ -1125,7 +1125,7 @@ export default {
       //console.log("*Change Routes mimicModeChanged:",mimicModeChanged);
       const self = this;
       const result = await self.$store.dispatch("GetUserAuthorities");
-      console.log("changeRoutes resule:",result);
+      console.log("changeRoutes result:",result);
     
       if (result.errCode === 0) {
         await self.$store.dispatch("generateRoutes");
