@@ -3,13 +3,14 @@
     <div class="overview-date" style="margin-left:24px;">
       <date-time-selector :showTooltips="true" @change="dateChange"/>
       <span class="el-store">
-        {{ $t('overview.totalStore', {storeNum: storeDataList.length-1}) }}
+        <!-- {{ $t('overview.totalStore', {storeNum: storeDataList.length-1}) }} -->
+        {{ $t('overview.totalStore', {storeNum: storeList.length}) }}
       </span>
 
       <!-- 巡檢地點 -->
       <div class="store_title" style="margin-left: 30px; margin-right: 20px;" v-if="isiService">{{ $t('overview.patrolStore')}}</div>
       <region-multi-select
-      v-if="isiService"
+        v-if="isiService"
         ref="multiState"
         style="width: 30%; "
         :selected="selectedInstantStore"
@@ -106,7 +107,7 @@
                   class="content-labels">
                   <div class="excellent_nums">{{ item.percent }}%</div>
                   <div class="excellent_labels">
-                    <span :class="`label-` + index" class="labels excellent-label"/>
+                    <span :class="`label-` + index" class="labels excellent-label"></span>
                     <span class="label-desc">{{ item.type }}</span>
                   </div>
                 </div>
@@ -228,7 +229,7 @@ export default {
       storeDataList: [],
       checkAllStore: true,
       storeIds: [],
-      curStore: '',
+      curStore: '-1',
       showMonthDrap: false,
       showStoreContent: false,
       eventBySource: [
@@ -376,6 +377,9 @@ export default {
         var userInfo = await self.$store.dispatch("GetUserAuthorities");
         self.hasAdvanced = userInfo.data.isSystemAdvanced
         self.isLicensePro = userInfo.data.isLicensePro
+
+        
+
       }
     }
   },
@@ -388,8 +392,12 @@ export default {
     var userInfo = await this.$store.dispatch("GetUserAuthorities");
     this.hasAdvanced = userInfo.data.isSystemAdvanced
     this.isLicensePro = userInfo.data.isLicensePro
-    this.hasAdvanced ? this.sourceLegend.push({'type': this.$t('immediatePush.immediateEvent'), 'percent': '0%'}) : null
 
+    console.log('self.hasAdvanced :>> ', self.hasAdvanced);
+    console.log('self.isLicensePro :>> ', self.isLicensePro);
+
+
+    this.isLicensePro ? this.sourceLegend.push({'type': this.$t('immediatePush.immediateEvent'), 'percent': '0%'}) : null
     this.getAccountInfo()
   
   },
@@ -435,6 +443,7 @@ export default {
     },
 
     storeChange(selectedInstantStore){
+      console.log('selectedInstantStore :>> ', selectedInstantStore);
       this.selectedInstantStore = selectedInstantStore
       this.storeIds = selectedInstantStore.filter(i => i !== "-1")
       this.curStore = "-1"
@@ -468,6 +477,7 @@ export default {
           this.storeList = storeList
           this.selectedInstantStore = storeList.map( i => i.storeId)
           this.storeIds = this.selectedInstantStore.filter(i => i !== "-1");
+          this.curStore = '-1'
 
           // console.log('storeList ~~~~~>', storeList)
           // console.log('this.selectedInstantStore~~~~~>',  this.selectedInstantStore)
@@ -479,17 +489,18 @@ export default {
     handleSelector(){
       let tempStore = [];
       if(this.selectedInstantStore.length == 0){
-        this.storeList.forEach(item => {
-          const obj = {
-            storeId: item.storeId,
-            label: item.name,
-            value: item.storeId,
-            userId: item.userId,
-            name: item.name,
-            checked: true
-          };
-          tempStore.push(obj);
-        });
+        this.tempStore = []
+        // this.storeList.forEach(item => {
+        //   const obj = {
+        //     storeId: item.storeId,
+        //     label: item.name,
+        //     value: item.storeId,
+        //     userId: item.userId,
+        //     name: item.name,
+        //     checked: true
+        //   };
+        //   tempStore.push(obj);
+        // });
       } else {
         var afterFilterData = []
         this.storeList.forEach(item => {
@@ -524,19 +535,19 @@ export default {
       
       if (val === '-1') {
         self.storeIds = this.selectedInstantStore.filter(i => i !== "-1");
+        
       } else {
         self.storeIds.push(self.curStore);
       }
 
-      console.log('this.selectedInstantStore :>> ', this.selectedInstantStore);
-      console.log('self.storeIds :>> ', self.storeIds);
+      // console.log('this.selectedInstantStore :>> ', this.selectedInstantStore);
+      // console.log('self.storeIds :>> ', self.storeIds);
 
       self.saveSearchParams();
       self.getStoreEventStatics();
     },
 
     
-
     async getEventStatsStatics() {
       const self = this;
       var overviewParam = {
@@ -599,14 +610,14 @@ export default {
         if (index === 2) {
           onsiteEventNum = item.numOfEvent;
         }
-        else if (index === 3 && this.hasAdvanced) {
+        else if (index === 3 && this.isLicensePro) {
           immediateEventNum = item.numOfEvent;
         } 
 
       });
       const totalArray = [onsiteEventNum, immediateEventNum];
       jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
-      if(jsonArray[1] && this.hasAdvanced) jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2)
+      if(jsonArray[1] && this.isLicensePro) jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2)
       
       // console.log('jsonArray 2 !!!:>> ', jsonArray);
       if (sumEvent !== 0) {
@@ -680,7 +691,7 @@ export default {
                 borderWidth:5,
                 borderColor:'#FFF',
                 color: function(params) {
-                  const colorList = ['#7b9feb', '#5274bb']; 
+                  const colorList = [ '#7b9feb' ,'#7bd8eb' ]
                   return colorList[params.dataIndex];
                 }
               }

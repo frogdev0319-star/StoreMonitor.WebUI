@@ -78,7 +78,7 @@ export const navbarRoute = {
       name: 'patrolOverview',
       component: resolve => require(['@/views/overview/PatrolOverview'], resolve),
       meta: {
-        keepAlive: true
+        // keepAlive: true
       },
     }) && primaryPathesList.push('/patrolOverview');
 
@@ -87,7 +87,7 @@ export const navbarRoute = {
       name: 'eventOverview',
       component: resolve => require(['@/views/overview/EventOverview'], resolve),
       meta: {
-        keepAlive: true
+        // keepAlive: true
       },
     }) && primaryPathesList.push('/eventOverview');
     return overviewRoute;
