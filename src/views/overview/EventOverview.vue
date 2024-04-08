@@ -8,9 +8,9 @@
       </span>
 
       <!-- 巡檢地點 -->
-      <div class="store_title" style="margin-left: 30px; margin-right: 20px;" v-if="isiService">{{ $t('overview.patrolStore')}}</div>
+      <div class="store_title" style="margin-left: 30px; margin-right: 20px;" v-if="isiService || isTransform">{{ $t('overview.patrolStore')}}</div>
       <region-multi-select
-        v-if="isiService"
+        v-if="isiService || isTransform"
         ref="multiState"
         style="width: 30%; "
         :selected="selectedInstantStore"
@@ -351,7 +351,8 @@ export default {
       isLicensePro: false,
       selectedInstantStore: [],
       storeList: [],
-      isiService: false
+      isiService: false,
+      isTransform: false
     };
   },
 
@@ -394,8 +395,8 @@ export default {
     this.hasAdvanced = userInfo.data.isSystemAdvanced
     this.isLicensePro = userInfo.data.isLicensePro
 
-    console.log('self.hasAdvanced :>> ', self.hasAdvanced);
-    console.log('self.isLicensePro :>> ', self.isLicensePro);
+    console.log('this.hasAdvanced :>> ', this.hasAdvanced);
+    console.log('this.isLicensePro :>> ', this.isLicensePro);
 
     this.isLicensePro ? this.sourceLegend.push({'type': this.$t('immediatePush.immediateEvent'), 'percent': '0%'}) : null
     this.getAccountInfo()
@@ -419,15 +420,13 @@ export default {
         accountId : result.data.accountId
       }
       await accountInfo(accountId).then(res => {
-
-        console.log('res.data', res.data)
+        // console.log('res.data', res.data)
         console.log('res.data.isTransform', res.data.isTransform)
         console.log('res.data.isiService', res.data.isiService)
 
         this.isiService = res.data.isiService
-        // if(res.data.isTransform){
-        //   this.showDialog =  true
-        // }
+        this.isTransform = res.data.isTransform
+        
       }).catch(err => {
         console.log('err :>> ', err);
       });
