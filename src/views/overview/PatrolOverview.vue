@@ -8,7 +8,7 @@
       </span>
 
       <!-- 選擇地點 -->
-      <div class="store_title" style="margin-left: 30px; margin-right: 20px;"  v-if="isiService">{{ $t('overview.patrolStore')}}</div>
+      <div class="store_title" style="margin-left: 30px; margin-right: 20px;"  v-if="isiService || isTransform">{{ $t('overview.patrolStore')}}</div>
       <region-multi-select
         v-if="isiService"
         ref="multiState"
@@ -277,6 +277,7 @@ export default {
   data() {
     return {
       isiService: false,
+      isTransform: false,
       dateValue: [this.$moment().startOf('month').toDate(), this.$moment(new Date()).endOf('d').toDate()],
       taskList: [],
       isWorstArea: true,
@@ -386,6 +387,7 @@ export default {
         await self.getInspectStatus();
         await self.getSearchParams();
         await self.getPatrolOverviewData();
+        await self.getAccountInfo()
       }
     },
     
@@ -410,19 +412,19 @@ export default {
   },
 
   methods: {
-    getAccountInfo(){
-      var id = sessionStorage.getItem("accountId")
+    async getAccountInfo(){
+      const result = await this.$store.dispatch("GetUserAuthorities");
       const accountId = {
-        accountId : id
+        accountId : result.data.accountId
       }
+      console.log('accountId ****>> ', accountId);
       accountInfo(accountId).then(res => {
-
-        // console.log('res.data !!!', res.data)
-        // console.log('res.data.isTransform', res.data.isTransform)
-        // console.log('res.data.isiService', res.data.isiService)
+        console.log('res.data !!!', res.data)
+        console.log('res.data.isTransform', res.data.isTransform)
+        console.log('res.data.isiService', res.data.isiService)
 
         this.isiService = res.data.isiService
-        console.log('this.isiService ', this.isiService )
+        this.isTransform = res.data.isTransform
         // if(res.data.isTransform){
         //   this.showDialog =  true
         // }
@@ -1599,9 +1601,9 @@ export default {
           self.totalGroupNum > 1 ? self.showNextGroup = true : self.showNextGroup = false;
           const tempRegions = util.groupArrayOnSize(regions, self.showRegionNum);
 
-          console.log('this.selectedInstantStore *--->> ', this.selectedInstantStore);
-          console.log('tempRegions *--->> ', tempRegions);
-          console.log('this.storeList *--->> ', this.storeList);
+          // console.log('this.selectedInstantStore *--->> ', this.selectedInstantStore);
+          // console.log('tempRegions *--->> ', tempRegions);
+          // console.log('this.storeList *--->> ', this.storeList);
 
           // filter province
           let result = this.storeList.filter((e) => {

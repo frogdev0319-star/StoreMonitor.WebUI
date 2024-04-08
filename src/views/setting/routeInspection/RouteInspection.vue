@@ -480,7 +480,10 @@ export default {
         sessionStorage.removeItem('newInspect');
         self.activeName = '0';
         self.getTagList('accountChanged');
+        self.getAccountInfo()
       }
+
+      
     },
 
     changeNum(val){
@@ -556,7 +559,6 @@ export default {
     // console.log('tagIndex --->', tagIndex)
 
 
-
     self.getTagList();
     self.initData();
     self.getAccountInfo()
@@ -564,15 +566,23 @@ export default {
   },
 
   methods: {
-
     async getAccountInfo(){
-      var id = sessionStorage.getItem("accountId")
+
+      const result = await this.$store.dispatch("GetUserAuthorities");
       const accountId = {
-        accountId : id
+        accountId : result.data.accountId
       }
+
+      console.log('accountId ****>> ', accountId);
       await accountInfo(accountId).then(res => {
         this.isiService = res.data.isiService
+
         this.btnList[0].show = this.isiService
+
+        console.log('this.isiService ****>> ', this.isiService);
+        console.log('this.btnList ****>> ', this.btnList);
+
+
       }).catch(err => {
         console.log('err :>> ', err);
       });
