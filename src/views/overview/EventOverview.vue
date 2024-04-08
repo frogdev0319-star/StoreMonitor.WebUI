@@ -372,6 +372,7 @@ export default {
         await self.getBriefStoreData();
         await self.saveSearchParams();
         await self.getEventOverviewData();
+        await self.getAccountInfo();
         
 
         var userInfo = await self.$store.dispatch("GetUserAuthorities");
@@ -396,7 +397,6 @@ export default {
     console.log('self.hasAdvanced :>> ', self.hasAdvanced);
     console.log('self.isLicensePro :>> ', self.isLicensePro);
 
-
     this.isLicensePro ? this.sourceLegend.push({'type': this.$t('immediatePush.immediateEvent'), 'percent': '0%'}) : null
     this.getAccountInfo()
   
@@ -414,9 +414,9 @@ export default {
   methods: {
 
     async getAccountInfo(){
-      var id = sessionStorage.getItem("accountId")
+      const result = await this.$store.dispatch("GetUserAuthorities");
       const accountId = {
-        accountId : id
+        accountId : result.data.accountId
       }
       await accountInfo(accountId).then(res => {
 
