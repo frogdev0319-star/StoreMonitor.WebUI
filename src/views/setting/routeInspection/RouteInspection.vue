@@ -460,7 +460,8 @@ export default {
       passWord: '',
       changeNum: 0,
       canDeleteReport: false,
-      isiService: false
+      isiService: false,
+      isTransform: false
     };
   },
 
@@ -552,12 +553,6 @@ export default {
       }
     }
 
-    // 
-    // if(newInspect){
-    //   tagIndex = newInspect.mode
-    // }
-    // console.log('tagIndex --->', tagIndex)
-
 
     self.getTagList();
     self.initData();
@@ -567,7 +562,6 @@ export default {
 
   methods: {
     async getAccountInfo(){
-
       const result = await this.$store.dispatch("GetUserAuthorities");
       const accountId = {
         accountId : result.data.accountId
@@ -576,8 +570,11 @@ export default {
       console.log('accountId ****>> ', accountId);
       await accountInfo(accountId).then(res => {
         this.isiService = res.data.isiService
+        this.isTransform = res.data.isTransform
 
-        this.btnList[0].show = this.isiService
+        if(this.isiService || this.isTransform ) {
+          this.btnList[0].show = true
+        }
 
         console.log('this.isiService ****>> ', this.isiService);
         console.log('this.btnList ****>> ', this.btnList);
