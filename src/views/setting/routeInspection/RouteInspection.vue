@@ -553,7 +553,6 @@ export default {
       }
     }
 
-
     self.getTagList();
     self.initData();
     self.getAccountInfo()
@@ -569,12 +568,13 @@ export default {
 
       console.log('accountId ****>> ', accountId);
       await accountInfo(accountId).then(res => {
+        console.log('res.data.isTransform', res.data.isTransform)
+        console.log('res.data.isiService', res.data.isiService)
+
         this.isiService = res.data.isiService
         this.isTransform = res.data.isTransform
-
-        if(this.isiService || this.isTransform ) {
-          this.btnList[0].show = true
-        }
+        this.btnList[0].show = (this.isiService || this.isTransform)
+        
 
         console.log('this.isiService ****>> ', this.isiService);
         console.log('this.btnList ****>> ', this.btnList);

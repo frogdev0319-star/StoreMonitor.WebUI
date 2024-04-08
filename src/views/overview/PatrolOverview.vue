@@ -10,7 +10,7 @@
       <!-- 選擇地點 -->
       <div class="store_title" style="margin-left: 30px; margin-right: 20px;"  v-if="isiService || isTransform">{{ $t('overview.patrolStore')}}</div>
       <region-multi-select
-        v-if="isiService"
+        v-if="isiService || isTransform"
         ref="multiState"
         style="width: 30%; "
         :selected="selectedInstantStore"
