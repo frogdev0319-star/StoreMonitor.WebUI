@@ -480,7 +480,10 @@ export default {
         sessionStorage.removeItem('newInspect');
         self.activeName = '0';
         self.getTagList('accountChanged');
+        self.getAccountInfo()
       }
+
+      
     },
 
     changeNum(val){
@@ -556,7 +559,6 @@ export default {
     // console.log('tagIndex --->', tagIndex)
 
 
-
     self.getTagList();
     self.initData();
     self.getAccountInfo()
@@ -564,15 +566,23 @@ export default {
   },
 
   methods: {
-
     async getAccountInfo(){
-      var id = sessionStorage.getItem("accountId")
+
+      const result = await this.$store.dispatch("GetUserAuthorities");
       const accountId = {
-        accountId : id
+        accountId : result.data.accountId
       }
+
+      console.log('accountId ****>> ', accountId);
       await accountInfo(accountId).then(res => {
         this.isiService = res.data.isiService
+
         this.btnList[0].show = this.isiService
+
+        console.log('this.isiService ****>> ', this.isiService);
+        console.log('this.btnList ****>> ', this.btnList);
+
+
       }).catch(err => {
         console.log('err :>> ', err);
       });
@@ -1022,7 +1032,7 @@ export default {
         Score && await this.resolveSheetData(Score, 'Score');
         Others && await this.resolveSheetData(Others, 'Others');
         await this.getTagList('add');
-      } catch (e) {
+      }catch (e) {
         util.notify(this.$t('insSettingView.importFail'), 'warning', 3000);
         console.log('importFile -' + e);
       }
@@ -1398,7 +1408,6 @@ export default {
       primaryGroupCelss.map((cell, i) => {
         sheet[cell.cellRef].id = primaryResult.data[i];
       });
-
       if (secondaryGroupCells.length) {
         addGroupParams = secondaryGroupCells.map(cell => {
           return {
@@ -1958,12 +1967,13 @@ export default {
           let ScoreCopy = deepClone(Score);
           let OthersCopy = deepClone(Others);
           const tableVersion = _this.getTableVersonBasedOnWeight(PassFail, Score, Others);
-
+          //console.log('**tableVersion:',tableVersion);
           outdata.PassFail = _this.getPassAndFailSheetJsonData(wb, PassFail, tableVersion);
           outdata.Score = _this.getScoreSheetJsonData(wb, Score, tableVersion);
           outdata.Others = _this.getOthersSheetJsonData(wb, Others, tableVersion);
 
           if (outdata.PassFail.length > 0) {
+            //console.log("outdata.PassFail:",outdata.PassFail)
             if (!outdata.PassFail[0].catergyName) {
               PassFailCopy.A2 = {
                 h: _this.$t('insSettingView.Ratingitems'),
@@ -2073,6 +2083,7 @@ export default {
         const sheetArray = XLSX.utils.sheet_to_json(sheet);
         const rowDataArray = [];
         sheetArray.forEach((_item) => {
+          
           const rowDataObj = {};
           rowDataObj.catergyName = this.getTableCellData(_item.__EMPTY);
           rowDataObj.weight = _item.__EMPTY_1;
@@ -2080,7 +2091,8 @@ export default {
           rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_3);
           rowDataObj.score = _item.__EMPTY_4;
           rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
-          rowDataObj.required = _item.__EMPTY_5;
+          //console.log('**_item.__EMPTY_5:',_item.__EMPTY_5);
+          rowDataObj.required = (typeof _item.__EMPTY_5=='undefined')?'':_item.__EMPTY_5;
           // if (tableVersion === 1) {
           //   rowDataObj.subCatergyName = '';
           //   rowDataObj.weight = _item.__EMPTY_1;
@@ -2099,6 +2111,7 @@ export default {
 
           rowDataArray.push(rowDataObj);
         });
+        //console.log('**rowDataArray:',rowDataArray);
         return rowDataArray;
       }
       return [];
@@ -2570,6 +2583,7 @@ export default {
           }
         }
       }
+      //console.log("**passFailSheet:",passFailSheet);
       return passFailSheet;
     },
 
