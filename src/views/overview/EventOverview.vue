@@ -266,8 +266,9 @@ export default {
         //   'percent': '0%'
         // },
         {
-          'type': this.$t('overview.onsitePatrol'),
-          'percent': '0%'
+          id: 0,
+          type: this.$t('overview.onsitePatrol'),
+          percent: '0%'
         },
         // {
         //   'type': this.$t('overview.storeMonitor'),
@@ -375,13 +376,24 @@ export default {
         await self.getEventOverviewData();
         await self.getAccountInfo();
         
-
         var userInfo = await self.$store.dispatch("GetUserAuthorities");
         self.hasAdvanced = userInfo.data.isSystemAdvanced
         self.isLicensePro = userInfo.data.isLicensePro
+        console.log('self.hasAdvanced :>> ', self.hasAdvanced);
+        console.log('self.isLicensePro :>> ', self.isLicensePro);
+        console.log('this.sourceLegend :>> ', this.sourceLegend);
 
-        
-
+        var isAddItem = this.sourceLegend.some(i => i.id == 1)
+        console.log('isAddItem :>> ', isAddItem);
+        if(!isAddItem && this.isLicensePro ){
+          this.sourceLegend.push(
+            {
+              id: 1,
+              type: this.$t('immediatePush.immediateEvent'), 
+              percent: '0%'
+            }
+          ) 
+        }
       }
     }
   },
@@ -395,10 +407,17 @@ export default {
     this.hasAdvanced = userInfo.data.isSystemAdvanced
     this.isLicensePro = userInfo.data.isLicensePro
 
-    console.log('this.hasAdvanced :>> ', this.hasAdvanced);
-    console.log('this.isLicensePro :>> ', this.isLicensePro);
+    console.log('this.hasAdvanced cc:>> ', this.hasAdvanced);
+    console.log('this.isLicensePro cc:>> ', this.isLicensePro);
 
-    this.isLicensePro ? this.sourceLegend.push({'type': this.$t('immediatePush.immediateEvent'), 'percent': '0%'}) : null
+    this.isLicensePro ? this.sourceLegend.push(
+      {
+        id: 1,
+        type: this.$t('immediatePush.immediateEvent'), 
+        percent: '0%'
+      }
+    ) : null
+
     this.getAccountInfo()
   
   },
