@@ -268,7 +268,7 @@ export default {
         {
           id: 0,
           type: this.$t('overview.onsitePatrol'),
-          percent: '0%'
+          percent: '0'
         },
         // {
         //   'type': this.$t('overview.storeMonitor'),
@@ -371,11 +371,6 @@ export default {
         self.storeIds = [];
         self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
         // await self.getSearchParams();
-        await self.getBriefStoreData();
-        await self.saveSearchParams();
-        await self.getEventOverviewData();
-        await self.getAccountInfo();
-        
         var userInfo = await self.$store.dispatch("GetUserAuthorities");
         self.hasAdvanced = userInfo.data.isSystemAdvanced
         self.isLicensePro = userInfo.data.isLicensePro
@@ -390,10 +385,14 @@ export default {
             {
               id: 1,
               type: this.$t('immediatePush.immediateEvent'), 
-              percent: '0%'
+              percent: '0'
             }
           ) 
         }
+        await self.getBriefStoreData();
+        await self.saveSearchParams();
+        await self.getEventOverviewData();
+        await self.getAccountInfo();
       }
     }
   },
@@ -414,7 +413,7 @@ export default {
       {
         id: 1,
         type: this.$t('immediatePush.immediateEvent'), 
-        percent: '0%'
+        percent: '0'
       }
     ) : null
 
