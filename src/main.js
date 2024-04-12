@@ -100,7 +100,7 @@ function getBrandList(brandList) {
       tempAccount.push(accountItem);
     }
   })
-  console.log(tempAccount)
+  // console.log(tempAccount)
   sessionStorage.setItem('brandList', JSON.stringify(tempAccount));
 }
 

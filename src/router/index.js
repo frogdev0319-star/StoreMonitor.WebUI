@@ -96,7 +96,11 @@ export const navbarRoute = {
 
   // 巡店管理
   getPatrolRoute() {
+
     console.log("PermissionHelper.enableInspectReport()",PermissionHelper.enableInspectReport());
+    console.log("PermissionHelper.advancedMode",PermissionHelper.advancedMode);
+    console.log("PermissionHelper.enableMimicMode",PermissionHelper.enableMimicMode);
+
     const patrolRoute = {
       id:1,
       path: '/home',

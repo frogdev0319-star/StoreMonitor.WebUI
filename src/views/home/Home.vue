@@ -1126,13 +1126,13 @@ export default {
       const self = this;
       const result = await self.$store.dispatch("GetUserAuthorities");
       console.log("changeRoutes result:",result);
+      console.log("this.availabePathList:",this.availabePathList);
     
       if (result.errCode === 0) {
         await self.$store.dispatch("generateRoutes");
         self.getAdvanceSettingStastus(result.data);
         self.getUserName(result.data);
         const availablePathesList = this.availabePathList;
-        // console.log('availablePathesList :>> ', availablePathesList);
         
         if (availablePathesList.includes("/noRight")) {
           this.$router.push("/noRight");

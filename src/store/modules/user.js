@@ -363,8 +363,16 @@ const user = {
     GetUserAuthorities({ commit }) {
       return new Promise((resolve, reject) => {
         getUserAuthorities().then((res) => {
-          if (res.data && (!res.data.services || res.data.services.includes('custom_iqm_inspection'))) {
-            console.log('@@@@',res.data.userId);
+          console.log('@@@@',res.data);
+          console.log('@@@@ accountId',res.data.accountId);
+          
+          var brandList = JSON.parse(sessionStorage.getItem("brandList"));
+          console.log('@@@@ brandList :>> ', brandList);
+
+          var existenceBrand = brandList.some( i => i.accountId == res.data.accountId)
+          console.log('@@@@ existenceBrand :>> ', existenceBrand);
+
+          if (res.data && (!res.data.services || res.data.services.includes('custom_iqm_inspection')) && existenceBrand) {
             commit('SET_AUTHORITY', res.data.authorities);
             commit('SET_ROLES', [res.data.title]);
             commit('SET_ROLE_ID', res.data.roleId);
@@ -396,7 +404,9 @@ const user = {
     generateRoutes({ commit }) {
       return new Promise(resolve => {
         const accessedRoutes = [];
-        console.log("user.state.authorities:",user.state.authorities);
+        console.log("user.state.authorities:~~~>>>",user.state.authorities);
+        console.log("user.state:~~~>>>",user.state);
+
         if (user.state.authorities.length > 0) {
           PermissionHelper.setData(user.state.authorities);
 
@@ -481,9 +491,7 @@ const user = {
             
             const instantPushRoute = navbarRoute.getInstantPush();
             instantPushRoute.children.length > 0 ? accessedRoutes.push(instantPushRoute) : '';
-
           } 
-
 
           // console.log("accessedRoutes.length !?!?!?:",accessedRoutes.length);
           // console.log('accessedRoutes :>> ', accessedRoutes)
