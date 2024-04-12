@@ -94,13 +94,13 @@ function getBrandList(brandList) {
   brandList.forEach((accountItem) => {
     const res = accountItem['srp'].filter((srpItem) =>
       srpItem.type === 'Custom_Inspection' && srpItem.enable && srpItem.visible);
-    //  console.log(res)
+
     if (res && res.length) {
       accountItem['srp'] = res;
       tempAccount.push(accountItem);
     }
   })
-  console.log(tempAccount)
+  // console.log(tempAccount)
   sessionStorage.setItem('brandList', JSON.stringify(tempAccount));
 }
 
