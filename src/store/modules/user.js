@@ -360,13 +360,13 @@ const user = {
       return new Promise((resolve, reject) => {
         getUserAuthorities().then((res) => {
           console.log('@@@@',res.data);
-          console.log('@@@@ accountId',res.data.accountId);
+          // console.log('@@@@ accountId',res.data.accountId);
           
           var brandList = JSON.parse(sessionStorage.getItem("brandList"));
-          console.log('@@@@ brandList :>> ', brandList);
+          // console.log('@@@@ brandList :>> ', brandList);
 
           var existenceBrand = brandList.some( i => i.accountId == res.data.accountId)
-          console.log('@@@@ existenceBrand :>> ', existenceBrand);
+          // console.log('@@@@ existenceBrand :>> ', existenceBrand);
 
           if (res.data && (!res.data.services || res.data.services.includes('Custom_Inspection')) && existenceBrand) {
             commit('SET_AUTHORITY', res.data.authorities);
