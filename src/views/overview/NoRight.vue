@@ -61,11 +61,17 @@ export default {
       const accountId = {
         accountId : result.data.accountId
       }
+
+      var brandList = JSON.parse(sessionStorage.getItem("brandList"));
+      console.log('@@@@ brandList :>> ', brandList);
+      var srcType = brandList[0].srp[0].type
+      console.log('@@@@ srcType :>> ', srcType);
+
       await accountInfo(accountId).then(res => {
-        // console.log('res.data', res.data)
-        // console.log('res.data.isTransform', res.data.isTransform)
-        // console.log('res.data.isiService', res.data.isiService)
-        if(res.data.isTransform){
+        console.log('res.data', res.data)
+        console.log('res.data.isTransform !!', res.data.isTransform)
+        console.log('res.data.isiService !!', res.data.isiService)
+        if(res.data.isTransform && srcType !== "custom_iqm_inspection"){
           this.showDialog =  true
         }
       }).catch(err => {
