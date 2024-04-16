@@ -363,7 +363,7 @@ const user = {
     GetUserAuthorities({ commit }) {
       return new Promise((resolve, reject) => {
         getUserAuthorities().then((res) => {
-          console.log('@@@@',res.data);
+          // console.log('@@@@',res.data);
           // console.log('@@@@ accountId',res.data.accountId);
           
           var brandList = JSON.parse(sessionStorage.getItem("brandList"));
@@ -404,10 +404,11 @@ const user = {
     generateRoutes({ commit }) {
       return new Promise(resolve => {
         const accessedRoutes = [];
-        console.log("user.state.authorities:~~~>>>",user.state.authorities);
-        console.log("user.state:~~~>>>",user.state);
+        // console.log("user.state.authorities:~~~>>>",user.state.authorities);
+        // console.log("user.state:~~~>>>",user.state);
 
         if (user.state.authorities.length > 0) {
+          
           PermissionHelper.setData(user.state.authorities);
 
           // 總覽
