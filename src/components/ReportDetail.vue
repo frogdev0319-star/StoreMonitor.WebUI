@@ -282,7 +282,7 @@ export default {
         width: calc(110/1920*100vw);
         padding: calc(5/1920*100vw) calc(20/1920*100vw);
         background-color: #f7f9fa;
-        font-size: calc(15 / 1920 * 100vw);
+        font-size: 13px;
         color:#556679;
         font-weight: bold;
         border-radius: 5px;
@@ -292,7 +292,7 @@ export default {
         width: calc(110/1920*100vw);
         padding: calc(5/1920*100vw) calc(20/1920*100vw);
         background-color: #ffefeb;
-        font-size: calc(15 / 1920 * 100vw);
+        font-size: 13px;
         color:#f57949;
         font-weight: bold;
         border-radius: 5px;
@@ -302,7 +302,7 @@ export default {
         width: calc(110/1920*100vw);
         padding: calc(5/1920*100vw) calc(20/1920*100vw);
         background-color: #e8f6de;
-        font-size: calc(15 / 1920 * 100vw);
+        font-size: 13px;
         color:#59ab22;
         font-weight: bold;
         border-radius: 5px;
@@ -318,7 +318,7 @@ export default {
           text-align: left;
         }
         .title2{
-          font-size: calc(12 / 1920 * 100vw);
+          font-size: 15px;
           color:#7d8cad;
           margin: 15px 0 0 10px;
           text-align: left;
