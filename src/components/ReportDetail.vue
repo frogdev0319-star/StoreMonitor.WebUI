@@ -343,7 +343,7 @@ export default {
       padding-left:calc(20 / 1920 * 100vw);
       padding-right: calc(20 / 1920 * 100vw);
       .cdm-title{
-        font-size:calc(12 / 1920 * 100vw);
+        font-size:14px;
         color:#006ab7;
         font-weight: 500;
         padding-left:calc(10 / 1920 * 100vw);

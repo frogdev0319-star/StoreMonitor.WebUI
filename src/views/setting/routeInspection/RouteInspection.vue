@@ -33,6 +33,8 @@
             {{ $t('insSettingView.bindList') }}
           </el-button>
       </el-col>
+
+    
       <el-col
         v-loading="isLoading"
         :span="18"
@@ -568,6 +570,7 @@ export default {
 
       console.log('accountId ****>> ', accountId);
       await accountInfo(accountId).then(res => {
+        
         console.log('res.data.isTransform', res.data.isTransform)
         console.log('res.data.isiService', res.data.isiService)
 
@@ -925,7 +928,8 @@ export default {
           let label = '';
           if (tag_item.mode == 0) {
             label = '现场巡检';
-          } else if (tag_item.mode == 1) {
+          } 
+          else if (tag_item.mode == 1) {
             label = '远程巡检';
           }
           tagObj.label = label;
@@ -958,8 +962,13 @@ export default {
         }
       } else {
         self.getDownLoadURL();
-        self.elTableData = [{ label: '现场巡检', data: [] }, { label: '远程巡检', data: [] }];
+        self.elTableData = [
+          { label: '现场巡检', data: [] },
+          // { label: '远程巡检', data: [] }
+        ];
       }
+
+      console.log('self.elTableData !!-----------:>> ', self.elTableData);
       self.getBindStoreList();
     },
 
