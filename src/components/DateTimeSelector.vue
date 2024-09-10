@@ -2,7 +2,12 @@
   <div class="date-selector-container" :style="{'width':getLangStyleValue(contentWidth)}">
       <div class="time-title">{{ dateRangeTitle }}</div>
       <div class="paper shadow-light" style="display:flex; flex-direction:row;">
-        <el-select class="bDateSel" :class="getLangStyleValue(selecClass)" v-model="dateRange" value-key="value" :style="{'width':getLangStyleValue(rangeWidth)}" @change="changeDateRange">
+        <el-select class="bDateSel" 
+          :class="getLangStyleValue(selecClass)" 
+          v-model="dateRange" 
+          value-key="value" 
+          :style="{'width':getLangStyleValue(rangeWidth)}" 
+          @change="changeDateRange">
             <el-option 
               v-for="item in dateRangeItems"
               :key="item.value"
@@ -129,10 +134,8 @@ export default {
       //this.dateTimeValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
       }
     },
-    dateChange(val) {
-      this.$emit('change', val);
-    },
     changeDateRange(val){
+      console.log('val :1---->> ', val);
       this.dateRangevalue = val;
       if(val!=4){
         this.diablePick = true;
@@ -141,6 +144,19 @@ export default {
       }
       //this.getDateRange();
     },
+
+    dateChange(val) {
+      console.log('this is dataChange ------->> ');
+      this.$emit('change', val);
+
+      
+      console.log('this.dateRangevalue :2---->> ', this.dateRangevalue);
+      console.log('val :2---->> ', val);
+
+
+
+    },
+    
     
   }
 };

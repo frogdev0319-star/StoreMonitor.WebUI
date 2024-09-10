@@ -171,7 +171,7 @@
                   filterable
                   :placeholder="$t('audit.workFlows.findUser')"
                   :loading="loading" 
-                  style="300px">
+                  >
                   <el-option
                     v-for="user in userInfo"
                     :key="user.userId"
@@ -1257,6 +1257,10 @@ export default {
 };
 </script>
 <style lang="sass">
+  .el-select
+    .el-input--medium
+      .el-input__inner
+        height: auto !important;
   // .notify_person
   //   .el-tag.el-tag--info
   //     overflow: hidden
@@ -1268,7 +1272,6 @@ export default {
 <style lang="sass" scoped>
   .el-select
     width: 300px !important
-
   .is-multiple 
     .el-select-dropdown__item 
         padding-left: 10px !important
@@ -1315,7 +1318,7 @@ export default {
   .device-select
     .el-input
       .el-input__inner
-          height: 36px
+          height: 36px !important
           padding-right: 50px
           
   .icon-gengduo
@@ -1412,7 +1415,7 @@ export default {
         border-radius: 5px
 
 
-
+ 
 </style>
 
 <style scoped>

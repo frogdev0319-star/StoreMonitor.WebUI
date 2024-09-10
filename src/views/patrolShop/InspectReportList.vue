@@ -69,12 +69,15 @@
     </div>
     
     <div id="el-containter" class="flex-column spacer" style="margin-left:0px">
+
       <div class="report-header">
         <div class="flex-center" style="padding-top: 0;">
+          <!-- 時間範圍 -->
           <date-time-selector
             class="time-selector"
             @change="dateChange" 
             :dateTimeValue = dateValue /> 
+            
           <div class="flex-center fullWidth" style="margin-left: 20px">
             <div class="search-content flex-center" style="margin-right: 20px">
               <div class="search-label">{{ $t('remotePatrol.keywords') }}</div>
@@ -1161,6 +1164,7 @@ export default {
     },
 
     dateChange(val) {
+      console.log('val ~~~~~>> ', val);
       const self = this;
       const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
       const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
