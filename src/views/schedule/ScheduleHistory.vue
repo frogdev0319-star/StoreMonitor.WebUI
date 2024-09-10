@@ -767,12 +767,12 @@ export default{
 
   .has_delete
     height: 40px
-    font-size: calc(15/1920*100vw)
+    font-size: 13px !important
     position: relative
     display: flex
     flex-direction: row
     align-items: center
-    justify-content: flex-start
+    justify-content: center
     &:hover
       .tips
         display: block
@@ -794,8 +794,12 @@ export default{
       transition: all .3s
   // .el-table__body-wrapper
   //   max-height: fit-content !important
-
-
+  .tbl-schedule
+    .el-table__header-wrapper 
+      overflow: visible !important
+    .el-table__body-wrapper
+      overflow: visible !important
+      
   
 </style>
 

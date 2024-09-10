@@ -1291,9 +1291,9 @@ export default {
     align-items: flex-start
   .widewidth
     width: 100% !important
-  .el-input--medium .el-input__inner
+  // .el-input--medium .el-input__inner
     // height: 30px !important
-    height: calc(36 / 1920* 100vw) !important
+    // height: calc(36 / 1920* 100vw) !important
 </style>
 
 <style lang="scss" scoped>

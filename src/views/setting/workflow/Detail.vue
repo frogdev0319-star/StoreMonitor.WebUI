@@ -1257,10 +1257,10 @@ export default {
 };
 </script>
 <style lang="sass">
-  .el-select
-    .el-input--medium
-      .el-input__inner
-        height: auto !important;
+  // .el-select
+  //   .el-input--medium
+  //     .el-input__inner
+  //       height: auto !important;
   // .notify_person
   //   .el-tag.el-tag--info
   //     overflow: hidden
