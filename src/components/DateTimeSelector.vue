@@ -84,7 +84,7 @@ export default {
         {key:'id-ID',value:util.getWindowWidth()>1366?'calc(120/1440*100vw)':'calc(150/1440*100vw)'},{key:'th-TH',value:util.getWindowWidth()>1366?'calc(120/1440*100vw)':'calc(150/1440*100vw)'}],
       selecClass:[{key:'en',value:'rangeSel'},{key:'zh',value:'rangeSel'},{key:'zhtw',value:'rangeSel'},
         {key:'ja-JP',value:'rangeSel-ja'},{key:'ko-KR',value:'rangeSel-ko'},{key:'vi-VN',value:'rangeSel-vi'},
-        {key:'id-ID',value:'rangeSel-id'},{key:'th-TH',value:'rangeSel-th'}]
+        {key:'id-ID',value:'rangeSel-id'},{key:'th-TH',value:'rangeSel-th'}],
     }
   },
   computed:{
@@ -136,25 +136,24 @@ export default {
     },
     changeDateRange(val){
       console.log('val :1---->> ', val);
-      this.dateRangevalue = val;
       if(val!=4){
         this.diablePick = true;
+        this.dateRangevalue = val;
       }else{
         this.diablePick = false;
+        this.dateRangevalue = 4;
       }
       //this.getDateRange();
     },
 
+
+    
     dateChange(val) {
       console.log('this is dataChange ------->> ');
       this.$emit('change', val);
 
-      
       console.log('this.dateRangevalue :2---->> ', this.dateRangevalue);
       console.log('val :2---->> ', val);
-
-
-
     },
     
     

@@ -84,7 +84,7 @@
       </div>
     </div>
 
-    <!-- 巡檢門店 -->
+    <!-- 巡檢地點 -->
     <div class="page-container report-setting paper" >
 
       <div class="setting-titles padding flex-center">

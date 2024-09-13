@@ -994,6 +994,7 @@ export default {
         items.forEach(i => {
           // 權重
           if(i.weight !== -1){
+            console.log('權重 :>> ', );
             // 分數無上限
             if(i.groupScore !== -99999){
               // tab1 為Number.MAX_VALUE ,不計分
@@ -1083,8 +1084,11 @@ export default {
 
           // 無權重
           else {
+            console.log('無權重 :>> ', );
+            console.log('i.type :>> ', i.type);
             // 分數無上限
             if(i.groupScore !== -99999 ){
+              console.log('分數無上限 :>> ');
               if(i.actualScore === Number.MAX_VALUE)  var tempScore = 0
           
               if(this.includedInTotalScoreWithType1){
@@ -1128,6 +1132,7 @@ export default {
 
             // 無分數無上限
             else if(i.groupScore == -99999){
+              console.log('無分數無上限 :>> ');
               if(i.actualScore === Number.MAX_VALUE) var tempScore = 0
 
               if(this.includedInTotalScoreWithType1){
@@ -1153,7 +1158,7 @@ export default {
               else {
                 // tab1
                 if( i.type == 0){
-                  var tempScore =  0 
+                  var tempScore =  i.totalScore / 100
                 }
                 // tab2
                 if(this.qualifiedForIgnoredWithType2 && i.type == 1){
@@ -1167,6 +1172,8 @@ export default {
               }
             }
           }
+          
+          console.log('tempScore >>>>>>>>', tempScore )
           n = n + tempScore
         })
         this.totalSumScore = Number(n.toFixed(3))
@@ -1180,7 +1187,6 @@ export default {
         console.log('扣分制')
         this.totalSumScore = 100
       }
-  
       console.log('this.totalSumScore =======>> ', this.totalSumScore)
     },
 
@@ -1196,11 +1202,16 @@ export default {
             tableTotalScore = tableTotalScore + 0
             } else {
               // 比例制
+              console.log('來到比例制！ :~~~~~~~~~~~~~~~~~~~~~~~~~~~>> ');
+              console.log('ii.actualScore :>> ', ii.actualScore);
+              console.log('isInfinity :>> ', isInfinity);
+              console.log('this.totalSumScore :>> ', this.totalSumScore);
+
+
               if(this.hundredMarkType.value == 0){
                 if(ii.weight == -1 && i.type == 0){
                   tableTotalScore = tableTotalScore +  (ii.actualScore / this.totalSumScore) 
-                  // tableTotalScore.toFixed(1)
-                  console.log('gogo 沒有權重啊！！ :>> ', ii.groupName, tableTotalScore);
+                  console.log('gogo 沒有權重啊 1！！ :>> ', ii.groupName, tableTotalScore);
                 }
                 else if(ii.weight !== -1 && i.type == 0){
                   // tableTotalScore = tableTotalScore + ii.actualScore * ii.weight / 100
@@ -1210,7 +1221,7 @@ export default {
                 else if(ii.weight == -1 && i.type == 1){
                   tableTotalScore = tableTotalScore +  (ii.actualScore / this.totalSumScore) 
                   // tableTotalScore.toFixed(1)
-                  console.log('gogo 沒有權重啊！！ :>> ', ii.groupName, tableTotalScore);
+                  console.log('gogo 沒有權重啊 2！！ :>> ', ii.groupName, tableTotalScore);
                 }
                 else if(ii.weight !== -1 && i.type == 1){
                   // tableTotalScore = tableTotalScore + ii.actualScore * ii.weight / 100
@@ -1282,7 +1293,6 @@ export default {
 
     
     getSum(Array){
-      console.log('getSum Array :>> ', Array);
       var totalScore = 0
       Array.forEach(i => {
         // 比例制
@@ -1293,7 +1303,7 @@ export default {
           } else {
             if(i.weight == -1 && i.type == 0){
               totalScore = totalScore + i.actualScore / this.totalSumScore
-              totalScore.toFixed(2)
+              totalScore.toFixed(3)
               console.log('i.groupName totalScore tab1 (沒有權重)>> ', i.groupName, totalScore);
             } 
             else if(i.weight !== -1 && i.type == 0){
@@ -1302,7 +1312,7 @@ export default {
             }
             else if(i.weight == -1 && i.type == 1){
               totalScore = totalScore + i.actualScore / this.totalSumScore
-              totalScore.toFixed(2)
+              totalScore.toFixed(3)
               console.log('i.groupName totalScore tab2(沒有權重)>> ', i.groupName, totalScore);
             } 
             else if(i.weight !== -1 && i.type == 1){
@@ -2961,13 +2971,13 @@ export default {
         display: flex;
         height: 25px;
         .font-15 {
-           font-size: calc(15/1440*100vw);
-           height: calc(32/1440*100vw);
+          font-size: 15px;
+          height: calc(32/1440*100vw);
           line-height: calc(40/1440*100vw);
         }
         .font-score {
-           font-size: calc(32/1440*100vw);
-           color: #c60957;
+          font-size: calc(32/1440*100vw);
+          color: #c60957;
         }
         .font-score_count {
           font-size: calc(12/1440*100vw);
@@ -3448,7 +3458,7 @@ export default {
               padding-left:calc(20 / 1920 * 100vw);
               padding-right: calc(20 / 1920 * 100vw);
               .cdm-title{
-                font-size:14px;
+                font-size:calc(12 / 1920 * 100vw);
                 color:#94a4b4;
                 font-weight: bold;
                 margin: 0;

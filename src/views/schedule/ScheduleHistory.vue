@@ -306,7 +306,7 @@ export default{
     init(){
       this.curSchStatus= -1;
       this.inputSearchValue='';
-      this.doSearchScheduleHis()
+      // this.doSearchScheduleHis()
     },
     dateChange(val) {
         const self = this;
@@ -407,10 +407,9 @@ export default{
       var gmt_beginTs = new Date(ts).getTime()
       var gmt_endTs= new Date(te).getTime()
 
-      // console.log('gmt_beginTs :>> ', gmt_beginTs);
-      // console.log('gmt_endTs :>> ', gmt_endTs);
+      console.log('gmt_beginTs :>> ', gmt_beginTs);
+      console.log('gmt_endTs :>> ', gmt_endTs);
       
-
       const params={
         status: -1,
         beginTs: gmt_beginTs,
@@ -422,9 +421,7 @@ export default{
         order
       };
 
-
       console.log('params :>> ', params);
-
       if(this.curSchStatus !== -1 ){
         params.status = this.curSchStatus
         // if(self.totalElements < self.curSizeNum){
@@ -438,10 +435,8 @@ export default{
         // if(self.totalElements < self.curSizeNum){
         //   params.filter.page = 0
         //   this.curPage = 1
-        // } 
-
+        // }
       }
-
       scheduleRESTful.getScheduleTaskHistory(params).then(res=>{
         var thisData = [];
         if(res.errCode == 0){
@@ -506,7 +501,6 @@ export default{
           // if(self.totalElements < this.curSizeNum){
           //   this.curPage = self.total - 1
           // }
-          
           
           self.isLoadingData = false;
         }else{
@@ -766,7 +760,7 @@ export default{
       text-align: left !important
 
   .has_delete
-    height: 40px
+    height: 23px
     font-size: 13px !important
     position: relative
     display: flex

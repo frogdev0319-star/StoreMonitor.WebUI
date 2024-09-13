@@ -1,13 +1,14 @@
 <template>
   <div style="display: flex; align-items: center">
     <el-date-picker
-                v-model="dateTimeValue"
-                type="daterange"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期" 
+      v-model="dateTimeValue"
+      type="daterange"
+      start-placeholder="开始日期"
+      end-placeholder="结束日期" 
       range-separator="-"
       size="mini"
       format="yyyy/MM/dd"
+      :disabled="diablePick"
       class="date-picker global-date-pick"
       @change="dateChange"
     />
