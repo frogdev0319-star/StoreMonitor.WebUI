@@ -788,13 +788,19 @@ export default{
       transition: all .3s
   // .el-table__body-wrapper
   //   max-height: fit-content !important
+
   .tbl-schedule
     .el-table__header-wrapper 
       overflow: visible !important
     .el-table__body-wrapper
-      overflow: visible !important
+      max-height: none !important
+      // overflow: visible !important
       
-  
+  .ScheduleContainer 
+    .el-table
+      max-height: none !important
+      padding: 0
+
 </style>
 
 

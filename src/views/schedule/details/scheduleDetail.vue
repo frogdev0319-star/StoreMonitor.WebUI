@@ -104,7 +104,7 @@
           </div>
         </div>
         <div class="buttons">
-          <!-- 加入門店 -->
+          <!-- 加入地點 -->
           <delay-button
             class="red_border"
             type="primary"
@@ -343,7 +343,6 @@
               </div>
             </div>
 
-
             <div class="users" style="width: 100%">
               <el-table
                 ref="storeDataList"
@@ -360,7 +359,6 @@
                   :prop="_item.prop"
                   :label="_item.label"
                 />
-                
               </el-table>
             </div>
 
@@ -1166,7 +1164,13 @@ export default{
           isRemindModeCurrently: false,
           remindTime: '',
           timeZone: _item.timeZone,
-          tempId: Math.random().toString(36).slice(2)
+          tempId: Math.random().toString(36).slice(2),
+
+          remindStyle:[],
+          remindDate: null,
+          remindTimePoint: null
+
+          
         }
       ))
       console.log('this.addStoreTemp', this.addStoreTemp)
@@ -1178,7 +1182,6 @@ export default{
       
       this.showingAddStore = false
       // this.scheduleDataList = [...this.addStoreTemp, ...this.scheduleDataList]
-
       if(this.scheduleStatus.action == "addSchedule") {
         if(this.showScheduleDataList.length == 0){
           var noRepeat =  this.searchStoreData.filter((item, index, array) => array.findIndex(s => (item.province === s.province && item.city === s.city)) === index)
@@ -1280,10 +1283,6 @@ export default{
               })
             }
 
-            
-
-
-            
           } else if(this.scheduleStatus.action == "addSchedule") {
             needTempId.forEach(id => {
               if(l.tempId == id){
