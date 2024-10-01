@@ -22,6 +22,8 @@ import './assets/sass/index.scss';
 import { getAccountList } from '@/api/login';
 
 import VueSignaturePad from 'vue-signature-pad';
+import Chat from 'vue-beautiful-chat'
+
 
 
 
@@ -40,6 +42,7 @@ Vue.prototype.appName = '看门店管理系统';
 Vue.prototype.$message = message;
 Vue.prototype.$showIgnoreItem = true;
 Vue.use(VueSignaturePad);
+Vue.use(Chat)
 
 process.env.MOCK && require('@/mock');
 

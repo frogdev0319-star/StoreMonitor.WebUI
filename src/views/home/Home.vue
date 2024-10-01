@@ -322,6 +322,8 @@
             {{EditRptchangeStoreObj.showInfo}}
           </div>
         </dialog-pop>
+
+        <AiChat/>
   </div>
 </template>
 <script>
@@ -332,10 +334,14 @@ import util from '@/common/util.js';
 import PermissionHelper from '../../api/PermissionHelper';
 import DialogPop from '@/components/DialogPop.vue';
 import environment from '@/common/environment.js'
+
+import AiChat from '@/components/AiChat.vue';
+
 export default {
   name: "Home",
   components: {
-    DialogPop
+    DialogPop,
+    AiChat
   },
   data() {
     return {
