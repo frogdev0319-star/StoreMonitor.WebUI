@@ -311,19 +311,20 @@
       </div>
     </dialog-pop>
     <dialog-pop
-          v-if="EditRptchangeStoreObj.dialogCosed"
-          :title="EditRptchangeStoreObj.title"
-          :isWarning="EditRptchangeStoreObj.isWarning"
-          :visible="EditRptchangeStoreObj.dialogCosed"
-          :showCancelbtn="false"
-          @confirmHandler="()=>EditRptchangeStoreObj.dialogCosed=false"
-          >
-          <div class="dialog-slot">
-            {{EditRptchangeStoreObj.showInfo}}
-          </div>
-        </dialog-pop>
+      v-if="EditRptchangeStoreObj.dialogCosed"
+      :title="EditRptchangeStoreObj.title"
+      :isWarning="EditRptchangeStoreObj.isWarning"
+      :visible="EditRptchangeStoreObj.dialogCosed"
+      :showCancelbtn="false"
+      @confirmHandler="()=>EditRptchangeStoreObj.dialogCosed=false"
+      >
+      <div class="dialog-slot">
+        {{EditRptchangeStoreObj.showInfo}}
+      </div>
+    </dialog-pop>
 
-        <AiChat/>
+    <AiChat/>
+    
   </div>
 </template>
 <script>
