@@ -323,7 +323,23 @@
       </div>
     </dialog-pop>
 
-    <AiChat/>
+    <!-- ai Chat -->
+    <!-- <AiChat/> -->
+    <div class="chat"
+      style="
+      position: fixed;
+      z-index: 999;
+      width: 550px;
+      height: fit-content;
+      bottom: 32px;
+      right: 50px;
+      box-shadow: 0 7px 40px 2px rgba(148, 149, 150, .1);
+      "
+    >
+      <QuickChat/>
+    </div>
+    
+  
     
   </div>
 </template>
@@ -337,12 +353,16 @@ import DialogPop from '@/components/DialogPop.vue';
 import environment from '@/common/environment.js'
 
 import AiChat from '@/components/AiChat.vue';
+import QuickChat from '@/components/QuickChat.vue';
+
 
 export default {
   name: "Home",
   components: {
     DialogPop,
-    AiChat
+    AiChat,
+    QuickChat
+    
   },
   data() {
     return {
