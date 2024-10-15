@@ -1,4 +1,21 @@
 <template>
+  <div class="">
+    <div class="test" 
+      style="
+        background: #789;
+        width: 40%;
+        font-size: 14px;
+        color: #FFF;
+        background: rgba(255, 255, 255, 1);
+        border: 1px solid #555;
+        position: fixed;
+        padding: 10px;
+        top: -999%;
+        left: -999%;
+        z-index: 1;">
+          <canvas  ref="myChart"></canvas>
+    </div>
+
     <Chat v-if="visible"
         :participants="participants"
         :myself="myself"
@@ -34,7 +51,6 @@
           </div>
         </template> -->
 
-        
       </Chat>
   </div>
 </template>
@@ -54,6 +70,8 @@
       getInspectStatus,
       getInspectReportInfo
     } from '@/api/inspect';
+  import Chart from 'chart.js'
+import jsCookie from 'js-cookie';
 
   export default {
     name: 'app',
@@ -152,27 +170,27 @@
             //   type: 'image',
             // },
         ],
-        chatTitle: 'My chat title',
-        placeholder: 'send your message XDXD',
+        chatTitle: 'GenieAI',
+        placeholder: 'send your message',
         colors: {
             header: {
-                bg: '#d30303',
+                bg: '#246ffb',
                 text: '#fff'
             },
             message: {
                 myself: {
                     bg: '#fff',
-                    text: '#bdb8b8'
+                    text: '#888'
                 },
                 others: {
-                    bg: '#fb4141',
+                    bg: '#4e8cff',
                     text: '#fff'
                 },
                 messagesDisplay: {
                     bg: '#f7f3f3'
                 }
             },
-            submitIcon: '#b91010',
+            submitIcon: '#4e8cff',
             submitImageIcon: '#b91010',
         },
         borderStyle: {
@@ -241,7 +259,9 @@
                     return value;
                 }
             }
-        }
+        },
+
+        imgUrl: "",
       }
     },
     mounted() {
@@ -250,7 +270,6 @@
     },
 
     methods: {
-
         // get inspect for AI
       async getInspectList() {
         const self = this;
@@ -292,9 +311,22 @@
       },
 
 
-      async fetchAi(message){
+      
 
-        // var aaa = massage.content
+      onType: function (event) {
+          //here you can set any behavior
+      },
+      loadMoreMessages(resolve) {
+          setTimeout(() => {
+              resolve(this.toLoad); //We end the loading state and add the messages
+              //Make sure the loaded messages are also added to our local messages copy or they will be lost
+              this.messages.unshift(...this.toLoad);
+              this.toLoad = [];
+          }, 1000);
+      },
+      
+
+      async fetchAi(message){
         const params = {
           "inputs": {
               "text": message.content,
@@ -388,46 +420,90 @@
           console.error('SSE error', error);
         }
 
-      },  
+      }, 
 
-      onType: function (event) {
-          //here you can set any behavior
+
+      async addChartAndMessage(){
+        await this.createChart()
+        this.getImageUrl() 
       },
-      loadMoreMessages(resolve) {
+
+      async createChart(){
+        return new Promise((resolve) => {
+          console.log('createChart :>> ');
+          const ctx = this.$refs.myChart.getContext('2d');
+          new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: ['文化三店', '龜山店', '文化二店'],
+              datasets: [
+                { 
+                  label: 'Sales', 
+                  data: [76.3, 88.4, 79.1],
+                  backgroundColor: [
+                    'rgb(255, 99, 132)',
+                    'rgb(54, 162, 235)',
+                    'rgb(255, 205, 86)',
+                    // 'rgb(123, 205, 86)',
+                    // 'rgb(223, 205, 86)',
+                    // 'rgb(111, 205, 86)',
+                  ]
+                }
+              ],
+              
+            },
+          });
+
           setTimeout(() => {
-              resolve(this.toLoad); //We end the loading state and add the messages
-              //Make sure the loaded messages are also added to our local messages copy or they will be lost
-              this.messages.unshift(...this.toLoad);
-              this.toLoad = [];
+            resolve();
           }, 1000);
+        })
       },
-      
-      async onMessageSubmit (message) {
 
-          /*
-          * example simulating an upload callback. 
-          * It's important to notice that even when your message wasn't send 
-          * yet to the server you have to add the message into the array
-          */
-          this.messages.push(message);
-          console.log('message :>> ', message);
+      getImageUrl() {
+        console.log('getImageUrl :>> ');
+        const canvas = this.$refs.myChart;
+        const dataURL = canvas.toDataURL('image/png'); // 將 canvas 轉換為 PNG 格式的 base64 數據
+        this.imgUrl = dataURL
+        console.log('dataURL :>> ', dataURL);
+        this.aiMessage()
 
-          // await this.fetchAi(message)
-          // console.log('this.messages !!!!!:>> ', this.messages[this.messages.length-1]);
-
-        var aaa =  {
-              content: 'received messages', 
-              myself: false,
-              participantId: 1,
-              timestamp: {year: 2019, month: 4, day: 5, hour: 19, minute: 50, second: 3, millisecond: 123},
-              uploaded: true,
-              viewed: true,
-              preview: 'blob:https://cdn.pixabay.com/photo/2024/09/25/15/53/japan-9074037_640.jpg',
-              src: 'https://cdn.pixabay.com/photo/2024/09/25/15/53/japan-9074037_640.jpg',
-              type: 'image',
-            }
+        // const link = document.createElement('a');
+        // link.href = dataURL;
+        // link.download = 'myChart.png'; // 設置下載檔名
+        // link.click();
+      },
+      async aiMessage(){
+        console.log('aiMessage :>> ');
+        var addMessage =  {
+          content: 'received messages', 
+          myself: false,
+          participantId: 1,
+          timestamp: {year: 2019, month: 4, day: 5, hour: 19, minute: 50, second: 3, millisecond: 123},
+          uploaded: true,
+          viewed: true,
+          preview: 'blob:' + this.imgUrl,
+          src: this.imgUrl,
+          type: 'image',
+        }
         
-        this.messages.push(aaa);
+        this.messages.push(addMessage);
+      },
+
+      async onMessageSubmit (message) {
+        /*
+        * example simulating an upload callback. 
+        * It's important to notice that even when your message wasn't send 
+        * yet to the server you have to add the message into the array
+        */
+        this.messages.push(message);
+        console.log('message :>> ', message);
+
+        await this.fetchAi(message)
+        // console.log('this.messages !!!!!:>> ', this.messages[this.messages.length-1]);
+        await this.addChartAndMessage()
+
+
           /*
           * you can update message state after the server response
           */
@@ -453,11 +529,17 @@
           }, 3000, {src});
       },
       onImageClicked(message){
-          /**
-           * This is the callback function that is going to be executed when some image is clicked.
-           * You can add your code here to do whatever you need with the image clicked. A common situation is to display the image clicked in full screen.
-           */
-          console.log('Image clicked', message.src)
+        /**
+         * This is the callback function that is going to be executed when some image is clicked.
+         * You can add your code here to do whatever you need with the image clicked. A common situation is to display the image clicked in full screen.
+         */
+        // console.log('Image clicked', message.src)
+
+        const link = document.createElement('a');
+        link.href = message.src;
+        link.download = 'myChart.png'; // 設置下載檔名
+        link.click();
+
       }
     }
   }
@@ -469,4 +551,10 @@
     overflow: auto !important
   .message-text
     line-height: 1.2 !important
+  .header-paticipants-text
+    display: none
+  .quick-chat-container .header-container .header-title-text 
+    margin-bottom: revert
+  .container-message-display
+    background: #f3f4f7 !important
 </style>

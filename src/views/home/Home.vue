@@ -334,6 +334,7 @@
       bottom: 32px;
       right: 50px;
       box-shadow: 0 7px 40px 2px rgba(148, 149, 150, .5);
+      border-radius: 10px;
       "
     >
       <QuickChat/>
