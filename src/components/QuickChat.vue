@@ -1,9 +1,9 @@
 <template>
-  <div class="">
+  <div>
     <div class="test" 
       style="
         background: #789;
-        width: 40%;
+        width: 800px;
         font-size: 14px;
         color: #FFF;
         background: rgba(255, 255, 255, 1);
@@ -45,13 +45,38 @@
         @onType="onType"
         @onClose="onClose">
       
-        <!-- <template v-slot:header>
-          <div>
-            <p v-for="(participant, index) in participants" :key="index" class="custom-title">{{participant.name}}</p>
-          </div>
-        </template> -->
-
+        <template v-slot:header>
+          <div class=""><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none"><path d="m12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036q-.016-.004-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z"/><path fill="#fcfcfc" d="M9.107 5.448c.598-1.75 3.016-1.803 3.725-.159l.06.16l.807 2.36a4 4 0 0 0 2.276 2.411l.217.081l2.36.806c1.75.598 1.803 3.016.16 3.725l-.16.06l-2.36.807a4 4 0 0 0-2.412 2.276l-.081.216l-.806 2.361c-.598 1.75-3.016 1.803-3.724.16l-.062-.16l-.806-2.36a4 4 0 0 0-2.276-2.412l-.216-.081l-2.36-.806c-1.751-.598-1.804-3.016-.16-3.724l.16-.062l2.36-.806A4 4 0 0 0 8.22 8.025l.081-.216zM19 2a1 1 0 0 1 .898.56l.048.117l.35 1.026l1.027.35a1 1 0 0 1 .118 1.845l-.118.048l-1.026.35l-.35 1.027a1 1 0 0 1-1.845.117l-.048-.117l-.35-1.026l-1.027-.35a1 1 0 0 1-.118-1.845l.118-.048l1.026-.35l.35-1.027A1 1 0 0 1 19 2"/></g></svg></div>
+          <h6 style="font-size: 14px; line-height: 0; color: #FFF;">GenieAI</h6>
+          <el-select
+            class="el-province ai_header_input "
+            style="
+              width: 50% ; 
+              margin-left: 20px;
+              border:none;
+              border-radius:0px;
+              background-color: rgba(255, 255, 255, 0.2); "
+              v-model="inspectId"
+              placeholder="請選擇巡檢表"
+              size="mini"
+              @change="onChange"
+              >
+            <el-option
+              v-for="(item,index) in inspectTableList"
+              :key="index"
+              :label="item.name"
+              :value="item.id"/>
+          </el-select> 
+        </template>
       </Chat>
+
+      <div class="switch_wrap">
+        <div class="switch" @click.prevent="onClose">
+            <img src="https://api.iconify.design/mingcute:ai-fill.svg?color=%23fcfcfc" alt="">
+        </div>
+      </div>
+      
+      
   </div>
 </template>
 
@@ -98,7 +123,7 @@ import jsCookie from 'js-cookie';
             {
                 // name: 'GenieAI',
                 id: 1,
-                profilePicture: 'https://uc8f5ea4122c2853ee970fd28fac.previews.dropboxusercontent.com/p/thumb/ACaQroGcwS9vLB6I95xbpJXEMIC312JDFrPmH3d8T4higHyABummKL-Q4OH91lmXWvGUlgdUdhU82ERDebavsL208TAmeZQqCQ8FVIww6a5ZBXwDuapxG3c_UgD_TBV16sYu96TqJBVXDNZdVr6eWp0uHR7___XffhDk3MDJHxO9TYzq9spNJ8jXVLYzKQ2C-dk9d-bjqBgu19IhyEolN0aWowlgWShbnPIdlKdxkgT1oA2iVuDEAHt_cXhqtM8N5xuczalitAMwepj84-oCv-dt_b4kg-1NjHVYYVnn0A3jQQtHp7RxN9_p3zkEN2MqNqF9tCS0kkL6j2zqNDZ-JB0HgQueoDtxlGK8arH2U26y6kbXO77BOnjRk5cUmqg_FEjkXmha3mOIpgmvCsEN691L/p.jpeg?is_prewarmed=true'
+                profilePicture: `https://api.iconify.design/mdi:robot.svg?color=%234e8cff`
             },
             // {
             //     name: 'José',
@@ -262,6 +287,7 @@ import jsCookie from 'js-cookie';
         },
 
         imgUrl: "",
+        chartData : []
       }
     },
     mounted() {
@@ -288,6 +314,10 @@ import jsCookie from 'js-cookie';
         this.inspectName = this.inspectTableList.find( i => i.id == this.inspectId).name
       },
 
+      onChange(){
+        this.inspectName = this.inspectTableList.find( i => i.id == this.inspectId).name
+      },
+
       getTagAll() {
         return new Promise((resolve, reject) => {
           GetInspectTagList().then(res => {
@@ -309,9 +339,6 @@ import jsCookie from 'js-cookie';
           });
         });
       },
-
-
-      
 
       onType: function (event) {
           //here you can set any behavior
@@ -364,24 +391,25 @@ import jsCookie from 'js-cookie';
                   // timestamp: {year: 2019, month: 4, day: 5, hour: 19, minute: 10, second: 3, millisecond: 123},
                   type: 'text'
               }
-
             this.messages = [ ...this.messages, aiMessage ]
             this.messageLength = this.messages.length
           }
+
+          
           const reader = response.body.getReader();
           const decoder = new TextDecoder('utf-8');
 
           
           // 逐字读取消息
           let text = '';
-
           while (true) {
             const { done, value } = await reader.read();
             if (done) {
               break;
             }
-
+            
             text += decoder.decode(value, { stream: true });
+            console.log('text :>> ', text);
 
             // 将缓存的文本加上新获取的文本
             this.bufferedText += text;
@@ -390,10 +418,9 @@ import jsCookie from 'js-cookie';
             const parts = this.bufferedText.split(/\n\n/);
 
             console.log('parts :>> ', parts );
-            let result = parts[0].includes("text_chunk");
-            if(result) console.log('!!!!!!! :>> ')
+            // let result = parts[0].includes("text_chunk");
+            // if(result) console.log('!!!!!!! :>> ')
             
-
             // 最后一部分可能是未完整的一行数据，因此先保留在 `bufferedText` 中
             this.bufferedText = parts.pop();  // 获取最后未完成的数据
 
@@ -406,47 +433,79 @@ import jsCookie from 'js-cookie';
                     return
                   }
                   else {                    
-                    // 模拟逐字输出
-          
+                   // 模拟逐字输出
                     this.messages[this.messageLength - 1].content += obj.data.text
+
+
+
+
+
+
                   }  
+              
               }
             });
 
             // 重置 `text` 以便于下一轮读取
             text = '';
           }
+
+          var ttt = this.messages[this.messageLength - 1].content
+          const regex = /\*{5}([\s\S]*?)\*{5}/;
+          const match = ttt.match(regex);
+          if (match) {
+            const jsonString = match[1].replace(/\s+/g, "");
+
+            const jsonData = JSON.parse(jsonString);
+            console.log("jsonData" , jsonData);
+
+            const title = jsonData.title
+            var type = jsonData.type
+            var labels = []
+            var infoData = []
+
+            jsonData.count.forEach(i => {
+              labels.push(i.label)
+              infoData.push(i.number)
+            })
+            
+            console.log('labels :>> ', labels);
+            console.log('infoData :>> ', infoData);
+            this.addChartAndMessage(title, type, labels, infoData)
+
+          } else {
+            console.error("未找到符合格式的 JSON 資料");
+          }
         } catch (error) {
           console.error('SSE error', error);
         }
-
       }, 
 
 
-      async addChartAndMessage(){
-        await this.createChart()
+      async addChartAndMessage(title, type, labels, infoData){
+        await this.createChart(title, type, labels, infoData)
         this.getImageUrl() 
       },
 
-      async createChart(){
+      async createChart(title, type, labels, infoData){
         return new Promise((resolve) => {
-          console.log('createChart :>> ');
+          console.log('createChart :>> ' ,title, type, labels, infoData );
           const ctx = this.$refs.myChart.getContext('2d');
           new Chart(ctx, {
-            type: 'bar',
+            type: type,
             data: {
-              labels: ['文化三店', '龜山店', '文化二店'],
+              labels: labels,
               datasets: [
                 { 
-                  label: 'Sales', 
-                  data: [76.3, 88.4, 79.1],
+                  label: title, 
+                  data: infoData,
                   backgroundColor: [
                     'rgb(255, 99, 132)',
                     'rgb(54, 162, 235)',
                     'rgb(255, 205, 86)',
-                    // 'rgb(123, 205, 86)',
-                    // 'rgb(223, 205, 86)',
-                    // 'rgb(111, 205, 86)',
+                    'rgb(155, 205, 86)',
+                    'rgb(255, 105, 86)',
+                    'rgb(255, 5, 86)',
                   ]
                 }
               ],
@@ -465,7 +524,7 @@ import jsCookie from 'js-cookie';
         const canvas = this.$refs.myChart;
         const dataURL = canvas.toDataURL('image/png'); // 將 canvas 轉換為 PNG 格式的 base64 數據
         this.imgUrl = dataURL
-        console.log('dataURL :>> ', dataURL);
+        // console.log('dataURL :>> ', dataURL);
         this.aiMessage()
 
         // const link = document.createElement('a');
@@ -501,7 +560,7 @@ import jsCookie from 'js-cookie';
 
         await this.fetchAi(message)
         // console.log('this.messages !!!!!:>> ', this.messages[this.messages.length-1]);
-        await this.addChartAndMessage()
+        // await this.addChartAndMessage()
 
 
           /*
@@ -513,7 +572,7 @@ import jsCookie from 'js-cookie';
           // }, 2000)
       },
       onClose() {
-          this.visible = false;
+          this.visible = !this.visible;
       },
       onImageSelected(files, message){
           let src = 'https://149364066.v2.pressablecdn.com/wp-content/uploads/2017/03/vue.jpg'
@@ -553,8 +612,42 @@ import jsCookie from 'js-cookie';
     line-height: 1.2 !important
   .header-paticipants-text
     display: none
+  .quick-chat-container
+    box-shadow: 0 7px 40px 2px rgba(148, 149, 150, .5);
   .quick-chat-container .header-container .header-title-text 
     margin-bottom: revert
   .container-message-display
     background: #f3f4f7 !important
+    max-height: 500px !important
+
+  .switch_wrap
+    width: 100% 
+    display: flex
+    flex-direction: row
+    justify-content: flex-end
+    align-items: center
+
+    .switch
+      width: 60px
+      height: 60px
+      background: rgb(36, 111, 251)
+      border-radius: 50%
+      margin-top: 30px
+      display: flex
+      flex-direction: row
+      justify-content: center
+      align-items: center
+      box-shadow: 0 7px 40px 2px rgba(148, 149, 150, .5);
+      cursor: pointer
+      transition: all .3s
+      &:hover
+        box-shadow: 0 7px 20px 2px rgba(148, 149, 150, .9);
+        img
+          transform: scale(1.2)
+      img
+        width: 30px
+        height: 30px
+        transition: all .2s
 </style>
+
+
