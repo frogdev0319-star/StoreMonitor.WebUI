@@ -113,6 +113,7 @@ import jsCookie from 'js-cookie';
         messageLength: 2,
         mesageDataXDXD: '',
         bufferedText: '', // 用于保存未完整处理的流数据
+        bufferedText_n: '', // 用于保存未完整处理的流数据
 
         inspectTableList: [],
         inspectId: null,
@@ -395,11 +396,9 @@ import jsCookie from 'js-cookie';
             this.messageLength = this.messages.length
           }
 
-          
           const reader = response.body.getReader();
           const decoder = new TextDecoder('utf-8');
 
-          
           // 逐字读取消息
           let text = '';
           while (true) {
@@ -407,7 +406,7 @@ import jsCookie from 'js-cookie';
             if (done) {
               break;
             }
-            
+      
             text += decoder.decode(value, { stream: true });
             console.log('text :>> ', text);
 
@@ -416,7 +415,6 @@ import jsCookie from 'js-cookie';
 
             // 处理 SSE 数据流格式（按行处理）
             const parts = this.bufferedText.split(/\n\n/);
-
             console.log('parts :>> ', parts );
             // let result = parts[0].includes("text_chunk");
             // if(result) console.log('!!!!!!! :>> ')
@@ -424,35 +422,55 @@ import jsCookie from 'js-cookie';
             // 最后一部分可能是未完整的一行数据，因此先保留在 `bufferedText` 中
             this.bufferedText = parts.pop();  // 获取最后未完成的数据
 
-            
+            if(parts[0].includes("*****"))  break;
             parts.forEach(part => {
               if (part.startsWith('data:')) {
                 const message = part.replace('data:', '').trim();
                 const obj = JSON.parse(message)
-                if(obj.event !== 'text_chunk') {
-                    return
-                  }
-                  else {                    
-                   // 模拟逐字输出
-                    this.messages[this.messageLength - 1].content += obj.data.text
 
-
-
-
-
-
-                  }  
-              
+                if(obj.event !== 'text_chunk') return
+                // 模拟逐字输出
+                this.messages[this.messageLength - 1].content += obj.data.text
               }
             });
-
             // 重置 `text` 以便于下一轮读取
             text = '';
           }
 
-          var ttt = this.messages[this.messageLength - 1].content
+          // ------ 取 this.chart Data json -------
+          var chartData = ""
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+              break;
+            }
+            
+            text += decoder.decode(value, { stream: true });
+            // 将缓存的文本加上新获取的文本
+            this.bufferedText += text;
+            // 处理 SSE 数据流格式（按行处理）
+            const parts = this.bufferedText.split(/\n\n/);
+            // let result = parts[0].includes("text_chunk");
+            // if(result) console.log('!!!!!!! :>> ')
+            
+            // 最后一部分可能是未完整的一行数据，因此先保留在 `bufferedText` 中
+            this.bufferedText = parts.pop();  // 获取最后未完成的数据
+            parts.forEach(part => {
+              if (part.startsWith('data:')) {
+                const message = part.replace('data:', '').trim();
+                const obj = JSON.parse(message)
+
+                if(obj.event !== 'text_chunk') return
+                // 模拟逐字输出
+                chartData += obj.data.text
+              }
+            });
+            text = '';
+          }
+        
+          console.log('chartData :>> ', chartData);
           const regex = /\*{5}([\s\S]*?)\*{5}/;
-          const match = ttt.match(regex);
+          const match = chartData.match(regex);
           if (match) {
             const jsonString = match[1].replace(/\s+/g, "");
 
