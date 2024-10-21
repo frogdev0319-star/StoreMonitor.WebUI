@@ -1855,7 +1855,14 @@ export default {
     },
 
     createItem(){
-      this.$router.push({ name: 'createInspect' });
+      console.log('this.elTableData :>> ', this.elTableData);
+      const Datalength = this.elTableData[Number(this.activeName)].data.length;
+      if(Number(this.activeName) === 0 && Datalength >= 200) {
+        util.notify(this.$t('insSettingView.OnsiteLength'), 'warning', 3000);
+      } 
+      else {
+        this.$router.push({ name: 'createInspect' });
+      }
     },
     
 
@@ -1864,10 +1871,10 @@ export default {
       const isGlobalWebsite = Environment.isGlobalWebsite;
       if (isGlobalWebsite) {
         const Datalength = self.elTableData[Number(self.activeName)].data.length;
-        if (Number(self.activeName) === 1 && Datalength >= 40) {
+        if (Number(self.activeName) === 1 && Datalength >= 200) {
           util.notify(self.$t('insSettingView.RemoteLength'), 'warning', 3000);
           return false;
-        } else if (Number(self.activeName) === 0 && Datalength >= 40) {
+        } else if (Number(self.activeName) === 0 && Datalength >= 200) {
           util.notify(self.$t('insSettingView.OnsiteLength'), 'warning', 3000);
           return false;
         } else {

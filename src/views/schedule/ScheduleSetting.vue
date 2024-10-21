@@ -317,9 +317,14 @@ export default{
 }
 </script>
 <style lang="sass">
-.sch_table
-  .el-table .cell 
-    text-align: left !important
+  .sch_table
+    .row-class
+      .el-table__cell
+        .cell
+          text-align: left !important
+        &:nth-child(1)
+          .cell
+            padding-left: 20px !important
 </style>
 
 <style lang="scss" scoped>
