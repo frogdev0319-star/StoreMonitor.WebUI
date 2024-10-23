@@ -463,7 +463,8 @@ export default {
       changeNum: 0,
       canDeleteReport: false,
       isiService: false,
-      isTransform: false
+      isTransform: false,
+      isSystemAdvanced: false
     };
   },
 
@@ -568,7 +569,10 @@ export default {
         accountId : result.data.accountId
       }
 
-      console.log('accountId ****>> ', accountId);
+      this.isSystemAdvanced = result.data.isSystemAdvanced
+      console.log('this.isSystemAdvanced ****>> ', this.isSystemAdvanced);
+
+      // console.log('accountId ****>> ', accountId);
       await accountInfo(accountId).then(res => {
         
         console.log('res.data.isTransform', res.data.isTransform)
@@ -577,10 +581,8 @@ export default {
         this.isiService = res.data.isiService
         this.isTransform = res.data.isTransform
         this.btnList[0].show = (this.isiService || this.isTransform)
-        
-
-        console.log('this.isiService ****>> ', this.isiService);
-        console.log('this.btnList ****>> ', this.btnList);
+        // console.log('this.isiService ****>> ', this.isiService);
+        // console.log('this.btnList ****>> ', this.btnList);
 
 
       }).catch(err => {
@@ -1857,11 +1859,31 @@ export default {
     createItem(){
       console.log('this.elTableData :>> ', this.elTableData);
       const Datalength = this.elTableData[Number(this.activeName)].data.length;
-      if(Number(this.activeName) === 0 && Datalength >= 200) {
-        util.notify(this.$t('insSettingView.OnsiteLength'), 'warning', 3000);
-      } 
-      else {
-        this.$router.push({ name: 'createInspect' });
+
+      switch(this.isSystemAdvanced) {
+        case true : {
+          console.log('1 :>> ');
+          if(Number(this.activeName) === 0 && Datalength >= 200) {
+            util.notify(this.$t('insSettingView.OnsiteLength'), 'warning', 3000);
+          } 
+          else {
+            this.$router.push({ name: 'createInspect' });
+          }
+          break; 
+        }
+        case false : {
+          console.log('2 :>> ');
+          if(Number(this.activeName) === 0 && Datalength >= 40) {
+            util.notify(this.$t('insSettingView.OnsiteLength'), 'warning', 3000);
+          } 
+          else {
+            this.$router.push({ name: 'createInspect' });
+          }
+          break; 
+        }
+        default: {
+          break;
+        }
       }
     },
     
@@ -1869,22 +1891,56 @@ export default {
     importItem() {
       const self = this;
       const isGlobalWebsite = Environment.isGlobalWebsite;
-      if (isGlobalWebsite) {
-        const Datalength = self.elTableData[Number(self.activeName)].data.length;
-        if (Number(self.activeName) === 1 && Datalength >= 200) {
-          util.notify(self.$t('insSettingView.RemoteLength'), 'warning', 3000);
-          return false;
-        } else if (Number(self.activeName) === 0 && Datalength >= 200) {
-          util.notify(self.$t('insSettingView.OnsiteLength'), 'warning', 3000);
-          return false;
-        } else {
-          self.showNameImport = true;
-          self.ImportName = '';
+      switch(this.isSystemAdvanced) {
+        case true : {
+          if (isGlobalWebsite) {
+            const Datalength = self.elTableData[Number(self.activeName)].data.length;
+            if (Number(self.activeName) === 1 && Datalength >= 200) {
+              util.notify(self.$t('insSettingView.RemoteLength'), 'warning', 3000);
+              return false;
+            } else if (Number(self.activeName) === 0 && Datalength >= 200) {
+              util.notify(self.$t('insSettingView.OnsiteLength'), 'warning', 3000);
+              return false;
+            } else {
+              self.showNameImport = true;
+              self.ImportName = '';
+            }
+          } else {
+            self.showNameImport = true;
+            self.ImportName = '';
+          }
+          break; 
         }
-      } else {
-        self.showNameImport = true;
-        self.ImportName = '';
+        case false: {
+          if (isGlobalWebsite) {
+            const Datalength = self.elTableData[Number(self.activeName)].data.length;
+            if (Number(self.activeName) === 1 && Datalength >= 40) {
+              util.notify(self.$t('insSettingView.RemoteLength'), 'warning', 3000);
+              return false;
+            } else if (Number(self.activeName) === 0 && Datalength >= 40) {
+              util.notify(self.$t('insSettingView.OnsiteLength'), 'warning', 3000);
+              return false;
+            } else {
+              self.showNameImport = true;
+              self.ImportName = '';
+            }
+          } else {
+            self.showNameImport = true;
+            self.ImportName = '';
+          }
+          break; 
+        }
+        default: {
+          break;
+        }
       }
+
+      
+
+
+
+
+
     },
 
     checkBeforeImport() {
