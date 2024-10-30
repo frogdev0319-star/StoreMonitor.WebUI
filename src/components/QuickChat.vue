@@ -423,6 +423,7 @@ import jsCookie from 'js-cookie';
             this.bufferedText = parts.pop();  // 获取最后未完成的数据
 
             if(parts[0].includes("*****"))  break;
+
             parts.forEach(part => {
               if (part.startsWith('data:')) {
                 const message = part.replace('data:', '').trim();
@@ -445,6 +446,7 @@ import jsCookie from 'js-cookie';
               break;
             }
             
+            console.log('------ 取 this.chart Data json -------');
             text += decoder.decode(value, { stream: true });
             // 将缓存的文本加上新获取的文本
             this.bufferedText += text;
@@ -467,7 +469,9 @@ import jsCookie from 'js-cookie';
             });
             text = '';
           }
-        
+          // ------ 取 this.chart Data json -------
+
+
           console.log('chartData :>> ', chartData);
           const regex = /\*{5}([\s\S]*?)\*{5}/;
           const match = chartData.match(regex);
