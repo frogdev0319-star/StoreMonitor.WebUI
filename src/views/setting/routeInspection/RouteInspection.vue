@@ -804,10 +804,6 @@ export default {
         }
 
       
-   
-
-
-
         const params = {
           inspectId: TagData[tagIndex].id
         };
