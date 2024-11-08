@@ -3,7 +3,7 @@
 		<div class="submit_btn" >
       <delay-button type="filled"  :disabled="tableTagName == ''" @click="submit">
         <div class="button-area" style="width: 80px; height: 20px;">
-          <span>儲存</span>
+          <span>{{$t('createinspect.save')}}</span>
         </div>
       </delay-button>
     </div>
@@ -11,9 +11,9 @@
       <div class="el-table-content" >
         <div class="send_content" v-loading="isLoadingData" style="padding-top:20px;">
 
-          <div class="title-name" >表單設定</div>
+          <div class="title-name" >{{$t('createinspect.tabeleSetting')}}</div>
           <div class="send_content_row" >
-            <div class="row_title" ><span style="color: #c60957">* </span>巡檢表名稱</div>
+            <div class="row_title" ><span style="color: #c60957">* </span>{{$t('createinspect.inspectName')}}</div>
             <el-input
               v-model="tableTagName"
               style="width: 50%;"
@@ -25,12 +25,12 @@
           </div>
 
           <div class="send_content_row">
-            <div class="row_title"><span style="color: #c60957">* </span> 考評總分計算方式</div>
+            <div class="row_title"><span style="color: #c60957">* </span> {{$t('createinspect.gradeClac')}}</div>
             <div class="overall_row" > 
               <el-radio-group class="storevue-radio radio_item" v-model="hundredMarkType" >
-                <el-radio :label="0" style=" width: fit-content; text-align: left; margin-right: 40px;" > 總分-比例制 </el-radio>
-                <el-radio :label="-1" style=" width: fit-content;  margin-right: 40px;">加分制</el-radio>
-                <el-radio :label="1" style=" width: fit-content;">扣分制 </el-radio>
+                <el-radio :label="0" style=" width: fit-content; text-align: left; margin-right: 40px;" > {{$t('createinspect.proportional')}} </el-radio>
+                <el-radio :label="-1" style=" width: fit-content;  margin-right: 40px;"> {{$t('createinspect.extraPoints')}} </el-radio>
+                <el-radio :label="1" style=" width: fit-content;"> {{$t('createinspect.pointDeduction')}}  </el-radio>
               </el-radio-group>
             </div>
           </div>
@@ -38,7 +38,7 @@
           <div class="send_content_row" >
             <div class="overall_row" style="margin-right: 50px;" v-if="hundredMarkType == 1">
               <div class="title-status">
-                <span style="color: #c60957">* </span> 扣分起始分數
+                <span style="color: #c60957">* </span> {{$t('createinspect.startGrade')}}
                 <el-input
                   v-model="baseScore"
                   style="margin: 0 5px 0 10px;"
@@ -48,13 +48,13 @@
                   class="input-name_short"
                   @blur="inputChangeBaseScore"
                   />
-                  分
+                  {{$t('createinspect.socre')}}
               </div>
             </div>
 
             <div class="overall_row" >
               <div class="title-status">
-                <span style="color: #c60957">* </span> 考評總分範圍設定
+                <span style="color: #c60957">* </span> {{$t('createinspect.gradeRange')}}
                 <el-input
                   v-model="minScore"
                   style="margin: 0 5px 0 10px;"
@@ -64,7 +64,7 @@
                   class="input-name_short"
                   @blur="inputChangeMin"
                   />
-                  分
+                  {{$t('createinspect.socre')}}
               </div>
             </div>
               ~
@@ -79,12 +79,12 @@
                   style="margin: 0 5px;"
                   @blur="inputChangeMax"
                   />
-                  分
+                  {{$t('createinspect.socre')}}
               </div>
             </div>
             <div class="overall_row" style="margin-left: 50px;">
               <div class="title-status">
-                考評達標分
+                {{$t('createinspect.targetSocre')}}
                 <el-input
                   v-model="standardScore"
                   placeholder=""
@@ -93,7 +93,7 @@
                   style="margin: 0 5px;"
                   @blur="inputChangeStandardScore"
                   />
-                  分
+                  {{$t('createinspect.socre')}}
               </div>
             </div>
           </div>
@@ -101,7 +101,7 @@
   
           <!-- 表單類型 -->
           <div class="send_content_row">
-            <div class="row_title"><span style="color: #c60957">* </span>表單類型 </div>
+            <div class="row_title"><span style="color: #c60957">* </span>{{$t('createinspect.formType')}} </div>
             <el-select 
               v-model="tableTypeValue"
               style="width: 25%;"
@@ -132,7 +132,7 @@
 
           <!-- 其他設定 -->
           <div class="send_content_row">
-            <div class="row_title">其他設定</div>
+            <div class="row_title">{{$t('createinspect.otherSettings')}}</div>
             <div class="role-all-checkbox"  style="margin-right: 30px">
               <el-checkbox
                 v-model="qualifiedForIgnoredWithType"
@@ -140,7 +140,7 @@
                 style="margin-right: 8px"
                 :disabled="tableTypeValue =='t3' "
               />
-              <span class="group-name">忽略項視同得分</span>
+              <span class="group-name">{{$t('createinspect.ignoredItems')}}</span>
             </div>
             <div class="role-all-checkbox"  style="margin-right: 30px">
               <el-checkbox
@@ -148,7 +148,7 @@
                 class="storevue-checkbox-filled" 
                 style="margin-right: 8px"
               />
-              <span class="group-name">先簽到，再巡檢</span>
+              <span class="group-name">{{$t('createinspect.SignFirst')}}</span>
             </div>
             <div class="role-all-checkbox"   style="margin-right: 30px">
               <el-checkbox
@@ -156,7 +156,7 @@
                 class="storevue-checkbox-filled" 
                 style="margin-right: 8px"
               />
-              <span class="group-name">顯示區域計分(僅支援網頁板)</span>
+              <span class="group-name">{{$t('createinspect.ShowAreaScoring')}}</span>
             </div>
             <div class="role-all-checkbox"  >
               <el-checkbox
@@ -164,16 +164,16 @@
                 class="storevue-checkbox-filled" 
                 style="margin-right: 8px"
               />
-              <span class="group-name">顯示巡檢類別計分</span>
+              <span class="group-name">{{$t('createinspect.categoryScoring')}}</span>
             </div>
           </div>
 
           <!-- ///職務權限/// -->
-          <div class="title-name" style="margin-top: 50px;">權限設定</div>
-          <div class="subtitle_name" style="margin-top: 20px;">職務權限</div>
+          <div class="title-name" style="margin-top: 50px;">{{$t('createinspect.permissionSettings')}}</div>
+          <div class="subtitle_name" style="margin-top: 20px;">{{$t('createinspect.PositionAuthority')}}</div>
           
           <div class="send_content_row">
-            <div class="row_title">職務權限 </div>
+            <div class="row_title">{{$t('createinspect.PositionAuthority')}} </div>
               <region-multi-select
                 ref="multiState"
                 style="width: 50%; "
@@ -197,7 +197,7 @@
                 v-model="allData"
                 @change="choiceAll" 
               />
-              <span class="group-name">綁定至所有地點</span>
+              <span class="group-name">{{$t('createinspect.bindAllLocations')}}</span>
             </div>
           </div>
 
@@ -257,26 +257,26 @@ export default {
       tableTypeValue: "t1",
       tableType:[
         {
-          label: "合格率評分項",
+          label: this.$t('createinspect.bindAllLocations'),
           value: "t1"
         },
         {
-          label: "巡檢評分項",
+          label: this.$t('createinspect.ScoringItems'),
           value: "t2"
         },
         {
-          label: "附加評分項",
+          label: this.$t('createinspect.additionalRatingItems'),
           value: "t3"
         }
       ],
       tableLayerValue: "l2",
       tableLayer: [
         {
-          label: "二階層表單",
+          label: this.$t('createinspect.secondLevelForm'),
           value: "l1"
         },
         {
-          label: "三階層表單",
+          label: this.$t('createinspect.threeLevelForm'),
           value: "l2"
         }
       ],
@@ -335,27 +335,27 @@ export default {
       this.isLoadingData = true
       var isReapet = this.allInspectTypeList.some( i => i.name == this.tableTagName)
       if(isReapet) {
-        util.notify("巡檢表名稱名稱不可重複", 'error', 2000 );
+        util.notify(this.$t('createinspect.noRepeat'), 'error', 2000 );
         this.isLoadingData = false
         return
       } 
 
       if(this.baseScore.toString()=="" && this.hundredMarkType == 1) {
-        util.notify("扣分起始分數不可為空", 'error', 2000 );
+        util.notify(this.$t('createinspect.startScoreNoEmpty'), 'error', 2000 );
         this.isLoadingData = false
         this.$refs.basescore.focus()
         return
       } 
 
       if(this.minScore.toString()=="" ) {
-        util.notify("考評總分範圍最低分數不可為空", 'error', 2000 );
+        util.notify(this.$t('createinspect.hiNoEmpty'), 'error', 2000 );
         this.isLoadingData = false
         this.$refs.minscore.focus()
         return
       } 
 
       if(this.maxScore.toString()=="" ) {
-        util.notify("考評總分範圍最高分數不可為空", 'error', 2000 );
+        util.notify(this.$t('createinspect.lowNoEmpty'), 'error', 2000 );
         this.isLoadingData = false
         this.$refs.maxscore.focus()
         return

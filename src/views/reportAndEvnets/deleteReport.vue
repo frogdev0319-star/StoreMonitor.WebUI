@@ -150,7 +150,7 @@
       </div>
     </div>
     <dialog-pop
-      title="是否確認刪除報告"
+      :title="this.$t('deleteReport.confirmDelete')"
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
@@ -161,21 +161,23 @@
       <div class="dialog-slot">
         <div class="dialog-content">
           <div class="comfirm_delete_report" >
-            <h3>同意刪除須知事項 </h3>
-            <p>請注意！刪除報告後資料無法復原，請確保您要刪除的報告是正確的，請謹慎操作。 
-              為確保報告的安全刪除，請提供用戶密碼並勾選 <b>「我理解並同意刪除報告」</b>。
-              如果您有任何疑問或需要協助，請隨時聯絡我們的客服團隊。</p>
+            <h3>{{ $t('deleteReport.confirmDelete') }} </h3>
+            <p>
+              {{ $t('deleteReport.notice_1') }}
+              <b>{{ $t('deleteReport.notice_2') }}</b>。
+              {{ $t('deleteReport.notice_3') }}
+            </p>
           </div>
 
           <div class="l_row" >
             <el-checkbox  class="storevue-checkbox-filled" v-model="agreeDelete" @change="addNum">
-              <span style="color: red">*</span> 我理解並同意刪除報告
+              <span style="color: red">*</span> {{ $t('deleteReport.agreeDelete') }}
             </el-checkbox>
           </div>
 
           <div class="l_row">
             <div style="margin-bottom: 5px ;">
-              <span style="color: red; ">*</span> 刪除原因
+              <span style="color: red; ">*</span> {{ $t('deleteReport.deleteReason') }}
             </div>
             <el-input
               v-model="deleteReason"
@@ -189,7 +191,7 @@
 
           <div class="l_row">
             <div style="margin-bottom: 5px ;">
-              <span style="color: red; ">*</span> 請再次輸入使用者密碼
+              <span style="color: red; ">*</span> {{ $t('deleteReport.insertPassword') }}
             </div>
             <el-input
               v-model="passWord"
