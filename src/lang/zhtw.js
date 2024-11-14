@@ -1763,9 +1763,6 @@ export default{
         "changeStatus": "請確認是否變更狀態為",
         "unprocessed": "未處理",
     },
-
-
-    
     "createinspect":{
         "save": "儲存",
         "tabeleSetting": "表單設定",
@@ -1801,11 +1798,10 @@ export default{
         "confirmDelete": "是否確認刪除報告",
         "notice_1": "請注意！刪除報告後資料無法復原，請確保您要刪除的報告是正確的，請謹慎操作。 為確保報告的安全刪除，請提供用戶密碼並勾選 ",
         "notice_2": "「我理解並同意刪除報告」",
-        "notice_3": "如果您有任何疑問或需要協助，請隨時聯絡我們的客服團隊。」",
+        "notice_3": "如果您有任何疑問或需要協助，請隨時聯絡我們的客服團隊。",
         "agreeDelete": "我理解並同意刪除報告",
         "deleteReason": "刪除原因",
         "insertPassword": "請再次輸入使用者密碼",
     }
-
 }
 
