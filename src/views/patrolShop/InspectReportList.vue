@@ -29,7 +29,7 @@
 
             <!-- 巡檢表 -->
             <div class="flex-center">
-              <span style="margin-right: 16px;font-size:calc(15/1920*100vw);">巡檢表</span>
+              <span style="margin-right: 16px;font-size:calc(15/1920*100vw);">{{ $t('remotePatrol.selectInspect') }}</span>
               <div class="flex-center report-type-area">
 
               <!-- ==== 2024 sprint1 遠端巡檢關閉 ==== -->

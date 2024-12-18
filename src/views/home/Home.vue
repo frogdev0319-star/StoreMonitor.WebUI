@@ -232,7 +232,7 @@
                   class="dropdown-item"
                   style="width:auto;min-width: calc(140/1920 *100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
                   @click.native="advanceMode">
-                    {{ showAdvanceMode ? '返回': '進階管理' }}
+                    {{ showAdvanceMode ? $t('advance.back') :$t('advance.advanceMgt') }}
                 </el-dropdown-item>
 
                 <el-dropdown-item

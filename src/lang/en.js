@@ -134,8 +134,8 @@ export default{
         "operationRecord": "Operation Record",
         "DataSecurity":"Data Security",
         "InstantPush":"Instant Push",
-        "send":"Send",
-        "sendingRecord":"sending Record",
+        "Send":"Send",
+        "SendingRecord":"sending Record",
         "downloadManagement": "Download Management",
         "createInspect": "create Inspection"
 
@@ -1758,6 +1758,8 @@ export default{
         "centebottomRightrLeft": "Bottom right",
         "inputName": "Please enter a schedule name!",
         "screenShots": "Restrict screenshot",
+        "advanceMgt": "Advanced management",
+        "back": "Back",
     },
     "reportAndEvents":{
         "reportType": "reportType",
@@ -1805,5 +1807,16 @@ export default{
         "agreeDelete": "I understand and agree to delete the report",
         "deleteReason": "Reason for Deletion",
         "insertPassword": "Please re-enter your password",
+    },
+
+    "addition":{
+        "insertPassword": "Changes to Closed Events",
+        "operator": "Operator",
+        "OperatingTime": "Operating time:",
+        "uploadTime": "Upload time:",
+        "deleted": "Deleted",
+        "event": "Event:",
+        "eventTime": "Event Time:",
+        "ChangeToUnprocessed": "Change to unprocessed",
     }
 }

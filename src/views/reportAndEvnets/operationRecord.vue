@@ -121,26 +121,26 @@ export default {
       activeName:'0',
       tableDataList:[
         {
-          label: '刪除報告',
+          label: this.$t('route.deleteReport'),
           name: '0',
           taskCount: 0,
           tableData: [],
           columnData: [
             {
               'prop': 'userName',
-              'label': '操作人',
+              'label': this.$t('addition.operator'),
               'width': 50,
               'maxWidth': 50,
             },
             {
               'prop': 'logContent',
-              'label': '內容',
+              'label': this.$t('immediatePush.messageContent'),
               'width': 200,
               'maxWidth': 200,
             },
             {
               'prop': 'actionTs',
-              'label': '操作時間',
+              'label': this.$t('addition.OperatingTime'),
               'width': 200,
               'maxWidth': 200,
             },
@@ -148,26 +148,26 @@ export default {
           ],
         },
         {
-          label: '已結案事件變更',
+          label: this.$t('addition.insertPassword'),
           name: '1',
           taskCount: 0,
           tableData: [],
           columnData: [
             {
               'prop': 'userName',
-              'label': '操作人',
+              'label': this.$t('addition.operator'),
               'width': 50,
               'maxWidth': 50,
             },
             {
               'prop': 'logContent',
-              'label': '內容',
+              'label': this.$t('immediatePush.messageContent'),
               'width': 200,
               'maxWidth': 200,
             },
             {
               'prop': 'actionTs',
-              'label': '操作時間',
+              'label': this.$t('addition.OperatingTime'),
               'width': 200,
               'maxWidth': 200,
             },
@@ -292,7 +292,7 @@ export default {
         if(typeN == 0){
           var temp = res.data.content.map( i => ({
             userName : i.userName,
-            logContent: `${i.systemContent.storeName } / ${i.systemContent.inspectTable} / ${i.systemContent.reportSubmitterName} / 報告上傳時間: ${i.systemContent.reportTs} / 已刪除`,
+            logContent: `${i.systemContent.storeName } / ${i.systemContent.inspectTable} / ${i.systemContent.reportSubmitterName} / ${this.$t('addition.OperatingTime')} ${i.systemContent.reportTs} / ${this.$t('addition.deleted')}`,
             actionTs: this.getdate(i.actionTs)
           }))
           this.total = res.data.totalPages
@@ -301,7 +301,7 @@ export default {
         else if(typeN == 1){
           var temp = res.data.content.map( i => ({
             userName : i.userName,
-            logContent: `${i.systemContent.storeName } / ${i.systemContent.inspectTable} / 事件: ${i.systemContent.eventSubject} / 事件時間: ${i.systemContent.eventTs} / 變更為未處理`,
+            logContent: `${i.systemContent.storeName } / ${i.systemContent.inspectTable} / ${this.$t('addition.event')}  ${i.systemContent.eventSubject} / ${this.$t('addition.eventTime')} ${i.systemContent.eventTs} / ${this.$t('addition.ChangeToUnprocessed')}`,
             actionTs: this.getdate(i.actionTs)
           }))
           this.total = res.data.totalPages

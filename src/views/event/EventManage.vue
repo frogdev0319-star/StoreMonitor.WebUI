@@ -9,7 +9,7 @@
         >
         <template v-slot:others>
             <div class="last-row" >
-              <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{isLicensePro ? "報表類型" : "巡檢表"}} </span>
+              <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{isLicensePro ?  $t('remotePatrol.reportType') : $t('remotePatrol.inspectName')}} </span>
               <div class="flex-center report-type-area">
                 <el-select
                   v-if="isLicensePro"

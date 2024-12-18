@@ -138,7 +138,7 @@
                   v-model="broadcastContent"
                   style="width: 50%; "
                   ref="nodeName"
-                  placeholder="請輸入內容"
+                  :placeholder="$t('remotePatrol.enterDesc')"
                   type="textarea"
                   :autosize="{ minRows: 2, maxRows: 10}"
                   @input="(val) => itemInputChanged_a2(val, 500)"

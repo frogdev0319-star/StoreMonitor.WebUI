@@ -134,8 +134,8 @@ export default{
     "operationRecord": "操作記錄",
     "DataSecurity":"资料安全",
     "InstantPush":"即时推播",
-    "send":"发送推播",
-    "sendingRecord":"发送纪录",
+    "Send":"发送推播",
+    "SendingRecord":"发送纪录",
     "downloadManagement": "下載管理",
     "createInspect": "建立巡檢表"
   },
@@ -1750,6 +1750,9 @@ export default{
         "centebottomRightrLeft": "右下",
         "inputName": "请输入自定义名称！",
         "screenShots": "限制萤幕截图",
+        "advanceMgt": "进阶管理",
+        "back": "返回",
+        
     },
     "reportAndEvents":{
         "reportType": "报表类型",
@@ -1797,6 +1800,17 @@ export default{
         "agreeDelete": "我理解并同意删除报告",
         "deleteReason": "刪除原因",
         "insertPassword": "请再次输入使用者密码",
+    },
+
+    "addition":{
+        "insertPassword": "已結案事件變更",
+        "operator": "操作人",
+        "OperatingTime": "操作時間",
+        "uploadTime": "報告上傳時間",
+        "deleted": "已刪除",
+        "event": "事件:",
+        "eventTime": "事件时间:",
+        "ChangeToUnprocessed": "变更为未处理",
     }
 
 }
