@@ -7,10 +7,10 @@
         </div>
       </delay-button>
     </div>
-  
+
     <div class="page-container report-setting paper" >
       <div class="setting-titles padding flex-center">
-        {{$t('generalSetting.timeoutReminder')}}  
+        {{$t('generalSetting.timeoutReminder')}}
         <div class="spacer"></div>
       </div>
       <!-- 超時提醒 -->
@@ -30,7 +30,7 @@
                       :label="$t('generalSetting.eventTimeoutReminder')"/>
                   </div>
                 </div>
-                
+
                 <!-- row -->
                 <div class="setting-config basic-config">
                   <div class="title-status ">
@@ -66,7 +66,7 @@
               </template>
             </setting-table>
 
-        
+
             <!-- 節點停留時間 -->
             <setting-table :table-name="$t('generalSetting.signatureTimeoutReminder')" style="margin-top: 20px;">
               <template slot="tableDetail">
@@ -79,7 +79,7 @@
                       :label="$t('generalSetting.signatureTimeoutReminder')"/>
                   </div>
                 </div>
-                
+
                 <!-- row -->
                 <div class="setting-config basic-config">
                   <div class="title-status ">
@@ -120,7 +120,7 @@
 
     <div class="page-container report-setting paper" >
       <div class="setting-titles padding flex-center">
-        {{$t('generalSetting.reports')}}  
+        {{$t('generalSetting.reports')}}
         <div class="spacer"></div>
       </div>
 
@@ -193,7 +193,7 @@
                       <el-radio :label="0" style=" width: fit-content;">關閉 </el-radio>
                     </el-radio-group>
                   </div>
-                  
+
                   <div class="title-status" style="margin-left: calc(26/1920*100vw);">
                     逾期天數
                     <el-input
@@ -208,7 +208,38 @@
                       />
                     {{$t('audit.workFlows.day')}}
                   </div>
-                  
+
+                  <span class="text_limit_sign" v-if="showInputLimit_overallItem"> {{$t('insSettingView.inputRuletip')}} </span>
+                </div>
+              </div>
+            </setting-table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- "GPS禁止略過"開關選項 -->
+    <div class="page-container report-setting paper" >
+      <div class="setting-titles padding flex-center">
+        GPS 禁止略過
+        <div class="spacer"></div>
+      </div>
+
+      <div v-loading="isLoadingData" class="setting-details self-loading">
+        <div class="template-info">
+          <div class="inspect-basic">
+            <setting-table table-name="GPS 禁止略過設定" style="margin-top: 20px;">
+              <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
+                <div class="overall_row">
+
+                  <div style="margin-left: 20px; padding: 20px 0px;">
+                    <el-switch
+                      v-model="disable_skip_check_in"
+                      active-text="開啟"
+                      inactive-text="關閉">
+                    </el-switch>
+                  </div>
                   <span class="text_limit_sign" v-if="showInputLimit_overallItem"> {{$t('insSettingView.inputRuletip')}} </span>
                 </div>
               </div>
@@ -219,7 +250,7 @@
 
     </div>
   </div>
-  
+
 </template>
 
 <script>
@@ -236,7 +267,7 @@ import util from '@/common/util';
 
 export default {
   name: 'GeneralSetting',
-  components: { 
+  components: {
     DelayButton,
     SettingTable
 
@@ -282,8 +313,9 @@ export default {
       viewReportByTagAuth: 0,
 
       dueDayIsFeatureOn: 1,
-      overDueDay: 90
-      
+      overDueDay: 90,
+      disable_skip_check_in: false
+
     };
   },
 
@@ -312,11 +344,11 @@ export default {
         console.log('val :>> ', val);
       }
     },
-    
+
     enableDelay(val){
       if(val == true && this.delayDay == undefined)  this.delayDay = 1
     },
-    
+
     wokflowDelay(val){
       if(val == true && this.workflowDay == undefined)  this.workflowDay = 1
     },
@@ -332,7 +364,7 @@ export default {
   async created() {
     this.init()
 
-    
+
   },
 
   methods: {
@@ -348,10 +380,10 @@ export default {
         }
       }
 
-      
+
     },
 
-
+// general_setting
     getInspectStatus(){
       return new Promise((resolve, reject) => {
         inpectRESTful.getInspectStatus().then(res => {
@@ -393,7 +425,7 @@ export default {
             this.wokflowDelay = false
             this.wokflowTime = "09:00"
           }
-          
+
           this.inspectStatus = res.data.settingContent.general_setting_inspect_status_name
           delete this.inspectStatus.update_time
           delete this.inspectStatus.update_user_id
@@ -402,7 +434,7 @@ export default {
           console.log('this.inspectStatus :>> ', this.inspectStatus);
 
           this.dueDayIsFeatureOn = res.data.settingContent.general_setting_event_event_over_due_day_config.isFeatureOn == true ? 1 : 0
-          this.overDueDay = res.data.settingContent.general_setting_event_event_over_due_day_config.overDueDay 
+          this.overDueDay = res.data.settingContent.general_setting_event_event_over_due_day_config.overDueDay
 
 
         }).catch(err => {
@@ -457,6 +489,7 @@ export default {
               checkTime: eventCheckTime
           },
           time_zone: timeZone,
+          disable_skip_check_in: this.disable_skip_check_in,
           view_report_by_tag_auth: this.viewReportByTagAuth == 1 ? true : false,
 
           eventOverDueDayConfig:{
@@ -464,7 +497,6 @@ export default {
             overDueDay: this.overDueDay
           }
 
-          
       }
 
       console.log('status ~~~~~~~~>> ', status);
@@ -554,16 +586,13 @@ export default {
         this.overDueDay = e;
       }
     },
-
-
-
-
   }
 };
 </script>
 
 
 <style lang="sass" scoped>
+
   .submit_btn
     margin-bottom: 20px
     display: flex
@@ -577,7 +606,7 @@ export default {
     align-items: center
     // width: fit-content
 
-  .remider_setting 
+  .remider_setting
     margin: 0 8px
   .select_audit
     display: flex
@@ -627,14 +656,14 @@ export default {
     width: fit-content
     pointer-events: none
 
-    i 
+    i
       margin-right: 5px
       color: #d5d5d5
   .clickable
     color: #006ab7
     cursor: pointer
     pointer-events: auto !important
-    i 
+    i
       color: #006ab7
 
   .workflow-header
@@ -690,13 +719,13 @@ export default {
     align-items: center
     .el-input
       margin-left: 10px
-  
+
   .dialog-content
     width: 100%
     .showing_search_user
       width: 100%
       height: 500px
-      
+
       .filter_section
         background: #FFF
         display: flex
@@ -740,7 +769,7 @@ export default {
           flex-direction: row
           justify-content: flex-start
           .el-tag
-            margin-right: 5px 
+            margin-right: 5px
             margin-bottom: 5px
 
       .users
@@ -750,11 +779,14 @@ export default {
 </style>
 
 <style lang="sass">
+  .el-switch__label .is-active
+      color: #888 !important
+
   .title-status
     .el-input__count-inner
       margin-top: 55px
     input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button 
+    input::-webkit-inner-spin-button
       -webkit-appearance: none
       margin: 0
 
@@ -776,16 +808,16 @@ export default {
       border-color: #2c90d9 !important
       &:hover
         border-color: #dcdfe6 !important
-    .is-focus .el-checkbox__inner      
+    .is-focus .el-checkbox__inner
       border-color: #dcdfe6 !important
-    
+
     .el-checkbox__inner:hover
       border-color: #190 !important
-      
+
   .title-status
     .el-input__count-inner
       margin-top: 55px
-      
+
   .text_limit_notice
     position: absolute
     text-align: right
@@ -884,9 +916,9 @@ export default {
   }
 
   .name-tips{
-    display:flex; 
+    display:flex;
     flex-direction:column;
-    
+
   }
   .error-text{
     font-size: 12px;
@@ -950,10 +982,10 @@ export default {
   .title-status{
     width: 28%;
     text-align: left;
-    
+
   }
-  
- 
+
+
 
   .sortable-ghost{
     color: #424151 !important;
@@ -984,7 +1016,7 @@ export default {
     font-size: 12px;
   }
   .template-select-area{
-    display:flex; 
+    display:flex;
     flex-direction:row;
     height:calc(30/1920*100vw);
     width:200px;
