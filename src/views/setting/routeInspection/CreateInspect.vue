@@ -7,7 +7,7 @@
         </div>
       </delay-button>
     </div>
-	
+
       <div class="el-table-content" >
         <div class="send_content" v-loading="isLoadingData" style="padding-top:20px;">
 
@@ -26,7 +26,7 @@
 
           <div class="send_content_row">
             <div class="row_title"><span style="color: #c60957">* </span> {{$t('createinspect.gradeClac')}}</div>
-            <div class="overall_row" > 
+            <div class="overall_row" >
               <el-radio-group class="storevue-radio radio_item" v-model="hundredMarkType" >
                 <el-radio :label="0" style=" width: fit-content; text-align: left; margin-right: 40px;" > {{$t('createinspect.proportional')}} </el-radio>
                 <el-radio :label="-1" style=" width: fit-content;  margin-right: 40px;"> {{$t('createinspect.extraPoints')}} </el-radio>
@@ -98,11 +98,11 @@
             </div>
           </div>
 
-  
+
           <!-- 表單類型 -->
           <div class="send_content_row">
             <div class="row_title"><span style="color: #c60957">* </span>{{$t('createinspect.formType')}} </div>
-            <el-select 
+            <el-select
               v-model="tableTypeValue"
               style="width: 25%;"
               @change="cheangeType"
@@ -111,11 +111,11 @@
                 v-for="item in tableType"
                 :key="item.value"
                 :label="item.label"
-                :value="item.value" 
-                
+                :value="item.value"
+
                 />
-            </el-select> 
-            <el-select 
+            </el-select>
+            <el-select
               v-model="tableLayerValue"
               style="width: 25%;"
               @change="cheangeType"
@@ -124,8 +124,8 @@
                 v-for="item in tableLayer"
                 :key="item.value"
                 :label="item.label"
-                :value="item.value"  
-                
+                :value="item.value"
+
                 />
             </el-select>
           </div>
@@ -136,7 +136,7 @@
             <div class="role-all-checkbox"  style="margin-right: 30px">
               <el-checkbox
                 v-model="qualifiedForIgnoredWithType"
-                class="storevue-checkbox-filled" 
+                class="storevue-checkbox-filled"
                 style="margin-right: 8px"
                 :disabled="tableTypeValue =='t3' "
               />
@@ -145,7 +145,7 @@
             <div class="role-all-checkbox"  style="margin-right: 30px">
               <el-checkbox
                 v-model="onSiteSignature"
-                class="storevue-checkbox-filled" 
+                class="storevue-checkbox-filled"
                 style="margin-right: 8px"
               />
               <span class="group-name">{{$t('createinspect.SignFirst')}}</span>
@@ -153,7 +153,7 @@
             <div class="role-all-checkbox"   style="margin-right: 30px">
               <el-checkbox
                 v-model="isShowDistrictSum"
-                class="storevue-checkbox-filled" 
+                class="storevue-checkbox-filled"
                 style="margin-right: 8px"
               />
               <span class="group-name">{{$t('createinspect.ShowAreaScoring')}}</span>
@@ -161,7 +161,7 @@
             <div class="role-all-checkbox"  >
               <el-checkbox
                 v-model="isShowGroupSum"
-                class="storevue-checkbox-filled" 
+                class="storevue-checkbox-filled"
                 style="margin-right: 8px"
               />
               <span class="group-name">{{$t('createinspect.categoryScoring')}}</span>
@@ -171,7 +171,7 @@
           <!-- ///職務權限/// -->
           <div class="title-name" style="margin-top: 50px;">{{$t('createinspect.permissionSettings')}}</div>
           <div class="subtitle_name" style="margin-top: 20px;">{{$t('createinspect.PositionAuthority')}}</div>
-          
+
           <div class="send_content_row">
             <div class="row_title">{{$t('createinspect.PositionAuthority')}} </div>
               <region-multi-select
@@ -185,17 +185,17 @@
                 @changeInput="handleTitelChange"
                 />
           </div>
-        
+
           <div class="l-1" style="height: 1px; width: 100%; background: #ebebeb; margin: 20px 0;"></div>
           <div class="subtitle_name" style="margin-top: 20px;"> {{ $t('mysterio.storeAuth') }}</div>
           <div class="send_content_row">
             <!-- 全部門店 -->
             <div  v-if="storeList.length !== 0" class="role-all-checkbox">
               <el-checkbox
-                class="storevue-checkbox-filled" 
+                class="storevue-checkbox-filled"
                 style="margin-right: 8px"
                 v-model="allData"
-                @change="choiceAll" 
+                @change="choiceAll"
               />
               <span class="group-name">{{$t('createinspect.bindAllLocations')}}</span>
             </div>
@@ -227,7 +227,7 @@ import { getStorageInfo } from '@/api/event';
 import { getUserInfo, getDepartAll, getAllUserInfoNoAuth, getDepart} from '@/api/login';
 import {
   sendImmediateBroadcast,
-  sendImmediateTask, 
+  sendImmediateTask,
   sendImmediateEvent,
   broadcastCheck
 } from '@/api/advanceSetting';
@@ -287,11 +287,11 @@ export default {
       baseScore: 100,
       standardScore: '',
       qualifiedForIgnoredWithType: true,
-      onSiteSignature:  true, 
+      onSiteSignature:  true,
       isShowDistrictSum: true,
       isShowGroupSum: true,
-    
-  
+
+
       titleAuth: [],
       bindStoreIds: [],
       unbindStoreIds: [],
@@ -314,7 +314,7 @@ export default {
   mounted() {},
   created() {
     this.init()
-    
+
   },
   computed: {
     // ...mapGetters({ accountChanged: 'accountChanged' })
@@ -326,7 +326,7 @@ export default {
       await this.getTitle()
       await this.getCountryStore();
       await this.getTagAll()
-    
+
       // await this.getUserInfo()
       // await this.getDepartAll()
     },
@@ -338,28 +338,28 @@ export default {
         util.notify(this.$t('createinspect.noRepeat'), 'error', 2000 );
         this.isLoadingData = false
         return
-      } 
+      }
 
       if(this.baseScore.toString()=="" && this.hundredMarkType == 1) {
         util.notify(this.$t('createinspect.startScoreNoEmpty'), 'error', 2000 );
         this.isLoadingData = false
         this.$refs.basescore.focus()
         return
-      } 
+      }
 
       if(this.minScore.toString()=="" ) {
         util.notify(this.$t('createinspect.hiNoEmpty'), 'error', 2000 );
         this.isLoadingData = false
         this.$refs.minscore.focus()
         return
-      } 
+      }
 
       if(this.maxScore.toString()=="" ) {
         util.notify(this.$t('createinspect.lowNoEmpty'), 'error', 2000 );
         this.isLoadingData = false
         this.$refs.maxscore.focus()
         return
-      } 
+      }
 
       const storeIdChecked = [];
       const storeIdUnchecked = [];
@@ -379,7 +379,7 @@ export default {
         formType: this.formType,
         settings: [
           {
-            name: "includedInTotalScoreWithType1", // default!!! 
+            name: "includedInTotalScoreWithType1", // default!!!
             value: false
           },
           {
@@ -403,7 +403,7 @@ export default {
             value: this.maxScore
           },
           {
-            name: "baseScore", //扣分起始分數起始分數 
+            name: "baseScore", //扣分起始分數起始分數
             value: this.baseScore
           },
           {
@@ -445,14 +445,14 @@ export default {
             value: true
           },
           {
-            name: "onSitePhotoOnly", // 現場拍照 default!!! 
+            name: "onSitePhotoOnly", // 現場拍照 default!!!
             category: "generalRule",
             value: false
           },
           {
             name: "onSiteSignature",
             category: "generalRule",
-            value: true, 
+            value: true,
             extra: [
               {
                 header: "簽名1",
@@ -524,7 +524,7 @@ export default {
                       name: this.$t('remotePatrol.pass')
                     },
                     {
-                      cod: "fail",
+                      code: "fail",
                       name: this.$t('remotePatrol.failed')
                     }
                   ]
@@ -569,7 +569,7 @@ export default {
 
       quickAdd(this.params).then(res => {
         const errCode = res.errCode;
-      
+
         console.log('errCode :>> ', errCode);
         if (errCode == 0) {
           this.isLoadingData = false
@@ -583,7 +583,7 @@ export default {
           sessionStorage.setItem('newInspect', JSON.stringify(newIsp));
 
           this.$router.push(
-            { name: 'inspectListSetting', 
+            { name: 'inspectListSetting',
             // params: { data: routeData}
           });
         }
@@ -592,7 +592,7 @@ export default {
       });
     },
 
-  
+
     // init get Inspect
     getTagAll() {
       return new Promise((resolve, reject) => {
@@ -644,13 +644,13 @@ export default {
       // const bindStoreId = await self.getBindStoreList();
       // const storeIds = bindStoreId.data.length > 0 ? bindStoreId.data[0].storeIds : [];
       const storeIds = [];
-      
+
       data.forEach( i => {
         const obj = {};
         if(needArry.indexOf(i.province) === -1 && needArry.indexOf(i.city) === -1){
           obj.city = i.city
           obj.province = i.province
-          
+
         }
         needArry.push(obj)
         storeIds.forEach(_item => {
@@ -658,9 +658,9 @@ export default {
             bindArr.push(_item);
           }
         });
-        
+
       })
-      
+
       const allItems =  [...new Set(needArry.map(item => JSON.stringify(item)))].map(item => JSON.parse(item));
       self.storeCount = bindArr.length;
       allItems.forEach( l => {
@@ -686,15 +686,15 @@ export default {
         let _tempCount = 0;
         item.store.forEach(_item => {
           const _obj = {};
-          
+
             _obj.checked = true;
             _tempCount++;
-          
+
           _obj.storeId = _item.storeId;
           _obj.name = _item.storeName;
           _temp.push(_obj);
         });
-        
+
         groupObj.checked = true;
         groupObj.itemData = _temp;
         groupTemp.push(groupObj);
@@ -941,7 +941,7 @@ export default {
 <style lang="sass">
   .title-status
     input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button 
+    input::-webkit-inner-spin-button
       -webkit-appearance: none
       margin: 0
 </style>
@@ -951,13 +951,13 @@ export default {
     width: 60px
     // height: 30px
     // margin: 0 8px
-  
+
   .input-name_short.el-input--medium >>> .el-input__inner
     height: 30px
     line-height: 30px
     font-size: 12px
     padding: 0 10px !important
-    
+
 
   .submit_btn
     margin-bottom: 20px
@@ -1015,7 +1015,7 @@ export default {
         align-items: center
         .group-name
           line-height: 1
-    
+
     .store_content_row
       display: flex
       flex-direction: column
@@ -1052,7 +1052,7 @@ export default {
             margin-bottom: 20px
             .device-name
               margin-left: 8px
-          
+
 
 
   .el-table-content
@@ -1063,7 +1063,7 @@ export default {
     position: relative
     // padding-top: calc(30/1920*100vw)
     .list-table
-      .table-white 
+      .table-white
         /deep/
         .el-table
           box-shadow: none !important
@@ -1079,6 +1079,6 @@ export default {
 
 
 
-  
+
 </style>
 
