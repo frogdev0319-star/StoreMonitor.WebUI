@@ -880,7 +880,7 @@ export default {
         if (res.errCode === 0) {
           self.showEditTab = false;
           self.routeName = self.editRouteName;
-          
+
           self.showLengthNameWarning = false;
           util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           return false;
@@ -1193,6 +1193,7 @@ export default {
                 titleIds: titleIds
               }]
             };
+
             this.bindGroup(paramsBind);
           }
           if(this.parentId !== -1) {
@@ -1762,6 +1763,11 @@ export default {
         };
         inpectRESTful.getInspectItemList(params).then(res => {
           const data = res.data;
+
+
+          [data[0], data[1]] = [data[1], data[0]];
+          console.log('data :::::>> ', data);
+
           resolve(data);
         }).catch(err => {
           reject(err);
@@ -1783,6 +1789,7 @@ export default {
       const self = this;
       const inspectId = self.routeData[0].inspectId;
       const params = { inspectIds: [inspectId] };
+
       inpectRESTful.getInspectBindList(params).then(res => {
         if (res.errCode === 0) {
           const data = res.data.length > 0 ? res.data[0].storeIds : [];
@@ -1801,6 +1808,9 @@ export default {
       const filterData = util.handleInspctionCatergyTree(data);
       const temp = [];
       const groupIds = [];
+
+      console.log('data :::::::::>> ', data);
+      console.log('filterData :::::::::>> ', filterData);
       filterData.forEach(item => {
         const obj = {};
         obj.id = item.id;

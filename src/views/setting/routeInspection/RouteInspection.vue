@@ -34,7 +34,7 @@
           </el-button>
       </el-col>
 
-    
+
       <el-col
         v-loading="isLoading"
         :span="18"
@@ -180,7 +180,7 @@
       <div class="import-slot">
         <span>{{ $t('insSettingView.FailTitle') }}</span>
       </div>
-    
+
       <ul class="ul_style">
         <li v-for="(item,index) in FileInfo" :key="index" class="li_style">
           <div class="list_style"/>
@@ -190,10 +190,10 @@
     </dialog-pop>
 
     <!-- 刪除 巡檢表 -->
-    <!-- 
+    <!--
       updateDeleteContentDialogFlag
       hideDeleteContentDialog
-      confirmDelete 
+      confirmDelete
     -->
     <dialog-pop
       :title="$t('insSettingView.confirmDelete')"
@@ -351,7 +351,7 @@ export default {
     return {
       // ==== 2024 sprint1 遠端巡檢關閉 ====
       // elTableData: [{ label: '现场巡检', data: [] }, { label: '远程巡检', data: [] }],
-      
+
       elTableData: [{ label: '现场巡检', data: [] }],
       loadingGif: require('../../../../static/img/loading.svg'),
       WeightingSetting:require('../../../../static/img/ic_WeightingSetting_blue.svg'),
@@ -464,7 +464,8 @@ export default {
       canDeleteReport: false,
       isiService: false,
       isTransform: false,
-      isSystemAdvanced: false
+      isSystemAdvanced: false,
+      bindPisition: ','
     };
   },
 
@@ -487,7 +488,7 @@ export default {
         self.getAccountInfo()
       }
 
-      
+
     },
 
     changeNum(val){
@@ -540,7 +541,7 @@ export default {
     } else {
       const tabIndex = sessionStorage.getItem('TabIndex');
       console.log('tabIndex  ~~~> 1', tabIndex)
-    
+
       if (tabIndex !== null) {
         self.activeName = tabIndex;
         console.log('tabIndex ~~~> 2', tabIndex)
@@ -574,7 +575,7 @@ export default {
 
       // console.log('accountId ****>> ', accountId);
       await accountInfo(accountId).then(res => {
-        
+
         console.log('res.data.isTransform', res.data.isTransform)
         console.log('res.data.isiService', res.data.isiService)
 
@@ -773,12 +774,12 @@ export default {
     async getTagList(val, sheetIndex) {
       const self = this;
       const TagData = await self.getTagAll();
-      
-      console.log('self.activeName', self.activeName)
-      console.log('val >>>>>>> ', val);
-      console.log('sheetIndex >>>>>>> ', sheetIndex);
-      console.log('TagData >>>>>>> ', TagData);
-      console.log("self.patrolActive >>>>>>>",self.patrolActive);
+
+      // console.log('self.activeName', self.activeName)
+      // console.log('val >>>>>>> ', val);
+      // console.log('sheetIndex >>>>>>> ', sheetIndex);
+      // console.log('TagData >>>>>>> ', TagData);
+      // console.log("self.patrolActive >>>>>>>",self.patrolActive);
 
       if (TagData.length != 0) {
         if (val == 'del' || self.$route.params.val == 'del') {
@@ -803,7 +804,7 @@ export default {
           sessionStorage.setItem('TabPatrolIndex1', tagIndex);
         }
 
-      
+
         const params = {
           inspectId: TagData[tagIndex].id
         };
@@ -815,6 +816,10 @@ export default {
         const obj = {};
         const temp = [];
         const groupids = [];
+
+        const parentTemp = [];
+        const parentGroupids = [];
+
         self.weightOptions = [];
         NapeData.forEach((_item, _index) => {
           const _obj = {};
@@ -858,14 +863,27 @@ export default {
           _obj.itemData = tempChild;
           _obj.inspectId = TagData[tagIndex].id; // 巡检表
           _obj.mode = TagData[Number(self.patrolActive)].mode; // 巡检类别
-          groupids.push(_item.id);
+
           temp.push(_obj);
+          groupids.push(_item.id);
+
+          // if(_item.parentId === -1){
+          //   parentTemp.push(_obj);
+          //   parentGroupids.push(_item.id);
+          // }
         });
+
+
+
+
         const postparams = {
           groupIds: groupids
         };
         const titletemp = await self.getInspectGroupBindAll(postparams);
         const titleList = await self.getUserTitleList();
+        // console.log('titletemp ::::::::::>> ', titletemp);
+        // console.log('titleList ::::::::::>> ', titleList);
+
         temp.forEach(te_item => {
           const usertext = [];
           titletemp.forEach(ti_item => {
@@ -877,6 +895,7 @@ export default {
                   ti_item.userTitles.forEach(u_item => {
                     usertext.push(u_item.titleName);
                     te_item['ModelPost'] = usertext.toString();
+                    console.log('te_item[ModelPost] :>> ', te_item['ModelPost']);
                   });
                 }
               } else {
@@ -885,6 +904,13 @@ export default {
             }
           });
         });
+
+        // console.log('temp ::::::::::>> ', temp);
+        // this.bindPisition = temp.find( i => i.parentId === -1).ModelPost
+        // console.log('this.bindPisition :>> ', this.bindPisition);
+
+
+
         const te_temp = [];
         const sheetName = [];
         for (let i = 0; i < 3; i++) {
@@ -926,7 +952,7 @@ export default {
           let label = '';
           if (tag_item.mode == 0) {
             label = '现场巡检';
-          } 
+          }
           else if (tag_item.mode == 1) {
             label = '远程巡检';
           }
@@ -1444,7 +1470,7 @@ export default {
         return current;
       }, {});
 
-     
+
 
       const subjectMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderB', 'subject');
       const itemScoreMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderE', 'itemScore');
@@ -1455,7 +1481,7 @@ export default {
       const mapping = {};
 
 
-      
+
       Object.assign(mapping, subjectMapping, itemScoreMapping, descriptionMapping, availableScoreMapping, qualifiedScoreMapping, requiredMapping);
       var names = {};
       Object.values(rowCellsObject).forEach(rowCells => {
@@ -1551,7 +1577,7 @@ export default {
     },
 
 
- 
+
 
     bindStore() {
       const self = this;
@@ -1746,7 +1772,7 @@ export default {
       }
       self.showSingleDeleteContent = true;
       self.$refs.needPassword.focus()
-      
+
     },
 
 
@@ -1754,7 +1780,7 @@ export default {
     confirmDelete() {
       this.showSingleDeleteContent = false;
       this.isLoading = true
-      
+
       const self = this;
       const arrGroup = [];
       const arrItem = [];
@@ -1861,28 +1887,28 @@ export default {
           console.log('1 :>> ');
           if(Number(this.activeName) === 0 && Datalength >= 200) {
             util.notify(this.$t('insSettingView.OnsiteLength'), 'warning', 3000);
-          } 
+          }
           else {
             this.$router.push({ name: 'createInspect' });
           }
-          break; 
+          break;
         }
         case false : {
           console.log('2 :>> ');
           if(Number(this.activeName) === 0 && Datalength >= 40) {
             util.notify(this.$t('insSettingView.OnsiteLength'), 'warning', 3000);
-          } 
+          }
           else {
             this.$router.push({ name: 'createInspect' });
           }
-          break; 
+          break;
         }
         default: {
           break;
         }
       }
     },
-    
+
 
     importItem() {
       const self = this;
@@ -1905,7 +1931,7 @@ export default {
             self.showNameImport = true;
             self.ImportName = '';
           }
-          break; 
+          break;
         }
         case false: {
           if (isGlobalWebsite) {
@@ -1924,14 +1950,14 @@ export default {
             self.showNameImport = true;
             self.ImportName = '';
           }
-          break; 
+          break;
         }
         default: {
           break;
         }
       }
 
-      
+
 
 
 
@@ -2148,7 +2174,7 @@ export default {
         const sheetArray = XLSX.utils.sheet_to_json(sheet);
         const rowDataArray = [];
         sheetArray.forEach((_item) => {
-          
+
           const rowDataObj = {};
           rowDataObj.catergyName = this.getTableCellData(_item.__EMPTY);
           rowDataObj.weight = _item.__EMPTY_1;
@@ -2501,7 +2527,7 @@ export default {
         } else if (filterString.getContentLength(item.itemName.toString().trim()) > ITEMSLENGTH) {
           otherFlagObj.flags.flagItemLengthOthers = true;
         }
-        
+
         // if (item.score == undefined || item.score.length == 0 || isNaN(item.score) ||
         //     parseFloat(item.score) < -100 || parseFloat(item.score) > 100) {
         //   // 项目分值必填，字符类型为-100~+100
@@ -2515,7 +2541,7 @@ export default {
           otherFlagObj.flags.flagOtherScoreType = true;
         }
 
-        
+
         if (item.description != undefined) {
           if (filterString.getContentLength(item.description.toString().trim()) > 1200) {
             otherFlagObj.flags.flagDesLengthOthers = true;
@@ -2781,7 +2807,7 @@ export default {
       if (sheetDataArr) {
         const treeData = util.handleInspctionCatergyTree(sheetDataArr);
         console.log('treeData ~~~~~>> ', treeData);
-        
+
         treeData.forEach(item => {
           if (!item.children) {
             if (item.itemData.length !== 0) {

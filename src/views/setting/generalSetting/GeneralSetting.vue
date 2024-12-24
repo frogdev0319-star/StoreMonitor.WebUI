@@ -220,7 +220,7 @@
     </div>
 
     <!-- "GPS禁止略過"開關選項 -->
-    <div class="page-container report-setting paper" >
+    <!-- <div class="page-container report-setting paper" >
       <div class="setting-titles padding flex-center">
         GPS 禁止略過
         <div class="spacer"></div>
@@ -248,7 +248,8 @@
         </div>
       </div>
 
-    </div>
+    </div> -->
+
   </div>
 
 </template>

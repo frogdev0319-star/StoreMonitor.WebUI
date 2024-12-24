@@ -217,7 +217,7 @@
               </div>
             </el-menu>
           </el-scrollbar>
-          
+
           <div class="spacer"></div>
           <div class="headUrl-content flex-center" :style="collapsed?{'justify-content':'center'}:{}">
             <el-dropdown class="el-user-drop" >
@@ -260,7 +260,7 @@
 
         </aside>
 
-        
+
         <section :class="secClass">
           <el-col
             v-if="!showHeader"
@@ -289,13 +289,13 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.2.2.11
+                v3.2.2.13
                   &copy; {{ getFullYear }} Advantech Intelligent City
                   Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
             </footer>
           </el-col>
-        </section> 
+        </section>
       </el-col>
     </el-row>
     <dialog-pop
@@ -551,7 +551,7 @@ export default {
       if (pathMAP) {
         path = pathMAP.activePath;
         this.setBrandListDisabled(true);
-      } 
+      }
       else if(this.showMimicMode){
         this.setBrandListDisabled(true);
       }
@@ -614,7 +614,7 @@ export default {
     });
 
     window.addEventListener("resize", this.$_isMobile);
-    
+
     self.$_isMobile();
     this.getBrandList();
     this.updateTitle();
@@ -633,11 +633,11 @@ export default {
     this.$store.dispatch("GetIsMysteryMode");
     this.showMimicMode = this.$store.getters.ShowMimicMode;
     this.hasMystery = this.$store.getters.isMystery;
-    
+
     var userInfo = await this.$store.dispatch("GetUserAuthorities");
     this.userInfo = userInfo.data
     this.hasAdvanced = this.userInfo.isSystemAdvanced
-  
+
   },
 
   methods: {
@@ -659,7 +659,7 @@ export default {
       this.currentUrl = url + base + ""
 
 
-      if(this.showAdvanceMode){ 
+      if(this.showAdvanceMode){
           // this.$router.push('WaterMark');
           window.location.href = this.currentUrl + "waterMark";
         }
@@ -668,9 +668,9 @@ export default {
           sessionStorage.removeItem('advancedSettingMode')
           this.$router.push(this.availablePathesList[0]);
         }
-      
+
     },
-    
+
     changeMimicMode(){
       if(this.$route.path=="/report" && this.$store.getters.editReport){
         this.EditRptchangeStoreObj.dialogCosed = true;
@@ -1127,20 +1127,20 @@ export default {
       const result = await self.$store.dispatch("GetUserAuthorities");
       console.log("changeRoutes result:",result);
       console.log("this.availabePathList:",this.availabePathList);
-    
+
       if (result.errCode === 0) {
         await self.$store.dispatch("generateRoutes");
         self.getAdvanceSettingStastus(result.data);
         self.getUserName(result.data);
         const availablePathesList = this.availabePathList;
-        
+
         if (availablePathesList.includes("/noRight")) {
           this.$router.push("/noRight");
         }
         else if (!availablePathesList.includes(this.$route.path)) {
           console.log('availablePathesList', availablePathesList)
           this.$router.push(availablePathesList[0]);
-        } 
+        }
         else if(mimicModeChanged && this.$route.path=="/auditDetail" || this.$route.path=="/auditReportdetails"){
           this.$router.push("/audit");
         //this.$router.path = "/audit";
@@ -1171,7 +1171,7 @@ export default {
           ? result.userName.substr(0, 10) + "..."
           : result.userName;
       self.orgAccountId = result.accountId;
-      
+
       self.accountId = result.accountId;
       // sessionStorage.setItem("accountId", self.accountId);
 

@@ -19,7 +19,7 @@
                 <!-- 基本信息 -->
                 <div class="flex-row" style="margin-right: 30px">
                   <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.workFlowName')}}</div>
-                  <div class="title-status"> 
+                  <div class="title-status">
                     <el-input
                       ref="workflowName"
                       :placeholder="workflowDetail.name"
@@ -37,7 +37,7 @@
                 <!-- 分類流程 -->
                 <div class="flex-row" style="margin-right: 30px">
                   <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.workFlowClassification')}}</div>
-                  <div class="title-status"> 
+                  <div class="title-status">
                     <el-select
                       v-model="curTemplateIndex"
                       :placeholder="$t('audit.workFlows.inspectionForm')"
@@ -58,7 +58,7 @@
                   <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.signoffMode')}}</div>
                       <el-radio-group class="storevue-radio" v-model="workflowDetail.cancelable" >
                         <div class="flex-row" style="margin-right: 30px">
-                          <el-radio :label="false">{{$t('audit.workFlows.canNotCancel')}}</el-radio>  
+                          <el-radio :label="false">{{$t('audit.workFlows.canNotCancel')}}</el-radio>
                             <el-tooltip
                               class="date-time-tooltip"
                               effect="light"
@@ -106,7 +106,7 @@
               <!-- 流程描述 -->
               <div class="setting-config" style="margin-bottom: 20px;">
                 <div class="title-name">{{$t('audit.workFlows.workFlowDescription')}}</div>
-                <div class="title-status"> 
+                <div class="title-status">
                   <el-input
                     v-model="workflowDetail.description"
                     :autosize="{ minRows: 3, maxRows: 5 }"
@@ -141,7 +141,7 @@
                 <div class="tablelist flow-setting" v-loading.fullscreen.lock="fullscreenLoading">
                   <table-only
                     ref="elTP"
-                    class="table-white"
+                    class="table-white workflow"
                     :column-data="columnData"
                     :table-data="newFlatNodeDataView"
                     :tableworkflowOperation ="columnOperationData"
@@ -150,7 +150,7 @@
                     :allowRowExpand = "false"
                     :showBorder = "false"
                     :default-sort = "{prop: 'createTime', order: 'descending'}"
-                    :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+                    :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}"
                     :tableHeight = "760"
                     :cellStyle="{backgroundColor: '#fff !important'}"
                     :indexType="indexType"
@@ -170,7 +170,7 @@
                   multiple
                   filterable
                   :placeholder="$t('audit.workFlows.findUser')"
-                  :loading="loading" 
+                  :loading="loading"
                   >
                   <el-option
                     v-for="user in userInfo"
@@ -180,7 +180,7 @@
                   </el-option>
                 </el-select>
             </div>
-            <div class="search_member" @click="handelePopupUserList"><i class="iconfont el-icon-view iconbangzhu"/> {{$t('audit.workFlows.findUser')}}</div>  
+            <div class="search_member" @click="handelePopupUserList"><i class="iconfont el-icon-view iconbangzhu"/> {{$t('audit.workFlows.findUser')}}</div>
 
           </div>
         </div>
@@ -224,7 +224,7 @@
                 <!-- 關鍵字 -->
                 <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
                   <div class="title-name">{{$t('audit.workFlows.keywords')}}</div>
-                  <div class="title-status"> 
+                  <div class="title-status">
                     <el-input
                       v-model="inputSearchUser"
                       :placeholder="$t('audit.workFlows.searchNameMail')"
@@ -236,7 +236,7 @@
                 <!-- 部門 -->
                 <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
                   <div class="title-name">  {{$t('audit.workFlows.depart')}}</div>
-                  <div class="title-status"> 
+                  <div class="title-status">
                     <el-select
                       v-model="curTemplateDepartment"
                       :placeholder="$t('audit.workFlows.depart')"
@@ -254,7 +254,7 @@
                 <!-- 職務 -->
                 <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
                   <div class="title-name"> {{$t('audit.workFlows.position')}}</div>
-                  <div class="title-status"> 
+                  <div class="title-status">
                     <el-select
                       v-model="curTemplateTitleList"
                       :placeholder="$t('audit.workFlows.position')"
@@ -291,12 +291,12 @@
                 :column-data ="userColumnData"
                 :table-data ="searchUserData"
                 :showSelectionColumn = showSelectionColumn
-                
+
                 :highlight-current-row = "false"
                 :is-loading-data ="isLoadingData"
                 :allowRowExpand = "false"
                 :showBorder = "false"
-                :headerStyle ="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+                :headerStyle ="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}"
                 :cellStyle ="{backgroundColor: '#fff !important'}"
                 @handleSelectionChange = "handleSelectionChange "
               />
@@ -312,13 +312,13 @@
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
 import {
-  getNodeList, 
-  updateWorkflow,   
-  getWorkflowList, 
+  getNodeList,
+  updateWorkflow,
+  getWorkflowList,
   creadNewFlow,
   getUserStatus,
   enableWorkflow,
-  
+
   } from "@/api/workflow";
 import {getUserTitleList } from "@/api/title";
 import {getUserInfo} from '@/api/login';
@@ -341,7 +341,7 @@ export default {
   data() {
     return {
       ccToUSer: [],
-    
+
       showSingleDeleteContent: false,
       dataFromRoute: {},
       workflowDetail: {},
@@ -391,7 +391,7 @@ export default {
       userData:[],
       inputSearchUser: '',
       showSelectionColumn: true,
-  
+
       showingSearchUser: false,
       inputSearchUser: '',
       titleList:[],
@@ -460,7 +460,7 @@ export default {
           'maxWidth': 100,
           'signature': true,
         },
-        
+
       ],
       indexType: true,
       penSrc: require('../../../../static/img/table-edit.png'),
@@ -498,7 +498,7 @@ export default {
   },
 
   computed: {
-  
+
     searchUserData: {
       get(){
         return this.filterInputSearchUser(this.filterCurTemplateDepartment(this.filterCurTemplateTitleList(this.userData)))
@@ -511,10 +511,10 @@ export default {
 
   methods: {
     async init(){
-      await this.getTitle() 
-      await this.getUserInfo() 
-      await this.getDepartmentList() 
-    
+      await this.getTitle()
+      await this.getUserInfo()
+      await this.getDepartmentList()
+
       const result = await this.$store.dispatch("GetUserAuthorities");
       this.currentUser = result.data.userId
 
@@ -526,44 +526,44 @@ export default {
         case 'firstEdit':{
           console.log('go firstEdit !!');
           this.firstEdit()
-          break;      
+          break;
         }
         case 'create':{
           console.log('go create !!');
           this.getNodeData()
-          break;      
+          break;
         }
         case 'edit':{
           console.log('go edit !!');
           await this.handleEdit()
-          break;      
+          break;
         }
         case 'set':{
           // for Breadcrumb link
           console.log('go set !!');
           await this.handleEdit()
-          break;      
+          break;
         }
         default: {
           break;
         }
       }
       await this.getPickedMember()
-      await this.handleData() 
+      await this.handleData()
 
-      
+
       this.isLoadingData = false
     },
 
 
     async firstEdit(){
-      // get id 
+      // get id
       await this.getWorkflowInfo()
-      await this.getNodeList(this.infoForm.processDefinitionKey) 
-      await this.handleData() 
+      await this.getNodeList(this.infoForm.processDefinitionKey)
+      await this.handleData()
       await this.getWorkflowList(this.apiBody)
-      
-      
+
+
       this.isLoadingData = false
     },
 
@@ -591,7 +591,7 @@ export default {
 
         this.newFlatNodeDataView = orinode
         console.log('orinode 2 >> ', orinode);
-        
+
       }else{
         sessionStorage.setItem('reNewNode', JSON.stringify(orinode))
         this.newFlatNodeDataView = orinode
@@ -604,7 +604,7 @@ export default {
       const data = sessionStorage.getItem('workflowDetail')
       this.infoForm = JSON.parse(data)
 
-      // this.workflowDetail = this.infoForm 
+      // this.workflowDetail = this.infoForm
 
       console.log('this.infoForm 1 ------>> ', this.infoForm);
       console.log('this.workflowDetail 1 ------>> ', this.workflowDetail);
@@ -637,8 +637,8 @@ export default {
         // console.log('this.nodeList 4 ------>> ', this.nodeList);
         // console.log('res.data 4 ------>> ', res.data);
         // console.log('this.workflowDetail 4 ------>> ', this.workflowDetail);
-        
-        // flat data  
+
+        // flat data
         this.flattenData(this.nodeList)
         this.fromApiflatNodeData.forEach(d=>{
           delete d.nextAuditNode
@@ -648,12 +648,12 @@ export default {
         this.fromApiflatNodeData[0].name = this.$t('audit.workFlows.submitAudit')
         this.fromApiflatNodeData[0].auditByUsers = []
         this.fromApiflatNodeData[0].auditByUsers.push(this.$t('audit.sendAudit.submitterName'))
-        
+
         this.newFlatNodeDataView = this.fromApiflatNodeData
 
         // 傳node資料到 workflownode
         sessionStorage.setItem('reNewNode', JSON.stringify(this.newFlatNodeDataView))
-        
+
 
 
         // this.isLoadingData = false
@@ -673,21 +673,21 @@ export default {
         return this.fromApiflatNodeData;
       }
     },
-    
+
     handleEdit(){
       console.log('this is Edit')
-    
+
       const tempData = sessionStorage.getItem('workflowDetail')
       this.workflowDetail = JSON.parse(tempData)
       console.log('object  :::::::::>> ',  this.workflowDetail);
-      
+
       // 取得副本通知人員
       this.ccToUSer = this.workflowDetail.copyToUsers
-      
+
       const data = sessionStorage.getItem('newWorkFlow')
       const newNode = JSON.parse(data)
       console.log('newNode :::::::::>> ', newNode);
-      
+
       const reNewNode = sessionStorage.getItem('reNewNode')
       const orinode = JSON.parse(reNewNode)
       console.log('orinode :::::::::>> ', orinode);
@@ -722,14 +722,14 @@ export default {
 
         this.userData = this.userInfo
 
-        
+
 
         console.log('this.userInfo ------>> ', this.userInfo);
       }).catch(err => {
         console.log('error' + err);
       });
     },
-    
+
     // get getDepart
     async getDepartmentList(){
       await getDepartAll({ type: 0 }).then(res=>{
@@ -757,7 +757,7 @@ export default {
         console.log('error' + err);
       });
     },
-    
+
     addNode() {
       // name or group convert id
       this.newFlatNodeDataView.forEach(d =>{
@@ -818,7 +818,7 @@ export default {
       sessionStorage.setItem('workflowNode', JSON.stringify(newNode))
       sessionStorage.setItem('pageAction', JSON.stringify("create"))
       sessionStorage.setItem('routeTo', JSON.stringify("workflowDetail"))
-      
+
       sessionStorage.removeItem('newWorkFlow')
       this.$router.push({ name: 'nodeSetting' })
     },
@@ -833,11 +833,11 @@ export default {
       var handleFlatNodeDataView = [...orinode]
       handleFlatNodeDataView.shift()
 
-      var auditMembers = {        
+      var auditMembers = {
         "auditByUsers": [],
         "auditByGroups": []
       }
-      
+
       console.log('handleFlatNodeDataView ===--->> ', handleFlatNodeDataView);
 
       handleFlatNodeDataView.forEach(i=>{
@@ -852,25 +852,25 @@ export default {
       // 刪除重複
       auditMembers.auditByUsers = [... new Set(auditMembers.auditByUsers)]
       auditMembers.auditByGroups = [... new Set(auditMembers.auditByGroups)]
-      
+
       console.log('auditMembers :>> ', auditMembers);
       sessionStorage.setItem('auditMembers', JSON.stringify(auditMembers))
     },
 
     // maping data for page view
     handleData(){
-      // switch user id to name 
+      // switch user id to name
       var tempNewFlatNodeDataView = [...this.newFlatNodeDataView]
       console.log('this.newFlatNodeDataView  handele ------>> ', this.newFlatNodeDataView);
 
       this.newFlatNodeDataView.forEach(item =>{
         var newArr = []
         if(item.auditByUsers[0] == this.$t('audit.sendAudit.submitterName')) newArr.push( this.$t('audit.sendAudit.submitterName'))
-        
+
         this.userInfo.forEach( u =>{
           if( item.auditByUsers[0] == u.userId || item.auditByUsers[0] == u.userName){
             newArr.push(u.userName)
-          } 
+          }
         })
         item.auditByUsers = newArr
       })
@@ -880,13 +880,13 @@ export default {
         this.department.forEach( u =>{
           if( item.auditByGroups[0] == u.defineId || item.auditByGroups[0] == u.defineName){
             newArr2.push(u.defineName)
-          } 
+          }
         })
         item.auditByGroups = newArr2
       })
     },
 
-    
+
     async getWorkflowList(param){
       await getWorkflowList(param).then(res=>{
         this.allTableData = res.data.content
@@ -944,7 +944,7 @@ export default {
       }else{
         return users.filter(item => item.title == this.curTemplateTitleList )
       }
-    },  
+    },
 
     confirmSearchUsersDialog(){
         console.log('this.ccToUSer ~~~~~~~>', this.ccToUSer)
@@ -959,7 +959,7 @@ export default {
       this.inputSearchUser =''
       this.curTemplateDepartment = ''
       this.curTemplateTitleList = ''
-      
+
       // 清除所有勾選
       this.$refs.usersList.clear()
     },
@@ -969,7 +969,7 @@ export default {
       this.multipleSelection = val.val
       console.log(' this.multipleSelection',  this.multipleSelection)
       this.tags = this.multipleSelection.map(t => (
-        { 
+        {
           userName : t.userName,
           type: 'info'
         }
@@ -992,7 +992,7 @@ export default {
       // [查詢人員]資料
       this.userData.forEach(user =>{
         this.titleList.forEach( title =>{
-          if(title.contents.length !== 0 && title.contents.includes(user.userId)) user.title = title.defineName 
+          if(title.contents.length !== 0 && title.contents.includes(user.userId)) user.title = title.defineName
         })
         // user 會有多個部門
         user.sector = []
@@ -1003,7 +1003,7 @@ export default {
         })
         user.sector = user.sector.join(", ")
       })
-      
+
        // 等待 dialog 生成
       if(this.ccToUSer.length > 0){
         var data = this.ccToUSer
@@ -1014,8 +1014,8 @@ export default {
     },
 
     //======================================
-   
-    
+
+
 
     handleEmitMove(method){
       // console.log('List method ', method);
@@ -1032,7 +1032,7 @@ export default {
           this.newFlatNodeDataView.move(method.index, method.index + 1)
           sessionStorage.setItem('reNewNode', JSON.stringify(this.newFlatNodeDataView))
 
-          break;      
+          break;
         }
         default: {
           break;
@@ -1046,13 +1046,13 @@ export default {
       switch(method){
         case 'set':{
           this.settingWorkFlow(row)
-          break;      
+          break;
         }
         case 'delete':{
           this.rowId = row.id
           console.log('this.rowId :>> ', this.rowId);
           this.showSingleDeleteContent = true
-          break;      
+          break;
         }
         default: {
           break;
@@ -1124,7 +1124,7 @@ export default {
       // })
 
       console.log('this.newFlatNodeDataView :~~~~~:::::::>> ', this.newFlatNodeDataView);
-      
+
       sessionStorage.removeItem('newWorkFlow')
       sessionStorage.setItem('reNewNode', JSON.stringify(this.newFlatNodeDataView))
 
@@ -1151,7 +1151,7 @@ export default {
           if( i == u.defineName) auditMembers.auditByGroups.push(u.defineId)
         })
       })
-      
+
       sessionStorage.setItem('auditMembers', JSON.stringify(auditMembers))
       this.fullscreenLoading = false
     },
@@ -1170,7 +1170,7 @@ export default {
         this.$refs.workflowName.focus()
         return
       }
-  
+
 
       var repeatResult = this.allTableData.some(i => i.name == this.workflowDetail.name)
       console.log('repeatResult~~~~ :>> ', repeatResult);
@@ -1182,7 +1182,7 @@ export default {
         this.$refs.workflowName.focus()
         return
       }
-      
+
 
       // 刪除非 api 產生的 id
       this.newFlatNodeDataView.forEach(i =>{
@@ -1205,7 +1205,7 @@ export default {
           if(currentGroup.length > 0) d.auditByGroups.push(currentGroup[0].defineId)
         }
       })
-      
+
       const orderedAuditNodeArray = [...this.newFlatNodeDataView]
       console.log('orderedAuditNodeArray :>> ', orderedAuditNodeArray);
 
@@ -1251,32 +1251,32 @@ export default {
           console.log('error' + err);
       })
     },
-    
+
   }
 
 };
 </script>
+
+
 <style lang="sass">
-  // .el-select
-  //   .el-input--medium
-  //     .el-input__inner
-  //       height: auto !important;
-  // .notify_person
-  //   .el-tag.el-tag--info
-  //     overflow: hidden
-  //     text-overflow: ellipsis
-  //     white-space: nowrap
-  //     .el-select__tags-text
+  .workflow
+    .el-table .cell
+      text-align: left !important
+    .cell-class
+      &:first-child
+        .cell
+          margin-left: calc(30 / 1920* 100vw) !important;
 </style>
+
 
 <style lang="sass" scoped>
   .el-select
     width: 300px !important
-  .is-multiple 
-    .el-select-dropdown__item 
+  .is-multiple
+    .el-select-dropdown__item
         padding-left: 10px !important
         border-left: solid 1px #FFF
-    .el-select-dropdown__item.selected 
+    .el-select-dropdown__item.selected
         padding-left: 10px !important
         border-left: solid 1px rgba(44, 144, 217, 0.34)
 
@@ -1292,7 +1292,7 @@ export default {
     ul
       padding-left: 0
 
-      li 
+      li
         margin-left: 18px
         line-height: 1.5
 
@@ -1314,13 +1314,13 @@ export default {
     margin: 30px
   .storevue-textarea
     width: 50vw
-    
+
   .device-select
     .el-input
       .el-input__inner
           height: 36px !important
           padding-right: 50px
-          
+
   .icon-gengduo
     width: 24px
     height: 24px
@@ -1341,7 +1341,7 @@ export default {
     position: absolute
     right: 1%
     top: 5px
-  
+
   .search_member
     height: 36px
     font-size: 14px
@@ -1353,16 +1353,16 @@ export default {
     width: fit-content
     cursor: pointer
     margin-left: 20px
-    i 
+    i
       margin-right: 5px
       color: #006ab7
-  
+
   .dialog-content
     width: 100%
     .showing_search_user
       width: 100%
       height: 500px
-      
+
       .filter_section
         background: #FFF
         display: flex
@@ -1406,7 +1406,7 @@ export default {
           flex-direction: row
           justify-content: flex-start
           .el-tag
-            margin-right: 5px 
+            margin-right: 5px
             margin-bottom: 5px
 
       .users
@@ -1415,7 +1415,7 @@ export default {
         border-radius: 5px
 
 
- 
+
 </style>
 
 <style scoped>
@@ -1493,9 +1493,9 @@ export default {
   }
 
   .name-tips{
-    display:flex; 
+    display:flex;
     flex-direction:column;
-    
+
   }
   .error-text{
     font-size: 12px;
@@ -1591,7 +1591,7 @@ export default {
     font-size: 12px;
   }
   .template-select-area{
-    display:flex; 
+    display:flex;
     flex-direction:row;
     height:calc(30/1920*100vw);
     width:200px;
@@ -1645,14 +1645,14 @@ export default {
     align-items: flex-start
     .audit-user
       margin-right: 10px
-  
+
   .tablelist
     .el-table__row
       &:first-child
         .el-table_1_column_6
           .cell
             display: none !important
-            
+
   .title-status
     .el-input__count-inner
       margin-top: 55px
@@ -1665,7 +1665,7 @@ export default {
           .cell
             width: 50px
             margin-left: -28px
-            
+
 
 
   .users
@@ -1677,16 +1677,16 @@ export default {
       border-color: #2c90d9 !important
       &:hover
         border-color: #dcdfe6 !important
-    .is-focus .el-checkbox__inner      
+    .is-focus .el-checkbox__inner
       border-color: #dcdfe6 !important
-    
+
     .el-checkbox__inner:hover
       border-color: #190 !important
-      
+
   .title-status
     .el-input__count-inner
       margin-top: 55px
-  
+
   .text_limit_notice
     position: absolute
     text-align: right
