@@ -1265,7 +1265,12 @@ export default {
     .cell-class
       &:first-child
         .cell
-          margin-left: calc(30 / 1920* 100vw) !important;
+          margin-left: calc( 25 / 1920* 100vw) !important;
+      &:last-child
+        .cell
+          margin-left: -5px !important;
+      .cell
+          margin-left: calc( 5 / 1920* 100vw) !important;
 </style>
 
 
