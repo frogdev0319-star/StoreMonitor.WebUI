@@ -1755,6 +1755,9 @@ export default{
         "centebottomRightrLeft": "右下",
         "inputName": "請輸入自定義名稱！",
         "screenShots": "限制螢幕截圖",
+        "advanceMgt": "進階管理",
+        "back": "返回",
+
     },
     "reportAndEvents":{
         "reportType": "報表類型",
@@ -1763,9 +1766,6 @@ export default{
         "changeStatus": "請確認是否變更狀態為",
         "unprocessed": "未處理",
     },
-
-
-    
     "createinspect":{
         "save": "儲存",
         "tabeleSetting": "表單設定",
@@ -1801,11 +1801,22 @@ export default{
         "confirmDelete": "是否確認刪除報告",
         "notice_1": "請注意！刪除報告後資料無法復原，請確保您要刪除的報告是正確的，請謹慎操作。 為確保報告的安全刪除，請提供用戶密碼並勾選 ",
         "notice_2": "「我理解並同意刪除報告」",
-        "notice_3": "如果您有任何疑問或需要協助，請隨時聯絡我們的客服團隊。」",
+        "notice_3": "如果您有任何疑問或需要協助，請隨時聯絡我們的客服團隊。",
         "agreeDelete": "我理解並同意刪除報告",
         "deleteReason": "刪除原因",
         "insertPassword": "請再次輸入使用者密碼",
-    }
+    },
 
+    "addition":{
+        "insertPassword": "已結案事件變更",
+        "operator": "操作人",
+        "OperatingTime": "操作時間",
+        "uploadTime": "報告上傳時間:",
+        "deleted": "已刪除",
+        "event": "事件:",
+        "eventTime": "事件時間:",
+        "ChangeToUnprocessed": "變更為未處理",
+    }
+    
 }
 
