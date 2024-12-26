@@ -31,7 +31,7 @@ export default{
     "itemSetting":"巡檢項設置",
     "leftBracket":"（",
     "logOut":"登出",
-    "changePWD":"修改密碼",						 
+    "changePWD":"修改密碼",
     "loginAbnormal":"登入信息異常，請重新登入！",
     "meta":"智慧巡檢",
     "mgt":"智慧巡檢",
@@ -311,8 +311,8 @@ export default{
   },
   "remotePatrol":{
       "InspectionDetail":"匯出報告",
-	  "exportPDF":"PDF匯出",
-      "exportExcel":"EXCEL匯出",				  
+	    "exportPDF":"PDF匯出",
+      "exportExcel":"EXCEL匯出",
       "Patroltips2":"此巡檢表名稱已存在",
       "TableGet":"得分",
       "TableIgnore":"不適用",
@@ -606,7 +606,7 @@ export default{
       "events":"處理事件",
       "exportReport":"匯出Excel",
 	  "exportReportDetail":"報告明細匯出",
-      "exportEntailReport":"報告完整匯出",									
+      "exportEntailReport":"報告完整匯出",
       "handled":"已處理",
       "handling":"處理",
       "methods":"選擇處理方式",
@@ -679,7 +679,7 @@ export default{
       "confirmDelData":"確認刪除當前巡檢表?",
       "confirmDelete":"確認刪除",
       "confirmSelecDel":"確認是否刪除勾選的巡檢項？",
-	  "confirmSelecDel_":"(刪除後請重新調整權重值)",		   
+	  "confirmSelecDel_":"(刪除後請重新調整權重值)",
       "confirmToBindData":"巡檢表尚未與職務關聯",
       "confirmToSetRule":"巡檢表導入成功，是否現在設置巡檢考評規則？",
       "contains":"共分",
@@ -1817,6 +1817,6 @@ export default{
         "eventTime": "事件時間:",
         "ChangeToUnprocessed": "變更為未處理",
     }
-    
+
 }
 
