@@ -19,7 +19,7 @@
                 <!-- 基本信息 -->
                 <div class="flex-row" style="margin-right: 30px">
                   <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.workFlowName')}}</div>
-                  <div class="title-status"> 
+                  <div class="title-status">
                     <el-input
                       ref="workflowName"
                       :placeholder="workflowDetail.name"
@@ -29,13 +29,13 @@
                       />
                       <span class="text_limit_notice" v-if="showInputLimit"> {{$t('remotePatrol.eventNameRuletip')}}   </span>
                   </div>
-                  
+
                 </div>
 
                 <!-- 分類流程 -->
                 <div class="flex-row" style="margin-right: 30px">
                   <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.workFlowClassification')}}</div>
-                  <div class="title-status"> 
+                  <div class="title-status">
                     <el-select
                       v-model="curTemplateIndex"
                       :placeholder="$t('audit.workFlows.inspectionForm')"
@@ -56,7 +56,7 @@
                   <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.signoffMode')}}</div>
                       <el-radio-group class="storevue-radio" v-model="workflowDetail.cancelable" >
                         <div class="flex-row" style="margin-right: 30px">
-                          <el-radio :label="false">{{$t('audit.workFlows.canNotCancel')}}</el-radio>  
+                          <el-radio :label="false">{{$t('audit.workFlows.canNotCancel')}}</el-radio>
                             <el-tooltip
                               class="date-time-tooltip"
                               effect="light"
@@ -104,7 +104,7 @@
               <!-- 流程描述 -->
               <div class="setting-config" style="margin-bottom: 20px;">
                 <div class="title-name">{{$t('audit.workFlows.workFlowDescription')}}</div>
-                <div class="title-status"> 
+                <div class="title-status">
                   <el-input
                     v-model="workflowDetail.description"
                     :autosize="{ minRows: 3, maxRows: 5 }"
@@ -139,7 +139,7 @@
                 <div class="tablelist flow-setting" v-loading.fullscreen.lock="fullscreenLoading">
                   <table-only
                     ref="elTP"
-                    class="table-white"
+                    class="table-white workflow"
                     :column-data="columnData"
                     :table-data="newFlatNodeDataView"
                     :tableworkflowOperation ="columnOperationData"
@@ -148,7 +148,7 @@
                     :allowRowExpand = "false"
                     :showBorder = "false"
                     :default-sort = "{prop: 'createTime', order: 'descending'}"
-                    :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+                    :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}"
                     :tableHeight = "760"
                     :cellStyle="{backgroundColor: '#fff !important'}"
                     :indexType="indexType"
@@ -168,7 +168,7 @@
                   multiple
                   filterable
                   :placeholder="$t('audit.workFlows.findUser')"
-                  :loading="loading" 
+                  :loading="loading"
                   style="300px">
                   <el-option
                     v-for="user in userInfo"
@@ -178,7 +178,7 @@
                   </el-option>
                 </el-select>
             </div>
-            <div class="search_member" @click="handelePopupUserList"><i class="iconfont el-icon-view iconbangzhu"/> {{$t('audit.workFlows.findUser')}}</div>  
+            <div class="search_member" @click="handelePopupUserList"><i class="iconfont el-icon-view iconbangzhu"/> {{$t('audit.workFlows.findUser')}}</div>
 
           </div>
         </div>
@@ -222,7 +222,7 @@
                 <!-- 關鍵字 -->
                 <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
                   <div class="title-name">{{$t('audit.workFlows.keywords')}}</div>
-                  <div class="title-status"> 
+                  <div class="title-status">
                     <el-input
                       v-model="inputSearchUser"
                       :placeholder="$t('audit.workFlows.searchNameMail')"
@@ -234,7 +234,7 @@
                 <!-- 部門 -->
                 <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
                   <div class="title-name">  {{$t('audit.workFlows.depart')}}</div>
-                  <div class="title-status"> 
+                  <div class="title-status">
                     <el-select
                       v-model="curTemplateDepartment"
                       :placeholder="$t('audit.workFlows.depart')"
@@ -252,7 +252,7 @@
                 <!-- 職務 -->
                 <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
                   <div class="title-name"> {{$t('audit.workFlows.position')}}</div>
-                  <div class="title-status"> 
+                  <div class="title-status">
                     <el-select
                       v-model="curTemplateTitleList"
                       :placeholder="$t('audit.workFlows.position')"
@@ -289,12 +289,12 @@
                 :column-data ="userColumnData"
                 :table-data ="searchUserData"
                 :showSelectionColumn = showSelectionColumn
-                
+
                 :highlight-current-row = "false"
                 :is-loading-data ="isLoadingData"
                 :allowRowExpand = "false"
                 :showBorder = "false"
-                :headerStyle ="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+                :headerStyle ="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}"
                 :cellStyle ="{backgroundColor: '#fff !important'}"
                 @handleSelectionChange = "handleSelectionChange "
               />
@@ -310,12 +310,12 @@
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
 import {
-  getNodeList, 
-  updateWorkflow,   
-  getWorkflowList, 
+  getNodeList,
+  updateWorkflow,
+  getWorkflowList,
   creadNewFlow,
   getUserStatus,
-  
+
   } from "@/api/workflow";
 import {getUserTitleList } from "@/api/title";
 import {getUserInfo, getAllUserInfoNoAuth, getDepartAll} from '@/api/login';
@@ -336,7 +336,7 @@ export default {
   data() {
     return {
       ccToUSer: [],
-    
+
       showSingleDeleteContent: false,
       dataFromRoute: {},
       workflowDetail: {},
@@ -387,7 +387,7 @@ export default {
       userData:[],
       inputSearchUser: '',
       showSelectionColumn: true,
-  
+
       showingSearchUser: false,
       inputSearchUser: '',
       titleList:[],
@@ -456,7 +456,7 @@ export default {
           'maxWidth': 100,
           'signature': true,
         },
-        
+
       ],
       indexType: true,
       penSrc: require('../../../../static/img/table-edit.png'),
@@ -494,7 +494,7 @@ export default {
   },
 
   computed: {
-  
+
     searchUserData: {
       get(){
         return this.filterInputSearchUser(this.filterCurTemplateDepartment(this.filterCurTemplateTitleList(this.userData)))
@@ -507,15 +507,15 @@ export default {
 
   methods: {
     async init(){
-      // await this.getNodeList(this.infoForm.processDefinitionKey) 
+      // await this.getNodeList(this.infoForm.processDefinitionKey)
 
-      await this.getTitle() 
-      await this.getUserInfo() 
-      await this.getDepartmentList() 
+      await this.getTitle()
+      await this.getUserInfo()
+      await this.getDepartmentList()
       await this.initBasicData()
 
       await this.getWorkflowList(this.apiBody)
-      
+
       const result = await this.$store.dispatch("GetUserAuthorities");
       this.currentUser = result.data.userId
 
@@ -526,25 +526,25 @@ export default {
       switch(pageAction){
         case 'init':{
           console.log('go init !!');
-          this.initFirstNode() 
-          break;      
+          this.initFirstNode()
+          break;
         }
         case 'create':{
           console.log('go create !!');
           this.getNodeData()
-          break;      
+          break;
         }
         case 'edit':{
           console.log('go edit !!');
           this.handleEdit()
-          break;      
+          break;
         }
         default: {
           break;
         }
       }
       await this.getPickedMember()
-      await this.handleData() 
+      await this.handleData()
 
     },
 
@@ -572,8 +572,8 @@ export default {
       var data = sessionStorage.getItem('workflowDetail')
       var workflowDetail = JSON.parse(data)
 
-      
-      
+
+
       if(workflowDetail == null){
         this.workflowDetail = initBasicData
       } else {
@@ -618,7 +618,7 @@ export default {
           "unHandleNotifyDay": null
         },
       ]
-      
+
       // console.log('this.currentUser 2', this.currentUser)
       // initData[0].auditByUsers.push(this.currentUser)
       initData[0].auditByUsers.push(this.$t('audit.sendAudit.submitterName'))
@@ -644,14 +644,14 @@ export default {
 
         this.newFlatNodeDataView = orinode
         console.log('orinode 2 >> ', orinode);
-        
+
       }else{
         sessionStorage.setItem('reNewNode', JSON.stringify(orinode))
         this.newFlatNodeDataView = orinode
       }
       sessionStorage.removeItem('newWorkFlow')
     },
-    
+
     handleEdit(){
       console.log('this is Edit')
 
@@ -660,7 +660,7 @@ export default {
 
       // 取得副本通知人員
       this.ccToUSer = this.workflowDetail.copyToUsers
-      
+
       const reNewNode = sessionStorage.getItem('reNewNode')
       const orinode = JSON.parse(reNewNode)
 
@@ -674,7 +674,7 @@ export default {
       } else {
         this.newFlatNodeDataView = orinode
       }
-      
+
       sessionStorage.removeItem('newWorkFlow')
     },
 
@@ -777,7 +777,7 @@ export default {
       sessionStorage.setItem('workflowNode', JSON.stringify(newNode))
       sessionStorage.setItem('pageAction', JSON.stringify("create"))
       sessionStorage.setItem('routeTo', JSON.stringify("createWorkflow"))
-      
+
       sessionStorage.removeItem('newWorkFlow')
       this.$router.push({ name: 'createNodeSetting' })
     },
@@ -792,11 +792,11 @@ export default {
       var handleFlatNodeDataView = [...orinode]
       handleFlatNodeDataView.shift()
 
-      var auditMembers = {        
+      var auditMembers = {
         "auditByUsers": [],
         "auditByGroups": []
       }
-      
+
       console.log('handleFlatNodeDataView ===--->> ', handleFlatNodeDataView);
 
       handleFlatNodeDataView.forEach(i=>{
@@ -811,7 +811,7 @@ export default {
       // 刪除重複
       auditMembers.auditByUsers = [... new Set(auditMembers.auditByUsers)]
       auditMembers.auditByGroups = [... new Set(auditMembers.auditByGroups)]
-      
+
       console.log('auditMembers :>> ', auditMembers);
       sessionStorage.setItem('auditMembers', JSON.stringify(auditMembers))
     },
@@ -871,7 +871,7 @@ export default {
       }else{
         return users.filter(item => item.title == this.curTemplateTitleList )
       }
-    },  
+    },
 
     confirmSearchUsersDialog(){
         console.log('this.ccToUSer ~~~~~~~>', this.ccToUSer)
@@ -886,7 +886,7 @@ export default {
       this.inputSearchUser =''
       this.curTemplateDepartment = ''
       this.curTemplateTitleList = ''
-      
+
       // 清除所有勾選
       this.$refs.usersList.clear()
     },
@@ -896,7 +896,7 @@ export default {
       this.multipleSelection = val.val
       console.log(' this.multipleSelection',  this.multipleSelection)
       this.tags = this.multipleSelection.map(t => (
-        { 
+        {
           userName : t.userName,
           type: 'info'
         }
@@ -919,7 +919,7 @@ export default {
       // [查詢人員]資料
       this.userData.forEach(user =>{
         this.titleList.forEach( title =>{
-          if(title.contents.length !== 0 && title.contents.includes(user.userId)) user.title = title.defineName 
+          if(title.contents.length !== 0 && title.contents.includes(user.userId)) user.title = title.defineName
         })
         // user 會有多個部門
         user.sector = []
@@ -930,7 +930,7 @@ export default {
         })
         user.sector = user.sector.join(", ")
       })
-      
+
        // 等待 dialog 生成
       if(this.ccToUSer.length > 0){
         var data = this.ccToUSer
@@ -984,7 +984,7 @@ export default {
 
     // maping data for page view
     handleData(){
-      // switch user id to name 
+      // switch user id to name
       var tempNewFlatNodeDataView = [...this.newFlatNodeDataView]
       console.log('tempNewFlatNodeDataView  handele ------>> ', tempNewFlatNodeDataView);
       console.log('this.newFlatNodeDataView  handele ------>> ', this.newFlatNodeDataView);
@@ -992,11 +992,11 @@ export default {
       this.newFlatNodeDataView.forEach(item =>{
         var newArr = []
         if(item.auditByUsers[0] == this.$t('audit.sendAudit.submitterName')) newArr.push( this.$t('audit.sendAudit.submitterName'))
-        
+
         this.userInfo.forEach( u =>{
           if( item.auditByUsers[0] == u.userId || item.auditByUsers[0] == u.userName){
             newArr.push(u.userName)
-          } 
+          }
         })
         item.auditByUsers = newArr
       })
@@ -1006,8 +1006,8 @@ export default {
         item.auditByGroups.forEach(id =>{
           this.department.forEach(d =>{
             if(id == d.defineId){
-              newArr2.push(d.defineName)  
-            } 
+              newArr2.push(d.defineName)
+            }
           })
         })
         item.auditByGroups = newArr2
@@ -1029,7 +1029,7 @@ export default {
           this.newFlatNodeDataView.move(method.index, method.index + 1)
           sessionStorage.setItem('reNewNode', JSON.stringify(this.newFlatNodeDataView))
 
-          break;      
+          break;
         }
         default: {
           break;
@@ -1043,13 +1043,13 @@ export default {
       switch(method){
         case 'set':{
           this.settingWorkFlow(row)
-          break;      
+          break;
         }
         case 'delete':{
           this.rowId = row.id
           console.log('this.rowId :>> ', this.rowId);
           this.showSingleDeleteContent = true
-          break;      
+          break;
         }
         default: {
           break;
@@ -1120,7 +1120,7 @@ export default {
       // })
 
       console.log('this.newFlatNodeDataView :~~~~~:::::::>> ', this.newFlatNodeDataView);
-      
+
       sessionStorage.removeItem('newWorkFlow')
       sessionStorage.setItem('reNewNode', JSON.stringify(this.newFlatNodeDataView))
 
@@ -1147,7 +1147,7 @@ export default {
           if( i == u.defineName) auditMembers.auditByGroups.push(u.defineId)
         })
       })
-      
+
       sessionStorage.setItem('auditMembers', JSON.stringify(auditMembers))
       this.fullscreenLoading = false
     },
@@ -1172,9 +1172,9 @@ export default {
         this.$refs.workflowName.focus()
         return
       }
-      
+
       this.newFlatNodeDataView.forEach(d =>{
-        delete d.id 
+        delete d.id
         if(d.auditByUsers.length !== 0 ){
           var currentUser = this.userInfo.filter(u => u.userName == d.auditByUsers[0])
           d.auditByUsers = []
@@ -1188,7 +1188,7 @@ export default {
           if(currentGroup.length > 0)  d.auditByGroups.push(currentGroup[0].defineId)
         }
       })
-      
+
       // console.log('this.newFlatNodeDataView !!!!!!', this.newFlatNodeDataView)
 
       this.newFlatNodeDataView.push('null')
@@ -1231,15 +1231,28 @@ export default {
 
 };
 </script>
-
+<style lang="sass">
+  .workflow
+    .el-table .cell
+      text-align: left !important
+    .cell-class
+      &:first-child
+        .cell
+          margin-left: calc( 25 / 1920* 100vw) !important;
+      &:last-child
+        .cell
+          margin-left: -5px !important;
+      .cell
+          margin-left: calc( 5 / 1920* 100vw) !important;
+</style>
 <style lang="sass" scoped>
   .el-select
       width: 300px !important
-  .is-multiple 
-    .el-select-dropdown__item 
+  .is-multiple
+    .el-select-dropdown__item
         padding-left: 10px !important
         border-left: solid 1px #FFF
-    .el-select-dropdown__item.selected 
+    .el-select-dropdown__item.selected
         padding-left: 10px !important
         border-left: solid 1px rgba(44, 144, 217, 0.34)
 
@@ -1255,7 +1268,7 @@ export default {
     ul
       padding-left: 0
 
-      li 
+      li
         margin-left: 18px
         line-height: 1.5
 
@@ -1277,13 +1290,13 @@ export default {
     margin: 30px
   .storevue-textarea
     width: 50vw
-    
+
   .device-select
     .el-input
       .el-input__inner
           height: 36px
           padding-right: 50px
-          
+
   .icon-gengduo
     width: 24px
     height: 24px
@@ -1304,7 +1317,7 @@ export default {
     position: absolute
     right: 1%
     top: 5px
-  
+
   .search_member
     height: 36px
     font-size: 14px
@@ -1316,16 +1329,16 @@ export default {
     width: fit-content
     cursor: pointer
     margin-left: 20px
-    i 
+    i
       margin-right: 5px
       color: #006ab7
-  
+
   .dialog-content
     width: 100%
     .showing_search_user
       width: 100%
       height: 500px
-      
+
       .filter_section
         background: #FFF
         display: flex
@@ -1369,7 +1382,7 @@ export default {
           flex-direction: row
           justify-content: flex-start
           .el-tag
-            margin-right: 5px 
+            margin-right: 5px
             margin-bottom: 5px
 
       .users
@@ -1456,9 +1469,9 @@ export default {
   }
 
   .name-tips{
-    display:flex; 
+    display:flex;
     flex-direction:column;
-    
+
   }
   .error-text{
     font-size: 12px;
@@ -1554,7 +1567,7 @@ export default {
     font-size: 12px;
   }
   .template-select-area{
-    display:flex; 
+    display:flex;
     flex-direction:row;
     height:calc(30/1920*100vw);
     width:200px;
@@ -1606,14 +1619,14 @@ export default {
     align-items: flex-start
     .audit-user
       margin-right: 10px
-  
+
   .tablelist
     .el-table__row
       &:first-child
         .el-table_1_column_6
           .cell
             display: none !important
-            
+
   .title-status
     .el-input__count-inner
       margin-top: 55px
@@ -1626,7 +1639,7 @@ export default {
           .cell
             width: 50px
             margin-left: -28px
-            
+
 
 
   .users
@@ -1635,12 +1648,12 @@ export default {
       border-color: #2c90d9 !important
       &:hover
         border-color: #dcdfe6 !important
-    .is-focus .el-checkbox__inner      
+    .is-focus .el-checkbox__inner
       border-color: #dcdfe6 !important
-    
+
     .el-checkbox__inner:hover
       border-color: #190 !important
-      
+
   .title-status
     .el-input__count-inner
       margin-top: 55px

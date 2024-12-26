@@ -5,12 +5,12 @@
       {{$t('route.nodeSetting')}}
       <div class="spacer"/>
       <!-- 儲存 -->
-      <delay-button 
-        type="filled" 
+      <delay-button
+        type="filled"
         @click="saveNode"
         v-loading.fullscreen.lock="fullscreenLoading"
         >{{$t('audit.workFlows.save')}}</delay-button>
-        
+
     </div>
 
     <!-- 基本信息 -->
@@ -33,21 +33,21 @@
                     />
                     <span class="text_limit_notice" style="position: absolute;" v-if="showInputLimit"> 最多可輸入 20 個字元  </span>
                 </div>
-                
+
                 <el-radio-group class="select_audit storevue-radio" v-model="nodeData.auditTargetType">
                   <!-- 簽核部門 -->
-                  
+
                   <div class="select_audit_dep">
-                    <el-radio :label="1">{{$t('audit.workFlows.auditDepart')}}</el-radio> 
-                    <el-select 
-                      v-model="departmentStatus" 
-                      :placeholder="$t('audit.workFlows.selectAuditDepart')" 
+                    <el-radio :label="1">{{$t('audit.workFlows.auditDepart')}}</el-radio>
+                    <el-select
+                      v-model="departmentStatus"
+                      :placeholder="$t('audit.workFlows.selectAuditDepart')"
                       :disabled="nodeData.auditTargetType == 0 || nodeData.auditTargetType == null">
                       <el-option
                         v-for="item in department"
                         :key="item.defineId"
                         :label="item.defineName"
-                        :value="item.defineId" 
+                        :value="item.defineId"
                         />
                     </el-select>
                   </div>
@@ -59,7 +59,7 @@
                       v-model="auditUsers"
                       filterable
                       :placeholder="$t('audit.workFlows.selectAuditUser')"
-                      :loading="loading" 
+                      :loading="loading"
                       :disabled="nodeData.auditTargetType == 1 || nodeData.auditTargetType == null"
                       >
                       <el-option
@@ -71,9 +71,9 @@
                     </el-select>
                   </div>
                 </el-radio-group>
-              
-                <div class="search_member" @click="handelePopupUserList" :class="{clickable : nodeData.auditTargetType == 0}"><i class="iconfont el-icon-view iconbangzhu"/> {{$t('audit.workFlows.findUser')}}</div>  
-                
+
+                <div class="search_member" @click="handelePopupUserList" :class="{clickable : nodeData.auditTargetType == 0}"><i class="iconfont el-icon-view iconbangzhu"/> {{$t('audit.workFlows.findUser')}}</div>
+
               </div>
 
               <!-- row -->
@@ -81,7 +81,7 @@
                 <div class="title-name">{{$t('audit.workFlows.auditMethod')}}</div>
                 <div class="flex">
                   <el-radio-group class="storevue-radio" v-model="nodeData.auditMethod">
-                    <el-radio :label="0" style="margin-right: 0">{{$t('audit.workFlows.countersigned')}}</el-radio>  
+                    <el-radio :label="0" style="margin-right: 0">{{$t('audit.workFlows.countersigned')}}</el-radio>
                     <el-tooltip
                       class="date-time-tooltip"
                       effect="light"
@@ -109,7 +109,7 @@
                     <!-- 定義同意 -->
                     <div class="approve_row">
                       <el-radio-group class="storevue-radio flex-row" v-model="btnDefaultAgree">
-                        <el-radio :label="0">{{$t('audit.workFlows.agree')}}</el-radio>  
+                        <el-radio :label="0">{{$t('audit.workFlows.agree')}}</el-radio>
                         <el-radio :label="1">{{$t('audit.workFlows.define')}}</el-radio>
                         <el-input
                           :placeholder="$t('audit.workFlows.defineItem')"
@@ -119,14 +119,14 @@
                           class="input-name"
                           @input="(val) => itemDefineChanged_a(val, 8)"
                           />
-                          
+
                       </el-radio-group>
                       <span class="text_limit_notice" style="position: initial;" v-if="showDefineLimit_a"> {{$t('insSettingView.btnAttrLength')}} </span>
                     </div>
                     <!-- 定義拒絕 -->
                     <div class="approve_row">
                       <el-radio-group class="storevue-radio flex-row" v-model="btnDefaultReject">
-                        <el-radio :label="0">{{$t('audit.workFlows.reject')}}</el-radio>  
+                        <el-radio :label="0">{{$t('audit.workFlows.reject')}}</el-radio>
                         <el-radio :label="1">{{$t('audit.workFlows.define')}}</el-radio>
                         <el-input
                           :placeholder="$t('audit.workFlows.defineItem')"
@@ -144,7 +144,7 @@
                     <!-- 定義撤回 -->
                     <div class="approve_row" style="margin-top: 3px">
                       <el-radio-group class="storevue-radio flex-row"  v-model="btnDefaultDrawback">
-                        <el-radio :label="0">{{$t('audit.workFlows.withdraw')}}</el-radio>  
+                        <el-radio :label="0">{{$t('audit.workFlows.withdraw')}}</el-radio>
                         <el-radio :label="1">{{$t('audit.workFlows.define')}}</el-radio>
                         <el-input
                           :placeholder="$t('audit.workFlows.defineItem')"
@@ -157,7 +157,7 @@
                       </el-radio-group>
                       <span class="text_limit_notice" style="position: initial;" v-if="showDefineLimit_c"> {{$t('insSettingView.btnAttrLength')}} </span>
                     </div>
-                    
+
                 </div>
               </div>
 
@@ -234,7 +234,7 @@
                 <!-- 關鍵字 -->
                 <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
                   <div class="title-name" style="width: fit-content;">{{$t('audit.workFlows.keywords')}} </div>
-                  <div class="title-status"> 
+                  <div class="title-status">
                     <el-input
                       v-model="inputSearchUser"
                       :placeholder="$t('audit.workFlows.searchNameMail')"
@@ -246,7 +246,7 @@
                 <!-- 部門 -->
                 <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
                   <div class="title-name" style="width: fit-content;"> {{$t('audit.workFlows.depart')}}</div>
-                  <div class="title-status"> 
+                  <div class="title-status">
                     <el-select
                       v-model="curTemplateDepartment"
                       :placeholder="$t('audit.workFlows.depart')"
@@ -264,7 +264,7 @@
                 <!-- 職務 -->
                 <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
                   <div class="title-name" style="width: fit-content;"> {{$t('audit.workFlows.position')}}</div>
-                  <div class="title-status"> 
+                  <div class="title-status">
                     <el-select
                       v-model="curTemplateTitleList"
                       :placeholder="$t('audit.workFlows.position')"
@@ -301,12 +301,12 @@
                 :column-data ="userColumnData"
                 :table-data ="searchUserData"
                 :showSelectionColumn = showSelectionColumn
-                
+
                 :highlight-current-row = "false"
                 :is-loading-data ="isLoadingData"
                 :allowRowExpand = "false"
                 :showBorder = "false"
-                :headerStyle ="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+                :headerStyle ="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}"
                 :cellStyle ="{backgroundColor: '#fff !important'}"
                 @handleSelectionChange = "handleSelectionChange "
               />
@@ -343,7 +343,7 @@ export default {
     return {
       nodeData: [],
       infoForm: {},
-      apiData: {}, 
+      apiData: {},
       loading: false,
 
       dataFromRoute: {},
@@ -383,7 +383,7 @@ export default {
       userData:[],
       inputSearchUser: '',
       showSelectionColumn: true,
-  
+
       showingSearchUser: false,
       inputSearchUser: '',
       titleList:[],
@@ -391,7 +391,7 @@ export default {
       departmentAry:[],
       curTemplateDepartment: '',
       curTemplateTitleList: '',
-      
+
 
       // 簽核人員
       auditUsers:[],
@@ -399,7 +399,7 @@ export default {
       basicList: [],
       isLoadingData: false,
       workflowDescription: '',
-    
+
       sector: 0,
       btnDefaultAgree: 0,
       btnDefaultReject: 0,
@@ -416,9 +416,9 @@ export default {
 
       changeNotify: false
     };
-    
+
   },
-  watch:{ 
+  watch:{
 
     changeNotify(val){
       if(val == true){
@@ -431,11 +431,11 @@ export default {
       }
     },
 
-    
+
     btnDefaultAgree(){
       if(this.btnDefaultAgree == 1){
         this.nodeData.customButton[0].text = this.defineAgree
-      }   
+      }
       if(this.btnDefaultReject == 1){
         this.nodeData.customButton[1].text = this.defineReject
       }
@@ -448,7 +448,7 @@ export default {
   mounted() {},
   async created() {
     await this.init()
-    
+
   },
   computed: {
     searchUserData: {
@@ -468,13 +468,13 @@ export default {
       this.auditMembers = JSON.parse(data)
       console.log('this.auditMembers :>> ', this.auditMembers);
 
-      await this.getNodeInfo() 
+      await this.getNodeInfo()
       await this.getWorkflowInfo()
       await this.getUserInfo()
       await this.getDepartmentList()
-      
+
       await this.getTitle()
-    }, 
+    },
 
     // get user
     async getUserInfo(){
@@ -487,7 +487,7 @@ export default {
         })
         let newAuditByUsersArr = []
         if(this.auditMembers !== null){
-          if(this.nodeData.auditByUsers.length !== 0){  
+          if(this.nodeData.auditByUsers.length !== 0){
             this.auditMembers.auditByUsers = this.auditMembers.auditByUsers.filter(i => i !== this.nodeData.auditByUsers[0])
           }
           newAuditByUsersArr = this.userInfo.filter(i => !this.auditMembers.auditByUsers.includes(i.userId))
@@ -507,7 +507,7 @@ export default {
       });
     },
 
-  
+
     // get getDepart
     async getDepartmentList(){
       await getDepartAll({ type: 0 }).then(res=>{
@@ -516,11 +516,11 @@ export default {
 
         let newAuditByGroupsArr = []
         if(this.auditMembers !== null){
-          if(this.nodeData.auditByGroups.length !== 0){  
+          if(this.nodeData.auditByGroups.length !== 0){
             this.auditMembers.auditByGroups = this.auditMembers.auditByGroups.filter(i => i !== this.nodeData.auditByGroups[0])
             this.departmentStatus = this.nodeData.auditByGroups[0]
             newAuditByGroupsArr = AllDepartment.filter(i => !this.auditMembers.auditByGroups.includes(i.defineId))
-            
+
             this.department = newAuditByGroupsArr
             // console.log('this.department ::::::::::>> ', this.department);
             // console.log('this.departmentStatus ::::::::::>> ', this.departmentStatus);
@@ -531,7 +531,7 @@ export default {
             this.departmentStatus = newAuditByGroupsArr[0].defineId
           }
         }
-        
+
         this.departmentAry = res.data.map( i => i = i.defineName)
         this.departmentAry.unshift(this.$t('overview.allDepartment'))
       }).catch(err => {
@@ -564,7 +564,7 @@ export default {
       this.infoForm.type = this.$t('audit.workFlows.inspectionForm')
       console.log(' this.infoForm :>> ',  this.infoForm);
     },
-    
+
     async getNodeInfo(){
       const data = sessionStorage.getItem('workflowNode')
       const apiData = sessionStorage.getItem('nodeDataToApi')
@@ -576,13 +576,13 @@ export default {
 
       if(this.nodeData.customButton.length < 3){
         const drawBackBtn = {
-            type: 2, 
-            text: this.$t('audit.workFlows.withdraw'), 
+            type: 2,
+            text: this.$t('audit.workFlows.withdraw'),
             enable: true
         }
         this.nodeData.customButton.push(drawBackBtn)
       }
-      
+
 
       if(this.nodeData.customButton[0].text !== this.$t('audit.workFlows.agree')){
         this.btnDefaultAgree = 1
@@ -603,7 +603,7 @@ export default {
       console.log('this.auditUsers :>> ', this.auditUsers);
 
       // 取得部門資訊 & 簽核部門
-      // await this.getDepartmentList() 
+      // await this.getDepartmentList()
       // this.departmentStatus = this.department[0].defineId
       console.log('this.departmentStatus :>> ', this.departmentStatus);
 
@@ -679,7 +679,7 @@ export default {
       }else{
         return users.filter(item => item.title == this.curTemplateTitleList )
       }
-    },    
+    },
 
     confirmSearchUsersDialog(){
         console.log('this.multipleSelection ~~~~~~~>', this.multipleSelection)
@@ -694,7 +694,7 @@ export default {
       this.inputSearchUser =''
       this.curTemplateDepartment = ''
       this.curTemplateTitleList = ''
-      
+
       // 清除所有勾選
       this.$refs.usersList.clear()
     },
@@ -705,14 +705,14 @@ export default {
       this.multipleSelection = val.val
       console.log(' this.multipleSelection',  this.multipleSelection)
       this.tags = this.multipleSelection.map(t => (
-        { 
+        {
           userName : t.userName,
           type: 'info'
         }
       ))
       if(this.multipleSelection.length > 1) {
         this.$refs.usersList.toggleChecked(this.tags[0])
-      } 
+      }
     },
 
     // 刪除 tag
@@ -730,7 +730,7 @@ export default {
       // [查詢人員]資料
       this.userData.forEach(user =>{
         this.titleList.forEach( title =>{
-          if(title.contents.length !== 0 && title.contents.includes(user.userId)) user.title = title.defineName 
+          if(title.contents.length !== 0 && title.contents.includes(user.userId)) user.title = title.defineName
         })
         // user 會有多個部門
         user.sector = []
@@ -741,7 +741,7 @@ export default {
           })
           user.sector = user.sector.join(", ")
       })
-      
+
        // 等待 dialog 生成
       // if(this.ccToUSer.length > 0){
       //   var data = this.ccToUSer
@@ -765,9 +765,9 @@ export default {
       //  節點名稱不可為空
       if(this.nodeData.name == ''){
         util.notify(this.$t('audit.workFlows.cantEmptyNodeName'), 'error', 2000 );
-        return 
+        return
       }
-      
+
 
       // handle btn naming
       if(this.btnDefaultAgree == 1){
@@ -790,7 +790,7 @@ export default {
         this.nodeData.customButton[2].text = this.$t('audit.workFlows.withdraw')
       }
 
-    
+
       //自定簽核按鈕不可為空
       console.log('this.nodeData 3', this.nodeData)
       if(this.defineAgree == '' && this.btnDefaultAgree == 1 ){
@@ -816,12 +816,12 @@ export default {
         this.fullscreenLoading = false
         return
       }
-      
+
       //  停留時間不可為空
       if(this.nodeData.notify && this.nodeData.unHandleNotifyDay == ""){
         util.notify(this.$t('audit.workFlows.cantEmptyDays'), 'error', 2000 );
         this.$refs.stayOver.focus()
-        return 
+        return
       } else if(this.nodeData.unHandleNotifyDay > 365){
         util.notify(this.$t('audit.workFlows.cantTooMuchDays'), 'error', 2000 );
         this.$refs.stayOver.focus()
@@ -864,7 +864,7 @@ export default {
         sessionStorage.setItem('workflowNode', JSON.stringify(this.nodeData))
       }
 
-      
+
       this.apiData.orderedAuditNodeArray.forEach(data =>{
         if(data.name == this.nodeData.name){
           if(data.auditTargetType == 0){
@@ -880,14 +880,14 @@ export default {
           }
         }
       })
-      
 
-      
-      
+
+
+
       console.log('to API', this.apiData)
       if(pageAction == "create" || pageAction == "edit"){
         console.log('pageAction ---->', pageAction)
-      
+
         //  節點名稱不可為重複
         var status = sessionStorage.getItem('reNewNode');
         const reNewNode = JSON.parse(status)
@@ -911,7 +911,7 @@ export default {
 
           var tt = tempAry.some(i =>
             i.name == this.nodeData.name
-          ) 
+          )
           console.log('tt', tt)
           if(tt){
             util.notify(this.$t('audit.workFlows.cantRepeatNodeName'), 'error', 2000 );
@@ -928,7 +928,7 @@ export default {
         }else if(routeTo == "workflowDetail"){
           this.$router.push({name: 'workflowDetail'})
         }
-        
+
       }else if(pageAction == "set"){
          //  節點名稱不可為重複
         var status = sessionStorage.getItem('reNewNode');
@@ -947,24 +947,24 @@ export default {
 
           var tt = tempAry.some(i =>
             i.name == this.nodeData.name
-          ) 
+          )
           console.log('tt', tt)
           if(tt){
             util.notify(this.$t('audit.workFlows.cantRepeatNodeName'), 'error', 2000 );
             return
           }
         }
-        
+
         sessionStorage.setItem('newWorkFlow', JSON.stringify(this.apiData))
         console.log('newWorkFlow 2', this.apiData)
         sessionStorage.setItem('pageAction', JSON.stringify("edit"))
         this.$router.push({name: 'workflowDetail'})
 
-      
+
 
         // var checkRepeatArry = this.apiData.orderedAuditNodeArray.map(i => i = i.name)
         // console.log('checkRepeatArry', checkRepeatArry)
-        
+
         // const repeat = checkRepeatArry.some( (item, index, arr) => arr.indexOf(item) !== index)
         // console.log('repeat', repeat)
         // if(repeat){
@@ -988,7 +988,7 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  
+
   .flex-row
     display: flex
     flex-direction: row
@@ -996,7 +996,7 @@ export default {
     align-items: center
     // width: fit-content
 
-  
+
   .select_audit
     display: flex
     flex-direction: row
@@ -1017,14 +1017,14 @@ export default {
     width: fit-content
     pointer-events: none
 
-    i 
+    i
       margin-right: 5px
       color: #d5d5d5
   .clickable
     color: #006ab7
     cursor: pointer
     pointer-events: auto !important
-    i 
+    i
       color: #006ab7
 
   .workflow-header
@@ -1080,13 +1080,13 @@ export default {
     align-items: center
     .el-input
       margin-left: 10px
-  
+
   .dialog-content
     width: 100%
     .showing_search_user
       width: 100%
       height: 500px
-      
+
       .filter_section
         background: #FFF
         display: flex
@@ -1130,7 +1130,7 @@ export default {
           flex-direction: row
           justify-content: flex-start
           .el-tag
-            margin-right: 5px 
+            margin-right: 5px
             margin-bottom: 5px
 
       .users
@@ -1144,7 +1144,7 @@ export default {
     .el-input__count-inner
       margin-top: 55px
     input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button 
+    input::-webkit-inner-spin-button
       -webkit-appearance: none
       margin: 0
 
@@ -1166,16 +1166,16 @@ export default {
       border-color: #2c90d9 !important
       &:hover
         border-color: #dcdfe6 !important
-    .is-focus .el-checkbox__inner      
+    .is-focus .el-checkbox__inner
       border-color: #dcdfe6 !important
-    
+
     .el-checkbox__inner:hover
       border-color: #190 !important
-      
+
   .title-status
     .el-input__count-inner
       margin-top: 55px
-      
+
   .text_limit_notice
     position: absolute
     text-align: right
@@ -1272,9 +1272,9 @@ export default {
   }
 
   .name-tips{
-    display:flex; 
+    display:flex;
     flex-direction:column;
-    
+
   }
   .error-text{
     font-size: 12px;
@@ -1339,7 +1339,7 @@ export default {
     width: 20%;
     text-align: left;
   }
-  
+
   .title-operation{
     /* width: 20%; */
   }
@@ -1373,7 +1373,7 @@ export default {
     font-size: 12px;
   }
   .template-select-area{
-    display:flex; 
+    display:flex;
     flex-direction:row;
     height:calc(30/1920*100vw);
     width:200px;

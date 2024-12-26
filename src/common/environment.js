@@ -9,7 +9,7 @@ const _Environments = {
   Preview: {
     CHINA_WEBSITE: 'http://47.103.135.242:8081/storemonitor/api/',
     GLOBAL_WEBSITE: 'https://preview-inspect.storevue.com/storemonitor/api/',
-    
+
     VERSION: version,
     clientId: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a'
   },
@@ -63,8 +63,8 @@ const _Environments = {
 
   // new RC vm
   RC_StoreVue:{
-    CHINA_WEBSITE: 'https://rc-inspect.wise-apps.com/storemonitor/api/',
-    GLOBAL_WEBSITE: 'https://rc-inspect.wise-apps.com/storemonitor/api/',
+    CHINA_WEBSITE: 'https://rc-inspection.wise-iservice.com/storemonitor/api/',
+    GLOBAL_WEBSITE: 'https://rc-inspection.wise-iservice.com/storemonitor/api/',
     VERSION: version,
     clientId: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a'
   },
@@ -111,7 +111,7 @@ else if(data.SITE == 'iservice-preview'){
   isGlobalWebsite = true;
 }
 else{
-  environJSON = _Environments.iservicePreview;
+  environJSON = _Environments.RC_iService;
   isGlobalWebsite = true;
 }
 
