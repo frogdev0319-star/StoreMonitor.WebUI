@@ -1368,7 +1368,8 @@ export default {
       }
       self.refreshData(index);
       if (self.typeTemp.length === 1 && self.groupList.length === 0) {
-        self.$router.push({ name: 'inspectSetting', params: { val: 'del' }});
+        util.notify("已刪除此巡檢表", 'warning', 3000);
+        self.$router.push({ name: 'inspectListSetting', params: { val: 'del' }});
       }
     },
 
