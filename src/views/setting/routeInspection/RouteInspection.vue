@@ -95,7 +95,7 @@
                     <!--<i class="iconfont icon-quxiaolianjie"/>-->
                     <img :src="require('../../../../static/img/ic_relate.svg')" style="width:24px;height:24px;"/>
                     <div style="color: #006ab7;margin-left:8px; margin-right: 5px;cursor:pointer;"><u>{{ $t('insSettingView.relationDuty')}}</u></div>
-                    <div>{{ '：'+_item.routeData[0].ModelPost }}</div>
+                    <div>{{ '：' + bindPisition }}</div>
                   </div>
                 </div>
                 <div v-if="_item.routeData && !loading">
@@ -817,9 +817,6 @@ export default {
         const temp = [];
         const groupids = [];
 
-        const parentTemp = [];
-        const parentGroupids = [];
-
         self.weightOptions = [];
         NapeData.forEach((_item, _index) => {
           const _obj = {};
@@ -906,8 +903,7 @@ export default {
         });
 
         // console.log('temp ::::::::::>> ', temp);
-        // this.bindPisition = temp.find( i => i.parentId === -1).ModelPost
-        // console.log('this.bindPisition :>> ', this.bindPisition);
+        this.bindPisition = temp.find( i => i.parentId === -1).ModelPost
 
 
 
