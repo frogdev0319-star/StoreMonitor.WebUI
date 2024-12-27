@@ -80,8 +80,8 @@ const _Environments = {
 
 let environJSON
 let isGlobalWebsite
-console.log("Enrionment")
-console.log(data)
+// console.log("Enrionment")
+// console.log(data)
 if(data.SITE == 'RC'){
   environJSON = _Environments.RC;
   isGlobalWebsite = true;
@@ -121,3 +121,4 @@ export default Environment = {
   isGlobalWebsite: isGlobalWebsite,
   BASE_URL: isGlobalWebsite ? environJSON.GLOBAL_WEBSITE : environJSON.CHINA_WEBSITE
 };
+

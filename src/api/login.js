@@ -3,6 +3,19 @@ import { serviceLogout } from '@/common/request';
 import Environment from '@/common/environment';
 const version = Environment.VERSION;
 
+
+
+export const checkServerVersion = params => {
+  return request({
+    url: `server/info/version`,
+    method: 'get',
+    params
+  });
+};
+
+
+
+
 export function loginByUsername(data) {
   return request({
     url: `${version}/login`,
@@ -17,6 +30,7 @@ export function logout() {
     method: 'post'
   });
 };
+
 
 export const getUserInfo = params => {
   return request({

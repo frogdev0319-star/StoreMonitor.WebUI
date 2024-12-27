@@ -291,7 +291,7 @@
               <p style="text-align: left">
                 v3.2.2.14
                   &copy; {{ getFullYear }} Advantech Intelligent City
-                  Services Co., Ltd. (AiCS) All Rights Reserved.
+                  Services Co., Ltd. <span @click.prevent="checkServerVersion">(AiCS)</span> All Rights Reserved.
               </p>
             </footer>
           </el-col>
@@ -332,6 +332,8 @@ import util from '@/common/util.js';
 import PermissionHelper from '../../api/PermissionHelper';
 import DialogPop from '@/components/DialogPop.vue';
 import environment from '@/common/environment.js'
+import {checkServerVersion} from'@/api/login'
+
 export default {
   name: "Home",
   components: {
@@ -392,7 +394,9 @@ export default {
         isWarning: false,
         dialogCosed: false
       },
-      loading: false
+      loading: false,
+      serverVersion: "",
+      clickNum: 0
     };
   },
 
@@ -620,6 +624,7 @@ export default {
     this.updateTitle();
 
     this.showAdvanceMode = sessionStorage.getItem("advancedSettingMode");
+    this.serverVersion = await this.getServerVersion()
   },
 
   async mounted() {
@@ -641,6 +646,26 @@ export default {
   },
 
   methods: {
+    async checkServerVersion(){
+      this.clickNum += 1
+      if(this.clickNum == 6){
+        util.notify(`Server version is  ${this.serverVersion.version}`, 'success', 2000);
+        this.clickNum = 0
+      }
+      setTimeout(() => {
+        this.clickNum = 0
+      },2000);
+    },
+
+    getServerVersion() {
+      return new Promise((resolve, reject) => {
+        checkServerVersion().then(res => {
+          const data = res.data;
+          resolve(data);
+        });
+      });
+    },
+
     advanceMode(){
       this.loading = true
       // console.log('this.userInfo.isSystemAdvanced :>> ', this.userInfo.isSystemAdvanced);
