@@ -219,29 +219,32 @@
 
     </div>
 
-    <!-- GPS禁止略過 開關選項 -->
+    <!-- 特定巡檢管理功能設定 開關選項 -->
     <div class="page-container report-setting paper" >
       <div class="setting-titles padding flex-center">
-        GPS 禁止略過
+        特定巡檢管理功能設定
         <div class="spacer"></div>
       </div>
 
       <div v-loading="isLoadingData" class="setting-details self-loading">
         <div class="template-info">
           <div class="inspect-basic">
-            <setting-table table-name="GPS 禁止略過設定" style="margin-top: 20px;">
+            <setting-table table-name="GPS 巡檢簽到" style="margin-top: 20px;">
               <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
-                <div class="overall_row">
-
-                  <div style="margin-left: 20px; padding: 20px 0px;">
-                    <el-switch
-                      v-model="disable_skip_check_in"
-                      active-text="開啟"
-                      inactive-text="關閉">
-                    </el-switch>
-                  </div>
-                  <span class="text_limit_sign" v-if="showInputLimit_overallItem"> {{$t('insSettingView.inputRuletip')}} </span>
+                <div class="overall_options">
+                  <div class="overall_row" style="flex-direction: column; align-items: flex-start">
+                    <div style="margin-left: 20px; padding: 20px 0px;">
+                      <el-switch
+                        v-model="disable_skip_check_in"
+                        active-text="開啟"
+                        inactive-text="關閉">
+                      </el-switch>
+                    </div>
+                    <span style="margin-left: 20px; font-size: 12px;"> 巡檢表開啟巡檢簽到時，簽到失敗時不可略過 </span>
                 </div>
+                </div>
+
+
               </div>
             </setting-table>
           </div>
@@ -432,6 +435,8 @@ export default {
           delete this.inspectStatus.update_user_id
 
           this.viewReportByTagAuth = res.data.settingContent.general_setting.view_report_by_tag_auth == true ? 1 : 0
+          this.disable_skip_check_in = res.data.settingContent.general_setting.disable_skip_check_in
+
           console.log('this.inspectStatus :>> ', this.inspectStatus);
 
           this.dueDayIsFeatureOn = res.data.settingContent.general_setting_event_event_over_due_day_config.isFeatureOn == true ? 1 : 0
