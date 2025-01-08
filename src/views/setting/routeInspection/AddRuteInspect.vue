@@ -1764,9 +1764,8 @@ export default {
         inpectRESTful.getInspectItemList(params).then(res => {
           const data = res.data;
 
-
-          [data[0], data[1]] = [data[1], data[0]];
-          console.log('data :::::>> ', data);
+          // [data[0], data[1]] = [data[1], data[0]];
+          // console.log('data :::::>> ', data);
 
           resolve(data);
         }).catch(err => {
