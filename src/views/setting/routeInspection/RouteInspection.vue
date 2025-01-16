@@ -95,7 +95,7 @@
                     <!--<i class="iconfont icon-quxiaolianjie"/>-->
                     <img :src="require('../../../../static/img/ic_relate.svg')" style="width:24px;height:24px;"/>
                     <div style="color: #006ab7;margin-left:8px; margin-right: 5px;cursor:pointer;"><u>{{ $t('insSettingView.relationDuty')}}</u></div>
-                    <div>{{ '：' + bindPisition }}</div>
+                    <div>{{ '：' + bindPisition }} </div>
                   </div>
                 </div>
                 <div v-if="_item.routeData && !loading">
@@ -902,7 +902,7 @@ export default {
           });
         });
 
-        // console.log('temp ::::::::::>> ', temp);
+        console.log('temp ::::::::::>> ', temp);
         this.bindPisition = temp.find( i => i.parentId === -1).ModelPost
 
 
@@ -1578,7 +1578,13 @@ export default {
     bindStore() {
       const self = this;
       const routeData = self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData;
-      self.showNoPostDialog = routeData[0].ModelPost === null;
+      console.log('routeData ~~~ :>> ', routeData);
+
+      // self.showNoPostDialog = routeData[0].ModelPost === null;
+      console.log('this.bindPisition :>> ', this.bindPisition);
+      self.showNoPostDialog = this.bindPisition === null;
+
+
       if (!self.showNoPostDialog) {
         self.confirmToBind();
       }
