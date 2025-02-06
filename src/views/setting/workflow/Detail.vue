@@ -5,7 +5,8 @@
       {{$t('audit.workFlows.workFlowConfiguration')}}
       <div class="spacer"></div>
       <div class="buttons">
-        <delay-button type="filled" @click="submitWorkFlow">  {{$t('audit.workFlows.saveAndEnable')}}</delay-button>
+        <delay-button
+          type="filled" @click="submitWorkFlow">  {{$t('audit.workFlows.saveAndEnable')}}</delay-button>
       </div>
     </div>
     <!-- 基本信息 -->
@@ -340,6 +341,9 @@ export default {
   },
   data() {
     return {
+      disableBtn: false,
+      fullscreenLoading: false,
+      isLoadingData: true,
       ccToUSer: [],
 
       showSingleDeleteContent: false,
@@ -349,7 +353,7 @@ export default {
       curTemplateIndex:'',
       basicList: [],
       loading: false,
-      isLoadingData: true,
+
       workflowDescription: '',
       infoForm: {},
       nodeList:{},
@@ -402,7 +406,7 @@ export default {
     // ======
 
       titleList:[],
-      fullscreenLoading: false,
+
       columnOperationData: {
         label: this.$t('deviceView.operation'),
         move: true,
@@ -1161,8 +1165,11 @@ export default {
       console.log('this.newFlatNodeDataView :>> ', this.newFlatNodeDataView);
       console.log('this.workflowDetail :>> ', this.workflowDetail);
 
+      this.disableBtn = true
       this.fullscreenLoading = true
       this.isLoadingData = true
+
+
 
       if(this.workflowDetail.name == "") {
         this.fullscreenLoading = false

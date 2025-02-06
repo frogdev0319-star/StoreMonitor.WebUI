@@ -181,7 +181,7 @@ export const navbarRoute = {
   },
 
   // 事件管理
-  getEventRoute() { 
+  getEventRoute() {
     const eventRoute = {
       id:2,
       path: '/home',
@@ -210,7 +210,7 @@ export const navbarRoute = {
         hidden: true,
         component: resolve => require(['@/views/event/details/RateManage'], resolve),
         meta: {
-          keepAlive: true, 
+          keepAlive: true,
         }
       }
     ) && primaryPathesList.push('/event', '/rate');
@@ -266,7 +266,7 @@ export const navbarRoute = {
         name: 'deleteReport',
         component: resolve => require(['@/views/reportAndEvnets/deleteReport'], resolve),
         meta: {
-          keepAlive: true, 
+          keepAlive: true,
           requireAuth: true
         }
       },
@@ -275,7 +275,7 @@ export const navbarRoute = {
         name: 'closeEvents',
         component: resolve => require(['@/views/reportAndEvnets/closeEvents'], resolve),
         meta: {
-          keepAlive: true, 
+          keepAlive: true,
           requireAuth: true
         }
       },
@@ -284,7 +284,7 @@ export const navbarRoute = {
         name: 'operationRecord',
         component: resolve => require(['@/views/reportAndEvnets/operationRecord'], resolve),
         meta: {
-          keepAlive: true, 
+          keepAlive: true,
           requireAuth: true
         }
       },
@@ -294,7 +294,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/patrolShop/InspectReport'], resolve),
         hidden: true,
         meta: {
-          keepAlive: true, 
+          keepAlive: true,
           requireAuth: true
         }
       },
@@ -304,11 +304,11 @@ export const navbarRoute = {
         component: resolve => require(['@/views/event/details/RateManage'], resolve),
         hidden: true,
         meta: {
-          keepAlive: true, 
+          keepAlive: true,
           requireAuth: true
         }
       },
-      
+
     ) && primaryPathesList.push('/deleteReport', '/closeEvents', '/operationRecord', '/needDeleteReport', '/needUpdateEvent');
     return reportAndEventRoute;
   },
@@ -399,7 +399,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/patrolShop/InspectReport'], resolve)
       }
     ) && primaryPathesList.push('/waitaudit', '/auditHandling','/waitAuditDetail','/waitAuditReportdetails','/handingReportdetails');
-    
+
     !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableTranscriptNotify() && auditRoute.children.push(
       {
         path: '/transcriptnotify',
@@ -451,7 +451,7 @@ export const navbarRoute = {
         hidden: false,
         meta: {
           requireAuth: true,
-          
+
         }
       }
     ) && primaryPathesList.push('/patrolEvaluation');
@@ -470,7 +470,7 @@ export const navbarRoute = {
         name: 'patrolItemsStat',
         component: resolve => require(['@/views/statistical/InspectItemStatistics_old'], resolve),
         hidden: true,
-    
+
       }
     ) && primaryPathesList.push('/patrolItem','/patrolItem_old');
     !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableSupervisionEffStatistics() && statisticsRoute.children.push(
@@ -556,7 +556,7 @@ export const navbarRoute = {
         name: 'ScheduleSetting',
         component: resolve => require(['@/views/schedule/ScheduleSetting'], resolve),
         meta: {
-          keepAlive: true, 
+          keepAlive: true,
           requireAuth: true
         },
         isReadOnly: false
@@ -587,7 +587,7 @@ export const navbarRoute = {
       }
 
     ) && primaryPathesList.push('/scheduleSetting', '/personalSchedule','/scheduleDetailCreate','/scheduleDetailModify');
-    
+
     !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleHistroy() && schduleRoute.children.push(
       {
         path: '/scheduleHistory',
@@ -656,20 +656,20 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/generalSetting/GeneralSetting'], resolve),
         hidden: false,
         meta: {
-          keepAlive: false, 
+          keepAlive: false,
           requireAuth: true
         }
       },
     ) && primaryPathesList.push('/generalSetting');
 
-    
+
     !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enablePatrolSetting() && inspectionRoute.children.push(
       {
         path: '/routeinspection',
         name: 'inspectListSetting',
         component: resolve => require(['@/views/setting/routeInspection/RouteInspection'], resolve),
         meta: {
-          keepAlive: false, 
+          keepAlive: false,
         },
         hidden: false
       },
@@ -679,7 +679,7 @@ export const navbarRoute = {
         hidden: true,
         component: resolve => require(['@/views/setting/routeInspection/AddRuteInspect'], resolve),
         meta: {
-          keepAlive: false, 
+          keepAlive: false,
         },
       },
       {
@@ -688,7 +688,7 @@ export const navbarRoute = {
         hidden: true,
         component: resolve => require(['@/views/setting/routeInspection/SetRuleInspect'], resolve),
         meta: {
-          keepAlive: false, 
+          keepAlive: false,
         },
       },
       {
@@ -704,7 +704,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/routeInspection/CreateInspect'], resolve),
       },
 
-      
+
 
     ) && primaryPathesList.push('/routeinspection', '/addroute', '/setroute', '/bindroute', '/createinspect');
 
@@ -744,7 +744,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/title/TitleManage'], resolve),
         hidden: false,
         meta: {
-          keepAlive: false, 
+          keepAlive: false,
           requireAuth: true
         }
       },
@@ -764,7 +764,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/workflow/List'], resolve),
         hidden: false,
         meta: {
-          keepAlive: false, 
+          keepAlive: false,
           requireAuth: true
         }
       },
@@ -885,7 +885,7 @@ export const navbarRoute = {
         name: 'Send',
         component: resolve => require(['@/views/advanceSetting/broadcast/Send'], resolve),
         meta: {
-          keepAlive: true, 
+          keepAlive: true,
           requireAuth: true
         },
         isReadOnly: false
@@ -895,12 +895,12 @@ export const navbarRoute = {
         name: 'SendingRecord',
         component: resolve => require(['@/views/advanceSetting/broadcast/SendingRecord'], resolve),
         meta: {
-          keepAlive: true, 
+          keepAlive: true,
           requireAuth: true
         },
         isReadOnly: false
       } ,
-      
+
     ) && primaryPathesList.push('/send', '/sendingRecord');
     return instantPushRoute;
 
@@ -952,7 +952,7 @@ export const navbarRoute = {
     //   }
     // ) && primaryPathesList.push('/beseyeAccount', '/beseyeDeviceSetting', '/beseye/authorize');
 
-    
+
     /*
     util.getVideoAuthority(4) && deviceRoutes.push(
       {

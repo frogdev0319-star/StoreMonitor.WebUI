@@ -2,23 +2,23 @@
   <div class="date-selector-container" :style="{'width':getLangStyleValue(contentWidth)}">
       <div class="time-title">{{ dateRangeTitle }}</div>
       <div class="paper shadow-light" style="display:flex; flex-direction:row;">
-        <el-select class="bDateSel" 
-          :class="getLangStyleValue(selecClass)" 
-          v-model="dateRange" 
-          value-key="value" 
-          :style="{'width':getLangStyleValue(rangeWidth)}" 
+        <el-select class="bDateSel"
+          :class="getLangStyleValue(selecClass)"
+          v-model="dateRange"
+          value-key="value"
+          :style="{'width':getLangStyleValue(rangeWidth)}"
           @change="changeDateRange">
-            <el-option 
+            <el-option
               v-for="item in dateRangeItems"
               :key="item.value"
               :label="item.label"
               :value="item.value"
             ></el-option>
         </el-select>
-      <date-time-picker 
-        :dateRange="dateRange" 
-        :poper-class="date-range" 
-        :diablePick="diablePick" 
+      <date-time-picker
+        :dateRange="dateRange"
+        :poper-class="date-range"
+        :diablePick="diablePick"
         :dateTimeValue="dateTimeValue"
         :showTooltips="showTooltips"
         :pickFuturerDate="pickFuturerDate"
@@ -56,7 +56,7 @@ export default {
       type: Boolean,
       default: false
     },
-  
+
     pickFuturerDate:{
       type:Boolean,
       default:false
@@ -147,7 +147,7 @@ export default {
     },
 
 
-    
+
     dateChange(val) {
       console.log('this is dataChange ------->> ');
       this.$emit('change', val);
@@ -155,8 +155,8 @@ export default {
       console.log('this.dateRangevalue :2---->> ', this.dateRangevalue);
       console.log('val :2---->> ', val);
     },
-    
-    
+
+
   }
 };
 </script>
@@ -197,7 +197,7 @@ export default {
   }
   .rangeSel-ja.el-select .el-input--medium .el-input__inner {
     width:inherit;
-    @media screen and (max-width:1367px) { 
+    @media screen and (max-width:1367px) {
       width: calc(230/1440*100vw);
     }
     @media screen and(min-width: 1367px){
@@ -208,7 +208,7 @@ export default {
     width: calc(125/1440*100vw);
   }
   .rangeSel-vi.el-select .el-input--medium .el-input__inner {
-     @media screen and (max-width:1367px) { 
+     @media screen and (max-width:1367px) {
       width: calc(150/1440*100vw);
     }
     @media screen and(min-width: 1367px){
@@ -216,7 +216,7 @@ export default {
     }
   }
   .rangeSel-id.el-select .el-input--medium .el-input__inner {
-    @media screen and (max-width:1367px) { 
+    @media screen and (max-width:1367px) {
       width: calc(150/1440*100vw);
     }
     @media screen and(min-width: 1367px){
@@ -224,14 +224,14 @@ export default {
     }
   }
   .rangeSel-th.el-select .el-input--medium .el-input__inner {
-    @media screen and (max-width:1367px) { 
+    @media screen and (max-width:1367px) {
       width: calc(110/1440*100vw) !important;
     }
 
     @media screen and(min-width: 1367px){
       width: calc(95/1440*100vw) !important;
     }
-    
+
   }
   .bDateSel.el-select .el-input .el-select__caret {
     color: #2c90d9;
