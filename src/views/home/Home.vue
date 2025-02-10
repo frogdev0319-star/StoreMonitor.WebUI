@@ -289,7 +289,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.2.2.17
+                v3.2.2.18
                   &copy; {{ getFullYear }} Advantech Intelligent City
                   Services Co., Ltd. <span @click.prevent="checkServerVersion">(AiCS)</span> All Rights Reserved.
               </p>

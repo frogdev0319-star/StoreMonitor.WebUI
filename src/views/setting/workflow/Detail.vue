@@ -6,7 +6,9 @@
       <div class="spacer"></div>
       <div class="buttons">
         <delay-button
-          type="filled" @click="submitWorkFlow">  {{$t('audit.workFlows.saveAndEnable')}}</delay-button>
+          type="filled"
+          :disabled="disableBtn"
+          @click="submitWorkFlow">  {{$t('audit.workFlows.saveAndEnable')}}</delay-button>
       </div>
     </div>
     <!-- 基本信息 -->
@@ -1169,12 +1171,13 @@ export default {
       this.fullscreenLoading = true
       this.isLoadingData = true
 
-
-
       if(this.workflowDetail.name == "") {
         this.fullscreenLoading = false
         util.notify(this.$t('audit.workFlows.cantEmptyWorkflowName'), 'error', 2000 );
         this.$refs.workflowName.focus()
+        this.disableBtn = false
+        this.fullscreenLoading = false
+        this.isLoadingData = false
         return
       }
 
@@ -1187,6 +1190,9 @@ export default {
         this.isLoadingData = false
         util.notify(this.$t('audit.workFlows.cantRepeatWorkflowName'), 'error', 2000 );
         this.$refs.workflowName.focus()
+        this.disableBtn = false
+        this.fullscreenLoading = false
+        this.isLoadingData = false
         return
       }
 
@@ -1225,6 +1231,9 @@ export default {
         this.fullscreenLoading = false
         this.isLoadingData = false
         util.notify(this.$t('audit.workFlows.mustCreateOneNode'), 'error', 2000 );
+        this.disableBtn = false
+        this.fullscreenLoading = false
+        this.isLoadingData = false
         return
       }else{
         var id = {
@@ -1233,11 +1242,9 @@ export default {
         id.processDefinitionKeys.push(toApiData.processDefinitionKey)
 
         updateWorkflow(toApiData).then(res=>{
-          console.log('res 111111', res)
           if(toApiData.state == 0){
             this.switchEnableWorkflow(id)
           }else{
-            console.log('res okokokokok', res)
             this.$router.push({name: 'workflowManage'})
           }
           }).catch(err => {
@@ -1245,8 +1252,7 @@ export default {
           });
 
       }
-      this.fullscreenLoading = false
-      this.isLoadingData = false
+
     },
 
     // 流程啟用

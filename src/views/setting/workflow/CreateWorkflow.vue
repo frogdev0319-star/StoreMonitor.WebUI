@@ -5,7 +5,10 @@
       {{$t('audit.workFlows.workFlowConfiguration')}}
       <div class="spacer"></div>
       <div class="buttons">
-        <delay-button type="filled" @click="addNewFlow"> {{$t('audit.workFlows.saveAndEnable')}}</delay-button>
+        <delay-button
+          type="filled"
+          :disabled="disableBtn"
+          @click="addNewFlow"> {{$t('audit.workFlows.saveAndEnable')}}</delay-button>
       </div>
     </div>
     <!-- 基本信息 -->
@@ -336,7 +339,7 @@ export default {
   data() {
     return {
       ccToUSer: [],
-
+      disableBtn: false,
       showSingleDeleteContent: false,
       dataFromRoute: {},
       workflowDetail: {},
@@ -1158,18 +1161,23 @@ export default {
       console.log('this.newFlatNodeDataView :>> ', this.newFlatNodeDataView);
       console.log('this.workflowDetail :>> ', this.workflowDetail);
 
+      this.disableBtn = true
+
       var repeatResult = this.allTableData.some(i=>i.name == this.workflowDetail.name)
       console.log('repeatResult~~~~ :>> ', repeatResult);
 
       if(this.workflowDetail.name == "") {
         util.notify(this.$t('audit.workFlows.cantEmptyWorkflowName'), 'error', 2000 );
         this.$refs.workflowName.focus()
+        this.disableBtn = false
+
         return
       }
 
       if(repeatResult == true){
         util.notify(this.$t('audit.workFlows.cantRepeatWorkflowName'), 'error', 2000 );
         this.$refs.workflowName.focus()
+        this.disableBtn = false
         return
       }
 
@@ -1214,6 +1222,7 @@ export default {
         this.newFlatNodeDataView.pop()
         this.newFlatNodeDataView[0].auditByUsers.push('送出人')
         util.notify(this.$t('audit.workFlows.mustCreateOneNode'), 'error', 2000 );
+        this.disableBtn = false
         return
       } else {
         creadNewFlow(toApiData).then(res=>{
@@ -1224,6 +1233,7 @@ export default {
             this.newFlatNodeDataView.pop()
             this.handleData()
             util.notify(this.$t('audit.workFlows.cantRepeatWorkflowName'), 'error', 2000 );
+            this.disableBtn = false
           });
       }
     }
