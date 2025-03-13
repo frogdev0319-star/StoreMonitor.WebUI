@@ -124,6 +124,65 @@
           </setting-table>
         </div>
 
+
+
+
+        <!-- 自動簽核 -->
+        <div class="inspect-basic">
+          <setting-table table-name="自動簽核">
+            <template slot="tableDetail">
+              <!-- row -->
+              <div class="setting-config">
+                <div class="flex-row">
+                  <div class="flex-row" >
+                    <el-radio-group
+                      class="storevue-radio radio_item"
+                      v-model="autoApprove"
+                      style="margin-left: 20px;"
+                      >
+                      <el-radio :label="0" style="  min-width: 60px; text-align: left; margin-right: 30px;" >關閉</el-radio>
+                      <el-radio :label="1" style=" width: fit-content;">開啟</el-radio>
+                    </el-radio-group>
+                  </div>
+                  <div class="flex-row" style="margin-left: 40px;">
+                    <div class="title-name">自動簽核天數</div>
+                    <div class="title-status num_input">
+                      <el-input
+                        v-model="autoApproveDay"
+                        style="width: 80px;"
+                        placeholder="1"
+                        type="number"
+                        :disabled="autoApprove == 0"
+                        :min="1"
+                        :max="7"
+                        @change="onAutoApprovel"
+                      />
+                    </div>
+                    <el-tooltip
+                      class="date-time-tooltip"
+                      effect="light"
+                      placement="bottom-end">
+                      <div slot="content">
+                        自動簽核天數最多為七天。
+                      </div>
+                      <i class="iconfont icon-bangzhu iconbangzhu"/>
+                    </el-tooltip>
+
+                  </div>
+                </div>
+              </div>
+            </template>
+          </setting-table>
+        </div>
+
+
+
+
+
+
+
+
+
         <!-- 流程設定 -->
         <div class="inspect-basic">
           <!-- 新增審核節點 btn -->
@@ -398,6 +457,8 @@ export default {
       departmentAry:[],
       curTemplateDepartment: '',
       curTemplateTitleList: '',
+      autoApprove: 0,
+      autoApproveDay: 1,
     // ======
 
       titleList:[],
@@ -1170,7 +1231,6 @@ export default {
         util.notify(this.$t('audit.workFlows.cantEmptyWorkflowName'), 'error', 2000 );
         this.$refs.workflowName.focus()
         this.disableBtn = false
-
         return
       }
 
@@ -1213,6 +1273,14 @@ export default {
         }
       });
 
+      // 自動簽核
+      if(this.autoApprove == 1){
+        this.workflowDetail.autoApproveDuration = this.autoApproveDay
+      } else {
+        this.workflowDetail.autoApproveDuration = 0
+      }
+
+      console.log('this.workflowDetail.autoApproveDuration :>> ', this.workflowDetail.autoApproveDuration);
       var toApiData = {...this.workflowDetail, ...result}
       toApiData.copyToUsers = this.ccToUSer
 
@@ -1236,7 +1304,20 @@ export default {
             this.disableBtn = false
           });
       }
-    }
+    },
+
+    onAutoApprovel(e){
+      console.log('e :>> ', e);
+      if(e<=0){
+        this.autoApproveDay = 1;
+      }
+      else if(e >= 7){
+        this.autoApproveDay = 7;
+      }
+      else {
+        this.autoApproveDay = e;
+      }
+    },
   }
 
 };

@@ -126,6 +126,58 @@
           </setting-table>
         </div>
 
+
+
+        <!-- 自動簽核 -->
+        <div class="inspect-basic">
+          <setting-table table-name="自動簽核">
+            <template slot="tableDetail">
+              <!-- row -->
+              <div class="setting-config">
+                <div class="flex-row">
+                  <div class="flex-row" >
+                    <el-radio-group
+                      class="storevue-radio radio_item"
+                      v-model="autoApprove"
+                      style="margin-left: 20px;"
+                      >
+                      <el-radio :label="0" style="  min-width: 60px; text-align: left; margin-right: 30px;" >關閉</el-radio>
+                      <el-radio :label="1" style=" width: fit-content;">開啟</el-radio>
+                    </el-radio-group>
+                  </div>
+                  <div class="flex-row" style="margin-left: 40px;">
+                    <div class="title-name">自動簽核天數</div>
+                    <div class="title-status num_input">
+                      <el-input
+                        v-model="autoApproveDay"
+                        style="width: 80px;"
+                        placeholder="1"
+                        type="number"
+                        :disabled="autoApprove == 0"
+                        :min="1"
+                        :max="7"
+                        @change="onAutoApprovel"
+                      />
+                    </div>
+                    <el-tooltip
+                      class="date-time-tooltip"
+                      effect="light"
+                      placement="bottom-end">
+                      <div slot="content">
+                        自動簽核天數最多為七天。
+                      </div>
+                      <i class="iconfont icon-bangzhu iconbangzhu"/>
+                    </el-tooltip>
+
+                  </div>
+                </div>
+              </div>
+            </template>
+          </setting-table>
+        </div>
+
+
+
         <!-- 流程設定 -->
         <div class="inspect-basic">
           <!-- 新增審核節點 btn -->
@@ -364,6 +416,9 @@ export default {
 
       nodeDataToApi:[],
       userInfo:[],
+      autoApprove: 0,
+      autoApproveDay: 1,
+
 
       // ======
       w_width: "1000",
@@ -569,7 +624,6 @@ export default {
       await this.handleData()
       await this.getWorkflowList(this.apiBody)
 
-
       this.isLoadingData = false
     },
 
@@ -643,6 +697,17 @@ export default {
         // console.log('this.nodeList 4 ------>> ', this.nodeList);
         // console.log('res.data 4 ------>> ', res.data);
         // console.log('this.workflowDetail 4 ------>> ', this.workflowDetail);
+
+
+
+        if(this.workflowDetail.autoApproveDuration > 0){
+          this.autoApprove = 1
+          this.autoApproveDay = this.workflowDetail.autoApproveDuration
+        } else {
+          this.autoApprove = 0
+          this.autoApproveDay = 1
+        }
+
 
         // flat data
         this.flattenData(this.nodeList)
@@ -933,6 +998,7 @@ export default {
     },
 
 
+
     //======================================
     filterInputSearchUser(users){
         return users.filter( item => item.userName.indexOf(this.inputSearchUser) > -1 || item.email.indexOf(this.inputSearchUser) > -1)
@@ -1181,7 +1247,6 @@ export default {
         return
       }
 
-
       var repeatResult = this.allTableData.some(i => i.name == this.workflowDetail.name)
       console.log('repeatResult~~~~ :>> ', repeatResult);
 
@@ -1221,6 +1286,14 @@ export default {
 
       const orderedAuditNodeArray = [...this.newFlatNodeDataView]
       console.log('orderedAuditNodeArray :>> ', orderedAuditNodeArray);
+
+
+      // 自動簽核
+      if(this.autoApprove == 1){
+        this.workflowDetail.autoApproveDuration = this.autoApproveDay
+      } else {
+        this.workflowDetail.autoApproveDuration = 0
+      }
 
       var toApiData = {...this.workflowDetail, orderedAuditNodeArray}
       toApiData.copyToUsers = this.ccToUSer
@@ -1263,6 +1336,20 @@ export default {
       }).catch(err => {
           console.log('error' + err);
       })
+    },
+
+
+    onAutoApprovel(e){
+      console.log('e :>> ', e);
+      if(e<=0){
+        this.autoApproveDay = 1;
+      }
+      else if(e >= 7){
+        this.autoApproveDay = 7;
+      }
+      else {
+        this.autoApproveDay = e;
+      }
     },
 
   }
@@ -1713,4 +1800,11 @@ export default {
     margin-top: 2px
     color: #ff2400
     display: block
+
+  .num_input
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button
+      -webkit-appearance: none
+      margin: 0
+
 </style>

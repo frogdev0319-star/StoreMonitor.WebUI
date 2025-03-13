@@ -45,7 +45,7 @@
                     :key="'sendAudit'+index"
                     :label="item.label"
                     :name="item.name">
-                
+
                     <div class="list-table">
                         <table-only
                             ref="elTP"
@@ -58,7 +58,7 @@
                             :allowRowExpand = "false"
                             :showBorder = "false"
                             :default-sort = "defaultSort"
-                            :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '6px',}" 
+                            :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '6px',}"
                             :tableHeight = "760"
                             :cellStyle="{backgroundColor: '#fff !important'}"
                             @onCellClick="clickDetail"
@@ -79,7 +79,7 @@
                 </el-tab-pane>
             </el-tabs>
         </div>
-        
+
     </div>
 </template>
 <script>
@@ -344,14 +344,14 @@ export default{
                     },
                     totalPage: 1,
                     sizeNum:10
-                },                                                                      
+                },
             ],
             tabContentId:[{key:'en',value:'#en-tabs-content'},{key:'zh',value:'#en-tabs-content'},{key:'zhtw',value:'#en-tabs-content'},
                 {key:'ja-JP',value:'#en-tabs-content'},{key:'ko-KR',value:'#en-tabs-content'},{key:'vi-VN',value:'#en-tabs-content'},
                 {key:'id-ID',value:'#en-tabs-content'},{key:'th-TH',value:'#th-tabs-content'}],
             isMimicMode:false,
         };
-            
+
     },
     computed: {
         ...mapGetters({ accountChanged: 'accountChanged', mimicModeChanged:'mimicMode' })
@@ -359,7 +359,7 @@ export default{
     watch: {
         accountChanged(val) {
             const self = this;
-            
+
             if (val !== 0) {
                 window.setTimeout(function() {
                 self.$route.meta.keepAlive = true;
@@ -465,7 +465,7 @@ export default{
                 this.curTabIndx = (this.$route.params.curTabIndx)? this.$route.params.curTabIndx:0;
                 this.activeName = (this.$route.params.curTabIndx)? this.$route.params.curTabIndx.toString():'0';
                 this.curStoreIds = this.storeFilterObj.filterStoreIds;
-                
+
                 this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
                 //this.params.beginTs = this.dateValue[0].valueOf();
                 //this.params.endTs = this.dateValue[1].valueOf();
@@ -506,7 +506,7 @@ export default{
             const self = this;
             self.curSizeNum = val.size;
             self.curPage = 1;
-            
+
             self.tableDataList[self.curTabIndx].sizeNum = val.size;
             //self.params.filter = { page: 0, size: val.size };
             self.getAllTask();
@@ -554,7 +554,7 @@ export default{
             if(this.curTabIndx==1){//進行中
                 params['auditState'] = [2,3,6,7];
             }else if(this.curTabIndx==2){//已完成
-                params['auditState'] = [4,5] 
+                params['auditState'] = [4,5]
             }
             if(this.inputSearchValue.trim()!=''){
                 params['keyword'] = this.inputSearchValue;
@@ -575,13 +575,19 @@ export default{
                     //const tempProcessing = [];
                     //const tempCompleted = [];
                     //var processingCount=0, completedCount=0;
-                    
+
                     for(const task of data){
                         var taskObj = {...task};
                         taskObj['id'] =  task.inspectReportId;
                         taskObj['processStartTs'] =  util.getDateStr(task.processStartTs);
                         taskObj['processLastUpdateTs'] =  util.getDateStr(task.processLastUpdateTs);
-                        taskObj['auditStatusName'] = util.getAuditStatusName(task.auditState);
+
+                        if(taskObj.isAutoApproved){
+                          taskObj['auditStatusName'] = util.getAuditStatusName(8);
+                        } else{
+                          taskObj['auditStatusName'] = util.getAuditStatusName(task.auditState);
+                        }
+
                         taskObj['operator']=this.$t('statistics.check');
                         if(task.auditState==2 || task.auditState==3 || task.auditState==6){//進行中
                             //processingCount+=1;
@@ -599,7 +605,7 @@ export default{
                     self.tableDataList[self.curTabIndx].tableData = tempAll;
                     self.tableDataList[self.curTabIndx].taskCount = res.data.numberOfElements;
                     self.tableDataList[self.curTabIndx].totalPage = res.data.totalPages;
-                    
+
                     /*self.tableDataList[1].tableData = tempProcessing;
                     if(tempProcessing.length>0){
                         self.tableDataList[1].taskCount = processingCount;
@@ -629,7 +635,7 @@ export default{
             self.$router.push({ name: 'auditDetail', params: { data: item.row }});
         },
     },
-    
+
 }
 </script>
 <style lang="scss" scoped>
@@ -651,7 +657,7 @@ export default{
     position: relative;
     padding-top: calc(30/1920*100vw);
     .list-table{
-      
+
       .table-white {
         /deep/
         .el-table{

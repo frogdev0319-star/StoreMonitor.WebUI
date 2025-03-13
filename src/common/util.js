@@ -783,6 +783,8 @@ export default {
         return i18n.t('audit.auditStatus.rollback');
       case 7:
         return i18n.t('audit.auditStatus.systemRollback');
+      case 8:
+        return i18n.t('audit.auditStatus.approved') + "(自動簽核)";
     }
   },
   //乘法

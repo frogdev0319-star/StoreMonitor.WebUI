@@ -1,11 +1,11 @@
 <template>
-    <div>
+  <div>
 		<div class="audit-flow-unit" v-for="(taskItem, index) in taskInfo" :key="index" :class="{ not__yet: taskItem.tasks[0].taskId == null }">
 			<div class="check" v-if="taskItem.state == 0"><i class="iconfont el-icon-success iconbangzhu"/></div>
 			<div class="check" v-else-if="taskItem.state == 1"><i class="iconfont el-icon-success iconbangzhu"/></div>
 			<div class="check" v-else-if="taskItem.state == 2 || taskItem.state == 4 || taskItem.state == 6 || taskItem.state == 8"><i class="iconfont el-icon-time iconbangzhu"/></div>
 			<div class="check" v-else-if="taskItem.state == 3 || taskItem.state == 7"><i class="iconfont el-icon-more iconbangzhu need_grey"/></div>
-			
+
 			<!-- audit task wrapper -->
 			<div class="audit-task-wrapper" :class="{ on_audit : taskItem.state == 2 }" >
 				<div class="audit-workflow-name">{{taskItem.nodeName}} </div>
@@ -13,22 +13,25 @@
 					<!-- name -->
 					<div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
 						<div class="audit-name">
-							
 							<div class="audit-user-name" v-if="taskItem.state == 1 && task.comment.result == 0">{{task.assignee.titleName}} -- {{task.assignee.userName}} <span> ({{task.endTs}})</span></div>
-							<!-- 補上神秘客判斷 -->
-							<div class="audit-user-name" v-else-if="taskItem.parentId == -1"> <span v-if="!isMysteryMode">{{task.assignee.titleName}} -- </span> {{task.assignee.userName}} <span> ({{task.endTs}})</span></div>
+							<div class="audit-user-name" v-if="taskItem.state == 1 && task.comment.result == -979"> 簽核通過（自動簽核）<span v-if="taskItem.tasks[0].endTs !==null"> ({{task.endTs}})</span></div>
 
+
+              <!-- 補上神秘客判斷 -->
+							<div class="audit-user-name" v-else-if="taskItem.parentId == -1"> <span v-if="!isMysteryMode">{{task.assignee.titleName}} -- </span> {{task.assignee.userName}} <span> ({{task.endTs}})</span></div>
 
 							<div class="audit-user-name" v-else-if="taskItem.state == 1 && task.comment.result == 1"> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
 							<div class="audit-user-name" v-else-if="taskItem.state == 1 && task.comment.result == -999"> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
-							<div class="audit-user-name" v-else-if="taskItem.state == 5 && task.comment.result == -1"> {{task.auditByUsers[0].titleName}} -- {{task.auditByUsers[0].userName}} <span>({{task.endTs}})</span></div>
+
+
+              <div class="audit-user-name" v-else-if="taskItem.state == 5 && task.comment.result == -1"> {{task.auditByUsers[0].titleName}} -- {{task.auditByUsers[0].userName}} <span>({{task.endTs}})</span></div>
 							<div class="audit-user-name" v-else-if="taskItem.state == 5 && task.comment.result == 1 "> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
 							<div class="audit-user-name" v-else-if="taskItem.state == 5 && task.comment.result == 0 "> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
 
 							<div class="audit-user-name" v-else-if="taskItem.state == 2 && task.comment == null"> {{task.auditByUsers[0].titleName}} -- {{task.auditByUsers[0].userName}} <span v-if="task.endTs !== null">({{task.endTs}}) </span></div>
 							<div class="audit-user-name" v-else-if="taskItem.state == 2 && task.comment !== null"> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}}) </span></div>
 							<div class="audit-user-name" v-else-if="taskItem.state == 3"> {{taskItem.auditTargetName}}</div>
-							
+
 							<div class="audit-user-name" v-else-if="taskItem.state == 6 && task.comment.result == -2"> {{task.auditByUsers[0].titleName}} -- {{task.auditByUsers[0].userName}} <span>({{task.endTs}})</span></div>
 							<div class="audit-user-name" v-else-if="taskItem.state == 6 && task.comment.result == 1"> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
 							<div class="audit-user-name" v-else-if="taskItem.state == 6 && task.comment.result == 0"> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
@@ -38,8 +41,10 @@
 							<div class="audit-user-name" v-else-if="taskItem.state == 8 && task.comment.result == 1"> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span> </div>
 							<div class="audit-user-name" v-else-if="taskItem.state == 8 && task.comment.result == -999"> {{task.auditByUsers[0].titleName}} -- {{task.auditByUsers[0].userName}} <span>({{task.endTs}})</span> </div>
 						</div>
+
 						<div class="audit-situation"  v-if="taskItem.parentId !== -1 ">
 							<div class="audit_agree" v-if="taskItem.state == 1 &&  task.comment.result == 0"><i class="iconfont el-icon-check"/>{{$t('audit.auditStatus.agree')}}</div>
+							<div class="audit_agree" v-if="taskItem.state == 1 &&  task.comment.result == -979""><i class="iconfont el-icon-check"/>{{$t('audit.auditStatus.agree')}}</div>
 							<div class="audit_agree" v-if="task.assignee !== null && taskItem.state == 2 && task.comment.result == 0"><i class="iconfont el-icon-check"/> {{$t('audit.auditStatus.agree')}}</div>
 							<div class="audit_agree" v-if="taskItem.state == 5 && task.comment.result == 0"><i class="iconfont el-icon-check"/> {{$t('audit.auditStatus.agree')}}</div>
 							<div class="audit_agree" v-if="taskItem.state == 6 && task.comment.result == 0"><i class="iconfont el-icon-check"/> {{$t('audit.auditStatus.agree')}}</div>
@@ -47,7 +52,7 @@
 
 							<div class="audit_disagree" v-if="taskItem.state == 5 && task.comment.result == 1"><i class="iconfont el-icon-close"/> {{$t('audit.auditStatus.reject')}}</div>
 							<div class="audit_disagree" v-else-if="taskItem.state == 1 && task.comment.result == 1"><i class="iconfont el-icon-close"/> {{$t('audit.auditStatus.reject')}}</div>
-							
+
 							<div class="audit_disagree" v-else-if="task.assignee !== null && taskItem.state == 2 && task.comment.result == 1"><i class="iconfont el-icon-close"/> {{$t('audit.auditStatus.reject')}}</div>
 							<div class="audit_disagree" v-else-if="taskItem.state == 8 && task.comment.result == 1"><i class="iconfont el-icon-close"/> {{$t('audit.auditStatus.reject')}}</div>
 							<div class="audit_cancel" v-else-if="taskItem.state == 6 && task.comment.result == -2"><i class="iconfont el-icon-info"/> {{$t('audit.auditStatus.rollback')}}</div>
@@ -62,19 +67,19 @@
 						<div class="audit-description-comment" v-if="task.comment !== null " >{{task.comment.description}}</div>
 						<div class="audit-description-data" v-if="task.comment !== null ">
 
-							<!-- <img :src="blopSign.content" alt="" v-for="blopSign in task.comment.signature" :key="blopSign.ts" 
-							style="background: #FFF;" 
+							<!-- <img :src="blopSign.content" alt="" v-for="blopSign in task.comment.signature" :key="blopSign.ts"
+							style="background: #FFF;"
 							:preview-src-list = "getImgSrcSign(index, blopSign)"
 							> -->
 							<div class="iimg" v-for="(blopSign, index) in task.comment.signature" :key="blopSign.ts">
 								<el-image
-									style="background: #FFF;" 
+									style="background: #FFF;"
 									:src="blopSign.content"
 									v-if="blopSign.type == 2 || blopSign.type == 1"
 									:preview-src-list = "getImgSrcSign(index, blopSign)"
 									/>
 							</div>
-							
+
 							<div class="iimg" v-for="(blopImg, index) in task.comment.attachment" :key="blopImg.ts">
 								<el-image
 									:src="blopImg.url"
@@ -85,7 +90,7 @@
 								<p class="pdf_name" v-if="blopImg.mediaType == 4">{{blopImg.fileName}}</p>
 								</a>
 							</div>
-							
+
 						</div>
 					</div>
 				</div>
@@ -130,17 +135,17 @@ export default {
 		getImgSrc(index, blopImg){
 			var arr = []
 			arr.push(blopImg.url)
-		
+
 			// if(this.taskInfo[index].tasks.length > 1){
 			// 	this.taskInfo[index].tasks.forEach( t => {
 			// 		var rulResult = t.comment.attachment.map( i => i = i.url )
 			// 		arr.push(rulResult[0])
 			// 	});
 			// }
-			// else 
-			
+			// else
+
 			// if(this.taskInfo[index].tasks.length === 1){
-				
+
 			// 	var rulResult = this.taskInfo[1].tasks[0].comment.attachment.map( i => i = i.url )
 			// 	arr = rulResult
 
@@ -150,7 +155,7 @@ export default {
 			// 	// 		arr = rulResult
 			// 	// 	}
 			// 	// });
-			// } 
+			// }
 			// console.log('arr :>> ', arr);
 			return this.urlList = arr
 		},
@@ -160,13 +165,13 @@ export default {
 <style lang="sass" scoped>
 	.not__yet
 		color: #c0c0c0 !important
-	.iconbangzhu 
+	.iconbangzhu
 		color: #556679
 		font-size: 23px
 	.need_grey
 		color: #c9c9c9 !important
 
-	h3 
+	h3
 		margin: 0
 		font-size: calc(18/1920*100vw)
 	p
@@ -181,7 +186,7 @@ export default {
 	.for-flex
 		display: flex
 		flex-direction: row
-		justify-content: flex-start 
+		justify-content: flex-start
 		align-items: flex-end
 	.justify-content_space-between
 		justify-content: space-between
@@ -209,7 +214,7 @@ export default {
 				font-size: 15px
 				font-weight: 900
 				margin-bottom: 3px
-				
+
 
 			.audit-flow-content
 				// padding-top: 0px !important
@@ -218,7 +223,7 @@ export default {
 					.audit-user-name
 						font-size: 12px
 				.audit-situation
-					i 
+					i
 						margin-right: 5px
 					.audit_agree
 						width: 120px
@@ -280,7 +285,7 @@ export default {
 									height: 120px
 									border-radius: 4px
 									cursor: pointer !important
-						
+
 						img
 							margin-top: 10px
 							margin-right: 10px
@@ -320,6 +325,6 @@ export default {
 .el-image-viewer__img
 	background: #FFF
 	max-width: 600px !important
-	
+
 
 </style>

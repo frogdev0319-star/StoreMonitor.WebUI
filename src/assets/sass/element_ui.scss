@@ -102,16 +102,16 @@ body .el-table th.gutter {
   display: none;
 }
 .el-table__footer-wrapper, .el-table__header-wrapper {
-  @media screen and (max-width:1367px) { 
+  @media screen and (max-width:1367px) {
     overflow: visible;
   }
   @media screen and(min-width: 1367px){
     overflow: hidden;
   }
-  
+
 }
 .el-table__body-wrapper {
-  @media screen and (max-width:1367px) { 
+  @media screen and (max-width:1367px) {
     overflow: visible;
   }
   @media screen and(min-width: 1367px){
@@ -119,7 +119,7 @@ body .el-table th.gutter {
   }
 }
 .el-table--scrollable-x .el-table__body-wrapper {
-  @media screen and (max-width:1367px) { 
+  @media screen and (max-width:1367px) {
     overflow: visible;
   }
   @media screen and(min-width: 1367px){
@@ -127,16 +127,16 @@ body .el-table th.gutter {
   }
 }
 .el-table--border::after, .el-table--group::after {
-  width: 0px; 
+  width: 0px;
 }
 .el-table th>.cell{
-  @media screen and (max-width:1367px) { 
+  @media screen and (max-width:1367px) {
     width:max-content;
   }
   @media screen and(min-width: 1367px){
     width:100%;
   }
-  
+
 }
 //.el-table {
 //  overflow-x: auto;
@@ -182,7 +182,7 @@ body .el-table th.gutter {
   padding-left: calc(20/1920*100vw) !important;
 }
 .cell-class:first-child .cell{
-  padding-left: calc(0/1920*100vw) !important;
+  // padding-left: calc(0/1920*100vw) !important;
 }
 .el-table__empty-block{
   border-bottom: 1px solid #e3e9f4;
@@ -283,7 +283,7 @@ body .el-table th.gutter {
     position: relative;
   }
 
-  
+
   .el-loading-text {
     color: #7d8cad;
     font-size: calc(14 / 1920 * 100vw);

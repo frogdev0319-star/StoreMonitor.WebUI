@@ -45,7 +45,7 @@
                     :key="'sendAudit'+index"
                     :label="item.label"
                     :name="item.name">
-                
+
                     <div class="list-table">
                         <table-only
                             ref="elTP"
@@ -58,7 +58,7 @@
                             :allowRowExpand = "false"
                             :showBorder = "false"
                             :default-sort = "defaultSort"
-                            :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '6px',}" 
+                            :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '6px',}"
                             :tableHeight = "760"
                             :cellStyle="{backgroundColor: '#fff !important'}"
                             @onCellClick="clickDetail"
@@ -279,7 +279,7 @@ export default{
                     },
                     totalPage: 1,
                     sizeNum:10
-                    },                                                                  
+                    },
             ],
             tabContentId:[{key:'en',value:'#en-tabs-content'},{key:'zh',value:'#en-tabs-content'},{key:'zhtw',value:'#en-tabs-content'},
                 {key:'ja-JP',value:'#en-tabs-content'},{key:'ko-KR',value:'#en-tabs-content'},{key:'vi-VN',value:'#en-tabs-content'},
@@ -292,7 +292,7 @@ export default{
     watch: {
         accountChanged(val) {
             const self = this;
-            
+
             if (val !== 0) {
                 window.setTimeout(function() {
                 self.$route.meta.keepAlive = true;
@@ -331,7 +331,7 @@ export default{
             self.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
             self.inputSearchValue = '';
             self.curTotalPage = 0;
-            
+
             self.getSearchParams();
             //this.tableDataList[Number(this.activeName)].page = 1;
             self.getAllTask()
@@ -391,7 +391,7 @@ export default{
             }
         },
         saveSearchParams() {
-            
+
             const params = {...this.searchParams};
             params['inputSearchValue'] = this.inputSearchValue;
             params['curTabIndx'] = this.curTabIndx;
@@ -427,7 +427,7 @@ export default{
             const self = this;
             self.curSizeNum = val.size;
             self.curPage = 1;
-            
+
             self.tableDataList[self.curTabIndx].sizeNum = val.size;
             //self.params.filter = { page: 0, size: val.size };
             self.getAllTask();
@@ -457,7 +457,7 @@ export default{
             };
 
 
-            
+
 
             //console.log("this.storeFilterObj.curStore:",this.storeFilterObj.curStore);
             if(this.curStoreIds!=-1 && !this.storeFilterObj.curStore.includes('-1')){
@@ -467,18 +467,18 @@ export default{
 
             if( params['storeId'] && params['storeId'].length == 0){
                 this.tableDataList.tableData = []
-                
+
                 this.isLoading = false;
                 return
             }
-            
+
 
             if(this.curTabIndx==0){//待簽核
                 params['type'] = 1;
                 params['auditState'] = [2];
             }else if(this.curTabIndx==1){//已簽核
                 params['type'] = 2;
-                params['auditState'] = [2,3,4,5,6,7] 
+                params['auditState'] = [2,3,4,5,6,7]
             }
             if(Object.keys(this.curOrder).length>0){
                 params['order'] = this.curOrder;//this.curOrder;
@@ -491,7 +491,7 @@ export default{
             // if(params.storeId && params.storeId.length == 0){
             //     this.tableDataList = []
             //     this.tableDataList[this.curTabIndx].page = 1;
-                
+
             //     this.isLoading = false;
             //     return
             // }
@@ -508,13 +508,19 @@ export default{
                     //const tempProcessing = [];
                     //const tempCompleted = [];
                     //var processingCount=0, completedCount=0;
-                    
+
                     for(const task of data){
                         var taskObj = {...task};
                         taskObj['id'] =  task.inspectReportId;
                         taskObj.processStartTs =  util.getDateStr(task.processStartTs);
                         taskObj.processLastUpdateTs =  util.getDateStr(task.processLastUpdateTs);
-                        taskObj['auditStatusName'] = util.getAuditStatusName(task.auditState);
+
+                        if(taskObj.isAutoApproved){
+                          taskObj['auditStatusName'] = util.getAuditStatusName(8);
+                        } else{
+                          taskObj['auditStatusName'] = util.getAuditStatusName(task.auditState);
+                        }
+
                         taskObj['operator']=this.$t('statistics.check');
                         if(task.auditState==4 || task.auditState==5){//已完成
                             //completedCount+=1;
@@ -554,12 +560,7 @@ export default{
 </script>
 
 <style lang="scss" scoped>
-.aaa{
-    width: 50px;
-    height: 50px;
-    background: yellow;
-    cursor: pointer;
-}
+
 .el-audit-header{
     .search-button{
       float: right;
@@ -578,7 +579,7 @@ export default{
     position: relative;
     padding-top: calc(30/1920*100vw);
     .list-table{
-      
+
       .table-white {
         /deep/
         .el-table{

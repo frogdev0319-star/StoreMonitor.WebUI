@@ -5,26 +5,26 @@
         <!-- audit-header -->
         <div class="audit-header">
           <h3>{{auditDetail.reportName}}</h3>
-          <div class="goto-report" 
+          <div class="goto-report"
             @click="goToReportdetails"
             v-if="showingBtn "> {{$t('route.reportDetails')}}</div>
         </div>
-      
+
         <div v-loading="isLoadingData" class="setting-details self-loading">
           <!-- audit body -->
           <div class="audit-flow-body">
 
             <div class="audit-flow-ownerhandling">
               <p style="margin-bottom: 30px"> {{$t('audit.workFlows.auditFlow')}}</p>
-              <div class="handling" v-if="!onEditing && auditDetail.auditState < 4"> 
+              <div class="handling" v-if="!onEditing && auditDetail.auditState < 4">
                 <div class="withdraw" @click="showDoalogTaskDrawback = true" v-if="auditDetail.submitter == currentUserInfo && auditStates !== 3" >{{customButton[2].text}}</div>
                 <div class="l-l" v-if="auditDetail.cancelable && auditDetail.submitter == currentUserInfo && auditStates !== 3"> | </div>
                 <div class="cancel" @click="showDoalogTaskCancel = true " v-if="auditDetail.cancelable && auditDetail.submitter == currentUserInfo && auditStates !== 3">{{$t('audit.auditStatus.cancel')}}</div>
               </div>
             </div>
-            
             <!-- task -->
-            <AuditUnit 
+
+            <AuditUnit
               :taskInfo = "taskInfo"
               :auditStates = auditStates
               :isMysteryMode = isMysteryMode
@@ -33,7 +33,7 @@
           </div>
         </div>
       </div>
-    </div> 
+    </div>
     <!-- popup -->
     <dialog-pop
       :title=" $t('audit.auditStatus.ifDraback')"
@@ -123,11 +123,11 @@ export default {
       isMysteryMode: false
     }
   },
-  
+
   mounted() {},
   async created() {
     await this.init()
-    await this.getNodeList(this.auditDetail.processDefinitionKey) 
+    await this.getNodeList(this.auditDetail.processDefinitionKey)
 
     const resulit = await this.$store.dispatch("GetUserAuthorities");
     this.currentUserInfo = resulit.data.userId
@@ -146,18 +146,18 @@ export default {
             status : '',
             ts : this.auditDetail.processStartTs,
             submitterName : this.auditDetail.submitterName,
-    
+
           };
       sessionStorage.setItem('report_data', JSON.stringify(parsObj));
 
 
       if(this.$router.currentRoute.fullPath == "/auditDetail") {
         this.$router.push(
-          { 
-            name: 'auditReportdetails', 
+          {
+            name: 'auditReportdetails',
             params: {
-              reportId: reportId, 
-              isAuditMode: true, 
+              reportId: reportId,
+              isAuditMode: true,
               canEdit: (this.auditDetail.submitter == this.currentUserInfo) && (this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7),
               canCancel: canCancel,
               auditCancelable:this.auditDetail.cancelable
@@ -166,11 +166,11 @@ export default {
         );
       } else if(this.$router.currentRoute.fullPath == "/waitAuditDetail"){
         this.$router.push(
-          { 
-            name: 'WaitAuditReportdetails', 
+          {
+            name: 'WaitAuditReportdetails',
             params: {
-              reportId: reportId, 
-              isAuditMode: true, 
+              reportId: reportId,
+              isAuditMode: true,
               canEdit: (this.auditDetail.submitter == this.currentUserInfo) && (this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7),
               canCancel: canCancel,
               auditCancelable:this.auditDetail.cancelable
@@ -180,11 +180,11 @@ export default {
       } else if(this.$router.currentRoute.fullPath =="/transcriptnotifyAuditDetail"){
         console.log('hahaah :>> ');
         this.$router.push(
-          { 
-            name: 'transcriptnotifyReportdetails', 
+          {
+            name: 'transcriptnotifyReportdetails',
             params: {
-              reportId: reportId, 
-              isAuditMode: true, 
+              reportId: reportId,
+              isAuditMode: true,
               canEdit: (this.auditDetail.submitter == this.currentUserInfo) && (this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7),
               canCancel: canCancel,
               auditCancelable:this.auditDetail.cancelable
@@ -192,7 +192,7 @@ export default {
           }
         );
       }
-      
+
     },
 
     hideDeleteContentDialog(key) {
@@ -233,7 +233,19 @@ export default {
         this.isMysteryMode = res.data.isMysteryMode
 
         console.log('this.auditStates ----->> ', this.auditStates);
+
+
+        // !!!??!!!!!
+
+        const n = this.taskInfo.length - 1
+        if(this.taskInfo[n].state == 1 && this.taskInfo[n].autoApproved){
+          this.taskInfo[n].tasks[0].comment = {result : -979}
+
+        }
+
+
         console.log('this.taskInfo ori ----->> ', this.taskInfo);
+
 
         // 部門簽核完成時間排序
         this.taskInfo.forEach(item =>{
@@ -250,7 +262,7 @@ export default {
         console.log('error' + err);
       });
     },
-    
+
     // get node
     async getNodeList(id){
       await getNodeList(id).then(res=>{
@@ -273,7 +285,7 @@ export default {
               this.customButton = n.customButton
             }
           })
-        })      
+        })
       }).catch(err => {
         console.log('error' + err);
       });
@@ -291,7 +303,7 @@ export default {
     },
 
     taskDrawback(){
-      
+
       const value = {
         "inspectReportId" : this.auditDetail.inspectReportId
         }
@@ -335,13 +347,13 @@ export default {
 <style lang="sass" scoped>
   .not__yet
     color: #c0c0c0 !important
-  .iconbangzhu 
+  .iconbangzhu
     color: #556679
     font-size: 23px
   .need_grey
     color: #c9c9c9 !important
 
-  h3 
+  h3
     margin: 0
     font-size: calc(18/1920*100vw)
   p
@@ -355,11 +367,11 @@ export default {
   .for-flex
     display: flex
     flex-direction: row
-    justify-content: flex-start 
+    justify-content: flex-start
     align-items: flex-end
   .justify-content_space-between
     justify-content: space-between
-  
+
   .report-setting
     height: 100%
     position: relative

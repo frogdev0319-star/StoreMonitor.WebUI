@@ -1,6 +1,6 @@
 <template>
   <div :style="{'minHeight':windowHeight-118+'px'}" class="el-event-content">
-    <div class="el-event-header"> 
+    <div class="el-event-header">
       <div class="el-area">
         <store-filter
           :cached-params="searchParams"
@@ -35,7 +35,7 @@
                     :alltype="0"
                     :options="inspectTableList"
                     @changeInput="changeSelect(arguments)"/>
-                  
+
               </div>
             </div>
           </template>
@@ -49,7 +49,7 @@
             @change="dateChange"
           />
         </div>
-      
+
         <div class="flex-center">
           <span style="margin-right: 10px; white-space:nowrap;">{{ $t('remotePatrol.keywords') }}</span>
           <el-input
@@ -123,7 +123,7 @@
                     :class="lang.indexOf('ja') !== -1 ? 'ja-icon': 'icon-span'"
                     style="background-color:#fff2ef;color:#f57848;"
                     >
-                    {{ $t('eventView.pending') }} 
+                    {{ $t('eventView.pending') }}
                   </span>
                   <span
                     v-else-if="scope.row.status === 1"
@@ -143,17 +143,17 @@
                     style="background-color:#ffeff5;color:#e22472;" >
                     {{ $t('eventView.returnStatus') }}
                   </span>
-                  
+
                   <el-tooltip v-if="scope.row.status === 0  && scope.row.isSystemAdvancedEdited" effect="light" placement="right-end">
                     <div slot="content"> 變更時間：{{scope.row.systemAdvancedActionTs}} </div>
                     <div v-if="scope.row.status === 0 && scope.row.isSystemAdvancedEdited" class="expiretag">
-                      <span style="color:#f57848;"> (已變更狀態) </span> 
+                      <span style="color:#f57848;"> (已變更狀態) </span>
                     </div>
                   </el-tooltip>
                   <el-tooltip v-if="scope.row.status === 1 && scope.row.isSystemAdvancedEdited" effect="light" placement="right-end">
                     <div slot="content"> 變更時間：{{scope.row.systemAdvancedActionTs}} </div>
                     <div v-if="scope.row.status === 1 && scope.row.isSystemAdvancedEdited" class="expiretag">
-                      <span style="color:#59ab22;"> (已變更狀態) </span> 
+                      <span style="color:#59ab22;"> (已變更狀態) </span>
                     </div>
                   </el-tooltip>
 
@@ -163,7 +163,7 @@
                       <div v-else> {{ $t('eventView.expiredate')+ scope.row.updateTs }}</div>
                     </div>
                     <div v-if="scope.row.status === 2 && scope.row.isSystemAdvancedEdited" class="expiretag">
-                      <span style="color:#556679;"> (已變更狀態) </span> 
+                      <span style="color:#556679;"> (已變更狀態) </span>
                     </div>
                   </el-tooltip>
 
@@ -173,16 +173,16 @@
                       <div v-else> {{ $t('eventView.expiredate')+ scope.row.updateTs }}</div>
                     </div>
                     <div v-if="scope.row.status === 3 && scope.row.isSystemAdvancedEdited" class="expiretag">
-                      <span style="color:#e22472;"> (已變更狀態) </span> 
+                      <span style="color:#e22472;"> (已變更狀態) </span>
                     </div>
                   </el-tooltip>
                   <el-tooltip v-if="scope.row.status === 4 " effect="light" placement="right-end">
                     <div slot="content">{{ $t('eventView.expiredate')+ scope.row.updateTs }} </div>
                     <div v-if="scope.row.status === 4 && scope.row.isSystemAdvancedEdited" class="expiretag">
-                      <span style="color:#556679;"> (已變更狀態) </span> 
+                      <span style="color:#556679;"> (已變更狀態) </span>
                     </div>
                     <div v-else="scope.row.status === 4" class="expiretag">
-                      {{ '('+$t('eventView.expiretag')+')' }} 
+                      {{ '('+$t('eventView.expiretag')+')' }}
                     </div>
                   </el-tooltip>
 
@@ -262,7 +262,7 @@
                 @currentChange="currentChange"
               />
             </div>
-            
+
           </div>
         </el-tab-pane>
       </el-tabs>
@@ -447,7 +447,7 @@ export default {
         // { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
         { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') },
         // { 'mode': 2, 'label': this.$t('immediatePush.storeMonitoring') },
-        // { 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')  } 
+        // { 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')  }
       ],
       inspectId: [],
       inspectTableList: [],
@@ -536,7 +536,7 @@ export default {
     else {
       this.isLicensePro ? this.reportTypeList.push({ 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')}) : null
     }
-    
+
   },
 
   activated() {
@@ -766,14 +766,14 @@ export default {
         // this.tableDataList[tabIndex].eventCount = 0;
         // this.totalElements = 0;
         // this.numberOfElements = 0;
-        
+
         delete self.params.clause.storeId;
         return;
       }
 
       // self.params.searchMysteryMode = 0
 
-      if(this.curReportType == -1){ 
+      if(this.curReportType == -1){
         self.params.sourceType = null
         if(this.inspectId[0] == -1){
           self.params.inspectTagIds = []
@@ -783,7 +783,7 @@ export default {
       else if(this.curReportType == 1){self.params.sourceType = 2}
       else if(this.curReportType == 2){self.params.sourceType = 0}
       else if(this.curReportType == 3){self.params.sourceType = 3}
-      
+
       console.log("@@@self.params:",self.params);
 
       eventRESTful.getEventList(self.params).then((res) => {
@@ -1049,7 +1049,7 @@ export default {
       //console.log(self.params.clause.storeId);
       const tabIndex = Number(this.activeName);
       if ( self.params.clause.storeId && self.params.clause.storeId.length === 0) {
-      
+
         console.log('tabIndex' ,tabIndex)
         // console.log('this.tableDataList', this.tableDataList)
 
@@ -1059,7 +1059,7 @@ export default {
         this.totalElements = 0;
         this.numberOfElements = 0;
 
-        
+
         // delete self.params.clause.storeId;
         return;
       }
@@ -1231,7 +1231,7 @@ export default {
       var hour = this.pad2(date.getHours())
       var min = this.pad2(date.getMinutes())
       var sec = this.pad2(date.getSeconds())
-      return year + month + day 
+      return year + month + day
     },
     getOnlyDate(t){
       var date = new Date(t);
@@ -1241,7 +1241,7 @@ export default {
       var hour = this.pad2(date.getHours())
       var min = this.pad2(date.getMinutes())
       var sec = this.pad2(date.getSeconds())
-      return  month + day 
+      return  month + day
     },
 
     gotoDownloadManagement(){
@@ -1255,7 +1255,7 @@ export default {
       try {
         const ret = await that.isLoginIn();
         if (ret.data != undefined && ret.data.isLogin) {
-          
+
           const tabIndex = Number(that.activeName);
           if (that.tableDataList[tabIndex].tableData.length === 0) {
             util.notify(this.$t('eventView.noEvents'), 'warning', 3 * 1000);
@@ -1264,8 +1264,8 @@ export default {
 
           console.log('this.params :>> ', this.params);
           this.params.filter = {page: 0, size: 99999}
-          
-          
+
+
           const now = new Date()
           var nowTs = this.getAllDate(now)
           var tsbegin = this.getDate(this.dateValue[0])
@@ -1273,7 +1273,7 @@ export default {
 
           if(this.params.clause.status === 0) {
             var fileName = nowTs + "-Unhandled_events-" + tsbegin + tsEnd
-          } 
+          }
           else if(this.params.clause.status == 1){
             var fileName = nowTs + "-Handled_events-" + tsbegin + tsEnd
           }
@@ -1287,9 +1287,9 @@ export default {
             var fileName = nowTs + "-Closed_events-" + tsbegin + tsEnd
           }
           this.params.fileName = fileName
-          
+
           var tempinspectTagName = []
-          
+
           // console.log('this.inspectTableList :>> ', this.inspectTableList);
           // console.log('this.storeList :>> ', this.storeList);
 
@@ -1309,7 +1309,7 @@ export default {
           this.params.conTableName = tempinspectTagName.join(', ')
           this.params.conStoreName = this.storeList.length == this.params.clause.storeId.length ? "全部" : this.storeFilterObj.storeStr
           this.params.requestTs = now.getTime()
-          
+
           this.showExportMassage = true
           exportEventList(this.params).then(res=>{
             console.log('res :>> ', res);
@@ -1429,7 +1429,7 @@ export default {
       };
       console.log("save params:",params);
       SearchConditionUtil.saveSearchCondition(searchConditon);
-    
+
     },
 
 
@@ -1505,8 +1505,8 @@ export default {
         this.ifGetParamsFromCash = false;
       }
 
-    
-      
+
+
 
 
     },

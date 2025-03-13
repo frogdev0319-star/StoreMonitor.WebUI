@@ -261,7 +261,7 @@
         </aside>
 
 
-        <section :class="secClass">
+        <section :class="secClass">``
           <el-col
             v-if="!showHeader"
             :class="wrapperAll ? 'content-wrapper-all' : 'content-wrapper'"
@@ -289,7 +289,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.2.2.18
+                v3.2.3.1
                   &copy; {{ getFullYear }} Advantech Intelligent City
                   Services Co., Ltd. <span @click.prevent="checkServerVersion">(AiCS)</span> All Rights Reserved.
               </p>

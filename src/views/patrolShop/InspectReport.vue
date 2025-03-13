@@ -21,7 +21,7 @@
       <div class="dialog-content">
         <div class="comfirm_delete_report" >
           <h3>同意刪除須知事項 </h3>
-          <p>請注意！刪除報告後資料無法復原，請確保您要刪除的報告是正確的，請謹慎操作。 
+          <p>請注意！刪除報告後資料無法復原，請確保您要刪除的報告是正確的，請謹慎操作。
             為確保報告的安全刪除，請提供用戶密碼並勾選 <b>「我理解並同意刪除報告」</b>。
             如果您有任何疑問或需要協助，請隨時聯絡我們的客服團隊。</p>
         </div>
@@ -34,7 +34,7 @@
 
         <div class="l_row">
           <div style="margin-bottom: 5px ;">
-            <span style="color: red; ">*</span> 刪除原因 
+            <span style="color: red; ">*</span> 刪除原因
           </div>
           <el-input
             v-model="deleteReason"
@@ -48,7 +48,7 @@
 
         <div class="l_row">
           <div style="margin-bottom: 5px ;">
-            <span style="color: red; ">*</span> 請再次輸入使用者密碼 
+            <span style="color: red; ">*</span> 請再次輸入使用者密碼
           </div>
           <el-input
             v-model="passWord"
@@ -127,7 +127,7 @@
 
             <span class="info-label">{{ $t('remotePatrol.generateTime')+'：' }}</span>
             <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
-            
+
             <span class="ignoreSign" v-if="report.isCheckInIgnore"> 略過簽到 </span>
 
             <!-- 簽到時間 -->
@@ -182,7 +182,7 @@
       <span v-if="hasSignRecord && report.isCheckInIgnore"> (略過簽到) </span>
       <span v-if="hasSignRecord" class="info-label">{{ $t('remotePatrol.signInTime')+'：' }}</span>
       <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ signInTime }}</span>
-      
+
 
       <span v-if="hasSignRecord" class="info-label" style="margin-left:calc(40/1980*100vw)">{{ $t('remotePatrol.patrolTime')+'：' }}</span>
       <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ inceptionExecutTime }}</span>
@@ -464,8 +464,8 @@
                       <div v-if="categoryItem.weight != -1 && categoryItem.type != 2">{{ categoryItem.weight + '%' }}</div>
                       <div>
                         {{ categoryItem.groupName }}
-                        <span style="color: #7d8cad; margin-left: 5px;" v-if="setting_isShowGroupSum"> 
-                          ( {{$t('remotePatrol.totalScoreUnit')}} : {{ getSum(categoryItem.children)}} ) 
+                        <span style="color: #7d8cad; margin-left: 5px;" v-if="setting_isShowGroupSum">
+                          ( {{$t('remotePatrol.totalScoreUnit')}} : {{ getSum(categoryItem.children)}} )
                         </span>
                       </div>
                     </div>
@@ -883,7 +883,7 @@ export default {
       canDeleteReport: false,
       needDeleteReport: false,
       showExportMassage: false
-      
+
     };
   },
 
@@ -934,7 +934,7 @@ export default {
     this.getReportTemplateAndInfo();
     this.getInspectStatus()
 
-    
+
   },
 
   mounted() {
@@ -943,7 +943,7 @@ export default {
   },
 
   methods: {
-    
+
     addNum(){
       this.changeNum += 1
       console.log('this.changeNum :>> ', this.changeNum);
@@ -965,7 +965,7 @@ export default {
         password: EncryptPassword
       }
       console.log('delParams ~~~~~~~>> ', delParams);
-      // this.isLoading = true;   
+      // this.isLoading = true;
       deleteReport(delParams).then(res=>{
         console.log('res :>> ', res);
         if(res.errCode){
@@ -973,7 +973,7 @@ export default {
         } else {
           this.$router.push({ name: 'deleteReport' });
         }
-        
+
       }).catch(err => {
         console.log('err :>> ', err.errCode);
       })
@@ -990,8 +990,8 @@ export default {
       console.log('this.qualifiedForIgnoredWithType1 :>> ', this.qualifiedForIgnoredWithType1);
       console.log('this.qualifiedForIgnoredWithType2 :>> ', this.qualifiedForIgnoredWithType2);
 
-      // -1 - original mark system， 
-      // 0 - hundred mark system, 
+      // -1 - original mark system，
+      // 0 - hundred mark system,
       // 1 - penalty point system
       if(hundredMarkType == 0){
         var n = 0
@@ -1003,7 +1003,7 @@ export default {
             if(i.groupScore !== -99999){
               // tab1 為Number.MAX_VALUE ,不計分
               if(i.actualScore === Number.MAX_VALUE)  var tempScore = 0
-              
+
               if(this.includedInTotalScoreWithType1){
                 // tab1
                 if(this.qualifiedForIgnoredWithType1 && i.type == 0){
@@ -1044,7 +1044,7 @@ export default {
             // 無分數無上限
             else {
               if(i.actualScore === Number.MAX_VALUE)  var tempScore = 0
-              
+
               if(this.includedInTotalScoreWithType1){
                 // tab1
                 if(this.qualifiedForIgnoredWithType1 && i.type == 0){
@@ -1082,9 +1082,9 @@ export default {
                 }
               }
 
-              
+
             }
-          } 
+          }
 
           // 無權重
           else {
@@ -1094,7 +1094,7 @@ export default {
             if(i.groupScore !== -99999 ){
               console.log('分數無上限 :>> ');
               if(i.actualScore === Number.MAX_VALUE)  var tempScore = 0
-          
+
               if(this.includedInTotalScoreWithType1){
                  // tab1
                 if(this.qualifiedForIgnoredWithType1 && i.type == 0){
@@ -1119,7 +1119,7 @@ export default {
               else {
                 // tab1
                 if(i.type == 0){
-                  var tempScore =  0 
+                  var tempScore =  0
                 }
                 // tab2
                 if(this.qualifiedForIgnoredWithType2 && i.type == 1){
@@ -1176,7 +1176,7 @@ export default {
               }
             }
           }
-          
+
           console.log('tempScore >>>>>>>>', tempScore )
           n = n + tempScore
         })
@@ -1214,52 +1214,52 @@ export default {
 
               if(this.hundredMarkType.value == 0){
                 if(ii.weight == -1 && i.type == 0){
-                  tableTotalScore = tableTotalScore +  (ii.actualScore / this.totalSumScore) 
+                  tableTotalScore = tableTotalScore +  (ii.actualScore / this.totalSumScore)
                   console.log('gogo 沒有權重啊 1！！ :>> ', ii.groupName, tableTotalScore);
                 }
                 else if(ii.weight !== -1 && i.type == 0){
                   // tableTotalScore = tableTotalScore + ii.actualScore * ii.weight / 100
-                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
+                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore)
                   console.log('gogo 有權重啊 :>> ' , ii.groupName, tableTotalScore);
                 }
                 else if(ii.weight == -1 && i.type == 1){
-                  tableTotalScore = tableTotalScore +  (ii.actualScore / this.totalSumScore) 
+                  tableTotalScore = tableTotalScore +  (ii.actualScore / this.totalSumScore)
                   // tableTotalScore.toFixed(1)
                   console.log('gogo 沒有權重啊 2！！ :>> ', ii.groupName, tableTotalScore);
                 }
                 else if(ii.weight !== -1 && i.type == 1){
                   // tableTotalScore = tableTotalScore + ii.actualScore * ii.weight / 100
-                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
+                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore)
                   console.log('gogo 有權重啊 :>> ' , ii.groupName, tableTotalScore);
                 }
                 else if(ii.weight == -1 && ii.type== 2){
                   tableTotalScore = tableTotalScore + ii.actualScore
-                } 
+                }
                 else if(ii.weight !== -1 && ii.type== 2){
                   tableTotalScore = tableTotalScore + ii.actualScore * ii.weight
-                } 
+                }
               }
 
               // 加分制
               else if(this.hundredMarkType.value == -1){
                 if(ii.weight == -1 && i.type == 0){
-                  tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore) 
+                  tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore)
                 }
                 else if(ii.weight !== -1 && i.type == 0){
                   tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) / 100
                 }
                 else if(ii.weight == -1 && i.type == 1){
-                  tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore) 
+                  tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore)
                 }
                 else if(ii.weight !== -1 && i.type == 1){
                   tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) / 100
                 }
                 else if(ii.weight == -1 && ii.type== 2){
-                  tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore) 
-                } 
+                  tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore)
+                }
                 else if(ii.weight !== -1 && ii.type== 2){
-                  tableTotalScore = tableTotalScore + ii.actualScore 
-                } 
+                  tableTotalScore = tableTotalScore + ii.actualScore
+                }
               }
 
               // 扣分制
@@ -1268,23 +1268,23 @@ export default {
                   tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore)  *100
                 }
                 else if(ii.weight !== -1 && i.type == 0){
-                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
+                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore)
                 }
                 else if(ii.weight == -1 && i.type == 1){
                   tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore) *100
                 }
                 else if(ii.weight !== -1 && i.type == 1){
-                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
+                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore)
                 }
                 else if( ii.weight == 0  && ii.type == 2){
                   tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore)  *100
                 }
                 else if(ii.weight == -1 && ii.type== 2){
                   tableTotalScore = tableTotalScore + (ii.actualScore / this.totalSumScore)  *100
-                } 
+                }
                 else if(ii.weight !== -1 && ii.type== 2){
-                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore) 
-                } 
+                  tableTotalScore = tableTotalScore + ((ii.actualScore * ii.weight) / this.totalSumScore)
+                }
               }
             }
         })
@@ -1295,7 +1295,7 @@ export default {
       return tableTotalScore
     },
 
-    
+
     getSum(Array){
       var totalScore = 0
       Array.forEach(i => {
@@ -1309,23 +1309,23 @@ export default {
               totalScore = totalScore + i.actualScore / this.totalSumScore
               totalScore.toFixed(3)
               console.log('i.groupName totalScore tab1 (沒有權重)>> ', i.groupName, totalScore);
-            } 
+            }
             else if(i.weight !== -1 && i.type == 0){
-              totalScore = totalScore + ((i.actualScore * i.weight) / this.totalSumScore) 
+              totalScore = totalScore + ((i.actualScore * i.weight) / this.totalSumScore)
               console.log('i.groupName totalScore tab1(有權重)>> ', i.groupName, totalScore);
             }
             else if(i.weight == -1 && i.type == 1){
               totalScore = totalScore + i.actualScore / this.totalSumScore
               totalScore.toFixed(3)
               console.log('i.groupName totalScore tab2(沒有權重)>> ', i.groupName, totalScore);
-            } 
+            }
             else if(i.weight !== -1 && i.type == 1){
-              totalScore = totalScore + ((i.actualScore * i.weight) / this.totalSumScore) 
+              totalScore = totalScore + ((i.actualScore * i.weight) / this.totalSumScore)
               console.log('i.groupName totalScore tab2(有權重)>> ', i.groupName, totalScore);
             }
-            
+
             else if( i.weight == -1 && i.type == 2 ){
-              totalScore = totalScore + i.actualScore 
+              totalScore = totalScore + i.actualScore
               console.log('i.groupName totalScore tab3(附加類別項)>> ', i.groupName, totalScore);
             }
             else if( i.weight !== -1 && i.type == 2 ){
@@ -1339,7 +1339,7 @@ export default {
           if(i.weight == -1 && i.type == 0){
             console.log('a ~~~~----->> ');
             if(i.actualScore === Number.MAX_VALUE) totalScore = 0
-            else totalScore = totalScore + (i.actualScore ) 
+            else totalScore = totalScore + (i.actualScore )
           }
           else if(i.weight !== -1 && i.type == 0){
             console.log('b ~~~~----->> ');
@@ -1355,10 +1355,10 @@ export default {
             else totalScore = totalScore + (i.actualScore * i.weight ) / 100
           }
           else if( i.weight == -1 && i.type == 2 ){
-            totalScore = totalScore + i.actualScore 
+            totalScore = totalScore + i.actualScore
           }
           else if( i.weight !== -1 && i.type == 2 ){
-            totalScore = totalScore + i.actualScore  
+            totalScore = totalScore + i.actualScore
           }
         }
 
@@ -1385,12 +1385,12 @@ export default {
             totalScore = totalScore + i.actualScore
           }
           else if( i.weight == -1  && i.type == 2 ){
-            totalScore =totalScore + i.actualScore 
+            totalScore =totalScore + i.actualScore
           }
           else if( i.weight !== -1  && i.type == 2 ){
             totalScore = totalScore + (i.actualScore * i.weight / 100)
           }
-          
+
         }
       })
 
@@ -1423,10 +1423,10 @@ export default {
 
         var hundredMarkType = results[1].data[0].inspectSettings.find( i => i.name == 'hundredMarkType')
         this.hundredMarkType = hundredMarkType
-        // -1 - original mark system， 
-        // 0 - hundred mark system, 
+        // -1 - original mark system，
+        // 0 - hundred mark system,
         // 1 - penalty point system
-        
+
         this.setting_isShowGroupSum = (results[1].data[0].inspectSettings.find( i => i.name == "setting_isShowGroupSum")).value
         this.setting_isShowDistrictSum = (results[1].data[0].inspectSettings.find( i => i.name == "setting_isShowDistrictSum")).value
 
@@ -1434,7 +1434,7 @@ export default {
         console.log('this.setting_isShowDistrictSum :>> ', this.setting_isShowDistrictSum);
 
         this.showMaxInfo = results[1].data[0].info.summary.some(i => i.isAdvanced == true)
-        
+
         var includedInTotalScoreWithType1 = results[1].data[0].inspectSettings.find( i => i.name == "includedInTotalScoreWithType1")
         var qualifiedForIgnoredWithType1 = results[1].data[0].inspectSettings.find( i => i.name == "qualifiedForIgnoredWithType1")
         var qualifiedForIgnoredWithType2 = results[1].data[0].inspectSettings.find( i => i.name == "qualifiedForIgnoredWithType2")
@@ -1499,13 +1499,13 @@ export default {
       var month = this.pad2(date.getMonth()+1);
       var day = this.pad2(date.getDate());
       var year= date.getFullYear();
-      return year + month + day 
+      return year + month + day
     },
     getOnlyDate(t){
       var date = new Date(t);
       var month = this.pad2(date.getMonth()+1);
       var day = this.pad2(date.getDate());
-      return  month + day 
+      return  month + day
     },
 
     handleDownExcel(){
@@ -1537,7 +1537,7 @@ export default {
         conTableName,
         conStoreName,
         requestTs : now.getTime()
-        
+
       }
 
       exportEntireJsonUnit(params).then(res=>{
@@ -2149,7 +2149,7 @@ export default {
       if (data.feedback.length === 0) {
         this.showFeedBacks = false;
       } else {
-        this.showFeedBacks = true; 
+        this.showFeedBacks = true;
 
         data.feedback.forEach((item, index) => {
           const obj = {};
@@ -2179,7 +2179,7 @@ export default {
                   hasNotPlayAudio: true
                 });
                 obj.showAudio = true;
-                
+
 
               } else if (_item.mediaType === 3) {
                 obj.descriptionList.push({ description: _item.url });

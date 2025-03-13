@@ -64,7 +64,7 @@
                 <!-- 巡檢平均得分 -->
                 <el-col :span="8" class="division">
                     <el-col class="text-area">
-                        <el-row class="top"> 
+                        <el-row class="top">
                             <span class="mainTitle">{{ bigScore !== -9999 ? bigScore : "N/A" }}</span>
                             <span class="unit">{{ $t('statistics.overview.avg_unit') }}</span>
                         </el-row>
@@ -152,12 +152,12 @@
                         <el-button class="mode-btn" :class="{'active-mode-btn' :part1.storeMode==0}" @click="onSwitchPart1Mode(0)">{{ $t('statistics.event.tableMode')}}</el-button>
                         <el-button class="mode-btn" :class="{'active-mode-btn' :part1.storeMode==1}" @click="onSwitchPart1Mode(1)">{{ $t('statistics.event.imageMode')}}</el-button>
                     </div>
-                    <delay-button 
-                        :class="getLangStyleValue(operationBtnClass)" 
-                        style="margin-left:32px;background-color:#FFF;color:#006ab7;border:none;" 
-                        type="default" size="mini" 
+                    <delay-button
+                        :class="getLangStyleValue(operationBtnClass)"
+                        style="margin-left:32px;background-color:#FFF;color:#006ab7;border:none;"
+                        type="default" size="mini"
                         @click="exportStore2ExcelPart1">
-                        
+
                         <div class="button-area">
                             <img :src="exportPng" class="icon-excel">
                             <span style="color:rgb(0, 106, 183)">{{ $t('eventView.exportReport') }}</span>
@@ -214,7 +214,7 @@
             <div class="head">
                 <div class="region-titles">
                     <span class="title">
-                        {{ $t('statistics.titles.scoreDistribution') }} 
+                        {{ $t('statistics.titles.scoreDistribution') }}
                     </span>
                 </div>
                 <TypeSelectArea
@@ -248,7 +248,7 @@
                 <el-col v-if='part2.standardScore!=-9999' :span="4" class="division" />
                 <el-col :span="8" class="division">
                     <el-col class="text-area">
-                        <el-row class="top"> 
+                        <el-row class="top">
                             <span class="mainTitle">{{part2.averageScore !== -9999 ?  part2.averageScore : 'N/A' }} </span>
                             <span class="unit">{{ $t('statistics.score') }}</span>
                         </el-row>
@@ -546,7 +546,7 @@ export default {
             storePatrolLists: '',
             curRegion: [],
             timeMode: 1,
-            
+
             regionsList: [],
             params: {},
 
@@ -1817,7 +1817,7 @@ export default {
             var hour = this.pad2(date.getHours())
             var min = this.pad2(date.getMinutes())
             var sec = this.pad2(date.getSeconds())
-            return year + month + day 
+            return year + month + day
         },
         getOnlyDate(t){
             var date = new Date(t);
@@ -1827,9 +1827,9 @@ export default {
             var hour = this.pad2(date.getHours())
             var min = this.pad2(date.getMinutes())
             var sec = this.pad2(date.getSeconds())
-            return  month + day 
+            return  month + day
         },
-            
+
 
         async exportStore2ExcelPart1() {
             const self = this;
@@ -1901,7 +1901,7 @@ export default {
                 util.notify("表格資料為空！請重新搜尋條件", 'warning', 3 * 1000);
                 return false;
             }
-            
+
             const now = new Date()
             var nowTs = this.getAllDate(now)
             var tsbegin = this.getDate(this.params.beginTs)
@@ -1951,7 +1951,7 @@ export default {
             //     export_json_to_excel(tHeader, data, fileName);
             // });
         },
-        
+
         async exportStore2ExcelPart2() {
             const self = this;
             const that = this;
@@ -2132,7 +2132,7 @@ export default {
                 util.notify("表格資料為空！請重新搜尋條件", 'warning', 3 * 1000);
                 return false;
             }
-            
+
 
 
             const now = new Date()
@@ -2162,7 +2162,7 @@ export default {
             exportStatisticsReport(params).then(res=>{
                 console.log('res :>> ', res);
             })
-            
+
             // require.ensure([], async () => {
             //     const {
             //         export_json_to_excel
@@ -2823,7 +2823,7 @@ export default {
             const option = this.getInspectLineOption();
             const regionData = [];
             var regionLabel = [];
-            
+
             if (this.part1.content) {
                 this.part1.content.map((item, index) => {
                     let value = 0;
@@ -2991,7 +2991,7 @@ export default {
                         params.storeIds = this.part1.compareIds;
                         params.groupIds = this.part1.compareIds;
                     }*/
-                    
+
 
                     params.inspectTagId = self.params.inspectId;
                     params.order = {
@@ -3014,7 +3014,7 @@ export default {
                         if (result) {
                             content = result.content
                             this.part1.table.total = result.totalPages;
-                            
+
                             //   console.log(result)
                         }
                     }
@@ -3060,7 +3060,7 @@ export default {
                 });
             }
             this.part1.storeTableData = content;
-            
+
             option.series[0].name = "";
             option.series[0].data = regionData;
             option.xAxis.data = regionLabel;
@@ -3175,7 +3175,7 @@ export default {
 
 
                     this.part2.averageScore = Math.round(totalStandard / totalReport);
-                    
+
                     this.part2.indexRegion = -1;
                     this.drawPart2RegionBar();
                 }
@@ -3208,7 +3208,7 @@ export default {
                         totalStandard += item.averageScore * item.numOfReport;
                     })
                     // this.bigScore = totalStandard > 0 ? Math.round(totalStandard / totalReport) : -9999;
-                    this.bigScore =  Math.round(totalStandard / totalReport) 
+                    this.bigScore =  Math.round(totalStandard / totalReport)
                 }
             }
         },
@@ -3374,7 +3374,7 @@ export default {
                         if(i.averageScore == ii.averageScore) ii.rankbyaveragescore = i.rankbyaveragescore
                     })
                 })
-                
+
                 content.map((item, index) => {
                     // item.rankbyaveragescore = parseInt(index) + 1;
                     item.compareTrend = this.$t('statistics.check'),
@@ -3479,7 +3479,7 @@ export default {
             if(params.storeIds.length == 0 ) {
                 this.part3.averageScore = -1
                 return;
-            }   
+            }
             const storeResult = await self.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
                 const result = storeResult.data;
@@ -3735,8 +3735,8 @@ export default {
                 }
                 this.part1.indexRegion = -1;
                 this.part1.table.page = 1;
-                
-                
+
+
                 console.log('showingColor :>> ', showingColor);
                 await this.drawPart1RegionBar(showingColor);
             }
@@ -3744,7 +3744,7 @@ export default {
 
 
         async clickPart1Bar(event) {
-            
+
             if(this.part1.indexRegion == event.dataIndex){
                 this.part1.indexRegion = -1;
             }
@@ -3812,10 +3812,10 @@ export default {
             //option.series[1].data = regionData2;
             self.regionsChartsOptions = option;
         },
- 
+
         async initData() {
             console.log("PATG="+this.path)
-            
+
             this.params = SearchConditionUtil.getSearchCondition("inspectEvalutionStatistics");
 
             console.log("Init Data")
@@ -3853,7 +3853,7 @@ export default {
             this.doGetAssessmentStandardScore();
             let params  = JSON.parse(JSON.stringify(searchParams));
             // if(params.curCountry=='-1'){
-            //     params.curCity = null;                
+            //     params.curCity = null;
             // }
 
             console.log('params --->', params)
@@ -4031,12 +4031,12 @@ export default {
                     this.part1.indexType = index;
                 }
                 this.part1.indexRegion = -1;
-        
+
 
                 var showingColor = ''
                 if(this.part1.indexType == -1){
                     showingColor = "#1375bc"
-                } 
+                }
                 else if(this.part1.indexType == 0){
                     showingColor = "#f11e66"
                 }
@@ -4123,7 +4123,7 @@ export default {
             console.log("@@filterTag:", filterTag);
             console.log("@@this.params:", this.params);
             this.inspectName = filterTag[0].name
-            
+
             if(this.params.storeIds.length == 0){
                 this.part3.standardScore = 'N/A'
                 this.part2.standardScore = 'N/A'
