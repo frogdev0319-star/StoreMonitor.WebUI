@@ -31,14 +31,13 @@
           :allowRowExpand = "false"
           :showBorder = "false"
           :default-sort = defaultSort
-          :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+          :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}"
           :tableHeight = "760"
           :cellStyle="{backgroundColor: '#fff !important'}"
           @handleOperation="handleEmitOperation"
           @handleSwitchChange="handleSwitchChange"
           @cantCloseAlertPopup = "cantCloseAlertPopup"
           @sortChange="sortChange"
-
         />
       </div>
     </div>
@@ -83,10 +82,10 @@
       @confirmHandler="cantDeleteAlert = false"
     >
       <div class="dialog-slot">
-        <div class="dialog-content"> 
+        <div class="dialog-content">
           {{$t('audit.workFlows.makeSureUsign')}}<br>
           <b> 「 {{cantDeleteList}} 」</b>
-          
+
         </div>
       </div>
     </dialog-pop>
@@ -116,10 +115,10 @@
 <script>
 import {
     creadNewFlow,
-    getWorkflowList, 
-    duplicateRow, 
-    deleteRow, 
-    disableWorkflow, 
+    getWorkflowList,
+    duplicateRow,
+    deleteRow,
+    disableWorkflow,
     enableWorkflow
   } from '@/api/workflow';
 import { getUserInfo, getAllUserInfoNoAuth} from '@/api/login';
@@ -242,7 +241,7 @@ export default {
       total: 5,
       currentPage: 1,
       curSizeNum:10,
-      sizeNum: 50,
+      sizeNum: 10,
       apiBody: {
           "page": 0,
           "size": 10,
@@ -257,7 +256,7 @@ export default {
     }
   },
   mounted() {
-    
+
   },
   created() {
     this.init()
@@ -275,7 +274,7 @@ export default {
       this.currentPage = 1;
       if(val.trim()!=""){
         this.allTableData =this.allWorkflowList.filter(item => (
-          item.name.indexOf(val) > -1 
+          item.name.indexOf(val) > -1
         ))
         this.setTableBySearch();
       } else {
@@ -285,7 +284,7 @@ export default {
     }
   },
   methods: {
-    async init(){      
+    async init(){
       await this.getUserInfo()
       this.inputSearchValue="";
       const data = sessionStorage.getItem('pageInfo')
@@ -434,16 +433,16 @@ export default {
         else {
           /*if( order.property=='createdTs'|| order.property=="updateTs"){
             if(order.direction=='asc'){
-               console.log('1.order ~~~~~>> ', order);
+              console.log('1.order ~~~~~>> ', order);
               util.sortArrayByKeyAsc(this.allTableData,order.property)
             }else{
-               console.log('2.order ~~~~~>> ', order);
+              console.log('2.order ~~~~~>> ', order);
               util.sortArrayByKeyDesc(this.allTableData,order.property)
             }
           }*/
           this.setTableBySearch();
         }
-        
+
     },
 
 
@@ -467,7 +466,7 @@ export default {
       // this.init()
       if(this.inputSearchValue.trim()=="") this.getWorkflowList(this.apiBody);
       else this.setTableBySearch()
-      
+
     },
     setTableBySearch() {
       this.total = Math.ceil(this.allTableData.length/this.apiBody.size);
@@ -490,7 +489,7 @@ export default {
         }
         case 'set':{
           this.settingWorkFlow(row)
-          break;      
+          break;
         }
         case 'delete':{
           if(!row.isBind){
@@ -500,9 +499,9 @@ export default {
             this.cantDeleteAlert = true
             this.cantDeleteList = row.inspectTagName.replaceAll(',', '、')
             console.log('row.inspectTagName :>> ', row);
-            
+
           }
-          break;      
+          break;
         }
         default: {
           break;
@@ -540,13 +539,13 @@ export default {
         this.$message({
           type: 'success',
           message: this.$t('audit.workFlows.dulplicateScuccess')
-        });  
+        });
         this.init()
       }).catch(err => {
         console.log('error' + err);
       });
     },
-    
+
     deleteRow(processDefinitionKey){
       this.isLoadingData = true
       const rowID = {
@@ -560,7 +559,7 @@ export default {
           type: 'success',
           message: this.$t('audit.workFlows.deleteScuccess')
         })
-      
+
       }).catch(err => {
         this.isLoadingData = false
         this.showSingleDeleteContent = false
@@ -581,7 +580,7 @@ export default {
       this.deleteRow(value)
     },
 
-  
+
 
     // handlePageAndSizeChange(pageObj) {
     //   const self = this;
@@ -597,7 +596,7 @@ export default {
     //   console.log('this.tableData :>> ', this.tableData);
     // },
 
-    
+
 
     handleSwitchChange({ checked, target }) {
       console.log('checked :>> ', checked);
@@ -640,13 +639,13 @@ export default {
         })
       }
     },
-    
+
   },
 };
 </script>
 
 <style lang="sass" >
-  
+
   .alert-popup
     .el-dialog__header
       color: #c60957
@@ -660,7 +659,7 @@ export default {
 
     .el-table__body
       width: auto !important
-    
+
 
   .workflow-header
     width: 100%
@@ -673,7 +672,7 @@ export default {
     align-items: flex-start
   .el-table
     border: none !important
-    
+
   // .el-button--primary
   //   color: #fff
   //   background-color: #190
@@ -718,9 +717,9 @@ export default {
         border-radius: 3px
         z-index: 1000
         display: none
-       
 
-    
+
+
 
 
 
@@ -729,7 +728,7 @@ export default {
     flex-direction: row
     justify-content: center
     align-items: center
-    
+
   .width-fit
     width: max-content !important
 </style>

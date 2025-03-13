@@ -261,7 +261,7 @@
         </aside>
 
 
-        <section :class="secClass">``
+        <section :class="secClass">
           <el-col
             v-if="!showHeader"
             :class="wrapperAll ? 'content-wrapper-all' : 'content-wrapper'"

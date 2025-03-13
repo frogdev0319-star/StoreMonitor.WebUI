@@ -4154,11 +4154,11 @@ export default {
 };
 </script>
 <style lang="sass">
-    .el-table .cell
-        text-overflow: ellipsis !important
-        word-break: normal !important
-        padding-left: 3px !important
-        text-align: center
+  .el-table .cell
+      text-overflow: ellipsis !important
+      word-break: normal !important
+      padding-left: 3px !important
+      text-align: center
 
 </style>
 <style lang="scss" scoped>
