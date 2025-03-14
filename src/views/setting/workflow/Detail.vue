@@ -637,6 +637,10 @@ export default {
       this.workflowDetail = JSON.parse(tempData)
       this.ccToUSer = this.workflowDetail.copyToUsers
 
+      // 自動簽核資料
+      this.autoApprove = this.workflowDetail.autoApprove
+      this.autoApproveDay = this.workflowDetail.autoApproveDay
+
       const data = sessionStorage.getItem('newWorkFlow')
       const newNode = JSON.parse(data)
       // console.log('newNode :>> ', newNode);
@@ -664,7 +668,9 @@ export default {
       const data = sessionStorage.getItem('workflowDetail')
       this.infoForm = JSON.parse(data)
 
-      // this.workflowDetail = this.infoForm
+      // 自動簽核資料
+      this.autoApprove = this.workflowDetail.autoApprove
+      this.autoApproveDay = this.workflowDetail.autoApproveDay
 
       console.log('this.infoForm 1 ------>> ', this.infoForm);
       console.log('this.workflowDetail 1 ------>> ', this.workflowDetail);
@@ -750,7 +756,11 @@ export default {
 
       const tempData = sessionStorage.getItem('workflowDetail')
       this.workflowDetail = JSON.parse(tempData)
-      console.log('object  :::::::::>> ',  this.workflowDetail);
+      // console.log('object  :::::::::>> ',  this.workflowDetail);
+
+      // 自動簽核資料
+      this.autoApprove = this.workflowDetail.autoApprove
+      this.autoApproveDay = this.workflowDetail.autoApproveDay
 
       // 取得副本通知人員
       this.ccToUSer = this.workflowDetail.copyToUsers
@@ -849,6 +859,11 @@ export default {
           }
       })
       this.workflowDetail.copyToUsers = this.ccToUSer
+      this.workflowDetail.autoApprove = this.autoApprove
+      this.workflowDetail.autoApproveDay = this.autoApproveDay
+
+      console.log('this.workflowDetail :>> ', this.workflowDetail);
+
       sessionStorage.setItem('workflowDetail', JSON.stringify(this.workflowDetail))
       sessionStorage.setItem('reNewNode', JSON.stringify(this.newFlatNodeDataView))
       var time = new Date()
@@ -893,6 +908,8 @@ export default {
       sessionStorage.removeItem('newWorkFlow')
       this.$router.push({ name: 'nodeSetting' })
     },
+
+
 
     getPickedMember(){
       const reNewNode = sessionStorage.getItem('reNewNode')
@@ -1147,6 +1164,9 @@ export default {
       console.log('this.userInfo ------>> ', this.userInfo);
 
       this.workflowDetail.copyToUsers = this.ccToUSer
+      this.workflowDetail.autoApprove = this.autoApprove
+      this.workflowDetail.autoApproveDay = this.autoApproveDay
+
       sessionStorage.setItem('workflowDetail', JSON.stringify(this.workflowDetail))
 
 
@@ -1341,14 +1361,14 @@ export default {
 
     onAutoApprovel(e){
       console.log('e :>> ', e);
-      if(e<=0){
+      if(e < 1){
         this.autoApproveDay = 1;
       }
       else if(e >= 7){
         this.autoApproveDay = 7;
       }
       else {
-        this.autoApproveDay = e;
+        this.autoApproveDay = Math.floor(e);
       }
     },
 

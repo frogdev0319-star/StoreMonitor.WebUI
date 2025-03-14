@@ -70,7 +70,7 @@
                         :btn-style="{backgroundColor:'transparent'}"
                         :total="curTotalPage"
                         :current-page="curPage"
-                        :pagesize.sync="curSizeNum"
+                        :pageSize.sync="curSizeNum"
                         layout = "prev,pager, next,sizes,slot"
                         @sizeChange="sizeChange"
                         @currentChange="currentChange"
@@ -456,10 +456,7 @@ export default{
                 }
             };
 
-
-
-
-            //console.log("this.storeFilterObj.curStore:",this.storeFilterObj.curStore);
+            console.log("this.storeFilterObj.curStore:",this.storeFilterObj.curStore);
             if(this.curStoreIds!=-1 && !this.storeFilterObj.curStore.includes('-1')){
                 params['storeId'] = this.curStoreIds;
             }

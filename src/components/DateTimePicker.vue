@@ -4,7 +4,7 @@
       v-model="dateTimeValue"
       type="daterange"
       start-placeholder="开始日期"
-      end-placeholder="结束日期" 
+      end-placeholder="结束日期"
       range-separator="-"
       size="mini"
       format="yyyy/MM/dd"
@@ -12,7 +12,7 @@
       class="date-picker global-date-pick"
       @change="dateChange"
     />
-                
+
 
 
     <!-- <el-date-picker
@@ -33,7 +33,7 @@
       class="date-picker global-date-pick"
       @change="dateChange"
     /> -->
-    
+
   </div>
 </template>
 

@@ -45,6 +45,7 @@
 						<div class="audit-situation"  v-if="taskItem.parentId !== -1 ">
 							<div class="audit_agree" v-if="taskItem.state == 1 &&  task.comment.result == 0"><i class="iconfont el-icon-check"/>{{$t('audit.auditStatus.agree')}}</div>
 							<div class="audit_agree" v-if="taskItem.state == 1 &&  task.comment.result == -979""><i class="iconfont el-icon-check"/>{{$t('audit.auditStatus.agree')}}</div>
+
 							<div class="audit_agree" v-if="task.assignee !== null && taskItem.state == 2 && task.comment.result == 0"><i class="iconfont el-icon-check"/> {{$t('audit.auditStatus.agree')}}</div>
 							<div class="audit_agree" v-if="taskItem.state == 5 && task.comment.result == 0"><i class="iconfont el-icon-check"/> {{$t('audit.auditStatus.agree')}}</div>
 							<div class="audit_agree" v-if="taskItem.state == 6 && task.comment.result == 0"><i class="iconfont el-icon-check"/> {{$t('audit.auditStatus.agree')}}</div>

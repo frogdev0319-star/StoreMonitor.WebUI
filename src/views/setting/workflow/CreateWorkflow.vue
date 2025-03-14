@@ -124,9 +124,6 @@
           </setting-table>
         </div>
 
-
-
-
         <!-- 自動簽核 -->
         <div class="inspect-basic">
           <setting-table table-name="自動簽核">
@@ -174,14 +171,6 @@
             </template>
           </setting-table>
         </div>
-
-
-
-
-
-
-
-
 
         <!-- 流程設定 -->
         <div class="inspect-basic">
@@ -642,6 +631,8 @@ export default {
         this.workflowDetail = initBasicData
       } else {
         this.workflowDetail = workflowDetail
+        this.autoApprove = this.workflowDetail.autoApprove
+      this.autoApproveDay = this.workflowDetail.autoApproveDay
       }
 
       console.log(' this.workflowDetail !!!!!!!tt>> ',  this.workflowDetail);
@@ -802,6 +793,9 @@ export default {
           }
       })
       this.workflowDetail.copyToUsers = this.ccToUSer
+      this.workflowDetail.autoApprove = this.autoApprove
+      this.workflowDetail.autoApproveDay = this.autoApproveDay
+
       sessionStorage.setItem('workflowDetail', JSON.stringify(this.workflowDetail))
       sessionStorage.setItem('reNewNode', JSON.stringify(this.newFlatNodeDataView))
       var time = new Date()
@@ -1134,7 +1128,11 @@ export default {
     settingWorkFlow(row){
       console.log('go edit  :>> ', row);
       console.log('this.userInfo ------>> ', this.userInfo);
+
       this.workflowDetail.copyToUsers = this.ccToUSer
+      this.workflowDetail.autoApprove = this.autoApprove
+      this.workflowDetail.autoApproveDay = this.autoApproveDay
+
       sessionStorage.setItem('workflowDetail', JSON.stringify(this.workflowDetail))
 
 
@@ -1315,7 +1313,7 @@ export default {
         this.autoApproveDay = 7;
       }
       else {
-        this.autoApproveDay = e;
+        this.autoApproveDay = Math.floor(e);
       }
     },
   }
@@ -1748,4 +1746,10 @@ export default {
   .title-status
     .el-input__count-inner
       margin-top: 55px
+
+  .num_input
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button
+      -webkit-appearance: none
+      margin: 0
 </style>
