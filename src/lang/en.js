@@ -31,7 +31,7 @@ export default{
         "itemSetting":"Item Settings",
         "leftBracket":" (",
         "logOut":"Logout system",
-        "changePWD":"Change password",				  
+        "changePWD":"Change password",
         "loginAbnormal":"The login information is abnormal, please sign in again!",
         "meta":"Inspection",
         "mgt":"Inspection",
@@ -1376,6 +1376,7 @@ export default{
         "agree":"Agree",
         "reject":"Rejected",
         "approved":"Sign-off passed",
+        "autoApproved":"Sign-off passed(Auto Approved)",
         "cancel":"Cancel",
         "rollback":"Withdraw",
         "systemRollback":"System withdrawal",
@@ -1393,6 +1394,11 @@ export default{
         "needSign":"This sign-off requires attaching a signature file",
         "selectComment":"Please choose to sign-off on comments!",
         "rejectReason":"Please fill in the reason for rejection!",
+        "close":"Close",
+        "open":"Open",
+        "autoApprove":"auto Approve",
+        "autoApproveDays":"Automatic approval days",
+        "most7Days":"The maximum number of days for automatic approval is seven days.",
 
         },
         "sendAudit":{

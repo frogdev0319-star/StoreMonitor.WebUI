@@ -130,7 +130,7 @@
 
         <!-- 自動簽核 -->
         <div class="inspect-basic">
-          <setting-table table-name="自動簽核">
+          <setting-table :table-name="$t('audit.auditStatus.autoApprove')">
             <template slot="tableDetail">
               <!-- row -->
               <div class="setting-config">
@@ -141,12 +141,12 @@
                       v-model="autoApprove"
                       style="margin-left: 20px;"
                       >
-                      <el-radio :label="0" style="  min-width: 60px; text-align: left; margin-right: 30px;" >關閉</el-radio>
-                      <el-radio :label="1" style=" width: fit-content;">開啟</el-radio>
+                      <el-radio :label="0" style="  min-width: 60px; text-align: left; margin-right: 30px;" >{{$t('audit.auditStatus.close')}}</el-radio>
+                      <el-radio :label="1" style=" width: fit-content;">{{$t('audit.auditStatus.open')}}</el-radio>
                     </el-radio-group>
                   </div>
                   <div class="flex-row" style="margin-left: 40px;">
-                    <div class="title-name">自動簽核天數</div>
+                    <div class="title-name">{{$t('audit.auditStatus.autoApproveDays')}}</div>
                     <div class="title-status num_input">
                       <el-input
                         v-model="autoApproveDay"
@@ -164,7 +164,7 @@
                       effect="light"
                       placement="bottom-end">
                       <div slot="content">
-                        自動簽核天數最多為七天。
+                        {{$t('audit.auditStatus.most7Days')}}
                       </div>
                       <i class="iconfont icon-bangzhu iconbangzhu"/>
                     </el-tooltip>
@@ -609,10 +609,9 @@ export default {
           break;
         }
       }
-      await this.getPickedMember()
+
       await this.handleData()
-
-
+      await this.getPickedMember()
       this.isLoadingData = false
     },
 
@@ -622,7 +621,11 @@ export default {
       await this.getWorkflowInfo()
       await this.getNodeList(this.infoForm.processDefinitionKey)
       await this.handleData()
+
       await this.getWorkflowList(this.apiBody)
+
+      // 篩選人員資料
+      await this.getPickedMember()
 
       this.isLoadingData = false
     },
@@ -802,9 +805,6 @@ export default {
         })
 
         this.userData = this.userInfo
-
-
-
         console.log('this.userInfo ------>> ', this.userInfo);
       }).catch(err => {
         console.log('error' + err);
@@ -910,11 +910,10 @@ export default {
     },
 
 
-
     getPickedMember(){
       const reNewNode = sessionStorage.getItem('reNewNode')
       const orinode = JSON.parse(reNewNode)
-      // console.log('orinode 1 >> ', orinode);
+      console.log('orinode 1 >> ', orinode);
 
       if(reNewNode == null) return
 
@@ -941,7 +940,7 @@ export default {
       auditMembers.auditByUsers = [... new Set(auditMembers.auditByUsers)]
       auditMembers.auditByGroups = [... new Set(auditMembers.auditByGroups)]
 
-      console.log('auditMembers :>> ', auditMembers);
+      console.log('auditMembers XDXDXDXD:>> ', auditMembers);
       sessionStorage.setItem('auditMembers', JSON.stringify(auditMembers))
     },
 

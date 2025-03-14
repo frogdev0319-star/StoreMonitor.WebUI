@@ -237,10 +237,16 @@ export default {
 
         // !!!??!!!!!
         const n = this.taskInfo.length - 1
-        if(this.taskInfo[n].state == 1 && this.taskInfo[n].autoApproved){
-          this.taskInfo[n].tasks[0].comment = {result : -979}
+        // if(this.taskInfo[n].state == 1 && this.taskInfo[n].autoApproved){
+        //   this.taskInfo[n].tasks[0].comment = {result : -979}
+        // }
 
-        }
+        this.taskInfo.forEach( i => {
+          if( i.autoApproved && i.tasks[0].comment == null) {
+            i.tasks[0].comment = {result : -979}
+          }
+
+        })
 
         console.log('this.taskInfo ori ----->> ', this.taskInfo);
         // 部門簽核完成時間排序

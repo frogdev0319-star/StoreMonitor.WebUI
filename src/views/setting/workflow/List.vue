@@ -298,6 +298,8 @@ export default {
         await this.getWorkflowList(newApiBody);
       }
       sessionStorage.removeItem('pageAction')
+      // sessionStorage.removeItem('auditMembers')
+
 
       await this.getAllWorkflowList()
     },

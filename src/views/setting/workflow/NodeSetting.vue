@@ -36,7 +36,6 @@
 
                 <el-radio-group class="select_audit storevue-radio" v-model="nodeData.auditTargetType">
                   <!-- 簽核部門 -->
-
                   <div class="select_audit_dep">
                     <el-radio :label="1">{{$t('audit.workFlows.auditDepart')}}</el-radio>
                     <el-select
