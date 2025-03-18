@@ -512,6 +512,7 @@ export default {
     },
 
     cantCloseAlertPopup(row){
+      console.log('row :>> ', row);
       this.cantCloseAlert = true
       this.cantCloseList = row.inspectTagName.replaceAll(',', '、')
     },

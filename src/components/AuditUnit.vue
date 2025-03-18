@@ -14,7 +14,7 @@
 					<div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
 						<div class="audit-name">
 							<div class="audit-user-name" v-if="taskItem.state == 1 && task.comment.result == 0">{{task.assignee.titleName}} -- {{task.assignee.userName}} <span> ({{task.endTs}})</span></div>
-							<div class="audit-user-name" v-if="taskItem.state == 1 && task.comment.result == -979">{{$t('audit.auditStatus.autoApproved')}}<span v-if="taskItem.tasks[0].endTs !==null"> ({{task.endTs}})</span></div>
+							<div class="audit-user-name" v-if="taskItem.state == 1 && task.comment.result == -979">{{$t('audit.auditStatus.autoApprove')}}<span v-if="taskItem.tasks[0].endTs !==null"> ({{task.endTs}})</span></div>
 
 
               <!-- 補上神秘客判斷 -->
