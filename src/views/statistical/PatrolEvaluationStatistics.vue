@@ -177,7 +177,9 @@
                 </div>
                 <div v-else style="margin-top:20.5px;height:100%;" :style="{width:ispdf?'1280px':null}">
                     <div style="margin-top:20.5px;">
-                        <table-only ref="elTP"
+                        <table-only
+                            ref="elTP"
+                            class="patrol-table"
                             :column-data="part1StoreInfoTableCol"
                             :table-data="part1.storeTableData"
                             :total="part1.table.total"
@@ -295,7 +297,9 @@
 
                 <div v-else style="margin-top:20.5px;height:100%;" :style="{width:ispdf?'1280px':null}">
                     <div style="margin-top:20.5px;padding-right:10px;">
-                        <table-only ref="elTP"
+                        <table-only
+                            ref="elTP"
+                            class="patrol-table"
                             :column-data="part2StoreInfoTableCol"
                             :table-data="part2.storeTableData"
                             :total="part2.table.total"
@@ -409,7 +413,9 @@
                 </div>
                 <div v-else style="margin-top:20.5px;height:100%;overflow-x:auto;" :style="{width:ispdf?'1280px':null}">
                     <div style="margin-top:20.5px;padding-right:10px;">
-                        <table-only ref="elTP"
+                        <table-only
+                            ref="elTP"
+                            class="patrol-table"
                             :column-data="part3StoreInfoTableCol"
                             :table-data="part3.storeTableData"
                             :total="part3.table.total"
@@ -4154,11 +4160,12 @@ export default {
 };
 </script>
 <style lang="sass">
-  .el-table .cell
-      text-overflow: ellipsis !important
-      word-break: normal !important
-      padding-left: 3px !important
-      text-align: center
+  .patrol-table
+    .el-table .cell
+        text-overflow: ellipsis !important
+        word-break: normal !important
+        padding-left: 3px !important
+        text-align: center
 
 </style>
 <style lang="scss" scoped>
