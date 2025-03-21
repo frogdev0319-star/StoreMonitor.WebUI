@@ -289,7 +289,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.2.3.1
+                v3.2.3.2
                   &copy; {{ getFullYear }} Advantech Intelligent City
                   Services Co., Ltd. <span @click.prevent="checkServerVersion">(AiCS)</span> All Rights Reserved.
               </p>
@@ -1088,7 +1088,7 @@ export default {
 
     },
     changePWD(){
-      const url = sessionStorage.getItem("LoginURL")+"/changepwd";
+      const url = sessionStorage.getItem("LoginURL")+"/resetpwd";
       window.location.href = url;
     },
     logOut() {
