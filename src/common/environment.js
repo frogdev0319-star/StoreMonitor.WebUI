@@ -36,25 +36,25 @@ const _Environments = {
     VERSION: version,
     clientId: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a'
   },
-  NewPortals:{
+  NewPortals: {
     CHINA_WEBSITE: 'http://47.103.135.242:8081/storemonitor/api/',
     GLOBAL_WEBSITE: 'https://inspection.storevue.com/storemonitor/api',
     VERSION: version,
     clientId: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a'
   },
-  Dev:{
+  Dev: {
     CHINA_WEBSITE: 'http://47.103.135.242:8081/storemonitor/api/',
     GLOBAL_WEBSITE: 'https://dev-inspection.wise-apps.com/storemonitor/api',
     VERSION: version,
     clientId: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a'
   },
-  iservice:{
+  iservice: {
     CHINA_WEBSITE: 'https://inspection.wise-iservice.com/storemonitor/api/',
     GLOBAL_WEBSITE: 'https://inspection.wise-iservice.com/storemonitor/api/',
     VERSION: version,
     clientId: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a'
   },
-  iservicePreview:{
+  iservicePreview: {
     CHINA_WEBSITE: 'https://preview-inspection.wise-iservice.com/storemonitor/api',
     GLOBAL_WEBSITE: 'https://preview-inspection.wise-iservice.com/storemonitor/api/',
     VERSION: version,
@@ -62,13 +62,13 @@ const _Environments = {
   },
 
   // new RC vm
-  RC_StoreVue:{
+  RC_StoreVue: {
     CHINA_WEBSITE: 'https://rc-inspection.wise-iservice.com/storemonitor/api/',
     GLOBAL_WEBSITE: 'https://rc-inspection.wise-iservice.com/storemonitor/api/',
     VERSION: version,
     clientId: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a'
   },
-  RC_iService:{
+  RC_iService: {
     CHINA_WEBSITE: 'https://rc-inspection.wise-iservice.com/storemonitor/api/',
     GLOBAL_WEBSITE: 'https://rc-inspection.wise-iservice.com/storemonitor/api/',
     VERSION: version,
@@ -82,35 +82,35 @@ let environJSON
 let isGlobalWebsite
 // console.log("Enrionment")
 // console.log(data)
-if(data.SITE == 'RC'){
+if (data.SITE == 'RC') {
   environJSON = _Environments.RC;
   isGlobalWebsite = true;
 }
-else if(data.SITE == 'Preview'){
+else if (data.SITE == 'Preview') {
   environJSON = _Environments.Preview;
   isGlobalWebsite = true;
 }
-else if(data.SITE == 'Portals'){
+else if (data.SITE == 'Portals') {
   environJSON = _Environments.Stable;
   isGlobalWebsite = true;
 }
-else if(data.SITE == 'NewPortals'){
+else if (data.SITE == 'NewPortals') {
   environJSON = _Environments.NewPortals;
   isGlobalWebsite = true;
 }
-else if(data.SITE == 'Dev'){
+else if (data.SITE == 'Dev') {
   environJSON = _Environments.Dev;
   isGlobalWebsite = true;
 }
-else if(data.SITE == 'iservice'){
+else if (data.SITE == 'iservice') {
   environJSON = _Environments.iservice;
   isGlobalWebsite = true;
 }
-else if(data.SITE == 'iservice-preview'){
+else if (data.SITE == 'iservice-preview') {
   environJSON = _Environments.iservicePreview;
   isGlobalWebsite = true;
 }
-else{
+else {
   environJSON = _Environments.iservicePreview;
   isGlobalWebsite = true;
 }
