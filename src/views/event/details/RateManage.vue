@@ -2,8 +2,8 @@
   <el-row class="el-rate-container">
     <el-col :span="12" :style="{'height':windowHeight*0.82+'px','overflow-y': 'auto'}" class="lside">
       <div class="title-content">
-        <img  
-          :src="sourceSrc"  
+        <img
+          :src="sourceSrc"
           :class="(event.sourceType!=2) ? 'title-img' : 'title-img-inside'" >
         <el-tooltip effect="light" placement="bottom">
           <div slot="content">{{ event.eventTitle }}</div>
@@ -213,6 +213,7 @@
                   :src="item.url"
                   :style="{height: imgHeight+'px', width: 'auto'}"
                   :preview-src-list="getImgList(index, imgsourceList)"
+                  @contextmenu.prevent
                   class="imgLittle imgInner"/>
               </div>
               <div v-if="item.deviceId!=-1" class="imgLittle" @click="showRelatedChannel">
@@ -253,6 +254,7 @@
                       :src="_item.url"
                       :style="{height: imgHeight+'px',width: 'calc(100/1920*100vw)'}"
                       :preview-src-list="getImgList(_index, item.sourceList)"
+
                       class="imgLittle imgInner"/>
                   </div>
                   <div v-else class="img-content " @click="playCommentVideo(_item,_index)">
@@ -290,7 +292,7 @@
         </delay-button>
         </div>
         <div class="line"></div>
-        <div class="btn-content"> 
+        <div class="btn-content">
           <div v-for="(item,index) in subBtnList" :key="index" class="btn_List">
             <div
               v-if="item.isShow"
@@ -301,10 +303,10 @@
           </div>
           <div class="btn_List" v-if="needUpdateEvent">
             <div class="reopen" @click="showUpdateEvent = true" >
-              返回處理 
+              返回處理
             </div>
           </div>
-        
+
 
         </div>
       </div>
@@ -589,9 +591,22 @@ export default {
     self.getCommentList(0);
 
     this.needUpdateEvent =  sessionStorage.getItem('needUpdateEvent')
+
+    document.addEventListener("contextmenu", this.disableRightClickOnViewer);
+  },
+  beforeUnmount() {
+    document.removeEventListener("contextmenu", this.disableRightClickOnViewer);
   },
 
   methods: {
+    disableRightClickOnViewer(e) {
+      const target = e.target;
+      // 如果是在 el-image-viewer 裡點的右鍵，就禁止
+      if (target.closest && target.closest(".el-image-viewer__img")) {
+        e.preventDefault();
+      }
+    },
+
     cancelUpdate(){
       this.showUpdateEvent = false
     },
@@ -986,7 +1001,7 @@ export default {
         if (res.errCode === 0) {
           self.oss = res.data;
         }
-      }); 
+      });
       for(let idx=0; idx<self.attachFileList.length;idx++){
         await self.upLoadFile(self.attachFileList[idx]).then((url) => {
           self.uploadingnumOfPic++;

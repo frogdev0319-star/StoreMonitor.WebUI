@@ -305,6 +305,7 @@
                                 :style="isexportPDF ? exportImageStyle :imageStyle"
                                 :src="sourceitem.url"
                                 :preview-src-list="getImgList(index, item.sourceList)"
+                                @contextmenu.prevent
                                 class="imgLittle imgInner"/>
                             </div>
                             <div
@@ -385,6 +386,7 @@
                           :style="isexportPDF ? exportImageStyle :imageStyle"
                           :src="sourceitem.url"
                           :preview-src-list="getImgList(index, item.sourceList)"
+                          contextmenu.prevent
                           class="imgLittle imgInner"/>
                       </div>
                       <div
@@ -940,9 +942,22 @@ export default {
   mounted() {
     this.accountName = sessionStorage.getItem('accountName');
     this.needDeleteReport = sessionStorage.getItem('needDeleteReport');
+
+    document.addEventListener("contextmenu", this.disableRightClickOnViewer);
+  },
+  beforeUnmount() {
+    document.removeEventListener("contextmenu", this.disableRightClickOnViewer);
   },
 
   methods: {
+    disableRightClickOnViewer(e) {
+      const target = e.target;
+      // 如果是在 el-image-viewer 裡點的右鍵，就禁止
+      if (target.closest && target.closest(".el-image-viewer__img")) {
+        e.preventDefault();
+      }
+    },
+
 
     addNum(){
       this.changeNum += 1

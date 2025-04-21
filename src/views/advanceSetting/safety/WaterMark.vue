@@ -8,111 +8,128 @@
       </delay-button>
     </div>
 
-    <div class="page-container report-setting paper" >
-      <div class="setting-titles padding flex-center">
-        {{$t('advance.waterMarkSetting') }}
-        <div class="spacer"></div>
-      </div>
+    <div class="page-container report-setting paper" style="padding-top: 30px;">
 
-      <div v-loading="isLoadingData" class="setting-details self-loading">
-        <div class="template-info">
-          <div class="inspect-basic">
-            
-            <div class="water_setting">
+      <el-tabs  v-model="activeName" >
+         <!-- 浮水印 -->
+        <el-tab-pane :label="$t('advance.waterMark')" name="0">
+          <div class="setting-titles padding flex-center">
+            {{$t('advance.waterMarkSetting') }}
+            <div class="spacer"></div>
+          </div>
 
-              <div class="setting_row" >
-                <div class="setting_item">
-                  <el-switch
-                    style="display: block"
-                    v-model="isSwitchOn"
-                    active-color="#c60957"
-                    inactive-color="#eee"
-                    :active-text="$t('advance.on')"
-                    :inactive-text="$t('advance.off')"
-                  >
-                  </el-switch>
-                </div>
-              </div>
-              
-              <div class="setting_row">
-                <div class="setting_item">
-                  <h6> {{$t('advance.showMarkSetting') }}</h6>
-                  <el-select v-model="showTextStatus" placeholder="請選擇" :disabled="!isSwitchOn">
-                    <el-option
-                      v-for="item in showText"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
-                  </el-select>
-                  <el-input
-                    ref="defineName"
-                    v-model="defineText"
-                    :disabled = "!isSwitchOn || showTextStatus == false"
-                    :placeholder="$t('audit.workFlows.defineItem')"
-                    style="width: 300px;  margin: 0 20px ;"
-                    @input="(val) => itemInputChanged_overall(val)"
-                    />
-                  <span class="text_limit_sign" v-if="showInputLimit_overallItem"> {{$t('advance.maxCharacter') }} </span>
+          <div v-loading="isLoadingData" class="setting-details self-loading">
+            <div class="template-info">
+              <div class="inspect-basic">
+
+                <div class="water_setting">
+
+                  <div class="setting_row" >
+                    <div class="setting_item">
+                      <el-switch
+                        style="display: block"
+                        v-model="isSwitchOn"
+                        active-color="#c60957"
+                        inactive-color="#eee"
+                        :active-text="$t('advance.on')"
+                        :inactive-text="$t('advance.off')"
+                      >
+                      </el-switch>
+                    </div>
+                  </div>
+
+                  <div class="setting_row">
+                    <div class="setting_item">
+                      <h6> {{$t('advance.showMarkSetting') }}</h6>
+                      <el-select v-model="showTextStatus" placeholder="請選擇" :disabled="!isSwitchOn">
+                        <el-option
+                          v-for="item in showText"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value">
+                        </el-option>
+                      </el-select>
+                      <el-input
+                        ref="defineName"
+                        v-model="defineText"
+                        :disabled = "!isSwitchOn || showTextStatus == false"
+                        :placeholder="$t('audit.workFlows.defineItem')"
+                        style="width: 300px;  margin: 0 20px ;"
+                        @input="(val) => itemInputChanged_overall(val)"
+                        />
+                      <span class="text_limit_sign" v-if="showInputLimit_overallItem"> {{$t('advance.maxCharacter') }} </span>
+                    </div>
+
+                  </div>
+                  <div class="setting_row" style="margin-bottom: 40px;">
+                    <div class="setting_item">
+                      <h6>{{$t('advance.textColor') }} </h6>
+                      <el-color-picker v-model="color" show-alpha :disabled="!isSwitchOn"></el-color-picker>
+                    </div>
+
+                    <div class="setting_item">
+                      <h6>{{$t('advance.textSize') }} </h6>
+                      <el-select v-model="textSize" :placeholder="$t('advance.opiton')" :disabled="!isSwitchOn">
+                        <el-option
+                          v-for="item in textSizeSelect"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value">
+                        </el-option>
+                      </el-select>
+
+                    </div>
+                    <div class="setting_item">
+                      <h6>{{$t('advance.textPOsition') }}</h6>
+                      <el-select v-model="textPosition" :placeholder="$t('advance.opiton')" :disabled="!isSwitchOn">
+                        <el-option
+                          v-for="item in textPositionSelect"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value">
+                        </el-option>
+                      </el-select>
+                    </div>
+                  </div>
+
+
+
+                  <div
+                    class="mobile_review"
+                    :style=" {justifyContent: text_justifyContent, alignItems: text_alignItems}">
+                    <div
+                      v-show="isSwitchOn"
+                      class="text_content"
+                      :style="{
+                        color: color ,
+                        fontSize: textSize,
+                      }"
+                    >
+                      {{showTextStatus == false ? userName : defineText}}
+                    </div>
+                  </div>
                 </div>
 
-              </div>
-              <div class="setting_row" style="margin-bottom: 40px;">
-                <div class="setting_item">
-                  <h6>{{$t('advance.textColor') }} </h6>
-                  <el-color-picker v-model="color" show-alpha :disabled="!isSwitchOn"></el-color-picker>
-                </div>
-
-                <div class="setting_item">
-                  <h6>{{$t('advance.textSize') }} </h6>
-                  <el-select v-model="textSize" :placeholder="$t('advance.opiton')" :disabled="!isSwitchOn">
-                    <el-option
-                      v-for="item in textSizeSelect"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
-                  </el-select>
-                    
-                </div>
-                <div class="setting_item">
-                  <h6>{{$t('advance.textPOsition') }}</h6> 
-                  <el-select v-model="textPosition" :placeholder="$t('advance.opiton')" :disabled="!isSwitchOn">
-                    <el-option
-                      v-for="item in textPositionSelect"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
-                  </el-select>
-                </div>
-              </div>
-              
-
-
-              <div 
-                class="mobile_review" 
-                :style=" {justifyContent: text_justifyContent, alignItems: text_alignItems}">
-                <div 
-                  v-show="isSwitchOn"
-                  class="text_content" 
-                  :style="{ 
-                    color: color , 
-                    fontSize: textSize,
-                  }"
-                >
-                  {{showTextStatus == false ? userName : defineText}} 
-                </div>
               </div>
             </div>
-
           </div>
-        </div>
+
+        </el-tab-pane>
+        <el-tab-pane :label="$t('advance.DynamicWatermark')" name="1">
+          動態浮水印設定
+        </el-tab-pane>
+      </el-tabs>
+
+
+
       </div>
-    </div>
+
+
+
+
 
   </div>
-  
+
 </template>
 
 <script>
@@ -129,7 +146,7 @@ import {advancedUpdate, advancedFetch} from '@/api/advanceSetting';
 
 export default {
   name: 'GeneralSetting',
-  components: { 
+  components: {
     DelayButton,
     SettingTable
 
@@ -158,12 +175,12 @@ export default {
           label: this.$t('advance.l'),
           mobileSize: "66px"
 
-        }, 
+        },
         {
           value: "17.6px",
           label: this.$t('advance.m'),
           mobileSize: "44px"
-        }, 
+        },
         {
           value: "8.8px",
           label: this.$t('advance.s'),
@@ -175,11 +192,11 @@ export default {
         {
           value: "topLeft",
           label: this.$t('advance.topLeft')
-        }, 
+        },
         {
           value: "topCenter",
           label: this.$t('advance.topCenter')
-        }, 
+        },
         {
           value: "topRight",
           label: this.$t('advance.topRight')
@@ -209,11 +226,11 @@ export default {
           label: this.$t('advance.bottomRight')
         },
       ],
-      
+
       text_justifyContent: "flex-start",
       text_alignItems: "flex-start",
       showInputLimit_overallItem: false,
-  
+
     };
   },
 
@@ -268,13 +285,13 @@ export default {
           break;
       }
     },
-  
+
   },
 
   created() {
     console.log('waterMark!!!!')
     this.init()
-    
+
   },
 
   methods: {
@@ -374,14 +391,14 @@ export default {
       }
     },
 
-  
+
   }
 };
 </script>
 
 
 <style lang="sass" scoped>
-            
+
   .water_setting
     display: flex
     flex-direction: column
@@ -402,7 +419,7 @@ export default {
         align-items: center
         margin-right: 50px
         padding: 10px 0
-        h6 
+        h6
           margin-right: 12px
           line-height: 0
 
@@ -421,12 +438,12 @@ export default {
       // position: absolute
       // left: 10px
       // top: 10px
-      
+
       color: #FFF
       font-size: 18px
       transition: all .3s
 
-    
+
   .submit_btn
     margin-bottom: 20px
     display: flex
@@ -440,7 +457,7 @@ export default {
     align-items: center
     // width: fit-content
 
-  .remider_setting 
+  .remider_setting
     margin: 0 8px
   .select_audit
     display: flex
@@ -493,7 +510,7 @@ export default {
     cursor: pointer
     margin-left: 20px
 
-  
+
 </style>
 
 
@@ -585,9 +602,9 @@ export default {
   }
 
   .name-tips{
-    display:flex; 
+    display:flex;
     flex-direction:column;
-    
+
   }
   .error-text{
     font-size: 12px;
@@ -651,10 +668,10 @@ export default {
   .title-status{
     width: 28%;
     text-align: left;
-    
+
   }
-  
- 
+
+
 
   .sortable-ghost{
     color: #424151 !important;
@@ -685,7 +702,7 @@ export default {
     font-size: 12px;
   }
   .template-select-area{
-    display:flex; 
+    display:flex;
     flex-direction:row;
     height:calc(30/1920*100vw);
     width:200px;
