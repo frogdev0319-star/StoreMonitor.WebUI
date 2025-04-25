@@ -241,7 +241,7 @@
             <div v-for="(item,index) in imgsourceList" :key="'img-' + index" class="source-content">
               <div v-if="item.mediaType===2" class="img-content">
                 <!--image-->
-                ***
+                **_**
                 <el-image
                   class="imgLittle imgInner"
                   :src="item.url"
