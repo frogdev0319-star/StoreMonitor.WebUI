@@ -936,7 +936,6 @@ export default {
     this.getReportTemplateAndInfo();
     this.getInspectStatus()
 
-
   },
 
   mounted() {

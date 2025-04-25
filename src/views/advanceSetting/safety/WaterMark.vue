@@ -11,7 +11,7 @@
     <div class="page-container report-setting paper" style="padding-top: 30px;">
 
       <el-tabs  v-model="activeName" >
-         <!-- 浮水印 -->
+        <!-- 浮水印 -->
         <el-tab-pane :label="$t('advance.waterMark')" name="0">
           <div class="setting-titles padding flex-center">
             {{$t('advance.waterMarkSetting') }}

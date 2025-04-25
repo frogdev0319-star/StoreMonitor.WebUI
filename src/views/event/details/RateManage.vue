@@ -177,6 +177,38 @@
           </div>-->
         </div>
       </div>
+
+      <!-- ==== !!! === -->
+      <!-- <div v-for="(i, index) in newImgArray" :key="index">
+        <img :src="i" class="w-full rounded shadow" />
+      </div> -->
+
+      <!-- <watermark :options="waterOptions">
+        <div class="container" style="height: 300px">
+          内容区域
+        </div>
+      </watermark>
+
+
+      <div class="img" style=" display: flex; flex-direction: row;">
+        <div class="" v-for="iii in tempDB" style="width: 150px; margin-right: 10px; position: relative;">
+            <div class="mask"
+              style="position: absolute; width: 100%; height: 100%; z-index: 101;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+
+              ">
+              <div class="text"" style="color: #FFF; transform: rotate(45deg) ; font-size: 30px;">Albert</div>
+            </div>
+            <el-image
+              style="width: 100%; height: auto;"
+              :src="iii.src"
+            />
+          </div>
+      </div> -->
+      <!-- ==== !!! === -->
+
       <div class="eventInfo-content">
         <strong v-if="lang.indexOf('zh') === -1" style="margin-right: 28px">{{ $t('eventView.eventDetails') }}:</strong>
         <strong v-else>{{ $t('eventView.eventDetails') }}：</strong>
@@ -209,12 +241,16 @@
             <div v-for="(item,index) in imgsourceList" :key="'img-' + index" class="source-content">
               <div v-if="item.mediaType===2" class="img-content">
                 <!--image-->
+                ***
                 <el-image
+                  class="imgLittle imgInner"
                   :src="item.url"
                   :style="{height: imgHeight+'px', width: 'auto'}"
-                  :preview-src-list="getImgList(index, imgsourceList)"
+                  :preview-src-list="getImgList(index, newImgArray)"
                   @contextmenu.prevent
-                  class="imgLittle imgInner"/>
+                  @click="testaaa"
+                />
+
               </div>
               <div v-if="item.deviceId!=-1" class="imgLittle" @click="showRelatedChannel">
                 <img :src="cameraImg" style="width:14px;height:14px;" />
@@ -250,12 +286,16 @@
                   :height="imgHeight+'px'"
                   class="source-details">
                   <div v-if="_item.mediaType === 2" class="img-content">
+                    XXXD  2
                     <el-image
+                      class="imgLittle imgInner"
                       :src="_item.url"
                       :style="{height: imgHeight+'px',width: 'calc(100/1920*100vw)'}"
                       :preview-src-list="getImgList(_index, item.sourceList)"
+                      @contextmenu.prevent
+                      @click="testaaa"
+                      />
 
-                      class="imgLittle imgInner"/>
                   </div>
                   <div v-else class="img-content " @click="playCommentVideo(_item,_index)">
                     <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
@@ -306,8 +346,6 @@
               返回處理
             </div>
           </div>
-
-
         </div>
       </div>
 
@@ -374,10 +412,14 @@
                 </div>
               <div v-else-if="imgItem.type===2" class="img-content">
                 <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
+
+                XXXD 1
                 <el-image
                   :src="imgItem.src"
                   class="imgLittle"
-                  :preview-src-list="getAuditImgList(index)"/>
+                  :preview-src-list="getAuditImgList(index)"
+                  @click="testaaa"
+                  />
               </div>
             </div>
             <div v-if="attFileCount<10" class="attach-add" @click="$refs.auditfile.click()">
@@ -434,6 +476,7 @@ import { mapGetters } from 'vuex';
 import DelayButton from '@/components/DelayButton';
 import DescriptionText from "../../../components/DescriptionText";
 import DialogPop from '@/components/DialogPop';
+import Watermark from "watermark-for-vue";
 
 export default {
   name: 'EventDetail',
@@ -441,6 +484,7 @@ export default {
     DescriptionText,
     DelayButton,
     DialogPop,
+    Watermark,
     AudioVue: () => import('@/components/AudioVue.vue'),
     SkywatchVideo: () => import('@/components/SkywatchVideo.vue'),
     DashVideo: () => import('@/components/DashVideo.vue'),
@@ -523,6 +567,23 @@ export default {
       showUpdateEvent: false,
       curId: '',
       needUpdateEvent: false,
+
+      objectURL: '',
+      tempDB: [],
+      waterOptions: {
+        content: "~囧囧囧~~",
+        width: 300,
+        height: 300,
+        rotate: 45,
+        repeat: 'repeat',
+        fillStyle: "#190",
+        globalAlpha: .9,
+
+      },
+
+      newImgArray: []
+
+
     };
   },
   watch:{
@@ -536,6 +597,9 @@ export default {
   },
 
   computed: {
+
+
+
     player() {
       return this.$refs.videoPlayer.player;
     },
@@ -583,22 +647,230 @@ export default {
     })
   },
 
-  mounted() {
+  async mounted() {
     const self = this;
-    self.getUpLoadBucketInfo();
-    self.getBtnList();
-    self.getSessionData();
-    self.getCommentList(0);
+    await self.getUpLoadBucketInfo();
+    await self.getBtnList();
+    await self.getSessionData();
+    await self.getCommentList(0);
 
     this.needUpdateEvent =  sessionStorage.getItem('needUpdateEvent')
 
     document.addEventListener("contextmenu", this.disableRightClickOnViewer);
+    // await this.saveToindexedDB()
+
+    this.handleImg()
+
   },
   beforeUnmount() {
     document.removeEventListener("contextmenu", this.disableRightClickOnViewer);
   },
 
   methods: {
+
+    async handleImg(){
+      const imageLinks = this.imgsourceList.map(i => i.url)
+      // console.log('imageLinks :>> ', imageLinks);
+      const newImgArray = await this.addTextToImageUrls(imageLinks, 'albert superfrog Deng');
+      this.newImgArray = newImgArray.map( i => URL.createObjectURL(i))
+    },
+
+
+    // 處理陣列
+    async addTextToImageUrls(imgUrls, text) {
+      const newImgArray = [];
+
+      for (const url of imgUrls) {
+        const img = await this.loadImage(url);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) continue;
+
+        // 畫圖片
+        ctx.drawImage(img, 0, 0);
+
+        // 加文字樣式
+        ctx.font = '30px sans-serif';
+        ctx.fillStyle = 'white';
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 2;
+
+        const metrics = ctx.measureText(text)
+        const textWidth = metrics.width
+        const textHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent
+
+        // 移動到圖片中心
+        const centerX = (img.width / 2)
+        const centerY = img.height / 2
+        ctx.translate(centerX, centerY)
+
+        // 旋轉 45 度（順時針）
+        ctx.rotate((45 * Math.PI) / 180)
+
+        // 畫出描邊文字 + 實心文字
+        ctx.strokeText(text, -textWidth / 2, -textHeight / 2)
+        ctx.fillText(text, -textWidth / 2, -textHeight / 2)
+
+        // 轉成 blob
+        const newBlob = await new Promise((resolve) =>
+          canvas.toBlob((blob) => resolve(blob), 'image/png')
+        );
+        if (newBlob) newImgArray.push(newBlob);
+      }
+
+      return newImgArray;
+    },
+
+loadImage(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous'; // 加這行以便處理跨域圖片
+    img.onload = () => resolve(img);
+    img.onerror = (err) => reject(err);
+    img.src = url;
+  });
+},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    async testaaa(){
+      // const blob = await this.getImageFromDB(link);
+      // this.objectURL = URL.createObjectURL(blob);
+
+    },
+
+    async saveToindexedDB(){
+      const imageLinks = this.imgsourceList.map(i => i.url)
+      // console.log('imageLinks :>> ', imageLinks);
+      const result = [];
+      this.tempDB = await this.loadImagesFromDB(imageLinks);
+      // console.log('this.tempDB: [] :>> ', this.tempDB);
+
+    },
+    // async saveTo(){
+    //   console.log('this.imgsourceList :>> ', this.imgsourceList);
+    //   const imageLinks = this.imgsourceList.map(i => i.url)
+    //   this.clearAllImagesFromDB()
+    //   const response = await fetch(imageLinks);
+    //   const blob = await response.blob();
+    //   await this.saveMultipleImagesToDB(imageLinks);
+    //   console.log("✅ 圖片已存進 IndexedDB");
+    // },
+
+    clearAllImagesFromDB() {
+      const request = indexedDB.deleteDatabase("ImageDB");
+      request.onsuccess = () => console.log("✅ IndexedDB 清除完成");
+      request.onerror = () => console.error("❌ 清除失敗");
+    },
+
+    // 建立資料庫
+    openDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open("ImageDB", 1);
+        request.onupgradeneeded = (event) => {
+          const db = event.target.result;
+          if (!db.objectStoreNames.contains("images")) {
+            db.createObjectStore("images");
+          }
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    },
+
+    // 儲存圖片（key: 圖片名稱或網址，value: Blob）
+    // async  saveImageToDB(key, blob) {
+    //   const db = await this.openDB();
+    //   const tx = db.transaction("images", "readwrite");
+    //   const store = tx.objectStore("images");
+    //   store.put(blob, key);
+    //   return tx.complete;
+    // },
+
+    async saveMultipleImagesToDB(links) {
+      const db = await this.openDB();
+
+      for (const link of links) {
+        try {
+          const res = await fetch(link);
+          const blob = await res.blob();
+
+          if (!(blob instanceof Blob)) {
+            console.warn(`❌ ${link} 回傳不是合法 Blob`);
+            continue;
+          }
+
+          const tx = db.transaction("images", "readwrite");
+          const store = tx.objectStore("images");
+          store.put(blob, link);
+          console.log(`✅ 存好了：${link}`);
+
+        } catch (err) {
+          console.error(`⚠️ 存 ${link} 失敗`, err);
+        }
+      }
+
+      console.log("🎉 所有圖片處理完畢！");
+    },
+
+    // 讀取圖片 Blob
+    async getImageFromDB(key) {
+      const db = await this.openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction("images", "readonly");
+        const store = tx.objectStore("images");
+        const request = store.get(key);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    },
+    async fetchAndCacheImage(url) {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      await this.saveImageToDB(url, blob);
+      console.log("取得 blob：", blob);
+      return blob;
+    },
+
+    async loadImagesFromDB(links) {
+      const result = [];
+
+      for (const link of links) {
+        const blob = await this.getImageFromDB(link);
+        if (blob instanceof Blob) {
+          const url = URL.createObjectURL(blob);
+          result.push({ src: url, original: link });
+        }
+      }
+
+      return result;
+    },
+
+
+
+
+
+
+
     disableRightClickOnViewer(e) {
       const target = e.target;
       // 如果是在 el-image-viewer 裡點的右鍵，就禁止
@@ -674,8 +946,21 @@ export default {
           index = 0 - (i + 1);
         }
       }
-      return arr.filter(source => source.mediaType === 2).map(source => source.url);
+      return arr
+
+      // let i = 0;
+      // for (i; i < sourceList.length; i++) {
+      //   arr.push(sourceList[i + index]);
+      //   if (i + index >= sourceList.length - 1) {
+      //     index = 0 - (i + 1);
+      //   }
+      // }
+      // return arr.filter(source => source.mediaType === 2).map(source => source.url);
     },
+
+
+
+
 
     closeRealTime() {
       this.$refs.vendorVideo.stopVideoPlay();
@@ -774,6 +1059,9 @@ export default {
       //console.log("deviceList:",deviceList);
       self.videosourceList = temp.filter(x => x.mediaType === 1);
       self.imgsourceList = temp.filter(x => x.mediaType === 2);
+
+
+
       if(event.relatedDeviceIds.length > 0){
         const relatedDeviceIds = event.relatedDeviceIds.sort();
         self.relatedChannels = [];
@@ -840,7 +1128,7 @@ export default {
           // 3 reject：handle、add、closed
           // 4
           self.subBtnList.forEach(item => {
-            console.log("item:",item);
+            // console.log("item:",item);
             if (self.curStatus === 0 || self.curStatus === 3) {
               //if (item.order === 0 && !!PermissionHelper.enableEventHandle()) item.isShow = true;
               //else if(item.order === 1 && !!PermissionHelper.enableEventAdd())  item.isShow = true;
@@ -911,7 +1199,7 @@ export default {
             temp.push(obj);
           });
           self.commentList = temp.slice(0, temp.length - 1);
-          console.log("commentList:",self.commentList);
+          // console.log("commentList:",self.commentList);
         }
       });
     },

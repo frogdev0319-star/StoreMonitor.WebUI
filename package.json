@@ -54,6 +54,7 @@
     "vue-video-player": "^5.0.2",
     "vuedraggable": "2.20.0",
     "vuex": "^3.0.1",
+    "watermark-for-vue": "^2.0.1",
     "xlsx": "^0.14.1"
   },
   "devDependencies": {
