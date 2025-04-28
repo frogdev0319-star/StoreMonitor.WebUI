@@ -77,7 +77,6 @@
                           :value="item.value">
                         </el-option>
                       </el-select>
-
                     </div>
                     <div class="setting_item">
                       <h6>{{$t('advance.textPOsition') }}</h6>
@@ -91,8 +90,6 @@
                       </el-select>
                     </div>
                   </div>
-
-
 
                   <div
                     class="mobile_review"
@@ -142,7 +139,7 @@
                     </div>
                   </div>
 
-                  <div class="setting_row">
+                  <!-- <div class="setting_row">
                     <div class="setting_item">
                       <h6> {{$t('advance.showMarkSetting') }}</h6>
                       <el-select v-model="showTextStatus" placeholder="請選擇" :disabled="!isSwitchOn_dynamic">
@@ -163,19 +160,19 @@
                         />
                       <span class="text_limit_sign" v-if="showInputLimit_overallItem"> {{$t('advance.maxCharacter') }} </span>
                     </div>
+                  </div> -->
 
-                  </div>
                   <div class="setting_row" style="margin-bottom: 40px;">
                     <div class="setting_item">
                       <h6>{{$t('advance.textColor') }} </h6>
-                      <el-color-picker v-model="color" show-alpha :disabled="!isSwitchOn_dynamic"></el-color-picker>
+                      <el-color-picker v-model="color_dynamic" show-alpha :disabled="!isSwitchOn_dynamic"></el-color-picker>
                     </div>
 
                     <div class="setting_item">
                       <h6>{{$t('advance.textSize') }} </h6>
-                      <el-select v-model="textSize" :placeholder="$t('advance.opiton')" :disabled="!isSwitchOn_dynamic">
+                      <el-select v-model="textSize_dynamic" :placeholder="$t('advance.opiton')" :disabled="!isSwitchOn_dynamic">
                         <el-option
-                          v-for="item in textSizeSelect"
+                          v-for="item in textSizeSelect_dynamic"
                           :key="item.value"
                           :label="item.label"
                           :value="item.value">
@@ -185,9 +182,9 @@
                     </div>
                     <div class="setting_item">
                       <h6>{{$t('advance.textPOsition') }}</h6>
-                      <el-select v-model="textPosition" :placeholder="$t('advance.opiton')" :disabled="!isSwitchOn_dynamic">
+                      <el-select v-model="textPosition_dynamic" :placeholder="$t('advance.opiton')" :disabled="!isSwitchOn_dynamic">
                         <el-option
-                          v-for="item in textPositionSelect"
+                          v-for="item in textPositionSelect_dynamic"
                           :key="item.value"
                           :label="item.label"
                           :value="item.value">
@@ -196,17 +193,19 @@
                     </div>
                   </div>
                   <div
-                    class="mobile_review"
-                    :style=" {justifyContent: text_justifyContent, alignItems: text_alignItems}">
+                    class="mobile_review_dynamic"
+                    style="justify-content: center; align-items: center;"
+                    >
                     <div
                       v-show="isSwitchOn_dynamic"
                       class="text_content"
                       :style="{
-                        color: color ,
-                        fontSize: textSize,
+                        color: color_dynamic ,
+                        fontSize: textSize_dynamic,
+                        transform: rotateDegree
                       }"
                     >
-                      {{showTextStatus == false ? userName : defineText}}
+                      {{userName}}
                     </div>
                   </div>
                 </div>
@@ -218,13 +217,7 @@
       </el-tabs>
 
 
-
-      </div>
-
-
-
-
-
+    </div>
   </div>
 
 </template>
@@ -256,8 +249,37 @@ export default {
       // dynamic
       isSwitchOn_dynamic: false,
       showTextStatus_dynamic: true,
+      color_dynamic:'#FFFFFF',
+      textSize_dynamic: this.$t('advance.m'),
+      textPosition_dynamic: this.$t('advance.topLeftToBottomRight'),
+      textPositionSelect_dynamic:[
+        {
+          value: "topLeftToBottomRight",
+          label: this.$t('advance.topLeftToBottomRight')
+        },
+        {
+          value: "bottomLeftToTopLeft",
+          label: this.$t('advance.bottomLeftToTopLeft')
+        },
+      ],
+      textSizeSelect_dynamic:[
+        {
+          value: "26.4px",
+          label: this.$t('advance.l'),
+          mobileSize: "66px"
 
-
+        },
+        {
+          value: "17.6px",
+          label: this.$t('advance.m'),
+          mobileSize: "44px"
+        },
+        {
+          value: "8.8px",
+          label: this.$t('advance.s'),
+          mobileSize: "22px"
+        }
+      ],
 
 			isSwitchOn: false,
       userName: '',
@@ -337,6 +359,8 @@ export default {
 
       text_justifyContent: "flex-start",
       text_alignItems: "flex-start",
+
+      rotateDegree: 'rotate(45deg)',
       showInputLimit_overallItem: false,
 
     };
@@ -394,6 +418,19 @@ export default {
       }
     },
 
+    textPosition_dynamic(val){
+      switch (val) {
+        case "topLeftToBottomRight":
+          this.rotateDegree = 'rotate(45deg)'
+          break
+        case "bottomLeftToTopLeft":
+          this.rotateDegree = 'rotate(-45deg)'
+          break
+        default:
+          break;
+      }
+    },
+
   },
 
   created() {
@@ -429,10 +466,25 @@ export default {
         });
       });
     },
+    advancedFetch_dynamic(){
+      var param = {
+        contentKey: "dynamic_print"
+      }
+      return new Promise((resolve, reject) => {
+        advancedFetch(param).then(res => {
+          resolve(res);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
 
     async getInitAdvance(){
       const initData = await this.advancedFetch();
-      console.log('initData.data :>> ', initData.data);
+      const initData_dynamic = await this.advancedFetch_dynamic();
+      // console.log('initData.data :>> ', initData.data);
+      console.log('initData_dynamic', initData_dynamic)
+
       var tempItem = this.textSizeSelect.find( i => i.mobileSize == initData.data.content.waterPrintSize)
       this.isSwitchOn = initData.data.content.isSwitchOn
       this.defineText = initData.data.content.waterPrintText
@@ -440,6 +492,17 @@ export default {
       this.color = initData.data.content.waterPrintColor
       this.textSize = tempItem.value
       this.textPosition = initData.data.content.waterPrintPosition
+
+      // dynamic
+
+      var tempItem_dynamic = this.textSizeSelect_dynamic.find( i => i.mobileSize == initData_dynamic.data.content.waterPrintSize)
+      console.log('tempItem_dynamic', tempItem_dynamic)
+      this.isSwitchOn_dynamic = initData_dynamic.data.content.isSwitchOn
+      // this.defineText = initData.data.content.waterPrintText
+      this.showTextStatus_dynamic = initData_dynamic.data.content.waterPrintType == 0 ? true : false
+      this.color_dynamic = initData_dynamic.data.content.waterPrintColor
+      this.textSize_dynamic = tempItem_dynamic.value
+      this.textPosition_dynamic = initData_dynamic.data.content.waterPrintPosition
 
     },
 
@@ -450,7 +513,7 @@ export default {
       var param = {
         contentKey: "water_print",
         contentMap: {
-          waterPrintText: this.defineText,
+          waterPrintText: this.userName,
           waterPrintType: this.showTextStatus ? 0 : 1,
           waterPrintSize: tempItem.mobileSize,
           waterPrintPosition: this.textPosition,
@@ -468,6 +531,30 @@ export default {
       });
     },
 
+    advancedUpdate_dynamic(){
+      this.isLoadingData = true
+      var tempItem_dynamic = this.textSizeSelect_dynamic.find( i => i.value == this.textSize_dynamic)
+      var param = {
+        contentKey: "dynamic_print",
+        contentMap: {
+          waterPrintText: this.defineText,
+          waterPrintType: 1,
+          waterPrintSize: tempItem_dynamic.mobileSize,
+          waterPrintPosition: this.textPosition_dynamic,
+          waterPrintColor: this.color_dynamic,
+          isSwitchOn: this.isSwitchOn_dynamic
+        }
+      }
+      return new Promise((resolve, reject) => {
+        advancedUpdate(param).then(res => {
+          resolve(res);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
+
     async submit(){
       if(this.defineText == '' && this.showTextStatus){
         this.$refs.defineName.focus()
@@ -476,6 +563,10 @@ export default {
       }
 
       const statusNameRes = await this.advancedUpdate();
+      const statusNameRes_dynamic = await this.advancedUpdate_dynamic();
+
+      console.log('statusNameRes_dynamic', statusNameRes_dynamic)
+
       if (statusNameRes.errCode == 0) {
         this.isLoadingData = false
         util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
@@ -535,6 +626,26 @@ export default {
     width: 450px
     height: 598px
     background: url("../../../../static/img/mobile_review.jpg") center
+    background-size: cover
+    padding: 10px
+    margin-bottom: 40px
+    display: flex
+    flex-direction: row
+    justify-content: flex-start
+    align-items: flex-start
+    .text_content
+      // position: absolute
+      // left: 10px
+      // top: 10px
+
+      color: #FFF
+      font-size: 18px
+      transition: all .3s
+
+  .mobile_review_dynamic
+    width: 450px
+    height: 598px
+    background: url("../../../../static/img/mobile_review_dynamic.jpg") center
     background-size: cover
     padding: 10px
     margin-bottom: 40px

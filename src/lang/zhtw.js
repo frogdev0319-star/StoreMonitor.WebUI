@@ -1766,6 +1766,9 @@ export default {
     "waterMark": "一般浮水印",
     "DynamicWatermark": "動態浮水印 ",
     "DynamicWatermarkSetting": "動態浮水印設定",
+    "topLeftToBottomRight": "左上右下",
+    "bottomLeftToTopLeft": "左下右上",
+
 
 
   },
