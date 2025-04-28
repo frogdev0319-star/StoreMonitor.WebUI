@@ -113,10 +113,107 @@
               </div>
             </div>
           </div>
-
         </el-tab-pane>
         <el-tab-pane :label="$t('advance.DynamicWatermark')" name="1">
-          動態浮水印設定
+
+          <!-- ----動態浮水印設定--- -->
+          <div class="setting-titles padding flex-center">
+            {{$t('advance.DynamicWatermarkSetting') }}
+            <div class="spacer"></div>
+          </div>
+
+          <div v-loading="isLoadingData" class="setting-details self-loading">
+            <div class="template-info">
+              <div class="inspect-basic">
+
+                <div class="water_setting">
+
+                  <div class="setting_row" >
+                    <div class="setting_item">
+                      <el-switch
+                        style="display: block"
+                        v-model="isSwitchOn_dynamic"
+                        active-color="#c60957"
+                        inactive-color="#eee"
+                        :active-text="$t('advance.on')"
+                        :inactive-text="$t('advance.off')"
+                      >
+                      </el-switch>
+                    </div>
+                  </div>
+
+                  <div class="setting_row">
+                    <div class="setting_item">
+                      <h6> {{$t('advance.showMarkSetting') }}</h6>
+                      <el-select v-model="showTextStatus" placeholder="請選擇" :disabled="!isSwitchOn_dynamic">
+                        <el-option
+                          v-for="item in showText"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value">
+                        </el-option>
+                      </el-select>
+                      <el-input
+                        ref="defineName"
+                        v-model="defineText"
+                        :disabled = "!isSwitchOn_dynamic || showTextStatus == false"
+                        :placeholder="$t('audit.workFlows.defineItem')"
+                        style="width: 300px;  margin: 0 20px ;"
+                        @input="(val) => itemInputChanged_overall(val)"
+                        />
+                      <span class="text_limit_sign" v-if="showInputLimit_overallItem"> {{$t('advance.maxCharacter') }} </span>
+                    </div>
+
+                  </div>
+                  <div class="setting_row" style="margin-bottom: 40px;">
+                    <div class="setting_item">
+                      <h6>{{$t('advance.textColor') }} </h6>
+                      <el-color-picker v-model="color" show-alpha :disabled="!isSwitchOn_dynamic"></el-color-picker>
+                    </div>
+
+                    <div class="setting_item">
+                      <h6>{{$t('advance.textSize') }} </h6>
+                      <el-select v-model="textSize" :placeholder="$t('advance.opiton')" :disabled="!isSwitchOn_dynamic">
+                        <el-option
+                          v-for="item in textSizeSelect"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value">
+                        </el-option>
+                      </el-select>
+
+                    </div>
+                    <div class="setting_item">
+                      <h6>{{$t('advance.textPOsition') }}</h6>
+                      <el-select v-model="textPosition" :placeholder="$t('advance.opiton')" :disabled="!isSwitchOn_dynamic">
+                        <el-option
+                          v-for="item in textPositionSelect"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value">
+                        </el-option>
+                      </el-select>
+                    </div>
+                  </div>
+                  <div
+                    class="mobile_review"
+                    :style=" {justifyContent: text_justifyContent, alignItems: text_alignItems}">
+                    <div
+                      v-show="isSwitchOn_dynamic"
+                      class="text_content"
+                      :style="{
+                        color: color ,
+                        fontSize: textSize,
+                      }"
+                    >
+                      {{showTextStatus == false ? userName : defineText}}
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </el-tab-pane>
       </el-tabs>
 
@@ -154,6 +251,14 @@ export default {
   data() {
     return {
       isLoadingData: false,
+      activeName: "0",
+
+      // dynamic
+      isSwitchOn_dynamic: false,
+      showTextStatus_dynamic: true,
+
+
+
 			isSwitchOn: false,
       userName: '',
       defineText: this.$t('audit.workFlows.defineItem'),
@@ -167,6 +272,9 @@ export default {
           label: this.$t('advance.userName')
         }
       ],
+
+
+
       color:'#FFFFFF',
       textSize: this.$t('advance.m'),
       textSizeSelect:[

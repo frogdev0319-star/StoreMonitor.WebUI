@@ -1768,6 +1768,8 @@ export default {
     "back": "Back",
     "waterMark": "一般浮水印",
     "DynamicWatermark": "動態浮水印 ",
+    "DynamicWatermarkSetting": "動態浮水印 ",
+
 
   },
   "reportAndEvents": {

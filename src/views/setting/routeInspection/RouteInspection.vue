@@ -892,7 +892,7 @@ export default {
                   ti_item.userTitles.forEach(u_item => {
                     usertext.push(u_item.titleName);
                     te_item['ModelPost'] = usertext.toString();
-                    console.log('te_item[ModelPost] :>> ', te_item['ModelPost']);
+                    // console.log('te_item[ModelPost] :>> ', te_item['ModelPost']);
                   });
                 }
               } else {
