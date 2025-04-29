@@ -241,14 +241,14 @@
             <div v-for="(item,index) in imgsourceList" :key="'img-' + index" class="source-content">
               <div v-if="item.mediaType===2" class="img-content">
                 <!--image-->
-                **_**
+                <!-- add watre print -->
+                * - *
                 <el-image
                   class="imgLittle imgInner"
                   :src="item.url"
                   :style="{height: imgHeight+'px', width: 'auto'}"
                   :preview-src-list="getImgList(index, newImgArray)"
                   @contextmenu.prevent
-                  @click="testaaa"
                 />
 
               </div>
@@ -260,7 +260,7 @@
           </div>
           <div class="process-detail">
             <div style="font-family: NotoSansCJKTC;font-size: 13px;font-weight: 500;color: #556679;">{{$t('eventView.details')}}</div>
-            <div v-for="(item,index) in commentList" :key="index" class="deal-details">
+            <div v-for="(item,index) in newCommentList" :key="index" class="deal-details">
               <div class="creator-area">
                 <div style="display:flex;flex-direction:row;align-item:center;">
                   <div class="account-area" >{{item.accountTitle}}</div>
@@ -286,14 +286,13 @@
                   :height="imgHeight+'px'"
                   class="source-details">
                   <div v-if="_item.mediaType === 2" class="img-content">
-                    XXXD  2
+                    ** 2
                     <el-image
                       class="imgLittle imgInner"
                       :src="_item.url"
                       :style="{height: imgHeight+'px',width: 'calc(100/1920*100vw)'}"
-                      :preview-src-list="getImgList(_index, item.sourceList)"
+                      :preview-src-list="item.sourceList.map(i => i.url)"
                       @contextmenu.prevent
-                      @click="testaaa"
                       />
 
                   </div>
@@ -315,8 +314,8 @@
           </div>-->
         </div>
       </div>
-
     </el-col>
+
     <el-col :span="12" class="rside" :style="{'height':windowHeight*0.82+'px','background-color':'#edf0f2'}">
       <div class="title">
         <div id="rside-title" class="title-content">
@@ -412,13 +411,10 @@
                 </div>
               <div v-else-if="imgItem.type===2" class="img-content">
                 <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
-
-                XXXD 1
                 <el-image
                   :src="imgItem.src"
                   class="imgLittle"
                   :preview-src-list="getAuditImgList(index)"
-                  @click="testaaa"
                   />
               </div>
             </div>
@@ -469,6 +465,8 @@ import 'videojs-contrib-hls';
 import { eventRESTful } from '@/api/index';
 import { getDetailedStoreInfo } from '@/api/store';
 import { getStorageInfo } from '@/api/event';
+import {advancedUpdate, advancedFetch} from '@/api/advanceSetting';
+
 import PermissionHelper from '@/api/PermissionHelper';
 import {handleEventStatus} from '@/api/reportAndEvent';
 import filterString from '@/common/filterString';
@@ -476,7 +474,6 @@ import { mapGetters } from 'vuex';
 import DelayButton from '@/components/DelayButton';
 import DescriptionText from "../../../components/DescriptionText";
 import DialogPop from '@/components/DialogPop';
-import Watermark from "watermark-for-vue";
 
 export default {
   name: 'EventDetail',
@@ -484,7 +481,6 @@ export default {
     DescriptionText,
     DelayButton,
     DialogPop,
-    Watermark,
     AudioVue: () => import('@/components/AudioVue.vue'),
     SkywatchVideo: () => import('@/components/SkywatchVideo.vue'),
     DashVideo: () => import('@/components/DashVideo.vue'),
@@ -581,7 +577,14 @@ export default {
 
       },
 
-      newImgArray: []
+      waterPrintContent: {},
+      isFeatureActivate: false,
+
+      newImgArray: [],
+      previewList: [],
+      newCommentList: []
+
+
 
 
     };
@@ -597,8 +600,6 @@ export default {
   },
 
   computed: {
-
-
 
     player() {
       return this.$refs.videoPlayer.player;
@@ -653,13 +654,20 @@ export default {
     await self.getBtnList();
     await self.getSessionData();
     await self.getCommentList(0);
+    // await self.goWaterPrint()
+
+    await self.getInitAdvance();
 
     this.needUpdateEvent =  sessionStorage.getItem('needUpdateEvent')
-
     document.addEventListener("contextmenu", this.disableRightClickOnViewer);
-    // await this.saveToindexedDB()
 
     this.handleImg()
+
+    // handle waterPrint
+    // const newList = await this.processCommentList(rawCommentList) // rawCommentList 是你原本的資料
+    // this.newCommentList.value = newList
+    // console.log(' this.newCommentList. :>> ',  this.newCommentList);
+
 
   },
   beforeUnmount() {
@@ -669,25 +677,27 @@ export default {
   methods: {
 
     async handleImg(){
-      const imageLinks = this.imgsourceList.map(i => i.url)
-      // console.log('imageLinks :>> ', imageLinks);
-      const newImgArray = await this.addTextToImageUrls(imageLinks, 'albert superfrog Deng');
-      this.newImgArray = newImgArray.map( i => URL.createObjectURL(i))
+      if(this.isFeatureActivate && this.waterPrintContent.isSwitchOn){
+        var waterPrintText = this.waterPrintContent.waterPrintText
+        const imageLinks = this.imgsourceList.map(i => i.url)
+        // console.log('imageLinks :>> ', imageLinks);
+        const newImgArray = await this.addTextToImageUrls(imageLinks, waterPrintText);
+        this.newImgArray = newImgArray.map( i => URL.createObjectURL(i))
+
+        console.log('newImgArray :>> ', newImgArray);
+
+      } else {
+        this.newImgArray = this.imgsourceList.map(i => i.url)
+      }
     },
 
-
-    // 處理陣列
     async addTextToImageUrls(imgUrls, text) {
       const newImgArray = [];
-
       for (const url of imgUrls) {
         const img = await this.loadImage(url);
-
         const canvas = document.createElement('canvas');
         canvas.width = img.width;
         canvas.height = img.height;
-
-
 
         const ctx = canvas.getContext('2d');
         if (!ctx) continue;
@@ -696,10 +706,11 @@ export default {
         ctx.drawImage(img, 0, 0);
 
         // 加文字樣式
-        ctx.font = '30px sans-serif';
-        ctx.fillStyle = 'white';
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = 2;
+
+        ctx.font = `${this.waterPrintContent.waterPrintSize} sans-serif`;
+        ctx.fillStyle = this.waterPrintContent.waterPrintColor;
+        // ctx.strokeStyle = 'black';
+        // ctx.lineWidth = 2;
 
         const metrics = ctx.measureText(text)
         const textWidth = metrics.width
@@ -710,8 +721,12 @@ export default {
         const centerY = img.height / 2
         ctx.translate(centerX, centerY)
 
-        // 旋轉 45 度（順時針）
-        ctx.rotate((45 * Math.PI) / 180)
+        // 旋轉 45 度
+        if(this.waterPrintContent.waterPrintPosition === "topLeftToBottomRight"){
+          ctx.rotate((45 * Math.PI) / 180)
+        } else {
+          ctx.rotate((-45 * Math.PI) / 180)
+        }
 
         // 畫出描邊文字 + 實心文字
         ctx.strokeText(text, -textWidth / 2, -textHeight / 2)
@@ -723,19 +738,62 @@ export default {
         );
         if (newBlob) newImgArray.push(newBlob);
       }
-
       return newImgArray;
     },
 
-loadImage(url) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = 'anonymous'; // 加這行以便處理跨域圖片
-    img.onload = () => resolve(img);
-    img.onerror = (err) => reject(err);
-    img.src = url;
-  });
-},
+
+
+
+    // async addTextToImageUrlsSingle(imgUrls, text) {
+    //   const newImgArray = [];
+    //   // for (const url of imgUrls) {
+    //     const img = await this.loadImage(url);
+    //     const canvas = document.createElement('canvas');
+    //     canvas.width = img.width;
+    //     canvas.height = img.height;
+
+    //     const ctx = canvas.getContext('2d');
+
+    //     // 畫圖片
+    //     ctx.drawImage(img, 0, 0);
+
+    //     // 加文字樣式
+
+    //     ctx.font = `${this.waterPrintContent.waterPrintSize} sans-serif`;
+    //     ctx.fillStyle = this.waterPrintContent.waterPrintColor;
+    //     // ctx.strokeStyle = 'black';
+    //     // ctx.lineWidth = 2;
+
+    //     const metrics = ctx.measureText(text)
+    //     const textWidth = metrics.width
+    //     const textHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent
+
+    //     // 移動到圖片中心
+    //     const centerX = (img.width / 2)
+    //     const centerY = img.height / 2
+    //     ctx.translate(centerX, centerY)
+
+    //     // 旋轉 45 度
+    //     if(this.waterPrintContent.waterPrintPosition === "topLeftToBottomRight"){
+    //       console.log('111 :>> ');
+    //       ctx.rotate((45 * Math.PI) / 180)
+    //     } else {
+    //       ctx.rotate((-45 * Math.PI) / 180)
+    //     }
+
+    //     // 畫出描邊文字 + 實心文字
+    //     ctx.strokeText(text, -textWidth / 2, -textHeight / 2)
+    //     ctx.fillText(text, -textWidth / 2, -textHeight / 2)
+
+    //     // 轉成 blob
+    //     const newBlob = await new Promise((resolve) =>
+    //       canvas.toBlob((blob) => resolve(blob), 'image/png')
+    //     );
+    //     if (newBlob) newImgArray.push(newBlob);
+    //   // }
+    //   return newImgArray;
+
+    // }
 
 
 
@@ -743,28 +801,21 @@ loadImage(url) {
 
 
 
-
-
-
-
-
-
-
-
-
-    async testaaa(){
-      // const blob = await this.getImageFromDB(link);
-      // this.objectURL = URL.createObjectURL(blob);
-
+    loadImage(url) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous'; // 加這行以便處理跨域圖片
+        img.onload = () => resolve(img);
+        img.onerror = (err) => reject(err);
+        img.src = url;
+      });
     },
-
     async saveToindexedDB(){
       const imageLinks = this.imgsourceList.map(i => i.url)
       // console.log('imageLinks :>> ', imageLinks);
       const result = [];
       this.tempDB = await this.loadImagesFromDB(imageLinks);
       // console.log('this.tempDB: [] :>> ', this.tempDB);
-
     },
     // async saveTo(){
     //   console.log('this.imgsourceList :>> ', this.imgsourceList);
@@ -895,6 +946,36 @@ loadImage(url) {
 
 
 
+    advancedFetch_dynamic(){
+      var param = {
+        contentKey: "dynamic_print"
+      }
+      return new Promise((resolve, reject) => {
+        advancedFetch(param).then(res => {
+          resolve(res);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+    async getInitAdvance(){
+      const initData_dynamic = await this.advancedFetch_dynamic();
+      this.isFeatureActivate = initData_dynamic.data.isFeatureActivate
+      this.waterPrintContent = initData_dynamic.data.content
+
+
+      // var tempItem_dynamic = this.textSizeSelect_dynamic.find( i => i.mobileSize == initData_dynamic.data.content.waterPrintSize)
+      console.log('waterPrintPosition', this.waterPrintContent.waterPrintPosition)
+      // this.isSwitchOn_dynamic = initData_dynamic.data.content.isSwitchOn
+      // this.showTextStatus_dynamic = initData_dynamic.data.content.waterPrintType == 0 ? true : false
+      // this.color_dynamic = initData_dynamic.data.content.waterPrintColor
+      // this.textSize_dynamic = tempItem_dynamic.value
+      // this.textPosition_dynamic = initData_dynamic.data.content.waterPrintPosition
+    },
+
+
+
+
     ivsIdChange(val) {
       const self = this;
       const comment = filterString.all(val, 1000);
@@ -956,6 +1037,143 @@ loadImage(url) {
       //   }
       // }
       // return arr.filter(source => source.mediaType === 2).map(source => source.url);
+    },
+
+
+
+  // async goWaterPrint(){
+  //   this.processCommentList(this.commentList).then(newCommentList => {
+  //     console.log("newCommentList" , newCommentList);
+
+  //     // newCommentList 裡的每個 comment.sourceList 的 url 會是 blob 開頭
+  //   });
+  // },
+
+  async processCommentList(commentList) {
+    const newList = await Promise.all(commentList.map(async comment => {
+      const newSourceList = await Promise.all(comment.sourceList.map(async item => {
+        if (item.mediaType === 2 && item.url.startsWith("http")) {
+          try {
+            const img = await this.loadImage(item.url);
+            const watermarkedBlob = await this.createWatermarkedBlob(img, "StoreVue");
+            const blobUrl = URL.createObjectURL(watermarkedBlob);
+            return { ...item, url: blobUrl };
+          } catch (err) {
+            console.warn("圖片載入失敗", item.url, err);
+            return item; // 若失敗就保留原始 URL
+          }
+        }
+        return item;
+      }));
+
+      return { ...comment, sourceList: newSourceList };
+    }));
+
+    return newList;
+},
+
+
+
+  // async addWatermarkToImages(attachments) {
+  //   const results = await Promise.all(
+  //     attachments.map(async item => {
+  //       // 僅處理 mediaType = 2 且為圖片 URL
+  //       if (item.mediaType === 2 && item.url.startsWith("http")) {
+  //         const img = await this.loadImage(item.url);
+  //         const watermarkedBlob = await this.createWatermarkedBlob(img, "StoreVue");
+  //         const blobUrl = URL.createObjectURL(watermarkedBlob);
+  //         return { ...item, url: blobUrl };
+  //       }
+  //       return item;
+  //     })
+  //   );
+  //   return results;
+  // },
+
+  loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous"; // 避免 CORS 問題（前提是圖片允許跨域）
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+  },
+createWatermarkedBlob(img, watermarkText) {
+  return new Promise(resolve => {
+    const canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext("2d");
+
+    ctx.drawImage(img, 0, 0);
+
+    // 設定浮水印樣式
+    ctx.font = "36px sans-serif";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+
+    const metrics = ctx.measureText(watermarkText)
+    const textWidth = metrics.width
+    const textHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent
+    ctx.fillText(watermarkText, -textWidth / 2, -textHeight / 2)
+
+    canvas.toBlob(blob => {
+      resolve(blob);
+    }, "image/jpeg");
+  });
+},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // async generatePreview(imagArr) {
+    //   const urls = imagArr.filter(item => item.mediaType === 2 && item.url).map(item => item.url)
+    //   console.log('urls :>> ', urls);
+    //   const newImgArray = await this.addTextToImageUrls(urls, '浮水印文字')
+    //   this.previewList = newImgArray.map( i => URL.createObjectURL(i))
+    //   console.log('this.previewList :>> ', this.previewList);
+    // },
+
+
+    getImgList_des(index, sourceList) {
+
+      // console.log('sourceList :>> ', sourceList);
+      const imageUrls = sourceList.filter(item => item.mediaType === 2 && item.url).map(item => item.url)
+
+      var arr = [];
+      let i = 0;
+      // for (i; i < sourceList.length; i++) {
+      //   arr.push(imageUrls[i + index]);
+      //   if (i + index >= sourceList.length - 1) {
+      //     index = 0 - (i + 1);
+      //   }
+      // }
+
+      arr =  this.addTextToImageUrls(imageUrls, '檢查中')
+      return arr
+
+      // let i = 0;
+      // for (i; i < sourceList.length; i++) {
+      //   arr.push(sourceList[i + index]);
+      //   if (i + index >= sourceList.length - 1) {
+      //     index = 0 - (i + 1);
+      //   }
+      // }
+      return arr.filter(source => source.mediaType === 2).map(source => source.url);
     },
 
 
@@ -1101,7 +1319,7 @@ loadImage(url) {
     },
 
     getCommentList(e) {
-      console.log("getCommentList");
+      // console.log("getCommentList");
       const self = this;
       const eventIds = [];
       self.commentList = [];
@@ -1199,7 +1417,14 @@ loadImage(url) {
             temp.push(obj);
           });
           self.commentList = temp.slice(0, temp.length - 1);
-          // console.log("commentList:",self.commentList);
+          console.log("commentList:",self.commentList);
+
+          this.processCommentList(this.commentList).then(newCommentList => {
+            console.log("newCommentList" , newCommentList);
+            this.newCommentList = newCommentList
+            // newCommentList 裡的每個 comment.sourceList 的 url 會是 blob 開頭
+          });
+
         }
       });
     },

@@ -205,7 +205,7 @@
                         transform: rotateDegree
                       }"
                     >
-                      {{userName}}
+                      {{userEmail}}
                     </div>
                   </div>
                 </div>
@@ -362,6 +362,7 @@ export default {
 
       rotateDegree: 'rotate(45deg)',
       showInputLimit_overallItem: false,
+      userEmail: ''
 
     };
   },
@@ -449,6 +450,8 @@ export default {
     async getUserInfo(){
       const result = await this.$store.dispatch("GetUserAuthorities");
       this.userName = result.data.userName
+      this.userEmail = result.data.email.split("@")[0];
+
       // console.log('result  :>> ', result );
       // console.log('this.userName  :>> ', this.userName );
     },
@@ -537,7 +540,7 @@ export default {
       var param = {
         contentKey: "dynamic_print",
         contentMap: {
-          waterPrintText: this.defineText,
+          waterPrintText: this.userEmail,
           waterPrintType: 1,
           waterPrintSize: tempItem_dynamic.mobileSize,
           waterPrintPosition: this.textPosition_dynamic,
