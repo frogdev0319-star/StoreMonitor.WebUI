@@ -250,8 +250,45 @@
           </div>
         </div>
       </div>
-
     </div> -->
+
+
+    <!-- 生物辨識開關 -->
+    <div class="page-container report-setting paper" >
+      <div class="setting-titles padding flex-center">
+        特定巡檢管理功能設定
+        <div class="spacer"></div>
+      </div>
+
+      <div v-loading="isLoadingData" class="setting-details self-loading">
+        <div class="template-info">
+          <div class="inspect-basic">
+            <setting-table table-name="啟用生物辨識功能" style="margin-top: 20px;">
+              <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
+                <div class="overall_options">
+                  <div class="overall_row" style="flex-direction: column; align-items: flex-start">
+                    <div style="margin-left: 20px; padding: 20px 0px;">
+                      <el-switch
+                        v-model="biometric_switch"
+                        active-text="開啟"
+                        inactive-text="關閉">
+                      </el-switch>
+                    </div>
+                    <span style="margin-left: 20px; font-size: 12px;"> 開啟後，該品牌下的所有使用者在 App 端登入時必須使用生物辨識功能（若手機支援） </span>
+                </div>
+                </div>
+
+
+              </div>
+            </setting-table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
 
   </div>
 
@@ -318,7 +355,8 @@ export default {
 
       dueDayIsFeatureOn: 1,
       overDueDay: 90,
-      disable_skip_check_in: false
+      disable_skip_check_in: false,
+      biometric_switch:  false
 
     };
   },
@@ -436,6 +474,7 @@ export default {
 
           this.viewReportByTagAuth = res.data.settingContent.general_setting.view_report_by_tag_auth == true ? 1 : 0
           this.disable_skip_check_in = res.data.settingContent.general_setting.disable_skip_check_in
+          this.biometric_switch = res.data.settingContent.general_setting.biometric_switch
 
           console.log('this.inspectStatus :>> ', this.inspectStatus);
 
@@ -496,6 +535,7 @@ export default {
           },
           time_zone: timeZone,
           disable_skip_check_in: this.disable_skip_check_in,
+          biometric_switch: this.biometric_switch,
           view_report_by_tag_auth: this.viewReportByTagAuth == 1 ? true : false,
 
           eventOverDueDayConfig:{

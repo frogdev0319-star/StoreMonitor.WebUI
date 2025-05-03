@@ -97,7 +97,7 @@
                 @click="barchartClick"/>
               </div>
             </div>
-            
+
             <!-- 地點事件 -->
             <div class="table-area">
               <div class="sec-head">
@@ -1224,11 +1224,11 @@ export default {
       if(res.errCode ==0){
           this.storeList = res.data;
       }
-      
+
     },
     getSearchParams() {
       const searchParams = SearchConditionUtil.getSearchCondition('eventStatistics');
-      
+
       this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
       this.params.beginTs = this.dateValue[0].valueOf();
       this.params.endTs = this.dateValue[1].valueOf();
@@ -1338,7 +1338,7 @@ export default {
       console.log("getUpperGloableEventData > params.inspectTagIds:",params.inspectTagIds);
       params.regionMode = 0;
 
-     
+
       try {
         //console.log('params:',params);
         const eventResult = await this.getEventTableDataInfo(params);
@@ -1371,7 +1371,7 @@ export default {
         totalProcessed += item.numOfProcessed;
         totalRejected = item.numOfRejected;
       });
-      
+
       console.log('self.gloableEventData :>> ', self.gloableEventData);
       if(this.storeIds.length == 0){
         self.eventKPIs[0].eventNum = "N/A";
@@ -1385,7 +1385,7 @@ export default {
         self.eventKPIs[3].eventNum = (totalEvents==0)? 0 : ((totalProcessed/totalEvents)*100).toFixed(0);
       }
 
-      
+
     },
     /**end 取得上方狀態 */
 
@@ -1779,14 +1779,14 @@ export default {
 
               // 已結案＝人工結案＋預期結案
               item.numOfProcessed = item.numOfOverdue + item.numOfProcessed
-              
+
               if (numOfTotal === 0) {
                 item.completedRateStr = 0 + '%';
               } else {
                 item.completedRateStr = (item.numOfProcessed / numOfTotal * 100).toFixed(0) + '%';
               }
               item.id = item.innerId;
-              
+
               item.completedRate = Number(item.completedRateStr.replace('%', ''));
               item.storeGroup = item.storeRegion.toString();
               item.storeType = item.storeBranchType.toString();
@@ -1879,7 +1879,7 @@ export default {
       var hour = this.pad2(date.getHours())
       var min = this.pad2(date.getMinutes())
       var sec = this.pad2(date.getSeconds())
-      return year + month + day 
+      return year + month + day
     },
     getOnlyDate(t){
       var date = new Date(t);
@@ -1889,9 +1889,9 @@ export default {
       var hour = this.pad2(date.getHours())
       var min = this.pad2(date.getMinutes())
       var sec = this.pad2(date.getSeconds())
-      return  month + day 
+      return  month + day
     },
-    
+
     export2Excel() {
       const that = this;
       if (that.eventTableData.length === 0) {
@@ -1912,7 +1912,7 @@ export default {
       } else {
         needParams.storeIds = [...this.params.storeIds]
       }
-    
+
       // console.log('this.storeList', this.storeList)
       var tempinspectTagName = []
       if(this.storeList.length == needParams.storeIds.length){
@@ -2312,7 +2312,7 @@ export default {
         util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
         return false;
       }
-      
+
       const now = new Date()
       var nowTs = this.getAllDate(now)
       var tsbegin = this.getDate(this.params.beginTs)

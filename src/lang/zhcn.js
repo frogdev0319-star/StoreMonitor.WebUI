@@ -465,7 +465,7 @@ export default {
     "relevantEvent": "相关事件",
     "remotePatrol": "远程巡检",
     "reportExcelList": "巡检报告明细单",
-    "reportType": "报表类型",
+    "reportType": "事件来源",
     "resultType": "总评类型",
     "return": "{seconds}秒后自动返回远程巡检页面！",
     "returnStoreMonitor": "{seconds}秒后自动返回现场监控页面！",
@@ -1681,6 +1681,9 @@ export default {
     "read": "已读",
     "notRead": "未读",
     "storeMonitoring": "门店监控",
+    "AIEvent": "AI事件",
+
+
   },
   "downloadManagement": {
     "message": "档案汇出中，请至「下载管理」查看。",

@@ -465,7 +465,7 @@ export default {
     "relateProblem": "Historical problem",
     "relevantEvent": "Relevant Event",
     "remotePatrol": "Remote Inspection",
-    "reportExcelList": "Report List",
+    "reportExcelList": "Event Source",
     "reportType": "Report Type",
     "resultType": "Result Type",
     "return": "Automatically return in {seconds}s",
@@ -1690,6 +1690,8 @@ export default {
     "read": "Read",
     "notRead": "Unread",
     "storeMonitoring": "Store monitoring",
+    "AIEvent": "AI Event",
+
   },
   "downloadManagement": {
     "message": 'File is being exported, please check "Download Management" ',

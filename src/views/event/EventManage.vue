@@ -7,6 +7,7 @@
           path = "eventManage"
           @storeChange = "onStoreChange"
         >
+        <!-- 報表類型 -->
         <template v-slot:others>
             <div class="last-row" >
               <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{isLicensePro ?  $t('remotePatrol.reportType') : $t('remotePatrol.inspectName')}} </span>
@@ -35,7 +36,6 @@
                     :alltype="0"
                     :options="inspectTableList"
                     @changeInput="changeSelect(arguments)"/>
-
               </div>
             </div>
           </template>
@@ -58,6 +58,8 @@
             class="search-input shadow-light"
             clearable/>
         </div>
+
+        <!-- 查詢按鈕 -->
         <delay-button
           class="search-button"
           style="background-color:#556679;border:none;"
@@ -68,6 +70,8 @@
           <span>{{ $t('remotePatrol.search') }}</span>
         </delay-button>
       </div>
+
+
       <!--<selected-stores :store-str="storeFilterObj.storeStr"/>-->
     </div>
     <div class="el-table-content">
@@ -201,11 +205,15 @@
                   <img v-if="scope.row.sourceType === 0" :src="videoSrc" class="sourceType-icon">
                   <img v-else-if="scope.row.sourceType === 1" :src="inspectSrc" class="sourceType-icon">
                   <img v-else-if="scope.row.sourceType === 3" :src="immediateInspectSrc" class="sourceType-icon">
+                  <img v-else-if="scope.row.sourceType === 4" :src="AIInspectSrc" class="sourceType-icon">
                   <img v-else :src="insiteInspectSrc" class="sourceType-icon" style="width:15px;">
                   <span class="event-subject">{{ scope.row.subject }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('overview.patrolLists')" prop="inspectTagName" align="left" min-width="150" />
+
+              <!-- 巡檢表 -->
+              <el-table-column v-if="isShowInspectTagName" :label="$t('overview.patrolLists')" prop="inspectTagName" align="left" min-width="200" />
+
               <el-table-column :label="$t('eventView.enclosure')" align="left" min-width="100" :render-header="renderHeader">
                 <template slot-scope="scope">
                   <div v-if="scope.row.attachment.length!==0">
@@ -213,7 +221,9 @@
                   </div>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('eventView.submitter')" prop="assignerName" align="left" min-width="80" sortable="custom" :render-header="renderHeader"/>
+
+              <!-- 送出人 -->
+              <el-table-column v-if="isShowAssignerName" :label="$t('eventView.submitter')" prop="assignerName" align="left" min-width="80" sortable="custom" :render-header="renderHeader"/>
               <el-table-column :label="$t('eventView.submitTime')" prop="ts" align="left" width="160" sortable="custom" :render-header="renderHeader"/>
               <el-table-column :label="$t('remotePatrol.regionI')" prop="province" align="left" width="80" :render-header="renderHeader"/>
               <el-table-column :label="$t('remotePatrol.regionII')" prop="city" align="left" width="80" :render-header="renderHeader"/>
@@ -322,7 +332,8 @@ export default {
     RegionMultiSelect,
     TblPaginationOnly,
     DialogVue,
-    DownloadDialogPop
+    DownloadDialogPop,
+
   },
 
   data() {
@@ -388,10 +399,12 @@ export default {
       inspectSrc: require('../../../static/img/remote_patrol.png'),
       immediateInspectSrc: require('../../../static/img/immediate_patrol.png'),
 
+      AIInspectSrc: require('../../../static/img/ai_inspection.png'),
       insiteInspectSrc: require('../../../static/img/onsite_patrol.png'),
       attachmentVideo: require('../../../static/img/photo.png'),
       attachmentImg: require('../../../static/img/photo.png'),
       attachmentAudio: require('../../../static/img/voice.png'),
+
       penSrc:require('../../../static/img/icon_pen.png'),
       total: 0,
       page: 1,
@@ -443,6 +456,7 @@ export default {
         {key:'id-ID',value:'#en-tabs-content'},{key:'th-TH',value:'#th-tabs-content'}],
       curReportType: -1,
       reportTypeList: [
+
         { 'mode': -1, 'label': this.$t('remotePatrol.all') },
         // { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
         { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') },
@@ -457,7 +471,10 @@ export default {
       sourceType: 0,
       hasAdvanced: false,
       isLicensePro: false,
-      showExportMassage: false
+      showExportMassage: false,
+
+      isShowInspectTagName: true,
+      isShowAssignerName: true
     };
   },
   computed: {
@@ -502,7 +519,7 @@ export default {
           this.isLicensePro ? this.reportTypeList.push({ 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')}) : null
         }
 
-
+        this.reportTypeList.push({ 'mode': 4, 'label': this.$t('immediatePush.AIEvent')})
       }
     },
 
@@ -536,7 +553,7 @@ export default {
     else {
       this.isLicensePro ? this.reportTypeList.push({ 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')}) : null
     }
-
+    this.reportTypeList.push({ 'mode': 4, 'label': this.$t('immediatePush.AIEvent')})
   },
 
   activated() {
@@ -669,7 +686,22 @@ export default {
         delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
         this.searchParams['searchFrom'] = '';
         this.searchParams['searchMysteryMode'] = -1;
-    }
+      }
+
+      if(this.curReportType == 4){
+        this.isShowInspectTagName = false
+        this.isShowAssignerName = false
+      }
+      else if(this.curReportType == 3){
+        this.isShowInspectTagName = false
+        this.isShowAssignerName = true
+      }
+      else {
+        this.isShowInspectTagName = true
+        this.isShowAssignerName = true
+      }
+
+
       this.getEventListAndCount();
     },
 
@@ -783,6 +815,7 @@ export default {
       else if(this.curReportType == 1){self.params.sourceType = 2}
       else if(this.curReportType == 2){self.params.sourceType = 0}
       else if(this.curReportType == 3){self.params.sourceType = 3}
+      else if(this.curReportType == 4){self.params.sourceType = 4}
 
       console.log("@@@self.params:",self.params);
 
@@ -1126,6 +1159,7 @@ export default {
       else if(this.curReportType == 1){params.sourceType = 2}
       else if(this.curReportType == 2){params.sourceType = 0}
       else if(this.curReportType == 3){params.sourceType = 3}
+      else if(this.curReportType == 4){params.sourceType = 4}
 
       //delete params.clause['status'];
       if (storeId.length === 0) {
@@ -1570,7 +1604,7 @@ export default {
     async getInspectList() {
       const self = this;
       const inspectArr = await self.getTagAll();
-      console.log('inspectArr ::::::::>> ', inspectArr);
+      // console.log('inspectArr ::::::::>> ', inspectArr);
       const newArr = ['-1'];
       const inspectList = [];
       inspectArr.forEach(_item => {
@@ -1618,12 +1652,14 @@ export default {
         console.log(">>>>self.ifGetParamsFromCash:", self.ifGetParamsFromCash);
         self.inspectId = (self.ifGetParamsFromCash && self.inspectCatch!='-1') ? self.inspectCatch : newArr;
 
-        console.log('self.inspectId 1', self.inspectId)
+        // console.log('self.inspectId 1', self.inspectId)
         self.ifGetParamsFromCash = false;
       } else {
         self.inspectId = newArr;
-        console.log('self.inspectId 2', self.inspectId)
+        // console.log('self.inspectId 2', self.inspectId)
       }
+
+      console.log('this.curReportType ::::::::>> ', this.curReportType);
   },
 
   getTagAll() {

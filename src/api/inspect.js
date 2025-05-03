@@ -1,5 +1,5 @@
 import request from '@/common/request';
-import { serviceAxios,serviceRpt } from '@/common/request';
+import { serviceAxios, serviceRpt } from '@/common/request';
 const base = 'http://172.21.84.62:8085';
 const itempath = '/storemonitor/api/v1.0';
 
@@ -122,7 +122,7 @@ export const newDeleteInspect = data => {
 
 
 
-export const deleteInspect = async(params1, params2) => {
+export const deleteInspect = async (params1, params2) => {
   const item = await request({ url: `${base}${itempath}/inspect/item/delete`, method: 'post', data: params1 });
   const group = await request({ url: `${base}${itempath}/inspect/group/delete`, method: 'post', data: params2 });
   return [item, group];

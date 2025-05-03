@@ -141,6 +141,12 @@
         </span>
       </el-dialog>
       <div class="storeInfo-content">
+
+        <!-- <div class="storeInfo-details">
+          <dd><span :class="lang.indexOf('zh') === -1 ? 'en-w4': 'w4'">AI模型：</span></dd>
+          <span class="details-info"> xxxxx</span>
+        </div> -->
+
         <div class="storeInfo-details">
           <dd><span :class="lang.indexOf('zh') === -1 ? 'en-w4': 'w4'">{{ $t('eventView.storeName') }}：</span></dd>
           <span class="details-info">{{ event.storeName }}</span>
@@ -158,6 +164,12 @@
             </el-tooltip>-->
           </div>
         </div>
+
+        <div class="storeInfo-details">
+          <dd><span :class="lang.indexOf('zh') === -1 ? 'en-w4': 'w4'">觸發時間：</span></dd>
+          <span class="details-info"> YYYY/MM/DD hh:mm </span>
+        </div>
+
         <div class="storeInfo-details">
           <div :class="lang.indexOf('zh') === -1 ? 'en-w3-content' : 'w3-content'">
             <dd><span :class="lang.indexOf('zh') === -1 ? 'en-w4' : 'w4'">{{ $t('eventView.submitTime') }}：</span></dd>
@@ -521,6 +533,7 @@ export default {
       inspectSrc: require('../../../../static/img/remote_patrol.png'),
       insiteInspectSrc: require('../../../../static/img/onsite_patrol.png'),
       immediateInspectSrc: require('../../../../static/img/immediate_patrol.png'),
+      AIInspectSrc: require('../../../../static/img/ai_inspection.png'),
       startIcon: require('../../../../static/img/play_icon.png'),
       videoImgSrc: require('../../../../static/img/video_thumbnail.png'),
       cameraImg: require('../../../../static/img/icon_camera.svg'),
@@ -631,6 +644,7 @@ export default {
         case 1: src = this.inspectSrc; break;
         case 2: src = this.insiteInspectSrc; break;
         case 3: src = this.immediateInspectSrc; break;
+        case 4: src = this.AIInspectSrc; break;
       }
       return src;
     },
@@ -664,9 +678,15 @@ export default {
     this.handleImg()
 
     // handle waterPrint
-    // const newList = await this.processCommentList(rawCommentList) // rawCommentList 是你原本的資料
+    // const newList = await processCommentList(rawCommentList) // rawCommentList 是你原本的資料
     // this.newCommentList.value = newList
     // console.log(' this.newCommentList. :>> ',  this.newCommentList);
+
+    this.processCommentList(this.commentList).then(newCommentList => {
+      console.log("newCommentList" , newCommentList);
+      this.newCommentList = newCommentList
+      // newCommentList 裡的每個 comment.sourceList 的 url 會是 blob 開頭
+    });
 
 
   },
@@ -1055,7 +1075,7 @@ export default {
         if (item.mediaType === 2 && item.url.startsWith("http")) {
           try {
             const img = await this.loadImage(item.url);
-            const watermarkedBlob = await this.createWatermarkedBlob(img, "StoreVue");
+            const watermarkedBlob = await this.createWatermarkedBlob(img, this.waterPrintContent.waterPrintText);
             const blobUrl = URL.createObjectURL(watermarkedBlob);
             return { ...item, url: blobUrl };
           } catch (err) {
@@ -1109,13 +1129,10 @@ createWatermarkedBlob(img, watermarkText) {
     ctx.drawImage(img, 0, 0);
 
     // 設定浮水印樣式
-    ctx.font = "36px sans-serif";
-    ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-
-    const metrics = ctx.measureText(watermarkText)
-    const textWidth = metrics.width
-    const textHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent
-    ctx.fillText(watermarkText, -textWidth / 2, -textHeight / 2)
+    ctx.font = `${this.waterPrintContent.waterPrintSize} sans-serif`;
+    ctx.fillStyle = this.waterPrintContent.waterPrintColor;
+    ctx.textAlign = "right";
+    ctx.fillText(watermarkText, canvas.width - 20, canvas.height - 20);
 
     canvas.toBlob(blob => {
       resolve(blob);
@@ -1212,6 +1229,8 @@ createWatermarkedBlob(img, watermarkText) {
     async getSessionData() {
       const self = this;
       const event = JSON.parse(sessionStorage.getItem('event'));
+
+      console.log('event ::::::::>> ', event);
       self.curStatus = event.status;
       self.curId = event.id;
 
@@ -1419,11 +1438,7 @@ createWatermarkedBlob(img, watermarkText) {
           self.commentList = temp.slice(0, temp.length - 1);
           console.log("commentList:",self.commentList);
 
-          this.processCommentList(this.commentList).then(newCommentList => {
-            console.log("newCommentList" , newCommentList);
-            this.newCommentList = newCommentList
-            // newCommentList 裡的每個 comment.sourceList 的 url 會是 blob 開頭
-          });
+
 
         }
       });

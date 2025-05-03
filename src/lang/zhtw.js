@@ -469,7 +469,7 @@ export default {
     "relevantEvent": "相關事件",
     "remotePatrol": "遠端巡檢",
     "reportExcelList": "巡檢報告明細單",
-    "reportType": "報表類型",
+    "reportType": "事件來源",
     "resultType": "總評類型",
     "return": "{seconds}秒後自動返回遠端巡檢頁面！",
     "returnStoreMonitor": "{seconds}秒後自動返回地點監控頁面！",
@@ -1687,6 +1687,8 @@ export default {
     "read": "已讀",
     "notRead": "未讀",
     "storeMonitoring": "地點監控",
+    "AIEvent": "AI事件",
+
   },
   "downloadManagement": {
     "message": "檔案匯出中，請至「下載管理」查看。",
