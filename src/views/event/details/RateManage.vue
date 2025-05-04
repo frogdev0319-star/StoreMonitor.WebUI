@@ -151,7 +151,7 @@
           <dd><span :class="lang.indexOf('zh') === -1 ? 'en-w4': 'w4'">{{ $t('eventView.storeName') }}：</span></dd>
           <span class="details-info">{{ event.storeName }}</span>
         </div>
-        <div class="storeInfo-details">
+        <div class="storeInfo-details" v-if="event.sourceType !== 4">
           <div :class="lang.indexOf('zh') === -1 ? 'en-w3-content' : 'w3-content'">
             <dd><span :class="lang.indexOf('zh') === -1 ? 'en-w3': 'w3'">{{ $t('eventView.submitter') }}：</span></dd>
             <span class="details-info">{{ event.createor }}</span>
@@ -165,9 +165,9 @@
           </div>
         </div>
 
-        <div class="storeInfo-details">
+        <div class="storeInfo-details" v-if="event.sourceType == 4">
           <dd><span :class="lang.indexOf('zh') === -1 ? 'en-w4': 'w4'">觸發時間：</span></dd>
-          <span class="details-info"> YYYY/MM/DD hh:mm </span>
+          <span class="details-info"> {{ visionSenseEventTime }}  </span>
         </div>
 
         <div class="storeInfo-details">
@@ -595,7 +595,8 @@ export default {
 
       newImgArray: [],
       previewList: [],
-      newCommentList: []
+      newCommentList: [],
+      visionSenseEventTime: ''
 
 
 
@@ -1364,6 +1365,8 @@ createWatermarkedBlob(img, watermarkText) {
           // 2 closed：
           // 3 reject：handle、add、closed
           // 4
+
+          this.visionSenseEventTime = util.getDateTime(data[0].visionSenseEventTime);
           self.subBtnList.forEach(item => {
             // console.log("item:",item);
             if (self.curStatus === 0 || self.curStatus === 3) {

@@ -93,13 +93,18 @@
 
                   <div
                     class="mobile_review"
-                    :style=" {justifyContent: text_justifyContent, alignItems: text_alignItems}">
+                    :style=" {
+                      justifyContent: text_justifyContent,
+                      alignItems: text_alignItems,
+
+                      }">
                     <div
                       v-show="isSwitchOn"
                       class="text_content"
                       :style="{
                         color: color ,
                         fontSize: textSize,
+                        transform: rotateDegree
                       }"
                     >
                       {{showTextStatus == false ? userName : defineText}}
@@ -202,7 +207,7 @@
                       :style="{
                         color: color_dynamic ,
                         fontSize: textSize_dynamic,
-                        transform: rotateDegree
+                        transform: rotateDegree__dynamic
                       }"
                     >
                       {{userEmail}}
@@ -355,12 +360,21 @@ export default {
           value: "bottomRight",
           label: this.$t('advance.bottomRight')
         },
+        {
+          value: "topLeftToBottomRight",
+          label: this.$t('advance.topLeftToBottomRight')
+        },
+        {
+          value: "bottomLeftToTopLeft",
+          label: this.$t('advance.bottomLeftToTopLeft')
+        },
       ],
 
       text_justifyContent: "flex-start",
       text_alignItems: "flex-start",
 
-      rotateDegree: 'rotate(45deg)',
+      rotateDegree: 'rotate(0deg)',
+      rotateDegree__dynamic: 'rotate(45deg)',
       showInputLimit_overallItem: false,
       userEmail: ''
 
@@ -381,38 +395,69 @@ export default {
         case "topLeft":
           this.text_justifyContent = "flex-start"
           this.text_alignItems =  "flex-start"
+          this.rotateDegree = 'rotate(0deg)'
           break
         case "topCenter":
           this.text_justifyContent = "center"
           this.text_alignItems =  "flex-start"
+          this.rotateDegree = 'rotate(0deg)'
           break
         case "topRight":
           this.text_justifyContent = "flex-end"
           this.text_alignItems =  "flex-start"
+          this.rotateDegree = 'rotate(0deg)'
           break
         case "centerLeft":
           this.text_justifyContent = "flex-start"
           this.text_alignItems =  "center"
+          this.rotateDegree = 'rotate(0deg)'
           break
         case "center":
           this.text_justifyContent = "center"
           this.text_alignItems =  "center"
+          this.rotateDegree = 'rotate(0deg)'
           break
         case "centerRight":
           this.text_justifyContent = "flex-end"
           this.text_alignItems =  "center"
+          this.rotateDegree = 'rotate(0deg)'
           break
         case "bottomLeft":
           this.text_justifyContent = "flex-start"
           this.text_alignItems =  "flex-end"
+          this.rotateDegree = 'rotate(0deg)'
           break
         case "bottomCenter":
           this.text_justifyContent = "center"
           this.text_alignItems =  "flex-end"
+          this.rotateDegree = 'rotate(0deg)'
           break
         case "bottomRight":
           this.text_justifyContent = "flex-end"
           this.text_alignItems =  "flex-end"
+          this.rotateDegree = 'rotate(0deg)'
+          break
+
+        case "topLeftToBottomRight":
+          // if(val == this.textPosition_dynamic){
+          //   util.notify("與動態浮水印位置重疊，請重新選取位置或修改一般浮水印位置設定", 'error', 2000 );
+          //   this.textPosition = val
+          //   return
+          // }
+
+          this.text_justifyContent = "center"
+          this.text_alignItems =  "center"
+          this.rotateDegree = 'rotate(45deg)'
+          break
+        case "bottomLeftToTopLeft":
+        // if(val == this.textPosition_dynamic){
+        //     util.notify("與動態浮水印位置重疊，請重新選取位置或修改一般浮水印位置設定", 'error', 2000 );
+        //     this.textPosition = val
+        //     return
+        //   }
+          this.text_justifyContent = "center"
+          this.text_alignItems =  "center"
+          this.rotateDegree = 'rotate(-45deg)'
           break
         default:
           break;
@@ -422,10 +467,21 @@ export default {
     textPosition_dynamic(val){
       switch (val) {
         case "topLeftToBottomRight":
-          this.rotateDegree = 'rotate(45deg)'
+          if(val == this.textPosition){
+              util.notify("與浮水印位置重疊，請重新選取位置或修改一般浮水印位置設定", 'error', 2000 );
+              this.textPosition_dynamic = "bottomLeftToTopLeft"
+              return
+            }
+
+          this.rotateDegree__dynamic = 'rotate(45deg)'
           break
         case "bottomLeftToTopLeft":
-          this.rotateDegree = 'rotate(-45deg)'
+          if(val == this.textPosition){
+              util.notify("與浮水印位置重疊，請重新選取位置或修改一般浮水印位置設定", 'error', 2000 );
+              this.textPosition_dynamic = "topLeftToBottomRight"
+              return
+            }
+          this.rotateDegree__dynamic = 'rotate(-45deg)'
           break
         default:
           break;
