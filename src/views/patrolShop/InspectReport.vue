@@ -238,7 +238,7 @@
                 <div v-for="(item,index) in pageItem.data" :key="index" style="border-bottom:1px solid #f4f5f9;margin-bottom:20px;">
                   <div v-if="!item.children" class="content-title"><span class="pdf_font_20">{{ item.groupName }}</span></div>
                   <hr v-if="!item.children" class="hr-horizontal" />
-                  ***
+                  <!-- *** -->
                   <template v-if="!item.children">
                     <report-detail
                       :report-detail-data="item.cateryItems"
@@ -1977,9 +1977,10 @@ export default {
       console.log('rowDatailCateryItems', rowDatailCateryItems)
 
       // *****
-      this.processCommentList(rowDatailCateryItems).then(newCommentList => {
+      if(this.isFeatureActivate && this.waterPrintContent.isSwitchOn){
+        this.processCommentList(rowDatailCateryItems).then(newCommentList => {
           this.newCommentList = newCommentList
-          console.log('this.newCommentList', this.newCommentList)
+          // console.log('this.newCommentList', this.newCommentList)
           // newCommentList 裡的每個 comment.sourceList 的 url 會是 blob 開頭
 
           pageData.forEach( i => {
@@ -1989,8 +1990,10 @@ export default {
           })
           this.pageData = pageData;
         });
-        // console.log('this.pageData ~~~~>> ', this.pageData);
 
+      } else {
+        this.pageData = pageData;
+      }
     },
 
 

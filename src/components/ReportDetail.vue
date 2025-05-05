@@ -83,7 +83,6 @@
                 v-if="sourceitem.mediaType === 2"
                 :style="isExportPdf ? 'margin-right:20px;margin-bottom:20px' : ''"
                 class="img-content">
-                **
                 <el-image
                   :style="isExportPdf ? exportImageStyle :imageStyle"
                   :src="sourceitem.url"
