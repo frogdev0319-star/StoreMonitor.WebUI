@@ -83,12 +83,15 @@
                 v-if="sourceitem.mediaType === 2"
                 :style="isExportPdf ? 'margin-right:20px;margin-bottom:20px' : ''"
                 class="img-content">
+                **
                 <el-image
                   :style="isExportPdf ? exportImageStyle :imageStyle"
                   :src="sourceitem.url"
-                  :preview-src-list="getImgList(sourceindex, _item.sourceList)"
+                  :preview-src-list="_item.sourceList.map(i => i.url)"
                   class="imgLittle imgInner"/>
               </div>
+
+              <!-- :preview-src-list="getImgList(sourceindex, _item.sourceList)" -->
               <div
                 v-if="sourceitem.mediaType==1"
                 class="img-content "

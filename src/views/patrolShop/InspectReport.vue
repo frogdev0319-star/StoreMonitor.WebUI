@@ -238,6 +238,7 @@
                 <div v-for="(item,index) in pageItem.data" :key="index" style="border-bottom:1px solid #f4f5f9;margin-bottom:20px;">
                   <div v-if="!item.children" class="content-title"><span class="pdf_font_20">{{ item.groupName }}</span></div>
                   <hr v-if="!item.children" class="hr-horizontal" />
+                  ***
                   <template v-if="!item.children">
                     <report-detail
                       :report-detail-data="item.cateryItems"
@@ -247,6 +248,7 @@
                       :tab1-btn-arr="tab1BtnArr"
                       :tab3-btn-arr="tab3BtnArr"/>
                   </template>
+
                   <template v-else>
                     <div v-for="(child, childIndex) in item.children" :key="childIndex">
                       <div class="content-title"><span class="pdf_font_20">{{ `【${item.groupName}】 —【${child.groupName}】` }}</span></div>
@@ -754,6 +756,7 @@ import echartResize from '@/components/mixins/echartResize';
 import i18n from '@/lang/index';
 import DialogPop from '@/components/DialogPop.vue';
 import DownloadDialogPop from '@/components/DownloadDialogPop';
+import {advancedUpdate, advancedFetch} from '@/api/advanceSetting';
 
 export default {
   name: 'InspectReport',
@@ -884,7 +887,13 @@ export default {
       deleteReportId: '',
       canDeleteReport: false,
       needDeleteReport: false,
-      showExportMassage: false
+      showExportMassage: false,
+      newCommentList: [],
+
+      isFeatureActivate: false,
+      waterPrintContent: {},
+      userName : '',
+      userEmail : ''
 
     };
   },
@@ -931,11 +940,13 @@ export default {
 
   },
   created() {
+    this.getInitAdvance()
+    this.getUserInfo()
+
     this.getStoredTemplateId();
     this.getRouterData();
     this.getReportTemplateAndInfo();
     this.getInspectStatus()
-
   },
 
   mounted() {
@@ -943,6 +954,7 @@ export default {
     this.needDeleteReport = sessionStorage.getItem('needDeleteReport');
 
     document.addEventListener("contextmenu", this.disableRightClickOnViewer);
+
   },
   beforeUnmount() {
     document.removeEventListener("contextmenu", this.disableRightClickOnViewer);
@@ -1931,7 +1943,6 @@ export default {
     getPageDataBasedOnTemplate(data) {
 
       console.log('data 2:>> ', data);
-
       const map = this.getDetailNameAndHandlerMap(data);
 
       this.sortArrayByKey(this.templateConfig, 'position');
@@ -1959,10 +1970,157 @@ export default {
         const mapObj = { name: 'signatureInfo', class: 'signature-map', ifExpand: false, distance: this.signInDistance, data:this.signMapUrl };
         pageData.push(mapObj);
       }
-      this.pageData = pageData;
-      console.log('this.pageData ~~~~>> ', this.pageData);
+      // this.pageData = pageData;
+
+
+      var rowDatailCateryItems = pageData.filter( i => i.class == "row-detail")[0].data[0].cateryItems
+      console.log('rowDatailCateryItems', rowDatailCateryItems)
+
+      // *****
+      this.processCommentList(rowDatailCateryItems).then(newCommentList => {
+          this.newCommentList = newCommentList
+          console.log('this.newCommentList', this.newCommentList)
+          // newCommentList 裡的每個 comment.sourceList 的 url 會是 blob 開頭
+
+          pageData.forEach( i => {
+            if(i.class == "row-detail"){
+              i.data[0].cateryItems = this.newCommentList
+            }
+          })
+          this.pageData = pageData;
+        });
+        // console.log('this.pageData ~~~~>> ', this.pageData);
 
     },
+
+
+
+     // comment section
+    async processCommentList(commentList) {
+      console.log('commentList', commentList)
+      const newList = await Promise.all(commentList.map(async comment => {
+        if(comment.sourceList) {
+          const newSourceList = await Promise.all(comment.sourceList.map(async item => {
+          if (item.mediaType === 2 ) {
+            try {
+              const img = await this.loadImage(item.url);
+              const watermarkedBlob = await this.createWatermarkedBlob(img, this.userEmail);
+              const blobUrl = URL.createObjectURL(watermarkedBlob);
+              return { ...item, url: blobUrl };
+
+            } catch (err) {
+              console.warn("圖片載入失敗", item.url, err);
+              return item; // 若失敗就保留原始 URL
+            }
+          }
+            return item;
+          }));
+
+          return { ...comment, sourceList: newSourceList };
+
+        } else {
+          return { ...comment, sourceList: null };
+        }
+
+      }));
+      return newList;
+    },
+
+
+    createWatermarkedBlob(img, watermarkText) {
+      return new Promise(resolve => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+
+        ctx.drawImage(img, 0, 0);
+
+
+        // 設定浮水印樣式
+        ctx.font = `${this.waterPrintContent.waterPrintSize} sans-serif`;
+        ctx.fillStyle = this.waterPrintContent.waterPrintColor;
+
+        const metrics = ctx.measureText(watermarkText)
+        const textWidth = metrics.width
+        const textHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent
+
+        // 移動到圖片中心
+        const centerX = (img.width / 2)
+        const centerY = img.height / 2
+        ctx.translate(centerX, centerY)
+
+        // 旋轉 45 度
+        if(this.waterPrintContent.waterPrintPosition === "topLeftToBottomRight"){
+          ctx.rotate((45 * Math.PI) / 180)
+        } else {
+          ctx.rotate((-45 * Math.PI) / 180)
+        }
+
+        // 畫出描邊文字 + 實心文字
+        ctx.fillText(watermarkText, -textWidth / 2, -textHeight / 2)
+        canvas.toBlob(blob => {
+          resolve(blob);
+        }, "image/jpeg");
+      });
+    },
+
+    loadImage(url) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous'; // 加這行以便處理跨域圖片
+        img.onload = () => resolve(img);
+        img.onerror = (err) => reject(err);
+        img.src = url;
+      });
+    },
+
+    advancedFetch_dynamic(){
+      var param = {
+        contentKey: "dynamic_print"
+      }
+      return new Promise((resolve, reject) => {
+        advancedFetch(param).then(res => {
+          resolve(res);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+    async getInitAdvance(){
+      const initData_dynamic = await this.advancedFetch_dynamic();
+      this.isFeatureActivate = initData_dynamic.data.isFeatureActivate
+      this.waterPrintContent = initData_dynamic.data.content
+    },
+
+    // get user
+    async getUserInfo(){
+      const result = await this.$store.dispatch("GetUserAuthorities");
+      this.userName = result.data.userName
+      this.userEmail = result.data.email.split("@")[0];
+
+
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     getDetailNameAndHandlerMap(data) {
       let map = null;

@@ -254,7 +254,7 @@
               <div v-if="item.mediaType===2" class="img-content">
                 <!--image-->
                 <!-- add watre print -->
-                *-*
+                <!-- *-* -->
                 <el-image
                   class="imgLittle imgInner"
                   :src="item.previewUrl"
@@ -298,7 +298,7 @@
                   :height="imgHeight+'px'"
                   class="source-details">
                   <div v-if="_item.mediaType === 2" class="img-content">
-                    ** 2
+                    <!-- **  -->
                     <el-image
                       class="imgLittle imgInner"
                       :src="_item.url"
@@ -599,7 +599,6 @@ export default {
       visionSenseEventTime: '',
       userEmail: '',
 
-      XXXXDDDDD: []
 
 
 
@@ -707,24 +706,25 @@ export default {
 
     async handleImg(){
       if(this.isFeatureActivate && this.waterPrintContent.isSwitchOn){
-        var waterPrintText = this.waterPrintContent.waterPrintText
-        const imageLinks = this.imgsourceList.map(i => i.url)
+
+        // var waterPrintText = this.waterPrintContent.waterPrintText
+        // const imageLinks = this.imgsourceList.map(i => i.url)
         // console.log('imageLinks :>> ', imageLinks);
         // const newImgArray = await this.addTextToImageUrls(imageLinks, this.userEmail);
         // this.newImgArray = newImgArray.map( i => URL.createObjectURL(i))
 
         // console.log('newImgArray :>> ', newImgArray);
-
-
         // this.newImgArray = await this.addTimestampWatermark(this.imgsourceList)
         // console.log('this.newImgArray :>> ', this.newImgArray);
 
         this.newImgArray = await this.processImagesWithWatermark(this.imgsourceList)
         console.log('this.newImgArray :>> ', this.newImgArray);
 
-
       } else {
-        this.newImgArray = this.imgsourceList.map(i => i.url)
+        this.imgsourceList.forEach( i => {
+          i.previewUrl = i.url
+        })
+        this.newImgArray = this.imgsourceList
       }
     },
 
@@ -1494,18 +1494,15 @@ createWatermarkedBlob(img, watermarkText) {
           self.commentList = temp.slice(0, temp.length - 1);
           console.log("commentList:",self.commentList);
 
-
-
-          // ******
-          this.processCommentList(this.commentList).then(newCommentList => {
-            console.log("newCommentList" , newCommentList);
-            this.newCommentList = newCommentList
-            // newCommentList 裡的每個 comment.sourceList 的 url 會是 blob 開頭
-          });
-
-
-
-
+          if(this.isFeatureActivate && this.waterPrintContent.isSwitchOn){
+            this.processCommentList(this.commentList).then(newCommentList => {
+              console.log("newCommentList" , newCommentList);
+              this.newCommentList = newCommentList
+              // newCommentList 裡的每個 comment.sourceList 的 url 會是 blob 開頭
+            });
+          } else {
+            this.newCommentList = self.commentList
+          }
         }
       });
     },
