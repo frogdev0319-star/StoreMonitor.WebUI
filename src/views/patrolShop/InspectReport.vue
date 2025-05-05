@@ -1972,24 +1972,56 @@ export default {
       }
       // this.pageData = pageData;
 
+      console.log('pageData', pageData)
 
       var rowDatailCateryItems = pageData.filter( i => i.class == "row-detail")[0].data[0].cateryItems
       console.log('rowDatailCateryItems', rowDatailCateryItems)
 
+      var aaabb = pageData.filter( i => i.class == "row-detail")[0].data
+      console.log('aaabb 1', aaabb)
+
       // *****
       if(this.isFeatureActivate && this.waterPrintContent.isSwitchOn){
-        this.processCommentList(rowDatailCateryItems).then(newCommentList => {
-          this.newCommentList = newCommentList
-          // console.log('this.newCommentList', this.newCommentList)
-          // newCommentList 裡的每個 comment.sourceList 的 url 會是 blob 開頭
 
-          pageData.forEach( i => {
-            if(i.class == "row-detail"){
-              i.data[0].cateryItems = this.newCommentList
-            }
-          })
-          this.pageData = pageData;
-        });
+        var ggg = []
+        aaabb.forEach( i => {
+          this.processCommentList(i.cateryItems).then(newCommentList => {
+
+            i.cateryItems = newCommentList
+
+            // console.log('this.newCommentList', this.newCommentList)
+            // newCommentList 裡的每個 comment.sourceList 的 url 會是 blob 開頭
+
+            // pageData.forEach( i => {
+            //   if(i.class == "row-detail"){
+            //     i.data[0].cateryItems = this.newCommentList
+            //   }
+            // })
+            // this.pageData = pageData;
+          });
+        })
+
+        console.log('aaabb 2', aaabb)
+
+        pageData.forEach( i => {
+          if(i.class == "row-detail"){
+            i.data = aaabb
+          }
+        })
+        this.pageData = pageData;
+
+        // this.processCommentList(rowDatailCateryItems).then(newCommentList => {
+        //   this.newCommentList = newCommentList
+        //   console.log('this.newCommentList', this.newCommentList)
+        //   // newCommentList 裡的每個 comment.sourceList 的 url 會是 blob 開頭
+
+        //   pageData.forEach( i => {
+        //     if(i.class == "row-detail"){
+        //       i.data[0].cateryItems = this.newCommentList
+        //     }
+        //   })
+        //   this.pageData = pageData;
+        // });
 
       } else {
         this.pageData = pageData;
