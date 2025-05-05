@@ -439,22 +439,22 @@ export default {
           break
 
         case "topLeftToBottomRight":
-          // if(val == this.textPosition_dynamic){
-          //   util.notify("與動態浮水印位置重疊，請重新選取位置或修改一般浮水印位置設定", 'error', 2000 );
-          //   this.textPosition = val
-          //   return
-          // }
+          if(val == this.textPosition_dynamic){
+            util.notify("與動態浮水印位置重疊，請重新選取位置或修改一般浮水印位置設定", 'error', 2000 );
+            this.textPosition = val
+            return
+          }
 
           this.text_justifyContent = "center"
           this.text_alignItems =  "center"
           this.rotateDegree = 'rotate(45deg)'
           break
         case "bottomLeftToTopLeft":
-        // if(val == this.textPosition_dynamic){
-        //     util.notify("與動態浮水印位置重疊，請重新選取位置或修改一般浮水印位置設定", 'error', 2000 );
-        //     this.textPosition = val
-        //     return
-        //   }
+        if(val == this.textPosition_dynamic){
+            util.notify("與動態浮水印位置重疊，請重新選取位置或修改一般浮水印位置設定", 'error', 2000 );
+            this.textPosition = val
+            return
+          }
           this.text_justifyContent = "center"
           this.text_alignItems =  "center"
           this.rotateDegree = 'rotate(-45deg)'
@@ -572,7 +572,7 @@ export default {
       var param = {
         contentKey: "water_print",
         contentMap: {
-          waterPrintText: this.userName,
+          waterPrintText: this.defineText,
           waterPrintType: this.showTextStatus ? 0 : 1,
           waterPrintSize: tempItem.mobileSize,
           waterPrintPosition: this.textPosition,
