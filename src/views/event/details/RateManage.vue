@@ -1825,8 +1825,10 @@ createWatermarkedBlob(img, watermarkText) {
         return;
       }
       if(files[0].type.includes("image")){
+
+        const safeFilename = files[0].name.replace(/#/g, '_')
         var objImg={
-          fileName:`${self.bucketImage}/inspect_${util.getCurTimeStr()}_${this.event.storeId}_${files[0].name}`,
+          fileName:`${self.bucketImage}/inspect_${util.getCurTimeStr()}_${this.event.storeId}_${safeFilename}`,
           src:'',
           url:'',
           file:'',
@@ -1838,7 +1840,7 @@ createWatermarkedBlob(img, watermarkText) {
       }else if(files[0].type.includes("video")){
         console.log("choose file:",fileName);
         var objvideo={
-          fileName:`${self.bucketVideo}/inspect_${util.getCurTimeStr()}_${this.event.storeId}_${files[0].name}`,
+          fileName:`${self.bucketVideo}/inspect_${util.getCurTimeStr()}_${this.event.storeId}_${safeFilename}`,
           src:'',
           url:URL.createObjectURL(files[0]),
           type:1,

@@ -13,7 +13,7 @@
           :allowRowExpand = "false"
           :showBorder = "false"
           :default-sort = "{prop: 'createTime', order: 'descending'}"
-          :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+          :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}"
           :tableHeight = "760"
           :cellStyle="{backgroundColor: '#fff !important'}"
           @handleOperation="handleEmitOperation"
@@ -120,8 +120,14 @@ export default {
       titleRESTful.getUserTitleList().then(res => {
         this.isLoadingData = false;
         res.data.map(item => {
-          item.createTime = util.getDateStr1(item.createTime);
+          // 主站這邊紀錄 UTC 時間，故前端修為 browser time => +8
+          const offsetMinutes = new Date().getTimezoneOffset(); // 例如 -480（代表 +8 小時）
+          const offsetHours = -offsetMinutes / 60; // 轉為 +8
+          const offset = offsetHours * 60 * 60 * 1000;
+          var tempT =  item.createTime + offset
+          item.createTime  = util.getDateStr1(tempT);
         });
+
         this.allTableData = res.data;
         this.total = Math.ceil(this.allTableData.length/this.sizeNum);
         this.setPagingTableData();

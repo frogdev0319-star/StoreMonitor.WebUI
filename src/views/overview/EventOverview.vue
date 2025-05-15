@@ -23,7 +23,7 @@
       <!-- <el-select
         v-model="selectedInstantStore"
         style="width: 30%;"
-        :placeholder="$t('immediatePush.selectStore')" 
+        :placeholder="$t('immediatePush.selectStore')"
         filterable
         multiple
         @change="storeChange"
@@ -32,7 +32,7 @@
           v-for="item in storeList"
           :key="item.storeId"
           :label="item.name"
-          :value="item.storeId" 
+          :value="item.storeId"
           />
       </el-select> -->
 
@@ -56,12 +56,12 @@
             <div class="title">{{ $t('overview.eventTrends') }} </div>
             <div class="region-result">
               <div class="store-list">
-                <span class="store-name">{{ $t('overview.selectStores') }}</span> 
-                <el-select 
-                  class="storevue-select" 
-                  v-model="curStore" 
-                  style="width: 200px" 
-                  size="mini" 
+                <span class="store-name">{{ $t('overview.selectStores') }}</span>
+                <el-select
+                  class="storevue-select"
+                  v-model="curStore"
+                  style="width: 200px"
+                  size="mini"
                   @change="changeStore">
                   <el-option
                     v-for="item in storeDataList"
@@ -80,7 +80,7 @@
               </div>
             </div>
           </el-col>
-          
+
           <!-- 事件來源 -->
           <el-col :span="isEnSpan ? 7 : 6" class="source-list" v-if="isLicensePro">
             <div class="title">
@@ -268,7 +268,12 @@ export default {
         {
           id: 0,
           type: this.$t('overview.onsitePatrol'),
-          percent: '0'
+          percent: 0
+        },
+        {
+          id: 4,
+          type: this.$t('immediatePush.AIEvent'),
+          percent: 0
         },
         // {
         //   'type': this.$t('overview.storeMonitor'),
@@ -374,20 +379,18 @@ export default {
         var userInfo = await self.$store.dispatch("GetUserAuthorities");
         self.hasAdvanced = userInfo.data.isSystemAdvanced
         self.isLicensePro = userInfo.data.isLicensePro
-        console.log('self.hasAdvanced :>> ', self.hasAdvanced);
-        console.log('self.isLicensePro :>> ', self.isLicensePro);
+
         console.log('this.sourceLegend :>> ', this.sourceLegend);
 
         var isAddItem = this.sourceLegend.some(i => i.id == 1)
         console.log('isAddItem :>> ', isAddItem);
         if(!isAddItem && this.isLicensePro ){
-          this.sourceLegend.push(
-            {
+          const _item = {
               id: 1,
-              type: this.$t('immediatePush.immediateEvent'), 
+              type: this.$t('immediatePush.immediateEvent'),
               percent: '0'
             }
-          ) 
+          this.sourceLegend.splice(1, 0, _item)
         }
         await self.getBriefStoreData();
         await self.saveSearchParams();
@@ -409,16 +412,15 @@ export default {
     console.log('this.hasAdvanced cc:>> ', this.hasAdvanced);
     console.log('this.isLicensePro cc:>> ', this.isLicensePro);
 
-    this.isLicensePro ? this.sourceLegend.push(
-      {
-        id: 1,
-        type: this.$t('immediatePush.immediateEvent'), 
-        percent: '0'
-      }
-    ) : null
+    const _item = {
+      id: 1,
+      type: this.$t('immediatePush.immediateEvent'),
+      percent: 0
+    }
 
+    this.isLicensePro ? this.sourceLegend.splice(1, 0, _item) : null
     this.getAccountInfo()
-  
+
   },
 
   async mounted() {},
@@ -444,7 +446,7 @@ export default {
 
         this.isiService = res.data.isiService
         this.isTransform = res.data.isTransform
-        
+
       }).catch(err => {
         console.log('err :>> ', err);
       });
@@ -527,7 +529,7 @@ export default {
         })
         console.log('afterFilterData ===>', afterFilterData)
         tempStore = []
-        tempStore = afterFilterData 
+        tempStore = afterFilterData
       }
 
       if (tempStore.length > 0) {
@@ -549,10 +551,10 @@ export default {
       const self = this;
       console.log('self.curStore', self.curStore)
       self.storeIds = [];
-      
+
       if (val === '-1') {
         self.storeIds = this.selectedInstantStore.filter(i => i !== "-1");
-        
+
       } else {
         self.storeIds.push(self.curStore);
       }
@@ -564,7 +566,7 @@ export default {
       self.getStoreEventStatics();
     },
 
-    
+
     async getEventStatsStatics() {
       const self = this;
       var overviewParam = {
@@ -577,6 +579,8 @@ export default {
         const eventResult = await self.getEventStatsOverview(overviewParam);
         if (eventResult.errCode === 0) {
           const result = eventResult.data;
+
+
           if (Object.keys(result).length > 0) {
             self.eventKPIs[0].eventNum = result.numOfNewEventsToday;
             self.eventKPIs[1].eventNum = result.numOfClosedEventsToday;
@@ -616,33 +620,40 @@ export default {
       let onsiteEventNum = 0;
       let storeEventNum = 0;
       let immediateEventNum = 0;
+      let aiEventNum = 0;
 
       let sumEvent = 0;
       let seriesData = 0;
 
-      // console.log('sourcePieList !!!:>> ', sourcePieList);
-      // console.log('jsonArray 1 !!!:>> ', jsonArray);
+      console.log('jsonArray 1 !!!:>> ', jsonArray);
+
       sourcePieList.forEach((item, index) => {
         sumEvent += item.numOfEvent;
-        if (index === 2) {
+        if (item.sourceType === 2) {
           onsiteEventNum = item.numOfEvent;
         }
-        else if (index === 3 && this.isLicensePro) {
+        else if(item.sourceType === 4){
+          aiEventNum = item.numOfEvent;
+        }
+        else if (item.sourceType === 3 && this.isLicensePro) {
           immediateEventNum = item.numOfEvent;
-        } 
+        }
+
 
       });
-      const totalArray = [onsiteEventNum, immediateEventNum];
+      const totalArray = [onsiteEventNum, immediateEventNum, aiEventNum];
       jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
+      jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
+
       if(jsonArray[1] && this.isLicensePro) jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2)
-      
-      // console.log('jsonArray 2 !!!:>> ', jsonArray);
+
       if (sumEvent !== 0) {
         seriesData = [
           // { value: remoteEventNum, name: self.$t('overview.remotePatrol') },
           { value: onsiteEventNum, name: self.$t('overview.onsitePatrol') },
           // { value: storeEventNum, name: self.$t('overview.storeMonitor') },
-          { value: immediateEventNum, name: self.$t('immediatePush.immediateEvent') }
+          { value: immediateEventNum, name: self.$t('immediatePush.immediateEvent') },
+          { value: aiEventNum, name: this.$t('immediatePush.AIEvent') }
         ];
       } else {
         seriesData = [];
@@ -697,18 +708,18 @@ export default {
               }
             },
             data: seriesData,
-            borderWidth:5,
+            borderWidth:2,
             borderColor:'#FFF',
             itemStyle: {
               emphasis: {
-                borderWidth:10,
+                borderWidth: 2,
                 borderColor:'#EDF0F2'
               },
               normal: {
-                borderWidth:5,
+                borderWidth: 2,
                 borderColor:'#FFF',
                 color: function(params) {
-                  const colorList = [ '#7b9feb' ,'#7bd8eb' ]
+                  const colorList = [ '#7b9feb' ,'#7bd8eb' ,'#5274bb']
                   return colorList[params.dataIndex];
                 }
               }
@@ -733,7 +744,7 @@ export default {
 
       let sumEvent = 0;
       let seriesData = [];
-      
+
       var tempCloseNum_A = 0
       var tempCloseNum_B = 0
 
@@ -743,10 +754,10 @@ export default {
         sumEvent += item.numOfEvent;
         if (index === 0) {
           pendingEventNum = item.numOfEvent;
-        } 
+        }
         else if (index === 1) {
           doneEventNum = item.numOfEvent;
-        } 
+        }
         else if (index === 2) {
           tempCloseNum_A = item.numOfEvent;
         }
@@ -757,7 +768,7 @@ export default {
           tempCloseNum_B = item.numOfEvent;
         }
       });
-      
+
       closedEventNum = tempCloseNum_A + tempCloseNum_B
       UnprocessedEventNum = pendingEventNum + rejectEventNum
 
@@ -859,12 +870,12 @@ export default {
         settingObj.axisArray = ['门店名称', this.$t('overview.pendingEvent')];
         settingObj.colorArray = [this.pendingColor];
         settingObj.seriesData = [{ type: 'bar', stack: 'test', barWidth: 35 }];
-      } 
+      }
       else if (this.rankType === 2) {
         settingObj.axisArray = ['门店名称', this.$t('overview.closedEvents')];
         settingObj.colorArray = [this.closedColor];
         settingObj.seriesData = [{ type: 'bar', stack: 'test', barWidth: 35 }];
-      } 
+      }
       else {
         settingObj.axisArray = ['门店名称', this.$t('overview.pendingEvent'),
           this.$t('overview.processedEvent'), this.$t('overview.closedEvents')];
@@ -878,8 +889,8 @@ export default {
       return settingObj;
     },
 
-    async getEventRankingInfo() { 
-      
+    async getEventRankingInfo() {
+
       const self = this;
       let params = {};
       params = JSON.parse(JSON.stringify(self.params));
@@ -893,7 +904,7 @@ export default {
       // console.log('rankingOption 1 ~~~~~>', rankingOption)
       // console.log('seriesData ~~~~~>', seriesData)
       // console.log('self.rankType; ~~~~~>', self.rankType)
-      
+
       try {
         const rankingResult = await self.getEventStatsRanking(params);
 
@@ -909,14 +920,14 @@ export default {
               itemArray.push(item.numOfUnprocessed + item.numOfRejected);
               itemArray.push(item.numOfInprocess);
               itemArray.push(item.numOfProcessed);
-            } 
+            }
             else if (self.rankType === 0) {
               itemArray.push(item.numOfUnprocessed);
-            } 
+            }
             else if (self.rankType === 2) {
               itemArray.push(item.numOfProcessed);
             }
-            
+
             soureceList.push(itemArray);
           });
           rankingOption.dataset.source = soureceList;
@@ -924,7 +935,7 @@ export default {
           rankingOption.dataset.source = [];
         }
 
-        
+
         self.storeStatusOptions = rankingOption;
       } catch (e) {
         self.storeStatusOptions = rankingOption;
@@ -1044,15 +1055,15 @@ export default {
           });
       });
     },
-    
+
     async getStoreEventStatics() {
       const self = this;
-      
+
       let params = {};
       params = JSON.parse(JSON.stringify(self.params));
       params.storeIds = self.storeIds;
       params.timeMode = self.timeMode;
-      
+
       // console.log('this.storeIds DDDDDDD:>> ', this.storeIds);
 
       const option = self.getStoreEventStaticsOption();
@@ -1060,7 +1071,7 @@ export default {
         const storeEventResult = await self.getStoreEventData(params);
         if (storeEventResult.errCode === 0) {
           const result = storeEventResult.data;
-          
+
           // console.log('result :>> ', result.data);
 
           self.storeEventList = result;
@@ -1088,11 +1099,11 @@ export default {
             itemArray.push(self.daysRangeList[index]);
             itemArray.push(sumOfNewEvents);
             itemArray.push(sumOfProcessedEvents);
-            itemArray.push(sumOfClosedEvents);  
+            itemArray.push(sumOfClosedEvents);
             soureceList.push(itemArray);
 
             // console.log('itemArray :>> ', itemArray);
-            
+
           });
           option.dataset.source = soureceList;
         }

@@ -940,6 +940,8 @@ export default {
 
   },
   created() {
+
+
     this.getInitAdvance()
     this.getUserInfo()
 
@@ -1974,41 +1976,64 @@ export default {
 
       console.log('pageData', pageData)
 
-      var rowDatailCateryItems = pageData.filter( i => i.class == "row-detail")[0].data[0].cateryItems
-      console.log('rowDatailCateryItems', rowDatailCateryItems)
+      // var rowDatailCateryItems = pageData.filter( i => i.class == "row-detail")[0].data[0].cateryItems
+      // console.log('rowDatailCateryItems', rowDatailCateryItems)
 
-      var aaabb = pageData.filter( i => i.class == "row-detail")[0].data
-      console.log('aaabb 1', aaabb)
+      var tempAry = pageData.filter( i => i.class == "row-detail")[0].data
+      console.log('tempAry 1', tempAry)
 
       // *****
       if(this.isFeatureActivate && this.waterPrintContent.isSwitchOn){
 
-        var ggg = []
-        aaabb.forEach( i => {
-          this.processCommentList(i.cateryItems).then(newCommentList => {
 
-            i.cateryItems = newCommentList
+        tempAry.forEach( i => {
+          if(i.children){
+            i.children.forEach( ii => {
+              this.processCommentList(ii.cateryItems).then(newCommentList => {
+                ii.cateryItems = newCommentList
+              });
+            })
+          }  else {
+            tempAry.forEach( i => {
+              this.processCommentList(i.cateryItems).then(newCommentList => {
+                i.cateryItems = newCommentList
+              });
+            })
+          }
 
-            // console.log('this.newCommentList', this.newCommentList)
-            // newCommentList 裡的每個 comment.sourceList 的 url 會是 blob 開頭
-
-            // pageData.forEach( i => {
-            //   if(i.class == "row-detail"){
-            //     i.data[0].cateryItems = this.newCommentList
-            //   }
-            // })
-            // this.pageData = pageData;
-          });
         })
 
-        console.log('aaabb 2', aaabb)
 
+        console.log('tempAry 2', tempAry)
         pageData.forEach( i => {
           if(i.class == "row-detail"){
-            i.data = aaabb
+            i.data = tempAry
           }
         })
         this.pageData = pageData;
+
+
+
+        // **** No Child ****
+        // tempAry.forEach( i => {
+        //   this.processCommentList(i.cateryItems).then(newCommentList => {
+        //     i.cateryItems = newCommentList
+        //   });
+        // })
+        // console.log('tempAry 2', tempAry)
+
+        // pageData.forEach( i => {
+        //   if(i.class == "row-detail"){
+        //     i.data = tempAry
+        //   }
+        // })
+        // this.pageData = pageData;
+        // ****
+
+
+
+
+
 
         // this.processCommentList(rowDatailCateryItems).then(newCommentList => {
         //   this.newCommentList = newCommentList
@@ -2026,6 +2051,9 @@ export default {
       } else {
         this.pageData = pageData;
       }
+
+      console.log("window.performance.memory" , window.performance.memory);
+
     },
 
 
@@ -2034,6 +2062,9 @@ export default {
     async processCommentList(commentList) {
       console.log('commentList', commentList)
       const newList = await Promise.all(commentList.map(async comment => {
+      var total = 0
+      var n = 0
+
         if(comment.sourceList) {
           const newSourceList = await Promise.all(comment.sourceList.map(async item => {
           if (item.mediaType === 2 ) {
@@ -2041,6 +2072,9 @@ export default {
               const img = await this.loadImage(item.url);
               const watermarkedBlob = await this.createWatermarkedBlob(img, this.userEmail);
               const blobUrl = URL.createObjectURL(watermarkedBlob);
+              total += (watermarkedBlob.size / 1024 / 1024)
+              n += 1
+
               return { ...item, url: blobUrl };
 
             } catch (err) {

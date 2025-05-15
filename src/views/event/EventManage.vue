@@ -10,10 +10,10 @@
         <!-- 報表類型 -->
         <template v-slot:others>
             <div class="last-row" >
-              <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{isLicensePro ?  $t('remotePatrol.reportType') : $t('remotePatrol.inspectName')}} </span>
+              <!-- <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{isLicensePro ?  $t('remotePatrol.reportType') : $t('remotePatrol.inspectName')}} </span> -->
+              <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.reportType')}} </span>
               <div class="flex-center report-type-area">
                 <el-select
-                  v-if="isLicensePro"
                   v-model="curReportType"
                   class="el-province"
                   :placeholder="$t('remotePatrol.all')"
@@ -27,7 +27,7 @@
                     :label="item.label"
                     :value="item.mode"/>
                 </el-select>
-                <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" v-if="isLicensePro"></div>
+                <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" ></div>
                   <multi-select
                     class="store-group-select region"
                     :selected="inspectId"
@@ -457,9 +457,11 @@ export default {
       curReportType: -1,
       reportTypeList: [
 
-        { 'mode': -1, 'label': this.$t('remotePatrol.all') },
+        // { 'mode': -1, 'label': this.$t('remotePatrol.all') },
         // { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
-        { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') },
+        // { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') },
+        // { 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')},
+        // { 'mode': 4, 'label': this.$t('immediatePush.AIEvent')}
         // { 'mode': 2, 'label': this.$t('immediatePush.storeMonitoring') },
         // { 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')  }
       ],
@@ -512,14 +514,23 @@ export default {
         var userInfo = await this.$store.dispatch("GetUserAuthorities");
         self.hasAdvanced = userInfo.data.isSystemAdvanced
         this.isLicensePro = userInfo.data.isLicensePro
-        if(this.reportTypeList.some( i => i.mode == 3 )){
-          return
-        }
-        else {
-          this.isLicensePro ? this.reportTypeList.push({ 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')}) : null
+
+
+        if(this.isLicensePro) {
+          this.reportTypeList = [
+            { 'mode': -1, 'label': this.$t('remotePatrol.all') },
+            { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') },
+            { 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')},
+            { 'mode': 4, 'label': this.$t('immediatePush.AIEvent')}
+          ]
+        } else {
+          this.reportTypeList =[
+            { 'mode': -1, 'label': this.$t('remotePatrol.all') },
+            { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') },
+            { 'mode': 4, 'label': this.$t('immediatePush.AIEvent')}
+          ]
         }
 
-        this.reportTypeList.push({ 'mode': 4, 'label': this.$t('immediatePush.AIEvent')})
       }
     },
 
@@ -547,13 +558,22 @@ export default {
     var userInfo = await this.$store.dispatch("GetUserAuthorities");
     this.hasAdvanced = userInfo.data.isSystemAdvanced
     this.isLicensePro = userInfo.data.isLicensePro
-    if(this.reportTypeList.some( i => i.mode == 3 )){
-      return
+
+    if(this.isLicensePro) {
+      this.reportTypeList = [
+        { 'mode': -1, 'label': this.$t('remotePatrol.all') },
+        { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') },
+        { 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')},
+        { 'mode': 4, 'label': this.$t('immediatePush.AIEvent')}
+      ]
+    } else {
+      this.reportTypeList =[
+        { 'mode': -1, 'label': this.$t('remotePatrol.all') },
+        { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') },
+        { 'mode': 4, 'label': this.$t('immediatePush.AIEvent')}
+      ]
     }
-    else {
-      this.isLicensePro ? this.reportTypeList.push({ 'mode': 3, 'label': this.$t('immediatePush.immediateEvent')}) : null
-    }
-    this.reportTypeList.push({ 'mode': 4, 'label': this.$t('immediatePush.AIEvent')})
+
   },
 
   activated() {
