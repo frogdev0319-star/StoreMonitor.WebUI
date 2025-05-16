@@ -260,7 +260,6 @@
                   :src="item.previewUrl"
                   :style="{height: imgHeight+'px', width: 'auto'}"
                   :preview-src-list="newImgArray.map(i => i.previewUrl)"
-                  @contextmenu.prevent
                 />
 
               </div>
@@ -304,7 +303,6 @@
                       :src="_item.url"
                       :style="{height: imgHeight+'px',width: 'calc(100/1920*100vw)'}"
                       :preview-src-list="item.sourceList.map(i => i.url)"
-                      @contextmenu.prevent
                       />
 
                   </div>
@@ -675,7 +673,6 @@ export default {
     await this.getInitAdvance();
 
     this.needUpdateEvent =  sessionStorage.getItem('needUpdateEvent')
-    document.addEventListener("contextmenu", this.disableRightClickOnViewer);
 
     this.handleImg()
 
@@ -684,12 +681,8 @@ export default {
     // this.newCommentList.value = newList
     // console.log(' this.newCommentList. :>> ',  this.newCommentList);
 
-
-
-
   },
   beforeUnmount() {
-    document.removeEventListener("contextmenu", this.disableRightClickOnViewer);
   },
 
   methods: {

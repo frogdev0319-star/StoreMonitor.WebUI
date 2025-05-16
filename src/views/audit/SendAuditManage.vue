@@ -403,7 +403,11 @@ export default{
             const self = this;
             self.isLoading = true;
             self.curTabIndx = 0;
-            self.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+
+            if(this.isFirstLoad){
+                self.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+            }
+
             self.inputSearchValue = '';
             self.curTotalPage = 0;
             self.getSearchParams();

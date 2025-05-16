@@ -263,6 +263,8 @@
                     </div>
                   </template>
                 </div>
+
+
                 <div v-if="showFeedBacks && showAllDetailsEnable" style="margin-bottom:20px;">
                   <div class="content-title"><span class="pdf_font_20">
                     {{ $t('remotePatrol.feedbacks') }}</span></div>
@@ -307,7 +309,6 @@
                                 :style="isexportPDF ? exportImageStyle :imageStyle"
                                 :src="sourceitem.url"
                                 :preview-src-list="getImgList(index, item.sourceList)"
-                                @contextmenu.prevent
                                 class="imgLittle imgInner"/>
                             </div>
                             <div
@@ -388,7 +389,6 @@
                           :style="isexportPDF ? exportImageStyle :imageStyle"
                           :src="sourceitem.url"
                           :preview-src-list="getImgList(index, item.sourceList)"
-                          contextmenu.prevent
                           class="imgLittle imgInner"/>
                       </div>
                       <div
@@ -955,11 +955,11 @@ export default {
     this.accountName = sessionStorage.getItem('accountName');
     this.needDeleteReport = sessionStorage.getItem('needDeleteReport');
 
-    document.addEventListener("contextmenu", this.disableRightClickOnViewer);
+    // document.addEventListener("contextmenu", this.disableRightClickOnViewer);
 
   },
   beforeUnmount() {
-    document.removeEventListener("contextmenu", this.disableRightClickOnViewer);
+    // document.removeEventListener("contextmenu", this.disableRightClickOnViewer);
   },
 
   methods: {
@@ -1982,18 +1982,18 @@ export default {
       var tempAry = pageData.filter( i => i.class == "row-detail")[0].data
       console.log('tempAry 1', tempAry)
 
-      // *****
+      // ***** 處理浮水印
       if(this.isFeatureActivate && this.waterPrintContent.isSwitchOn){
-
-
         tempAry.forEach( i => {
           if(i.children){
+            console.log('1 :>> ');
             i.children.forEach( ii => {
               this.processCommentList(ii.cateryItems).then(newCommentList => {
                 ii.cateryItems = newCommentList
               });
             })
           }  else {
+            console.log('2 :>> ');
             tempAry.forEach( i => {
               this.processCommentList(i.cateryItems).then(newCommentList => {
                 i.cateryItems = newCommentList
@@ -2003,37 +2003,12 @@ export default {
 
         })
 
-
-        console.log('tempAry 2', tempAry)
         pageData.forEach( i => {
           if(i.class == "row-detail"){
             i.data = tempAry
           }
         })
         this.pageData = pageData;
-
-
-
-        // **** No Child ****
-        // tempAry.forEach( i => {
-        //   this.processCommentList(i.cateryItems).then(newCommentList => {
-        //     i.cateryItems = newCommentList
-        //   });
-        // })
-        // console.log('tempAry 2', tempAry)
-
-        // pageData.forEach( i => {
-        //   if(i.class == "row-detail"){
-        //     i.data = tempAry
-        //   }
-        // })
-        // this.pageData = pageData;
-        // ****
-
-
-
-
-
 
         // this.processCommentList(rowDatailCateryItems).then(newCommentList => {
         //   this.newCommentList = newCommentList
@@ -2051,20 +2026,17 @@ export default {
       } else {
         this.pageData = pageData;
       }
-
-      console.log("window.performance.memory" , window.performance.memory);
-
+      // console.log("window.performance.memory" , window.performance.memory);
     },
 
 
-
-     // comment section
+    // comment section
     async processCommentList(commentList) {
-      console.log('commentList', commentList)
+      // console.log('commentList', commentList)
+      if(!commentList) return
       const newList = await Promise.all(commentList.map(async comment => {
-      var total = 0
-      var n = 0
-
+        var total = 0
+        var n = 0
         if(comment.sourceList) {
           const newSourceList = await Promise.all(comment.sourceList.map(async item => {
           if (item.mediaType === 2 ) {
@@ -2386,7 +2358,7 @@ export default {
     },
 
     getFeedbacks(data) {
-      const feedbackTemp = [];
+      var feedbackTemp = [];
       if (data.feedback.length === 0) {
         this.showFeedBacks = false;
       } else {
@@ -2429,13 +2401,21 @@ export default {
               }
             });
 
-
           } else {
             obj.showAttachment = false;
           }
           feedbackTemp.push(obj);
         });
-        this.feedbacks = feedbackTemp;
+
+        // 問題回饋處理浮水印！
+        if(this.isFeatureActivate && this.waterPrintContent.isSwitchOn){
+          this.processCommentList(feedbackTemp).then(newCommentList => {
+            feedbackTemp = newCommentList
+            this.feedbacks = feedbackTemp
+          });
+        } else {
+          this.feedbacks = feedbackTemp
+        }
       }
       return { class: 'feedback-detail', ifExpand: false, itemCount: this.feedbacks.length, data: this.feedbacks };
     },
@@ -2625,7 +2605,7 @@ export default {
           itemStyle: {
             decal:{
                 symbol:'rect',
-                 symbolSize:1,
+                symbolSize:1,
                 color:'red',
               },
             normal: {
@@ -2878,7 +2858,7 @@ export default {
                 deviceId:item.attachment[att].deviceId,
                 hasUrl:true
               }
-             obj['sourceObj']  = objsource;
+              obj['sourceObj']  = objsource;
             }else{
               var objAtt = {
                 mediaType:item.attachment[att].mediaType,

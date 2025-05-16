@@ -390,7 +390,8 @@ export default {
     //   val !== 0 && this.init();
     // },
 
-    textPosition(val){
+    textPosition(val, oldVal){
+
       switch (val) {
         case "topLeft":
           this.text_justifyContent = "flex-start"
@@ -440,8 +441,8 @@ export default {
 
         case "topLeftToBottomRight":
           if(val == this.textPosition_dynamic){
-            util.notify("與動態浮水印位置重疊，請重新選取位置或修改一般浮水印位置設定", 'error', 2000 );
-            this.textPosition = val
+            util.notify("與動態浮水印位置重疊，請重新選取位置或修改一般浮水印位置設定", 'error', 3000 );
+            this.textPosition = oldVal
             return
           }
 
@@ -451,8 +452,8 @@ export default {
           break
         case "bottomLeftToTopLeft":
         if(val == this.textPosition_dynamic){
-            util.notify("與動態浮水印位置重疊，請重新選取位置或修改一般浮水印位置設定", 'error', 2000 );
-            this.textPosition = val
+            util.notify("與動態浮水印位置重疊，請重新選取位置或修改一般浮水印位置設定", 'error', 3000 );
+            this.textPosition = oldVal
             return
           }
           this.text_justifyContent = "center"
@@ -468,7 +469,7 @@ export default {
       switch (val) {
         case "topLeftToBottomRight":
           if(val == this.textPosition){
-              util.notify("與浮水印位置重疊，請重新選取位置或修改一般浮水印位置設定", 'error', 2000 );
+              util.notify("與一般浮水印位置重疊，請重新選取位置或修改一般浮水印位置設定", 'error', 3000 );
               this.textPosition_dynamic = "bottomLeftToTopLeft"
               return
             }
@@ -477,7 +478,7 @@ export default {
           break
         case "bottomLeftToTopLeft":
           if(val == this.textPosition){
-              util.notify("與浮水印位置重疊，請重新選取位置或修改一般浮水印位置設定", 'error', 2000 );
+              util.notify("與一般浮水印位置重疊，請重新選取位置或修改一般浮水印位置設定", 'error', 3000 );
               this.textPosition_dynamic = "topLeftToBottomRight"
               return
             }
