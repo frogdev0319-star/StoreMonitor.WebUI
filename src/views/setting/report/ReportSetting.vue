@@ -25,7 +25,7 @@
     <div v-loading="isLoadingData" class="setting-details self-loading">
       <div class="content-titles">
         <div class="template-select-area" :style="lang.indexOf('ja')== -1?{}:{'width':'205px'}">
-          <div class="template-select-label" :style="lang.indexOf('ja')== -1?{}:{'width':'105px'}">{{ $t('titleView.reportTemplateLabel') }}</div> 
+          <div class="template-select-label" :style="lang.indexOf('ja')== -1?{}:{'width':'105px'}">{{ $t('titleView.reportTemplateLabel') }}</div>
           <el-select
             v-model="curTemplateIndex"
             class="device-select"
@@ -75,6 +75,7 @@
                   </div>
                 </div>
               </div>
+
               <div v-for="item in basicList" :key="item.position" class="setting-config basic-config">
                 <div class="title-name">{{ $t(`titleView.${item.name}`) }}</div>
                 <div class="title-status">
@@ -104,9 +105,12 @@
                   </div>
                 </div>
               </div>
+
             </template>
           </setting-table>
         </div>
+
+        <!-- 巡檢詳情 -->
         <setting-table :table-name="$t('remotePatrol.detailInfo')">
           <template slot="tableDetail">
             <div class="detail-setting">
@@ -595,9 +599,9 @@ export default {
   }
 
   .name-tips{
-    display:flex; 
+    display:flex;
     flex-direction:column;
-    
+
   }
   .error-text{
     font-size: 12px;
@@ -687,7 +691,7 @@ export default {
     font-size: 12px;
   }
   .template-select-area{
-    display:flex; 
+    display:flex;
     flex-direction:row;
     height:30px;
     width:200px;
