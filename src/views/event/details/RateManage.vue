@@ -753,12 +753,17 @@ export default {
         const centerY = canvas.height / 2;
 
         ctx.translate(centerX, centerY);
-        ctx.rotate((45 * Math.PI) / 180);
+        // *******
+        // 旋轉 45 度
+        if(this.waterPrintContent.waterPrintPosition === "topLeftToBottomRight"){
+          ctx.rotate((45 * Math.PI) / 180)
+        } else {
+          ctx.rotate((-45 * Math.PI) / 180)
+        }
 
 
         ctx.fillText(text, -textWidth / 2, -textHeight / 2);
         ctx.restore();
-
 
         const blob = await new Promise(resolve => canvas.toBlob(resolve));
         const previewUrl = URL.createObjectURL(blob);
@@ -777,136 +782,116 @@ export default {
     return result;
   },
 
-    async addTimestampWatermark(imageDataArray) {
-      const resultBlobs = [];
+  // async addTimestampWatermark(imageDataArray) {
+  //     const resultBlobs = [];
 
-      for (const item of imageDataArray) {
-        if (item.mediaType !== 2 || !item.url) continue;
+  //     for (const item of imageDataArray) {
+  //       if (item.mediaType !== 2 || !item.url) continue;
 
-        const img = await this.loadImage(item.url);
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
+  //       const img = await this.loadImage(item.url);
+  //       const canvas = document.createElement('canvas');
+  //       canvas.width = img.width;
+  //       canvas.height = img.height;
 
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
+  //       const ctx = canvas.getContext('2d');
+  //       ctx.drawImage(img, 0, 0);
 
-        // 設定字體
-        ctx.save();
-        ctx.font = '36px sans-serif';
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'top';
+  //       // 設定字體
+  //       ctx.save();
+  //       ctx.font = '36px sans-serif';
+  //       ctx.textAlign = 'left';
+  //       ctx.textBaseline = 'top';
 
-        // 浮水印文字：將 ts 轉為日期
-        const date = new Date(item.ts);
-        const text = date.toLocaleString();
+  //       // 浮水印文字：將 ts 轉為日期
+  //       const date = new Date(item.ts);
+  //       const text = date.toLocaleString();
 
-        // 取得文字大小
-        const metrics = ctx.measureText(text);
-        const textWidth = metrics.width;
-        const textHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+  //       // 取得文字大小
+  //       const metrics = ctx.measureText(text);
+  //       const textWidth = metrics.width;
+  //       const textHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
 
-        // 中心點
-        const centerX = img.width / 2;
-        const centerY = img.height / 2;
+  //       // 中心點
+  //       const centerX = img.width / 2;
+  //       const centerY = img.height / 2;
 
-        // 旋轉畫布
-        ctx.translate(centerX, centerY);
-        ctx.rotate((45 * Math.PI) / 180);
+  //       // 旋轉畫布
+  //       ctx.translate(centerX, centerY);
+  //       ctx.rotate((45 * Math.PI) / 180);
 
-        // 背景框（可選）
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        ctx.fillRect(-textWidth / 2 - 10, -textHeight / 2 - 5, textWidth + 20, textHeight + 10);
+  //       // 背景框（可選）
+  //       ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+  //       ctx.fillRect(-textWidth / 2 - 10, -textHeight / 2 - 5, textWidth + 20, textHeight + 10);
 
-        // 畫文字
-        ctx.fillStyle = 'white';
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = 2;
-        ctx.fillText(text, -textWidth / 2, -textHeight / 2);
-        ctx.strokeText(text, -textWidth / 2, -textHeight / 2);
-        ctx.restore();
+  //       // 畫文字
+  //       ctx.fillStyle = 'white';
+  //       ctx.strokeStyle = 'black';
+  //       ctx.lineWidth = 2;
+  //       ctx.fillText(text, -textWidth / 2, -textHeight / 2);
+  //       ctx.strokeText(text, -textWidth / 2, -textHeight / 2);
+  //       ctx.restore();
 
-        // 轉成 Blob 並加入陣列
-        const blob = await new Promise(resolve => canvas.toBlob(resolve));
-        resultBlobs.push(blob);
-      }
+  //       // 轉成 Blob 並加入陣列
+  //       const blob = await new Promise(resolve => canvas.toBlob(resolve));
+  //       resultBlobs.push(blob);
+  //     }
 
-      return resultBlobs;
-    },
-
-
+  //     return resultBlobs;
+  //   },
 
 
 
 
 
+    // async addTextToImageUrls(imgUrls, text) {
+    //   const newImgArray = [];
+    //   for (const url of imgUrls) {
+    //     const img = await this.loadImage(url);
+    //     const canvas = document.createElement('canvas');
+    //     canvas.width = img.width;
+    //     canvas.height = img.height;
 
+    //     const ctx = canvas.getContext('2d');
+    //     if (!ctx) continue;
 
+    //     // 畫圖片
+    //     ctx.drawImage(img, 0, 0);
 
+    //     // 加文字樣式
 
+    //     ctx.font = `${this.waterPrintContent.waterPrintSize} sans-serif`;
+    //     ctx.fillStyle = this.waterPrintContent.waterPrintColor;
+    //     // ctx.strokeStyle = 'black';
+    //     // ctx.lineWidth = 2;
 
+    //     const metrics = ctx.measureText(text)
+    //     const textWidth = metrics.width
+    //     const textHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent
 
+    //     // 移動到圖片中心
+    //     const centerX = (img.width / 2)
+    //     const centerY = img.height / 2
+    //     ctx.translate(centerX, centerY)
 
+    //     // 旋轉 45 度
+    //     if(this.waterPrintContent.waterPrintPosition === "topLeftToBottomRight"){
+    //       ctx.rotate((45 * Math.PI) / 180)
+    //     } else {
+    //       ctx.rotate((-45 * Math.PI) / 180)
+    //     }
 
+    //     // 畫出描邊文字 + 實心文字
+    //     ctx.strokeText(text, -textWidth / 2, -textHeight / 2)
+    //     ctx.fillText(text, -textWidth / 2, -textHeight / 2)
 
-
-
-
-
-
-
-
-
-
-    async addTextToImageUrls(imgUrls, text) {
-      const newImgArray = [];
-      for (const url of imgUrls) {
-        const img = await this.loadImage(url);
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-
-        const ctx = canvas.getContext('2d');
-        if (!ctx) continue;
-
-        // 畫圖片
-        ctx.drawImage(img, 0, 0);
-
-        // 加文字樣式
-
-        ctx.font = `${this.waterPrintContent.waterPrintSize} sans-serif`;
-        ctx.fillStyle = this.waterPrintContent.waterPrintColor;
-        // ctx.strokeStyle = 'black';
-        // ctx.lineWidth = 2;
-
-        const metrics = ctx.measureText(text)
-        const textWidth = metrics.width
-        const textHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent
-
-        // 移動到圖片中心
-        const centerX = (img.width / 2)
-        const centerY = img.height / 2
-        ctx.translate(centerX, centerY)
-
-        // 旋轉 45 度
-        if(this.waterPrintContent.waterPrintPosition === "topLeftToBottomRight"){
-          ctx.rotate((45 * Math.PI) / 180)
-        } else {
-          ctx.rotate((-45 * Math.PI) / 180)
-        }
-
-        // 畫出描邊文字 + 實心文字
-        ctx.strokeText(text, -textWidth / 2, -textHeight / 2)
-        ctx.fillText(text, -textWidth / 2, -textHeight / 2)
-
-        // 轉成 blob
-        const newBlob = await new Promise((resolve) =>
-          canvas.toBlob((blob) => resolve(blob), 'image/png')
-        );
-        if (newBlob) newImgArray.push(newBlob);
-      }
-      return newImgArray;
-    },
+    //     // 轉成 blob
+    //     const newBlob = await new Promise((resolve) =>
+    //       canvas.toBlob((blob) => resolve(blob), 'image/png')
+    //     );
+    //     if (newBlob) newImgArray.push(newBlob);
+    //   }
+    //   return newImgArray;
+    // },
 
 
 
@@ -1176,16 +1161,17 @@ export default {
 },
 
 
-  loadImage(src) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous"; // 避免 CORS 問題（前提是圖片允許跨域）
-      img.onload = () => resolve(img);
-      img.onerror = reject;
-      img.src = src;
-    });
-  },
+loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous"; // 避免 CORS 問題（前提是圖片允許跨域）
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+},
 createWatermarkedBlob(img, watermarkText) {
+  console.log('XXDDDd :>> ');
   return new Promise(resolve => {
     const canvas = document.createElement("canvas");
     canvas.width = img.width;

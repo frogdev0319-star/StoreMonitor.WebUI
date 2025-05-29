@@ -267,6 +267,7 @@ export default {
           label: this.$t('advance.bottomLeftToTopLeft')
         },
       ],
+
       textSizeSelect_dynamic:[
         {
           value: "26.4px",
@@ -554,18 +555,23 @@ export default {
       this.textPosition = initData.data.content.waterPrintPosition
 
       // dynamic
+      if( Object.keys(initData_dynamic.data.content).length === 0){
+        console.log("{{{}}}")
+        this.isSwitchOn_dynamic = this.isSwitchOn_dynamic
+        this.color_dynamic = '#FFFFFF'
+        this.textSize_dynamic = this.$t('advance.m')
+        this.textPosition_dynamic = this.$t('advance.topLeftToBottomRight')
 
-      var tempItem_dynamic = this.textSizeSelect_dynamic.find( i => i.mobileSize == initData_dynamic.data.content.waterPrintSize)
-      console.log('tempItem_dynamic', tempItem_dynamic)
-      this.isSwitchOn_dynamic = initData_dynamic.data.content.isSwitchOn
-      // this.defineText = initData.data.content.waterPrintText
-      this.showTextStatus_dynamic = initData_dynamic.data.content.waterPrintType == 0 ? true : false
-      this.color_dynamic = initData_dynamic.data.content.waterPrintColor
-      this.textSize_dynamic = tempItem_dynamic.value
-      this.textPosition_dynamic = initData_dynamic.data.content.waterPrintPosition
+      } else {
+        var tempItem_dynamic = this.textSizeSelect_dynamic.find( i => i.mobileSize == initData_dynamic.data.content.waterPrintSize)
+        console.log('initData_dynamic :>> ', initData_dynamic);
+        this.isSwitchOn_dynamic = initData_dynamic.data.content.isSwitchOn
+        this.color_dynamic = initData_dynamic.data.content.waterPrintColor
+        this.textSize_dynamic = tempItem_dynamic ? tempItem_dynamic.value : "17.6px"
+        this.textPosition_dynamic = initData_dynamic.data.content.waterPrintPosition
+      }
 
     },
-
 
     advancedUpdate(){
       this.isLoadingData = true
@@ -594,12 +600,17 @@ export default {
     advancedUpdate_dynamic(){
       this.isLoadingData = true
       var tempItem_dynamic = this.textSizeSelect_dynamic.find( i => i.value == this.textSize_dynamic)
+
+      console.log("this.textSize_dynamic", this.textSize_dynamic)
+      console.log("this.textSizeSelect_dynamic", this.textSizeSelect_dynamic)
+      console.log("tempItem_dynamic", tempItem_dynamic)
+
       var param = {
         contentKey: "dynamic_print",
         contentMap: {
           waterPrintText: this.userEmail,
           waterPrintType: 1,
-          waterPrintSize: tempItem_dynamic.mobileSize,
+          waterPrintSize: tempItem_dynamic ? tempItem_dynamic.mobileSize : "17.6px" ,
           waterPrintPosition: this.textPosition_dynamic,
           waterPrintColor: this.color_dynamic,
           isSwitchOn: this.isSwitchOn_dynamic
