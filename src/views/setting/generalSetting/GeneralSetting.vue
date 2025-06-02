@@ -254,7 +254,7 @@
 
 
     <!-- 生物辨識開關 -->
-    <div class="page-container report-setting paper" >
+    <!-- <div class="page-container report-setting paper" >
       <div class="setting-titles padding flex-center">
         特定巡檢管理功能設定
         <div class="spacer"></div>
@@ -284,7 +284,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
 
 
 
