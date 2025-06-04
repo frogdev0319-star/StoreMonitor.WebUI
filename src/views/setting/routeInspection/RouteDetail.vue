@@ -38,6 +38,11 @@
           </div>
         </div>
       </div>
+
+
+      -- tableSlice: {{ tableSlice }} --  <br>
+      <!-- <p style="font-size: 11px;">showTable: {{ showTable }}</p> -->
+
       <div v-if="routeData.length !== 0" :style="{'min-height':varyWindowWidth*0.52+'px'}">
         <div v-for="(item,index) in showTable" :key="item.id">
           <observer @on-change="onChange"  class="data-content">
@@ -307,7 +312,9 @@ export default {
   watch:{
     routeData:{
       handler(newValue){
-        this.tableSlice = 3;
+        // this.tableSlice = 3;
+
+        // console.log('this.inspectCategoryList 1 :>>>>>>>>>> ', this.inspectCategoryList);
         this.inspectCategoryList = util.handleInspctionCatergyTree(newValue);
         if(this.inspectCategoryList.length >= this.tableSlice)
           this.showTable = this.inspectCategoryList.slice(0,this.tableSlice);
@@ -318,6 +325,7 @@ export default {
   },
   mounted() {
     //console.log("inspectCategoryList:",this.inspectCategoryList);
+    console.log('this.inspectCategoryList 2 :>>>>>>>>>> ', this.inspectCategoryList);
     if(this.inspectCategoryList.length >= this.tableSlice)
       this.showTable = this.inspectCategoryList.slice(0,this.tableSlice);
     else this.showTable = this.inspectCategoryList;
@@ -326,6 +334,8 @@ export default {
 
   methods: {
     onChange(entry, unobserve) {
+      // console.log('entry :>>>>>>>>>> ', entry);
+      // console.log('unobserve :>>>>>>>> ', unobserve);
       // After loading Cancel monitoring, optimise performance
       if (entry.isIntersecting) {
         this.tableSlice+=3;
