@@ -40,7 +40,7 @@
       </div>
 
 
-      -- tableSlice: {{ tableSlice }} --  <br>
+      <!-- -- tableSlice: {{ tableSlice }} --  <br> -->
       <!-- <p style="font-size: 11px;">showTable: {{ showTable }}</p> -->
 
       <div v-if="routeData.length !== 0" :style="{'min-height':varyWindowWidth*0.52+'px'}">
