@@ -1820,6 +1820,7 @@ export default {
     "agreeDelete": "我理解並同意刪除報告",
     "deleteReason": "刪除原因",
     "insertPassword": "請再次輸入使用者密碼",
+    "agree": "同意刪除須知事項",
   },
 
   "addition": {
@@ -1831,6 +1832,7 @@ export default {
     "event": "事件:",
     "eventTime": "事件時間:",
     "ChangeToUnprocessed": "變更為未處理",
+    "skipSignin": "略過簽到",
   }
 
 }

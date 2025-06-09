@@ -1822,6 +1822,7 @@ export default {
     "agreeDelete": "I understand and agree to delete the report",
     "deleteReason": "Reason for Deletion",
     "insertPassword": "Please re-enter your password",
+    "agree": "同意刪除須知事項",
   },
 
   "addition": {
@@ -1833,5 +1834,6 @@ export default {
     "event": "Event:",
     "eventTime": "Event Time:",
     "ChangeToUnprocessed": "Change to unprocessed",
+    "skipSignin": "Skip sign-in",
   }
 }

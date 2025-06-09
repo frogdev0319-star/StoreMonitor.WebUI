@@ -1816,6 +1816,7 @@ export default {
     "agreeDelete": "我理解并同意删除报告",
     "deleteReason": "刪除原因",
     "insertPassword": "请再次输入使用者密码",
+    "agree": "同意刪除須知事項",
   },
 
   "addition": {
@@ -1827,6 +1828,7 @@ export default {
     "event": "事件:",
     "eventTime": "事件时间:",
     "ChangeToUnprocessed": "变更为未处理",
+    "skipSignin": "略過簽到",
   }
 
 }

@@ -1,10 +1,10 @@
 <template>
     <div class="ScheduleContainer">
-        
+
         <div class="search-bar">
             <DateTimeSelectorSchedule
-                class="time-selector" 
-                :dateRangeTitle="$t('overview.date')" 
+                class="time-selector"
+                :dateRangeTitle="$t('overview.date')"
                 @change="dateChange"
             />
             <div class='keyword-area'>
@@ -27,7 +27,7 @@
         <div class="scheduleLlist-area">
             <div class="buttons">
                 <delay-button
-                    class="storevue-button-empty add_button" 
+                    class="storevue-button-empty add_button"
                     @click="addNewSchedule">
                     <div class="button-area">
                         <i class="iconfont el-icon-plus" />
@@ -35,8 +35,8 @@
                     </div>
                 </delay-button>
                 <delay-button
-                    class="storevue-button-empty del_button" 
-                    :disabled="!enableDeleteBtn" 
+                    class="storevue-button-empty del_button"
+                    :disabled="!enableDeleteBtn"
                     @click="deleteSchedule" >
                     <div class="button-area ">
                         <span>{{$t('scheduleView.delete')}}</span>
@@ -54,17 +54,17 @@
                 :table-operation ="columnOperationData"
                 :highlight-current-row= "false"
 
-                v-loading="isLoadingData" 
+                v-loading="isLoadingData"
 
                 :allowRowExpand = "false"
                 :showBorder = "false"
                 :default-sort = "defaultSort"
-                :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+                :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}"
                 :tableHeight = "760"
                 :cellStyle="{backgroundColor: '#fff !important'}"
-                @handleOperation="handleOperation"  
-                @sortChange="handleSortChange"    
-                @selection-change="handleSelectionChange"                            
+                @handleOperation="handleOperation"
+                @sortChange="handleSortChange"
+                @selection-change="handleSelectionChange"
             />
             <div style="width:100%; margin-top:12px;height:31px;">
                 <tbl-pagination-only
@@ -204,9 +204,9 @@ export default{
             //存在sessionStorage，refresh時才會留著
             const data = sessionStorage.getItem('PersonalSchedule')
             this.personSchedule = JSON.parse(data)
-            
+
             this.userId = (Object.getOwnPropertyNames(this.$route.params).length>0)?this.$route.params.userId:this.personSchedule.userId;
-            
+
             this.person = (Object.getOwnPropertyNames(this.$route.params).length>0)?this.$route.params.nickName:this.personSchedule.userName;
         },
         dateChange(val) {
@@ -216,7 +216,7 @@ export default{
             self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
             self.dateValue[1] = self.dateValue[1];
             // self.inputSearchValue = '';
-            if(this.firstLoad){ 
+            if(this.firstLoad){
                 this.doSearchScheduleList();
                 this.firstLoad = false;
             }
@@ -240,7 +240,7 @@ export default{
             var month = this.pad2(date.getMonth()+1);
             var day = this.pad2(date.getDate());
             var year= date.getFullYear();
-            return year + "-"+ month +"-"+ day 
+            return year + "-"+ month +"-"+ day
             },
 
 
@@ -287,7 +287,7 @@ export default{
                     obj['taskFinalStr']=(item.taskFinal==0)?'-':self.$moment.utc(self.$moment(item.taskFinal)).format("YYYY/MM/DD");//util.getDateStr(item.taskFinal),
                     obj['updateUserName']=(item.updateUserName == "NONE")?'-':item.updateUserName,
                     userData.push(obj);
-                    
+
                     });
                     self.tableData = [];
                     self.tableData = userData;
@@ -295,8 +295,8 @@ export default{
                     console.log('self.tableData :>> ', self.tableData);
                     self.total = res.data.totalPages;
                     self.isLoadingData = false;
-                
-                
+
+
                 }else{
                     util.notify(self.$t('schedule.getScheduleSettingFail'), 'error', 3000);
                 }
@@ -312,7 +312,7 @@ export default{
 
             let params= {
                 action: 'addSchedule',
-                userId: this.userId, 
+                userId: this.userId,
             };
             sessionStorage.setItem('scheduleParams', JSON.stringify(params))
             this.$router.push({ name: 'CreateSchedule', params: { userId: this.userId,userName:this.person}});
@@ -349,17 +349,17 @@ export default{
         },
         handleOperation({ method, row }) {
             sessionStorage.removeItem('scheduleParams')
-            let params= { 
+            let params= {
                 action: 'editSchedule',
-                userId: this.userId, 
-                taskGroupUuid: row.taskGroupUuid,  
+                userId: this.userId,
+                taskGroupUuid: row.taskGroupUuid,
                 taskName: row.taskName,
                 tagName: row.tagName,
                 tagNameMode: row.tagNameMode
             };
             console.log("handleOperation params:",params);
             sessionStorage.setItem('scheduleParams', JSON.stringify(params))
-            
+
             let copyParams = {
                 taskGroupUuid: row.taskGroupUuid,
                 userId: this.userId,
@@ -371,7 +371,7 @@ export default{
                 }
                 case 'set':{
                     this.$router.push({ name: 'ModifySchedule', params: { userId: this.userId,userName:this.person,taskGroupUuid: row.taskGroupUuid }});
-                    break;      
+                    break;
                 }
                 default: {
                     break;
@@ -420,7 +420,7 @@ export default{
         &:hover
             background: #fdf1f6
             opacity: 1
-            
+
     .del_button
         height: 35px
         padding: 5px 20px !important
@@ -460,8 +460,8 @@ export default{
                 font-weight: normal;
                 word-break: keep-all;
                 padding-right: 16px;
-            
-            
+
+
             }
         }
         .search-button{
@@ -496,7 +496,7 @@ export default{
             }
             /deep/.el-table__header-wrapper
             .el-table-column--selection
-            .el-checkbox__inner 
+            .el-checkbox__inner
             {
                 border-radius: 1px;
                 border: none;
@@ -574,7 +574,7 @@ export default{
     .el-table
     .el-table__body-wrapper
     .el-table-column--selection
-    .el-checkbox__inner 
+    .el-checkbox__inner
     {
       border-radius: 1px;
       border: solid 1px #acaeb1;
@@ -585,7 +585,7 @@ export default{
     .el-table__body-wrapper
     .el-table-column--selection
     .is-checked
-    .el-checkbox__inner 
+    .el-checkbox__inner
     {
       /*border-radius: 1px;
       border: solid 1px #2c90d9;
