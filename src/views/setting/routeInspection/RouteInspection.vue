@@ -574,21 +574,21 @@ export default {
       console.log('this.isSystemAdvanced ****>> ', this.isSystemAdvanced);
 
       // console.log('accountId ****>> ', accountId);
-      await accountInfo(accountId).then(res => {
+      // await accountInfo(accountId).then(res => {
 
-        console.log('res.data.isTransform', res.data.isTransform)
-        console.log('res.data.isiService', res.data.isiService)
+      //   console.log('res.data.isTransform', res.data.isTransform)
+      //   console.log('res.data.isiService', res.data.isiService)
 
-        this.isiService = res.data.isiService
-        this.isTransform = res.data.isTransform
-        this.btnList[0].show = (this.isiService || this.isTransform)
-        // console.log('this.isiService ****>> ', this.isiService);
-        // console.log('this.btnList ****>> ', this.btnList);
+      //   this.isiService = res.data.isiService
+      //   this.isTransform = res.data.isTransform
+      //   // this.btnList[0].show = (this.isiService || this.isTransform)
+      //   // console.log('this.isiService ****>> ', this.isiService);
+      //   // console.log('this.btnList ****>> ', this.btnList);
 
 
-      }).catch(err => {
-        console.log('err :>> ', err);
-      });
+      // }).catch(err => {
+      //   console.log('err :>> ', err);
+      // });
     },
 
     addNum(){
