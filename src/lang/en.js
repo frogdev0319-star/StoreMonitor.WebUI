@@ -1835,5 +1835,7 @@ export default {
     "eventTime": "Event Time:",
     "ChangeToUnprocessed": "Change to unprocessed",
     "skipSignin": "Skip sign-in",
+    "reviseStatus": "(已變更狀態)",
+    "reviseTime": "變更時間：",
   }
 }

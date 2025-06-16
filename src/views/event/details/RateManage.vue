@@ -441,7 +441,7 @@
       </div>
 
       <dialog-pop
-        title="修改已結案事件"
+        :title="$t('reportAndEvents.modifyClosedEvents')"
         :append-to-body="true"
         :close-on-click-modal="false"
         :show-close="false"
@@ -451,7 +451,7 @@
         @confirmHandler="confirmUpdate()"
       >
         <div class="dialog-slot">
-          <div class="dialog-content">請確認是否變更狀態為 <span style="color: red;"> <b>未處理</b></span>   ? </div>
+          <div class="dialog-content">{{ $t('reportAndEvents.changeStatus') }} <span style="color: red;"> <b>{{ $t('reportAndEvents.unprocessed') }}</b></span>   ? </div>
         </div>
       </dialog-pop>
 

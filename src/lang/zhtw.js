@@ -1833,6 +1833,9 @@ export default {
     "eventTime": "事件時間:",
     "ChangeToUnprocessed": "變更為未處理",
     "skipSignin": "略過簽到",
+    "reviseStatus": "(已變更狀態)",
+    "reviseTime": "變更時間：",
+
   }
 
 }
