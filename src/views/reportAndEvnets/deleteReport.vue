@@ -48,7 +48,7 @@
                   :label="item.label"
                   :value="item.mode"/>
               </el-select> -->
-              
+
               <!-- <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" /> -->
                 <el-select
                   class="el-province"
@@ -74,8 +74,8 @@
         <div class="flex-center" style="padding-top: 0;">
           <date-time-selector
             class="time-selector"
-            @change="dateChange" 
-            :dateTimeValue = dateValue /> 
+            @change="dateChange"
+            :dateTimeValue = dateValue />
           <div class="flex-center fullWidth" style="margin-left: 20px">
             <div class="search-content flex-center" style="margin-right: 20px">
               <div class="search-label">{{ $t('remotePatrol.keywords') }}</div>
@@ -116,17 +116,17 @@
               :allowRowExpand = "false"
               :showBorder = "false"
               :default-sort = "{prop: 'datestr', order: 'descending'}"
-              :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '6px',}" 
+              :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '6px',}"
               :tableHeight = "760"
               :cellStyle="{backgroundColor: '#fff !important'}"
               @sortChange="sortChange"
               @handleOperation="handleEmitOperation"
-              
+
             />
           </div>
-          
+
         </div>
-        
+
         <div
           v-loading="isLoading"
           v-else
@@ -134,7 +134,7 @@
           class="card-content self-loading">
           <div class="empty-content">{{ noData }}</div>
         </div>
-        
+
         <div class="el-pat" v-if="reportTableData.length > 0">
           <div class="pageSizeTitle" style="color: #666"> {{ $t('remotePatrol.totalOf') }} <b style="font-size: 16px"> {{totalElements}} </b> {{ $t('remotePatrol.numReports') }}</div>
           <tbl-pagination-only
@@ -211,15 +211,15 @@
             </el-button>
         </div>
 
-        
+
         </div>
       </div>
     </dialog-pop>
   </div>
 </template>
 <script>
-import { 
-      getInspectReportList, 
+import {
+      getInspectReportList,
       GetInspectTagList,
       downLoadInspectReportEntireDetail,
       getAllReportIds,
@@ -315,7 +315,7 @@ export default {
         },
         {
           'prop': 'submitterName',
-          'label': '巡檢人員',
+          'label': this.$t('scheduleView.InspectPerson'),
           'sortable': false,
           'width': '140',
           'maxWidth': '140',
@@ -329,28 +329,28 @@ export default {
         // },
         {
           'prop': 'tagName',
-          'label': '巡檢表',
+          'label': this.$t('overview.patrolLists'),
           'sortable': false,
           'width': '145',
           'maxWidth': '180',
         },
         {
           'prop': 'status',
-          'label': '巡檢總評',
+          'label': this.$t('remotePatrol.patrolResult'),
           'sortable': false,
           'width': '145',
           'maxWidth': '180',
         },
         {
           'prop': 'totalScore',
-          'label': '巡檢得分',
+          'label': this.$t('remotePatrol.patrolScore'),
           'sortable': false,
           'width': '145',
           'maxWidth': '180',
         },
         {
           'prop': 'datestr',
-          'label': '巡檢日期',
+          'label': this.$t('remotePatrol.patrolDate'),
           'sortable': 'custom',
           'width': '145',
           'maxWidth': '180',
@@ -378,7 +378,7 @@ export default {
       currentPage: 1,
       curSizeNum: 10,
       sizeNum: 50,
-    
+
       storeList: [],
       searchInput: '',
       sizeNum: 10,
@@ -397,10 +397,10 @@ export default {
         { 'status': 2, 'label': this.$t('overview.echartGood') } //good
       ],
       storeStr: '',
-      
 
 
-      
+
+
       params: {},
       storeDataList: [],
       storeIdList: [],
@@ -492,7 +492,7 @@ export default {
     }
     self.$route.meta.isBack = false;
     self.isFirstLoad = false;
-    
+
   },
 
 
@@ -514,7 +514,7 @@ export default {
       await self.getSearchParams();
       await self.getInspectList();
       await self.getInspectStatus();
-      
+
     },
     cellStyle({ row, column, rowIndex, columnIndex }) {
       let obj = {};
@@ -541,7 +541,7 @@ export default {
           this.showUpdateEvent = true
           this.deleteReportId = val.row.id
           break;
-      
+
         default:
           break;
       }
@@ -556,7 +556,7 @@ export default {
       sessionStorage.setItem('report_data', JSON.stringify(reportObj));
       this.$router.push({ name: 'needDeleteReport', params: { data: reportObj }});
     },
-  
+
     cancelUpdate(){
       this.showUpdateEvent = false
       this.agreeDelete = false
@@ -600,7 +600,7 @@ export default {
         like:p.like,
         filter:p.filter,
         order:p.order,
-        inspectTagId: p.inspectTagId != '-1' ? p.inspectTagId : null, 
+        inspectTagId: p.inspectTagId != '-1' ? p.inspectTagId : null,
         searchMysteryMode : PermissionHelper.enableMimicMode ? 1 : p.searchMysteryMode,
         sourceType : 1
       }
@@ -616,7 +616,7 @@ export default {
 
       console.log("***current user:",this.$store.getters.userId);
       if(PermissionHelper.enableMimicMode){
-        params['submitter'] = this.$store.getters.userId; 
+        params['submitter'] = this.$store.getters.userId;
       }else if(params.searchMysteryMode!=-1 && p.submitters && p.submitters!='-1' && p.submitters.length>0){
         var obj = {...p.clause};
         obj['submitter'] = p.submitters;
@@ -625,7 +625,7 @@ export default {
 
       // ==== 2024 sprint1 遠端巡檢關閉 ====
       params['clause'].mode = 1;
-      
+
       return new Promise((resolve) => {
         console.log("params~~~~~>>",params);
         getInspectReportList(params).then(async(res) => {
@@ -634,18 +634,18 @@ export default {
           if (errCode === 0) {
             data = res.data.content;
             this.totalElements = res.data.totalElements
-          } 
+          }
           const temp = [];
           const tempTable = [];
           self.isLoading = true;
 
-          
+
           for(const item of data){
             const tableObj = {};
-            tableObj.province = item.province 
+            tableObj.province = item.province
             tableObj.city = item.city;
 
-            tableObj.storeName = item.storeName 
+            tableObj.storeName = item.storeName
             tableObj.code = item.code ? item.code : '--';
 
             tableObj.modeText = item.mode === 0 ? self.$t('overview.remotePatrol') : self.$t('overview.onsitePatrol')
@@ -659,11 +659,11 @@ export default {
             tableObj.routeObj = item;
             tableObj.mode = item.mode;
             tableObj.totalScore = item.type === 1 ? "--" : item.totalScore;
-            
+
             tableObj.standard = item.standard;
             tableObj.standardMsg = util.setStandardMsg(tableObj.standard);
-            tableObj.statusCode = item.status; 
-            
+            tableObj.statusCode = item.status;
+
             let storeType = '';
             item.tags.length !== 0 ? item.tags.forEach((_item, _index) => {
               const isuu = _index === item.tags.length - 1 ? '' : ', \n';
@@ -684,7 +684,7 @@ export default {
           }
 
           self.reportTableData = tempTable;
-          
+
 
           self.total = res.data.totalPages
           self.isLoading = false;
@@ -786,7 +786,7 @@ export default {
 
       this.currentPage = pageInfo.page
       this.curSizeNum = pageInfo.size;
-      
+
       this.params.filter.page = pageInfo.page - 1
       this.params.filter.size = pageInfo.size
       this.getReportList(this.params);
@@ -827,7 +827,7 @@ export default {
       if (self.curAppraise != null && self.curAppraise !== -1) {
         clause.status = self.curAppraise;
       }
-      
+
       self.params.clause = clause;
       self.params.inspectTagId = self.inspectId === '-1' ? '' : self.inspectId;
       typeof (self.params.inspectTagId) === 'string' && delete self.params.inspectTagId;
@@ -856,7 +856,7 @@ export default {
           console.log("searchData>>>>no jump:",self.params)
           self.params.searchMysteryMode = PermissionHelper.enableMimicMode ? 1 : -1;
         }
-      
+
       console.log("###",self.params)
       self.params.filter = { page: 0, size: self.sizeNum };
       self.saveSearchParams();
@@ -929,7 +929,7 @@ export default {
         });
       });
     },
-    
+
     getInspectStatus() {
       return new Promise((resolve, reject) => {
         getInspectStatus().then(res => {
@@ -949,7 +949,7 @@ export default {
             this.inspectStatus.status_0 = this.$t('overview.danger')
           }
 
-          
+
           this.appraiseList.forEach(item =>{
             if(item.status === 0) {item.label = this.inspectStatus.status_0}
             else if(item.status === 1) {item.label = this.inspectStatus.status_1}
@@ -983,7 +983,7 @@ export default {
         //     newArr.push(_item.id);
         //     inspectList.push(_item);
         //   }
-        // } 
+        // }
         else if (self.curReportType === 1) {
           if (!newArr.includes(_item.id) && _item.mode === 1) {
             newArr.push(_item.id);
@@ -1030,14 +1030,14 @@ export default {
       this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
 
       if (Object.keys(searchParams).length > 0) {
-        
+
         this.storeFilterObj = searchParams;
         this.params = searchParams;
         console.log("Get Old Params")
         console.log(searchParams)
         this.order = searchParams.order;
         this.filter = searchParams.filter;
-      
+
         this.checkSortType(this.curSortType,true);
         console.log("searchParams.clause.status:",searchParams.clause.status);
         this.curAppraise = (typeof searchParams.clause.status=='undefined') ? -1:searchParams.clause.status;
@@ -1052,7 +1052,7 @@ export default {
         if(!searchParams.curCity){
           searchParams.curCity =[];
         }
-        
+
         if(searchParams.jump){ //跳轉
           console.log("Jump to ")
           //this.params.jump = false;
@@ -1066,7 +1066,7 @@ export default {
         }else{
           this.params.searchMysteryMode = PermissionHelper.enableMimicMode ? 1 : -1;
         }
-        
+
       } else {
         this.params.filter = { page: 0, size: this.sizeNum };
         this.params.clause = { storeId: [] };
@@ -1076,10 +1076,10 @@ export default {
       }
       if(!this.params.beginTs)this.params.beginTs = this.dateValue[0].valueOf();
       if(!this.params.endTs)this.params.endTs = this.dateValue[1].valueOf();
-  
-  
+
+
     },
-    
+
 
     onStoreChange(storeObj) {
       console.log("On Store Changed")
@@ -1144,7 +1144,7 @@ export default {
           .cell
             text-overflow:: initial !important
             white-space: nowrap !important
-            
+
     .el-table th div
       padding-left: 10px !important
       padding-right: 0 !important
@@ -1152,7 +1152,7 @@ export default {
 
     .cell-class .cell
       text-align: left  !important
-      
+
   .comfirm_delete_report
     h3
       color: red
@@ -1219,8 +1219,8 @@ $filterWidth: (100%-706);
   font-weight: normal;
   word-break: keep-all;
   padding-right: 16px;
-  
-  
+
+
 }
 .report-type-area{
     width:calc(260/1440*100vw);
@@ -1230,7 +1230,7 @@ $filterWidth: (100%-706);
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
 }
 #el-containter{
-    
+
     .report-header{
         margin-top: 20px;
         margin-bottom: 20px;
@@ -1277,7 +1277,7 @@ $filterWidth: (100%-706);
                 margin-right: 10px;
               };
             }
-            
+
             .el-province{
                 width: calc(160/1920*100vw);
                 min-width: 85px;
@@ -1362,7 +1362,7 @@ $filterWidth: (100%-706);
             }
         }
     }
-    
+
     .showCardHeight{
       display: flex;
       flex-wrap: wrap;
@@ -1371,7 +1371,7 @@ $filterWidth: (100%-706);
       align-items: flex-start;
       // height: calc(450/1440*100vw);
       // overflow: auto;
-        
+
     }
     .list-table{
       margin-bottom: 20px;
@@ -1383,7 +1383,7 @@ $filterWidth: (100%-706);
       padding-left: calc(20/1920*100vw) !important;
     }
     .list-table{
-      
+
       .table-white {
         /deep/
         .el-table{
@@ -1395,7 +1395,7 @@ $filterWidth: (100%-706);
         }
       }
     }
-    
+
     .report-card{
         width: 19%;
         margin-bottom: calc(20/1440*100vw);
@@ -1404,13 +1404,13 @@ $filterWidth: (100%-706);
         cursor: pointer;
         &:hover{
           box-shadow: 0 3px 8px 0 rgba(0, 0, 0, .2);
-          
+
         }
         .cards{
           width: 100%;
           height: calc(220/1440*100vw);
           padding: calc(15/1440*100vw);
-          
+
           // margin-right: calc(20/1440*100vw);
           border: 1px solid #e3e9f4;
           font-size: calc(12/1440*100vw);
@@ -1436,7 +1436,7 @@ $filterWidth: (100%-706);
               div {
                 text-align: left;
               }
-                
+
               .item-img{
                 position: absolute;
                 right: 1px;
@@ -1492,7 +1492,7 @@ $filterWidth: (100%-706);
               color: $border;
             }
             .score {
-              font-size: calc(32/1440*100vw); 
+              font-size: calc(32/1440*100vw);
               margin-right: calc(5/1440*100vw);
               // margin-bottom: calc(30/1440*100vw);
             }
@@ -1504,21 +1504,21 @@ $filterWidth: (100%-706);
               justify-content: flex-start;
               margin-bottom: 1%;
               .status-tag {
-                border-radius: 4px; 
+                border-radius: 4px;
                 padding: calc(5/1440*100vw) calc(7/1440*100vw);
                 font-size: calc(10/1440*100vw);
                 margin-bottom: 2%;
               }
               .status-tag-en{
                 font-size: calc(14/1920*100vw);
-                border-radius: calc(5/1440*100vw); 
+                border-radius: calc(5/1440*100vw);
                 padding: calc(2/1440*100vw) calc(15/1440*100vw);
                 margin-bottom: 2%;
               }
             }
           }
-          
-          
+
+
         .card_bottom{
           text-align: left;
           .submitter{
@@ -1536,7 +1536,7 @@ $filterWidth: (100%-706);
           text-overflow: ellipsis;
           white-space: nowrap;
           justify-content: space-between;
-          
+
         }
         .item-score{
           color: $tab;
@@ -1570,7 +1570,7 @@ $filterWidth: (100%-706);
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
-    
+
     .el-pag{
         position: absolute;
         //float: right;

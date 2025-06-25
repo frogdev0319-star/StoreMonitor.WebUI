@@ -352,7 +352,7 @@
           </div>
           <div class="btn_List" v-if="needUpdateEvent">
             <div class="reopen" @click="showUpdateEvent = true" >
-              返回處理
+                {{ $t('addition.returnProcessing') }}
             </div>
           </div>
         </div>

@@ -132,6 +132,11 @@ export default {
     "deleteReport": "Delete Report",
     "closeEvents": "Closed Events",
     "operationRecord": "Operation Record",
+    "reportAndEventDeleted": "Report and Event | Delete Report",
+    "reportAndEventUpdated": "Report and Event | Closed Events",
+    "needDeleteReport": "Report Details",
+    "needUpdateEvent": "Event Details",
+
     "DataSecurity": "Data Security",
     "InstantPush": "Instant Push",
     "Send": "Send",
@@ -1822,7 +1827,7 @@ export default {
     "agreeDelete": "I understand and agree to delete the report",
     "deleteReason": "Reason for Deletion",
     "insertPassword": "Please re-enter your password",
-    "agree": "同意刪除須知事項",
+    "agree": "Agree to delete the notice",
   },
 
   "addition": {
@@ -1835,7 +1840,21 @@ export default {
     "eventTime": "Event Time:",
     "ChangeToUnprocessed": "Change to unprocessed",
     "skipSignin": "Skip sign-in",
-    "reviseStatus": "(已變更狀態)",
-    "reviseTime": "變更時間：",
+    "reviseStatus": "(revise Status)",
+    "reviseTime": "Revise Time",
+    "moreThanDays": "The number of days cannot be greater than 90 days",
+    "moreThanCloseDays": "The number of days overdue for case settlement cannot exceed 365 days",
+    "events": "Events",
+    "overdueClosed": "Overdue Closed",
+    "on": "ON",
+    "off": "OFF",
+    "overdue": "Overdue",
+    "SpecificManagementSettings": "Specific Management Settings",
+    "biometricAuthentication": "Biometric Authentication",
+    "brandBiometrics": "Enable to require all users under this brand to log in with biometrics (if supported by device).",
+    "outOfRange": "Check-in Out of Range",
+    "returnProcessing": "Return Processing",
+    "Total Of": "共有",
+
   }
 }

@@ -188,7 +188,7 @@
                         {{ $t('insSettingView.scores') }}
                       </div>
                     </div>
-                    <div class="ignoreSign" v-if="item.mode == 1 && item.routeObj.isCheckInIgnore">略過簽到</div>
+                    <div class="ignoreSign" v-if="item.mode == 1 && item.routeObj.isCheckInIgnore">{{$t('addition.skipSignin')}}</div>
                   </div>
 
                   <!-- card bottom -->

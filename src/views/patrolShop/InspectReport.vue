@@ -138,7 +138,7 @@
             <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.signInDistance')+'：' }}</span>
             <span v-if="!isexportPDF && hasSignRecord && signInDistance !== -1">{{ $t('remotePatrol.aroundDistance')  }}</span>
             <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">
-              {{ (signInDistance === -1 ? '超出簽到範圍' : signInDistance) }}
+              {{ (signInDistance === -1 ? $t('addition.outOfRange') : signInDistance) }}
             </span>
             <span v-if="!isexportPDF && hasSignRecord && signInDistance !== -1" >{{$t('remotePatrol.mapDistance3')}}</span>
 
@@ -186,9 +186,9 @@
       <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ inceptionExecutTime }}</span>
 
       <span v-if="hasSignRecord" class="info-label" style="margin-left:calc(40/1980*100vw)">{{ $t('remotePatrol.signInDistance')+'：' }}</span>
-      <span v-if="hasSignRecord && signInDistance !== -1">{{ $t('remotePatrol.aroundDistance')  }}</span>
+      <span v-if="hasSignRecord && signInDistance !== -1">{{ $t('remotePatrol.aroundDistance') }}</span>
       <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">
-        {{ (signInDistance === -1 ? '超出簽到範圍' : signInDistance) }}
+        {{ (signInDistance === -1 ? $t('addition.outOfRange') : signInDistance) }}
       </span>
       <span v-if="hasSignRecord && signInDistance !== -1" >{{$t('remotePatrol.mapDistance3')}}</span>
 
@@ -639,7 +639,7 @@
 
                 <div class="content-title" v-if="pageItem.distance == -1 ">
                   <span class="pdf_font_20">
-                    {{ $t('remotePatrol.mapDistance1')+`${report.storeName}`+ $t('remotePatrol.signInDistance')}} : 超出簽到範圍
+                    {{ $t('remotePatrol.mapDistance1')+`${report.storeName}`+ $t('remotePatrol.signInDistance')}} : {{$t('addition.outOfRange')}}
                   </span>
                 </div>
 

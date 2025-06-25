@@ -403,7 +403,7 @@ export default {
           iconClass: 'iconfont icon-shanchu',
           style: 'font-size:15px;width:24px;',
           name: 'create',
-          btnTitle: '建立巡檢表',
+          btnTitle: this.$t('route.createInspect'),
           enabled: false,
           img:require('../../../../static/img/IcRoundPostAdd.svg'),
           show: true
