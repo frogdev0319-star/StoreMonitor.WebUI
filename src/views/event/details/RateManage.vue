@@ -840,9 +840,6 @@ export default {
   //   },
 
 
-
-
-
     // async addTextToImageUrls(imgUrls, text) {
     //   const newImgArray = [];
     //   for (const url of imgUrls) {
@@ -912,6 +909,7 @@ export default {
       this.tempDB = await this.loadImagesFromDB(imageLinks);
       // console.log('this.tempDB: [] :>> ', this.tempDB);
     },
+
     // async saveTo(){
     //   console.log('this.imgsourceList :>> ', this.imgsourceList);
     //   const imageLinks = this.imgsourceList.map(i => i.url)
@@ -952,31 +950,30 @@ export default {
     //   return tx.complete;
     // },
 
-    async saveMultipleImagesToDB(links) {
-      const db = await this.openDB();
+    // async saveMultipleImagesToDB(links) {
+    //   const db = await this.openDB();
 
-      for (const link of links) {
-        try {
-          const res = await fetch(link);
-          const blob = await res.blob();
+    //   for (const link of links) {
+    //     try {
+    //       const res = await fetch(link);
+    //       const blob = await res.blob();
 
-          if (!(blob instanceof Blob)) {
-            console.warn(`❌ ${link} 回傳不是合法 Blob`);
-            continue;
-          }
+    //       if (!(blob instanceof Blob)) {
+    //         console.warn(`❌ ${link} 回傳不是合法 Blob`);
+    //         continue;
+    //       }
 
-          const tx = db.transaction("images", "readwrite");
-          const store = tx.objectStore("images");
-          store.put(blob, link);
-          console.log(`✅ 存好了：${link}`);
+    //       const tx = db.transaction("images", "readwrite");
+    //       const store = tx.objectStore("images");
+    //       store.put(blob, link);
+    //       console.log(`✅ 存好了：${link}`);
 
-        } catch (err) {
-          console.error(`⚠️ 存 ${link} 失敗`, err);
-        }
-      }
-
-      console.log("🎉 所有圖片處理完畢！");
-    },
+    //     } catch (err) {
+    //       console.error(`⚠️ 存 ${link} 失敗`, err);
+    //     }
+    //   }
+    //   console.log("🎉 所有圖片處理完畢！");
+    // },
 
     // 讀取圖片 Blob
     async getImageFromDB(key) {
@@ -989,13 +986,13 @@ export default {
         request.onerror = () => reject(request.error);
       });
     },
-    async fetchAndCacheImage(url) {
-      const res = await fetch(url);
-      const blob = await res.blob();
-      await this.saveImageToDB(url, blob);
-      console.log("取得 blob：", blob);
-      return blob;
-    },
+    // async fetchAndCacheImage(url) {
+    //   const res = await fetch(url);
+    //   const blob = await res.blob();
+    //   await this.saveImageToDB(url, blob);
+    //   console.log("取得 blob：", blob);
+    //   return blob;
+    // },
 
     async loadImagesFromDB(links) {
       const result = [];
@@ -1007,12 +1004,8 @@ export default {
           result.push({ src: url, original: link });
         }
       }
-
       return result;
     },
-
-
-
 
 
 
@@ -1067,7 +1060,6 @@ export default {
       // this.textSize_dynamic = tempItem_dynamic.value
       // this.textPosition_dynamic = initData_dynamic.data.content.waterPrintPosition
     },
-
 
 
 
@@ -1207,27 +1199,6 @@ createWatermarkedBlob(img, watermarkText) {
     }, "image/jpeg");
   });
 },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     closeRealTime() {
