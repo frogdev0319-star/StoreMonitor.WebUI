@@ -137,7 +137,9 @@ export default {
     "Send": "Send",
     "SendingRecord": "sending Record",
     "downloadManagement": "Download Management",
-    "createInspect": "create Inspection"
+    "createInspect": "create Inspection",
+    "epaperManagement": "Epaper Management",
+    "signinRecord": "Sign-in record",
 
   },
   "overview": {

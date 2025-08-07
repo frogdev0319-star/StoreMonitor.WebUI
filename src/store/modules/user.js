@@ -3,14 +3,14 @@ import { getDashServerInfo } from '@/api/device';
 import { getToken, setToken, removeToken, getCookie, setCookie } from '@/common/auth';
 import PermissionHelper from '@/api/PermissionHelper';
 import { resetRouter, constantRoutes, navbarRoute } from '@/router';
-import {isMysteryMode} from  '@/api/mystero';
+import { isMysteryMode } from '@/api/mystero';
 import { getWhiteList } from '@/api/scheduleTask';
 
 
 const user = {
   state: {
     user: '',
-    userId:'',
+    userId: '',
     status: '',
     code: '',
     token: getToken(),
@@ -31,7 +31,7 @@ const user = {
     routes: [],
     addRoutes: [],
     PatrolHistory: null,
-    BackPatrolParam:null,
+    BackPatrolParam: null,
     InspectHistory: null,
     PatrolComment: '',
     videoAuthority: false,
@@ -43,16 +43,16 @@ const user = {
     storeCache: null,
     storeListCache: [],
     editCount: 0,
-    editCount_storeMonitor:0,
-    favoriteList:false,
-    mimicMode:false,
-    isMystery:false,
-    editReport:false,
+    editCount_storeMonitor: 0,
+    favoriteList: false,
+    mimicMode: false,
+    isMystery: false,
+    editReport: false,
     whiteList: [],
 
     advancedSettingMode: false,
     advancedSettingStatus: false
-    
+
   },
 
   mutations: {
@@ -174,29 +174,29 @@ const user = {
     SET_EDIT_COUNT_StoreMonitor: (state, count) => {
       state.editCount = count
     },
-    SET_FAVORIT_LIST:(state,favorit)=>{
+    SET_FAVORIT_LIST: (state, favorit) => {
       state.favoriteList = favorit
     },
-    SET_MIMIC_MODE:(state,mode)=>{
+    SET_MIMIC_MODE: (state, mode) => {
       state.mimicMode = mode
     },
-    SET_ISMYSTERY:(state,mode)=>{
+    SET_ISMYSTERY: (state, mode) => {
       state.isMystery = mode;
     },
-    SET_EDIT_REPORT:(state,mode)=>{
+    SET_EDIT_REPORT: (state, mode) => {
       state.editReport = mode;
     },
     SET_WHITE_LIST: (state, mode) => {
       state.whiteList = mode;
     },
-    
-    SET_ADVANCED_SETTING_MODE:(state,mode)=>{
+
+    SET_ADVANCED_SETTING_MODE: (state, mode) => {
       state.advancedSettingMode = mode
     },
     SET_ADVANCED_SETTING: (state, mode) => {
       state.advancedSettingStatus = mode;
     },
-    
+
   },
 
   actions: {
@@ -219,7 +219,7 @@ const user = {
       commit('SET_BackPatrolParam', BackPatrolParam);
     },
     setPatrolComment({ commit }, PatrolComment) {
-      console.log("@@setPatrolComment:",PatrolComment);
+      console.log("@@setPatrolComment:", PatrolComment);
       commit('SET_PatrolComment', PatrolComment);
     },
 
@@ -238,17 +238,17 @@ const user = {
     setStoreCache({ commit }, store) {
       commit('SET_STORE_CACHE', store);
     },
-    setEditReport({ commit }, mode){
-      commit('SET_EDIT_REPORT',mode)
+    setEditReport({ commit }, mode) {
+      commit('SET_EDIT_REPORT', mode)
     },
-    setMimicMode({ commit }, mode){
-      commit('SET_MIMIC_MODE',mode)
+    setMimicMode({ commit }, mode) {
+      commit('SET_MIMIC_MODE', mode)
     },
-    setAdvancedSettingMode({ commit }, mode){
-      commit('SET_ADVANCED_SETTING_MODE',mode)
+    setAdvancedSettingMode({ commit }, mode) {
+      commit('SET_ADVANCED_SETTING_MODE', mode)
     },
-    
-    
+
+
 
     GetDash({ commit }) {
       return new Promise((resolve, reject) => {
@@ -304,7 +304,7 @@ const user = {
             commit('SET_WHITE_LIST', res.data);
             resolve(res);
             // console.log('whiteList!!!!!!!!!!!!!!!!!!!!', res.data)
-          } 
+          }
         }).catch(err => {
           reject(err);
         });;
@@ -365,25 +365,25 @@ const user = {
         getUserAuthorities().then((res) => {
           // console.log('@@@@',res.data);
           // console.log('@@@@ accountId',res.data.accountId);
-          
+
           var brandList = JSON.parse(sessionStorage.getItem("brandList"));
           // console.log('@@@@ brandList :>> ', brandList);
 
-          var existenceBrand = brandList.some( i => i.accountId == res.data.accountId)
+          var existenceBrand = brandList.some(i => i.accountId == res.data.accountId)
           // console.log('@@@@ existenceBrand :>> ', existenceBrand);
 
           if (res.data && (!res.data.services || res.data.services.includes('custom_iqm_inspection')) && existenceBrand) {
             commit('SET_AUTHORITY', res.data.authorities);
             commit('SET_ROLES', [res.data.title]);
             commit('SET_ROLE_ID', res.data.roleId);
-            commit('SET_USERID',res.data.userId);
-            commit('SET_ACCOUNTID',res.data.accountId)
-            commit('SET_ADVANCED_SETTING',res.data.isSystemAdvanced)
+            commit('SET_USERID', res.data.userId);
+            commit('SET_ACCOUNTID', res.data.accountId)
+            commit('SET_ADVANCED_SETTING', res.data.isSystemAdvanced)
           } else {
             commit('SET_AUTHORITY', []);
             commit('SET_ROLES', []);
             commit('SET_ROLE_ID', 0);
-            commit('SET_USERID','');
+            commit('SET_USERID', '');
           }
           resolve(res);
         }).catch(error => {
@@ -408,7 +408,7 @@ const user = {
         // console.log("user.state:~~~>>>",user.state);
 
         if (user.state.authorities.length > 0) {
-          
+
           PermissionHelper.setData(user.state.authorities);
 
           // 總覽
@@ -418,9 +418,9 @@ const user = {
             accessedRoutes.push(overviewRoute);
           }
 
-          // 巡店管理
+          // 巡檢管理
           const patrolRoute = navbarRoute.getPatrolRoute();
-          accessedRoutes.length === 0 ? patrolRoute.redirect = ((patrolRoute.children.length>0)?patrolRoute.children[0].path:'') : '';
+          accessedRoutes.length === 0 ? patrolRoute.redirect = ((patrolRoute.children.length > 0) ? patrolRoute.children[0].path : '') : '';
           if (patrolRoute.children.length > 0) accessedRoutes.push(patrolRoute);
 
           // 事件管理
@@ -429,14 +429,14 @@ const user = {
             accessedRoutes.push(eventRoute);
           }
 
-        
+
           // 統計分析
           const statisticsRoute = navbarRoute.getStatisticalRoute();
-          if(statisticsRoute.children.length > 0 && !PermissionHelper.enableMimicMode) accessedRoutes.push(statisticsRoute);
+          if (statisticsRoute.children.length > 0 && !PermissionHelper.enableMimicMode) accessedRoutes.push(statisticsRoute);
 
           // 簽合管理
           const auditRoute = navbarRoute.getAuditRoute();
-          (auditRoute.children.length >0 && accessedRoutes.findIndex(item=>item.name==auditRoute.name)==-1) ? accessedRoutes.push(auditRoute):'';
+          (auditRoute.children.length > 0 && accessedRoutes.findIndex(item => item.name == auditRoute.name) == -1) ? accessedRoutes.push(auditRoute) : '';
 
           // 巡檢排程
           // ==== 依據白名單設定顯示&隱藏 ====
@@ -445,7 +445,7 @@ const user = {
             if (res.data) {
               resolve(res);
               commit('SET_WHITE_LIST', res.data);
-            } 
+            }
           }).catch(err => {
             reject(err);
           });
@@ -453,22 +453,22 @@ const user = {
           const accountId = user.state.accountId
           // console.log('whiteList!!!!!!!!!!!!!!!!!!!!', whiteList)
           // console.log('accountId !!!!!!!!!!!!!!!!!!!!', user.state.accountId)
-          var isShowing = whiteList.some( i => i == accountId)
+          var isShowing = whiteList.some(i => i == accountId)
           // console.log('isShowing !!!!!!', isShowing)
-          if(isShowing){
+          if (isShowing) {
             const scheduleRoute = navbarRoute.getInceptionSchedule();
-            (scheduleRoute.children.length > 0 && accessedRoutes.findIndex(item=>item.name==scheduleRoute.name)==-1) ? accessedRoutes.push(scheduleRoute) : '';
+            (scheduleRoute.children.length > 0 && accessedRoutes.findIndex(item => item.name == scheduleRoute.name) == -1) ? accessedRoutes.push(scheduleRoute) : '';
           }
-            
+
 
           const roleId = user.state.roleId
           // console.log('roleId !!!!!!>> ', roleId);
           // 報告與事件
-          if(roleId === 1){
+          if (roleId === 1) {
             const reportAndEventRoute = navbarRoute.getReportAndEvent();
-            if(reportAndEventRoute.children.length > 0 && !PermissionHelper.enableMimicMode) accessedRoutes.push(reportAndEventRoute);
+            if (reportAndEventRoute.children.length > 0 && !PermissionHelper.enableMimicMode) accessedRoutes.push(reportAndEventRoute);
           }
-          
+
           // 下載管理
           const downloadManagemenRoute = navbarRoute.getDownloadManagement();
           downloadManagemenRoute.children.length > 0 ? accessedRoutes.push(downloadManagemenRoute) : '';
@@ -478,29 +478,35 @@ const user = {
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();
           systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';
 
+          // epaper
+          const epaperRoute = navbarRoute.getEpaper();
+          console.log('epaperRoute :>> ', epaperRoute);
+          accessedRoutes.length === 0 ? epaperRoute.redirect = ((epaperRoute.children.length > 0) ? epaperRoute.children[0].path : '') : '';
+          if (epaperRoute.children.length > 0) accessedRoutes.push(epaperRoute);
+
 
           // 進階設定
           const advancedSettingStatus = sessionStorage.getItem("advancedSettingStatus")
           const advancedSettingMode = sessionStorage.getItem("advancedSettingMode")
           // console.log('-------{o..o}-------', advancedSettingStatus , advancedSettingMode)
-        
-          if(advancedSettingStatus && advancedSettingMode){
+
+          if (advancedSettingStatus && advancedSettingMode) {
 
             PermissionHelper.setAdvancedModeMode(advancedSettingMode);
             const advanceSettingRoute = navbarRoute.getAdvanceSetting();
             advanceSettingRoute.children.length > 0 ? accessedRoutes.push(advanceSettingRoute) : '';
-            
+
             const instantPushRoute = navbarRoute.getInstantPush();
             instantPushRoute.children.length > 0 ? accessedRoutes.push(instantPushRoute) : '';
-          } 
+          }
 
           // console.log("accessedRoutes.length !?!?!?:",accessedRoutes.length);
           // console.log('accessedRoutes :>> ', accessedRoutes)
 
-          if(accessedRoutes.length == 0){
+          if (accessedRoutes.length == 0) {
             const errorRoute = navbarRoute.getErrorRoute();
-            if(accessedRoutes.findIndex(item=>item.name==errorRoute.name)==-1) accessedRoutes.push(errorRoute);
-            console.log("errorRoute.children[0].path:",errorRoute.children[0].path);
+            if (accessedRoutes.findIndex(item => item.name == errorRoute.name) == -1) accessedRoutes.push(errorRoute);
+            console.log("errorRoute.children[0].path:", errorRoute.children[0].path);
             errorRoute.redirect = errorRoute.children[0].path;
           }
 
@@ -510,8 +516,8 @@ const user = {
           errorRoute.redirect = errorRoute.children[0].path;
         }
 
-        
-        
+
+
         commit('SET_ROUTES', accessedRoutes);
         commit('SET_Available_Path_List', navbarRoute.getAvailablePath());
         if (user.state.authorities.length >= 6) {
@@ -521,13 +527,13 @@ const user = {
         resolve(accessedRoutes);
       });
     },
-    GetIsMysteryMode({ commit }){
+    GetIsMysteryMode({ commit }) {
       console.log("GetIsMysteryMode");
       return new Promise((resolve, reject) => {
-        isMysteryMode().then(res=>{
-          console.log("GetIsMysteryMode:",res);
-          if(res.errCode==0){
-            commit('SET_ISMYSTERY',res.data.isMysteryModeOn);
+        isMysteryMode().then(res => {
+          console.log("GetIsMysteryMode:", res);
+          if (res.errCode == 0) {
+            commit('SET_ISMYSTERY', res.data.isMysteryModeOn);
           }
         });
         resolve(res.data.isMysteryModeOn);

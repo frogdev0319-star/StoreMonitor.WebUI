@@ -141,7 +141,10 @@ export default {
     "Send": "發送推播",
     "SendingRecord": "發送紀錄",
     "downloadManagement": "下載管理",
-    "createInspect": "建立巡檢表"
+    "createInspect": "建立巡檢表",
+    "epaperManagement": "電子紙管理",
+    "signinRecord": "簽到紀錄",
+
   },
   "overview": {
     "DangerousLess": "立即督導＜60%",
