@@ -10,7 +10,7 @@
           <div class="last-row" >
 
             <!-- 總評類型 -->
-            <div class="">
+            <!-- <div class="">
             <span style="margin-right: 16px; font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.resultType') }}</span>
             <el-select
               v-model="curAppraise"
@@ -25,31 +25,13 @@
                 :label="item.label"
                 :value="item.status"/>
             </el-select>
-            </div>
+            </div> -->
 
 
             <!-- 巡檢表 -->
-            <div class="flex-center">
+            <!-- <div class="flex-center">
               <span style="margin-right: 16px;font-size:calc(15/1920*100vw);">{{$t('reportAndEvents.inceptionTag')}}</span>
               <div class="flex-center report-type-area">
-
-              <!-- // ==== 2024 sprint1 遠端巡檢關閉 ==== -->
-              <!-- <el-select
-                v-model="curReportType"
-                class="el-province"
-                :placeholder="$t('remotePatrol.all')"
-                size="mini"
-                style="margin-right:0px;border:none;"
-                @change="getInspectList"
-              >
-                <el-option
-                  v-for="item in reportTypeList"
-                  :key="item.mode"
-                  :label="item.label"
-                  :value="item.mode"/>
-              </el-select> -->
-
-              <!-- <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" /> -->
                 <el-select
                   class="el-province"
                   style="width: 100% ; margin-left:0px;border:none;border-radius:0px;"
@@ -63,7 +45,8 @@
                   :value="item.id"/>
               </el-select>
               </div>
-            </div>
+            </div> -->
+
           </div>
         </template>
       </store-filter>
@@ -77,10 +60,32 @@
             @change="dateChange"
             :dateTimeValue = dateValue />
           <div class="flex-center fullWidth" style="margin-left: 20px">
-            <div class="search-content flex-center" style="margin-right: 20px">
+
+            <!-- 關鍵字 -->
+            <!-- <div class="search-content flex-center" style="margin-right: 20px">
               <div class="search-label">{{ $t('remotePatrol.keywords') }}</div>
               <el-input v-model="searchInput" size="mini" class="search-input shadow-light" style="margin-left: 16px;" clearable/>
+            </div> -->
+
+            <!-- 職務 -->
+            <div class="search-content flex-center" style="margin-right: 20px">
+              <div class="search-label">職務</div>
+
+              <el-select
+                v-model="curAppraise"
+                :placeholder="$t('remotePatrol.all')"
+                size="mini"
+                style="width: 50%;"
+                class="el-province "
+              >
+                <el-option
+                v-for="item in appraiseList"
+                  :key="item.status"
+                  :label="item.label"
+                  :value="item.status"/>
+              </el-select>
             </div>
+
             <div class="spacer"></div>
             <el-button
               class="storevue-button-search"
@@ -103,7 +108,6 @@
           class="card-content self-loading ">
 
           <!-- 報告列表 -->
-          <!-- @row-click = "clickReport" -->
           <div class="list-table for_pre">
             <table-only
               ref="elTP"
@@ -119,7 +123,6 @@
               :tableHeight = "760"
               :cellStyle="{backgroundColor: '#fff !important'}"
               @sortChange="sortChange"
-
             />
           </div>
 
@@ -134,7 +137,7 @@
         </div>
 
         <div class="el-pat" v-if="reportTableData.length > 0">
-          <div class="pageSizeTitle" style="color: #666"> {{ $t('remotePatrol.totalOf') }} <b style="font-size: 16px"> {{totalElements}} </b> {{ $t('remotePatrol.numReports') }}</div>
+          <div class="pageSizeTitle" style="color: #666"> 共有 <b style="font-size: 16px"> {{totalElements}} </b> {{ $t('remotePatrol.numReports') }}</div>
           <tbl-pagination-only
             :btn-style="{backgroundColor:'transparent'}"
             :total="total"
@@ -147,72 +150,8 @@
         </div>
       </div>
     </div>
-    <dialog-pop
-      :title="this.$t('deleteReport.confirmDelete')"
-      :append-to-body="true"
-      :close-on-click-modal="false"
-      :show-close="false"
-      :visible="showUpdateEvent"
-      :isWarning="true"
-      :showButton=" false"
-    >
-      <div class="dialog-slot">
-        <div class="dialog-content">
-          <div class="comfirm_delete_report" >
-            <h3>{{ $t('deleteReport.confirmDelete') }} </h3>
-            <p>
-              {{ $t('deleteReport.notice_1') }}
-              <b>{{ $t('deleteReport.notice_2') }}</b>。
-              {{ $t('deleteReport.notice_3') }}
-            </p>
-          </div>
-
-          <div class="l_row" >
-            <el-checkbox  class="storevue-checkbox-filled" v-model="agreeDelete" @change="addNum">
-              <span style="color: red">*</span> {{ $t('deleteReport.agreeDelete') }}
-            </el-checkbox>
-          </div>
-
-          <div class="l_row">
-            <div style="margin-bottom: 5px ;">
-              <span style="color: red; ">*</span> {{ $t('deleteReport.deleteReason') }}
-            </div>
-            <el-input
-              v-model="deleteReason"
-              type="textarea"
-              ref="delay_day"
-              placeholder=""
-              class="input-name_short"
-              @input="addNum"
-              />
-          </div>
-
-          <div class="l_row">
-            <div style="margin-bottom: 5px ;">
-              <span style="color: red; ">*</span> {{ $t('deleteReport.insertPassword') }}
-            </div>
-            <el-input
-              v-model="passWord"
-              show-password
-              ref="delay_day"
-              placeholder=""
-              class="input-name_short"
-              @input="addNum"
-              />
-          </div>
-          <div class="delete_btn_row">
-            <el-button class="cancel-btn" size="mini" @click="cancelUpdate">
-              {{ $t('remotePatrol.cancel') }}
-            </el-button>
-            <el-button :disabled="!canDeleteReport" class="confirm-btn" size="mini" type="primary" @click="confirmUpdate">
-              {{ $t('remotePatrol.confirm') }}
-            </el-button>
-        </div>
 
 
-        </div>
-      </div>
-    </dialog-pop>
   </div>
 </template>
 <script>
@@ -255,7 +194,6 @@ export default {
       varyWindowWidth: window.innerWidth,
       varyWindowHeight: window.innerHeight,
       searchContent: false,
-      showUpdateEvent: false,
 
       agreeDelete: false,
       deleteReason: '',
@@ -507,22 +445,8 @@ export default {
       this.changeNum += 1
       console.log('this.changeNum :>> ', this.changeNum);
     },
-    handleEmitOperation(val){
-      console.log('val' , val)
-      switch (val.method) {
-        case  'doc':
-          this.handleEventDoc(val)
-          break;
 
-        case'edit':
-          this.showUpdateEvent = true
-          this.deleteReportId = val.row.id
-          break;
 
-        default:
-          break;
-      }
-    },
 
     handleEventDoc(val){
       console.log('val :>> ', val);
@@ -534,40 +458,10 @@ export default {
       this.$router.push({ name: 'needDeleteReport', params: { data: reportObj }});
     },
 
-    cancelUpdate(){
-      this.showUpdateEvent = false
-      this.agreeDelete = false
-      this.deleteReason = ''
-      this.passWord = ''
-    },
 
 
-    confirmUpdate(){
-      console.log('this.deleteReportId :>> ', this.deleteReportId);
-      var EncryptPassword = Encrypt(this.passWord)
 
-      var delParams = {
-        reportId: this.deleteReportId,
-        reason: this.deleteReason,
-        password: EncryptPassword
-      }
-      // console.log('delParams ~~~~~~~>> ', delParams);
 
-      deleteReport(delParams).then(res=>{
-        console.log('res :>> ', res);
-        if(res.errCode){
-          util.notify('密碼錯誤，請重新輸入！', 'error', 3000);
-        } else {
-          this.showUpdateEvent = false
-          this.agreeDelete = false
-          this.deleteReason = ''
-          this.passWord = ''
-          this.searchData()
-        }
-      }).catch(err => {
-        console.log('err :>> ', err.errCode);
-      })
-    },
 
     getReportList(p) {
       console.log("1.Get Report List")
