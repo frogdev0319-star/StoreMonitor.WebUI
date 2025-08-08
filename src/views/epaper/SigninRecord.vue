@@ -84,6 +84,12 @@
                   :label="item.label"
                   :value="item.status"/>
               </el-select>
+                <el-switch
+                  v-model="jobSwitch"
+                  active-text="超時"
+                  inactive-text="全部"
+                  style="margin-left: 20px;"
+                />
             </div>
 
             <div class="spacer"></div>
@@ -311,6 +317,7 @@ export default {
         { 'status': 1, 'label': this.$t('remotePatrol.improve') }, //fair
         { 'status': 2, 'label': this.$t('overview.echartGood') } //good
       ],
+       jobSwitch: false,
       storeStr: '',
 
 
