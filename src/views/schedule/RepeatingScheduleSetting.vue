@@ -666,12 +666,12 @@ export default{
 
       console.log('param for save =======>> ', param)
 
-      // scheduleRESTful.addWeeklyTask(param).then(res =>{
-      //   if(res.errCode === 0){
-      //     util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
-      //     this.$router.push({name: 'RepeatingSchedule'});
-      //   }
-      // })
+      scheduleRESTful.addWeeklyTask(param).then(res =>{
+        if(res.errCode === 0){
+          util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
+          this.$router.push({name: 'RepeatingSchedule'});
+        }
+      })
 
       this.isLoadingData = false
 
