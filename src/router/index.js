@@ -598,8 +598,27 @@ export const navbarRoute = {
           requireAuth: true
         },
         isReadOnly: false
-      }
-    ) && primaryPathesList.push('/scheduleHistory');
+      },
+      {
+        path: '/repeatingSchedule',
+        name: 'RepeatingSchedule',
+        component: resolve => require(['@/views/schedule/RepeatingSchedule'], resolve),
+        meta: {
+          requireAuth: true,
+          keepAlive: true
+        },
+        isReadOnly: false
+      },
+      {
+        path: '/repeatingScheduleSetting',
+        name: 'RepeatingScheduleSetting',
+        hidden: true,
+        meta: {
+          keepAlive: false
+        },
+        component: resolve => require(['@/views/schedule/RepeatingScheduleSetting'], resolve),
+      },
+    ) && primaryPathesList.push('/scheduleHistory', '/repeatingSchedule', '/repeatingScheduleSetting');
     return schduleRoute;
   },
 
@@ -850,6 +869,7 @@ export const navbarRoute = {
         },
         isReadOnly: false
       },
+
 
     ) && primaryPathesList.push('/signinrecord');
     return patrolRoute;

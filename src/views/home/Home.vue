@@ -541,6 +541,10 @@ export default {
         { curPath: ["/scheduleDetailCreate"], activePath: "/scheduleSetting" },
         { curPath: ["/scheduleDetailModify"], activePath: "/scheduleSetting" },
 
+        // 重複排程
+        { curPath: ["/repeatingScheduleSetting"], activePath: "/repeatingSchedule" },
+
+
         { curPath: ["/waterMark"], activePath: "/waterMark" },
         { curPath: ["/dataSecurity"], activePath: "/dataSecurity" },
         { curPath: ["/send"], activePath: "/send" },
@@ -1042,6 +1046,12 @@ export default {
         {
           paths:["/scheduleDetailModify"],
           parentBread: { path: "/personalSchedule", name: "schedulePersonalModify" },
+        },
+
+        // 重複排程
+        {
+          paths:["/repeatingScheduleSetting"],
+          parentBread: { path: "/repeatingSchedule", name: "RepeatingSchedule" },
         },
 
         // 報告與事件

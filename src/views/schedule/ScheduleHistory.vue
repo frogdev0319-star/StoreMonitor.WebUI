@@ -1,9 +1,9 @@
 <template>
     <div class="ScheduleContainer">
       <div class="search-bar">
-          <date-time-selector 
-            class="time-selector" 
-            :dateRangeTitle="$t('schedule.schStartDate')" 
+          <date-time-selector
+            class="time-selector"
+            :dateRangeTitle="$t('schedule.schStartDate')"
             @change="dateChange"
             />
           <div class='status-area'>
@@ -76,12 +76,12 @@
             :allowRowExpand = "false"
             :showBorder = "false"
             :default-sort = "defaultSort"
-            :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+            :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}"
             :tableHeight = "760"
             :cellStyle="{backgroundColor: '#fff !important'}"
-            @onCellClick="onCellClick"  
-            @sortChange="handleSortChange"    
-            @selection-change="handleSelectionChange"                            
+            @onCellClick="onCellClick"
+            @sortChange="handleSortChange"
+            @selection-change="handleSelectionChange"
         />
         <div style="width:100%; margin-top:12px;height:31px;">
             <tbl-pagination-only
@@ -314,7 +314,7 @@ export default{
         const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
         self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
         self.dateValue[1] = self.dateValue[1];
-        if(this.firstLoad){ 
+        if(this.firstLoad){
             this.doSearchScheduleHis();
             this.firstLoad = false;
         }
@@ -343,7 +343,7 @@ export default{
       var month = this.pad2(date.getMonth()+1);
       var day = this.pad2(date.getDate());
       var year= date.getFullYear();
-      return year + "-"+ month +"-"+ day 
+      return year + "-"+ month +"-"+ day
     },
 
     getAll_Date(t){
@@ -364,7 +364,7 @@ export default{
       var hour = this.pad2(date.getHours())
       var min = this.pad2(date.getMinutes())
       var sec = this.pad2(date.getSeconds())
-      return year + month + day 
+      return year + month + day
     },
     getOnly_Date(t){
       var date = new Date(t);
@@ -374,15 +374,15 @@ export default{
       var hour = this.pad2(date.getHours())
       var min = this.pad2(date.getMinutes())
       var sec = this.pad2(date.getSeconds())
-      return  month + day 
+      return  month + day
     },
-    
+
 
     searchKeyWords(){
       this.curPage = 1;
       this.doSearchScheduleHis()
     },
-  
+
     doSearchScheduleHis(){
       this.isLoadingData = true
       const self = this;
@@ -391,12 +391,12 @@ export default{
         // direction: 'desc',
         // property: self.defaultSort.prop
         property: "remindTs"
-        
+
       };
 
       if(self.defaultSort.prop=="remindTimeStr") order.property = "remindTs";
       else if(self.defaultSort.prop=="reportTsStr") order.property = "reportTs";
-      
+
       console.log('order :>> ', order);
 
       let beginTs = self.$moment.utc(self.$moment(self.dateValue[0])).valueOf();
@@ -409,7 +409,7 @@ export default{
 
       console.log('gmt_beginTs :>> ', gmt_beginTs);
       console.log('gmt_endTs :>> ', gmt_endTs);
-      
+
       const params={
         status: -1,
         beginTs: gmt_beginTs,
@@ -427,7 +427,7 @@ export default{
         // if(self.totalElements < self.curSizeNum){
         //   params.filter.page = 0
         //   this.curPage = 1
-        // } 
+        // }
       }
 
       if(this.inputSearchValue.trim()!=""){
@@ -452,8 +452,8 @@ export default{
             // obj['remindTimeStr']=(item.remindTime==0) ?' -' : this.getdateOnlyDate(item.remindTime)
             // obj['reportTsStr']=(item.reportTs==0) ?'-' : self.$moment.utc(self.$moment(item.reportTs)).format("YYYY/MM/DD hh:mm:ss");//util.getDateStr(item.taskFinal),
             obj['reportTsStr'] = (item.reportTs==0) ? '--' : this.getdate(item.reportTs),
-            
-            
+
+
             obj['submitterName']=(item.submitterName == "NONE") ? '--':item.submitterName;
             obj['status'] = item.isDelete ? '2': (item.isExecute ? 0:1);
             if(item.isProcessing){//簽核中
@@ -466,7 +466,7 @@ export default{
               if(item.reportId==-1){
                 obj['porcessMode'] = {
                   isCellClick: false,
-                  value: this.$t('schedule.NA'), 
+                  value: this.$t('schedule.NA'),
                   html:`<span style="font-size:calc(15/1920*100vw);">`+this.$t('schedule.NA')+`</span>`};
               }
               else if(item.reportId==-9999){
@@ -501,12 +501,12 @@ export default{
           // if(self.totalElements < this.curSizeNum){
           //   this.curPage = self.total - 1
           // }
-          
+
           self.isLoadingData = false;
         }else{
           util.notify(self.$t('schedule.getScheduleSettingFail'), 'error', 3000);
         }
-    
+
       })
 
     },
@@ -529,11 +529,11 @@ export default{
 
     handleSortChange(order, defaultSort) {
       console.log('order ~~~~~>> ', order);
-      
+
       this.defaultSort = { ...defaultSort };
       this.isLoadingData = true
-      // this.defaultSort = { 
-      //   prop: 'remindTimeStr', 
+      // this.defaultSort = {
+      //   prop: 'remindTimeStr',
       //   order: 'ascending'
       // },
       console.log('this.defaultSort :>> ', this.defaultSort);
@@ -657,17 +657,17 @@ export default{
           util.notify("表格資料為空！請重新搜尋條件", 'warning', 3 * 1000);
           return false;
         }
-        
+
         this.showExportMassage = true
         exportScheduleRecord(params).then(res=>{
           console.log('res :>> ', res);
         })
-        
+
         // require.ensure([], async() => {
         //   const { export_json_to_excel } = require('@/excel/Export2Excel');
         //   export_json_to_excel(tHeader, exportData, fileName);
         // });
-        
+
       }else{
         this.showExportExcelWarning = true;
       }
@@ -703,7 +703,7 @@ export default{
         var nowTs = this.getAll_Date(now)
         var tsbegin = this.get_Date(beginTs)
         var tsEnd = this.getOnly_Date(endTs)
-        
+
       const params={
         status:this.curSchStatus,
         beginTs,
@@ -790,13 +790,13 @@ export default{
   //   max-height: fit-content !important
 
   .tbl-schedule
-    .el-table__header-wrapper 
+    .el-table__header-wrapper
       overflow: visible !important
     .el-table__body-wrapper
       max-height: none !important
       // overflow: visible !important
-      
-  .ScheduleContainer 
+
+  .ScheduleContainer
     .el-table
       max-height: none !important
       padding: 0
@@ -809,7 +809,7 @@ export default{
 .tbl-style-white{
   padding: 0 0 !important
 }
-  
+
 .ScheduleContainer{
     width:100%;
 
@@ -881,12 +881,12 @@ export default{
             border: none;
             margin-top: 40px;
             /deep/ .el-table__header-wrapper .el-table-column--selection{
-                padding-left: 0px !important;
+                // padding-left: 0px !important;
                 font-size: 14px !important;
             }
             /deep/.el-table__header-wrapper
             .el-table-column--selection
-            .el-checkbox__inner 
+            .el-checkbox__inner
             {
                 border-radius: 1px;
                 border: none;
@@ -951,7 +951,7 @@ export default{
         width: 100% !important;
         // max-height: fit-content !important;
     }
-  
+
     /deep/
       .el-table th .cell{
       padding-left: 0px !important;
@@ -964,7 +964,7 @@ export default{
     .el-table
     .el-table__body-wrapper
     .el-table-column--selection
-    .el-checkbox__inner 
+    .el-checkbox__inner
     {
       border-radius: 1px;
       border: solid 1px #acaeb1;
@@ -975,7 +975,7 @@ export default{
     .el-table__body-wrapper
     .el-table-column--selection
     .is-checked
-    .el-checkbox__inner 
+    .el-checkbox__inner
     {
       /*border-radius: 1px;
       border: solid 1px #2c90d9;

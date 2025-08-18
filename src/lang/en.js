@@ -140,6 +140,9 @@ export default {
     "createInspect": "create Inspection",
     "epaperManagement": "Epaper Management",
     "signinRecord": "Sign-in record",
+    "RepeatingSchedule": "Repeating Schedule",
+    "RepeatingScheduleSetting": "Repeating Schedule Setting",
+
 
   },
   "overview": {

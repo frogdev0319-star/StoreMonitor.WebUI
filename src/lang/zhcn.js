@@ -140,6 +140,9 @@ export default {
     "createInspect": "建立巡檢表",
     "epaperManagement": "電子紙管理",
     "signinRecord": "簽到紀錄",
+    "RepeatingSchedule": "重複排程",
+    "RepeatingScheduleSetting": "重複排程設定",
+
   },
   "overview": {
     "DangerousLess": "立即督导＜60%",

@@ -144,6 +144,9 @@ export default {
     "createInspect": "建立巡檢表",
     "epaperManagement": "電子紙管理",
     "signinRecord": "簽到紀錄",
+    "RepeatingSchedule": "重複排程列表",
+    "RepeatingScheduleSetting": "重複排程設定",
+
 
   },
   "overview": {
@@ -1834,7 +1837,9 @@ export default {
     "event": "事件:",
     "eventTime": "事件時間:",
     "ChangeToUnprocessed": "變更為未處理",
-  }
+  },
+
+
 
 }
 
