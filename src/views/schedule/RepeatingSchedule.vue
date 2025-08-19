@@ -307,11 +307,11 @@ export default{
     methods:{
       async init(){
         //存在sessionStorage，refresh時才會留著
-        const data = sessionStorage.getItem('PersonalSchedule')
-        this.personSchedule = JSON.parse(data)
+        // const data = sessionStorage.getItem('PersonalSchedule')
+        // this.personSchedule = JSON.parse(data)
 
-        this.userId = (Object.getOwnPropertyNames(this.$route.params).length>0)?this.$route.params.userId:this.personSchedule.userId;
-        this.person = (Object.getOwnPropertyNames(this.$route.params).length>0)?this.$route.params.nickName:this.personSchedule.userName;
+        // this.userId = (Object.getOwnPropertyNames(this.$route.params).length>0)?this.$route.params.userId:this.personSchedule.userId;
+        // this.person = (Object.getOwnPropertyNames(this.$route.params).length>0)?this.$route.params.nickName:this.personSchedule.userName;
 
         await this.getBriefStoreList();
         await this.getUserInfo();
