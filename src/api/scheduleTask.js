@@ -80,8 +80,8 @@ export const getWhiteList = data => {
 
 export const getWeeklyTask = data => {
   return request({
-    url: `${version}/weeklytask`,
-    method: 'get',
+    url: `${version}/weeklytask/query`,
+    method: 'post',
     data
   });
 };
@@ -96,3 +96,19 @@ export const addWeeklyTask = data => {
 };
 
 
+export const editWeeklyTask = data => {
+  return request({
+    url: `${version}/weeklytask/${data.id}`,
+    method: 'put',
+    data
+  });
+};
+
+
+export const deleteWeeklyTask = data => {
+  return request({
+    url: `${version}/weeklytask/delete`,
+    method: 'delete',
+    data
+  });
+};

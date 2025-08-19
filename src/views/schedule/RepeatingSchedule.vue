@@ -2,19 +2,71 @@
     <div class="ScheduleContainer">
 
         <div class="search-bar">
-            <DateTimeSelectorSchedule
-                class="time-selector"
-                :dateRangeTitle="$t('overview.date')"
-                @change="dateChange"
-            />
             <div class='keyword-area'>
-                <div class="search-label">{{$t('remotePatrol.keywords')}}</div>
-                <el-input
-                    v-model="inputSearchValue"
-                    size="medium"
-                    class="search-input shadow-light"
-                    clearable/>
+                <div class="search-label" >時間 </div>
+                <el-time-picker
+                  v-model="taskTime"
+                  format="HH:mm"
+                  value-format="HH:mm"
+                  placeholder="設定巡檢時間"
+                />
             </div>
+
+            <div class='keyword-area'>
+                <div class="search-label" >地點</div>
+                <el-select
+                  v-model="selectStore"
+                  placeholder="巡檢地點"
+                  clearable = "true"
+                  style="width: 250px"
+                  >
+                  <el-option
+                    v-for="(item, index) in storeList"
+                    :key="item.storeId"
+                    :label="item.name"
+                    :value="item.storeId"
+                  />
+                </el-select>
+            </div>
+
+            <div class='keyword-area'>
+                <div class="search-label" >執行人</div>
+                <el-select
+                  v-model="selectUser"
+                  placeholder="執行人員"
+                  clearable = "true"
+                  style="width: 250px"
+                  >
+                  <el-option
+                    v-for="(item, index) in userInfo"
+                    :key="item.userId"
+                    :label="item.userName"
+                    :value="item.userId"
+                  />
+                </el-select>
+            </div>
+
+            <div class='keyword-area'>
+                <div class="search-label" >重複排程 </div>
+                <el-select
+                  v-model="repeatCycle"
+                  :placeholder="$t('schedule.remiderMethod')"
+                  multiple
+                  filterable
+                  clearable = "true"
+                  style="width:300px"
+                  >
+                  <el-option
+                    v-for="(_item, index) in selectRemiderStyle"
+                    :key="index"
+                    :label="_item.label"
+                    :value="_item.value"
+                  />
+                </el-select>
+            </div>
+
+
+
             <div style="flex:2"></div>
             <delay-button
                 class="search-button"
@@ -24,6 +76,9 @@
                 <span>{{ $t('remotePatrol.search') }}</span>
             </delay-button>
         </div>
+
+
+
         <div class="scheduleLlist-area">
             <div class="buttons">
                 <delay-button
@@ -55,7 +110,6 @@
                 :table-operation ="columnOperationData"
 
                 :highlight-current-row= "false"
-
                 v-loading="isLoadingData"
 
                 :allowRowExpand = "false"
@@ -118,12 +172,12 @@ export default{
     },
     data(){
         return {
-        firstLoad:true,
-        userId:'',
-        person:'',
-        inputSearchValue:'',
-        dateValue:[],
-        columnData:[
+          firstLoad:true,
+          userId:'',
+          person:'',
+          inputSearchValue:'',
+          dateValue:[],
+          columnData:[
           {
               'prop': 'name',
               'label': '排程名稱',
@@ -207,9 +261,42 @@ export default{
 
         storeList:[],
         userInfo:[],
+        selectStore: null,
+        selectUser: null,
         allInspectTypeList: [],
-
-        }
+        selectRemiderStyle:[
+          {
+            value: 1,
+            label: '星期一'
+          },
+          {
+            value: 2,
+            label: '星期二'
+          },
+          {
+            value: 3,
+            label: '星期三'
+          },
+          {
+            value: 4,
+            label: '星期四'
+          },
+          {
+            value: 5,
+            label: '星期五'
+          },
+          {
+            value: 6,
+            label: '星期六'
+          },
+          {
+            value: 7,
+            label: '星期日'
+          },
+        ],
+        taskTime: null,
+        repeatCycle: [],
+      }
     },
     computed: {
         ...mapGetters({ accountChanged: 'accountChanged' })
@@ -219,13 +306,17 @@ export default{
     },
     methods:{
       async init(){
-
         //存在sessionStorage，refresh時才會留著
         const data = sessionStorage.getItem('PersonalSchedule')
         this.personSchedule = JSON.parse(data)
 
         this.userId = (Object.getOwnPropertyNames(this.$route.params).length>0)?this.$route.params.userId:this.personSchedule.userId;
         this.person = (Object.getOwnPropertyNames(this.$route.params).length>0)?this.$route.params.nickName:this.personSchedule.userName;
+
+        await this.getBriefStoreList();
+        await this.getUserInfo();
+        await this.getTagAll();
+        await this.doSearchScheduleList();
       },
 
 
@@ -263,24 +354,18 @@ export default{
             reject(err);
           });
         });
-    },
+      },
 
+        // async dateChange(val) {
+        //     console.log('dateChange :>> ');
+        //     // const self = this;
+        //     // const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
+        //     // const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
+        //     // self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
+        //     // self.dateValue[1] = self.dateValue[1];
+        //     // self.inputSearchValue = '';
+        // },
 
-        async dateChange(val) {
-            const self = this;
-            const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
-            const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
-            self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
-            self.dateValue[1] = self.dateValue[1];
-            // self.inputSearchValue = '';
-            if(this.firstLoad){
-                await this.getBriefStoreList();
-                await this.getUserInfo();
-                await this.getTagAll();
-                await this.doSearchScheduleList();
-                this.firstLoad = false;
-            }
-        },
         pad2(n){
             return (n < 10 ? '0' : '') + n;
             },
@@ -307,36 +392,14 @@ export default{
         doSearchScheduleList(){
             const self = this;
             self.isLoadingData = true;
-
-            // let beginTs = self.$moment.utc(self.$moment(self.dateValue[0])).valueOf();
-            // let endTs = self.$moment.utc(self.$moment(self.dateValue[1])).valueOf();
-            // var ts = this.getdate(beginTs) + " " + "GMT+00:00"
-            // var te = this.getdate(endTs) + " " + "GMT+00:00"
-            // var gmt_beginTs = new Date(ts).getTime()
-            // var gmt_endTs= new Date(te).getTime()
-            // const params={
-            //     userId:self.userId,
-            //     beginTs: gmt_beginTs,
-            //     endTs: gmt_endTs,
-            //     filter:{
-            //         page:this.curPage-1,
-            //         size:this.curSizeNum
-            //     },
-            //     order:{
-            //         direction:this.defaultSort.order=='ascending'? 'asc':'desc',
-            //         property:this.defaultSort.prop=="taskStartStr"?"taskStart":(this.defaultSort.prop=="taskFinalStr"?"taskFinal":this.defaultSort.prop),
-            //     },
-            // }
-            // if(self.inputSearchValue.trim()!=""){
-            //     params["keyword"] = self.inputSearchValue;
-            // }
-
             const params = {
-                  "storeId": "cTBbHsGhgkt4",
-                  "userId": "AsmGhMVnSxDa",
-                  "inspectTagId": 0,
-                  "name": ""
-                }
+                storeId: this.selectStore,
+                userId: this.selectUser,
+                weekDays: this.repeatCycle,
+                // "inspectTagId": 0,
+                // "name": "RD",
+
+              }
 
             scheduleRESTful.getWeeklyTask(params).then(res=>{
                 var userData = [];
@@ -424,7 +487,18 @@ export default{
 
         // 確認刪除
         onConfirmDeleteSch(){
-            console.log("SelSchedulId:",this.SelSchedulId);
+
+            this.isLoadingData = true;
+            const param = this.SelSchedulId
+            scheduleRESTful.deleteWeeklyTask(param).then(res =>{
+              if(res.errCode === 0){
+                util.notify("重複排程刪除成功", 'success', 3000);
+                this.showConfirmDelete = false
+                this.isLoadingData = false;
+                this.doSearchScheduleList()
+
+              }
+            })
             // this.showConfirmDelete = false;
             // let params = {
             //     taskGroupUuidArray: this.SelSchedulId,

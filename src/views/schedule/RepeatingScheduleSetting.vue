@@ -147,19 +147,19 @@
             <div class="title-name"><span style="color: #c60957">* </span> 重複週期</div>
             <div class="title-status">
               <el-select
-                    v-model="repeatCycle"
-                    :placeholder="$t('schedule.remiderMethod')"
-                    multiple
-                    filterable
-                    style="width:300px"
-                    >
-                    <el-option
-                      v-for="(_item, index) in selectRemiderStyle"
-                      :key="index"
-                      :label="_item.label"
-                      :value="_item.value"
-                    />
-                  </el-select>
+                v-model="repeatCycle"
+                :placeholder="$t('schedule.remiderMethod')"
+                multiple
+                filterable
+                style="width:300px"
+                >
+                <el-option
+                  v-for="(_item, index) in selectRemiderStyle"
+                  :key="index"
+                  :label="_item.label"
+                  :value="_item.value"
+                />
+              </el-select>
             </div>
             <!-- <div class="notice">{{$t('schedule.pleaseFinished')}} !</div> -->
           </div>
@@ -639,40 +639,58 @@ export default{
       //   return
       // }
 
-      this.taskTime
       const [HH, MM] = this.taskTime.split(':').map(Number);
-
       //建今天的日期物件
       const date = new Date();
       date.setHours(HH, MM, 0, 0);
       date.setMinutes(date.getMinutes() + 20);
       const newTime = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-
       const [endTimeHH, endTimeMM] = newTime.split(':').map(Number);
 
-
-      var param =  {
-        storeId: this.selectStore,
-        userId: this.selectUser,
-        inspectTagId: this.inspectionName,
-        name: this.taskName,
-        remindBeforeMinutes: this.remindTime,
-        weekDays: this.repeatCycle,
-        startTimeHH: HH,
-        startTimeMM: MM,
-        endTimeHH: endTimeHH,
-        endTimeMM: endTimeMM
-      }
-
-      console.log('param for save =======>> ', param)
-
-      scheduleRESTful.addWeeklyTask(param).then(res =>{
-        if(res.errCode === 0){
-          util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
-          this.$router.push({name: 'RepeatingSchedule'});
+      if(this.hasScheduleData == true){
+        console.log('XXXDDD :>> ');
+        // 編輯重複排程
+        var param =  {
+          id: this.scheduleStatus.id,
+          storeId: this.selectStore,
+          userId: this.selectUser,
+          inspectTagId: this.inspectionName,
+          name: this.taskName,
+          remindBeforeMinutes: this.remindTime,
+          weekDays: this.repeatCycle,
+          startTimeHH: HH,
+          startTimeMM: MM,
+          endTimeHH: endTimeHH,
+          endTimeMM: endTimeMM
         }
-      })
-
+        scheduleRESTful.editWeeklyTask(param).then(res =>{
+          if(res.errCode === 0){
+            util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
+            this.$router.push({name: 'RepeatingSchedule' , query: { refresh: Date.now()}});
+          }
+        })
+      }
+      else {
+        // 新建重複排程
+        var param =  {
+          storeId: this.selectStore,
+          userId: this.selectUser,
+          inspectTagId: this.inspectionName,
+          name: this.taskName,
+          remindBeforeMinutes: this.remindTime,
+          weekDays: this.repeatCycle,
+          startTimeHH: HH,
+          startTimeMM: MM,
+          endTimeHH: endTimeHH,
+          endTimeMM: endTimeMM
+        }
+        scheduleRESTful.addWeeklyTask(param).then(res =>{
+          if(res.errCode === 0){
+            util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
+            this.$router.push({name: 'RepeatingSchedule'});
+          }
+        })
+      }
       this.isLoadingData = false
 
     },
@@ -820,9 +838,6 @@ export default{
       this.curTempCityList = []
       this.hasScheduleData = true
     },
-
-
-
 
 
 

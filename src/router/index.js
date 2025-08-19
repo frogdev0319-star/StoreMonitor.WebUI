@@ -605,7 +605,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/schedule/RepeatingSchedule'], resolve),
         meta: {
           requireAuth: true,
-          keepAlive: true
+          keepAlive: false
         },
         isReadOnly: false
       },
