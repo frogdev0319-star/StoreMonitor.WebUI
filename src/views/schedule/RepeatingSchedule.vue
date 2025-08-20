@@ -3,12 +3,20 @@
 
         <div class="search-bar">
             <div class='keyword-area'>
-                <div class="search-label" >時間 </div>
+                <div class="search-label" >時間  {{ taskTime }}</div>
                 <el-time-picker
-                  v-model="taskTime"
+                  v-model="startSearchTime"
+                  style="width: 150px;"
                   format="HH:mm"
                   value-format="HH:mm"
-                  placeholder="設定巡檢時間"
+                  placeholder="搜尋開始時間"
+                />
+                <el-time-picker
+                  v-model="endSearchTime"
+                  style="width: 150px;"
+                  format="HH:mm"
+                  value-format="HH:mm"
+                  placeholder="搜尋結束時間"
                 />
             </div>
 
@@ -17,7 +25,7 @@
                 <el-select
                   v-model="selectStore"
                   placeholder="巡檢地點"
-                  clearable = "true"
+                  :clearable = "true"
                   style="width: 250px"
                   >
                   <el-option
@@ -34,7 +42,7 @@
                 <el-select
                   v-model="selectUser"
                   placeholder="執行人員"
-                  clearable = "true"
+                  :clearable = "true"
                   style="width: 250px"
                   >
                   <el-option
@@ -53,8 +61,8 @@
                   :placeholder="$t('schedule.remiderMethod')"
                   multiple
                   filterable
-                  clearable = "true"
-                  style="width:300px"
+                  :clearable = "true"
+                  style="width:150px"
                   >
                   <el-option
                     v-for="(_item, index) in selectRemiderStyle"
@@ -296,10 +304,18 @@ export default{
         ],
         taskTime: null,
         repeatCycle: [],
+        startSearchTime: null,
+        endSearchTime: null,
       }
     },
     computed: {
         ...mapGetters({ accountChanged: 'accountChanged' })
+    },
+    watch:{
+      accountChanged(val) {
+        console.log('val :>> ', val);
+        val !== 0 && this.init();
+      },
     },
     created(){
         this.init();
@@ -392,12 +408,20 @@ export default{
         doSearchScheduleList(){
             const self = this;
             self.isLoadingData = true;
+
+
+            const [startHH, startMM] = this.startSearchTime  ? this.startSearchTime.split(':').map(Number) : ""
+            const [endHH, endMM] = this.endSearchTime ? this.endSearchTime.split(':').map(Number) : ""
             const params = {
                 storeId: this.selectStore,
                 userId: this.selectUser,
                 weekDays: this.repeatCycle,
+                startTimeHH: startHH,
+                startTimeMM: startMM,
+                endTimeHH: endHH,
+                endTimeMM: endMM
                 // "inspectTagId": 0,
-                // "name": "RD",
+                // "name": "",
 
               }
 
@@ -487,7 +511,6 @@ export default{
 
         // 確認刪除
         onConfirmDeleteSch(){
-
             this.isLoadingData = true;
             const param = this.SelSchedulId
             scheduleRESTful.deleteWeeklyTask(param).then(res =>{
@@ -522,20 +545,6 @@ export default{
             sessionStorage.setItem('repeatScheduleParams', JSON.stringify(row))
 
             this.$router.push({ name: 'RepeatingScheduleSetting', params: { userId: this.userId}});
-
-            // let copyParams = {
-            //     taskGroupUuid: row.taskGroupUuid,
-            //     userId: this.userId,
-            // }
-            // switch(method){
-            //     case 'set':{
-            //         this.$router.push({ name: 'RepeatingScheduleSetting', params: { userId: this.userId,userName:this.person,taskGroupUuid: row.taskGroupUuid }});
-            //         break;
-            //     }
-            //     default: {
-            //         break;
-            //     }
-            // }
         },
 
         handleSortChange(order, defaultSort) {

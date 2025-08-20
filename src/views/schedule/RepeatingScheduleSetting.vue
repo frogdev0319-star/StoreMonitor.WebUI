@@ -138,6 +138,7 @@
                     @change="onEventChanged"
                     class="input-name_short"
                     />
+                    分鐘前
             </div>
             <!-- <div class="notice">{{$t('schedule.pleaseFinished')}} !</div> -->
           </div>
@@ -648,7 +649,6 @@ export default{
       const [endTimeHH, endTimeMM] = newTime.split(':').map(Number);
 
       if(this.hasScheduleData == true){
-        console.log('XXXDDD :>> ');
         // 編輯重複排程
         var param =  {
           id: this.scheduleStatus.id,

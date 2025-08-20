@@ -156,8 +156,6 @@
         </div>
       </div>
     </div>
-
-
   </div>
 </template>
 <script>
@@ -317,7 +315,7 @@ export default {
         { 'status': 1, 'label': this.$t('remotePatrol.improve') }, //fair
         { 'status': 2, 'label': this.$t('overview.echartGood') } //good
       ],
-       jobSwitch: false,
+      jobSwitch: false,
       storeStr: '',
 
 
@@ -466,10 +464,6 @@ export default {
     },
 
 
-
-
-
-
     getReportList(p) {
       console.log("1.Get Report List")
       var params = {
@@ -523,7 +517,6 @@ export default {
             tableObj.province = item.province
             tableObj.city = item.city;
             tableObj.region = item.province + '/' + item.city;
-
             tableObj.storeName = item.storeName
             tableObj.code = item.code ? item.code : '--';
 
@@ -533,14 +526,15 @@ export default {
             tableObj.id = item.id;
             tableObj.datestr = util.getDateStr(item.ts);
             tableObj.signstr = item.check_in_ts == 0 || !item.check_in_ts ? '--' : util.getDateStr(item.check_in_ts);
+
             tableObj.submitterName = item.submitterName;
             tableObj.submitter = item.submitter;
-            tableObj.routeObj = item;
-            tableObj.mode = item.mode;
-            tableObj.totalScore = item.type === 1 ? "--" : item.totalScore;
+            // tableObj.routeObj = item;
+            // tableObj.mode = item.mode;
+            // tableObj.totalScore = item.type === 1 ? "--" : item.totalScore;
+            // tableObj.standard = item.standard;
+            // tableObj.standardMsg = util.setStandardMsg(tableObj.standard);
 
-            tableObj.standard = item.standard;
-            tableObj.standardMsg = util.setStandardMsg(tableObj.standard);
             tableObj.statusCode = item.status;
 
             let storeType = '';
@@ -556,14 +550,22 @@ export default {
                 tableObj.city = _item.city;
               }
             });
+
+
             const statusAndIconObj = self.getIconSrc(item.status);
-            tableObj.status = statusAndIconObj.status;
-            tableObj.iconSrc = statusAndIconObj.iconSrc;
+
+            tableObj.status = item.status;
+            // tableObj.iconSrc = statusAndIconObj.iconSrc;
             tempTable.push(tableObj);
           }
 
-          self.reportTableData = tempTable;
 
+
+
+
+
+          console.log('tempTable ---------------:>> ', tempTable);
+          self.reportTableData = tempTable;
 
           self.total = res.data.totalPages
           self.isLoading = false;
