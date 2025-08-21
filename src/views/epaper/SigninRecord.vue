@@ -52,13 +52,22 @@
       </store-filter>
     </div>
 
-    <div id="el-containter" class="flex-column spacer" style="margin-left:0px">
-      <div class="report-header">
+
+    <div class="report-header" style="margin: 20px 0;">
         <div class="flex-center" style="padding-top: 0;">
-          <date-time-selector
+          <div class="search-label" style=" margin-right: 38px;">時間範圍</div>
+          <el-date-picker
             class="time-selector"
-            @change="dateChange"
-            :dateTimeValue = dateValue />
+            v-model="dateValue"
+            style="width: 300px;"
+            type="daterange"
+            range-separator="to"
+            start-placeholder="開始日期"
+            end-placeholder="结束日期"
+            :clearable = "true"
+            :picker-options="pickerOptions"
+            />
+
           <div class="flex-center fullWidth" style="margin-left: 20px">
 
             <!-- 關鍵字 -->
@@ -69,27 +78,29 @@
 
             <!-- 職務 -->
             <div class="search-content flex-center" style="margin-right: 20px">
-              <div class="search-label">職務</div>
+              <div class="search-label">人員</div>
+                <el-select
+                  v-model="selectUser "
+                  placeholder="執行人員"
+                  clearable
+                  style="width: 250px; background: #FFF;"
+                  >
+                  <el-option
+                    v-for="(item, index) in userInfo"
+                    :key="item.userId"
+                    :label="item.userName"
+                    :value="item.userId"
+                  />
+                </el-select>
 
-              <el-select
-                v-model="curAppraise"
-                :placeholder="$t('remotePatrol.all')"
-                size="mini"
-                style="width: 50%;"
-                class="el-province "
-              >
-                <el-option
-                v-for="item in appraiseList"
-                  :key="item.status"
-                  :label="item.label"
-                  :value="item.status"/>
-              </el-select>
-                <el-switch
+
+
+                <!-- <el-switch
                   v-model="jobSwitch"
                   active-text="超時"
                   inactive-text="全部"
                   style="margin-left: 20px;"
-                />
+                /> -->
             </div>
 
             <div class="spacer"></div>
@@ -105,6 +116,9 @@
         </div>
         <!-- <selected-stores :store-str="storeStr"/> -->
       </div>
+
+    <div id="el-containter" class="flex-column spacer" style="margin-left:0px">
+
 
       <div class="report-content loading spacer paper">
         <div
@@ -178,6 +192,7 @@ import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DateTimeSelector from '@/components/DateTimeSelector';
 import SelectedStores from "@/components/SelectedStores";
 import TblPaginationOnly from '@/components/TblPaginationOnly';
+import {getAllUserInfoNoAuth} from '@/api/login';
 import { getInspectReportInfo} from '@/api/inspect';//為了取是否有設置評分
 import TableOnly from '@/components/TableOnly';
 import PermissionHelper from '@/api/PermissionHelper';
@@ -362,7 +377,20 @@ export default {
 
       inspectStatus:'',
       totalElements: 0,
-      changeNum: 0
+      changeNum: 0,
+      weekTimeRange: "",
+      userInfo:[],
+      selectUser : null,
+      pickerOptions: {
+        disabledDate(time) {
+          const today = new Date()
+          today.setHours(0, 0, 0, 0)                  // 清除時分秒
+          const weekAgo = new Date(today)
+          weekAgo.setDate(today.getDate() - 7)        // 一週前
+          return time.getTime() < weekAgo.getTime() ||
+                time.getTime() > today.getTime()
+          }
+      }
     };
   },
 
@@ -422,8 +450,11 @@ export default {
       self.isLoading = true;
       this.searchInput = '';
       self.storeStr = '';
-      self.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24,
-        new Date(this.$moment(new Date()).endOf('day'))];
+      // self.dateValue = [ new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24 * 6,
+      //   new Date(this.$moment(new Date()).endOf('day'))];
+
+
+
       self.reportList = [];
       self.curSortType = 0;
       self.storeName = '';
@@ -433,9 +464,12 @@ export default {
       self.curReportType = -1;
       await self.getSearchParams();
       await self.getInspectList();
+      await self.getUserInfo();
       await self.getInspectStatus();
-
     },
+
+
+
     cellStyle({ row, column, rowIndex, columnIndex }) {
       let obj = {};
       if (columnIndex === 0) {
@@ -478,7 +512,14 @@ export default {
       }
 
       const self = this;
-      params.endTs = params.endTs - params.endTs % 1000 + 999;
+
+      // params.endTs = params.endTs - params.endTs % 1000 + 999;
+      const date = new Date(params.endTs);
+      date.setHours(23, 59, 59, 999);
+      params.endTs = date.getTime();
+
+      params.submitter = this.selectUser == "" ?  null : this.selectUser
+
       if (params.clause.storeId.length === 0) {
         // console.log("No Data")
         // this.setNoData();
@@ -486,7 +527,7 @@ export default {
         params.clause.storeId.push(-1)
       }
 
-      console.log("***current user:",this.$store.getters.userId);
+      // console.log("***current user:",this.$store.getters.userId);
       if(PermissionHelper.enableMimicMode){
         params['submitter'] = this.$store.getters.userId;
       }else if(params.searchMysteryMode!=-1 && p.submitters && p.submitters!='-1' && p.submitters.length>0){
@@ -511,9 +552,16 @@ export default {
           const tempTable = [];
           self.isLoading = true;
 
-
           for(const item of data){
             const tableObj = {};
+
+            var ignoreCheckIn = item.isCheckInIgnore ? "略過簽到" : ""
+            var overTime = this.checkTimeout(item.ts, item.check_in_ts, 20) ? "超時" : ""
+            var slash = (this.checkTimeout(item.ts, item.check_in_ts, 20) && item.isCheckInIgnore) ? "/" : ""
+            tableObj.status = ignoreCheckIn + slash + overTime
+
+            tableObj.isCheckInIgnore = item.isCheckInIgnore
+
             tableObj.province = item.province
             tableObj.city = item.city;
             tableObj.region = item.province + '/' + item.city;
@@ -551,11 +599,6 @@ export default {
               }
             });
 
-
-            const statusAndIconObj = self.getIconSrc(item.status);
-
-            tableObj.status = item.status;
-            // tableObj.iconSrc = statusAndIconObj.iconSrc;
             tempTable.push(tableObj);
           }
 
@@ -575,6 +618,28 @@ export default {
           resolve(temp);
         }).catch(err => {
         });
+      });
+    },
+
+
+    checkTimeout(start_ts, end_ts, minutes = 20) {
+       // 計算毫秒差異
+        const diffMs = Math.abs(end_ts - start_ts);
+        // 換算成分鐘
+        const diffMinutes = diffMs / (60 * 1000);
+        // 設定閾值
+        const isTimeout = diffMinutes > minutes;
+
+        return isTimeout;
+    },
+
+
+    async getUserInfo(){
+      await getAllUserInfoNoAuth().then(res=>{
+        this.userInfo = res.data
+        console.log('this.userInfo :>> ', this.userInfo);
+      }).catch(err => {
+        console.log('error' + err);
       });
     },
 
@@ -651,14 +716,14 @@ export default {
       this.getReportList(this.params);
     },
 
-    dateChange(val) {
-      const self = this;
-      const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
-      const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
-      self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
-      self.dateValue[1] = self.dateValue[1];
-      self.inputSearchValue = '';
-    },
+    // dateChange(val) {
+    //   const self = this;
+    //   const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
+    //   const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
+    //   self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
+    //   self.dateValue[1] = self.dateValue[1];
+    //   self.inputSearchValue = '';
+    // },
 
     handlePagination(pageInfo){
       console.log('pageInfo ~~~~~>> ', pageInfo);
@@ -908,7 +973,7 @@ export default {
       // console.log("Get SEarch Parameter");
       let searchParams = JSON.parse(JSON.stringify(SearchConditionUtil.getSearchCondition('deleteReport')));
       console.log("getSearchParams>>>>searchParams:",searchParams);
-      this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+      this.dateValue = [this.$moment().subtract(7, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
 
       if (Object.keys(searchParams).length > 0) {
 
@@ -1001,58 +1066,18 @@ export default {
 };
 </script>
 
+<style lang="sass" scoped>
+  .el-range-editor.is-active
+    border-color: #1375bc
 
+</style>
 <style lang="sass">
-  .table_style_delete_report
-    background: #FFF
-    .row-class
-      th
-        &:nth-child(1)
-          padding-left: 0 !important
-      td
-
-        &:nth-child(1), &:nth-child(2), &:nth-child(3), &:nth-child(5),
-          .cell
-            padding-left: 10% !important
-            // text-overflow: ellipsis !important
-            // white-space: nowrap !important
-            // overflow: hidden !important
-            span
-              // background: #9872 !important
-              // white-space: pre !important
-        &:nth-child(10)
-          width: 300px
-          .cell
-            text-overflow:: initial !important
-            white-space: nowrap !important
-
-    .el-table th div
-      padding-left: 10px !important
-      padding-right: 0 !important
-      text-align: left  !important
-
-    .cell-class .cell
-      text-align: left  !important
-
-  .comfirm_delete_report
-    h3
-      color: red
-  .l_row
-    margin-bottom: 20px
-  .delete_btn_row
-    display: flex
-    flex-direction: row
-    align-items: flex-end
-    justify-content: flex-end
-    .cancel-btn
-    .confirm-btn
-      color: #FFF
-    .is-disabled
-      background-color: #dcdfe9
-      border-color: #dcdfe9
-      &:hover
-        background-color: #dcdfe9
-        border-color: #dcdfe9
+  .el-range-editor--medium .el-range-separator
+    width: 50px
+  .el-date-table td.end-date span, .el-date-table td.start-date span
+    background-color: #1375bc
+  .el-date-table td.today span
+    color: #1375bc
 
 </style>
 
