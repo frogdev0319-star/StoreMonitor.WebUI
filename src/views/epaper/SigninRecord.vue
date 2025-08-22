@@ -93,7 +93,18 @@
                   />
                 </el-select>
 
-
+                <!-- 新增超時/全部下拉選單 -->
+                <div class="search-label" style=" margin-left: 40px;">搜巡超時</div>
+                <el-select
+                  v-model="timeoutFilter"
+                  placeholder="全部/超時"
+                  clearable
+                  style="width: 150px; background: #FFF;"
+                  @change="searchData"
+                >
+                  <el-option label="全部" value="all" />
+                  <el-option label="超時" value="timeout" />
+                </el-select>
 
                 <!-- <el-switch
                   v-model="jobSwitch"
@@ -194,9 +205,12 @@ import SelectedStores from "@/components/SelectedStores";
 import TblPaginationOnly from '@/components/TblPaginationOnly';
 import {getAllUserInfoNoAuth} from '@/api/login';
 import { getInspectReportInfo} from '@/api/inspect';//為了取是否有設置評分
+import {scheduleRESTful} from '@/api/index';
+
 import TableOnly from '@/components/TableOnly';
 import PermissionHelper from '@/api/PermissionHelper';
 import DialogPop from '@/components/DialogPop';
+import { getTimeOut } from '../../api/scheduleTask';
 export default {
   name: 'InspectReportList',
   components: {
@@ -213,6 +227,9 @@ export default {
       varyWindowWidth: window.innerWidth,
       varyWindowHeight: window.innerHeight,
       searchContent: false,
+
+      // 新增超時/全部下拉選單的綁定
+      timeoutFilter: 'all',
 
       agreeDelete: false,
       deleteReason: '',
@@ -390,7 +407,8 @@ export default {
           return time.getTime() < weekAgo.getTime() ||
                 time.getTime() > today.getTime()
           }
-      }
+      },
+      timeOutMin: 0
     };
   },
 
@@ -462,12 +480,36 @@ export default {
       self.showStoreContent = false;
       self.checkAllStore = false;
       self.curReportType = -1;
+
+      await self.getTimeOut();
       await self.getSearchParams();
       await self.getInspectList();
       await self.getUserInfo();
       await self.getInspectStatus();
     },
 
+    getTimeOut(){
+        this.isLoadingData = true;
+        const param = this.SelSchedulId
+        scheduleRESTful.getTimeOut().then(res =>{
+          if(res.errCode === 0){
+            console.log('res.data', res.data)
+            this.timeOutMin = res.data.timeOut
+          }
+        })
+        // this.showConfirmDelete = false;
+        // let params = {
+        //     taskGroupUuidArray: this.SelSchedulId,
+        //     userId: this.userId,
+        // }
+        // scheduleRESTful.deletePersonTaskList(params).then(res=>{
+        //     if(res.errCode==0){
+        //         this.doSearchScheduleList();
+        //     }else{
+        //         util.notify(this.$t('schedule.deletePersonSchError'), 'error', 2000);
+        //     }
+        // })
+    },
 
 
     cellStyle({ row, column, rowIndex, columnIndex }) {
@@ -556,7 +598,7 @@ export default {
             const tableObj = {};
 
             var ignoreCheckIn = item.isCheckInIgnore ? "略過簽到" : ""
-            var overTime = this.checkTimeout(item.ts, item.check_in_ts, 20) ? "超時" : ""
+            var overTime = this.checkTimeout(item.ts, item.check_in_ts, this.timeOutMin) ? "超時" : ""
             var slash = (this.checkTimeout(item.ts, item.check_in_ts, 20) && item.isCheckInIgnore) ? "/" : ""
             tableObj.status = ignoreCheckIn + slash + overTime
 
@@ -602,13 +644,12 @@ export default {
             tempTable.push(tableObj);
           }
 
-
-
-
-
-
-          console.log('tempTable ---------------:>> ', tempTable);
-          self.reportTableData = tempTable;
+          // 根據 timeoutFilter 過濾
+          let filteredTable = tempTable;
+          if (this.timeoutFilter === 'timeout') {
+            filteredTable = tempTable.filter(item => (item.status && item.status.includes('超時')));
+          }
+          self.reportTableData = filteredTable;
 
           self.total = res.data.totalPages
           self.isLoading = false;

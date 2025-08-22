@@ -112,3 +112,13 @@ export const deleteWeeklyTask = data => {
     data
   });
 };
+
+
+
+export const getTimeOut = data => {
+  return request({
+    url: `${version}/inspect/epaper/timeout`,
+    method: 'get',
+    data
+  });
+};
