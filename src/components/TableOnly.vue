@@ -197,6 +197,35 @@
         </template>
       </el-table-column>
 
+
+      <!-- signRecordStatus -->
+      <el-table-column
+        v-if="signRecordStatus.label "
+        :min-width="signRecordStatus.minWidth"
+        :label="signRecordStatus.label"
+        align="left"
+        class-name="small-padding fixed-width">
+        <template slot-scope="scope">
+          <div style="">
+
+            <!-- 超時 -->
+          <!-- -- {{ scope.row.status }} <br> -->
+
+          <!-- 略過簽到 -->
+          <!-- -- {{ scope.row.isCheckInIgnore }} -->
+
+          <div class="move" v-if="scope.row.status ">
+              <img src="../../static/img/TablerAlertCircleFilled.svg" alt="" style="width: 22px;">
+              <div style="margin-left: 5px; color: #e72835;">超時</div>
+          </div>
+          <div class="" v-if="scope.row.isCheckInIgnore "> 略過簽到</div>
+
+
+
+          </div>
+        </template>
+      </el-table-column>
+
       <!-- 操作 -->
       <el-table-column
         v-if="tableOperation.label "
@@ -454,6 +483,12 @@ export default {
       }
     },
     tableRepeatWeekDays: {
+      type: Object,
+      default: () => {
+        return {};
+      }
+    },
+    signRecordStatus: {
       type: Object,
       default: () => {
         return {};

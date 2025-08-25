@@ -153,6 +153,7 @@
               :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '6px',}"
               :tableHeight = "760"
               :cellStyle="{backgroundColor: '#fff !important'}"
+              :signRecordStatus = "signRecordStatus"
               @sortChange="sortChange"
             />
           </div>
@@ -299,13 +300,13 @@ export default {
           width: '180',
           maxWidth: '200',
         },
-        {
-          prop: 'status',
-          label: '狀態',
-          sortable: false,
-          width: '180',
-          maxWidth: '200',
-        },
+        // {
+        //   prop: 'status',
+        //   label: '狀態',
+        //   sortable: false,
+        //   width: '180',
+        //   maxWidth: '200',
+        // },
       ],
       columnOperationData: {
         label: this.$t('deviceView.operation'),
@@ -329,6 +330,12 @@ export default {
       currentPage: 1,
       curSizeNum: 10,
       sizeNum: 50,
+
+      signRecordStatus: {
+          label: '狀態',
+          minWidth: '120',
+          align: 'left',
+      },
 
       storeList: [],
       searchInput: '',
@@ -597,11 +604,12 @@ export default {
           for(const item of data){
             const tableObj = {};
 
-            var ignoreCheckIn = item.isCheckInIgnore ? "略過簽到" : ""
+            // var ignoreCheckIn = item.isCheckInIgnore ? "略過簽到" : ""
             var overTime = this.checkTimeout(item.ts, item.check_in_ts, this.timeOutMin) ? "超時" : ""
             var slash = (this.checkTimeout(item.ts, item.check_in_ts, 20) && item.isCheckInIgnore) ? "/" : ""
-            tableObj.status = ignoreCheckIn + slash + overTime
+            // tableObj.status = ignoreCheckIn + slash + overTime
 
+            tableObj.status = this.checkTimeout(item.ts, item.check_in_ts, this.timeOutMin)
             tableObj.isCheckInIgnore = item.isCheckInIgnore
 
             tableObj.province = item.province
@@ -647,7 +655,7 @@ export default {
           // 根據 timeoutFilter 過濾
           let filteredTable = tempTable;
           if (this.timeoutFilter === 'timeout') {
-            filteredTable = tempTable.filter(item => (item.status && item.status.includes('超時')));
+            filteredTable = tempTable.filter(item => (item.status && item.status.includes(true)));
           }
           self.reportTableData = filteredTable;
 
