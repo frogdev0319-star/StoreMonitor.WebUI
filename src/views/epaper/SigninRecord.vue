@@ -229,7 +229,7 @@ export default {
       searchContent: false,
 
       // 新增超時/全部下拉選單的綁定
-      statusFilter: null,
+      statusFilter: "",
 
       agreeDelete: false,
       deleteReason: '',
