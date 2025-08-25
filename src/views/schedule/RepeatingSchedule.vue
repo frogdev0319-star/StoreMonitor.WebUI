@@ -433,6 +433,9 @@ export default{
                     res.data.map(item => {
                       let obj = {...item};
 
+                      if(item.startTimeMM < 10) item.startTimeMM =  "0" + item.startTimeMM
+
+
                       obj.excuteTime = item.startTimeHH + ":" + (item.startTimeMM == 0 ? "00" : item.startTimeMM)
                       obj.remindBeforeMinutes = item.remindBeforeMinutes + " min"
 
@@ -469,7 +472,7 @@ export default{
                     self.isLoadingData = false;
 
                 }else{
-                    util.notify("?????", 'error', 3000);
+                  util.notify(self.$t('schedule.getScheduleSettingFail')+',error:'+err, 'error', 3000);
                 }
 
             }).catch(err=>{

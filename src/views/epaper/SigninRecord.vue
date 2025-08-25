@@ -94,16 +94,15 @@
                 </el-select>
 
                 <!-- 新增超時/全部下拉選單 -->
-                <div class="search-label" style=" margin-left: 40px;">搜巡超時</div>
+                <div class="search-label" style=" margin-left: 40px;">超時/略過簽到</div>
                 <el-select
-                  v-model="timeoutFilter"
+                  v-model="statusFilter"
                   placeholder="全部/超時"
                   clearable
                   style="width: 150px; background: #FFF;"
-                  @change="searchData"
                 >
-                  <el-option label="全部" value="all" />
-                  <el-option label="超時" value="timeout" />
+                  <el-option label="超時" value="0" />
+                  <el-option label="略過簽到" value="1" />
                 </el-select>
 
                 <!-- <el-switch
@@ -230,7 +229,7 @@ export default {
       searchContent: false,
 
       // 新增超時/全部下拉選單的綁定
-      timeoutFilter: 'all',
+      statusFilter: null,
 
       agreeDelete: false,
       deleteReason: '',
@@ -557,7 +556,8 @@ export default {
         order:p.order,
         inspectTagId: p.inspectTagId != '-1' ? p.inspectTagId : null,
         searchMysteryMode : PermissionHelper.enableMimicMode ? 1 : p.searchMysteryMode,
-        sourceType : 1
+        sourceType : 1,
+        overTimeOrSkip: this.statusFilter == "" ? null : Number(this.statusFilter)
       }
 
       const self = this;
@@ -652,12 +652,7 @@ export default {
             tempTable.push(tableObj);
           }
 
-          // 根據 timeoutFilter 過濾
-          let filteredTable = tempTable;
-          if (this.timeoutFilter === 'timeout') {
-            filteredTable = tempTable.filter(item => (item.status && item.status.includes(true)));
-          }
-          self.reportTableData = filteredTable;
+          self.reportTableData = tempTable
 
           self.total = res.data.totalPages
           self.isLoading = false;

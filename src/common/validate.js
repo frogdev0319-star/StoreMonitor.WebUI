@@ -24,11 +24,14 @@ export function validateEmail(email) {
  * validate input
  */
 export function validateInput(str) {
-  let pat = new RegExp('[^a-zA-Z0-9\_\u4e00-\u9fa5]', 'i');
-  var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\]<>/?~@#￥\\\\&*——|{}【】‘”“']");
-  var pattern = /[@#\$%\^&\*]+/g;
+  // let pat = new RegExp('[^a-zA-Z0-9\_\u4e00-\u9fa5]', 'i');
+  // var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\]<>/?~@#￥\\\\&*——|{}【】‘”“']");
+  var pattern = /[@#\$%\^&\*\/\\:\?"<>|]+/g;
   return pattern.test(str);
 }
+
+
+
 
 export function validateIp(ip) {
   let pat = /^((25[0-5]|2[0-4]\\d|[1]{1}\\d{1}\\d{1}|[1-9]{1}\\d{1}|\\d{1})($|(?!\\.$)\\.)){4}$/;

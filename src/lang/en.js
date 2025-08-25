@@ -717,7 +717,7 @@ export default {
     "eventTimeoutReminder": "Event timeout unhandled reminder",
     "excelEmpty": "The inspection category and item name can't empty",
     "excelFullScoreType": "Total Score: Required, 0~50points",
-    "excelIllegalCategory": "llegal characters '@#￥%^&*'!",
+    "excelIllegalCategory": "llegal characters '@#￥%^&*\/:?<>|",
     "excelIllegalDes": "The length of item description is 1200 characters at most!",
     "excelLongCategory": "The length of category supports up to 30 characters",
     "excelLongSubCategory": "The length of sub-category supports up to 30 characters",

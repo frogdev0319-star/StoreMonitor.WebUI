@@ -710,7 +710,7 @@ export default {
     "enterListName": "请输入巡检表名称",
     "enterListNameRuletip": "最多可输入250个字符",
     "enterName": "输入巡检类别名称",
-    "enterNameRuletip": "最多可输入30个字符",
+    "enterNameRuletip": "最多可输入50个字符",
     "inputRuletip": "最多可输入20个字符",
 
     "enterScore": "请输入分值",
@@ -719,7 +719,7 @@ export default {
     "eventTimeoutReminder": "事件超时未处理提醒",
     "excelEmpty": "巡检类别与巡检项名称不能为空",
     "excelFullScoreType": "项目总分值必填，取值范围为0~50",
-    "excelIllegalCategory": "存在'@#￥%^&*'非法字符！",
+    "excelIllegalCategory": "存在'@#￥%^&*\/:?<>|'非法字符！",
     "excelIllegalDes": "巡检项目详细说明不可超过1200个字符！",
     "excelLongCategory": "巡检类别长度不可超过30个字符！",
     "excelLongSubCategory": "巡检子类别长度不可超过30个字符！",
