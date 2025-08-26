@@ -5,7 +5,7 @@ import PermissionHelper from '@/api/PermissionHelper';
 import { resetRouter, constantRoutes, navbarRoute } from '@/router';
 import { isMysteryMode } from '@/api/mystero';
 import { getWhiteList } from '@/api/scheduleTask';
-
+import { getInspectStatus } from '@/api/inspect';
 
 const user = {
   state: {
@@ -49,6 +49,7 @@ const user = {
     isMystery: false,
     editReport: false,
     whiteList: [],
+    nfc_checkin: false,
 
     advancedSettingMode: false,
     advancedSettingStatus: false
@@ -117,6 +118,10 @@ const user = {
     SET_WHITE_LIST: (state, mode) => {
       state.whiteList = mode;
       console.log('SET_WHITE_LIST', mode)
+    },
+
+    NFC_CHECKIN: (state, mode) => {
+      state.nfc_checkin = mode;
     },
 
     newCachePath(state, msg) {
@@ -300,10 +305,10 @@ const user = {
       return new Promise((resolve, reject) => {
         getWhiteList(params).then(res => {
           const data = res.data;
+          console.log('GetWhiteList data :>> ', data);
           if (res.data) {
             commit('SET_WHITE_LIST', res.data);
             resolve(res);
-            // console.log('whiteList!!!!!!!!!!!!!!!!!!!!', res.data)
           }
         }).catch(err => {
           reject(err);
@@ -311,6 +316,19 @@ const user = {
       });
     },
 
+    GetEpaperNfcCheckin({ commit }) {
+      return new Promise((resolve, reject) => {
+        getInspectStatus().then(res => {
+          const data = res.data
+          if (res.data) {
+            commit('NFC_CHECKIN', data.settingContent.general_setting.nfc_checkin);
+            resolve(res);
+          }
+        }).catch(err => {
+          reject(err);
+        });;
+      });
+    },
 
     LoginByUser({ commit }, userInfo) {
       const username = userInfo.username.trim();
@@ -401,9 +419,11 @@ const user = {
       });
     },
 
-    generateRoutes({ commit }) {
-      return new Promise(resolve => {
+    async generateRoutes({ commit, dispatch }) {
+      return new Promise(async (resolve, reject) => {
         const accessedRoutes = [];
+        // 確保先載入 nfc_checkin 狀態，避免非同步問題
+        await dispatch('GetEpaperNfcCheckin');
         // console.log("user.state.authorities:~~~>>>",user.state.authorities);
         // console.log("user.state:~~~>>>",user.state);
 
@@ -478,11 +498,17 @@ const user = {
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();
           systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';
 
+
           // epaper
-          const epaperRoute = navbarRoute.getEpaper();
-          console.log('epaperRoute :>> ', epaperRoute);
-          accessedRoutes.length === 0 ? epaperRoute.redirect = ((epaperRoute.children.length > 0) ? epaperRoute.children[0].path : '') : '';
-          if (epaperRoute.children.length > 0) accessedRoutes.push(epaperRoute);
+          console.log('user.state.nfc_checkin :>> ', user.state.nfc_checkin);
+
+          // NFC 功能開啟, nfc_checkin:true
+          if (user.state.nfc_checkin) {
+            const epaperRoute = navbarRoute.getEpaper();
+            accessedRoutes.length === 0 ? epaperRoute.redirect = ((epaperRoute.children.length > 0) ? epaperRoute.children[0].path : '') : '';
+            if (epaperRoute.children.length > 0) accessedRoutes.push(epaperRoute);
+          }
+
 
 
           // 進階設定
@@ -516,8 +542,6 @@ const user = {
           errorRoute.redirect = errorRoute.children[0].path;
         }
 
-
-
         commit('SET_ROUTES', accessedRoutes);
         commit('SET_Available_Path_List', navbarRoute.getAvailablePath());
         if (user.state.authorities.length >= 6) {
@@ -526,12 +550,13 @@ const user = {
         }
         resolve(accessedRoutes);
       });
+
     },
+
     GetIsMysteryMode({ commit }) {
-      console.log("GetIsMysteryMode");
       return new Promise((resolve, reject) => {
         isMysteryMode().then(res => {
-          console.log("GetIsMysteryMode:", res);
+          // console.log("GetIsMysteryMode:", res);
           if (res.errCode == 0) {
             commit('SET_ISMYSTERY', res.data.isMysteryModeOn);
           }
@@ -541,6 +566,9 @@ const user = {
         // reject(error);
       });
     },
+
+
+
 
   }
 };
