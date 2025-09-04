@@ -112,31 +112,31 @@ export const navbarRoute = {
       hidden: false,
       children: []
     };
-    // !PermissionHelper.advancedMode && (PermissionHelper.enableMimicMode || PermissionHelper.enableRemoteInspect()) && patrolRoute.children.push(
-    //   {
-    //     path: '/reinspection',
-    //     name: 'remotePatrol',
-    //     hidden: true,
-    //     component: resolve => require(['@/views/patrolShop/ReInspection'], resolve),
-    //     meta: {
-    //       requireAuth: true,
-    //       keepAlive: false
-    //     },
-    //     isReadOnly: false
-    //   },
-    //   {
-    //     path: '/reinspect/confirmrein',
-    //     name: 'confirmSum',
-    //     hidden: true,
-    //     component: resolve => require(['@/views/patrolShop/ConfirmAddSum'], resolve)
-    //   },
-    //   {
-    //     path: '/reinspect/submit',
-    //     name: 'submitEvent',
-    //     hidden: true,
-    //     component: resolve => require(['@/views/patrolShop/ReInspectDealPage'], resolve)
-    //   }
-    // ) && primaryPathesList.push('/reinspection', '/reinspect/confirmrein', '/reinspect/submit');
+    !PermissionHelper.advancedMode && (PermissionHelper.enableMimicMode || PermissionHelper.enableRemoteInspect()) && patrolRoute.children.push(
+      {
+        path: '/reinspection',
+        name: 'remotePatrol',
+        hidden: false,
+        component: resolve => require(['@/views/patrolShop/ReInspection'], resolve),
+        meta: {
+          requireAuth: true,
+          keepAlive: false
+        },
+        isReadOnly: false
+      },
+      {
+        path: '/reinspect/confirmrein',
+        name: 'confirmSum',
+        hidden: true,
+        component: resolve => require(['@/views/patrolShop/ConfirmAddSum'], resolve)
+      },
+      {
+        path: '/reinspect/submit',
+        name: 'submitEvent',
+        hidden: true,
+        component: resolve => require(['@/views/patrolShop/ReInspectDealPage'], resolve)
+      }
+    ) && primaryPathesList.push('/reinspection', '/reinspect/confirmrein', '/reinspect/submit');
     // !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableStoreMonitor() && patrolRoute.children.push(
     //   {
     //     path: '/storemonitor',
@@ -156,6 +156,8 @@ export const navbarRoute = {
     //     component: resolve => require(['@/views/patrolShop/StoreSuccessPage'], resolve)
     //   }
     // ) && primaryPathesList.push('/storemonitor', '/storemonitor/submit');
+
+
     !PermissionHelper.advancedMode && (PermissionHelper.enableMimicMode || PermissionHelper.enableInspectReport()) && patrolRoute.children.push(
       {
         path: '/report',
