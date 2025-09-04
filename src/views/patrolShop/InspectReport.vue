@@ -121,7 +121,7 @@
         </span>
       </div>
       <div class="info-content">
-        <div class="pdf_font_24">
+        <div class="pdf_font_24" style="display: flex; flex-direction: row; align-items: center; justify-content: flex-start">
             <span class="info-label">{{ $t('remotePatrol.submitter') }}</span>
             <span :class="isexportPDF ? 'pdf-info-value' : 'info-value'">{{ report.submitterName }}</span>
 
@@ -136,16 +136,20 @@
             <!-- 巡檢花費時間 -->
             <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.patrolTime')+'：' }}</span>
             <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ inceptionExecutTime }}</span>
+
+
             <!-- 簽到距離 -->
-            <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.signInDistance')+'：' }}</span>
-            <span v-if="!isexportPDF && hasSignRecord && signInDistance !== -1">{{ $t('remotePatrol.aroundDistance')  }}</span>
-            <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">
-              {{ (signInDistance === -1 ? '超出簽到範圍' : signInDistance) }}
-            </span>
-            <span v-if="!isexportPDF && hasSignRecord && signInDistance !== -1" >{{$t('remotePatrol.mapDistance3')}}</span>
+            <div v-if="checkinType == 0" style="display: flex; flex-direction: row; align-items: center; justify-content: flex-start">
+              <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.signInDistance')+'：' }}</span>
+              <span v-if="!isexportPDF && hasSignRecord && signInDistance !== -1">{{ $t('remotePatrol.aroundDistance')  }}</span>
+              <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">
+                {{ (signInDistance === -1 ? '超出簽到範圍' : signInDistance) }}
+              </span>
+              <span v-if="!isexportPDF && hasSignRecord && signInDistance !== -1" >{{$t('remotePatrol.mapDistance3')}}</span>
+            </div>
 
         </div>
-        <div class="weather-content">
+        <div class="weather-content" style="margin-left: 20px">
           <img v-if="weatherImg" class="weather-info-content" :src="weatherImg">
         </div>
 
@@ -893,7 +897,8 @@ export default {
       isFeatureActivate: false,
       waterPrintContent: {},
       userName : '',
-      userEmail : ''
+      userEmail : '',
+      checkinType: 0
 
     };
   },
@@ -1651,6 +1656,9 @@ export default {
       const routeData = JSON.parse(sessionStorage.getItem('report_data'));
       self.deleteReportId = routeData.id
       console.log("report routeData:",routeData);
+
+      this.checkinType = routeData.checkinType
+
       if(routeData && !self.isAuditMode){
         const obj = {};
         console.log("self.$route.params.reportId:",self.$route.params.reportId);
@@ -3221,6 +3229,7 @@ export default {
         display: flex;
         flex-direction: row;
         align-items: center;
+        justify-content: flex-start;
         color: $tab;
         .info-label {
           margin-left: calc(20 / 1920 * 100vw);

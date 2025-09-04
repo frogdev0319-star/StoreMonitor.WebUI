@@ -41,6 +41,8 @@
           </template>
         </store-filter>
       </div>
+
+      <!-- 時間範圍   -->
       <div class="flex-center" style="justify-content: space-between; margin: 20px 0 20px 0px;font-size:calc(16/1920*100vw)">
         <div class="flex-center">
           <date-time-selector
@@ -50,6 +52,7 @@
           />
         </div>
 
+        <!-- 關鍵字 -->
         <div class="flex-center">
           <span style="margin-right: 10px; white-space:nowrap;">{{ $t('remotePatrol.keywords') }}</span>
           <el-input
@@ -673,8 +676,8 @@ export default {
       const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
       const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
       self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
-      self.dateValue[1] = self.dateValue[1];
-      self.inputSearchValue = '';
+      // self.dateValue[1] = self.dateValue[1];
+      // self.inputSearchValue = '';
       self.tableDataList[tabIndex].page = 1;
     },
 
@@ -1709,8 +1712,9 @@ export default {
   },
 
   beforeRouteLeave(to, from, next) {
+    // from.meta.keepAlive = true;
     if (to.name !== 'eventDetails') {
-      from.meta.keepAlive = false;
+      from.meta.keepAlive = true;
       next();
     } else {
       from.meta.keepAlive = true;
