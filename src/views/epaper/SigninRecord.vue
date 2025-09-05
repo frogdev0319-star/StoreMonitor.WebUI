@@ -407,12 +407,9 @@ export default {
       pickerOptions: {
         disabledDate(time) {
           const today = new Date()
-          today.setHours(0, 0, 0, 0)                  // 清除時分秒
-          const weekAgo = new Date(today)
-          weekAgo.setDate(today.getDate() - 7)        // 一週前
-          return time.getTime() < weekAgo.getTime() ||
-                time.getTime() > today.getTime()
-          }
+          today.setHours(23, 59, 59, 999)  // 設置為今天的結束
+          return time.getTime() > today.getTime()
+        }
       },
       timeOutMin: 0
     };
