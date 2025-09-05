@@ -409,7 +409,7 @@ export default {
           const today = new Date()
           today.setHours(23, 59, 59, 999)  // 設置為今天的結束
           return time.getTime() > today.getTime()
-        }
+        },
       },
       timeOutMin: 0
     };
@@ -445,6 +445,21 @@ export default {
         this.ifSearchData = true;
         this.getInspectList();
         //this.initData();
+    },
+
+    dateValue(val) {
+      if (val && val.length === 2) {
+        const start = new Date(val[0])
+        const end = new Date(val[1])
+        const diffTime = end.getTime() - start.getTime()
+        const diffDays = diffTime / (1000 * 3600 * 24)
+        if (diffDays > 7) { // 如果超過7天
+          // 固定結束時間，自動調整開始時間為結束時間往前6天
+          const newStart = new Date(end.getTime() - 6 * 24 * 60 * 60 * 1000) // 結束日期往前6天
+          this.dateValue = [newStart, val[1]]
+          this.$message.warning('時間範圍最短一天，最多7天，已重新調整。')
+        }
+      }
     },
 
     changeNum(val){
@@ -1014,7 +1029,7 @@ export default {
       // console.log("Get SEarch Parameter");
       let searchParams = JSON.parse(JSON.stringify(SearchConditionUtil.getSearchCondition('deleteReport')));
       console.log("getSearchParams>>>>searchParams:",searchParams);
-      this.dateValue = [this.$moment().subtract(7, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+      this.dateValue = [this.$moment().subtract(7, 'days').startOf('d').toDate(), this.$moment().subtract(1, 'days').endOf('d').toDate()];
 
       if (Object.keys(searchParams).length > 0) {
 
@@ -1080,7 +1095,9 @@ export default {
     getReportListOfCard() {
       this.ShowCard = true;
       this.checkSortType(this.curSortType);
-    }
+    },
+
+
   },
 
   beforeRouteEnter(to, from, next) {
