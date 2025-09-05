@@ -1029,7 +1029,7 @@ export default {
       // console.log("Get SEarch Parameter");
       let searchParams = JSON.parse(JSON.stringify(SearchConditionUtil.getSearchCondition('deleteReport')));
       console.log("getSearchParams>>>>searchParams:",searchParams);
-      this.dateValue = [this.$moment().subtract(7, 'days').startOf('d').toDate(), this.$moment().subtract(1, 'days').endOf('d').toDate()];
+      this.dateValue = [this.$moment().subtract(6, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
 
       if (Object.keys(searchParams).length > 0) {
 
