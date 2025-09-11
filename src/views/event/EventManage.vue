@@ -152,41 +152,41 @@
                   </span>
 
                   <el-tooltip v-if="scope.row.status === 0  && scope.row.isSystemAdvancedEdited" effect="light" placement="right-end">
-                    <div slot="content"> 變更時間：{{scope.row.systemAdvancedActionTs}} </div>
+                    <div slot="content"> {{ $t('addition.reviseTime') }}{{scope.row.systemAdvancedActionTs}} </div>
                     <div v-if="scope.row.status === 0 && scope.row.isSystemAdvancedEdited" class="expiretag">
-                      <span style="color:#f57848;"> (已變更狀態) </span>
+                      <span style="color:#f57848;"> {{ $t('addition.reviseStatus') }}</span>
                     </div>
                   </el-tooltip>
                   <el-tooltip v-if="scope.row.status === 1 && scope.row.isSystemAdvancedEdited" effect="light" placement="right-end">
-                    <div slot="content"> 變更時間：{{scope.row.systemAdvancedActionTs}} </div>
+                    <div slot="content"> {{ $t('addition.reviseTime') }}{{scope.row.systemAdvancedActionTs}} </div>
                     <div v-if="scope.row.status === 1 && scope.row.isSystemAdvancedEdited" class="expiretag">
-                      <span style="color:#59ab22;"> (已變更狀態) </span>
+                      <span style="color:#59ab22;"> {{ $t('addition.reviseStatus') }}</span>
                     </div>
                   </el-tooltip>
 
                   <el-tooltip v-if="scope.row.status === 2 " effect="light" placement="right-end">
                     <div slot="content">
-                      <div v-if="scope.row.isSystemAdvancedEdited">變更時間：{{scope.row.systemAdvancedActionTs }} </div>
+                      <div v-if="scope.row.isSystemAdvancedEdited">{{ $t('addition.reviseTime') }}{{scope.row.systemAdvancedActionTs }} </div>
                       <div v-else> {{ $t('eventView.expiredate')+ scope.row.updateTs }}</div>
                     </div>
                     <div v-if="scope.row.status === 2 && scope.row.isSystemAdvancedEdited" class="expiretag">
-                      <span style="color:#556679;"> (已變更狀態) </span>
+                      <span style="color:#556679;"> {{ $t('addition.reviseStatus') }}</span>
                     </div>
                   </el-tooltip>
 
                   <el-tooltip v-if="scope.row.status === 3 " effect="light" placement="right-end">
                     <div slot="content">
-                      <div v-if="scope.row.isSystemAdvancedEdited">變更時間：{{scope.row.systemAdvancedActionTs }} </div>
+                      <div v-if="scope.row.isSystemAdvancedEdited">{{ $t('addition.reviseTime') }}{{scope.row.systemAdvancedActionTs }} </div>
                       <div v-else> {{ $t('eventView.expiredate')+ scope.row.updateTs }}</div>
                     </div>
                     <div v-if="scope.row.status === 3 && scope.row.isSystemAdvancedEdited" class="expiretag">
-                      <span style="color:#e22472;"> (已變更狀態) </span>
+                      <span style="color:#e22472;"> {{ $t('addition.reviseStatus') }}</span>
                     </div>
                   </el-tooltip>
                   <el-tooltip v-if="scope.row.status === 4 " effect="light" placement="right-end">
                     <div slot="content">{{ $t('eventView.expiredate')+ scope.row.updateTs }} </div>
                     <div v-if="scope.row.status === 4 && scope.row.isSystemAdvancedEdited" class="expiretag">
-                      <span style="color:#556679;"> (已變更狀態) </span>
+                      <span style="color:#556679;"> {{ $t('addition.reviseStatus') }}</span>
                     </div>
                     <div v-else="scope.row.status === 4" class="expiretag">
                       {{ '('+$t('eventView.expiretag')+')' }}

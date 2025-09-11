@@ -5,7 +5,7 @@
         <div class="search_row" style="padding-top: 0;">
           <!-- <date-time-selector
             class="time-selector"
-            @change="dateChange" 
+            @change="dateChange"
             :dateTimeValue = dateValue />  -->
             <span style="margin-right: 16px; margin-top: 5px;font-size:calc(15/1920*100vw);width:10%;">{{ $t('downloadManagement.reportType') }}</span>
             <div class="report_type" >
@@ -23,7 +23,7 @@
                   :label="item.label"
                   :value="item.type"/>
               </el-select>
-              <div style="width: 2px; border: #999;"></div> 
+              <div style="width: 2px; border: #999;"></div>
               <el-select
                 v-model="reportRequestType"
                 size="mini"
@@ -88,7 +88,7 @@
               :allowRowExpand = "false"
               :showBorder = "false"
               :default-sort = "{prop: 'datestr', order: 'descending'}"
-              :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '6px',}" 
+              :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '6px',}"
               :tableHeight = "760"
               :cellStyle="{backgroundColor: '#fff !important'}"
               @handleOperation="handleEmitOperation"
@@ -102,10 +102,10 @@
           class="card-content self-loading">
           <div class="empty-content">{{ noData }} </div>
         </div>
-        
+
         <div class="el-pat"  v-if="downloadTableData.length > 0">
-          <div class="pageSizeTitle" style="color: #666">共有 <b style="font-size: 16px"> {{totalElements}} </b> {{ $t('remotePatrol.numReports') }}</div>
-    
+          <div class="pageSizeTitle" style="color: #666">{{ $t('addition.totalOf') }} <b style="font-size: 16px"> {{totalElements}} </b> {{ $t('remotePatrol.numReports') }}</div>
+
           <tbl-pagination-only
             :btn-style="{backgroundColor:'transparent'}"
             :total="total"
@@ -118,7 +118,7 @@
         </div>
       </div>
     </div>
-    
+
     <dialog-pop
       :title="$t('downloadManagement.conformDel')"
       :append-to-body="true"
@@ -194,11 +194,11 @@ export default {
     return {
       varyWindowWidth: window.innerWidth,
       varyWindowHeight: window.innerHeight,
-      
-  
+
+
 			reportTableData: [],
       eventTableData: [],
-			
+
       isLoading: false,
       downloadTableData: [],
       downloadInfoTable: [
@@ -256,20 +256,20 @@ export default {
       },
       reportDownloadList: [],
       oriReportDownloadList: [
-        { type: -1, 
+        { type: -1,
           label: this.$t('downloadManagement.all'),
         },
-        { 
-          type: 1, 
-          label: this.$t('downloadManagement.inspectReport'), 
+        {
+          type: 1,
+          label: this.$t('downloadManagement.inspectReport'),
           content: [
             { requestType: 1001, label: this.$t('downloadManagement.requestType_1001')},
             { requestType: 1002, label: this.$t('downloadManagement.requestType_1002')},
             { requestType: 1003, label: this.$t('downloadManagement.requestType_1003')},
           ]
         },
-        { 
-          type: 2, 
+        {
+          type: 2,
           label: this.$t('downloadManagement.eventMgn'),
           content: [
             { requestType: 2001, label: this.$t('downloadManagement.requestType_2001')},
@@ -279,8 +279,8 @@ export default {
             { requestType: 2005, label: this.$t('downloadManagement.requestType_2005')},
           ]
         },
-        { 
-          type: 3, 
+        {
+          type: 3,
           label: this.$t('downloadManagement.patrolEvaluation'),
           content: [
             { requestType: 3001, label: this.$t('downloadManagement.requestType_3001')},
@@ -288,15 +288,15 @@ export default {
             { requestType: 3003, label: this.$t('downloadManagement.requestType_3003')},
           ]
         },
-        { 
-          type: 4, 
+        {
+          type: 4,
           label: this.$t('downloadManagement.patrolItem'),
           content: [
             { requestType: 4001, label: this.$t('downloadManagement.requestType_4001')},
           ]
         },
-        { 
-          type: 5, 
+        {
+          type: 5,
           label: this.$t('downloadManagement.patrolPersonStat'),
           content: [
             { requestType: 5001, label: this.$t('downloadManagement.requestType_5001')},
@@ -304,8 +304,8 @@ export default {
             { requestType: 5003, label: this.$t('downloadManagement.requestType_5003')},
           ]
         },
-        { 
-          type: 6, 
+        {
+          type: 6,
           label: this.$t('downloadManagement.eventStat'),
           content: [
             { requestType: 6001, label: this.$t('downloadManagement.requestType_6001')},
@@ -313,8 +313,8 @@ export default {
             { requestType: 6003, label: this.$t('downloadManagement.requestType_6003')},
           ]
         },
-        { 
-          type: 7, 
+        {
+          type: 7,
           label: this.$t('downloadManagement.scheduleHistory'),
           content: [
             { requestType: 7001, label: this.$t('downloadManagement.requestType_7001')},
@@ -365,7 +365,7 @@ export default {
     };
   },
 
-  
+
   computed: {
     iconSrcHeight() {
       return (this.varyWindowWidth / 1920) * 50;
@@ -391,7 +391,7 @@ export default {
       //   if (res.data) {
       //     resolve(res);
       //     commit('SET_WHITE_LIST', res.data);
-      //   } 
+      //   }
       // }).catch(err => {
       //   reject(err);
       // });
@@ -402,7 +402,7 @@ export default {
       // this.isShowing = whiteList.some( i => i == accountId)
       // console.log('this.isShowing !!!!!!!!!!!!!!!!!!!! 2', this.isShowing);
 
-      
+
 
       // if(!this.isShowing) {
       //   this.reportDownloadList = this.reportDownloadList.filter( i => i.type !== 7)
@@ -420,7 +420,7 @@ export default {
       // })
       // this.reportRequestTypeList = this.allList
 
-      
+
 
     },
     mimicModeChanged(val){
@@ -431,7 +431,7 @@ export default {
 
   },
   created() {
-    
+
     this.initData()
   },
 
@@ -439,7 +439,7 @@ export default {
     var userInfo = await this.$store.dispatch("GetUserAuthorities");
     this.hasAdvanced = userInfo.data.isSystemAdvanced
   },
-  
+
 
   methods: {
     async initData() {
@@ -447,18 +447,18 @@ export default {
       this.storeStr = '';
       this.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24,
         new Date(this.$moment(new Date()).endOf('day'))];
-      
+
 
       this.inspectTagList = await this.getInspectTag()
       this.storeBriefList = await this.getBriefStoreData()
-      
+
       await this.handleReportList()
       await this.searchRequestTypeItems()
       await this.getDownloadTable(this.params)
     },
 
     handleReportList(){
-      
+
       this.reportDownloadList = [...this.oriReportDownloadList]
       this.allList = [];
       getWhiteList().then(res => {
@@ -466,7 +466,7 @@ export default {
           if (res.data) {
             resolve(res);
             commit('SET_WHITE_LIST', res.data);
-          } 
+          }
         }).catch(err => {
           reject(err);
         });
@@ -529,9 +529,9 @@ export default {
       var hour = this.pad2(date.getHours())
       var min = this.pad2(date.getMinutes())
       var sec = this.pad2(date.getSeconds())
-      return year + "/"+ month +"/"+ day 
+      return year + "/"+ month +"/"+ day
     },
-    
+
     getAllDate(t){
       var date = new Date(t);
       var month = this.pad2(date.getMonth()+1);
@@ -545,11 +545,11 @@ export default {
 
     async getDownloadTable(params){
       this.isLoading = true;
-      
+
 
       await getDownloadList(params).then(res=>{
         // console.log('res.data --->', res.data)
-        
+
         res.data.content.forEach(i => {
           var tempReport = this.allList.find(r => r.requestType == i.requestType)
           var groupName = ""
@@ -580,7 +580,7 @@ export default {
           //   if( i.requestContent.inspectTagIds.length == 0){
           //     fineInspect = "全部"
           //     console.log('fineInspect0', fineInspect)
-          //   } 
+          //   }
           //   else{
           //     var tempArray = []
           //     this.inspectTagList.forEach( x => {
@@ -590,8 +590,8 @@ export default {
           //     })
           //     fineInspect = tempArray.join(', ')
           //   }
-            
-          // } 
+
+          // }
           // else if(i.requestContent.hasOwnProperty("inspectTagId") && i.requestContent.inspectTagId !== -1){
           //   fineInspect = this.inspectTagList.filter(g => g.id == i.requestContent.inspectTagId)[0].name
           //   console.log('fineInspect2', fineInspect)
@@ -624,7 +624,7 @@ export default {
         this.downloadTableData = res.data.content
         this.totalElements = res.data.totalElements
         this.total = res.data.totalPages
-  
+
         this.isLoading = false;
       }).catch(err => {
         this.isLoading = false;
@@ -632,11 +632,11 @@ export default {
       });
     },
 
-    searchRequestTypeItems(value){ 
+    searchRequestTypeItems(value){
       this.reportRequestType = []
       if(this.reportType == -1 ){
         this.reportRequestTypeList = this.allList
-        console.log('this.allList :>> ', this.allList); 
+        console.log('this.allList :>> ', this.allList);
       }else {
         this.reportRequestTypeList = [...this.reportDownloadList[value].content]
         console.log('this.reportDownloadList[value].content :>> ', this.reportDownloadList[value].content);
@@ -657,7 +657,7 @@ export default {
     searchDownloadData(){
       console.log('this.reportRequestType', this.reportRequestType)
 
-      if(this.reportRequestType == -1){ 
+      if(this.reportRequestType == -1){
         this.params.requestType	= -1
       }
       else {
@@ -682,7 +682,7 @@ export default {
           this.deleteId = val.row.id
           this.showDeleteDialog = true
           break;
-      
+
         default:
           break;
       }
@@ -742,7 +742,7 @@ export default {
     },
     confirmDelete(updateEventId){
       this.showDeleteDialog = false
-      this.isLoading = true;   
+      this.isLoading = true;
       var del = {id : this.deleteId}
       deleteDownloadList(del).then(res=>{
         this.getDownloadTable(this.params)
@@ -753,7 +753,7 @@ export default {
     clearAll(){
       deleteAll().then(res=>{
         this.showDeleteAllDialog = false
-        this.isLoading = true;  
+        this.isLoading = true;
         this.getDownloadTable(this.params)
       }).catch(err => {
         this.isLoading = false;
@@ -787,11 +787,11 @@ export default {
       console.log('pageInfo ~~~~~>> ', pageInfo);
       console.log('this.params ~~~~~>> ', this.params);
       this.isLoading = true;
-      
+
       this.currentPage = pageInfo.page
       this.sizeNum = pageInfo.size
       this.curSizeNum = pageInfo.size;
-    
+
       this.params.filter.page = pageInfo.page - 1
       this.params.filter.size = pageInfo.size
       this.getDownloadTable(this.params)
@@ -801,7 +801,7 @@ export default {
 
     },
 
-    
+
   },
 
 
@@ -852,18 +852,18 @@ export default {
           //     width: 20% !important
           //     background: #789 !important
 
-          
 
-            
+
+
     .el-table th div
       padding-left: 10px !important
       padding-right: 0 !important
       text-align: left  !important
 
     .cell-class .cell
-      padding: 5px 
+      padding: 5px
       text-align: left  !important
-      
+
 
   .clear_btn
     width: 100%
@@ -925,8 +925,8 @@ $filterWidth: (100%-706);
   font-weight: normal;
   word-break: keep-all;
   padding-right: 16px;
-  
-  
+
+
 }
 .report-type-area{
     width:calc(346/1440*100vw);
@@ -936,7 +936,7 @@ $filterWidth: (100%-706);
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
 }
 #el-containter{
-    
+
     .report-header{
         margin-top: 20px;
         margin-bottom: 20px;
@@ -983,7 +983,7 @@ $filterWidth: (100%-706);
                 margin-right: 10px;
               };
             }
-            
+
             .el-province{
                 width: calc(160/1920*100vw);
                 min-width: 85px;
@@ -1072,7 +1072,7 @@ $filterWidth: (100%-706);
             }
         }
     }
-    
+
     .showCardHeight{
       display: flex;
       flex-wrap: wrap;
@@ -1081,7 +1081,7 @@ $filterWidth: (100%-706);
       align-items: flex-start;
       // height: calc(450/1440*100vw);
       // overflow: auto;
-        
+
     }
     .list-table{
       margin-bottom: 20px;
@@ -1093,7 +1093,7 @@ $filterWidth: (100%-706);
       padding-left: calc(20/1920*100vw) !important;
     }
     .list-table{
-      
+
       .table-white {
         /deep/
         .el-table{
@@ -1106,7 +1106,7 @@ $filterWidth: (100%-706);
         }
       }
     }
-    
+
     .report-card{
         width: 19%;
         margin-bottom: calc(20/1440*100vw);
@@ -1115,13 +1115,13 @@ $filterWidth: (100%-706);
         cursor: pointer;
         &:hover{
           box-shadow: 0 3px 8px 0 rgba(0, 0, 0, .2);
-          
+
         }
         .cards{
           width: 100%;
           height: calc(220/1440*100vw);
           padding: calc(15/1440*100vw);
-          
+
           // margin-right: calc(20/1440*100vw);
           border: 1px solid #e3e9f4;
           font-size: calc(12/1440*100vw);
@@ -1147,7 +1147,7 @@ $filterWidth: (100%-706);
               div {
                 text-align: left;
               }
-                
+
               .item-img{
                 position: absolute;
                 right: 1px;
@@ -1203,7 +1203,7 @@ $filterWidth: (100%-706);
               color: $border;
             }
             .score {
-              font-size: calc(32/1440*100vw); 
+              font-size: calc(32/1440*100vw);
               margin-right: calc(5/1440*100vw);
               // margin-bottom: calc(30/1440*100vw);
             }
@@ -1215,21 +1215,21 @@ $filterWidth: (100%-706);
               justify-content: flex-start;
               margin-bottom: 1%;
               .status-tag {
-                border-radius: 4px; 
+                border-radius: 4px;
                 padding: calc(5/1440*100vw) calc(7/1440*100vw);
                 font-size: calc(10/1440*100vw);
                 margin-bottom: 2%;
               }
               .status-tag-en{
                 font-size: calc(14/1920*100vw);
-                border-radius: calc(5/1440*100vw); 
+                border-radius: calc(5/1440*100vw);
                 padding: calc(2/1440*100vw) calc(15/1440*100vw);
                 margin-bottom: 2%;
               }
             }
           }
-          
-          
+
+
         .card_bottom{
           text-align: left;
           .submitter{
@@ -1247,7 +1247,7 @@ $filterWidth: (100%-706);
           text-overflow: ellipsis;
           white-space: nowrap;
           justify-content: space-between;
-          
+
         }
         .item-score{
           color: $tab;
@@ -1281,7 +1281,7 @@ $filterWidth: (100%-706);
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
-    
+
     .el-pag{
         position: absolute;
         //float: right;

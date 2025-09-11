@@ -176,26 +176,26 @@
     <!-- 巡檢事件 -->
     <div class="page-container report-setting paper" >
       <div class="setting-titles padding flex-center">
-        巡檢事件
+        {{$t('addition.events')}}
         <div class="spacer"></div>
       </div>
 
       <div v-loading="isLoadingData" class="setting-details self-loading">
         <div class="template-info">
           <div class="inspect-basic">
-            <setting-table table-name="逾期結案" style="margin-top: 20px;">
+            <setting-table :table-name="$t('addition.overdueClosed')" style="margin-top: 20px;">
               <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
                 <div class="overall_options">
 
                   <div class="overall_row" >
                     <el-radio-group class="storevue-radio radio_item" v-model="dueDayIsFeatureOn" style="margin-left: 20px;">
-                      <el-radio :label="1" style="  min-width: 60px; text-align: left; margin-right: 50px;" >開啟</el-radio>
-                      <el-radio :label="0" style=" width: fit-content;">關閉 </el-radio>
+                      <el-radio :label="1" style="  min-width: 60px; text-align: left; margin-right: 50px;" >{{$t('addition.on')}}</el-radio>
+                      <el-radio :label="0" style=" width: fit-content;">{{$t('addition.off')}} </el-radio>
                     </el-radio-group>
                   </div>
 
                   <div class="title-status" style="margin-left: calc(26/1920*100vw);">
-                    逾期天數
+                    {{$t('addition.overdue')}}
                     <el-input
                       v-model="overDueDay"
                       ref="overDue_Day"
@@ -256,25 +256,25 @@
     <!-- 生物辨識開關 -->
     <!-- <div class="page-container report-setting paper" >
       <div class="setting-titles padding flex-center">
-        特定巡檢管理功能設定
+        {{$t('addition.SpecificManagementSettings')}}
         <div class="spacer"></div>
       </div>
 
       <div v-loading="isLoadingData" class="setting-details self-loading">
         <div class="template-info">
           <div class="inspect-basic">
-            <setting-table table-name="啟用生物辨識功能" style="margin-top: 20px;">
+            <setting-table :table-name="$t('addition.biometricAuthentication')" style="margin-top: 20px;">
               <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
                 <div class="overall_options">
                   <div class="overall_row" style="flex-direction: column; align-items: flex-start">
                     <div style="margin-left: 20px; padding: 20px 0px;">
                       <el-switch
                         v-model="biometric_switch"
-                        active-text="開啟"
-                        inactive-text="關閉">
+                        :active-text="$t('addition.on')"
+                        :inactive-text="$t('addition.off')">
                       </el-switch>
                     </div>
-                    <span style="margin-left: 20px; font-size: 12px;"> 開啟後，該品牌下的所有使用者在 App 端登入時必須使用生物辨識功能（若手機支援） </span>
+                    <span style="margin-left: 20px; font-size: 12px;"> {{ $t('addition.brandBiometrics') }} </span>
                 </div>
                 </div>
 
@@ -571,17 +571,17 @@ export default {
         return
       }
       else if(this.delayDay > 90){
-        util.notify('天數不可大於 90 天', 'error', 2000 );
+        util.notify(this.$t('audit.workFlows.moreThanDays'), 'error', 2000 );
         this.$refs.delay_day.focus()
         return
       }
       else if(this.workflowDay > 90){
-        util.notify('天數不可大於 90 天', 'error', 2000 );
+        util.notify(this.$t('audit.workFlows.moreThanDays'), 'error', 2000 );
         this.$refs.workflow_day.focus()
         return
       }
       else if(this.overDueDay > 365){
-        util.notify('逾期結案天數不可大於 365 天', 'error', 2000 );
+        util.notify(this.$t('audit.workFlows.moreThanCloseDays'), 'error', 2000 );
         this.$refs.overDue_Day.focus()
         return
       }

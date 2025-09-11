@@ -132,6 +132,10 @@ export default {
     "deleteReport": "刪除報告",
     "closeEvents": "已結案事件",
     "operationRecord": "操作記錄",
+    "reportAndEventDeleted": "報告與事件 | 刪除報告",
+    "reportAndEventUpdated": "報告與事件 | 已結案事件",
+    "needDeleteReport": "報告詳情",
+    "needUpdateEvent": "事件詳情",
     "DataSecurity": "资料安全",
     "InstantPush": "即时推播",
     "Send": "发送推播",
@@ -1821,6 +1825,7 @@ export default {
     "agreeDelete": "我理解并同意删除报告",
     "deleteReason": "刪除原因",
     "insertPassword": "请再次输入使用者密码",
+    "agree": "同意刪除須知事項",
   },
 
   "addition": {
@@ -1832,6 +1837,22 @@ export default {
     "event": "事件:",
     "eventTime": "事件时间:",
     "ChangeToUnprocessed": "变更为未处理",
+    "skipSignin": "略過簽到",
+    "reviseStatus": "(已變更狀態)",
+    "reviseTime": "變更時間：",
+    "moreThanDays": "天數不可大於 90 天",
+    "moreThanCloseDays": "逾期結案天數不可大於 365 天",
+    "events": "巡檢事件",
+    "overdueClosed": "逾期結案",
+    "on": "開啟",
+    "off": "關閉",
+    "overdue": "逾期天數",
+    "SpecificManagementSettings": "特定巡檢管理功能設定",
+    "biometricAuthentication": "啟用生物辨識功能",
+    "brandBiometrics": "開啟後，該品牌下所有使用者在app端登入時必須使用生物辨識功能（若手機支援）",
+    "outOfRange": "超出簽到範圍",
+    "returnProcessing": "返回處理",
+    "totalOf": "共有",
   }
 
 }
