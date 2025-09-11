@@ -535,7 +535,9 @@ export default{
         var tempN = this.allInspectTypeList.filter( i => i.mode === 1)
         this.inspectionName = tempN[0].id
         this.selectUser = this.userInfo[0].userId
-        this.selectStore = this.storeList[0].storeId
+        this.selectStore = this.storeList[0] ?  this.storeList[0].storeId : null
+
+
 
       }
       this.isLoadingData = false
@@ -629,6 +631,11 @@ export default{
         return
       }
 
+      if(this.selectStore == null){
+        util.notify("需要選擇門店", 'error', 2000 );
+        this.isLoadingData = false
+        return
+      }
       // if(this.inspectionName == ''){
       //   util.notify("請選擇巡檢表", 'error', 2000 );
       //   this.isLoadingData = false
