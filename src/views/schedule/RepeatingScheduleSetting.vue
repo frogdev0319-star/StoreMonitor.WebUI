@@ -17,7 +17,7 @@
     <!-- 排程設定 -->
     <div class="page-container report-setting paper" style="margin-bottom: 40px">
       <div class="setting-titles padding flex-center">
-        重複排程設定
+        {{$t('repeatingSchedule.setting')}}
         <div class="spacer"></div>
       </div>
 
@@ -46,11 +46,11 @@
 
             <!-- 巡檢表 -->
             <div class="flex-row" style="margin-right: 30px">
-              <div class="title-name"><span style="color: #c60957">* </span> 巡檢表</div>
+              <div class="title-name"><span style="color: #c60957">* </span> {{$t('reportAndEvents.inceptionTag')}}</div>
               <div class="title-status">
                 <el-select
                   v-model="inspectionName"
-                  placeholder="巡檢表名稱"
+                  :placeholder="$t('createinspect.inspectName')"
                   style="width: 250px"
                   >
                   <el-option
@@ -70,11 +70,11 @@
           <div class="setting-config">
             <!-- 巡檢地點 -->
             <div class="flex-row" style="margin-right: 30px">
-              <div class="title-name"><span style="color: #c60957">* </span> 巡檢地點</div>
+              <div class="title-name"><span style="color: #c60957">* </span> {{$t('epaper.patrolStore')}}</div>
               <div class="title-status">
                 <el-select
                   v-model="selectStore"
-                  placeholder="巡檢地點"
+                  :placeholder="$t('epaper.patrolStore')"
                   style="width: 250px"
                   >
                   <el-option
@@ -89,11 +89,11 @@
 
             <!-- 執行人員 -->
             <div class="flex-row" style="margin-right: 30px">
-              <div class="title-name"><span style="color: #c60957">* </span> 執行人員</div>
+              <div class="title-name"><span style="color: #c60957">* </span>  {{$t('epaper.Executor')}}</div>
               <div class="title-status">
                 <el-select
                   v-model="selectUser"
-                  placeholder="執行人員"
+                  :placeholder="$t('epaper.Executor')"
                   style="width: 250px"
                   >
                   <el-option
@@ -113,13 +113,13 @@
         <div class="inspect-basic flex-column">
           <!-- 巡檢時間 -->
           <div class="flex-row" style="margin-right: 30px; margin-bottom: 30px;">
-            <div class="title-name"><span style="color: #c60957">* </span> 巡檢時間</div>
+            <div class="title-name"><span style="color: #c60957">* </span> {{$t('statistics.patrolPerson.ts')}}</div>
             <div class="title-status">
               <el-time-picker
                   v-model="taskTime"
                   format="HH:mm"
                   value-format="HH:mm"
-                  placeholder="設定巡檢時間"
+                  :placeholder="$t('repeatingSchedule.setInspectionTime')"
                 />
             </div>
             <!-- <div class="notice">{{$t('schedule.pleaseFinished')}} !</div> -->
@@ -127,7 +127,7 @@
 
           <!-- 提醒時間 -->
           <div class="flex-row" style="margin-right: 30px; margin-bottom: 30px;">
-            <div class="title-name"><span style="color: #c60957">* </span> 提醒時間</div>
+            <div class="title-name"><span style="color: #c60957">* </span> {{$t('scheduleView.notifyTime')}}</div>
             <div class="title-status">
               <el-input
                     v-model="remindTime"
@@ -138,14 +138,14 @@
                     @change="onEventChanged"
                     class="input-name_short"
                     />
-                    分鐘前
+                    {{$t('repeatingSchedule.beforeMin')}}
             </div>
             <!-- <div class="notice">{{$t('schedule.pleaseFinished')}} !</div> -->
           </div>
 
           <!-- 重複週期 -->
           <div class="flex-row" style="margin-right: 30px; margin-bottom: 30px;">
-            <div class="title-name"><span style="color: #c60957">* </span> 重複週期</div>
+            <div class="title-name"><span style="color: #c60957">* </span> {{$t('repeatingSchedule.repeatWeekDaysItems')}}</div>
             <div class="title-status">
               <el-select
                 v-model="repeatCycle"
@@ -220,31 +220,31 @@ export default{
       selectRemiderStyle:[
         {
           value: 1,
-          label: '星期一'
+          label:this.$t('repeatingSchedule.mon')
         },
         {
           value: 2,
-          label: '星期二'
+          label:this.$t('repeatingSchedule.tue')
         },
         {
           value: 3,
-          label: '星期三'
+          label:this.$t('repeatingSchedule.wed')
         },
         {
           value: 4,
-          label: '星期四'
+          label:this.$t('repeatingSchedule.thu')
         },
         {
           value: 5,
-          label: '星期五'
+          label:this.$t('repeatingSchedule.fri')
         },
         {
           value: 6,
-          label: '星期六'
+          label:this.$t('repeatingSchedule.sat')
         },
         {
           value: 7,
-          label: '星期日'
+          label:this.$t('repeatingSchedule.sun')
         },
       ],
       storeList: [],
@@ -342,16 +342,6 @@ export default{
 
       inspectionMode:'',
       inspectionName:'',
-      inspectionStyle: [
-        // {
-        //   value : 1,
-        //   label: '現場巡檢'
-        // },
-        {
-          value : 0,
-          label: '遠端巡檢'
-        },
-      ],
       allInspectTypeList: [],
       inspectTypeList: [],
 
@@ -516,13 +506,13 @@ export default{
 
         var repeatWeekDays = []
         this.scheduleStatus.repeatWeekDays.forEach(i => {
-          if(i == "星期一"){ repeatWeekDays.push(1) }
-          else if(i == "星期二") { repeatWeekDays.push(2) }
-          else if(i == "星期三") { repeatWeekDays.push(3) }
-          else if(i == "星期四") { repeatWeekDays.push(4) }
-          else if(i == "星期五") { repeatWeekDays.push(5) }
-          else if(i == "星期六") { repeatWeekDays.push(6) }
-          else if(i == "星期日") { repeatWeekDays.push(7) }
+          if(i == 1){ repeatWeekDays.push(this.$t('repeatingSchedule.mon')) }
+          else if(i == 2) { repeatWeekDays.push(this.$t('repeatingSchedule.tue'))}
+          else if(i == 3) { repeatWeekDays.push(this.$t('repeatingSchedule.wed')) }
+          else if(i == 4) { repeatWeekDays.push(this.$t('repeatingSchedule.thu')) }
+          else if(i == 5) { repeatWeekDays.push(this.$t('repeatingSchedule.fri')) }
+          else if(i == 6) { repeatWeekDays.push(this.$t('repeatingSchedule.sat')) }
+          else if(i == 7) { repeatWeekDays.push(this.$t('repeatingSchedule.sun')) }
         })
 
         this.repeatCycle =repeatWeekDays
@@ -626,26 +616,22 @@ export default{
       this.isLoadingData = true
 
       if(this.taskName == ''){
-        util.notify("排程名稱不可為空", 'error', 2000 );
+        util.notify(this.$t('repeatingSchedule.taskNameCantEmpty'), 'error', 2000 );
         this.isLoadingData = false
         return
       }
 
-      if(this.selectStore == null){
-        util.notify("需要選擇門店", 'error', 2000 );
+      if(this.taskTime == null){
+        util.notify(this.$t('repeatingSchedule.taskTimeCantEmpty'), 'error', 2000 );
         this.isLoadingData = false
         return
       }
-      // if(this.inspectionName == ''){
-      //   util.notify("請選擇巡檢表", 'error', 2000 );
-      //   this.isLoadingData = false
-      //   return
-      // }
-      // if(this.scheduleDataList.length < 1){
-      //   util.notify("請至少設定一筆排程！", 'error', 2000 );
-      //   this.isLoadingData = false
-      //   return
-      // }
+
+      if(this.repeatCycle.length == 0){
+        util.notify(this.$t('repeatingSchedule.repeatCycleCantEmpty'), 'error', 2000 );
+        this.isLoadingData = false
+        return
+      }
 
       const [HH, MM] = this.taskTime.split(':').map(Number);
       //建今天的日期物件
@@ -934,27 +920,6 @@ export default{
       console.log('this.handleSchedule', this.handleSchedule)
     },
 
-
-    resetData(val){
-      if(val.remindTime) val.remindTime = ''
-      if(val.remindDate) val.remindDate = ''
-      if(val.remindTimePoint) val.remindTimePoint = ''
-      if(val.remindStyle) val.remindStyle = []
-
-      console.log('val', val)
-      console.log('this.showScheduleDataList', this.showScheduleDataList)
-      // val.remindStyle = []
-      // this.scheduleDataList.forEach( i => {
-      //   if(i.id == val.id ){
-      //     console.log('1')
-      //     i.remindTime = ''
-      //     i.remindDate = ''
-      //     i.remindTimePoint = ''
-      //     i.remindStyle = []
-      //   }
-
-      // })
-    }
   }
 }
 </script>

@@ -3,30 +3,30 @@
 
         <div class="search-bar">
             <div class='keyword-area'>
-                <div class="search-label" >時間  {{ taskTime }}</div>
+                <div class="search-label" >{{$t('repeatingSchedule.time')}} </div>
                 <el-time-picker
                   v-model="startSearchTime"
                   style="width: 150px;"
                   format="HH:mm"
                   value-format="HH:mm"
-                  placeholder="搜尋開始時間"
+                  :placeholder="$t('repeatingSchedule.startSearchTime')"
                 />
                 <el-time-picker
                   v-model="endSearchTime"
                   style="width: 150px;"
                   format="HH:mm"
                   value-format="HH:mm"
-                  placeholder="搜尋結束時間"
+                  :placeholder="$t('repeatingSchedule.endSearchTime')"
                 />
             </div>
 
             <div class='keyword-area'>
-                <div class="search-label" >地點</div>
+                <div class="search-label" >{{$t('schedule.storeName')}}</div>
                 <el-select
                   v-model="selectStore"
-                  placeholder="巡檢地點"
+                  :placeholder="$t('overview.patrolStore')"
                   :clearable = "true"
-                  style="width: 250px"
+                  style="width: 200px"
                   >
                   <el-option
                     v-for="(item, index) in storeList"
@@ -38,12 +38,12 @@
             </div>
 
             <div class='keyword-area'>
-                <div class="search-label" >執行人</div>
+                <div class="search-label" >{{$t('schedule.incepPerson')}}</div>
                 <el-select
                   v-model="selectUser"
-                  placeholder="執行人員"
+                  :placeholder="$t('schedule.incepPerson')"
                   :clearable = "true"
-                  style="width: 250px"
+                  style="width: 200px"
                   >
                   <el-option
                     v-for="(item, index) in userInfo"
@@ -55,7 +55,7 @@
             </div>
 
             <div class='keyword-area'>
-                <div class="search-label" >重複排程 </div>
+                <div class="search-label" >{{$t('repeatingSchedule.repeatingSchedule')}} </div>
                 <el-select
                   v-model="repeatCycle"
                   :placeholder="$t('schedule.remiderMethod')"
@@ -188,28 +188,28 @@ export default{
           columnData:[
           {
               'prop': 'name',
-              'label': '排程名稱',
+              'label': this.$t('scheduleView.scheduleName'),
               'sortable': false,
               'width': 300,
               'maxWidth': 300,
           },
           {
               'prop': 'excuteTime',
-              'label': '執行時間',
+              'label': this.$t('scheduleView.exectionTime'),
               'sortable': false,
               'width': 50,
               'maxWidth': 50,
           },
           {
               'prop': 'remindBeforeMinutes',
-              'label': '提前提醒時間',
+              'label':  this.$t('repeatingSchedule.remindBeforeMinutes'),
               'sortable': false,
               'width': 50,
               'maxWidth': 50,
           },
           {
               'prop': 'store',
-              'label': '地點/時區',
+              'label': this.$t('schedule.store'),
               'sortable': false,
               'width': 100,
               'maxWidth': 100,
@@ -217,29 +217,23 @@ export default{
 
           {
               'prop': 'executor',
-              'label': '執行人',
+              'label': this.$t('schedule.incepPerson'),
               'sortable': false,
               'width': 130,
               'maxWidth': 130,
           },
           {
               'prop': 'inspection',
-              'label': '巡檢表',
+              'label': this.$t('reportAndEvents.inceptionTag'),
               'sortable': false,
               'width': 130,
               'maxWidth': 130,
           },
-          // {
-          //     'prop': 'repeatWeekDays',
-          //     'label': '重複週期',
-          //     'sortable': false,
-          //     'width': 50,
-          //     'maxWidth': 50,
-          // },
+
         ],
 
         repeatWeekDaysItems: {
-            label: '重複週期',
+            label: this.$t('repeatingSchedule.repeatWeekDaysItems'),
             minWidth: '120',
             align: 'left',
 
@@ -275,34 +269,33 @@ export default{
         selectRemiderStyle:[
           {
             value: 1,
-            label: '星期一'
+            label:this.$t('repeatingSchedule.mon')
           },
           {
             value: 2,
-            label: '星期二'
+            label:this.$t('repeatingSchedule.tue')
           },
           {
             value: 3,
-            label: '星期三'
+            label:this.$t('repeatingSchedule.wed')
           },
           {
             value: 4,
-            label: '星期四'
+            label:this.$t('repeatingSchedule.thu')
           },
           {
             value: 5,
-            label: '星期五'
+            label:this.$t('repeatingSchedule.fri')
           },
           {
             value: 6,
-            label: '星期六'
+            label:this.$t('repeatingSchedule.sat')
           },
           {
             value: 7,
-            label: '星期日'
+            label:this.$t('repeatingSchedule.sun')
           },
         ],
-        taskTime: null,
         repeatCycle: [],
         startSearchTime: null,
         endSearchTime: null,
@@ -441,13 +434,13 @@ export default{
 
                       var repeatWeekDays = []
                       item.weekDays.forEach(i => {
-                        if(i == 1){ repeatWeekDays.push("星期一") }
-                        else if(i == 2) { repeatWeekDays.push("星期二") }
-                        else if(i == 3) { repeatWeekDays.push("星期三") }
-                        else if(i == 4) { repeatWeekDays.push("星期四") }
-                        else if(i == 5) { repeatWeekDays.push("星期五") }
-                        else if(i == 6) { repeatWeekDays.push("星期六") }
-                        else if(i == 7) { repeatWeekDays.push("星期日") }
+                        if(i == 1){ repeatWeekDays.push(this.$t('repeatingSchedule.mon')) }
+                        else if(i == 2) { repeatWeekDays.push(this.$t('repeatingSchedule.tue'))}
+                        else if(i == 3) { repeatWeekDays.push(this.$t('repeatingSchedule.wed')) }
+                        else if(i == 4) { repeatWeekDays.push(this.$t('repeatingSchedule.thu')) }
+                        else if(i == 5) { repeatWeekDays.push(this.$t('repeatingSchedule.fri')) }
+                        else if(i == 6) { repeatWeekDays.push(this.$t('repeatingSchedule.sat')) }
+                        else if(i == 7) { repeatWeekDays.push(this.$t('repeatingSchedule.sun')) }
                       })
                       obj.repeatWeekDays = repeatWeekDays
 
@@ -518,7 +511,7 @@ export default{
             const param = this.SelSchedulId
             scheduleRESTful.deleteWeeklyTask(param).then(res =>{
               if(res.errCode === 0){
-                util.notify("重複排程刪除成功", 'success', 3000);
+                util.notify(this.$t('repeatingSchedule.deleteSucess'), 'success', 3000);
                 this.showConfirmDelete = false
                 this.isLoadingData = false;
                 this.doSearchScheduleList()
