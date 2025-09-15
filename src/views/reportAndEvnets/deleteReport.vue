@@ -579,7 +579,7 @@ export default {
       deleteReport(delParams).then(res=>{
         console.log('res :>> ', res);
         if(res.errCode){
-          util.notify('密碼錯誤，請重新輸入！', 'error', 3000);
+          util.notify(this.$t('addition.wrongPassword'), 'error', 3000);
         } else {
           this.showUpdateEvent = false
           this.agreeDelete = false

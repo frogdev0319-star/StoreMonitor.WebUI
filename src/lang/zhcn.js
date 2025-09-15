@@ -1853,6 +1853,17 @@ export default {
     "outOfRange": "超出簽到範圍",
     "returnProcessing": "返回處理",
     "totalOf": "共有",
+
+    "wrongPassword": "密碼錯誤，請重新輸入！",
+    "noEventData": "没有事件數據！",
+    "triggerTime": "觸發時間：",
+    "impItems": "重要巡檢項",
+    "inputTag": "請輸入備註標籤",
+    "deleteInspection": "已刪除此巡檢表",
+    "dataIsEmpty": "表格資料為空！請重新搜尋條件",
+    "comfimDelete": "巡檢表刪除後將無法復原，且無法再查看該巡檢表相關之報告與統計分析！請確認是否刪除？",
+    "passwordToDelete": "請輸入密碼確認刪除",
+
   },
   "epaper": {
     "date": "時間範圍",

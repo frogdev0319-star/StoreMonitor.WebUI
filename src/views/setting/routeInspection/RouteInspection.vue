@@ -206,10 +206,10 @@
     >
       <div class="dialog-slot">
         <div class="dialog-content">
-          <p> 巡檢表刪除後將無法復原，且無法再查看該巡檢表相關之報告與統計分析！請確認是否刪除？</p>
+          <p> {{$t('addition.comfimDelete')}}</p>
           <div class="l_row">
             <div style="margin-bottom: 5px ;">
-              <span style="color: red; ">*</span> 請輸入密碼確認刪除
+              <span style="color: red; ">*</span> {{$t('addition.passwordToDelete')}}
             </div>
             <el-input
               v-model="passWord"
@@ -369,7 +369,6 @@ export default {
       showWeightSetting: false,
       loading: false,
       varyWindowWidth: window.innerHeight,
-      addPatrol: '新增巡检表',
       patrolActive: '0',
       PatrolListOne: '0',
       PatrolListTwo: '0',
@@ -1818,7 +1817,7 @@ export default {
           this.canDeleteReport = false
         } else {
           this.isLoading = false
-          util.notify('密碼錯誤，請重新輸入！', 'error', 3000);
+          util.notify(this.$t('addition.wrongPassword'), 'error', 3000);
           this.passWord = ''
           this.canDeleteReport = false
           return false;
@@ -2183,7 +2182,7 @@ export default {
           rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_2);
           rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_3);
           rowDataObj.score = _item.__EMPTY_4;
-          rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
+          rowDataObj.description = this.getTableCellData(_item[this$t('insSettingView.tHeaderD')]);
           //console.log('**_item.__EMPTY_5:',_item.__EMPTY_5);
           rowDataObj.required = (typeof _item.__EMPTY_5=='undefined')?'':_item.__EMPTY_5;
           // if (tableVersion === 1) {
@@ -2223,13 +2222,13 @@ export default {
             rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_1);
             rowDataObj.score = _item.__EMPTY_2;
             rowDataObj.required = _item.__EMPTY_3;
-            rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
+            rowDataObj.description = this.getTableCellData(_item[this.$t('insSettingView.tHeaderD')]);
           } else {
             rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_1);
             rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_2);
             rowDataObj.score = _item.__EMPTY_3;
             rowDataObj.required = _item.__EMPTY_4;
-            rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
+            rowDataObj.description = this.getTableCellData(_item[this.$t('insSettingView.tHeaderD')]);
           }
 
           rowDataArray.push(rowDataObj);

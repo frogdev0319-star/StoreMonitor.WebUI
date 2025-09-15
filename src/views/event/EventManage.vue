@@ -104,7 +104,7 @@
               :header-row-style="{width:'1920px'}"
               :header-cell-style="{fontSize:'calc(12/1920*100vw)',color:'#7d8cad',height: '47px'}"
               :cell-style="cellStyle"
-              empty-text="没有事件數據"
+              :empty-text="$t('addition.noEventData')"
               align="left"
               style="width:auto"
               class="table-content tbl-checkbox"

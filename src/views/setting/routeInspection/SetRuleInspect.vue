@@ -21,7 +21,7 @@
           <p class="rule-item">
             <el-checkbox class="storevue-checkbox-outlined" v-model="qualifiedForIgnoredWithType1">
               <span>
-                {{ $t('insSettingView.tab1IgnoredQualified') }} 
+                {{ $t('insSettingView.tab1IgnoredQualified') }}
               </span>
             </el-checkbox>
           </p>
@@ -1177,7 +1177,7 @@ export default {
         if(this.workFlowInfoValue !== null){
           const firstObj = {
             processDefinitionKey: -1,
-            name: "無",
+            name: "None",
           }
           this.workFlowList = [firstObj, ...res.data]
           this.workFlowToBind = this.workFlowInfoValue.processDefinitionKey

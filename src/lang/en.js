@@ -1860,6 +1860,18 @@ export default {
     "outOfRange": "Check-in Out of Range",
     "returnProcessing": "Return Processing",
     "Total Of": "Total of",
+
+    "wrongPassword": "Wrong password, please re-enter!",
+    "noEventData": "No event data!",
+    "triggerTime": "Trigger Time",
+    "impItems": "Important inspection items",
+    "inputTag": "Please enter a note tag",
+    "deleteInspection": "This inspection table has been deleted",
+    "dataIsEmpty": "The form data is empty! Please search again",
+    "comfimDelete": "Once the inspection sheet is deleted, it cannot be restored and the reports and statistical analysis related to the inspection sheet will no longer be available! Please confirm whether to delete it?",
+    "passwordToDelete": "Please enter your password to confirm deletion.",
+
+
   },
   "epaper": {
     "date": "Time Range",

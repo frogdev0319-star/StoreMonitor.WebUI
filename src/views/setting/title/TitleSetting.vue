@@ -44,9 +44,9 @@
         <div class="flex-center" style="padding-bottom: 20px">
           <div>{{ $t('titleView.roleSetting') }}</div>
           <div class="spacer"></div>
-          
+
           <div class="temp-select-area" :style="{'width':getLangStyleValue(tempSelectAreaWidth)}">
-            <div class="temp-select-label" :style="{'width':getLangStyleValue(tempSelectLabelWidth)}">{{ $t('titleView.templateSelection') }}</div> 
+            <div class="temp-select-label" :style="{'width':getLangStyleValue(tempSelectLabelWidth)}">{{ $t('titleView.templateSelection') }}</div>
             <el-select
               v-model="templateRoleId"
               class="device-select"
@@ -63,9 +63,9 @@
         <hr class="hr-horizontal">
         <el-scrollbar :class="showRolesList? 'showlist-el-menuscrollbar' : 'el-menuscrollbar'">
 
-          <div 
-            v-for="(item,index) in roleNameList" 
-            :key="index" class="role-group" 
+          <div
+            v-for="(item,index) in roleNameList"
+            :key="index" class="role-group"
             v-show="item.show"
           >
             <div class="role-all-checkbox" style="text-align: left">
@@ -356,7 +356,7 @@ export default {
               visabled: false
             },
             {
-              roleName: '通用設定',
+              roleName: this.$t('route.generalSetting'),
               checked: false,
               disabled: false,
               visabled : true
@@ -443,7 +443,7 @@ export default {
   },
 
   created() {
-    
+
   },
   methods: {
     getWhiteLsit(){
@@ -541,7 +541,7 @@ export default {
       this.roleNameList[6].children[5].checked = !!PermissionHelper.enableReportSetting();
       this.roleNameList[6].children[6].checked = !!PermissionHelper.enableWorkflowSetting();
 
-      
+
 
       //auditSetting
       this.roleNameList[4].children[0].checked = !!PermissionHelper.enableSendAudit();
@@ -670,15 +670,15 @@ export default {
             else if(index === 4 && _index === 1){
               tempAuthorityNum += Math.pow(2, 1);
               console.log('xdxdxd 1' , tempAuthorityNum)
-            } 
+            }
             else if(index === 4 && _index === 2){
               tempAuthorityNum += Math.pow(2, 2);
               console.log('xdxdxd 2' , tempAuthorityNum)
-            } 
+            }
             else if(index === 4 && _index === 4){
               tempAuthorityNum += Math.pow(2, 4);
               console.log('xdxdxd 4' , tempAuthorityNum)
-            } 
+            }
             else if(index === 4 && _index === 5){
               tempAuthorityNum += Math.pow(2, 5);
               console.log('xdxdxd 5' , tempAuthorityNum)
@@ -894,7 +894,7 @@ export default {
 
   }
   .temp-select-area{
-    display:flex; 
+    display:flex;
     flex-direction:row;
     height:30px;
     width:220px;

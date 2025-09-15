@@ -33,7 +33,7 @@
           <div class="head">
             <div class="region-titles">
                 <span class="title">
-                      {{ $t('statistics.titles.inspectItemScores') }} 
+                      {{ $t('statistics.titles.inspectItemScores') }}
                 </span>
             </div>
                 <TypeSelectArea
@@ -51,7 +51,7 @@
                   @emitTypeChanged="emitTypeChangedPart3"
               ></TypeSelectArea>
           </div>
-          
+
           <!-- 巡檢項目選單 -->
           <div style="padding:20px">
             <InspectItemSelect
@@ -61,7 +61,7 @@
           </div>
           <div class="subtitle-head">
               <span class="title" style="width:80%" >
-                {{inspectSubTitle}} 
+                {{inspectSubTitle}}
               </span>
           </div>
 
@@ -799,7 +799,7 @@ export default {
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{},
               table:{total:0,page:1,sizeNum:10,order:'desc',property:'numOfTotal'}},
-              
+
       operationBtnClass:[
         {key:'en',value:'operation-btns-en'},{key:'zh',value:'operation-btns-zh'},{key:'zhtw',value:'operation-btns-zhTW'},
         {key:'ja-JP',value:'operation-btns-ja'},{key:'ko-KR',value:'operation-btns-ko'},{key:'vi-VN',value:'operation-btns-vi'},
@@ -1000,10 +1000,10 @@ export default {
       } else {
         this.totalRegion = 0;
         this.regionTableData = [];
-        
+
 
         this.part3.storeTableData = [];
-        
+
         this.regionsList = [];
         this.curRegion = [];
         this.regionsChartsOptions ={};
@@ -1064,7 +1064,7 @@ export default {
         direction:"desc",
         property: "averageScore",
       }
-    
+
       var needStoreId = null
       if(this.part3.compareType == 'stores'){
         console.log('stores :>> ');
@@ -1087,7 +1087,7 @@ export default {
           }
           params.groupIds   = [];
           params.groupMode = 0;
-        } 
+        }
         else if(this.part3.compareType == 'mysterio'){
           params.storeIds = self.params.storeIds;
           params.searchMysteryMode = 1
@@ -1111,11 +1111,10 @@ export default {
           return false;
         }
 
-        
+
         if(this.inspectItem){
           params.itemIds = this.inspectItem.item.ids
         }
-        console.log('params XXXDDD :>> ', params);
         const storeResult = await this.getInspectStatsItemOverGroup(params);
         console.log("storeResult" , storeResult)
 
@@ -1126,7 +1125,7 @@ export default {
           }
         }
       }
-      
+
       const now = new Date()
       var nowTs = this.getAllDate(now)
       var tsbegin = this.getDate(this.params.beginTs)
@@ -1142,10 +1141,10 @@ export default {
       params.fileName = nowTs + "-Inspection_item_score-" + tsbegin + tsEnd
       params.requestTs = now.getTime()
 
-    
+
       var tempinspectTagName = []
       if(this.storeList.length == params.storeIds.length){
-          tempinspectTagName = ["全部"]
+          tempinspectTagName = [this.$t('remotePatrol.all')]
       }
       else{
           params.storeIds.forEach( i => {
@@ -1156,7 +1155,7 @@ export default {
       }
       params.conTableName = this.inspectItem.item.tag
       params.conStoreName = tempinspectTagName.join(', ')
-    
+
       console.log("params" , params)
       // console.log("content" , content)
 
@@ -1170,12 +1169,12 @@ export default {
             if(item.storeType=='')item.storeType='- -'
 
       });
-      
+
       if (content.length == 0) {
-          util.notify("表格資料為空！請重新搜尋條件", 'warning', 3 * 1000);
+          util.notify(self.$t('addition.dataIsEmpty'), 'warning', 3 * 1000);
           return false;
       }
-  
+
       this.showExportMassage = true
       exportStatisticsInspectItemOverview(params).then(res=>{
         console.log('res [4001]:>> ', res);
@@ -1215,7 +1214,7 @@ export default {
       var hour = this.pad2(date.getHours())
       var min = this.pad2(date.getMinutes())
       var sec = this.pad2(date.getSeconds())
-      return year + month + day 
+      return year + month + day
     },
     getOnlyDate(t){
       var date = new Date(t);
@@ -1225,7 +1224,7 @@ export default {
       var hour = this.pad2(date.getHours())
       var min = this.pad2(date.getMinutes())
       var sec = this.pad2(date.getSeconds())
-      return  month + day 
+      return  month + day
     },
 
     formatJson(filterVal, jsonData) {
@@ -1385,7 +1384,7 @@ export default {
       this.part3.selStoreIdArr = selStoreIdArr;
       this.dataGetPart3();
     },
-    
+
     getInspectLineOption() {
       const option = {
         width:'100%',
@@ -1741,7 +1740,7 @@ export default {
       else if(self.part1.compareType=='storeType'){
         params.groupIds  = self.part1.compareIds;
         params.groupMode = 3;
-        
+
       }
       else if(self.part1.compareType=='storeGroup'){
         params.groupIds  = self.part1.compareIds;
@@ -1986,7 +1985,7 @@ export default {
       else if(this.part2.compareType=='storeGroup'){
         params.groupIds  = this.part2.compareIds;
         params.groupMode = 4;
-      } 
+      }
 
       let totalReport = 0;
       let totalStandard = 0;
@@ -2128,7 +2127,7 @@ export default {
       option.yAxis[0].name  =  this.$t('statistics.score'),
       this.part2.barStoreOption = option;
     },
-    
+
 
     async getPart3RegionBar() {
       // this.inspectItem
@@ -2204,7 +2203,7 @@ export default {
         params.itemIds = this.inspectItem.item.ids
       }
 
-      
+
       let totalReport = 0;
       let totalStandard = 0;
 
@@ -2214,7 +2213,7 @@ export default {
         this.drawPart3RegionBar();
         return;
       }
-      
+
       params.filter = { page: 0, size: params.groupIds.length };
       console.log('params :::::::::::::>> ', params);
 
@@ -2226,7 +2225,7 @@ export default {
         const storeResult = await self.getInspectStatsItemOverGroup(params);
 
         console.log('storeResult//////>>', storeResult)
-      
+
       if (storeResult.errCode === 0) {
         const result = storeResult.data;
         console.log("getPart3RegionBar result:",result);
@@ -2249,7 +2248,7 @@ export default {
 
     },
 
-    
+
     async drawPart3RegionBar(){
       console.log("drawPart3RegionBar")
       const option = this.getInspectLineOption();
@@ -2292,7 +2291,7 @@ export default {
 
           regionLabel.push(this.maxLabel(item.groupName))
         });
-        
+
         // console.log('totalAvgScore //////>> ', totalAvgScore);
         // console.log('count //////>> ', count);
 
@@ -2358,7 +2357,7 @@ export default {
             console.log("To Get Data")
             params.storeIds = this.part3.indexRegion==-1?this.part3.selStoreIdArr:this.part3.content[this.part3.indexRegion].list;
             params.groupIds = this.part3.indexRegion==-1?[]:this.part3.content[this.part3.indexRegion].list;
-            
+
             if(this.part3.compareType=='users' || this.part3.compareType=='position'){
               params.storeIds = self.params.storeIds;
               params.submitters=this.part3.indexRegion==-1?[]:[ this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName)]
@@ -2653,7 +2652,7 @@ export default {
                   });
 
               })
-  
+
               this.inspectItemList = tempList ;
               this.curInspectId = searchParams.inspectId
               console.log('this.inspectItemList :>> ', this.inspectItemList);
@@ -2808,7 +2807,7 @@ export default {
       console.log("2.getPart3RegionBar");
       this.getPart3RegionBar();
     },
-    
+
     async doGetAssessmentStandardScore(){
       console.log("tag-doGetAssessmentStandardScore")
       let tagList = await this.getInspectTagStandardScore();
@@ -2842,7 +2841,7 @@ export default {
         console.log('item ~~~~~>> ', item)
         console.log('this.params ======>> ', this.params)
 
-      
+
         if(this.params.storeIds.length == 0){
           this.inspectSubTitle = name + " " + this.$t('statistics.itemAverageScore') + "  ( " + this.$t('statistics.totalScore') +   " N/A)";
           this.inspectDetailSubTitle = name + " " + this.$t('statistics.evalDetail')+ "  ( " + this.$t('statistics.totalScore') +  " N/A)";
@@ -2850,7 +2849,7 @@ export default {
           this.inspectSubTitle = name + " " + this.$t('statistics.itemAverageScore') + "  ( " + this.$t('statistics.totalScore') +  parseFloat(item.qualifiedScore.toFixed(1)) + " )";
           this.inspectDetailSubTitle = name + " " + this.$t('statistics.evalDetail')+ "  ( " + this.$t('statistics.totalScore') +  parseFloat(item.qualifiedScore.toFixed(1)) + " )";
         }
-      
+
       }
     }
   }
