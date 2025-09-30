@@ -136,12 +136,20 @@ export default {
     "reportAndEventUpdated": "報告與事件 | 已結案事件",
     "needDeleteReport": "報告詳情",
     "needUpdateEvent": "事件詳情",
+
+
     "DataSecurity": "資料安全",
     "InstantPush": "即時推播",
     "Send": "發送推播",
     "SendingRecord": "發送紀錄",
     "downloadManagement": "下載管理",
-    "createInspect": "建立巡檢表"
+    "createInspect": "建立巡檢表",
+    "epaperManagement": "電子紙管理",
+    "signinRecord": "簽到紀錄",
+    "RepeatingSchedule": "重複排程",
+    "RepeatingScheduleSetting": "重複排程設定",
+
+
   },
   "overview": {
     "DangerousLess": "立即督導＜60%",
@@ -708,7 +716,7 @@ export default {
     "enterListName": "請輸入巡檢表名稱",
     "enterListNameRuletip": "最多可輸入250個字元",
     "enterName": "輸入巡檢類別名稱",
-    "enterNameRuletip": "最多可輸入30個字元",
+    "enterNameRuletip": "最多可輸入50個字元",
     "inputRuletip": "最多可輸入20個字元",
     "enterScore": "請輸入分值",
     "enterSelfListName": "請輸入自訂巡檢表名稱！",
@@ -716,7 +724,7 @@ export default {
     "eventTimeoutReminder": "事件超時未處理提醒",
     "excelEmpty": "巡檢類別與巡檢項名稱不能為空",
     "excelFullScoreType": "項目總分值必填，取值範圍為0~50",
-    "excelIllegalCategory": "存在“@#￥%^&*”特殊字元！",
+    "excelIllegalCategory": "存在“@#￥%^&*\/:?<>|”特殊字元！",
     "excelIllegalDes": "巡檢項目詳細說明不可超過1200個字元！",
     "excelLongCategory": "巡檢類別長度不可超過30個字元！",
     "excelLongSubCategory": "巡檢子類別長度不可超過30個字元！",
@@ -1627,7 +1635,6 @@ export default {
     "hasSelected": "已選地點總數： ",
     "ifDeleted": "是否需要刪除已選擇的地點？ ",
     "storeName": "地點 ",
-
   },
   "generalSetting": {
     "save": "保存",
@@ -1820,6 +1827,7 @@ export default {
     "agreeDelete": "我理解並同意刪除報告",
     "deleteReason": "刪除原因",
     "insertPassword": "請再次輸入使用者密碼",
+    "agree": "同意刪除須知事項",
   },
 
   "addition": {
@@ -1831,7 +1839,76 @@ export default {
     "event": "事件:",
     "eventTime": "事件時間:",
     "ChangeToUnprocessed": "變更為未處理",
-  }
+    "skipSignin": "略過簽到",
+    "reviseStatus": "(已變更狀態)",
+    "reviseTime": "變更時間：",
+    "moreThanDays": "天數不可大於 90 天",
+    "moreThanCloseDays": "逾期結案天數不可大於 365 天",
+    "events": "巡檢事件",
+    "overdueClosed": "逾期結案",
+    "on": "開啟",
+    "off": "關閉",
+    "overdue": "逾期天數",
+    "SpecificManagementSettings": "特定巡檢管理功能設定",
+    "biometricAuthentication": "啟用生物辨識功能",
+    "brandBiometrics": "開啟後，該品牌下所有使用者在app端登入時必須使用生物辨識功能（若手機支援）",
+    "outOfRange": "超出簽到範圍",
+    "returnProcessing": "返回處理",
+    "totalOf": "共有",
 
+    "wrongPassword": "密碼錯誤，請重新輸入！",
+    "noEventData": "没有事件數據！",
+    "triggerTime": "觸發時間：",
+    "impItems": "重要巡檢項",
+    "inputTag": "請輸入備註標籤",
+    "deleteInspection": "已刪除此巡檢表",
+    "dataIsEmpty": "表格資料為空！請重新搜尋條件",
+    "comfimDelete": "巡檢表刪除後將無法復原，且無法再查看該巡檢表相關之報告與統計分析！請確認是否刪除？",
+    "passwordToDelete": "請輸入密碼確認刪除",
+
+
+
+  },
+  "epaper": {
+    "date": "時間範圍",
+    "user": "人員",
+    "Executor": "執行人員",
+    "overTimeOrSkip": "超時/略過簽到",
+    "allOrOvertime": "全部/超時",
+    "overTime": "超時",
+    "skipSign": "略過簽到",
+    "total": "共有",
+    "region": "區域",
+    "patrolStore": "巡檢地點",
+    "patrolLists": "巡檢表",
+    "submitterName": "送出者",
+    "signstr": "打卡時間",
+    "datestr": "報告送出時間",
+    "status": "狀態",
+    "alert7days": "時間範圍最短一天，最多7天，已重新調整。",
+  },
+  "repeatingSchedule": {
+    "time": "時間",
+    "startSearchTime": "搜尋開始時間",
+    "endSearchTime": "搜尋結束時間",
+    "location": "地點",
+    "repeatingSchedule": "重複排程",
+    "remindBeforeMinutes": "提前提醒時間",
+    "repeatWeekDaysItems": "重複週期",
+    "mon": "星期一",
+    "tue": "星期二",
+    "wed": "星期三",
+    "thu": "星期四",
+    "fri": "星期五",
+    "sat": "星期六",
+    "sun": "星期日",
+    "deleteSucess": "重複排程刪除成功",
+    "setting": "重複排程設定",
+    "setInspectionTime": "設定巡檢時間",
+    "beforeMin": "分鐘前",
+    "taskNameCantEmpty": "排程名稱不可為空",
+    "taskTimeCantEmpty": "巡檢時間不可為空",
+    "repeatCycleCantEmpty": "重複週期不可為空",
+  }
 }
 

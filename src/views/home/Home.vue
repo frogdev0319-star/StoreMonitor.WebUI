@@ -289,7 +289,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.2.4.6
+                v3.2.5.5
                   &copy; {{ getFullYear }} Advantech Intelligent City
                   Services Co., Ltd. <span @click.prevent="checkServerVersion">(AiCS)</span> All Rights Reserved.
               </p>
@@ -540,6 +540,10 @@ export default {
         { curPath: ["/personalSchedule"], activePath: "/scheduleSetting" },
         { curPath: ["/scheduleDetailCreate"], activePath: "/scheduleSetting" },
         { curPath: ["/scheduleDetailModify"], activePath: "/scheduleSetting" },
+
+        // 重複排程
+        { curPath: ["/repeatingScheduleSetting"], activePath: "/repeatingSchedule" },
+
 
         { curPath: ["/waterMark"], activePath: "/waterMark" },
         { curPath: ["/dataSecurity"], activePath: "/dataSecurity" },
@@ -1042,6 +1046,12 @@ export default {
         {
           paths:["/scheduleDetailModify"],
           parentBread: { path: "/personalSchedule", name: "schedulePersonalModify" },
+        },
+
+        // 重複排程
+        {
+          paths:["/repeatingScheduleSetting"],
+          parentBread: { path: "/repeatingSchedule", name: "RepeatingSchedule" },
         },
 
         // 報告與事件

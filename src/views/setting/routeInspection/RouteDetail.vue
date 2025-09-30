@@ -448,7 +448,7 @@ export default {
               objChild.isImportant = itemChild.isImportant;
               objChild.name = itemChild.subject;
               objChild.description = (itemChild.description === undefined || itemChild.length === 0) ? '--' : itemChild.description;
-              objChild.score = itemChild.itemScore + '分';
+              objChild.score = itemChild.itemScore + this.$t('remotePatrol.scorecount');
               tempChild.push(objChild);
             });
             _obj.itemData = tempChild;

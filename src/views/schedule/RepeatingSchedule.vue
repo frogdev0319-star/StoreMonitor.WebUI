@@ -2,19 +2,79 @@
     <div class="ScheduleContainer">
 
         <div class="search-bar">
-            <DateTimeSelectorSchedule
-                class="time-selector"
-                :dateRangeTitle="$t('overview.date')"
-                @change="dateChange"
-            />
             <div class='keyword-area'>
-                <div class="search-label">{{$t('remotePatrol.keywords')}}</div>
-                <el-input
-                    v-model="inputSearchValue"
-                    size="medium"
-                    class="search-input shadow-light"
-                    clearable/>
+                <div class="search-label" >{{$t('repeatingSchedule.time')}} </div>
+                <el-time-picker
+                  v-model="startSearchTime"
+                  style="width: 150px;"
+                  format="HH:mm"
+                  value-format="HH:mm"
+                  :placeholder="$t('repeatingSchedule.startSearchTime')"
+                />
+                <el-time-picker
+                  v-model="endSearchTime"
+                  style="width: 150px;"
+                  format="HH:mm"
+                  value-format="HH:mm"
+                  :placeholder="$t('repeatingSchedule.endSearchTime')"
+                />
             </div>
+
+            <div class='keyword-area'>
+                <div class="search-label" >{{$t('schedule.storeName')}}</div>
+                <el-select
+                  v-model="selectStore"
+                  :placeholder="$t('overview.patrolStore')"
+                  :clearable = "true"
+                  style="width: 200px"
+                  >
+                  <el-option
+                    v-for="(item, index) in storeList"
+                    :key="item.storeId"
+                    :label="item.name"
+                    :value="item.storeId"
+                  />
+                </el-select>
+            </div>
+
+            <div class='keyword-area'>
+                <div class="search-label" >{{$t('schedule.incepPerson')}}</div>
+                <el-select
+                  v-model="selectUser"
+                  :placeholder="$t('schedule.incepPerson')"
+                  :clearable = "true"
+                  style="width: 200px"
+                  >
+                  <el-option
+                    v-for="(item, index) in userInfo"
+                    :key="item.userId"
+                    :label="item.userName"
+                    :value="item.userId"
+                  />
+                </el-select>
+            </div>
+
+            <div class='keyword-area'>
+                <div class="search-label" >{{$t('repeatingSchedule.repeatingSchedule')}} </div>
+                <el-select
+                  v-model="repeatCycle"
+                  :placeholder="$t('schedule.remiderMethod')"
+                  multiple
+                  filterable
+                  :clearable = "true"
+                  style="width:150px"
+                  >
+                  <el-option
+                    v-for="(_item, index) in selectRemiderStyle"
+                    :key="index"
+                    :label="_item.label"
+                    :value="_item.value"
+                  />
+                </el-select>
+            </div>
+
+
+
             <div style="flex:2"></div>
             <delay-button
                 class="search-button"
@@ -24,6 +84,9 @@
                 <span>{{ $t('remotePatrol.search') }}</span>
             </delay-button>
         </div>
+
+
+
         <div class="scheduleLlist-area">
             <div class="buttons">
                 <delay-button
@@ -46,14 +109,15 @@
 
             <table-only
                 ref="elTP"
-                class="table-white tbl-schedule"
+                class="table-white tbl-schedule-repeat"
                 table-themes="white"
                 :showSelectionColumn="true"
                 :column-data="columnData"
                 :table-data="tableData"
+                :tableRepeatWeekDays = "repeatWeekDaysItems"
                 :table-operation ="columnOperationData"
-                :highlight-current-row= "false"
 
+                :highlight-current-row= "false"
                 v-loading="isLoadingData"
 
                 :allowRowExpand = "false"
@@ -95,6 +159,9 @@
 <script>
 import { mapGetters } from 'vuex';
 import {scheduleRESTful} from '@/api/index';
+import { getBriefStoreList} from '@/api/store';
+import {getAllUserInfoNoAuth} from '@/api/login';
+import {  GetInspectTagList, GetInspectTagListAll } from '@/api/inspect';
 import DateTimeSelectorSchedule from '@/components/DateTimeSelectorSchedule';
 import TableOnly from '@/components/TableOnly';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
@@ -103,7 +170,7 @@ import DialogPop from '@/components/DialogPop'
 import util from '@/common/util';
 
 export default{
-    name: 'PersonalSchedule',
+    name: 'RepeatingSchedule',
     components: {
         DateTimeSelectorSchedule,
         TableOnly,
@@ -113,58 +180,64 @@ export default{
     },
     data(){
         return {
-        firstLoad:true,
-        userId:'',
-        person:'',
-        inputSearchValue:'',
-        dateValue:[],
-        columnData:[
-        {
-            'prop': 'taskName',
-            'label': this.$t('schedule.schName'),
-            'sortable': false,
-            'width': 200,
-            'maxWidth': 200,
-            'isExpand': false
-        },
-        {
-            'prop': 'tagNameMode',
-            'label': this.$t('statistics.patrolPerson.tagName'),
-            'sortable': false,
-            'width': 300,
-            'maxWidth': 300,
-            'isExpand': false,
-            // 'hasIcon':{
-            //     icon:require('@/../static/img/table-help.png'),
-            //     tooltipContent:this.$t('schedule.tagInfo')
-            // }
-        },
-        {
-            'prop': 'taskCounts',
-            'label': this.$t('schedule.incepNum'),
-            'sortable': false,
-            'width': 100,
-            'maxWidth': 100,
-            'isExpand': false
-        },
-        {
-            'prop': 'taskStartStr',
-            'label': this.$t('schedule.schStartDate'),
-            'sortable': 'custom',
-            'width': 50,
-            'maxWidth': 50,
-            'isExpand': false
-        },
-        {
-            'prop': 'taskFinalStr',
-            'label': this.$t('schedule.schEndDate'),
-            'sortable': 'custom',
-            'width': 130,
-            'maxWidth': 130,
-            'isExpand': false
-        }
+          firstLoad:true,
+          userId:'',
+          person:'',
+          inputSearchValue:'',
+          dateValue:[],
+          columnData:[
+          {
+              'prop': 'name',
+              'label': this.$t('scheduleView.scheduleName'),
+              'sortable': false,
+              'width': 300,
+              'maxWidth': 300,
+          },
+          {
+              'prop': 'excuteTime',
+              'label': this.$t('scheduleView.exectionTime'),
+              'sortable': false,
+              'width': 50,
+              'maxWidth': 50,
+          },
+          {
+              'prop': 'remindBeforeMinutes',
+              'label':  this.$t('repeatingSchedule.remindBeforeMinutes'),
+              'sortable': false,
+              'width': 50,
+              'maxWidth': 50,
+          },
+          {
+              'prop': 'store',
+              'label': this.$t('schedule.store'),
+              'sortable': false,
+              'width': 100,
+              'maxWidth': 100,
+          },
+
+          {
+              'prop': 'executor',
+              'label': this.$t('schedule.incepPerson'),
+              'sortable': false,
+              'width': 130,
+              'maxWidth': 130,
+          },
+          {
+              'prop': 'inspection',
+              'label': this.$t('reportAndEvents.inceptionTag'),
+              'sortable': false,
+              'width': 130,
+              'maxWidth': 130,
+          },
+
         ],
-        tableData:[],
+
+        repeatWeekDaysItems: {
+            label: this.$t('repeatingSchedule.repeatWeekDaysItems'),
+            minWidth: '120',
+            align: 'left',
+
+        },
         columnOperationData:{
             label: this.$t('titleView.operation'),
             minWidth: '50',
@@ -172,16 +245,13 @@ export default{
             operation: [
                 {
                     lable: '',
-                    icon: 'icon-copy',
-                    methods: 'copy'
-                },
-                {
-                    lable: '',
                     icon: 'icon-setting',
                     methods: 'set'
                 }
             ]
         },
+
+        tableData:[],
         isLoadingData : true,
         total:0,
         curPage:1,
@@ -191,36 +261,120 @@ export default{
         SelSchedulId:[],
         showConfirmDelete:false,
 
-        }
+        storeList:[],
+        userInfo:[],
+        selectStore: null,
+        selectUser: null,
+        allInspectTypeList: [],
+        selectRemiderStyle:[
+          {
+            value: 1,
+            label:this.$t('repeatingSchedule.mon')
+          },
+          {
+            value: 2,
+            label:this.$t('repeatingSchedule.tue')
+          },
+          {
+            value: 3,
+            label:this.$t('repeatingSchedule.wed')
+          },
+          {
+            value: 4,
+            label:this.$t('repeatingSchedule.thu')
+          },
+          {
+            value: 5,
+            label:this.$t('repeatingSchedule.fri')
+          },
+          {
+            value: 6,
+            label:this.$t('repeatingSchedule.sat')
+          },
+          {
+            value: 7,
+            label:this.$t('repeatingSchedule.sun')
+          },
+        ],
+        repeatCycle: [],
+        startSearchTime: null,
+        endSearchTime: null,
+      }
     },
     computed: {
         ...mapGetters({ accountChanged: 'accountChanged' })
+    },
+    watch:{
+      accountChanged(val) {
+        console.log('val :>> ', val);
+        val !== 0 && this.init();
+      },
     },
     created(){
         this.init();
     },
     methods:{
-        init(){
-            //存在sessionStorage，refresh時才會留著
-            const data = sessionStorage.getItem('PersonalSchedule')
-            this.personSchedule = JSON.parse(data)
+      async init(){
+        //存在sessionStorage，refresh時才會留著
+        // const data = sessionStorage.getItem('PersonalSchedule')
+        // this.personSchedule = JSON.parse(data)
 
-            this.userId = (Object.getOwnPropertyNames(this.$route.params).length>0)?this.$route.params.userId:this.personSchedule.userId;
+        // this.userId = (Object.getOwnPropertyNames(this.$route.params).length>0)?this.$route.params.userId:this.personSchedule.userId;
+        // this.person = (Object.getOwnPropertyNames(this.$route.params).length>0)?this.$route.params.nickName:this.personSchedule.userName;
 
-            this.person = (Object.getOwnPropertyNames(this.$route.params).length>0)?this.$route.params.nickName:this.personSchedule.userName;
-        },
-        dateChange(val) {
-            const self = this;
-            const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
-            const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
-            self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
-            self.dateValue[1] = self.dateValue[1];
-            // self.inputSearchValue = '';
-            if(this.firstLoad){
-                this.doSearchScheduleList();
-                this.firstLoad = false;
-            }
-        },
+        await this.getBriefStoreList();
+        await this.getUserInfo();
+        await this.getTagAll();
+        await this.doSearchScheduleList();
+      },
+
+
+      async getBriefStoreList() {
+        await getBriefStoreList().then(res => {
+          this.storeList = res.data
+          console.log('this.storeList ::::>> ', this.storeList);
+        })
+      },
+
+      async getUserInfo(){
+        await getAllUserInfoNoAuth().then(res=>{
+          this.userInfo = res.data
+          console.log('this.userInfo :>> ', this.userInfo);
+        }).catch(err => {
+          console.log('error' + err);
+        });
+      },
+
+       // 取得巡檢表
+      async getTagAll() {
+        return new Promise((resolve, reject) => {
+          GetInspectTagListAll().then(res => {
+            const data = res.data;
+            resolve(data);
+
+            this.allInspectTypeList = data.map(i => ({
+              id: i.id,
+              name: i.name,
+              mode: i.mode
+            }))
+            console.log(' this.allInspectTypeList =========>>>> ',  this.allInspectTypeList)
+
+          }).catch(err => {
+            reject(err);
+          });
+        });
+      },
+
+        // async dateChange(val) {
+        //     console.log('dateChange :>> ');
+        //     // const self = this;
+        //     // const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
+        //     // const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
+        //     // self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
+        //     // self.dateValue[1] = self.dateValue[1];
+        //     // self.inputSearchValue = '';
+        // },
+
         pad2(n){
             return (n < 10 ? '0' : '') + n;
             },
@@ -247,48 +401,62 @@ export default{
         doSearchScheduleList(){
             const self = this;
             self.isLoadingData = true;
-            let beginTs = self.$moment.utc(self.$moment(self.dateValue[0])).valueOf();
-            let endTs = self.$moment.utc(self.$moment(self.dateValue[1])).valueOf();
-
-            var ts = this.getdate(beginTs) + " " + "GMT+00:00"
-            var te = this.getdate(endTs) + " " + "GMT+00:00"
-            var gmt_beginTs = new Date(ts).getTime()
-            var gmt_endTs= new Date(te).getTime()
 
 
-            const params={
-                userId:self.userId,
-                beginTs: gmt_beginTs,
-                endTs: gmt_endTs,
-                filter:{
-                    page:this.curPage-1,
-                    size:this.curSizeNum
-                },
-                order:{
-                    direction:this.defaultSort.order=='ascending'? 'asc':'desc',
-                    property:this.defaultSort.prop=="taskStartStr"?"taskStart":(this.defaultSort.prop=="taskFinalStr"?"taskFinal":this.defaultSort.prop),
-                },
-            }
-            if(self.inputSearchValue.trim()!=""){
-                params["keyword"] = self.inputSearchValue;
-            }
-            scheduleRESTful.getPersonTaskList(params).then(res=>{
+            const [startHH, startMM] = this.startSearchTime  ? this.startSearchTime.split(':').map(Number) : ""
+            const [endHH, endMM] = this.endSearchTime ? this.endSearchTime.split(':').map(Number) : ""
+            const params = {
+                storeId: this.selectStore,
+                userId: this.selectUser,
+                weekDays: this.repeatCycle,
+                startTimeHH: startHH,
+                startTimeMM: startMM,
+                endTimeHH: endHH,
+                endTimeMM: endMM
+                // "inspectTagId": 0,
+                // "name": "",
+
+              }
+
+            scheduleRESTful.getWeeklyTask(params).then(res=>{
                 var userData = [];
                 if(res.errCode == 0){
-                    // ==== 2024 sprint1 遠端巡檢關閉 ====
-                    // var onlyOnsitePatrol = res.data.content.filter( i => i.tagMode == 1 )
-                    res.data.content.map(item =>{
-                    let obj = {...item};
-                    let mode = item.tagMode == 0 ? self.$t('remotePatrol.remotePatrol') : self.$t('remotePatrol.onsitePatrol');
-                    obj['tagNameMode'] = item.tagName;
-                    //obj['updateTs']=item.updateTime,
-                    obj['taskStartStr']=(item.taskStart==0)?'-':self.$moment.utc(self.$moment(item.taskStart)).format("YYYY/MM/DD");//util.getDateStr(item.taskStart),
-                    //console.log(">>>taskStartStr:",self.$moment.utc(self.$moment(item.taskStart)).format("YYYY/MM/DD hh:mm:ss"));
-                    obj['taskFinalStr']=(item.taskFinal==0)?'-':self.$moment.utc(self.$moment(item.taskFinal)).format("YYYY/MM/DD");//util.getDateStr(item.taskFinal),
-                    obj['updateUserName']=(item.updateUserName == "NONE")?'-':item.updateUserName,
-                    userData.push(obj);
 
-                    });
+                    console.log('res.data !!!!>> ', res.data);
+                    res.data.map(item => {
+                      let obj = {...item};
+
+                      if(item.startTimeMM < 10) item.startTimeMM =  "0" + item.startTimeMM
+
+
+                      obj.excuteTime = item.startTimeHH + ":" + (item.startTimeMM == 0 ? "00" : item.startTimeMM)
+                      obj.remindBeforeMinutes = item.remindBeforeMinutes + " min"
+
+                      var repeatWeekDays = []
+                      item.weekDays.forEach(i => {
+                        if(i == 1){ repeatWeekDays.push(this.$t('repeatingSchedule.mon')) }
+                        else if(i == 2) { repeatWeekDays.push(this.$t('repeatingSchedule.tue'))}
+                        else if(i == 3) { repeatWeekDays.push(this.$t('repeatingSchedule.wed')) }
+                        else if(i == 4) { repeatWeekDays.push(this.$t('repeatingSchedule.thu')) }
+                        else if(i == 5) { repeatWeekDays.push(this.$t('repeatingSchedule.fri')) }
+                        else if(i == 6) { repeatWeekDays.push(this.$t('repeatingSchedule.sat')) }
+                        else if(i == 7) { repeatWeekDays.push(this.$t('repeatingSchedule.sun')) }
+                      })
+                      obj.repeatWeekDays = repeatWeekDays
+
+                      var _store = this.storeList.filter( i => item.storeId == i.storeId)
+                      obj.store = _store.length == 0 ? '' : _store[0].name
+
+                      var _user = this.userInfo.filter( i => i.userId == item.userId)
+                      obj.executor = _user[0].userName
+
+                      var _inspect = this.allInspectTypeList.filter( i => i.id == item.inspectTagId)
+                      obj.inspection = _inspect.length == 0 ? '--' : _inspect[0].name
+
+                      userData.push(obj);
+                    })
+
+
                     self.tableData = [];
                     self.tableData = userData;
 
@@ -296,9 +464,8 @@ export default{
                     self.total = res.data.totalPages;
                     self.isLoadingData = false;
 
-
                 }else{
-                    util.notify(self.$t('schedule.getScheduleSettingFail'), 'error', 3000);
+                  util.notify(self.$t('schedule.getScheduleSettingFail')+',error:'+err, 'error', 3000);
                 }
 
             }).catch(err=>{
@@ -307,77 +474,75 @@ export default{
                 this.isLoadingData = false;
             });
         },
+
+
         addNewSchedule(){
-            sessionStorage.removeItem('scheduleParams')
+            sessionStorage.removeItem('repeatScheduleParams')
 
             let params= {
                 action: 'addSchedule',
                 userId: this.userId,
             };
-            sessionStorage.setItem('scheduleParams', JSON.stringify(params))
-            this.$router.push({ name: 'CreateSchedule', params: { userId: this.userId,userName:this.person}});
+            sessionStorage.setItem('repeatScheduleParams', JSON.stringify(params))
+            this.$router.push({ name: 'RepeatingScheduleSetting', params: { userId: this.userId,userName:this.person}});
         },
+
+
         deleteSchedule(){
             this.showConfirmDelete = true;
         },
+
         handleSelectionChange(val){
             console.log("handleSelectionChange:",val);
             this.SelSchedulId = [];
             if(val.length>0){
                 this.enableDeleteBtn = true;
                 val.map((item)=>{
-                    this.SelSchedulId.push(item.taskGroupUuid);
+                    this.SelSchedulId.push(item.id);
                 })
             }else{
                 this.enableDeleteBtn = false;
             }
         },
-        onConfirmDeleteSch(){
-            console.log("SelSchedulId:",this.SelSchedulId);
-            this.showConfirmDelete = false;
-            let params = {
-                taskGroupUuidArray: this.SelSchedulId,
-                userId: this.userId,
-            }
-            scheduleRESTful.deletePersonTaskList(params).then(res=>{
-                if(res.errCode==0){
-                    this.doSearchScheduleList();
-                }else{
-                    util.notify(this.$t('schedule.deletePersonSchError'), 'error', 2000);
-                }
-            })
-        },
-        handleOperation({ method, row }) {
-            sessionStorage.removeItem('scheduleParams')
-            let params= {
-                action: 'editSchedule',
-                userId: this.userId,
-                taskGroupUuid: row.taskGroupUuid,
-                taskName: row.taskName,
-                tagName: row.tagName,
-                tagNameMode: row.tagNameMode
-            };
-            console.log("handleOperation params:",params);
-            sessionStorage.setItem('scheduleParams', JSON.stringify(params))
 
-            let copyParams = {
-                taskGroupUuid: row.taskGroupUuid,
-                userId: this.userId,
-            }
-            switch(method){
-                case 'copy':{
-                    this.doCopyScheduleTask(copyParams);
-                    break;
-                }
-                case 'set':{
-                    this.$router.push({ name: 'ModifySchedule', params: { userId: this.userId,userName:this.person,taskGroupUuid: row.taskGroupUuid }});
-                    break;
-                }
-                default: {
-                    break;
-                }
-            }
+        // 確認刪除
+        onConfirmDeleteSch(){
+            this.isLoadingData = true;
+            const param = this.SelSchedulId
+            scheduleRESTful.deleteWeeklyTask(param).then(res =>{
+              if(res.errCode === 0){
+                util.notify(this.$t('repeatingSchedule.deleteSucess'), 'success', 3000);
+                this.showConfirmDelete = false
+                this.isLoadingData = false;
+                this.doSearchScheduleList()
+
+              }
+            })
+            // this.showConfirmDelete = false;
+            // let params = {
+            //     taskGroupUuidArray: this.SelSchedulId,
+            //     userId: this.userId,
+            // }
+            // scheduleRESTful.deletePersonTaskList(params).then(res=>{
+            //     if(res.errCode==0){
+            //         this.doSearchScheduleList();
+            //     }else{
+            //         util.notify(this.$t('schedule.deletePersonSchError'), 'error', 2000);
+            //     }
+            // })
         },
+
+        handleOperation({row }) {
+            console.log('row :>> ', row);
+            sessionStorage.removeItem('repeatScheduleParams')
+
+            row.action = "editSchedule"
+            console.log("handleOperation params:",row);
+            sessionStorage.setItem('repeatScheduleParams', JSON.stringify(row))
+
+            this.$router.push({ name: 'RepeatingScheduleSetting', params: { userId: this.userId}});
+        },
+
         handleSortChange(order, defaultSort) {
             this.defaultSort = { ...defaultSort };
             this.doSearchScheduleList();
@@ -393,14 +558,7 @@ export default{
             self.curPage = 1;
             self.doSearchScheduleList();
         },
-        doCopyScheduleTask(copyParams){
-            this.isLoadingData = true
-            scheduleRESTful.CopySchedulePersonSchedule(copyParams).then(res => {
-                if(res.errCode==0){
-                    this.doSearchScheduleList();
-                }
-            })
-        }
+
     }
 }
 </script>
@@ -431,14 +589,11 @@ export default{
             border-color: #999 !important
             color: #999 !important
             background: #f1f1f1 !important
-
-
 </style>
 
 <style scoped lang="scss">
 .ScheduleContainer{
     width:100%;
-
     .search-bar{
         display:flex;
         flex-direction:row;
@@ -487,7 +642,7 @@ export default{
             justify-content: end;
             align-items: center;
         }
-        .tbl-schedule{
+        .tbl-schedule-repeat{
             border: none;
             margin-top: 20px;
             /deep/ .el-table__header-wrapper .el-table-column--selection{

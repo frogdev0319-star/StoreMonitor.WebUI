@@ -2,7 +2,7 @@
   <div>
     <div class="flex-column" style="height: calc(100% - 20px)">
       <div class="el-audit-header">
-        
+
         <div class="el-audit-header">
             <div class="flex-center" style="justify-content: space-between; margin: 20px 0 20px 0px;font-size:calc(16/1920*100vw)">
               <!-- 時間範圍 -->
@@ -43,7 +43,7 @@
               :key="'sendAudit'+index"
               :label="item.label"
               :name="item.name">
-          
+
               <div class="tablelist_workflows">
                 <table-only
                   ref="elTP"
@@ -55,7 +55,7 @@
                   :allowRowExpand = "false"
                   :showBorder = "false"
                   :default-sort = defaultSort
-                  :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+                  :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}"
                   :tableHeight = "760"
                   :cellStyle="{backgroundColor: '#fff !important'}"
 
@@ -63,8 +63,8 @@
               </div>
               <div class="page-area">
 
-                <div class="pagination_row"  v-if="totalEvents > 0"> 
-                  <div class="pageSizeTitle" style="color: #666">共有 <b style="font-size: 16px"> {{totalEvents}} </b> {{ $t('remotePatrol.numReports') }}</div>
+                <div class="pagination_row"  v-if="totalEvents > 0">
+                  <div class="pageSizeTitle" style="color: #666">{{ $t('addition.totalOf') }} <b style="font-size: 16px"> {{totalEvents}} </b> {{ $t('remotePatrol.numReports') }}</div>
 
                   <tbl-pagination-only
                     :btn-style="{backgroundColor:'transparent'}"
@@ -144,7 +144,7 @@ export default {
               'width': 200,
               'maxWidth': 200,
             },
-            
+
           ],
         },
         {
@@ -173,7 +173,7 @@ export default {
             },
           ],
         },
-        
+
 
       ],
 
@@ -198,7 +198,7 @@ export default {
     }
   },
   mounted() {
-    
+
   },
   created() {
     this.init()
@@ -216,7 +216,7 @@ export default {
       this.currentPage = 1;
       if(val.trim()!=""){
         this.allTableData =this.allWorkflowList.filter(item => (
-          item.name.indexOf(val) > -1 
+          item.name.indexOf(val) > -1
         ))
         this.setTableBySearch();
       } else {
@@ -226,8 +226,8 @@ export default {
   },
   methods: {
 
-    async init(){      
-    
+    async init(){
+
       await this.getUserInfo()
       await this.getLog(0)
 
@@ -266,8 +266,8 @@ export default {
         },
         keyword: this.inputSearchValue ? this.inputSearchValue : ''
       }
-      
-      console.log('param :>> ', param); 
+
+      console.log('param :>> ', param);
 
       await fetchLog(param).then(res=>{
         console.log('res.data.content  ======>> ', res.data.content);
@@ -307,7 +307,7 @@ export default {
           this.total = res.data.totalPages
           this.totalEvents = res.data.totalElements
         }
-        
+
         this.tableDataList[typeN].tableData = temp
         this.isLoadingData = false
       }).catch(err => {
@@ -317,7 +317,7 @@ export default {
 
     },
 
-  
+
 
 
     pad2(n){
@@ -367,12 +367,12 @@ export default {
 
       this.currentPage = pageInfo.page
       this.curSizeNum = pageInfo.size;
-      
+
       this.getLog(this.actionType)
       // this.init()
       // if(this.inputSearchValue.trim()=="") this.getWorkflowList(this.apiBody);
       // else this.setTableBySearch()
-      
+
     },
 
     setTableBySearch() {
@@ -388,7 +388,7 @@ export default {
       this.searchData = [...this.allTableData.slice( (this.currentPage - 1)* this.curSizeNum, this.currentPage* this.curSizeNum)];
     },
 
-    
+
   },
 };
 </script>
@@ -404,7 +404,7 @@ export default {
       padding-left: 0 !important
       .cell
         padding-left: 12px !important
-      
+
     td, th
       &:nth-child(1)
         width: 12% !important
@@ -419,7 +419,7 @@ export default {
 
     .el-table .cell
       text-align: left !important
-      
+
 
   .el-table-content
     width: 100%
@@ -429,7 +429,7 @@ export default {
     position: relative
     padding-top: calc(30/1920*100vw)
     .list-table
-      .table-white 
+      .table-white
         /deep/
         .el-table
           box-shadow: none !important
@@ -452,7 +452,7 @@ export default {
 
 
 
-    
+
   .alert-popup
     .el-dialog__header
       color: #c60957
@@ -466,7 +466,7 @@ export default {
 
     .el-table__body
       width: auto !important
-    
+
 
   .workflow-header
     width: 100%
@@ -479,7 +479,7 @@ export default {
     align-items: flex-start
   .el-table
     border: none !important
-    
+
   // .el-button--primary
   //   color: #fff
   //   background-color: #190
@@ -515,10 +515,10 @@ export default {
     flex-direction: row
     justify-content: center
     align-items: center
-    
+
   .width-fit
     width: max-content !important
-  
+
   .pagination_row
     //position: absolute;
     height: 30px
@@ -528,7 +528,7 @@ export default {
     flex-direction: row
     justify-content: flex-end
     align-items: center
-    
+
 
 
 </style>

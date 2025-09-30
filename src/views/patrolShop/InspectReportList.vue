@@ -47,7 +47,7 @@
                   :label="item.label"
                   :value="item.mode"/>
               </el-select> -->
-              
+
               <!-- <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" /> -->
                 <el-select
                   class="el-province"
@@ -67,7 +67,7 @@
         </template>
       </store-filter>
     </div>
-    
+
     <div id="el-containter" class="flex-column spacer" style="margin-left:0px">
 
       <div class="report-header">
@@ -75,9 +75,9 @@
           <!-- 時間範圍 -->
           <date-time-selector
             class="time-selector"
-            @change="dateChange" 
-            :dateTimeValue = dateValue /> 
-            
+            @change="dateChange"
+            :dateTimeValue = dateValue />
+
           <div class="flex-center fullWidth" style="margin-left: 20px">
             <div class="search-content flex-center" style="margin-right: 20px">
               <div class="search-label">{{ $t('remotePatrol.keywords') }}</div>
@@ -133,7 +133,7 @@
                 <i class="iconfont icon-liebiao iconCard"/>
                 <span class="text-pattern">{{ $t('remotePatrol.listStyle') }}</span>
               </div>
-              <el-dropdown 
+              <el-dropdown
                 :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
                 class="export-report-btn dropdown"
                 style="display:flex; flex-direction: row-reverse; align-items: center;cursor:pointer;">
@@ -188,7 +188,7 @@
                         {{ $t('insSettingView.scores') }}
                       </div>
                     </div>
-                    <div class="ignoreSign" v-if="item.mode == 1 && item.routeObj.isCheckInIgnore">略過簽到</div>
+                    <div class="ignoreSign" v-if="item.mode == 1 && item.routeObj.isCheckInIgnore">{{$t('addition.skipSignin')}}</div>
                   </div>
 
                   <!-- card bottom -->
@@ -196,7 +196,7 @@
                     <div class="submitter">{{ $t('remotePatrol.submitter') }} {{ item.submitterName }}</div>
                     <div>{{ item.datestr }}</div>
                   </div>
-                  
+
                 </div>
               </div>
           </div>
@@ -212,7 +212,7 @@
               :allowRowExpand = "false"
               :showBorder = "false"
               :default-sort = "{prop: 'datestr', order: 'descending'}"
-              :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '6px',}" 
+              :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '6px',}"
               :tableHeight = "760"
               :cellStyle="{backgroundColor: '#fff !important'}"
               @handleOperation="clickReport"
@@ -220,9 +220,9 @@
               @row-click = "clickReport"
             />
           </div>
-          
+
         </div>
-        
+
         <div
           v-loading="isLoading"
           v-else
@@ -230,7 +230,7 @@
           class="card-content self-loading">
           <div class="empty-content">{{ noData }}</div>
         </div>
-        
+
         <div class="el-pat" v-if="reportList.length > 0">
           <div class="pageSizeTitle" style="color: #666"> {{ $t('remotePatrol.totalOf') }} <b style="font-size: 16px"> {{totalElements}} </b> {{ $t('remotePatrol.numReports') }}</div>
 
@@ -243,7 +243,7 @@
           @sizeChange="sizeChange"
           @currentChange="currentChange"
         />
-            
+
           </div>
       </div>
     </div>
@@ -278,7 +278,7 @@
       @confirmHandler="showExportMassage = false"
       @goToPage="gotoDownloadManagement"
       >
-      
+
       <!-- <div class="noticeDialog">
         檔案匯出中，請至下載管理查看
       </div> -->
@@ -288,8 +288,8 @@
   </div>
 </template>
 <script>
-import { 
-      getInspectReportList, 
+import {
+      getInspectReportList,
       GetInspectTagList,
       downLoadInspectReportEntireDetail,
       getAllReportIds,
@@ -333,7 +333,7 @@ export default {
       onsiteIcon: require('../../../static/img/onsite.png'),
       searchContent: false,
       exportPng: require('../../../static/img/excel.png'),
-      
+
       curSortType: 0,
       ShowCard: true,
       isHoverList: false,
@@ -478,7 +478,7 @@ export default {
           'methods': 'set'
         }
       ],
-      
+
       columnOperationData: {
         label: this.$t('titleView.operation'),
         minWidth: '60',
@@ -592,7 +592,7 @@ export default {
         this.getInspectList();
         //this.initData();
     }
-    
+
   },
 
   activated() {
@@ -602,7 +602,7 @@ export default {
     }
     self.$route.meta.isBack = false;
     self.isFirstLoad = false;
-    
+
   },
 
   methods: {
@@ -629,7 +629,7 @@ export default {
       if(res.errCode ==0){
         this.allStoreList = res.data;
       }
-      
+
     },
 
 
@@ -654,7 +654,7 @@ export default {
       var hour = this.pad2(date.getHours())
       var min = this.pad2(date.getMinutes())
       var sec = this.pad2(date.getSeconds())
-      return year + month + day 
+      return year + month + day
     },
     getOnlyDate(t){
       var date = new Date(t);
@@ -664,7 +664,7 @@ export default {
       var hour = this.pad2(date.getHours())
       var min = this.pad2(date.getMinutes())
       var sec = this.pad2(date.getSeconds())
-      return  month + day 
+      return  month + day
     },
 
     getBriefStoreData() {
@@ -745,7 +745,7 @@ export default {
       // });
     },
 
-    
+
     async export2ExcelAll(){
       const self = this;
       if(self.inspectId == -1 || self.params.inspectTagId==null){
@@ -779,7 +779,7 @@ export default {
         conStoreName,
         fileName : nowTs + "-" + conTableName + "_Full_report_details-" + tsbegin + tsEnd,
         requestTs : now.getTime()
-        
+
       }
       console.log('ExpAllParams :>> ', ExpAllParams);
       exportEntireJson(ExpAllParams).then(res=>{
@@ -823,7 +823,7 @@ export default {
       //   const that = this;
       //   require.ensure([], async() => {
       //     const { export_json_to_excel } = require('@/excel/Export2Excel');
-      //     const filterVal = ['province','city','storename','code', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 
+      //     const filterVal = ['province','city','storename','code', 'tagname', 'group', 'item', 'inspectitem','itemscore','result',
       //     'totlascore','status','submitter', 'detail', 'attachment','comment','singinmap','signints','timediff', 'reportts'];
       //     const curData = res.data;
       //     const tagName = that.inspectTableList.find(item=>item.id ==self.params.inspectTagId ).name;
@@ -886,7 +886,7 @@ export default {
         like:p.like,
         filter:p.filter,
         order:p.order,
-        inspectTagId: p.inspectTagId !='-1' ? p.inspectTagId:null 
+        inspectTagId: p.inspectTagId !='-1' ? p.inspectTagId:null
       }
       const self = this;
       params.endTs = params.endTs - params.endTs % 1000 + 999;
@@ -913,7 +913,7 @@ export default {
             reportObj.id = item.id;
             reportObj.datestr = util.getDateStr(item.ts);
             reportObj.signstr = item.check_in_ts == 0 || !item.check_in_ts ? '--' : util.getDateStr(item.check_in_ts);
-            
+
             reportObj.storeName = item.storeName;
             reportObj.tagName = item.tagName;
             reportObj.submitterName = item.submitterName;
@@ -924,7 +924,7 @@ export default {
             reportObj.code = item.code !== null ? item.code : '--';
             reportObj.standard = item.standard;
             reportObj.standardMsg = util.setStandardMsg(reportObj.standard);
-            reportObj.statusCode = item.status; 
+            reportObj.statusCode = item.status;
             if (item.mode === 0) {
               reportObj.modeText = self.$t('overview.remotePatrol');
             } else if (item.mode === 1) {
@@ -952,7 +952,7 @@ export default {
         });
       });
     },
-    
+
     getReportList(p) {
       console.log("1.Get Report List")
       var params = {
@@ -961,7 +961,7 @@ export default {
         like:p.like,
         filter:p.filter,
         order:p.order,
-        inspectTagId: p.inspectTagId != '-1' ? p.inspectTagId : null, 
+        inspectTagId: p.inspectTagId != '-1' ? p.inspectTagId : null,
         searchMysteryMode : PermissionHelper.enableMimicMode ? 1 : p.searchMysteryMode
       }
 
@@ -975,14 +975,14 @@ export default {
       }
       console.log("***current user:",this.$store.getters.userId);
       if(PermissionHelper.enableMimicMode){
-        
-        params['submitter'] = this.$store.getters.userId; 
+
+        params['submitter'] = this.$store.getters.userId;
       }else if(params.searchMysteryMode!=-1 && p.submitters && p.submitters!='-1' && p.submitters.length>0){
         var obj = {...p.clause};
         obj['submitter'] = p.submitters;
         params['clause'] = obj;
       }
-      
+
       return new Promise((resolve) => {
         //console.log("params:",params);
         getInspectReportList(params).then(async(res) => {
@@ -991,12 +991,12 @@ export default {
           if (errCode === 0) {
             data = res.data.content;
             this.totalElements = res.data.totalElements
-          } 
+          }
           const temp = [];
           const tempTable = [];
           self.isLoading = true;
 
-          
+
           for(const item of data){
             const reportObj = {};
             reportObj.province = item.province ;
@@ -1015,11 +1015,11 @@ export default {
             reportObj.routeObj = item;
             reportObj.mode = item.mode;
             reportObj.totalScore = item.type === 1 ? "--" : item.totalScore;
-            
+
             reportObj.standard = item.standard;
             reportObj.standardMsg = util.setStandardMsg(reportObj.standard);
-            reportObj.statusCode = item.status; 
-            
+            reportObj.statusCode = item.status;
+
             let storeType = '';
             item.tags.length !== 0 ? item.tags.forEach((_item, _index) => {
               const isuu = _index === item.tags.length - 1 ? '' : ', \n';
@@ -1037,7 +1037,7 @@ export default {
             reportObj.iconSrc = statusAndIconObj.iconSrc;
             temp.push(reportObj);
 
-            
+
             // ------- for table -------
             const tableObj = {};
             tableObj.province = item.province + '\n' + item.city;
@@ -1057,11 +1057,11 @@ export default {
             tableObj.routeObj = item;
             tableObj.mode = item.mode;
             tableObj.totalScore = item.type === 1 ? "--" : item.totalScore;
-            
+
             tableObj.standard = item.standard;
             tableObj.standardMsg = util.setStandardMsg(tableObj.standard);
-            tableObj.statusCode = item.status; 
-            
+            tableObj.statusCode = item.status;
+
             tableObj.storeType = storeType;
             self.storeList.forEach(_item => {
               if (item.storeId === _item.storeId) {
@@ -1074,7 +1074,7 @@ export default {
             tempTable.push(tableObj);
           }
 
-        
+
           self.reportList = temp;
           self.reportTableData = tempTable;
           console.log('self.reportList !!!~~~~~>> ', self.reportList);
@@ -1188,7 +1188,7 @@ export default {
     },
 
     searchData() {
-      console.log("Search Data" +this.dateValue) 
+      console.log("Search Data" +this.dateValue)
       const self = this;
       const val = self.dateValue;
       if (val.length === 0) return;
@@ -1207,7 +1207,7 @@ export default {
       if (self.curAppraise != null && self.curAppraise !== -1) {
         clause.status = self.curAppraise;
       }
-      
+
       self.params.clause = clause;
       self.params.inspectTagId = self.inspectId === '-1' ? '' : self.inspectId;
       typeof (self.params.inspectTagId) === 'string' && delete self.params.inspectTagId;
@@ -1236,7 +1236,7 @@ export default {
           console.log("searchData>>>>no jump:",self.params)
           self.params.searchMysteryMode = PermissionHelper.enableMimicMode ? 1 : -1;
         }
-      
+
       console.log("###",self.params)
       self.params.filter = { page: 0, size: self.sizeNum };
       self.saveSearchParams();
@@ -1312,7 +1312,7 @@ export default {
         });
       });
     },
-    
+
     getInspectStatus() {
       return new Promise((resolve, reject) => {
         getInspectStatus().then(res => {
@@ -1332,7 +1332,7 @@ export default {
             this.inspectStatus.status_0 = this.$t('overview.danger')
           }
 
-          
+
           this.appraiseList.forEach(item =>{
             if(item.status === 0) {item.label = this.inspectStatus.status_0}
             else if(item.status === 1) {item.label = this.inspectStatus.status_1}
@@ -1371,7 +1371,7 @@ export default {
       //     }
       //   }
       // });
-      
+
       var inspectList = inspectArr.filter(i => i.mode == 1)
       self.inspectTableList = inspectList;
       self.inspectTableList.length > 0 && self.inspectTableList.unshift({ id: '-1', name: self.$t('remotePatrol.all') });
@@ -1412,14 +1412,14 @@ export default {
       this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
 
       if (Object.keys(searchParams).length > 0) {
-        
+
         this.storeFilterObj = searchParams;
         this.params = searchParams;
         console.log("Get Old Params")
         console.log(searchParams)
         this.order = searchParams.order;
         this.filter = searchParams.filter;
-      
+
         this.checkSortType(this.curSortType,true);
         console.log("searchParams.clause.status:",searchParams.clause.status);
         this.curAppraise = (typeof searchParams.clause.status=='undefined') ? -1:searchParams.clause.status;
@@ -1434,7 +1434,7 @@ export default {
         if(!searchParams.curCity){
           searchParams.curCity =[];
         }
-        
+
         if(searchParams.jump){ //跳轉
           console.log("Jump to ")
           //this.params.jump = false;
@@ -1448,7 +1448,7 @@ export default {
         }else{
           this.params.searchMysteryMode = PermissionHelper.enableMimicMode ? 1 : -1;
         }
-        
+
       } else {
         this.params.filter = { page: 0, size: this.sizeNum };
         this.params.clause = { storeId: [] };
@@ -1458,10 +1458,10 @@ export default {
       }
       if(!this.params.beginTs)this.params.beginTs = this.dateValue[0].valueOf();
       if(!this.params.endTs)this.params.endTs = this.dateValue[1].valueOf();
-  
-  
+
+
     },
-    
+
 
     onStoreChange(storeObj) {
       console.log("On Store Changed")
@@ -1525,7 +1525,7 @@ export default {
             span
               // background: #9872 !important
               white-space: pre !important
-            
+
     .el-table th div
       padding-left: 4% !important
       padding-right: 0 !important
@@ -1580,8 +1580,8 @@ $filterWidth: (100%-706);
   font-weight: normal;
   word-break: keep-all;
   padding-right: 16px;
-  
-  
+
+
 }
 .report-type-area{
     width:calc(260/1440*100vw);
@@ -1591,7 +1591,7 @@ $filterWidth: (100%-706);
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
 }
 #el-containter{
-    
+
     .report-header{
         margin-top: 20px;
         margin-bottom: 20px;
@@ -1638,7 +1638,7 @@ $filterWidth: (100%-706);
                 margin-right: 10px;
               };
             }
-            
+
             .el-province{
                 width: calc(160/1920*100vw);
                 min-width: 85px;
@@ -1722,7 +1722,7 @@ $filterWidth: (100%-706);
             }
         }
     }
-    
+
     .showCardHeight{
       display: flex;
       flex-wrap: wrap;
@@ -1731,7 +1731,7 @@ $filterWidth: (100%-706);
       align-items: flex-start;
       // height: calc(450/1440*100vw);
       // overflow: auto;
-        
+
     }
     .list-table{
       margin-bottom: 20px;
@@ -1743,7 +1743,7 @@ $filterWidth: (100%-706);
       padding-left: calc(20/1920*100vw) !important;
     }
     .list-table{
-      
+
       .table-white {
         /deep/
         .el-table{
@@ -1755,7 +1755,7 @@ $filterWidth: (100%-706);
         }
       }
     }
-    
+
     .report-card{
         width: 19%;
         margin-bottom: calc(20/1440*100vw);
@@ -1764,13 +1764,13 @@ $filterWidth: (100%-706);
         cursor: pointer;
         &:hover{
           box-shadow: 0 3px 8px 0 rgba(0, 0, 0, .2);
-          
+
         }
         .cards{
           width: 100%;
           height: calc(220/1440*100vw);
           padding: calc(15/1440*100vw);
-          
+
           // margin-right: calc(20/1440*100vw);
           border: 1px solid #e3e9f4;
           font-size: calc(12/1440*100vw);
@@ -1796,7 +1796,7 @@ $filterWidth: (100%-706);
               div {
                 text-align: left;
               }
-                
+
               .item-img{
                 position: absolute;
                 right: 1px;
@@ -1852,7 +1852,7 @@ $filterWidth: (100%-706);
               color: $border;
             }
             .score {
-              font-size: calc(32/1440*100vw); 
+              font-size: calc(32/1440*100vw);
               margin-right: calc(5/1440*100vw);
               // margin-bottom: calc(30/1440*100vw);
             }
@@ -1864,21 +1864,21 @@ $filterWidth: (100%-706);
               justify-content: flex-start;
               margin-bottom: 1%;
               .status-tag {
-                border-radius: 4px; 
+                border-radius: 4px;
                 padding: calc(5/1440*100vw) calc(7/1440*100vw);
                 font-size: calc(10/1440*100vw);
                 margin-bottom: 2%;
               }
               .status-tag-en{
                 font-size: calc(14/1920*100vw);
-                border-radius: calc(5/1440*100vw); 
+                border-radius: calc(5/1440*100vw);
                 padding: calc(2/1440*100vw) calc(15/1440*100vw);
                 margin-bottom: 2%;
               }
             }
           }
-          
-          
+
+
         .card_bottom{
           text-align: left;
           width: 100%;
@@ -1897,7 +1897,7 @@ $filterWidth: (100%-706);
           text-overflow: ellipsis;
           white-space: nowrap;
           justify-content: space-between;
-          
+
         }
         .item-score{
           color: $tab;
@@ -1931,7 +1931,7 @@ $filterWidth: (100%-706);
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
-    
+
     .el-pag{
         position: absolute;
         //float: right;

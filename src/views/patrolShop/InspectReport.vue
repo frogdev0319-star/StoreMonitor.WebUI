@@ -3,13 +3,13 @@
   <div class="submit_btn"  v-if="needDeleteReport">
     <delay-button type="filled" @click="showUpdateEvent = true">
       <div class="button-area" style="width: 80px; height: 20px;">
-        <span>刪除報告</span>
+        <span>{{ $t('route.deleteReport') }}</span>
       </div>
     </delay-button>
   </div>
 
   <dialog-pop
-    title="是否確認刪除報告"
+    :title="$t('deleteReport.confirmDelete')"
     :append-to-body="true"
     :close-on-click-modal="false"
     :show-close="false"
@@ -20,21 +20,19 @@
     <div class="dialog-slot">
       <div class="dialog-content">
         <div class="comfirm_delete_report" >
-          <h3>同意刪除須知事項 </h3>
-          <p>請注意！刪除報告後資料無法復原，請確保您要刪除的報告是正確的，請謹慎操作。
-            為確保報告的安全刪除，請提供用戶密碼並勾選 <b>「我理解並同意刪除報告」</b>。
-            如果您有任何疑問或需要協助，請隨時聯絡我們的客服團隊。</p>
+          <h3>{{$t('deleteReport.confirmDelete')}} </h3>
+          <p>{{$t('deleteReport.notice_1')}} <b>{{$t('deleteReport.notice_2')}}</b> {{$t('deleteReport.notice_3') }}</p>
         </div>
 
         <div class="l_row" >
           <el-checkbox  class="storevue-checkbox-filled" v-model="agreeDelete" @change="addNum">
-            <span style="color: red">*</span> 我理解並同意刪除報告
+            <span style="color: red">*</span> {{$t('deleteReport.agreeDelete')}}
           </el-checkbox>
         </div>
 
         <div class="l_row">
           <div style="margin-bottom: 5px ;">
-            <span style="color: red; ">*</span> 刪除原因
+            <span style="color: red; ">*</span> {{$t('deleteReport.deleteReason')}}
           </div>
           <el-input
             v-model="deleteReason"
@@ -48,7 +46,7 @@
 
         <div class="l_row">
           <div style="margin-bottom: 5px ;">
-            <span style="color: red; ">*</span> 請再次輸入使用者密碼
+            <span style="color: red; ">*</span> {{$t('deleteReport.insertPassword')}}
           </div>
           <el-input
             v-model="passWord"
@@ -121,14 +119,14 @@
         </span>
       </div>
       <div class="info-content">
-        <div class="pdf_font_24">
+        <div class="pdf_font_24" style="display: flex; flex-direction: row; align-items: center; justify-content: flex-start">
             <span class="info-label">{{ $t('remotePatrol.submitter') }}</span>
             <span :class="isexportPDF ? 'pdf-info-value' : 'info-value'">{{ report.submitterName }}</span>
 
             <span class="info-label">{{ $t('remotePatrol.generateTime')+'：' }}</span>
             <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
 
-            <span class="ignoreSign" v-if="report.isCheckInIgnore"> 略過簽到 </span>
+            <span class="ignoreSign" v-if="report.isCheckInIgnore"> {{ $t('addition.skipSignin') }} </span>
 
             <!-- 簽到時間 -->
             <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.signInTime')+'：' }}</span>
@@ -136,16 +134,20 @@
             <!-- 巡檢花費時間 -->
             <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.patrolTime')+'：' }}</span>
             <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ inceptionExecutTime }}</span>
+
+
             <!-- 簽到距離 -->
-            <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.signInDistance')+'：' }}</span>
-            <span v-if="!isexportPDF && hasSignRecord && signInDistance !== -1">{{ $t('remotePatrol.aroundDistance')  }}</span>
-            <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">
-              {{ (signInDistance === -1 ? '超出簽到範圍' : signInDistance) }}
-            </span>
-            <span v-if="!isexportPDF && hasSignRecord && signInDistance !== -1" >{{$t('remotePatrol.mapDistance3')}}</span>
+            <div v-if="checkinType == 0" style="display: flex; flex-direction: row; align-items: center; justify-content: flex-start">
+              <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.signInDistance')+'：' }}</span>
+              <span v-if="!isexportPDF && hasSignRecord && signInDistance !== -1">{{ $t('remotePatrol.aroundDistance')  }}</span>
+              <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">
+                {{ (signInDistance === -1 ? $t('addition.outOfRange') : signInDistance) }}
+              </span>
+              <span v-if="!isexportPDF && hasSignRecord && signInDistance !== -1" >{{$t('remotePatrol.mapDistance3')}}</span>
+            </div>
 
         </div>
-        <div class="weather-content">
+        <div class="weather-content" style="margin-left: 20px">
           <img v-if="weatherImg" class="weather-info-content" :src="weatherImg">
         </div>
 
@@ -179,7 +181,7 @@
       </div>
     </div>
     <div v-if="isexportPDF && hasSignRecord" class="pdf_font_24 info-content" style="margin-left:46px">
-      <span v-if="hasSignRecord && report.isCheckInIgnore"> (略過簽到) </span>
+      <span v-if="hasSignRecord && report.isCheckInIgnore"> ({{ $t('addition.skipSignin') }}) </span>
       <span v-if="hasSignRecord" class="info-label">{{ $t('remotePatrol.signInTime')+'：' }}</span>
       <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ signInTime }}</span>
 
@@ -188,9 +190,9 @@
       <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ inceptionExecutTime }}</span>
 
       <span v-if="hasSignRecord" class="info-label" style="margin-left:calc(40/1980*100vw)">{{ $t('remotePatrol.signInDistance')+'：' }}</span>
-      <span v-if="hasSignRecord && signInDistance !== -1">{{ $t('remotePatrol.aroundDistance')  }}</span>
+      <span v-if="hasSignRecord && signInDistance !== -1">{{ $t('remotePatrol.aroundDistance') }}</span>
       <span v-if="hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">
-        {{ (signInDistance === -1 ? '超出簽到範圍' : signInDistance) }}
+        {{ (signInDistance === -1 ? $t('addition.outOfRange') : signInDistance) }}
       </span>
       <span v-if="hasSignRecord && signInDistance !== -1" >{{$t('remotePatrol.mapDistance3')}}</span>
 
@@ -641,7 +643,7 @@
 
                 <div class="content-title" v-if="pageItem.distance == -1 ">
                   <span class="pdf_font_20">
-                    {{ $t('remotePatrol.mapDistance1')+`${report.storeName}`+ $t('remotePatrol.signInDistance')}} : 超出簽到範圍
+                    {{ $t('remotePatrol.mapDistance1')+`${report.storeName}`+ $t('remotePatrol.signInDistance')}} : {{$t('addition.outOfRange')}}
                   </span>
                 </div>
 
@@ -893,7 +895,8 @@ export default {
       isFeatureActivate: false,
       waterPrintContent: {},
       userName : '',
-      userEmail : ''
+      userEmail : '',
+      checkinType: 0
 
     };
   },
@@ -1326,6 +1329,8 @@ export default {
 
     getSum(Array){
       var totalScore = 0
+
+      console.log('Array ::::::::>> ', Array);
       Array.forEach(i => {
         // 比例制
         if(this.hundredMarkType.value == 0){
@@ -1368,6 +1373,9 @@ export default {
             console.log('a ~~~~----->> ');
             if(i.actualScore === Number.MAX_VALUE) totalScore = 0
             else totalScore = totalScore + (i.actualScore )
+
+            console.log('totalScore :>> ', totalScore);
+            console.log('i.actualScore :>> ', i.actualScore);
           }
           else if(i.weight !== -1 && i.type == 0){
             console.log('b ~~~~----->> ');
@@ -1651,6 +1659,9 @@ export default {
       const routeData = JSON.parse(sessionStorage.getItem('report_data'));
       self.deleteReportId = routeData.id
       console.log("report routeData:",routeData);
+
+      this.checkinType = routeData.checkinType
+
       if(routeData && !self.isAuditMode){
         const obj = {};
         console.log("self.$route.params.reportId:",self.$route.params.reportId);
@@ -3221,6 +3232,7 @@ export default {
         display: flex;
         flex-direction: row;
         align-items: center;
+        justify-content: flex-start;
         color: $tab;
         .info-label {
           margin-left: calc(20 / 1920 * 100vw);

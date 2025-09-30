@@ -3,77 +3,122 @@ import Environment from '@/common/environment';
 const version = Environment.VERSION;
 
 export const getSchedulePersonList = data => {
-    return request({
-      url: `${version}/report/schedule/person/list`,
-      method: 'post',
-      data
-    });
-  };
+  return request({
+    url: `${version}/report/schedule/person/list`,
+    method: 'post',
+    data
+  });
+};
 
-  export const getPersonTaskList = data => {
-    return request({
-      url: `${version}/report/schedule/person/task/list`,
-      method: 'post',
-      data
-    });
-  };
+export const getPersonTaskList = data => {
+  return request({
+    url: `${version}/report/schedule/person/task/list`,
+    method: 'post',
+    data
+  });
+};
 
-  export const CopySchedulePersonSchedule = data => {
-    return request({
-      url: `${version}/report/schedule/person/task/duplicate`,
-      method: 'post',
-      data
-    });
-  };
+export const CopySchedulePersonSchedule = data => {
+  return request({
+    url: `${version}/report/schedule/person/task/duplicate`,
+    method: 'post',
+    data
+  });
+};
 
-  export const getScheduleTaskHistory = data => {
-    return request({
-      url: `${version}/report/schedule/record/list`,
-      method: 'post',
-      data
-    });
-  };
+export const getScheduleTaskHistory = data => {
+  return request({
+    url: `${version}/report/schedule/record/list`,
+    method: 'post',
+    data
+  });
+};
 
-  export const deletePersonTaskList = data => {
-    return request({
-      url: `${version}/report/schedule/person/task/deleteGroup`,
-      method: 'post',
-      data
-    });
-  };
+export const deletePersonTaskList = data => {
+  return request({
+    url: `${version}/report/schedule/person/task/deleteGroup`,
+    method: 'post',
+    data
+  });
+};
 
-  export const exportScheduleTaskHistory = data => {
-    return request({
-      url: `${version}/report/schedule/record/list/export`,
-      method: 'post',
-      data
-    });
-  };
-
-  
-  export const getPersonScheduleData = data => {
-    return request({
-      url: `${version}/report/schedule/person/task/fetch`,
-      method: 'post',
-      data
-    });
-  };
+export const exportScheduleTaskHistory = data => {
+  return request({
+    url: `${version}/report/schedule/record/list/export`,
+    method: 'post',
+    data
+  });
+};
 
 
-  export const saveScheduleData = data => {
-    return request({
-      url: `${version}/report/schedule/person/task/save`,
-      method: 'post',
-      data
-    });
-  };
+export const getPersonScheduleData = data => {
+  return request({
+    url: `${version}/report/schedule/person/task/fetch`,
+    method: 'post',
+    data
+  });
+};
 
 
-  export const getWhiteList = data => {
-    return request({
-      url: `${version}/report/schedule/white/list`,
-      method: 'get',
-      data
-    });
-  };
-  
+export const saveScheduleData = data => {
+  return request({
+    url: `${version}/report/schedule/person/task/save`,
+    method: 'post',
+    data
+  });
+};
+
+
+export const getWhiteList = data => {
+  return request({
+    url: `${version}/report/schedule/white/list`,
+    method: 'get',
+    data
+  });
+};
+
+
+export const getWeeklyTask = data => {
+  return request({
+    url: `${version}/weeklytask/query`,
+    method: 'post',
+    data
+  });
+};
+
+
+export const addWeeklyTask = data => {
+  return request({
+    url: `${version}/weeklytask`,
+    method: 'post',
+    data
+  });
+};
+
+
+export const editWeeklyTask = data => {
+  return request({
+    url: `${version}/weeklytask/${data.id}`,
+    method: 'put',
+    data
+  });
+};
+
+
+export const deleteWeeklyTask = data => {
+  return request({
+    url: `${version}/weeklytask/delete`,
+    method: 'delete',
+    data
+  });
+};
+
+
+
+export const getTimeOut = data => {
+  return request({
+    url: `${version}/inspect/epaper/timeout`,
+    method: 'get',
+    data
+  });
+};

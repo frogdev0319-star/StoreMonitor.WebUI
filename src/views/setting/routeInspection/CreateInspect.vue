@@ -1,7 +1,7 @@
 <template>
   <div>
 		<div class="submit_btn" >
-      <delay-button type="filled"  :disabled="tableTagName == ''" @click="submit">
+      <delay-button type="filled"  :disabled="rejectSubmit" @click="submit">
         <div class="button-area" style="width: 80px; height: 20px;">
           <span>{{$t('createinspect.save')}}</span>
         </div>
@@ -21,6 +21,7 @@
               :placeholder="$t('insSettingView.enterListName')"
               @input="(val) => itemInputChanged_a1(val, 50)"
             />
+            <span class="notice" v-if="specialSymbols"> {{$t('insSettingView.excelIllegalCategory')}}</span>
             <span class="notice" v-if="showInputLimit_a1">  {{$t('immediatePush.maxInput')}} 50 {{$t('immediatePush.character')}} </span>
           </div>
 
@@ -233,6 +234,7 @@ import {
 } from '@/api/advanceSetting';
 import { GetInspectTagListAll, quickAdd } from '@/api/inspect';
 import filterString from '@/common/filterString.js';
+import { validateInput } from '@/common/validate';
 import { mapGetters } from 'vuex';
 import util from '@/common/util';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
@@ -309,6 +311,8 @@ export default {
 
       broadcastTitle: '',
       showInputLimit_a1: '',
+      specialSymbols: false,
+      rejectSubmit: true
     }
   },
   mounted() {},
@@ -333,6 +337,7 @@ export default {
 
     async submit(){
       this.isLoadingData = true
+
       var isReapet = this.allInspectTypeList.some( i => i.name == this.tableTagName)
       if(isReapet) {
         util.notify(this.$t('createinspect.noRepeat'), 'error', 2000 );
@@ -925,13 +930,27 @@ export default {
 
 
     itemInputChanged_a1(val, n){
-      const content = filterString.all(val, n);
-      this.broadcastTitle = content
-      const length = filterString.getContentLength(val);
-      if(length > n) {
-        this.showInputLimit_a1 = true
+      // 先判斷是否有特殊符號
+      if (validateInput(val)) {
+        // 保留使用者輸入，但不進行其他操作
+        // this.broadcastTitle = val;
+        this.specialSymbols = true
+        this.rejectSubmit = true
+        return;
       } else {
-        this.showInputLimit_a1 = false
+        this.specialSymbols = false
+        this.rejectSubmit = false
+      }
+
+      const content = filterString.all(val, n);
+      this.broadcastTitle = content;
+      const length = filterString.getContentLength(val);
+      if (length > n) {
+        this.showInputLimit_a1 = true;
+        this.rejectSubmit = true
+      } else {
+        this.showInputLimit_a1 = false;
+        this.rejectSubmit = false
       }
     },
   },
@@ -1076,7 +1095,10 @@ export default {
     height: 23px
     padding: 0 5px
 
-
+  .notice
+    color: red
+    font-size: 12px
+    margin: 5px 0 0 5px
 
 
 

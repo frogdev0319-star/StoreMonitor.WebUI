@@ -26,7 +26,7 @@
       @sort-change="handleSortChange"
       @row-click="handleRowClick"
       @selection-change="handleSelectionChange"
-    > 
+    >
       <el-table-column
         v-if="indexType"
         :label= "$t('audit.workFlows.nodeOrder')"
@@ -76,13 +76,13 @@
           <!-- workflow switch state -->
           <template v-else-if="_item.forDescription">
             <div class="forDescription">
-              <div class="shortdescription">{{row.description}}</div> 
-              <div class="showDescription" 
+              <div class="shortdescription">{{row.description}}</div>
+              <div class="showDescription"
                 :class ="{ 'width-fit': row.description.length < 50}"
-                v-if="row.description.length > 13" 
+                v-if="row.description.length > 13"
                 > {{row.description}}</div>
             </div>
-            
+
           </template>
 
 
@@ -98,7 +98,7 @@
                 />
               </div>
           </template>
-          
+
           <!-- workflow auditByUsers -->
           <template v-else-if="_item.auditByUsers">
             <!-- auditTargetType == 0 顯示為使用者 -->
@@ -143,7 +143,7 @@
 
 
 
-          
+
           <template v-else>
             <template v-if="isDevice && _index < 3 ">
               <el-tooltip class="item" effect="dark" :content="row[_item.prop]" placement="bottom">
@@ -160,8 +160,72 @@
         </template>
       </el-table-column>
 
-    
-      
+      <!-- tableRepeatWeekDays -->
+      <el-table-column
+        v-if="tableRepeatWeekDays.label "
+        :min-width="tableRepeatWeekDays.minWidth"
+        :label="tableRepeatWeekDays.label"
+        align="left"
+        class-name="small-padding fixed-width">
+        <template slot-scope="scope">
+          <div style="
+            padding: 10px 0;
+            display: flex;
+            flex-wrap: wrap;
+
+            "
+            >
+            <div class="" v-for="item in scope.row.repeatWeekDays">
+                <div
+                  style="
+                    width: fit-content;
+                    background: #ecf5ff;
+                    color: #1f73c9;
+                    /* border: 1px solid #a0cfff; */
+                    font-size: 12px;
+                    padding: 2px 10px;
+                    margin-right: 5px;
+                    margin-bottom: 5px;
+                    border-radius: 3px;
+
+                    ">
+                    {{ item }}</div>
+            </div>
+
+
+          </div>
+        </template>
+      </el-table-column>
+
+
+      <!-- signRecordStatus -->
+      <el-table-column
+        v-if="signRecordStatus.label "
+        :min-width="signRecordStatus.minWidth"
+        :label="signRecordStatus.label"
+        align="left"
+        class-name="small-padding fixed-width">
+        <template slot-scope="scope">
+          <div style="">
+
+            <!-- 超時 -->
+          <!-- -- {{ scope.row.status }} <br> -->
+
+          <!-- 略過簽到 -->
+          <!-- -- {{ scope.row.isCheckInIgnore }} -->
+
+          <div class="move" v-if="scope.row.status ">
+              <img src="../../static/img/TablerAlertCircleFilled.svg" alt="" style="width: 22px;">
+              <div style="margin-left: 5px; color: #e72835;">超時</div>
+          </div>
+          <div class="" v-if="scope.row.isCheckInIgnore "> 略過簽到</div>
+
+
+
+          </div>
+        </template>
+      </el-table-column>
+
       <!-- 操作 -->
       <el-table-column
         v-if="tableOperation.label "
@@ -185,12 +249,12 @@
           </div>
 
           <div class="flex-center" v-else>
-              <img 
+              <img
                 :key="index"
                 class="child-space"
                 :class="index === 2 && item.icon.indexOf('disabled') !== -1 && scope.row.scope === 0 ? `${item.icon} icon-disabled` : item.icon"
-                v-for="(item,index) in tableOperation.operation" 
-                :src="`./static/img/table-${item.methods}.png`" 
+                v-for="(item,index) in tableOperation.operation"
+                :src="`./static/img/table-${item.methods}.png`"
                 @click="handleOperationButton(item.methods, scope.row, scope.$index)"
                 height="24px"
                 width="24px"
@@ -199,7 +263,7 @@
         </template>
       </el-table-column>
 
-      
+
       <!-- XDXDXD -->
       <el-table-column
         v-if="tableAction.label"
@@ -210,12 +274,12 @@
         >
         <template slot-scope="scope">
           <div class="flex-center" >
-              <img 
+              <img
                 :key="index"
                 class="child-space hover_effect"
                 :class="index === 2 && item.icon.indexOf('disabled') !== -1 && scope.row.scope === 0 ? `${item.icon} icon-disabled` : item.icon"
-                v-for="(item,index) in tableAction.operation" 
-                :src="`./static/img/table-${item.methods}.png`" 
+                v-for="(item,index) in tableAction.operation"
+                :src="`./static/img/table-${item.methods}.png`"
                 @click="handleOperationButton(item.methods, scope.row, scope.$index)"
                 height="24px"
                 width="24px"
@@ -237,20 +301,20 @@
             <div class="flex-center" >
               <div style="margin-right: 10px;" v-for="(item,index) in tableDownloadAction.operation" :key="index">
                   <el-tooltip class="item flex-center" effect="dark" :content="$t('downloadManagement.dayExpired')" placement="left"  :disabled="index == 1">
-                  <img 
+                  <img
                     class="child-space hover_effect"
                     :class="(scope.row.status == -1 || scope.row.status == 0 || scope.row.status == 2) && index == 0 ? `${item.icon} icon-disabled ` : item.icon"
-                    :src="`./static/img/table-${item.methods}.png`" 
+                    :src="`./static/img/table-${item.methods}.png`"
                     @click="handleOperationButton(item.methods, scope.row, scope.$index)"
                     height="24px"
                     width="24px"
                   />
                 </el-tooltip>
               </div>
-              
+
             </div>
-          
-        
+
+
         </template>
       </el-table-column>
 
@@ -264,7 +328,7 @@
         <template slot-scope="scope">
           <div class="flex-center" v-if="scope.$index !== 0">
               <div class="move" v-if="tableworkflowOperation.move" >
-                <div class="move-action" 
+                <div class="move-action"
                   :class="{moveup_disable:scope.$index == 1 && item.methods == 'moveUp', movedown_disable: scope.$index == maxIndex && item.methods == 'moveDown'}"
                   :key="item.text"
                   v-for="item in tableworkflowOperation.move"
@@ -272,12 +336,12 @@
                   >
                   {{item.text}} </div>
               </div>
-              <img 
+              <img
                 :key="index"
                 class="child-space"
                 :class="index === 2 && item.icon.indexOf('disabled') !== -1 && scope.row.scope === 0 ? `${item.icon} icon-disabled` : item.icon"
-                v-for="(item,index) in tableworkflowOperation.operation" 
-                :src="`./static/img/table-${item.methods}.png`" 
+                v-for="(item,index) in tableworkflowOperation.operation"
+                :src="`./static/img/table-${item.methods}.png`"
                 @click="handleOperationButton(item.methods, scope.row, scope.$index)"
                 height="24px"
                 width="24px"
@@ -285,6 +349,8 @@
           </div>
         </template>
       </el-table-column>
+
+
 
       <template v-if="isEvent">
         <el-table-column
@@ -416,6 +482,18 @@ export default {
         return {};
       }
     },
+    tableRepeatWeekDays: {
+      type: Object,
+      default: () => {
+        return {};
+      }
+    },
+    signRecordStatus: {
+      type: Object,
+      default: () => {
+        return {};
+      }
+    },
     headerStyle: {
       type: Object,
       default: {height:'75px',backgroundColor: 'transparent',border:'none',fontSize:'12px'}
@@ -531,13 +609,13 @@ export default {
   mounted() {
     //console.log(this.columnData)
     //console.log("this.expandCompProperties ????--->", this.expandCompProperties)
-    
+
   },
   methods: {
     changeAuditMethod(row){
       this.$emit('handleAuditMethod', row);
     },
-  
+
     changeSignature(row){
       this.$emit('handleSignature', row);
     },
@@ -574,11 +652,11 @@ export default {
       let hasIcon = false;
       if(this.columnData[idx] && this.columnData[idx].hasOwnProperty('hasIcon'))
         hasIcon = true;
-      
+
       if(hasIcon){
         column.minWidth+16;
         return h(
-          'div',[ 
+          'div',[
                   h('span',column.label),
                   h('el-tooltip',
                   { props:{placement:'top-start',width:'200',trigger:'hover',content:this.columnData[idx].hasIcon.tooltipContent}},
@@ -600,7 +678,7 @@ export default {
                         class: 'iconfont question-icon icon-bangzhu',
                         style: {fontSize:'14px',marginLeft:'4px'}
                       })*/
-                  ])                        
+                  ])
                 ]
           )
       }else
@@ -619,7 +697,7 @@ export default {
       if(row.id) return row.id;
       else if(row.userId) return row.userId;
       else return row[0];
-      
+
     },
     expandChange(row) {
        /*console.log("row click:",row);
@@ -672,15 +750,15 @@ export default {
 
     handleSortChange(col) {
 
-      
+
 
       if(col.order == null) col.order = "ascending"
       console.log("col",col);
       console.log("col.order:", col.order);
-      
+
       const self = this;
       const order = col.order;
-      
+
       if (!order) {
         self.getOrderBasedOnDefaultSort();
       } else {
@@ -720,7 +798,7 @@ export default {
 
 
 
-    
+
     handleOperationButton(methods, row, index) {
       this.tableData.map(item => { item.isEditing = false; });
       // console.log('this.tableData ======>> ', this.tableData);
@@ -759,7 +837,7 @@ export default {
       this.$emit('onCellClick',{row,prop});
     },
     indexMethod(index){
-      return index 
+      return index
     },
 
 
@@ -778,12 +856,12 @@ export default {
       console.log('tag !!!', tag)
       console.log('this.tableData !!!', this.tableData)
 
-      var row = this.tableData.filter(element => 
+      var row = this.tableData.filter(element =>
           element.userName == tag.userName
       );
       console.log('row', row)
       this.$refs.tablePagination.toggleRowSelection(row[0])
-      
+
     },
 
     toggleChecked_store(tag){
@@ -791,12 +869,12 @@ export default {
       console.log('tag !!!', tag)
       console.log('this.tableData !!!', this.tableData)
 
-      var row = this.tableData.filter(element => 
+      var row = this.tableData.filter(element =>
           element.name == tag.name
       );
       console.log('row', row)
       this.$refs.tablePagination.toggleRowSelection(row[0])
-      
+
     },
 
     fromInputSelect(data){
@@ -814,7 +892,7 @@ export default {
         this.$refs.tablePagination.toggleRowSelection(row, true);
       });
     },
-    
+
     needAlert(row){
       // console.log('needAlert :>> ');
       // console.log('row :>> ', row);
@@ -830,9 +908,9 @@ export default {
       // console.log('needAlert :>> ');
       // console.log('row :>> ', row);
       this.$emit('showAttachDialog', row);
-      
+
     }
-    
+
   }
 };
 </script>
@@ -886,7 +964,7 @@ export default {
       margin-right: 0px;
     }
   }
-  
+
 
   .iconfont{
     font-size: calc(24/1920*100vw);
@@ -935,7 +1013,7 @@ export default {
     padding:0;
     width: 0px;
   }
-  
+
 </style>
 
 <style lang="scss">
@@ -948,7 +1026,7 @@ export default {
   }
   .table {
     width: auto;
-    
+
     .el-table{
       box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1);
       border: solid 1px #f5f5f5;
@@ -957,16 +1035,16 @@ export default {
     tr{
       background-color: #f7f9fa !important;
     }
-  
+
     /**** body的scrollbar
     .el-table__body-wrapper::-webkit-scrollbar {
-	      width: 4px; 
-	      height: 150px; 
+	      width: 4px;
+	      height: 150px;
     }
     .el-table__body-wrapper::-webkit-scrollbar-thumb {
-        box-shadow: 0px 1px 3px #acaeb1 inset; 
-        border-radius: 2px; 
-        background-color: #acaeb1; 
+        box-shadow: 0px 1px 3px #acaeb1 inset;
+        border-radius: 2px;
+        background-color: #acaeb1;
     }*/
   }
   .table-white {
@@ -981,13 +1059,13 @@ export default {
     }
     /**** body的scrollbar
     .el-table__body-wrapper::-webkit-scrollbar {
-	      width: 4px; 
-	      height: 150px; 
+	      width: 4px;
+	      height: 150px;
     }
     .el-table__body-wrapper::-webkit-scrollbar-thumb {
-        box-shadow: 0px 1px 3px #acaeb1 inset; 
-        border-radius: 2px; 
-        background-color: #acaeb1; 
+        box-shadow: 0px 1px 3px #acaeb1 inset;
+        border-radius: 2px;
+        background-color: #acaeb1;
     }*/
   }
   #el-tablescrollbar {
@@ -1000,7 +1078,7 @@ export default {
     .el-table
     .el-table__header-wrapper
     .el-table-column--selection
-    .el-checkbox__inner 
+    .el-checkbox__inner
     {
       border-radius: 1px;
       border: solid 1px #acaeb1;
@@ -1014,7 +1092,7 @@ export default {
     .el-table__header-wrapper
     .el-table-column--selection
     .is-checked
-    .el-checkbox__inner 
+    .el-checkbox__inner
     {
       border-radius: 1px;
       border: solid 1px #2c90d9;
@@ -1024,7 +1102,7 @@ export default {
     .el-table
     .el-table__body-wrapper
     .el-table-column--selection
-    .el-checkbox__inner 
+    .el-checkbox__inner
     {
       border-radius: 1px;
       border: solid 1px #acaeb1;
@@ -1035,7 +1113,7 @@ export default {
     .el-table__body-wrapper
     .el-table-column--selection
     .is-checked
-    .el-checkbox__inner 
+    .el-checkbox__inner
     {
       border-radius: 1px;
       border: solid 1px #2c90d9;
@@ -1045,8 +1123,8 @@ export default {
         border-color:#2c90d9;
       }
     }
-    
-    
+
+
 </style>
 
 <style lang="sass" >
@@ -1066,8 +1144,8 @@ export default {
         transition: all .2s
         &:hover
           transform: scale(1.1)
-      
-  .icon-copy, .icon-setting, .icon-delete, .icon-doc,  .icon-edit, 
+
+  .icon-copy, .icon-setting, .icon-delete, .icon-doc,  .icon-edit,
     cursor: pointer
     transition: all .2s
     &:hover
@@ -1088,16 +1166,16 @@ export default {
     align-items: center
     transition: all .2s
 
-    img 
+    img
       width: 25px
-      
+
     &:hover
-      transform: scale(1.1) 
+      transform: scale(1.1)
   .not_Read
     color: #F57848
   .is_read
     color: #59AB22 !important
-  
+
   .hover_effect
     transition: all .2s
     cursor: pointer

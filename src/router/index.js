@@ -62,7 +62,7 @@ export const navbarRoute = {
   getOverviewRoute() {
     primaryPathesList = [];
     const overviewRoute = {
-      id:0,
+      id: 0,
       path: '/home',
       name: 'overview',
       component: Home,
@@ -94,15 +94,15 @@ export const navbarRoute = {
   },
 
 
-  // 巡店管理
+  // 巡檢管理
   getPatrolRoute() {
 
-    console.log("PermissionHelper.enableInspectReport()",PermissionHelper.enableInspectReport());
-    console.log("PermissionHelper.advancedMode",PermissionHelper.advancedMode);
-    console.log("PermissionHelper.enableMimicMode",PermissionHelper.enableMimicMode);
+    console.log("PermissionHelper.enableInspectReport()", PermissionHelper.enableInspectReport());
+    console.log("PermissionHelper.advancedMode", PermissionHelper.advancedMode);
+    console.log("PermissionHelper.enableMimicMode", PermissionHelper.enableMimicMode);
 
     const patrolRoute = {
-      id:1,
+      id: 1,
       path: '/home',
       name: 'patrolManage',
       component: Home,
@@ -183,7 +183,7 @@ export const navbarRoute = {
   // 事件管理
   getEventRoute() {
     const eventRoute = {
-      id:2,
+      id: 2,
       path: '/home',
       name: 'eventManage',
       component: Home,
@@ -218,9 +218,9 @@ export const navbarRoute = {
   },
 
   // 下載管理
-  getDownloadManagement(){
+  getDownloadManagement() {
     const downloadManagemenRoute = {
-      id:9,
+      id: 9,
       path: '/home',
       name: 'downloadManagement',
       component: Home,
@@ -247,7 +247,7 @@ export const navbarRoute = {
   },
 
   // 報告與事件
-  getReportAndEvent(){
+  getReportAndEvent() {
     const reportAndEventRoute = {
       id: 8,
       path: '/home',
@@ -319,7 +319,7 @@ export const navbarRoute = {
   // 簽核管理
   getAuditRoute() {
     const auditRoute = {
-      id:4,
+      id: 4,
       path: '/home',
       name: 'AuditManage',
       component: Home,
@@ -355,7 +355,7 @@ export const navbarRoute = {
         },
         component: resolve => require(['@/views/patrolShop/InspectReport'], resolve)
       }
-    ) && primaryPathesList.push('/audit', '/auditDetail','/auditReportdetails');
+    ) && primaryPathesList.push('/audit', '/auditDetail', '/auditReportdetails');
 
     !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableWaitAudit() && auditRoute.children.push(
       {
@@ -398,7 +398,7 @@ export const navbarRoute = {
         },
         component: resolve => require(['@/views/patrolShop/InspectReport'], resolve)
       }
-    ) && primaryPathesList.push('/waitaudit', '/auditHandling','/waitAuditDetail','/waitAuditReportdetails','/handingReportdetails');
+    ) && primaryPathesList.push('/waitaudit', '/auditHandling', '/waitAuditDetail', '/waitAuditReportdetails', '/handingReportdetails');
 
     !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableTranscriptNotify() && auditRoute.children.push(
       {
@@ -426,14 +426,14 @@ export const navbarRoute = {
         },
         component: resolve => require(['@/views/patrolShop/InspectReport'], resolve)
       }
-    ) && primaryPathesList.push('/transcriptnotify','/transcriptnotifyAuditDetail','/transcriptnotifyReportdetails');
+    ) && primaryPathesList.push('/transcriptnotify', '/transcriptnotifyAuditDetail', '/transcriptnotifyReportdetails');
     return auditRoute;
   },
 
   // 統計分析
   getStatisticalRoute() {
     const statisticsRoute = {
-      id:3,
+      id: 3,
       path: '/home',
       name: 'statistics',
       component: Home,
@@ -472,7 +472,7 @@ export const navbarRoute = {
         hidden: true,
 
       }
-    ) && primaryPathesList.push('/patrolItem','/patrolItem_old');
+    ) && primaryPathesList.push('/patrolItem', '/patrolItem_old');
     !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableSupervisionEffStatistics() && statisticsRoute.children.push(
       {
         path: '/patrolPersonStat',
@@ -537,7 +537,7 @@ export const navbarRoute = {
 
 
   // 巡檢排程
-  getInceptionSchedule(){
+  getInceptionSchedule() {
     const schduleRoute = {
       id: 5,
       path: '/home',
@@ -560,7 +560,7 @@ export const navbarRoute = {
           requireAuth: true
         },
         isReadOnly: false
-      } ,
+      },
       {
         path: '/personalSchedule',
         name: 'PersonalSchedule',
@@ -586,7 +586,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/schedule/details/scheduleDetail'], resolve)
       }
 
-    ) && primaryPathesList.push('/scheduleSetting', '/personalSchedule','/scheduleDetailCreate','/scheduleDetailModify');
+    ) && primaryPathesList.push('/scheduleSetting', '/personalSchedule', '/scheduleDetailCreate', '/scheduleDetailModify');
 
     !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleHistroy() && schduleRoute.children.push(
       {
@@ -598,15 +598,34 @@ export const navbarRoute = {
           requireAuth: true
         },
         isReadOnly: false
-      }
-    ) && primaryPathesList.push('/scheduleHistory');
+      },
+      {
+        path: '/repeatingSchedule',
+        name: 'RepeatingSchedule',
+        component: resolve => require(['@/views/schedule/RepeatingSchedule'], resolve),
+        meta: {
+          requireAuth: true,
+          keepAlive: false
+        },
+        isReadOnly: false
+      },
+      {
+        path: '/repeatingScheduleSetting',
+        name: 'RepeatingScheduleSetting',
+        hidden: true,
+        meta: {
+          keepAlive: false
+        },
+        component: resolve => require(['@/views/schedule/RepeatingScheduleSetting'], resolve),
+      },
+    ) && primaryPathesList.push('/scheduleHistory', '/repeatingSchedule', '/repeatingScheduleSetting');
     return schduleRoute;
   },
 
   // 系統設定
   getSystemSettingRoute() {
     const systemSettingRoute = {
-      id:6,
+      id: 6,
       path: '/home',
       name: 'systemSetting',
       iconCls: 'iconfont icon-button',
@@ -704,8 +723,6 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/routeInspection/CreateInspect'], resolve),
       },
 
-
-
     ) && primaryPathesList.push('/routeinspection', '/addroute', '/setroute', '/bindroute', '/createinspect');
 
     /*!PermissionHelper.enableMimicMode && PermissionHelper.enableScheduleSetting() && inspectionRoute.children.push({
@@ -721,17 +738,17 @@ export const navbarRoute = {
     }) && primaryPathesList.push('/patrolSchedule');*/
 
     !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableReportSetting() &&
-    inspectionRoute.children.push({
-      path: '/insepctionReportSetting',
-      name: 'insepctionReportSetting',
-      isReadOnly: false,
-      component: resolve => require(['@/views/setting/report/ReportSetting'], resolve),
-      hidden: false,
-      meta: {
-        keepAlive: false,
-        requireAuth: true
-      }
-    }) && primaryPathesList.push('/insepctionReportSetting');
+      inspectionRoute.children.push({
+        path: '/insepctionReportSetting',
+        name: 'insepctionReportSetting',
+        isReadOnly: false,
+        component: resolve => require(['@/views/setting/report/ReportSetting'], resolve),
+        hidden: false,
+        meta: {
+          keepAlive: false,
+          requireAuth: true
+        }
+      }) && primaryPathesList.push('/insepctionReportSetting');
 
     inspectionRoute.children.length > 0 && systemSettingRoute.children.push(inspectionRoute);
 
@@ -802,9 +819,9 @@ export const navbarRoute = {
         hidden: true,
       }
 
-    ) && primaryPathesList.push('/workflows', '/workflowDetail', '/createWorkflownode', '/workflownode', '/createWorkflow','/createEditWorkflownode');
+    ) && primaryPathesList.push('/workflows', '/workflowDetail', '/createWorkflownode', '/workflownode', '/createWorkflow', '/createEditWorkflownode');
 
-    (store.getters.roleId==1) && !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && systemSettingRoute.children.push(
+    (store.getters.roleId == 1) && !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && systemSettingRoute.children.push(
       {
         path: '/mysterio',
         name: 'MysterioManage',
@@ -827,8 +844,42 @@ export const navbarRoute = {
   },
 
 
+  // ePager
+  getEpaper() {
+    const patrolRoute = {
+      id: 10,
+      path: '/home',
+      name: 'epaperManagement',
+      component: Home,
+      iconCls: 'iconfont icon-jingyin',
+      styles: 'font-size:22px',
+      leaf: false,
+      hidden: false,
+      children: []
+    };
+
+    !PermissionHelper.advancedMode && (PermissionHelper.enableMimicMode || PermissionHelper.enableInspectReport()) && patrolRoute.children.push(
+      {
+        path: '/signinrecord',
+        name: 'signinRecord',
+        component: resolve => require(['@/views/epaper/SigninRecord'], resolve),
+        meta: {
+          requireAuth: true,
+          keepAlive: false
+        },
+        isReadOnly: false
+      },
+
+
+    ) && primaryPathesList.push('/signinrecord');
+    return patrolRoute;
+  },
+
+
+
+
   //進階設定
-  getAdvanceSetting(){
+  getAdvanceSetting() {
     const advanceSettingRoute = {
       id: 7,
       path: '/home',
@@ -850,7 +901,7 @@ export const navbarRoute = {
           requireAuth: true
         },
         isReadOnly: false
-      } ,
+      },
       {
         path: '/dataSecurity',
         name: 'DataSecurity',
@@ -860,14 +911,14 @@ export const navbarRoute = {
           requireAuth: true
         },
         isReadOnly: false
-      } ,
+      },
     ) && primaryPathesList.push('/waterMark', '/dataSecurity');
     return advanceSettingRoute;
 
   },
 
   //即時推播
-  getInstantPush(){
+  getInstantPush() {
     const instantPushRoute = {
       id: 8,
       path: '/home',
@@ -889,7 +940,7 @@ export const navbarRoute = {
           requireAuth: true
         },
         isReadOnly: false
-      } ,
+      },
       {
         path: '/sendingRecord',
         name: 'SendingRecord',
@@ -899,13 +950,12 @@ export const navbarRoute = {
           requireAuth: true
         },
         isReadOnly: false
-      } ,
+      },
 
     ) && primaryPathesList.push('/send', '/sendingRecord');
     return instantPushRoute;
 
   },
-
 
 
 
