@@ -136,8 +136,6 @@ export default {
     "reportAndEventUpdated": "報告與事件 | 已結案事件",
     "needDeleteReport": "報告詳情",
     "needUpdateEvent": "事件詳情",
-
-
     "DataSecurity": "資料安全",
     "InstantPush": "即時推播",
     "Send": "發送推播",
@@ -148,6 +146,8 @@ export default {
     "signinRecord": "簽到紀錄",
     "RepeatingSchedule": "重複排程",
     "RepeatingScheduleSetting": "重複排程設定",
+
+    "webPatrol": "網頁巡檢"
 
 
   },
@@ -1865,9 +1865,6 @@ export default {
     "dataIsEmpty": "表格資料為空！請重新搜尋條件",
     "comfimDelete": "巡檢表刪除後將無法復原，且無法再查看該巡檢表相關之報告與統計分析！請確認是否刪除？",
     "passwordToDelete": "請輸入密碼確認刪除",
-
-
-
   },
   "epaper": {
     "date": "時間範圍",
@@ -1909,6 +1906,11 @@ export default {
     "taskNameCantEmpty": "排程名稱不可為空",
     "taskTimeCantEmpty": "巡檢時間不可為空",
     "repeatCycleCantEmpty": "重複週期不可為空",
+  },
+
+  "webInspection": {
+
+
   }
 }
 
