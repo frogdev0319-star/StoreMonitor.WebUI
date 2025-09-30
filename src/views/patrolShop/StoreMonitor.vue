@@ -107,7 +107,7 @@
                   :clearable="false"
                   class="storevue-datepicker"
                   type="date"
-                  placeholder="日期"
+                  :placeholder='$t("scheduleView.date")'
                   size="mini"
                 />
                 <el-time-picker

@@ -166,7 +166,7 @@
         </div>
 
         <div class="storeInfo-details" v-if="event.sourceType == 4">
-          <dd><span :class="lang.indexOf('zh') === -1 ? 'en-w4': 'w4'">觸發時間：</span></dd>
+          <dd><span :class="lang.indexOf('zh') === -1 ? 'en-w4': 'w4'">{{$t('addition.triggerTime') }}</span></dd>
           <span class="details-info"> {{ visionSenseEventTime }}  </span>
         </div>
 
@@ -190,36 +190,6 @@
         </div>
       </div>
 
-      <!-- ==== !!! === -->
-      <!-- <div v-for="(i, index) in newImgArray" :key="index">
-        <img :src="i" class="w-full rounded shadow" />
-      </div> -->
-
-      <!-- <watermark :options="waterOptions">
-        <div class="container" style="height: 300px">
-          内容区域
-        </div>
-      </watermark>
-
-
-      <div class="img" style=" display: flex; flex-direction: row;">
-        <div class="" v-for="iii in tempDB" style="width: 150px; margin-right: 10px; position: relative;">
-            <div class="mask"
-              style="position: absolute; width: 100%; height: 100%; z-index: 101;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-
-              ">
-              <div class="text"" style="color: #FFF; transform: rotate(45deg) ; font-size: 30px;">Albert</div>
-            </div>
-            <el-image
-              style="width: 100%; height: auto;"
-              :src="iii.src"
-            />
-          </div>
-      </div> -->
-      <!-- ==== !!! === -->
 
       <div class="eventInfo-content">
         <strong v-if="lang.indexOf('zh') === -1" style="margin-right: 28px">{{ $t('eventView.eventDetails') }}:</strong>
@@ -352,7 +322,7 @@
           </div>
           <div class="btn_List" v-if="needUpdateEvent">
             <div class="reopen" @click="showUpdateEvent = true" >
-              返回處理
+                {{ $t('addition.returnProcessing') }}
             </div>
           </div>
         </div>
@@ -441,7 +411,7 @@
       </div>
 
       <dialog-pop
-        title="修改已結案事件"
+        :title="$t('reportAndEvents.modifyClosedEvents')"
         :append-to-body="true"
         :close-on-click-modal="false"
         :show-close="false"
@@ -451,7 +421,7 @@
         @confirmHandler="confirmUpdate()"
       >
         <div class="dialog-slot">
-          <div class="dialog-content">請確認是否變更狀態為 <span style="color: red;"> <b>未處理</b></span>   ? </div>
+          <div class="dialog-content">{{ $t('reportAndEvents.changeStatus') }} <span style="color: red;"> <b>{{ $t('reportAndEvents.unprocessed') }}</b></span>   ? </div>
         </div>
       </dialog-pop>
 
@@ -1140,7 +1110,7 @@ export default {
             const blobUrl = URL.createObjectURL(watermarkedBlob);
             return { ...item, url: blobUrl };
           } catch (err) {
-            console.warn("圖片載入失敗", item.url, err);
+            // console.warn("圖片載入失敗", item.url, err);
             return item; // 若失敗就保留原始 URL
           }
         }

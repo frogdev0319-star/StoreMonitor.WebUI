@@ -227,11 +227,11 @@
           <el-form-item style="margin-bottom: 20px">
             <div class="score_item">
               <span class="sign">*</span>
-              <span class="item_label">重要巡檢項</span>
+              <span class="item_label">{{$t('addition.impItems')}}</span>
             </div>
             <el-radio-group class="attribute-group" v-model="isImportant" >
-              <el-radio label="1">開啟</el-radio>
-              <el-radio label="0">關閉</el-radio>
+              <el-radio label="1">{{$t('addition.on')}}</el-radio>
+              <el-radio label="0">{{$t('addition.off')}}</el-radio>
             </el-radio-group>
           </el-form-item>
 
@@ -353,7 +353,7 @@
                   ref="memo_tag"
                   v-model="memo_option"
                   style="margin-bottom: 5px"
-                  placeholder="請輸入備註標籤"
+                  :placeholder="$t('addition.inputTag')"
                   @input="memoOptionsChange"
                 />
 
@@ -1368,7 +1368,7 @@ export default {
       }
       self.refreshData(index);
       if (self.typeTemp.length === 1 && self.groupList.length === 0) {
-        util.notify("已刪除此巡檢表", 'warning', 3000);
+        util.notify(self.$t('addition.deleteInspection'), 'warning', 3000);
         self.$router.push({ name: 'inspectListSetting', params: { val: 'del' }});
       }
     },

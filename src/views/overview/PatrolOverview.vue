@@ -8,9 +8,8 @@
       </span>
 
       <!-- 選擇地點 -->
-      <div class="store_title" style="margin-left: 30px; margin-right: 20px;"  v-if="isiService || isTransform">{{ $t('overview.patrolStore')}}</div>
+      <div class="store_title" style="margin-left: 30px; margin-right: 20px;"  >{{ $t('overview.patrolStore')}}</div>
       <region-multi-select
-        v-if="isiService || isTransform"
         ref="multiState"
         style="width: 30%; "
         :selected="selectedInstantStore"
@@ -24,7 +23,7 @@
         v-if="isiService"
         v-model="selectedInstantStore"
         style="width: 30%;"
-        :placeholder="$t('immediatePush.selectStore')" 
+        :placeholder="$t('immediatePush.selectStore')"
         filterable
         multiple
         @change="storeChange"
@@ -33,7 +32,7 @@
           v-for="item in storeList"
           :key="item.storeId"
           :label="item.name"
-          :value="item.storeId" 
+          :value="item.storeId"
           />
       </el-select> -->
     </div>
@@ -57,7 +56,7 @@
             </div>
           </div>
         </el-col>
-        
+
         <!-- 各區域門店巡檢情況 -->
         <el-col :span="14" class="store-list">
           <div class="title">{{ $t('overview.patrolStatus') }} </div>
@@ -364,8 +363,8 @@ export default {
       inspectStatus: '',
       selectedInstantStore: [],
       storeList: [],
-      
-      
+
+
     };
   },
 
@@ -382,7 +381,7 @@ export default {
         self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
         self.currentIndex = 0;
         self.selectedInstantStore = '';
-      
+
         await this.getBriefStoreData()
         await self.getInspectStatus();
         await self.getSearchParams();
@@ -390,7 +389,7 @@ export default {
         await self.getAccountInfo()
       }
     },
-    
+
   },
 
   async created() {
@@ -401,9 +400,9 @@ export default {
     this.getAccountInfo()
   },
   mounted() {
-    
+
   },
-  
+
   beforeDestroy() {
     this.$refs.storeChart && this.$refs.storeChart.dispose();
     this.$refs.itemsPie && this.$refs.itemsPie.dispose();
@@ -430,7 +429,7 @@ export default {
         // }
       })
     },
-    
+
     getInspectStatus(){
       return new Promise((resolve, reject) => {
           getInspectStatus().then(res => {
@@ -438,7 +437,7 @@ export default {
           this.inspectStatus = res.data.settingContent.general_setting_inspect_status_name
           delete this.inspectStatus.update_time
           delete this.inspectStatus.update_user_id
-          
+
           if(this.inspectStatus.is_customize_2 == false){
             this.inspectStatus.status_2 = this.$t('overview.echartGood')
           }
@@ -642,7 +641,7 @@ export default {
       itemsParam = JSON.parse(JSON.stringify(self.params));
       itemsParam.itemId = self.curItemId;
       itemsParam.storeIds = this.selectedInstantStore
-      
+
       const options = self.getItemRadarOption();
       try {
         const result = await self.getInspectItemsOverRegion(itemsParam);
@@ -824,7 +823,7 @@ export default {
       this.timeMode = daysDiff <= 30 ? 1 : 2;
       this.params.beginTs = start;
       this.params.endTs = end;
-      
+
       // 2024 sprint2 新增
       // this.params.storeIds = [];
 
@@ -1352,23 +1351,23 @@ export default {
           },
           data: [
             {
-              name: this.inspectStatus.status_0 + "≥60%", 
+              name: this.inspectStatus.status_0 + "≥60%",
               icon: 'rect' },
             {
-              name: this.inspectStatus.status_0 + "＜60%", 
-              icon: 'rect' 
+              name: this.inspectStatus.status_0 + "＜60%",
+              icon: 'rect'
             },
-            { 
-              name: this.$t('overview.excellentLess'), 
-              icon: 'rect' 
+            {
+              name: this.$t('overview.excellentLess'),
+              icon: 'rect'
             },
-            { 
-              name: this.$t('overview.excellentMore'), 
-              icon: 'rect' 
+            {
+              name: this.$t('overview.excellentMore'),
+              icon: 'rect'
             }]
         },
 
-        
+
         textStyle: {
           fontFamily: this.fontFamily
         },
@@ -1619,7 +1618,7 @@ export default {
           // });
           // self.regionList = regionList;
 
-          
+
           regionOption.baseOption.xAxis[0].data = SelectProvice;
           resultData.forEach((item) => {
             const dateTime = item.ts;

@@ -867,7 +867,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/epaper/SigninRecord'], resolve),
         meta: {
           requireAuth: true,
-          keepAlive: true
+          keepAlive: false
         },
         isReadOnly: false
       },

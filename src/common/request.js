@@ -125,6 +125,7 @@ service.interceptors.request.use(
   }
 );
 
+// ** **
 service.interceptors.response.use(
   response => {
     return response.data;
@@ -136,29 +137,48 @@ service.interceptors.response.use(
         duration: 5 * 1000
       });
     }
+
     if (err.response) {
       const errCode = err.response.data.errCode;
       const errMsg = err.response.data.errMsg;
+
       if (errCode === 500 && (errMsg == 'Invalid token' ||
-                errMsg == 'Failed to verify token' || errMsg == 'User does not exist')) {
+        errMsg == 'Failed to verify token' ||
+        errMsg == 'User does not exist' ||
+        errMsg == 'No message available'
+      )) {
         const url = sessionStorage.getItem('LoginURL');
-        window.location.href = url;
+        // *****
+        if (url) {
+          window.location.href = url;
+        } else {
+          router.push('/login')
+        }
         message({
           message: i18n.t('route.loginAbnormal'),
+          // message: "XDXDXD",
           type: 'error',
-          duration: 5 * 1000
+          duration: 2000
         });
+
       } else if (errCode === 500 && errMsg == 'Token does not exist') {
         const url = sessionStorage.getItem('LoginURL');
-        window.location.href = url;
+        if (url) {
+          window.location.href = url;
+        } else {
+          router.push('/login')
+        }
+
       } else if (errCode === 500 && errMsg == 'No authority') {
-        router.push('/home');
+        router.push('/login');
         message({
           message: i18n.t('route.noAuthority'),
           type: 'error',
           duration: 5 * 1000
         });
       }
+
+
       if (err.response.status != undefined && err.response.status == 404) {
         message({
           message: i18n.t('route.serverException'),
@@ -221,8 +241,8 @@ serviceRpt.interceptors.response.use(
     if (err.response) {
       const errCode = err.response.data.errCode;
       const errMsg = err.response.data.errMsg;
-      if (errCode === 500 && (errMsg == 'Invalid token' ||
-                errMsg == 'Failed to verify token' || errMsg == 'User does not exist')) {
+
+      if (errCode === 500) {
         const url = sessionStorage.getItem('LoginURL');
         window.location.href = url;
         message({

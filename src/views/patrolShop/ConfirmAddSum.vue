@@ -72,7 +72,7 @@
                 :preview-src-list="getAuditImgList(index)"/>
             </div>
           </div>
-          
+
           <div v-if="auditFileCount < 10" class="attach-add" @click="$refs.auditfile.click()">
             <input type="file" style="display: none" accept="image/png,image/jpeg,application/pdf" max-size="2" @change="doAddAttachment" ref="auditfile" />
             <div style="height:16px;display: flex;flex-direction: row;align-items: center;">
@@ -81,7 +81,7 @@
             </div>
           </div>
         </div>
-      
+
         <div style="margin-top:10px;">
           <span class="sug-label margin-bottom-md" >{{ $t('audit.inceptionRpt.auditNote') }}</span>
           <el-input
@@ -670,7 +670,7 @@ export default {
     await self.getUpLoadBucketInfo();
     await self.getOssInfo();
 
-    
+
   },
   methods: {
 
@@ -731,8 +731,8 @@ export default {
       }
       return totalScore
     },
-    
-  
+
+
 
     // 四捨五入
     getDoubleNum (num) {
@@ -1150,7 +1150,7 @@ export default {
               };
             }
 
-          } 
+          }
 
           else if(res.errCode == 7001){
             console.log('errerrerr 7001')
@@ -1165,9 +1165,9 @@ export default {
             setTimeout(() => {
               this.reportSubmitting = false
             },3500);
-            
+
           }
-          
+
           else {
             self.reportSubmitting = false;
             util.notify(res.errMsg, 'error', 3000);
@@ -1180,7 +1180,7 @@ export default {
 
           }
           if(!self.isBindWorkflow) self.$router.push({ name: 'submitEvent', params: { data: routeData}});
-          
+
         }).catch(err => {
           self.reportSubmitting = false;
           util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
@@ -1406,7 +1406,7 @@ export default {
 
 
         console.log('self.inspectList :::::::>> ', self.inspectList);
-        
+
 
         if(self.isEditReport) {
           self.reportId = routeData.reportId;
@@ -1427,7 +1427,7 @@ export default {
         let PassFileXN = 0, PassFileTotalScore = 0, PassFileTotalScoreX = 0, PassFileXS = 0, PassFileTotalScoreSystem = 0;
         let ScoreX = 0, ScoreN = 0, ScoreXN = 0, ScoreTotalScoreX = 0, allScoreB = 0, ScoreTotalScoreSystem = 0;
         let otherGetscoreTotal = 0, OtherTotalScoreSystem = 0;
-    
+
         let isOnlyTab1 = true;
         inspect.forEach(p_item => {
           if (p_item.type != 0) isOnlyTab1 = false
@@ -1460,11 +1460,11 @@ export default {
             item.unqualifiedItems = [];
             item.numOfCommentItem = 0;
             item.numOfTotalItems = 0;
-            
-        
+
+
             item.items.forEach(s_item => {//子項
               item.numOfTotalItems++;
-      
+
               if (s_item.itemType === 1) {
                 item.numOfCommentItem++;
                 return;
@@ -1537,14 +1537,14 @@ export default {
                 if (!s_item.isIgnore && !s_item.manualIgnore) {
                   ScoreX += s_item.itemgetScore;
                   Score_totalScoreX += s_item.itemScore;
-                  
+
                   notAddIgnoretotalScore += s_item.itemScore;
                   tab2NotIgnoredItemsGetScore += s_item.itemgetScore;
 
                 } else {
                   ScoreN += s_item.itemScore;
                   tab2IgnoredItemsGetScore += s_item.itemScore;
-                } 
+                }
 
                 if (s_item.isIgnore || s_item.manualIgnore) {
                   s_item.showTotalScore = inspectSettings.qualifiedForIgnoredWithType2;
@@ -1602,7 +1602,7 @@ export default {
               PassFileXS += util.accMul(xs,tempWeight);
               PassFileXN += util.accMul(xn,tempWeight);
 
-              
+
               if(inspectSettings.qualifiedForIgnoredWithType1){
                 PassFileTotalScore += util.accMul(ts0,tempWeight);
                 PassFileTotalScoreX += util.accMul(tsX,tempWeight)
@@ -1679,7 +1679,7 @@ export default {
                   if(type1tsX == -99999 || item.groupScore == -99999){
                     console.log('---1--')
                     console.log('inspectSettings.qualifiedForIgnoredWithType2', inspectSettings.qualifiedForIgnoredWithType2)
-                    
+
                     if(inspectSettings.qualifiedForIgnoredWithType2){
                       console.log('item ---', item)
                       ScoreTotalScoreX += util.accMul(type1ts, tempWeight);
@@ -1700,7 +1700,7 @@ export default {
                         ScoreTotalScoreX += util.accMul(n, tempWeight);
                       }
                     }
-                    
+
                   } else {
                     console.log('---2--')
                     if(inspectSettings.qualifiedForIgnoredWithType2){
@@ -1728,7 +1728,7 @@ export default {
                   //  console.log("type 1 ScoreTotalScoreSystem:",ScoreTotalScoreSystem);
                   //  console.log("type 1 ScoreXN:",ScoreXN);
             }
-            
+
             if (p_item.type === 2) {
               if(item.isAdvanced){
                   if(item.groupScore<=0){
@@ -1908,10 +1908,10 @@ export default {
               s_count = PassFileTotalScoreX === 0 ? 0 : util.accDiv(PassFileXS , PassFileTotalScoreX) * 100;
             }
           }
-        } 
+        }
         else {
           if (inspectSettings.includedInTotalScoreWithType1 || isOnlyTab1) {
-            // 加分 or 減分制 
+            // 加分 or 減分制
             console.log('status ooo1')
             if (inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1') {
               if (inspectSettings.qualifiedForIgnoredWithType1 && !inspectSettings.qualifiedForIgnoredWithType2) {
@@ -1933,7 +1933,7 @@ export default {
                 console.log('*ScoreTotalScoreSystem:',ScoreTotalScoreSystem);
                 total_a = PassFileXN + ScoreTotalScoreSystem;
                 total_b = PassFileTotalScore + ScoreTotalScoreX;
-              } 
+              }
               else if (!inspectSettings.qualifiedForIgnoredWithType1 && inspectSettings.qualifiedForIgnoredWithType2) {
                 console.log('status 2')
                 console.log('*PassFileXN 2:',PassFileXN);
@@ -1944,7 +1944,7 @@ export default {
 
                 total_a = PassFileXS + ScoreXN;
                 total_b = PassFileTotalScoreX + allScoreB;
-              } 
+              }
               else if (inspectSettings.qualifiedForIgnoredWithType1 && inspectSettings.qualifiedForIgnoredWithType2) {
                 console.log('status 3')
                 console.log('*PassFileXN 2:',PassFileXN);
@@ -1955,7 +1955,7 @@ export default {
 
                 total_a = PassFileXN + ScoreXN;
                 total_b = PassFileTotalScore + ScoreTotalScoreX;
-              } 
+              }
               else {
                 console.log('status 4')
                 console.log('*PassFileXS :',PassFileXS);
@@ -1974,14 +1974,14 @@ export default {
               console.log('total_a , total_b' , total_a , total_b)
               console.log('total_c !!!', total_c);
               this.totalScoreSum = total_b
-              
+
               console.log('====== 得分 ======')
               s_count = total_c + otherGetscoreTotal;
               console.log('s_count', s_count)
 
             }
           } else {
-            
+
             if (inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1') {
               if (inspectSettings.qualifiedForIgnoredWithType2) {
                 s_count = ScoreXN + OtherTotalScoreSystem;
@@ -1989,7 +1989,7 @@ export default {
                 s_count = ScoreTotalScoreSystem + OtherTotalScoreSystem;
               }
             } else {
-              
+
               let total_a = 0;
               if (inspectSettings.qualifiedForIgnoredWithType2) {
                 console.log('1')
@@ -1998,12 +1998,12 @@ export default {
                 console.log('2')
 
                 total_a = ScoreTotalScoreX === 0 || ScoreTotalScoreSystem === 0 ? 0 : (util.accDiv(ScoreTotalScoreSystem , ScoreTotalScoreX) * 100);
-                
+
               }
               s_count = total_a + otherGetscoreTotal;
 
               this.totalScoreSum = ScoreTotalScoreX
-              
+
               console.log('allScoreB', allScoreB)
               console.log('ScoreXN', ScoreXN)
               console.log('ScoreTotalScoreX', ScoreTotalScoreX)
@@ -2033,7 +2033,7 @@ export default {
         }
 
         self.summary = this.groupbyKey(inspect, 'type');
-        
+
         var ary = []
         self.summary.forEach(i => {
           i.data.forEach(ii => {

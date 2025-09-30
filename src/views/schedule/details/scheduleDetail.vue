@@ -12,8 +12,8 @@
           <span>{{$t('schedule.save')}}</span>
       </delay-button>
     </div>
-    
-    
+
+
     <!-- 基本訊息 -->
     <div class="page-container report-setting paper" style="margin-bottom: 40px">
       <div class="setting-titles padding flex-center">
@@ -27,7 +27,7 @@
             <!-- 排程名稱 -->
             <div class="flex-row" style="margin-right: 30px; position: relative;">
               <div class="title-name"><span style="color: #c60957">* </span> {{$t('scheduleView.scheduleName')}}</div>
-              <div class="title-status"> 
+              <div class="title-status">
                 <el-input
                   v-model="taskName"
                   ref="inputName"
@@ -35,21 +35,21 @@
                   style="width: 250px"
                   @input="(val) => itemInputChanged(val, 20)"
                   />
-                  
+
               </div>
 
-              <span class="notice" 
-                style="margin-right: 30px; position: absolute; bottom: -20px ; left: 92px" 
-                v-if="showInputLimit"> {{$t('schedule.maxCharacter')}} 
+              <span class="notice"
+                style="margin-right: 30px; position: absolute; bottom: -20px ; left: 92px"
+                v-if="showInputLimit"> {{$t('schedule.maxCharacter')}}
               </span>
             </div>
 
             <!-- 巡檢表 -->
             <div class="flex-row" style="margin-right: 30px">
               <div class="title-name"><span style="color: #c60957">* </span> 巡檢表</div>
-              <!-- <div class="title-status" style="margin-right: 10px"> 
+              <!-- <div class="title-status" style="margin-right: 10px">
                 <el-select
-                  v-model="inspectionMode" 
+                  v-model="inspectionMode"
                   placeholder="巡檢表"
                   style="width: 250px"
                   :disabled="canEditInspection"
@@ -62,10 +62,10 @@
                   />
                 </el-select>
               </div> -->
-              <div class="title-status"> 
+              <div class="title-status">
                 <el-select
-                  v-model="inspectionName" 
-                  placeholder="巡檢表名稱"
+                  v-model="inspectionName"
+                  :placeholder="$t('remotePatrol.inspectName')"
                   style="width: 250px"
                   :disabled="canEditInspection"
                   >
@@ -93,7 +93,7 @@
 
         <div class="flex-row" style="margin-right: 30px">
           <div class="title-name">{{$t('schedule.keyWord')}}</div>
-          <div class="title-status" > 
+          <div class="title-status" >
             <el-input
               v-model="inputSearchStoreList"
               ref="inputSearchStoreList"
@@ -125,7 +125,7 @@
             >
             <span> {{$t('schedule.edit')}}</span>
           </delay-button>
-          
+
           <!-- 刪除 -->
           <delay-button
             class="blue_border"
@@ -149,14 +149,14 @@
           />
           <p style="color: #b7c7df"> {{$t('schedule.noData')}}</p>
         </div>
-        
+
         <!-- 有數據 -->
         <div class="inspect-basic flex-column" v-else>
           <!-- 全部門店 -->
           <div class="role-all-checkbox" style="margin-bottom: 25px">
             <el-checkbox
-              v-model="seleAllSchedule" 
-              class="storevue-checkbox-filled" 
+              v-model="seleAllSchedule"
+              class="storevue-checkbox-filled"
               style="margin-right: 8px"
               @change="selectAll"
             />
@@ -170,7 +170,7 @@
                 <div class="role-all-checkbox" style="margin-bottom: 10px" >
                   <el-checkbox
                     v-model="_item.checked"
-                    class="storevue-checkbox-filled" 
+                    class="storevue-checkbox-filled"
                     style="margin-right: 8px"
                     @change="selectProvince(_item)"
                   />
@@ -187,14 +187,14 @@
                         style="margin-right: 8px"
                         :disabled="(item.remindTime < new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 && item.remindTime !== '' )"
                         @change="handleCheckboxChange(item)"
-                        
+
                         />
                         <span class="role-name">{{item.storeName}} <span style="color: #999; font-size: 13px" v-if="item.timeZone">({{item.timeZone}})</span></span>
                     </div>
                     <div class="memo_setting" >
                       <!-- 執行日期 -->
                       <div class="remider_setting flex-column">
-                        <p>{{$t('schedule.schExeDate')}}  </p> 
+                        <p>{{$t('schedule.schExeDate')}}  </p>
                         <el-date-picker
                           v-model="item.remindDate"
                           type="date"
@@ -242,7 +242,7 @@
                         <div class="notice" v-if="item.hasRemindStyle">{{$t('schedule.pleaseFinishedMethod')}} !</div>
                       </div>
                       <div class="remider_setting flex-column">
-                        <div 
+                        <div
                           v-if="(item.remindTime > new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 ) || item.taskId == -999 "
                           class="clear_all"
                           @click="resetData(item)"
@@ -279,7 +279,7 @@
                 <!-- 關鍵字 -->
                 <div class="flex-row" style="margin-right: 3%; margin-bottom: 10px;">
                   <div class="title-name">{{$t('audit.workFlows.keywords')}}</div>
-                  <div class="title-status"> 
+                  <div class="title-status">
                     <el-input
                       v-model="inputSearchStore"
                       :placeholder="$t('schedule.search')"
@@ -291,7 +291,7 @@
                 <!-- 區域一 -->
                 <div class="flex-row" style="margin-right: 3%; margin-bottom: 10px;">
                   <div class="title-name"> {{$t('schedule.region1')}} </div>
-                  <div class="title-status"> 
+                  <div class="title-status">
                     <el-select
                       v-model="curTempProvinceList"
                       :placeholder="$t('schedule.region1')"
@@ -311,7 +311,7 @@
                 <!-- 區域二 -->
                 <div class="flex-row" style="margin-right: 3%; margin-bottom: 10px;">
                   <div class="title-name">{{$t('schedule.region2')}}</div>
-                  <div class="title-status"> 
+                  <div class="title-status">
                     <el-select
                       v-model="curTempCityList"
                       :placeholder="$t('schedule.region1')"
@@ -369,17 +369,17 @@
                 :column-data ="storeColumnData"
                 :table-data ="showSearchStoreData"
                 :showSelectionColumn = showSelectionColumn
-                
+
                 :highlight-current-row = "false"
                 :is-loading-data ="isLoadingData"
                 :allowRowExpand = "false"
                 :showBorder = "false"
-                :headerStyle ="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+                :headerStyle ="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}"
                 :cellStyle ="{backgroundColor: '#fff !important'}"
                 @handleSelectionChange = "handleSelectionChange "
               />
             </div> -->
-          
+
           </div>
         </div>
       </div>
@@ -402,7 +402,7 @@
           <div class="memo_setting">
             <!-- 執行日期 -->
             <div class="remider_setting flex-column">
-              
+
               <p style="font-size: 14px; font-weight: 900"><span style="color: #f31d65">*</span> {{$t('schedule.schExeDate')}}</p>
               <el-date-picker
                 v-model="editSchedule.remindDate"
@@ -434,7 +434,7 @@
                 v-model="editSchedule.remindStyle"
                 multiple
                 filterable
-                :loading="loading" 
+                :loading="loading"
                 style="width:300px">
                 <el-option
                     v-for= "(selected, index) in selectRemiderStyle"
@@ -497,23 +497,23 @@ export default{
     DateTimeSelector,
     DelayButton,
     SettingTable,
-    
-    
+
+
   },
   data(){
     return {
 
       multipleSelection: [],
-      
+
       showConfirmDelete:  false,
       showInputLimit: false,
-    
+
       edit_isActive: false,
       del_isActive: false,
 
       taskName:'',
       scheduleStatus: {},
-      
+
       hasScheduleData: true,
       scheduleDataList:[],
 
@@ -537,15 +537,15 @@ export default{
       emptyData: require('../../../../static/img/icon_data.svg'),
       handleSchedule: [],
       seleAllSchedule: false,
-      
+
       editSchedule:{
         remindDate:'',
         remindTimePoint:'',
         remindStyle:[]
       },
-      
-        
-  
+
+
+
       // ======
       add_width: "1000",
       edit_width: "500",
@@ -641,7 +641,7 @@ export default{
             return Date.now() > time.getTime()  ;
           }
       }
-      
+
     }
   },
   computed: {
@@ -672,14 +672,14 @@ export default{
         newValue.forEach( i => {
           var cancelChecked = i.taskList.every(t => t.checked == false)
           if(cancelChecked) i.checked = false
-        }) 
-        
+        })
+
       },
       deep:true
     },
 
     inputSearchStoreList(val){
-      
+
       if(val.trim()!=""){
         var stores = []
         stores = this.showScheduleDataList.filter(item => (
@@ -699,7 +699,7 @@ export default{
             const match_stores = c.taskList.filter((s) => s.storeName.toLowerCase().indexOf(val.toLowerCase()) !== -1);
             console.log('match_stores.length', match_stores.length)
             if (!match_stores.length) return;
-            
+
             results.push({
               ...c,
               taskList: match_stores,
@@ -707,18 +707,18 @@ export default{
           });
           this.showScheduleDataList = results
         }
-      } 
+      }
         else {
         this.showScheduleDataList = this.ori_showScheduleDataList
       }
 
-      
+
     }
-  
+
   },
   mounted() {
     this.showSearchStoreData = this.searchStoreData
-    this.searchSheduleDataList = this.scheduleDataList 
+    this.searchSheduleDataList = this.scheduleDataList
   },
 
   computed: {
@@ -758,11 +758,11 @@ export default{
 
     filterCurTemplateProvince(stores){
         console.log('this.curTempProvinceList', this.curTempProvinceList)
-        
+
         if(this.curTempProvinceList.length == 0 ){
           return stores
         }else{
-          
+
           // return stores.filter(item => item.province.includes(this.curTempProvinceList))
           return stores.filter(item => this.curTempProvinceList.includes(item.province))
         }
@@ -776,7 +776,7 @@ export default{
         // return stores.filter(item => item.city == this.curTempCityList )
         return stores.filter(item => this.curTempCityList.includes(item.city))
       }
-    }, 
+    },
 
     onselectSec1(val){
       console.log('val 1', val)
@@ -789,7 +789,7 @@ export default{
     onselectSec2(val){
       console.log('val 2', val)
       if(val.length == 0){
-        
+
         // console.log('this.showSearchStoreData XDXD', this.showSearchStoreData)
         // console.log('this.searchStoreData XDXD', this.searchStoreData)
         var p = this.searchStoreData.map(p => p.province)
@@ -801,7 +801,7 @@ export default{
         const pppSet = new Set(p)
         this.provinceAry = [...pppSet]
       }
-    
+
     },
 
     async init(){
@@ -813,16 +813,16 @@ export default{
       this.scheduleStatus = JSON.parse(status)
       console.log('this.scheduleStatus  !!=========>>', this.scheduleStatus)
       console.log('this.inspectionName', this.inspectionName)
-      
+
       if(this.scheduleStatus.action == "editSchedule"){
 
         this.canEditInspection = true
         this.hasScheduleData = true
         this.taskName = this.scheduleStatus.taskName
-        
+
         var status =  this.allInspectTypeList.find( d => d.name == this.scheduleStatus.tagName)
         this.inspectionMode = status.mode
-        
+
         await this.getPersonScheduleData();
       }
       else if(this.scheduleStatus.action == "addSchedule"){
@@ -831,10 +831,10 @@ export default{
         this.inspectionMode = 1
         var tempN = this.allInspectTypeList.filter( i => i.mode === 1)
         this.inspectionName = tempN[0].id
-        
+
       }
       this.isLoadingData = false
-      
+
     },
 
     // 取得巡檢表
@@ -850,19 +850,19 @@ export default{
             mode: i.mode
           }))
           console.log(' this.allInspectTypeList =========>>>> ',  this.allInspectTypeList)
-          
+
         }).catch(err => {
           reject(err);
         });
       });
   },
-  
+
 
     async getBriefStoreList() {
       await getBriefStoreList().then(res => {
         this.storeList = res.data
         this.searchStoreData = [...this.storeList]
-        
+
         console.log('this.searchStoreData =========>>>> ', this.searchStoreData);
 
         var p = this.searchStoreData.map(p => p.province)
@@ -877,8 +877,8 @@ export default{
         this.cityAry = [...cccSet]
 
         console.log('this.cityAry  =========>>>>', this.cityAry)
-    
-      
+
+
       })
     },
     async getPersonScheduleData(){
@@ -905,7 +905,7 @@ export default{
                   if(i.remindMode_OneHour == true) i.remindStyle.push("remindMode_OneHour")
                 }
               })
-              
+
             });
             this.scheduleDataList = res.data
             this.inspectionName = res.data[0].inspectTagId
@@ -924,7 +924,7 @@ export default{
               taskList: []
             }))
 
-          
+
             newArr.forEach(d => {
               this.scheduleDataList.forEach( g => {
                 g.hasRemindDate = false
@@ -934,7 +934,7 @@ export default{
                   d.taskList.push(g)
                 }
               })
-              
+
             })
 
             console.log('newArr =========>> 2222', newArr)
@@ -963,7 +963,7 @@ export default{
       this.isLoadingData = true
       console.log('this.showScheduleDataList =======>> 1', this.showScheduleDataList);
       console.log('this.scheduleStatus', this.scheduleStatus)
-      
+
       if(this.showScheduleDataList.length < 1){
         util.notify("請至少設定一筆排程！", 'error', 2000 );
         this.isLoadingData = false
@@ -987,7 +987,7 @@ export default{
       //   return
       // }
 
-  
+
       var param = {
         taskList: []
       }
@@ -997,7 +997,7 @@ export default{
       console.log('this.showScheduleDataList =======>> 2', this.showScheduleDataList);
       this.showScheduleDataList.forEach( i => {
         i.taskList.forEach(ii => {
-          
+
           if(!ii.remindDate) {
             ii.hasRemindDate = true
             isEmpty = true
@@ -1024,8 +1024,8 @@ export default{
       })
 
       // var isEmpty = param.taskList.findIndex(i => (!i.remindTime ||  i.remindDate == '' || i.remindTimePoint == ''))
-      // console.log('isEmpty :>> ', isEmpty); 
-      if(isEmpty){  
+      // console.log('isEmpty :>> ', isEmpty);
+      if(isEmpty){
         util.notify("尚有設定未完成！", 'error', 2000 );
         this.isLoadingData = false
         return false
@@ -1037,7 +1037,7 @@ export default{
         param.userId = this.scheduleStatus.userId
         param.inspectTagId = status.id
         param.taskName = this.taskName
-      } 
+      }
       else if(this.scheduleStatus.action == "editSchedule"){
         console.log('editSchedule')
         param.userId = this.scheduleStatus.userId
@@ -1045,7 +1045,7 @@ export default{
         param.taskName = this.taskName
         param.taskGroupUuid = this.scheduleStatus.taskGroupUuid
       }
-      
+
       param.taskList.forEach(i => {
         i.taskId = i.hasOwnProperty("id") ? i.id : -999
         i.isRemindModeCurrently = i.remindStyle.includes('remindMode_Currently') ? true : false
@@ -1062,7 +1062,7 @@ export default{
       //   this.isLoadingData = false
       //   return false
       // }
-      
+
       // this.isLoadingData = false
       // return false
 
@@ -1098,7 +1098,7 @@ export default{
       var month = this.pad2(date.getUTCMonth()+1);
       var day = this.pad2(date.getUTCDate());
       var year= date.getUTCFullYear();
-      return year + "-"+ month +"-"+ day 
+      return year + "-"+ month +"-"+ day
     },
     getTimePoint(t){
       var date = new Date(t);
@@ -1108,15 +1108,15 @@ export default{
       return hour +":"+ min
     },
 
-    
-    
+
+
     hideAddStoreDialog(key){
       this[key] = false;
 
       this.inputSearchStore = ''
       this.curTempProvinceList = ''
       this.curTempCityList = ''
-      
+
       // 清除所有勾選
       console.log('this.$refs.storeDataList. :>> ', this.$refs.storeDataList);
       this.$refs.storeDataList.clearSelection()
@@ -1129,17 +1129,17 @@ export default{
       console.log('tag--->', tag)
       this.tags.splice(this.tags.indexOf(tag), 1);
 
-      var row = this.showSearchStoreData.filter(element => 
+      var row = this.showSearchStoreData.filter(element =>
           element.name == tag.name
       );
 
       this.$refs.storeDataList.toggleRowSelection(row[0])
     },
-    
+
 
     handleSelectionChange(val){
       console.log('handleSelectionChange val :>> ', val);
-      
+
       // tag 用
       this.selectStoreTags = val
 
@@ -1170,7 +1170,7 @@ export default{
           remindDate: null,
           remindTimePoint: null
 
-          
+
         }
       ))
       console.log('this.addStoreTemp', this.addStoreTemp)
@@ -1179,7 +1179,7 @@ export default{
     confirmAddStoreDialog(){
       console.log('confirmAddStoreDialog --->')
       console.log('this.showScheduleDataList ::::>>>>', this.showScheduleDataList)
-      
+
       this.showingAddStore = false
       // this.scheduleDataList = [...this.addStoreTemp, ...this.scheduleDataList]
       if(this.scheduleStatus.action == "addSchedule") {
@@ -1197,7 +1197,7 @@ export default{
               this.addStoreTemp.forEach( g => {
                 if(d.province == g.province && d.city == g.city){
                   d.taskList.unshift(g)
-                  
+
                 }
               })
             })
@@ -1211,7 +1211,7 @@ export default{
             })
           })
         }
-      } 
+      }
       else if(this.scheduleStatus.action == "editSchedule"){
         console.log('editSchedule :>> ');
         this.showScheduleDataList.forEach( i =>{
@@ -1245,7 +1245,7 @@ export default{
       let needEditId = ''
       let needTempId = ''
       if(this.scheduleStatus.action == "editSchedule"){
-        
+
         needEditId = this.handleSchedule.map(_item => _item.id)
         needTempId = this.handleSchedule.map(_item => _item.tempId)
 
@@ -1293,14 +1293,14 @@ export default{
               }
             })
           }
-          
+
         })
       })
 
       this.handleSchedule = []
       this.showingEditStore = false
       this.seleAllSchedule = false
-      
+
       this.showScheduleDataList.forEach(_item => {
         _item.checked = false
         _item.taskList.forEach(l => {
@@ -1318,7 +1318,7 @@ export default{
       this[key] = false;
       this.handleSchedule = []
       this.seleAllSchedule = false
-      
+
       this.showScheduleDataList.forEach(_item => {
         _item.checked = false
         _item.taskList.forEach(l => {
@@ -1328,8 +1328,8 @@ export default{
       this.editSchedule.remindDate = ''
       this.editSchedule.remindTimePoint = ''
       this.editSchedule.remindStyle = []
-      
-      
+
+
       console.log('this.editSchedule :>> ', this.editSchedule);
     },
 
@@ -1344,8 +1344,8 @@ export default{
               t.checked = true
               this.handleSchedule.push(t)
             }
-          
-            
+
+
           })
         })
       } else {
@@ -1363,10 +1363,10 @@ export default{
     selectProvince(val){
       console.log('val selectProvince:>> ', val);
 
-      // var isExpired = item.remindTime < new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 && item.remindTime !== '' 
+      // var isExpired = item.remindTime < new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 && item.remindTime !== ''
       if(val.checked){
         this.showScheduleDataList.forEach( i => {
-          
+
           i.taskList.forEach(t => {
             var isExpired = t.remindTime < new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1 && t.remindTime !== ''
             if(t.city === val.city && !isExpired) {
@@ -1424,27 +1424,27 @@ export default{
       }
       else if(this.scheduleStatus.action == "editSchedule"){
         let deltedId = this.handleSchedule.map(a => (a.id || a.tempId))
-      
+
         console.log('deltedId :>> ', deltedId);
         console.log('this.handleSchedule :>> ', this.handleSchedule);
-        
+
         this.showScheduleDataList.forEach( i =>{
           i.taskList = i.taskList.filter(b => !deltedId.includes(b.id || b.tempId ))
         })
-        
-        
+
+
       }
-      
+
       this.handleSchedule = []
       this.showConfirmDelete = false
-      
+
     },
     resetData(val){
       if(val.remindTime) val.remindTime = ''
       if(val.remindDate) val.remindDate = ''
       if(val.remindTimePoint) val.remindTimePoint = ''
       if(val.remindStyle) val.remindStyle = []
-      
+
       console.log('val', val)
       console.log('this.showScheduleDataList', this.showScheduleDataList)
       // val.remindStyle = []
@@ -1456,7 +1456,7 @@ export default{
       //     i.remindTimePoint = ''
       //     i.remindStyle = []
       //   }
-        
+
       // })
     }
   }
@@ -1541,7 +1541,7 @@ export default{
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15)
         padding: 20px 26px 48px 24px
   .setting-titles
-    border-bottom: 1px solid #e3e9f4 
+    border-bottom: 1px solid #e3e9f4
 
   .empty_data
     height: 50vh
@@ -1573,7 +1573,7 @@ export default{
     justify-content: flex-start
     align-items: flex-start
     margin-bottom: 20px
-    p 
+    p
       font-size: 12px
       margin: 5px
     .remider_setting
@@ -1597,15 +1597,15 @@ export default{
       line-height: 35px
       // border-bottom: 1px solid #928
 
-    
-            
+
+
   // dialog
   .dialog-content
     width: 100%
     .showing_search_user
       width: 100%
       height: 500px
-      
+
       .filter_section
         background: #FFF
         display: flex
@@ -1651,10 +1651,10 @@ export default{
           flex-wrap: wrap
           flex-direction: row
           justify-content: flex-start
-          
+
           overflow: auto
           .el-tag
-            margin-right: 5px 
+            margin-right: 5px
             margin-bottom: 5px
 
       .users
@@ -1677,7 +1677,7 @@ export default{
           .cell
             width: 50px
             margin-left: -3px !important
-            
+
   .users
     .el-checkbox__input.is-indeterminate .el-checkbox__inner
       background-color: #2c90d9 !important
@@ -1687,16 +1687,16 @@ export default{
       border-color: #2c90d9 !important
       &:hover
         border-color: #dcdfe6 !important
-    .is-focus .el-checkbox__inner      
+    .is-focus .el-checkbox__inner
       border-color: #dcdfe6 !important
-    
+
     .el-checkbox__inner:hover
       border-color: #190 !important
-      
+
   .title-status
     .el-input__count-inner
       margin-top: 55px
-  
+
   .text_limit_notice
     position: absolute
     text-align: right
@@ -1705,5 +1705,5 @@ export default{
     margin-top: 2px
     color: #ff2400
     display: block
-          
+
 </style>

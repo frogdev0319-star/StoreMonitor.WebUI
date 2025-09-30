@@ -8,9 +8,8 @@
       </span>
 
       <!-- 巡檢地點 -->
-      <div class="store_title" style="margin-left: 30px; margin-right: 20px;" v-if="isiService || isTransform">{{ $t('overview.patrolStore')}}</div>
+      <div class="store_title" style="margin-left: 30px; margin-right: 20px;" >{{ $t('overview.patrolStore')}}</div>
       <region-multi-select
-        v-if="isiService || isTransform"
         ref="multiState"
         style="width: 30%; "
         :selected="selectedInstantStore"

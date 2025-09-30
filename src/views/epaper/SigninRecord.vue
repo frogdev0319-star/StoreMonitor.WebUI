@@ -6,56 +6,13 @@
         :is-patrol = "false"
         @storeChange = "onStoreChange"
       >
-        <template v-slot:others>
-          <div class="last-row" >
-
-            <!-- 總評類型 -->
-            <!-- <div class="">
-            <span style="margin-right: 16px; font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.resultType') }}</span>
-            <el-select
-              v-model="curAppraise"
-              :placeholder="$t('remotePatrol.all')"
-              size="mini"
-              style="width: calc(260/1440*100vw); margin-right: 60px;"
-              class="el-province "
-            >
-              <el-option
-              v-for="item in appraiseList"
-                :key="item.status"
-                :label="item.label"
-                :value="item.status"/>
-            </el-select>
-            </div> -->
-
-
-            <!-- 巡檢表 -->
-            <!-- <div class="flex-center">
-              <span style="margin-right: 16px;font-size:calc(15/1920*100vw);">{{$t('reportAndEvents.inceptionTag')}}</span>
-              <div class="flex-center report-type-area">
-                <el-select
-                  class="el-province"
-                  style="width: 100% ; margin-left:0px;border:none;border-radius:0px;"
-                  v-model="inspectId"
-                  :placeholder="$t('insSettingView.selectPost')"
-                  size="mini">
-                <el-option
-                  v-for="item in inspectTableList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"/>
-              </el-select>
-              </div>
-            </div> -->
-
-          </div>
-        </template>
       </store-filter>
     </div>
 
 
     <div class="report-header" style="margin: 20px 0;">
         <div class="flex-center" style="padding-top: 0;">
-          <div class="search-label" style=" margin-right: 38px;">時間範圍</div>
+          <div class="search-label" style=" margin-right: 38px;"> {{$t('epaper.date')}}</div>
           <el-date-picker
             class="time-selector"
             v-model="dateValue"
@@ -69,19 +26,12 @@
             />
 
           <div class="flex-center fullWidth" style="margin-left: 20px">
-
-            <!-- 關鍵字 -->
-            <!-- <div class="search-content flex-center" style="margin-right: 20px">
-              <div class="search-label">{{ $t('remotePatrol.keywords') }}</div>
-              <el-input v-model="searchInput" size="mini" class="search-input shadow-light" style="margin-left: 16px;" clearable/>
-            </div> -->
-
             <!-- 職務 -->
             <div class="search-content flex-center" style="margin-right: 20px">
-              <div class="search-label">人員</div>
+              <div class="search-label">{{$t('epaper.user')}}</div>
                 <el-select
                   v-model="selectUser "
-                  placeholder="執行人員"
+                  :placeholder="$t('epaper.Executor')"
                   clearable
                   style="width: 250px; background: #FFF;"
                   >
@@ -94,23 +44,16 @@
                 </el-select>
 
                 <!-- 新增超時/全部下拉選單 -->
-                <div class="search-label" style=" margin-left: 40px;">超時/略過簽到</div>
+                <div class="search-label" style=" margin-left: 40px;">{{$t('epaper.overTimeOrSkip')}}</div>
                 <el-select
                   v-model="statusFilter"
-                  placeholder="全部/超時"
+                  :placeholder="$t('epaper.allOrOvertime')"
                   clearable
                   style="width: 150px; background: #FFF;"
                 >
-                  <el-option label="超時" value="0" />
-                  <el-option label="略過簽到" value="1" />
+                  <el-option :label="$t('epaper.overTime')" value="0" />
+                  <el-option :label="$t('epaper.skipSign')" value="1" />
                 </el-select>
-
-                <!-- <el-switch
-                  v-model="jobSwitch"
-                  active-text="超時"
-                  inactive-text="全部"
-                  style="margin-left: 20px;"
-                /> -->
             </div>
 
             <div class="spacer"></div>
@@ -168,7 +111,7 @@
         </div>
 
         <div class="el-pat" v-if="reportTableData.length > 0">
-          <div class="pageSizeTitle" style="color: #666"> 共有 <b style="font-size: 16px"> {{totalElements}} </b> {{ $t('remotePatrol.numReports') }}</div>
+          <div class="pageSizeTitle" style="color: #666"> {{$t('epaper.total')}} <b style="font-size: 16px"> {{totalElements}} </b> {{ $t('remotePatrol.numReports') }}</div>
           <tbl-pagination-only
             :btn-style="{backgroundColor:'transparent'}"
             :total="total"
@@ -259,53 +202,47 @@ export default {
       reportInfoTable: [
         {
           prop: 'region',
-          label: '區域',
+          label: this.$t('epaper.region'),
           sortable: false,
           width: '180',
           maxWidth: '200',
         },
         {
           prop: 'storeName',
-          label: '巡檢地點',
+          label: this.$t('epaper.patrolStore'),
           sortable: false,
           width: '180',
           maxWidth: '200',
         },
         {
           prop: 'tagName',
-          label: '巡檢表',
+          label: this.$t('epaper.patrolLists'),
           sortable: false,
           width: '180',
           maxWidth: '200',
         },
         {
           prop: 'submitterName',
-          label: '送出者',
+          label: this.$t('epaper.submitterName'),
           sortable: false,
           width: '180',
           maxWidth: '200',
         },
         {
           prop: 'signstr',
-          label: '打卡時間',
+          label: this.$t('epaper.signstr'),
           sortable: false,
           width: '180',
           maxWidth: '200',
         },
         {
           prop: 'datestr',
-          label: '報告送出時間',
+          label: this.$t('epaper.datestr'),
           sortable: false,
           width: '180',
           maxWidth: '200',
         },
-        // {
-        //   prop: 'status',
-        //   label: '狀態',
-        //   sortable: false,
-        //   width: '180',
-        //   maxWidth: '200',
-        // },
+
       ],
       columnOperationData: {
         label: this.$t('deviceView.operation'),
@@ -407,12 +344,9 @@ export default {
       pickerOptions: {
         disabledDate(time) {
           const today = new Date()
-          today.setHours(0, 0, 0, 0)                  // 清除時分秒
-          const weekAgo = new Date(today)
-          weekAgo.setDate(today.getDate() - 7)        // 一週前
-          return time.getTime() < weekAgo.getTime() ||
-                time.getTime() > today.getTime()
-          }
+          today.setHours(23, 59, 59, 999)  // 設置為今天的結束
+          return time.getTime() > today.getTime()
+        },
       },
       timeOutMin: 0
     };
@@ -448,6 +382,21 @@ export default {
         this.ifSearchData = true;
         this.getInspectList();
         //this.initData();
+    },
+
+    dateValue(val) {
+      if (val && val.length === 2) {
+        const start = new Date(val[0])
+        const end = new Date(val[1])
+        const diffTime = end.getTime() - start.getTime()
+        const diffDays = diffTime / (1000 * 3600 * 24)
+        if (diffDays > 7) { // 如果超過7天
+          // 固定結束時間，自動調整開始時間為結束時間往前6天
+          const newStart = new Date(end.getTime() - 6 * 24 * 60 * 60 * 1000) // 結束日期往前6天
+          this.dateValue = [newStart, val[1]]
+          this.$message.warning(this.$t('epaper.alert7days'))
+        }
+      }
     },
 
     changeNum(val){
@@ -604,11 +553,6 @@ export default {
           for(const item of data){
             const tableObj = {};
 
-            // var ignoreCheckIn = item.isCheckInIgnore ? "略過簽到" : ""
-            var overTime = this.checkTimeout(item.ts, item.check_in_ts, this.timeOutMin) ? "超時" : ""
-            var slash = (this.checkTimeout(item.ts, item.check_in_ts, 20) && item.isCheckInIgnore) ? "/" : ""
-            // tableObj.status = ignoreCheckIn + slash + overTime
-
             tableObj.status = this.checkTimeout(item.ts, item.check_in_ts, this.timeOutMin)
             tableObj.isCheckInIgnore = item.isCheckInIgnore
 
@@ -627,12 +571,6 @@ export default {
 
             tableObj.submitterName = item.submitterName;
             tableObj.submitter = item.submitter;
-            // tableObj.routeObj = item;
-            // tableObj.mode = item.mode;
-            // tableObj.totalScore = item.type === 1 ? "--" : item.totalScore;
-            // tableObj.standard = item.standard;
-            // tableObj.standardMsg = util.setStandardMsg(tableObj.standard);
-
             tableObj.statusCode = item.status;
 
             let storeType = '';
@@ -760,14 +698,7 @@ export default {
       this.getReportList(this.params);
     },
 
-    // dateChange(val) {
-    //   const self = this;
-    //   const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
-    //   const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
-    //   self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
-    //   self.dateValue[1] = self.dateValue[1];
-    //   self.inputSearchValue = '';
-    // },
+
 
     handlePagination(pageInfo){
       console.log('pageInfo ~~~~~>> ', pageInfo);
@@ -783,19 +714,6 @@ export default {
     },
 
 
-    // currentChange(val) {
-    //   const self = this;
-    //   self.page = val.page;
-    //   self.params.filter = { page: val.page - 1, size: self.sizeNum };
-    //   self.getReportList(self.params);
-    // },
-
-    // sizeChange(val) {
-    //   const self = this;
-    //   self.sizeNum = val.size;
-    //   self.params.filter = { page: 0, size: val.size };
-    //   self.getReportList(self.params);
-    // },
 
     searchData() {
       console.log("Search Data >>>>" , this.dateValue)
@@ -847,7 +765,7 @@ export default {
           self.params.searchMysteryMode = PermissionHelper.enableMimicMode ? 1 : -1;
         }
 
-      console.log("###",self.params)
+      // console.log("###",self.params)
       self.params.filter = { page: 0, size: self.sizeNum };
       self.saveSearchParams();
       self.getReportList(self.params);
@@ -1017,7 +935,7 @@ export default {
       // console.log("Get SEarch Parameter");
       let searchParams = JSON.parse(JSON.stringify(SearchConditionUtil.getSearchCondition('deleteReport')));
       console.log("getSearchParams>>>>searchParams:",searchParams);
-      this.dateValue = [this.$moment().subtract(7, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+      this.dateValue = [this.$moment().subtract(6, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
 
       if (Object.keys(searchParams).length > 0) {
 
@@ -1083,7 +1001,9 @@ export default {
     getReportListOfCard() {
       this.ShowCard = true;
       this.checkSortType(this.curSortType);
-    }
+    },
+
+
   },
 
   beforeRouteEnter(to, from, next) {
