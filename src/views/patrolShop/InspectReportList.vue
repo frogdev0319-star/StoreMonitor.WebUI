@@ -1352,7 +1352,7 @@ export default {
       const newArr = [];
       // const inspectList = [];
 
-      console.log('inspectArr :>> ', inspectArr);
+      // console.log('inspectArr :>> ', inspectArr);
       // inspectArr.forEach(_item => {
       //   if (self.curReportType === -1) {
       //     if (!newArr.includes(_item.id)) {
@@ -1372,7 +1372,7 @@ export default {
       //   }
       // });
 
-      var inspectList = inspectArr.filter(i => i.mode == 1)
+      var inspectList = inspectArr.filter(i => i.mode == 0)
       self.inspectTableList = inspectList;
       self.inspectTableList.length > 0 && self.inspectTableList.unshift({ id: '-1', name: self.$t('remotePatrol.all') });
       if (inspectList.length !== 0) {
