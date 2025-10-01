@@ -2182,7 +2182,7 @@ export default {
           rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_2);
           rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_3);
           rowDataObj.score = _item.__EMPTY_4;
-          rowDataObj.description = this.getTableCellData(_item[this$t('insSettingView.tHeaderD')]);
+          rowDataObj.description = this.getTableCellData(_item[this.$t('insSettingView.tHeaderD')]);
           //console.log('**_item.__EMPTY_5:',_item.__EMPTY_5);
           rowDataObj.required = (typeof _item.__EMPTY_5=='undefined')?'':_item.__EMPTY_5;
           // if (tableVersion === 1) {

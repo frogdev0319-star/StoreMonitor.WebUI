@@ -10,7 +10,7 @@
 
 
       <div :style="{'border-top-right-radius': isFullScreenMode ? '0px': 'unset', 'border-top-left-radius': isFullScreenMode ? '0px': 'unset'}"
-      :class="{'margin-left-md': !isFullScreenMode, 'padding': isFullScreenMode}" v-if="!showSpread" class="rside paper spacer" >
+        v-if="!showSpread" class="rside paper spacer" >
         <div v-if="!isFullScreenMode" class="patrol-select title" :class="{'padding': !isFullScreenMode}">
           <div class="patrol-content text-left flex-center" :class="{'margin-bottom-md': isFullScreenMode}">
             {{ $t('remotePatrol.selectInspect') }}
@@ -373,9 +373,9 @@
           </div>
         </div>
         <div v-if="sheetName.length==0" class="spacer flex-center" style="align-items: center; justify-content: center">
-          <div class="inspect-empty">
+          <div class="inspect-empty" style="padding: 60px 0;">
             <img :src="noItemIcon" class="no-item">
-            <div class="font-15" style="color: #69727c; margin-top: calc(10/1920*100vw)">{{ $t('remotePatrol.noItems') }}</div>
+            <div class="font-15" style="color: #69727c; margin-top: 15px">{{ $t('remotePatrol.noItems') }}</div>
           </div>
         </div>
       </div>
@@ -4961,7 +4961,7 @@ export default {
     color:#2b2b2b;
   }
   .no-item {
-    height: calc(25 / 1920 * 100vw);
+    height: 40px;
   }
   .title {
     font-size: calc(14 / 1920 * 100vw);
