@@ -3029,6 +3029,8 @@ export default {
 <style lang="sass" scoped>
   .l_row
     margin-bottom: 20px
+    height: 67px
+
   .delete_btn_row
     display: flex
     flex-direction: row
@@ -3043,6 +3045,11 @@ export default {
       &:hover
         background-color: #dcdfe9
         border-color: #dcdfe9
+  .input-name_short
+    width: 100% !important
+    height: 30px !important
+    margin: 0 !important
+
 </style>
 <style lang="scss" scoped>
   $mainColor:#f31d65;
