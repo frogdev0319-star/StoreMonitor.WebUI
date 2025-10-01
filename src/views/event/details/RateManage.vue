@@ -1759,6 +1759,7 @@ createWatermarkedBlob(img, watermarkText) {
         self.attachFileList.push(objImg);
       }else if(files[0].type.includes("video")){
         console.log("choose file:",fileName);
+        const safeFilename = files[0].name.replace(/#/g, '_')
         var objvideo={
           fileName:`${self.bucketVideo}/inspect_${util.getCurTimeStr()}_${this.event.storeId}_${safeFilename}`,
           src:'',
