@@ -1372,7 +1372,7 @@ export default {
       //   }
       // });
 
-      var inspectList = inspectArr.filter(i => i.mode == 0)
+      var inspectList = inspectArr.filter(i => i.mode == 1)
       self.inspectTableList = inspectList;
       self.inspectTableList.length > 0 && self.inspectTableList.unshift({ id: '-1', name: self.$t('remotePatrol.all') });
       if (inspectList.length !== 0) {

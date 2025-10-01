@@ -1088,7 +1088,8 @@ export default {
         items: temp,
         feedback: feedEventList,
         isMysteryMode:PermissionHelper.enableMimicMode,
-        isCreateEvent:sendEvent
+        isCreateEvent:sendEvent,
+        reportType: 1
       };
 
       console.log('params ::::::::::>> ', params);
