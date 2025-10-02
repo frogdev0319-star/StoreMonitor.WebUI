@@ -7,11 +7,10 @@
     ></store-filter>
     <div class="el-container" style="margin-top: 20px" :class="{'flex-column': isFullScreenMode}">
 
-
-
       <div :style="{'border-top-right-radius': isFullScreenMode ? '0px': 'unset', 'border-top-left-radius': isFullScreenMode ? '0px': 'unset'}"
         v-if="!showSpread" class="rside paper spacer" >
-        <div v-if="!isFullScreenMode" class="patrol-select title" :class="{'padding': !isFullScreenMode}">
+        <div class="patrol-select title padding" >
+          <!-- 請選擇巡檢表 -->
           <div class="patrol-content text-left flex-center" :class="{'margin-bottom-md': isFullScreenMode}">
             {{ $t('remotePatrol.selectInspect') }}
             <el-select
@@ -37,10 +36,9 @@
             </el-button>
           </div>
         </div>
-        <hr v-if="!isFullScreenMode" class="hr-horizontal" :style="isFullScreenMode?{'margin-bottom': '20px'}:{}">
+        <hr  class="hr-horizontal" :style="isFullScreenMode?{'margin-bottom': '20px'}:{}">
         <div v-if="sheetName.length!=0" :class="{'flex': isFullScreenMode, fullWidth: isFullScreenMode}">
-
-          <div v-if="isFullScreenMode" style="width: 200px; padding-right: 10px">
+          <!-- <div v-if="isFullScreenMode" style="width: 200px; padding-right: 10px">
             <el-input
               :placeholder="$t('insSettingView.enterInspectFilter')"
               v-model="searchItemValue"
@@ -71,9 +69,10 @@
                   <i class="el-icon-arrow-right icon"/>
                 </div>
               </template>
-              </div>
-          </div>
-          <div v-else class="flex-column padding" >
+            </div>
+          </div> -->
+          <div class="flex-column padding" >
+            <!-- 關鍵字搜尋 -->
             <el-input
               :placeholder="$t('insSettingView.enterInspectFilter')"
               v-model="searchItemValue"
@@ -86,8 +85,10 @@
                 class="iconfont icon-sousuo"
               />
             </el-input>
+
             <div class="flex" style="flex-wrap: wrap">
               <div v-for="(_item,_index) in sheetName.filter(sheet => sheet.groupId === 'feedBack' || sheet.inspectList && sheet.inspectList.some(inspect => inspect.items && inspect.items.some(item => item.subject.indexOf(searchItemValue) > -1)))" :key="_index">
+
                 <template v-if="_item.isCategory">
                   <div v-if="!showIgnoreItem ||_item.ignoreCount>0"  class="group_content" :class="_item.isClick?'noraml-color':'noraml-groupColor'"
                         @click="changeSheet(_item,_index)">
@@ -95,8 +96,11 @@
                   </div>
                 </template>
                 <template v-else>
-                  <div  v-if="!showIgnoreItem ||_item.ignoreCount>0" class="group_content" :class="_item.isClick?'noraml-color':'noraml-groupColor'"
-                        @click="getItemOfCategory(_item, _index)" >
+                  <div
+                    v-if="!showIgnoreItem || _item.ignoreCount>0"
+                    class="group_content"
+                    :class="_item.isClick?'noraml-color':'noraml-groupColor'"
+                    @click="getItemOfCategory(_item, _index)" >
                     <span>{{ _item.label }}</span>
                   </div>
                 </template>
@@ -104,11 +108,11 @@
             </div>
           </div>
 
-          <!-- right side -->
+          <!-- 巡檢項 -->
           <div class="fullWidth rside">
-
-            <div v-if="!showFeedBack" class="padding" :class="{flex:isFullScreenMode && $store.getters.collapsed}" style="background-color: rgb(237, 240, 242); height: 60vh; overflow: auto;flex-wrap: wrap; justify-content: space-between">
-
+            <div v-if="!showFeedBack" class="padding"
+              :class="{flex:isFullScreenMode && $store.getters.collapsed}"
+              style="background-color: rgb(237, 240, 242); height: 60vh; overflow: auto;flex-wrap: wrap; justify-content: space-between">
               <div
                 v-if="sourceListLength > 0"
                 style="width: 100%; margin-bottom: 3px; font-size: 12px; text-align: right; color: #989797;"
@@ -126,6 +130,7 @@
                 </div>
 
                 <hr v-if="!showIgnoreItem ||item_.ignoreCount>0"  class="hr-horizontal">
+
                 <div v-for="(item,index) in item_.items.filter(d => d.subject.indexOf(searchItemValue ) > -1 && (!showIgnoreItem || d.ignore )) "
                   :key="index"
                   class="item-details padding-sm"
@@ -146,10 +151,9 @@
                       >
                         <span style="color: #c60957" v-if="item.required">*</span>
                         <span :class= "{ is_important : item.isImportant}"> {{ item.subject }}  </span>
-
                       </div>
 
-                      <!-- dropdown -->
+                      <!-- dropdown 評分-->
                       <div v-if="item.itemType === 0">
                         <el-dropdown v-if="item.groupType !== 1" :class="!item.manualIgnore?'noraml-title':'ignore-title'"
                                       trigger="click" class="item-score" size="small" :disabled="(item.manualIgnore || item.notEdit)">
@@ -198,7 +202,9 @@
                   <!-- comment -->
                   <div style="padding-left: calc(20/1920*100vw)">
                     <!-- img -->
-                    <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
+                    <div v-if="item.sourceList.length!=0"
+                      :class="!item.manualIgnore?'noraml-title':'ignore-title'"
+                      class="source-content">
                       <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                         <div v-if="_item.mediaType == 3" class="flex-center">
                           <div
@@ -230,6 +236,7 @@
                       </div>
                     </div>
 
+                    <!-- 評論文字 -->
                     <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="img-source-content">
                       <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details" >
                         <div v-if="_item.mediaType==2" class="img-content">
@@ -254,10 +261,8 @@
                         v-model="item.inspectInput"
                         :placeholder="$t('remotePatrol.coment')"
                         :disabled="item.disabled"
-
                         size="mini"
                         class="force_white"
-
                         type="textarea"
                         resize="none"
                         @input="(val) => itemDescriptionChanged({ val, item })"
@@ -293,19 +298,19 @@
                           <span v-show="(item.memo_config.memo_check_media == true)">{{$t('remotePatrol.mediaItem')}}</span> {{$t('remotePatrol.attachments')}}
                       </div>
                     </div>
-                    <span v-if="item.RuleCountTip" class="rules">{{
-                      $t("remotePatrol.commentCountRuleTip")
-                    }}</span>
-                    <span v-if="item.Ruletip" class="rules">{{
-                      $t("remotePatrol.comentRuletip")
-                    }} </span>
+                    <span v-if="item.RuleCountTip" class="rules">{{$t("remotePatrol.commentCountRuleTip")}}</span>
+                    <span v-if="item.Ruletip" class="rules">{{$t("remotePatrol.comentRuletip")}} </span>
+
+                    <!-- **__** -->
+
+
                   </div>
                 </div>
               </div>
-
             </div>
 
-            <div v-if="showFeedBack" style="background-color: rgb(237, 240, 242); height: 60vh; overflow: auto;">
+            <!-- 問題回饋 -->
+            <div style="background-color: rgb(237, 240, 242); height: 60vh; overflow: auto;">
               <div v-if="showFeedBackInfo&&showFeedBack" class="item-content paper" style="margin: 20px; height: calc(100% - 40px); position: relative">
                 <div id="feedback-content">
                   <div class="feedback-info">{{ $t('remotePatrol.methodI') }}</div>

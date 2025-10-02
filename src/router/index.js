@@ -191,7 +191,7 @@ export const navbarRoute = {
     // 網頁巡檢
     !PermissionHelper.advancedMode && (PermissionHelper.enableMimicMode || PermissionHelper.enableRemoteInspect()) && patrolRoute.children.push(
       {
-        path: '/reinspection',
+        path: '/webinspection',
         name: 'webPatrol',
         hidden: false,
         component: resolve => require(['@/views/patrolShop/webPatrol/WebInspection'], resolve),
@@ -202,18 +202,18 @@ export const navbarRoute = {
         isReadOnly: false
       },
       {
-        path: '/reinspect/confirmrein',
+        path: '/webinspection/confirmrein',
         name: 'confirmSum',
         hidden: true,
         component: resolve => require(['@/views/patrolShop/webPatrol/ConfirmAddSum'], resolve)
       },
       {
-        path: '/reinspect/submit',
+        path: '/webinspection/submit',
         name: 'submitEvent',
         hidden: true,
         component: resolve => require(['@/views/patrolShop/webPatrol/DealPage'], resolve)
       }
-    ) && primaryPathesList.push('/reinspection', '/reinspect/confirmrein', '/reinspect/submit');
+    ) && primaryPathesList.push('/webinspection', '/webinspection/confirmrein', '/webinspection/submit');
 
     return patrolRoute;
   },
