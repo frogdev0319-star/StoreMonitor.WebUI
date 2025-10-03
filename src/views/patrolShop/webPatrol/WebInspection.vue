@@ -119,7 +119,6 @@
                 >
                 目前已附加截圖 {{ totalImageNum }} 張，最多可以附加 {{isSystemAdvanced ? 500 : 120}} 張。
               </div>
-
               <div
                 v-for="(item_) in inspectList"
                 :key="item_.id"
@@ -301,7 +300,41 @@
                     <span v-if="item.RuleCountTip" class="rules">{{$t("remotePatrol.commentCountRuleTip")}}</span>
                     <span v-if="item.Ruletip" class="rules">{{$t("remotePatrol.comentRuletip")}} </span>
 
-                    <!-- **__** -->
+                    <!-- **-** -->
+                    <!-- 添加附件 -->
+                    <div class="attach-area">
+                    <div v-for="(imgItem,index) in item.attachFileList" :key="'img'+index" class="source-details" >
+                      <!--video-->
+                        <div v-if="imgItem.type===1" class="img-content">
+                          <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
+                          <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon" @click="playAttachVideo(imgItem,index)">
+                          <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
+                        </div>
+                      <div v-else-if="imgItem.type===2" class="img-content">
+                        <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
+                        <el-image
+                          :src="imgItem.src"
+                          class="imgLittle"
+                          :preview-src-list="getAuditImgList(index)"
+                          />
+                      </div>
+                    </div>
+                    <div v-if="attFileCount<10" class="attach-add" @click="triggerFileSelect(index)">
+                      <input
+                        type="file"
+                        style="display: none"
+                        accept="image/png,image/jpeg,video/mp4"
+                        max-size="2"
+                        @change="doAddAttachment($event, item.id)"
+                        ref="fileInput"
+                        :data-testid="item.id"
+                        />
+                      <div style="height:16px;display: flex;flex-direction: row;align-items: center;">
+                        <img :src="addAttIcon" widht="16px" height="16px" style="border-radius:10px;"/>
+                        <div class="att-txt">{{ $t('audit.inceptionRpt.attachment') }}</div>
+                      </div>
+                    </div>
+                  </div>
 
 
                   </div>
@@ -687,7 +720,13 @@ export default {
       emptyPatrolList: true,
       isSystemAdvanced: false,
 
-      totalImageNum: 0
+      totalImageNum: 0,
+
+      attachFileList:[],
+      attFileCount:0,
+      videoAttFileCount:0,
+      addAttIcon: require('../../../../static/img/icon_attachment.svg'),
+      deleteInspectIcon_new: require('../../../../static/img/table-delete.png'),
 
     };
   },
@@ -770,7 +809,10 @@ export default {
     PatrolList(val){
       console.log('val :>> ', val);
       if(val.length > 0) this.emptyPatrolList = false
-
+    },
+    attachFileList(){
+      this.attFileCount = this.attachFileList.length;
+      this.videoAttFileCount = this.attachFileList.filter(item=>item.type==1).length;
     }
   },
 
@@ -871,6 +913,10 @@ export default {
       self.PatrolList = PatrolHistory.PatrolList;
       self.patrolstore = PatrolHistory.patrolstore;
       self.inspectList = PatrolHistory.sheetName[PatrolHistory.curSheetIndex].inspectList;
+
+
+      console.log('self.inspectList ----------:>> ', self.inspectList);
+
       self.showChannelBtns = PatrolHistory.showChannelBtns;
       self.allChannelBtns = PatrolHistory.allChannelBtns;
       self.curSheetIndex = PatrolHistory.curSheetIndex;
@@ -1679,6 +1725,14 @@ export default {
             handleData.push(obj);
           })
 
+
+          handleData[0].subcatergy.forEach( i => {
+            i.items.forEach( ii => {
+              ii.attachFileList = []
+            })
+          })
+
+
           console.log('handleData :::::::::::::::::>> ', handleData);
 
           for (let i = 0; i < handleData.length; i++) {
@@ -2352,10 +2406,9 @@ export default {
         self.$refs.vendorVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
       });
     },
+
     clickItem({item, index}) {
-
       const self = this;
-
       self.sourceList = [];
       self.sourceListLength = item.sourceList.length;
       console.log("ClickItem")
@@ -2575,8 +2628,8 @@ export default {
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
 
-      console.log('self.sheetName ::::::::>> ', self.sheetName);
-      console.log('sheetName ::::::::>> ', sheetName);
+      // console.log('self.sheetName ::::::::>> ', self.sheetName);
+      // console.log('sheetName ::::::::>> ', sheetName);
 
       sheetName.forEach(s_item => {
           s_item.inspectList.forEach(item => {
@@ -2728,9 +2781,6 @@ export default {
       console.log('sheetName end:>> ', sheetName);
       this.resolveConfoirmSummaryData();
     },
-
-
-
 
     spreadContent() {
       const self = this;
@@ -2965,7 +3015,14 @@ export default {
     },
     getshowBtns(list) {
       const self = this;
-      const width = document.getElementsByClassName('btn-content')[0].offsetWidth;
+      const btnContent = document.getElementsByClassName('btn-content')[0];
+
+      // 避免 offsetWidth error
+      if (!btnContent) {
+        console.warn('btn-content element not found');
+        return false;
+      }
+      const width = btnContent.offsetWidth;
       const detailsWidth = window.innerWidth / 1440 * 15 + 60;
       const count = parseInt(width / detailsWidth);
       if (count >= list.length) {
@@ -3028,6 +3085,7 @@ export default {
     },
 
     checkIfAllItemsAreRemark(groupsArr){
+
       console.log("checkIfAllItemsAreRemark:",groupsArr)
       let tempArr = [];
       groupsArr.forEach(group => {
@@ -3064,23 +3122,21 @@ export default {
         let count = 0;
         if(s_item.inspectList){
           s_item.inspectList.forEach(item => {
-          let ignoreCount = 0;
-          item.items.forEach((_item, _index) => {
-            _item.originIndex = _index;
-            if (_item.inputCount == 0 && !_item.manualIgnore) {
-              ignoreCount++;
-              _item.ignore = true;
-            //  hasIgnoretemp.push(_item);
-            } else  {
-              _item.ignore  = false;
-           //   self.tempArr.push(_item.type);
-            }
+            let ignoreCount = 0;
+            item.items.forEach((_item, _index) => {
+              _item.originIndex = _index;
+              if (_item.inputCount == 0 && !_item.manualIgnore) {
+                ignoreCount++;
+                _item.ignore = true;
+              //  hasIgnoretemp.push(_item);
+              } else  {
+                _item.ignore  = false;
+            //   self.tempArr.push(_item.type);
+              }
+            });
+            item.ignoreCount = ignoreCount;
+            if(ignoreCount>0)count++;
           });
-          item.ignoreCount = ignoreCount;
-          if(ignoreCount>0)count++;
-         });
-
-
         }
 
         s_item.ignoreCount = count;
@@ -3252,7 +3308,6 @@ export default {
       const self = this;
       // self.sourceList = [];
       const obj = {};
-      console.log("***editEzvizCanvas:",src)
       obj.mediaType = 2;
       obj.src = src;
       obj.height = '100px';
@@ -3270,7 +3325,6 @@ export default {
         })
       })
       if (tempId != null) {
-        console.log("***tempId != null");
           self.inspectList[0].items[tempId.itemIndex].sourceList.push(obj);
           if(self.inspectList[0].items[tempId.itemIndex].itemType === 1){
             if (this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount === 0) {
@@ -3284,7 +3338,6 @@ export default {
             this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount++;
           }
       } else {
-        console.log("***tempId == null");
         self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.push(obj);// = self.sourceList;
       }
       if (!this.showIgnoreItem) {
@@ -3478,7 +3531,108 @@ export default {
       this.eventDes = feedbackObj.eventDes;
       this.feedbackSourceList = feedbackObj.sourceList;
       this.showEventNameInfo = false;
-    }
+    },
+
+    triggerFileSelect(index) {
+      console.log('index :>> ', index);
+      this.$refs.fileInput[index].click();
+    },
+
+
+    doAddAttachment(e , itemId){
+
+      console.log('e :>> ', e);
+      console.log('itemId :>> ', itemId);
+      const self = this;
+      const maxSize = 4*1024*1024; //不能超過4MB
+      var files = e.target.files || e.dataTransfer.files;
+      console.log("choose file:",files);
+      var fileName = files[0].name;
+      if (!files.length)
+        return;
+      /*
+      if(self.attFileCount==10){
+        util.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
+        return;
+      }
+      */
+      if(files[0].type.includes("video") && self.videoAttFileCount==2){
+        util.notify(self.$t('eventView.maximumAttVedio'), 'warning', 3000);
+        return;
+      }
+      if(files[0].type.includes("image")){
+
+        const safeFilename = files[0].name.replace(/#/g, '_')
+        var objImg={
+          fileName:`${self.bucketImage}/inspect_${util.getCurTimeStr()}_${safeFilename}`,
+          src:'',
+          url:'',
+          file:'',
+          type:2,
+          size:files[0].size
+        };
+        self.createFile(files[0],objImg);
+        // self.attachFileList.push(objImg);
+
+        this.inspectList.forEach( i=> {
+          i.items.forEach( ii => {
+            if(ii.id == itemId){
+              ii.attachFileList.push(objImg)
+            }
+          })
+        })
+
+
+        console.log('this.inspectList :>> ', this.inspectList);
+
+
+      }else if(files[0].type.includes("video")){
+        console.log("choose file:",fileName);
+        const safeFilename = files[0].name.replace(/#/g, '_')
+        var objvideo={
+          fileName:`${self.bucketVideo}/inspect_${util.getCurTimeStr()}_${safeFilename}`,
+          src:'',
+          url:URL.createObjectURL(files[0]),
+          type:1,
+          size:files[0].size,
+        }
+        self.createFile(files[0],objvideo);
+        self.attachFileList.push(objvideo);
+      }
+      self.$refs.fileInput.value = '';
+    },
+    createFile(file, objFile) {
+      //var image = new Image();
+      console.log(objFile);
+      var reader = new FileReader();
+      console.log()
+      reader.onload = (e) => {
+        console.log("e:",e);
+        objFile.src = e.target.result;
+
+        objFile.file = util.base64ToBlob(e.target.result);
+        console.log(objFile.file);
+      };
+      reader.readAsDataURL(file);
+    },
+
+    deleteImg({item, index}) {
+      const self = this;
+      self.attachFileList.splice(index, 1);
+    },
+    getAuditImgList(index) {
+      const arr = [];
+      let i = 0;
+      for (i; i < this.attachFileList.length; i++) {
+        arr.push(this.attachFileList[i + index]);
+        if (i + index >= this.attachFileList.length - 1) {
+          index = 0 - (i + 1);
+        }
+      }
+      return arr.map(source => source.src);
+    },
+
+
   }
 };
 </script>
@@ -3520,6 +3674,8 @@ export default {
 
   .is_important
     color: #f31d65
+
+
 
 
 
@@ -5065,6 +5221,78 @@ export default {
 </style>
 
 <style lang="scss" scoped>
+  $red:#f31d65;
+  $black:#484848;
+  $border:rgba(172, 174, 177,0.3);
+  .attach-area{
+    display:flex;
+    flex-wrap:wrap;
+    align-content:flex-start;
+    align-self: flex-start;
+    width: 90px;
+    margin-top: 15px;
+    // margin-left: 16px;
+    margin-right: 19px;
+    margin-bottom:10px;
+    .attach-add{
+      width: 90px;
+      height: 60px;
+      border-radius: 5px;
+      box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1);
+      display:flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      background: #FFF;
+      .att-txt{
+        font-size: 12px;
+        color: #006ab7;
+        margin-left: 3px;
+      }
+    }
+    .source-details{
+      display: inline-block;
+      margin-right: 12px;
+      position: relative;
+      .icondelete{
+        position: absolute;
+        font-size: 14px;
+        right: 4px;
+        margin-top: 4px;
+        z-index: 2;
+        color: #fff;
+        cursor: pointer;
+        background-color: rgba($color: $black, $alpha: 0.8);
+        border-radius: 50%;
+      }
+      .img-content{
+        width: 100%;
+        height: 100%;
+        position: relative;
+        cursor: pointer;
+        .start-icon{
+          position: absolute;
+          left: 35%;
+          top: 30%;
+        }
+      }
+      .imgLittle{
+        height: calc(64/900*100vh);
+        width: auto;
+        border-radius: 5px;
+      }
+      .icon-video{
+        font-size: 18px;
+        color: $red;
+        /*position: relative;*/
+        /*top: 2px;*/
+        margin-right: 5px;
+        display: inline-block;
+        vertical-align: middle;
+      }
+    }
+  }
   .channel {
     width: 100%;
     height: calc(40 / 1920 * 100vw);
