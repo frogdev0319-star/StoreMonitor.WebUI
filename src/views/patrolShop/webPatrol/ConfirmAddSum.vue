@@ -878,7 +878,7 @@ export default {
       });
 
       console.log('inspect ::::::::::>> ', inspect);
-
+      // sourceList
       const temp = [];
       for (const i in inspect) {
         for (const g in inspect[i].inspectList) {
@@ -934,7 +934,9 @@ export default {
                       return false;
                     }
                   }
-                } else {
+                }
+
+                else {
                   obj.mediaType = 3;
                   obj.url = inspect[i].inspectList[g].items[j].sourceList[k].src;
                 }
@@ -949,6 +951,9 @@ export default {
         }
       }
 
+
+      console.log('temp ::::::::::>> ', temp);
+
       //feedBack
       console.log('self.eventList ::::::::::>> ', self.eventList);
       const feedEventList = [];
@@ -961,7 +966,6 @@ export default {
         obj.subject = self.eventList[i].eventName;
         // obj.description = self.eventList[i].eventDes;
         const commentTemp = [];
-        console.log("self.eventList:",self.eventList);
         if (self.eventList[i].sourceList.length > 0) {
           let arr = self.eventList[i].sourceList;
           arr.forEach(item => {
@@ -1015,6 +1019,7 @@ export default {
         obj.attachment = commentTemp;
         feedEventList.push(obj);
       }
+
       //上傳簽核附件
       var auditAttachment = [];
       //upload audit image

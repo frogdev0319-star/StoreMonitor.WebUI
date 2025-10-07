@@ -29,11 +29,14 @@
               </el-option>
             </el-select>
             <div class="spacer"></div>
+
+            <!-- 完成巡檢 -->
             <el-button :disabled="(!allRemarkItemsFlag && !isDisabled)||storeStatus==61"
               class="storevue-button-filled"
               :size="varyWindowWidth>1680?'small':'mini'" type="primary" @click="confirmSummary">
               {{ $t('remotePatrol.confirmSum') }}
             </el-button>
+
           </div>
         </div>
         <hr  class="hr-horizontal" :style="isFullScreenMode?{'margin-bottom': '20px'}:{}">
@@ -239,14 +242,14 @@
                     <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="img-source-content">
                       <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details" >
                         <div v-if="_item.mediaType==2" class="img-content">
-                          <i v-if="_item.showDelBtn" class="el-icon-close icondelete" @click="deleteImg({item,index: _index})" />
+                          <i v-if="_item.showDelBtn" class="el-icon-close icondelete" @click.stop="deleteImg({item,index: _index})" />
                           <el-image
                             :src="_item.src"
                             :style="{width: _item.width, height: _item.height}"
                             :preview-src-list="getImgList({index: _index, sourceList: item.sourceList})"/>
                         </div>
                         <div v-if="_item.mediaType==1" class="img-content">
-                          <i class="el-icon-close icondelete" @click="deleteImg({item,index:_index})" />
+                          <i class="el-icon-close icondelete" @click.stop="deleteImg({item,index:_index})" />
                           <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo({item:_item,index: _index})">
                           <img :src="videoImgSrc" :height="_item.height" class="imgLittle">
                         </div>
@@ -303,38 +306,41 @@
                     <!-- **-** -->
                     <!-- 添加附件 -->
                     <div class="attach-area">
-                    <div v-for="(imgItem,index) in item.attachFileList" :key="'img'+index" class="source-details" >
-                      <!--video-->
+                      <div v-for="(imgItem,index) in item.attachFileList" :key="'img'+index" class="source-details" >
+                        <!--video-->
                         <div v-if="imgItem.type===1" class="img-content">
-                          <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
+                          <i class="el-icon-close icondelete" @click.stop="deleteAttachImg({item:imgItem,index})" />
                           <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon" @click="playAttachVideo(imgItem,index)">
                           <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
                         </div>
-                      <div v-else-if="imgItem.type===2" class="img-content">
-                        <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
-                        <el-image
-                          :src="imgItem.src"
-                          class="imgLittle"
-                          :preview-src-list="getAuditImgList(index)"
+                        <div v-else-if="imgItem.type===2" class="img-content">
+                          <i class="el-icon-close icondelete" @click.stop="deleteAttachImg({item:imgItem,index})" />
+                          <el-image
+                            :src="imgItem.src"
+                            class="imgLittle"
+                            :preview-src-list="getAuditImgList(item.attachFileList, index)"
+                            :initial-index="index"
+                            @click.stop
+                            />
+                        </div>
+                      </div>
+
+                      <div v-if="attFileCount < 10" class="attach-add" @click="triggerFileSelect(index)">
+                        <input
+                          type="file"
+                          style="display: none"
+                          accept="image/png,image/jpeg,video/mp4"
+                          max-size="2"
+                          @change="doAddAttachment($event, item.id)"
+                          ref="fileInput"
+                          :data-testid="item.id"
                           />
+                        <div style="height:16px;display: flex;flex-direction: row;align-items: center;">
+                          <img :src="addAttIcon" widht="16px" height="16px" style="border-radius:10px;"/>
+                          <div class="att-txt">{{ $t('audit.inceptionRpt.attachment') }}</div>
+                        </div>
                       </div>
                     </div>
-                    <div v-if="attFileCount<10" class="attach-add" @click="triggerFileSelect(index)">
-                      <input
-                        type="file"
-                        style="display: none"
-                        accept="image/png,image/jpeg,video/mp4"
-                        max-size="2"
-                        @change="doAddAttachment($event, item.id)"
-                        ref="fileInput"
-                        :data-testid="item.id"
-                        />
-                      <div style="height:16px;display: flex;flex-direction: row;align-items: center;">
-                        <img :src="addAttIcon" widht="16px" height="16px" style="border-radius:10px;"/>
-                        <div class="att-txt">{{ $t('audit.inceptionRpt.attachment') }}</div>
-                      </div>
-                    </div>
-                  </div>
 
 
                   </div>
@@ -418,6 +424,17 @@
         </div>
       </div>
     </div>
+
+    <el-dialog :visible.sync="uploadProgress" :close-on-click-modal="false" width="510px" top="35vh" left="40vh" class="AddSumupLoad">
+      <div class="body-content">
+        <p>{{ $t('remotePatrol.uploading') }}</p>
+        <p style="margin-bottom:15px;">
+          {{ $t('remotePatrol.uploadInfo', {totalNum: totalnumOfPic, uploadedNum: uploadingnumOfPic}) }}
+        </p>
+        <el-progress :percentage="Math.round(uploadingnumOfPic/totalnumOfPic*100)"/>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 <script>
@@ -440,6 +457,7 @@ import EzvizVideo from '@/components/EzvizVideo';
 import BeseyeVideo from '@/components/BeseyeVideo';
 import StoreFilter from '@/components/StoreFilter';
 import PermissionHelper from '@/api/PermissionHelper';
+import { getStorageInfo } from '@/api/event';
 
 export default {
   name: 'ReInspection',
@@ -727,6 +745,10 @@ export default {
       videoAttFileCount:0,
       addAttIcon: require('../../../../static/img/icon_attachment.svg'),
       deleteInspectIcon_new: require('../../../../static/img/table-delete.png'),
+
+      totalnumOfPic:0,
+      uploadingnumOfPic:0,
+      uploadProgress: false,
 
     };
   },
@@ -1135,10 +1157,14 @@ export default {
     },
     getFileUrl(fileName) {
       const self = this;
-      const bucketName = 'viumo-n3azju2aknpw';
+      const bucketName = self.oss.ossBucketName;
       const endpoint = self.oss.ossEndPoint;
-      const url = `http://${bucketName}.${endpoint}/${fileName}`;
-      return url;
+      const key = fileName;
+      if (self.oss.ossVendor === 2) {
+        return `https://${endpoint}/${bucketName}/${fileName}`;
+      } else {
+        return `http://${bucketName}.${endpoint}/${fileName}`;
+      }
     },
 
     deleteEvent(item, index) {
@@ -1247,34 +1273,9 @@ export default {
       });
       return curIndex;
     },
-    upLoadFile(fileItem) {
-      const self = this;
-      self.percentage = 0;
-      const OSS = require('ali-oss');
-      const bucketName = 'viumo-n3azju2aknpw';
-      const client = new OSS({
-        region: self.oss.ossEndPoint.slice(0, self.oss.ossEndPoint.indexOf('.')),
-        accessKeyId: self.oss.ossAccessKeyId,
-        accessKeySecret: self.oss.ossAccessKeySecret,
-        // bucket: 'viumo-'+self.accountId
-        bucket: bucketName
-      });
-      const name = fileItem.fileName;
-      return new Promise((resolve, reject) => {
-        client.put(name, fileItem.file, {
-          progress: function * (percentage, cpt) {
-            self.percentage = percentage;
-          }
-        })
-          .then((results) => {
-            const url = self.getFileUrl(results.name);
-            resolve(url);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      });
-    },
+
+
+
 
     checkIgnoreScore(item, itemDS, e, index) {
       const self = this;
@@ -2249,6 +2250,8 @@ export default {
     },
 
     deleteImg({item, index}) {
+
+      console.log('item :>> ', item);
       const self = this;
       item.sourceList.splice(index, 1);
       self.sourceListLength--;
@@ -2498,124 +2501,31 @@ export default {
       self.allIgnoreObj.dialogCosed = false;
     },
 
-    // sourceList
-    async resolveConfoirmSummaryData() {
-      const inspectList = [];
-      const indexFeed = this.sheetName.map(x => x.groupId).indexOf('feedBack');
-      const sheetName = this.sheetName.slice(0, indexFeed);
-      console.log("resolveConfoirmSummaryData> sheetName:",sheetName);
-      const inspectSettings = JSON.parse(sessionStorage.getItem('inspectSettings'));
-      if (this.hasIgnoretemp.length === 0) {
-        sheetName.forEach(s_item => {
-          s_item.inspectList.forEach(item => {
-            inspectList.push(item);
-            item.items.forEach((_item, _index) => {
-              if (_item.inputCount === 0) {
-                _item.isIgnore = true;
-                // _item.inspectInput = '';
-                // _item.sourceList = [];
-                if (inspectSettings.qualifiedForIgnoredWithType1 && _item.type === 0
-                  || inspectSettings.qualifiedForIgnoredWithType2 && _item.type === 1) {
-                  _item.itemgetScore = _item.itemScore;
-                }
-                _item.itemgetScore = _item.manualIgnore ? '--' : null;
-              }
-            });
+
+
+    upLoadFile(fileItem) {
+      const self = this;
+      self.percentage = 0;
+
+      console.log('blob this way :>> ');
+      const url = `https://${self.oss.ossEndPoint}/${self.oss.ossBucketName}${self.oss.ossAccessKeySecret}`;
+      const containerURL = new azblob.ContainerURL(url, azblob.StorageURL.newPipeline(new azblob.AnonymousCredential()));
+      const blockBlobURL = azblob.BlockBlobURL.fromContainerURL(containerURL, fileItem.fileName);
+      return new Promise((resolve, reject) => {
+        azblob.uploadBrowserDataToBlockBlob(azblob.Aborter.none, fileItem.file, blockBlobURL)
+          .then((results) => {
+            const url = self.getFileUrl(fileItem.fileName);
+            resolve(url);
+          })
+          .catch((error) => {
+            reject(error);
           });
-        });
-      } else {
-        sheetName.forEach(s_item => {
-          const dealtemp = [];
-          s_item.inspectList.forEach(item => {
-            item.items.forEach((_item, _index) => {
-              this.hasIgnoretemp.forEach((h_item, h_index) => {
-                if (this.hasIgnoretemp[h_index].inputCount == 0) {
-                  this.hasIgnoretemp[h_index].isIgnore = true;
-                  // this.hasIgnoretemp[h_index].inspectInput = '';
-                  // this.hasIgnoretemp[h_index].sourceList = [];
-                  if (inspectSettings.qualifiedForIgnoredWithType1 && h_item.type === 0
-                    || inspectSettings.qualifiedForIgnoredWithType2 && h_item.type === 1) {
-                    h_item.itemgetScore = h_item.itemScore;
-                  }
-                  h_item.itemgetScore = h_item.manualIgnore ? '--' : null;
-                }
-                if (this.hasIgnoretemp[h_index].id == item.items[_index].id) {
-                  item.items[_index] = this.hasIgnoretemp[h_index];
-                }
-              });
-              if (_item.inputCount != 0 || _item.manualIgnore) {
-                const obj = {};
-                obj.dealCount = 1;
-                dealtemp.push(obj);
-              }
-            });
-            inspectList.push(item);
-          });
-          s_item.dealCount = dealtemp.length;
-        });
-      }
-      const hasIgnoretemp = [];
-      inspectList.forEach(item => {
-        item.items.forEach(_item => {
-          if (_item.inputCount == 0 && !_item.manualIgnore) {
-            _item['type'] = item.type;
-            hasIgnoretemp.push(_item);
-          }
-        });
       });
-      const obj = {
-        inspect: sheetName,
-        event: this.eventList,
-        store: this.store,
-        channel: this.channel,
-        allRemarkItemsFlag: this.allRemarkItemsFlag,
-        isBindWorkflow:this.isBindWorkflow||self.isEditReport,
-        isEditReport:this.isEditReport,
-        reportId:this.reportId,
-        auditState:this.auditState,
-        auditCancelable:this.auditCancelable,
-      };
-      this.historyObj = {
-        storeList: this.tabList[Number(this.activeIndex)].storeList,
-        patrolstore: this.patrolstore,
-        sheetName: this.sheetName,
-        PatrolList: this.PatrolList,
-        activeIndex: this.activeIndex,
-        store: this.store,
-        hasIgnoretemp: hasIgnoretemp,
-        inspectItemList: [...this.inspectItemList],
-        eventList: this.eventList,
-        showChannelBtns: this.showChannelBtns,
-        allChannelBtns: this.allChannelBtns,
-        curSheetIndex: this.curSheetIndex,
-        curSheet: this.curSheet,
-        curGroupIndex: this.curGroupIndex,
-        curItemIndex: this.curItemIndex,
-        channel: this.channel,
-        curItemId: this.curItemId,
-        deviceList: this.deviceList,
-        isBindWorkflow:this.isBindWorkflow,
-        isEditReport:this.isEditReport,
-        reportId:this.reportId,
-        auditState:this.auditState,
-        auditCancelable:this.auditCancelable,
-      };
-      this.hasIgnoretemp = [];
-      const params = { _id: this.userId, data: obj, rule: inspectSettings };
 
-      console.log('params :~~~~~~>> ', params);
-
-      this.$store.dispatch('setStoreList', this.storeList);
-
-      console.log("submit:",this.historyObj);
-      await Database.addDataToDB(this.userId, params);
-
-
-      this.$router.push({ name: 'confirmSum', params: params });
     },
 
 
-
+    // ****
     async confirmSummary() {
       const self = this;
       const temp = [];
@@ -2624,12 +2534,49 @@ export default {
       let requiredValid = false;
       let memoCheckText = false;
       let memoCheckMedia = false;
+      //上傳附件
+
+      let status = 0;
+      const attachment_des = [];
+      self.uploadingnumOfPic = 0;
+
+
+      // self.inspectList[0].items[0].attachFileList.length
+      self.totalnumOfPic = self.inspectList[0].items[0].attachFileList.length;
+      self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
+
+      const storageParams = {};
+      // storageParams.storeId = this.event.storeId;
+      console.log('storageParams :>> ', storageParams);
+      await getStorageInfo(storageParams).then(res => {
+        if (res.errCode === 0) {
+          self.oss = res.data;
+        }
+      });
+
+      for(let idx=0; idx < self.inspectList[0].items[0].attachFileList.length; idx++){
+        await self.upLoadFile(self.inspectList[0].items[0].attachFileList[idx]).then((url) => {
+          self.uploadingnumOfPic++;
+          const auditImgObj = {
+            mediaType: self.inspectList[0].items[0].attachFileList[idx].type,
+            url: url,
+            ts: Date.now()
+          };
+          attachment_des.push(auditImgObj);
+
+          console.log('attachment_des :>> ', attachment_des);
+          self.inspectList[0].items[0].sourceList = [... attachment_des]
+
+        }).catch((err) => {
+          console.log("uploade file error:",err)
+        });
+      }
+
 
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
-
-      // console.log('self.sheetName ::::::::>> ', self.sheetName);
-      // console.log('sheetName ::::::::>> ', sheetName);
+      console.log('self.sheetName ::::::::>> ', self.sheetName);
+      console.log('sheetName ::::::::>> ', sheetName);
 
       sheetName.forEach(s_item => {
           s_item.inspectList.forEach(item => {
@@ -2644,7 +2591,6 @@ export default {
                   requiredValid = true
                 }
               }
-
 
               if(_item.memo_config !== null){
                 switch (_item.type) {
@@ -2781,6 +2727,121 @@ export default {
       console.log('sheetName end:>> ', sheetName);
       this.resolveConfoirmSummaryData();
     },
+
+    async resolveConfoirmSummaryData() {
+      const inspectList = [];
+      const indexFeed = this.sheetName.map(x => x.groupId).indexOf('feedBack');
+      const sheetName = this.sheetName.slice(0, indexFeed);
+      console.log("resolveConfoirmSummaryData> sheetName:",sheetName);
+      const inspectSettings = JSON.parse(sessionStorage.getItem('inspectSettings'));
+      if (this.hasIgnoretemp.length === 0) {
+        sheetName.forEach(s_item => {
+          s_item.inspectList.forEach(item => {
+            inspectList.push(item);
+            item.items.forEach((_item, _index) => {
+              if (_item.inputCount === 0) {
+                _item.isIgnore = true;
+                // _item.inspectInput = '';
+                // _item.sourceList = [];
+                if (inspectSettings.qualifiedForIgnoredWithType1 && _item.type === 0
+                  || inspectSettings.qualifiedForIgnoredWithType2 && _item.type === 1) {
+                  _item.itemgetScore = _item.itemScore;
+                }
+                _item.itemgetScore = _item.manualIgnore ? '--' : null;
+              }
+            });
+          });
+        });
+      } else {
+        sheetName.forEach(s_item => {
+          const dealtemp = [];
+          s_item.inspectList.forEach(item => {
+            item.items.forEach((_item, _index) => {
+              this.hasIgnoretemp.forEach((h_item, h_index) => {
+                if (this.hasIgnoretemp[h_index].inputCount == 0) {
+                  this.hasIgnoretemp[h_index].isIgnore = true;
+                  // this.hasIgnoretemp[h_index].inspectInput = '';
+                  // this.hasIgnoretemp[h_index].sourceList = [];
+                  if (inspectSettings.qualifiedForIgnoredWithType1 && h_item.type === 0
+                    || inspectSettings.qualifiedForIgnoredWithType2 && h_item.type === 1) {
+                    h_item.itemgetScore = h_item.itemScore;
+                  }
+                  h_item.itemgetScore = h_item.manualIgnore ? '--' : null;
+                }
+                if (this.hasIgnoretemp[h_index].id == item.items[_index].id) {
+                  item.items[_index] = this.hasIgnoretemp[h_index];
+                }
+              });
+              if (_item.inputCount != 0 || _item.manualIgnore) {
+                const obj = {};
+                obj.dealCount = 1;
+                dealtemp.push(obj);
+              }
+            });
+            inspectList.push(item);
+          });
+          s_item.dealCount = dealtemp.length;
+        });
+      }
+      const hasIgnoretemp = [];
+      inspectList.forEach(item => {
+        item.items.forEach(_item => {
+          if (_item.inputCount == 0 && !_item.manualIgnore) {
+            _item['type'] = item.type;
+            hasIgnoretemp.push(_item);
+          }
+        });
+      });
+      const obj = {
+        inspect: sheetName,
+        event: this.eventList,
+        store: this.store,
+        channel: this.channel,
+        allRemarkItemsFlag: this.allRemarkItemsFlag,
+        isBindWorkflow:this.isBindWorkflow||self.isEditReport,
+        isEditReport:this.isEditReport,
+        reportId:this.reportId,
+        auditState:this.auditState,
+        auditCancelable:this.auditCancelable,
+      };
+      this.historyObj = {
+        storeList: this.tabList[Number(this.activeIndex)].storeList,
+        patrolstore: this.patrolstore,
+        sheetName: this.sheetName,
+        PatrolList: this.PatrolList,
+        activeIndex: this.activeIndex,
+        store: this.store,
+        hasIgnoretemp: hasIgnoretemp,
+        inspectItemList: [...this.inspectItemList],
+        eventList: this.eventList,
+        showChannelBtns: this.showChannelBtns,
+        allChannelBtns: this.allChannelBtns,
+        curSheetIndex: this.curSheetIndex,
+        curSheet: this.curSheet,
+        curGroupIndex: this.curGroupIndex,
+        curItemIndex: this.curItemIndex,
+        channel: this.channel,
+        curItemId: this.curItemId,
+        deviceList: this.deviceList,
+        isBindWorkflow:this.isBindWorkflow,
+        isEditReport:this.isEditReport,
+        reportId:this.reportId,
+        auditState:this.auditState,
+        auditCancelable:this.auditCancelable,
+      };
+      this.hasIgnoretemp = [];
+      const params = { _id: this.userId, data: obj, rule: inspectSettings };
+
+      console.log('params :~~~~~~>> ', params);
+      this.$store.dispatch('setStoreList', this.storeList);
+
+      console.log("submit:",this.historyObj);
+      await Database.addDataToDB(this.userId, params);
+      this.$router.push({ name: 'confirmSum', params: params });
+    },
+
+
+
 
     spreadContent() {
       const self = this;
@@ -3301,79 +3362,9 @@ export default {
         duration: time
       });
     },
-    /**
-     * handle ezviz video snapshot
-     */
-    editEzvizCanvas(src) {
-      const self = this;
-      // self.sourceList = [];
-      const obj = {};
-      obj.mediaType = 2;
-      obj.src = src;
-      obj.height = '100px';
-      obj.width = '140px';
-      obj.fileName = `${self.bucketImage}/inspect_${util.getCurTimeStr()}_${self.store.storeId}_${self.curItemId}.jpg`;
-      obj.file = util.base64ToBlob(obj.src);
-      obj.deviceId = self.channel.id;
-      obj.hasUrl = false;
-      obj.showDelBtn = true;
-      self.sourceList.push(obj);
-      const tempId = self.getIndexById(self.curItemId);
-      self.sheetName[self.curSheetIndex].inspectList.forEach((inspect, idx) => {
-        inspect.items.forEach(item_ => {
-          if (item_.id === self.curItemId) self.curGroupIndex = idx
-        })
-      })
-      if (tempId != null) {
-          self.inspectList[0].items[tempId.itemIndex].sourceList.push(obj);
-          if(self.inspectList[0].items[tempId.itemIndex].itemType === 1){
-            if (this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount === 0) {
-              this.editCount++;
-              this.$store.dispatch('setEditCount', this.editCount);
-              this.sheetName[this.curSheetIndex].dealCount++;
-              this.sheetName[this.curSheetIndex].Effective++;
-              this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].dealCount++;
-              this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].Effective++;
-            }
-            this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount++;
-          }
-      } else {
-        self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.push(obj);// = self.sourceList;
-      }
-      if (!this.showIgnoreItem) {
-        self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
-      } else {
-        self.sourceListLength = self.hasIgnoretemp[self.curItemIndex].sourceList.length;
-      }
 
-    },
 
-    ezvizPictureFeedback(obj) {
-      const self = this;
-      let srcObj = null;
-      const src = obj.src;
-      srcObj = {
-        mediaType: 2,
-        src: src,
-        height: '100px',
-        width: '140px',
-        fileName:`${self.bucketImage}/inspect_${util.getCurTimeStr()}_${self.store.storeId}_${self.curItemId}.jpg`,
-        file: util.base64ToBlob(src),
-        deviceId: self.channel.id,
-        hasUrl : false,
-        showDelBtn : true,
-      };
 
-      const picObj = {
-        eventName: obj.eventName,
-        eventDes: obj.eventDes,
-        sourceObj: srcObj,
-        sourceList: obj.sourceList,
-        showDelBtn:true
-      };
-      self.eventList.push(picObj);
-      self.showFeedBackInfo = false;
-    },
     submitItemResource({ item}) {
       const self = this;
       //this.curItemIndex = index;
@@ -3401,6 +3392,8 @@ export default {
       item.inspectInput = ''
     },
     deleteItemResource({ item, index }) {
+      console.log('item :*********>> ', item);
+
       const self = this
       this.curEditIndex = -1;
       item.inspectInput = '';
@@ -3568,7 +3561,7 @@ export default {
           src:'',
           url:'',
           file:'',
-          type:2,
+          type : 2,
           size:files[0].size
         };
         self.createFile(files[0],objImg);
@@ -3616,20 +3609,33 @@ export default {
       reader.readAsDataURL(file);
     },
 
-    deleteImg({item, index}) {
-      const self = this;
-      self.attachFileList.splice(index, 1);
+    deleteAttachImg({item, index}) {
+      // console.log('item :>> ', item);
+      // console.log('this.inspectList :>> ', this.inspectList);
+      this.inspectList.forEach( i =>{
+        i.items.forEach( ii => {
+          ii.attachFileList.forEach( iii =>{
+            if( iii.fileName == item.fileName){
+              console.log('iii :>> ', iii);
+              ii.attachFileList.splice(index, 1);
+            }
+          })
+        })
+      })
     },
-    getAuditImgList(index) {
-      const arr = [];
-      let i = 0;
-      for (i; i < this.attachFileList.length; i++) {
-        arr.push(this.attachFileList[i + index]);
-        if (i + index >= this.attachFileList.length - 1) {
-          index = 0 - (i + 1);
-        }
-      }
-      return arr.map(source => source.src);
+
+    getAuditImgList(sourceList , index) {
+      console.log('index :>> ', index);
+      console.log('sourceList :>> ', sourceList);
+      // const arr = [];
+      // let i = 0;
+      // for (i; i < this.attachFileList.length; i++) {
+      //   arr.push(this.attachFileList[i + index]);
+      //   if (i + index >= this.attachFileList.length - 1) {
+      //     index = 0 - (i + 1);
+      //   }
+      // }
+      return sourceList.map(source => source.src);
     },
 
 
@@ -3735,7 +3741,7 @@ export default {
     position: relative;
     // width: calc(140/1920*100vw);
     // height: calc(100/1920*100vw);
-    margin-right: calc(15/1920*100vw);
+    // margin-right: calc(15/1920*100vw);
     .el-image {
       border-radius: 5px;
     }
@@ -3753,7 +3759,7 @@ export default {
   height:18px;
   right: 10px;
   margin-top: 8px;
-  z-index: 2;
+  z-index: 2000 !important;
   padding:3px;
   color: #fff;
   cursor: pointer;
@@ -5226,10 +5232,10 @@ export default {
   $border:rgba(172, 174, 177,0.3);
   .attach-area{
     display:flex;
+    flex-direction: row;
     flex-wrap:wrap;
     align-content:flex-start;
     align-self: flex-start;
-    width: 90px;
     margin-top: 15px;
     // margin-left: 16px;
     margin-right: 19px;
@@ -5253,7 +5259,7 @@ export default {
     }
     .source-details{
       display: inline-block;
-      margin-right: 12px;
+      margin-right: 8px;
       position: relative;
       .icondelete{
         position: absolute;
@@ -5267,8 +5273,6 @@ export default {
         border-radius: 50%;
       }
       .img-content{
-        width: 100%;
-        height: 100%;
         position: relative;
         cursor: pointer;
         .start-icon{
@@ -5278,9 +5282,10 @@ export default {
         }
       }
       .imgLittle{
-        height: calc(64/900*100vh);
+        height: 60px;
         width: auto;
         border-radius: 5px;
+        overflow: hidden;
       }
       .icon-video{
         font-size: 18px;
@@ -5325,6 +5330,17 @@ export default {
       text-overflow: ellipsis;
     }
   }
+  .AddSumupLoad >>> .el-dialog__body{
+  padding:30px 40px !important;
+  text-align: left;
+  .body-content{
+    p{
+      margin-bottom:0;
+      color:#182752;
+      font-size: calc(14/1920*100vw);
+    }
+  }
+}
 </style>
 
 <style>
