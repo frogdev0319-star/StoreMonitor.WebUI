@@ -324,7 +324,7 @@
                         </div>
                       </div>
 
-                      <div v-if="attFileCount < 10" class="attach-add" @click="triggerFileSelect(index)">
+                      <div v-if="attFileCount < 10" class="attach-add" @click="triggerFileSelect(item)">
                         <input
                           type="file"
                           style="display: none"
@@ -2414,7 +2414,7 @@ export default {
       self.sourceList = [];
       self.sourceListLength = item.sourceList.length;
       console.log("ClickItem")
-      console.log(this.sheetName);
+      console.log("this.sheetName", this.sheetName);
       let total = 0;
       self.sheetName.forEach((inspectItem, index1) => {
         //  console.log(inspectItem.inspectList)
@@ -2543,15 +2543,15 @@ export default {
       // self.inspectList[0].items[0].attachFileList.length
       console.log('self.inspectList', self.inspectList)
 
-      // var fileNum = 0
-      // self.inspectList.forEach( i => {
-      //   i.items.forEach(ii => {
-      //     fileNum += ii.attachFileList.length
-      //   });
-      // })
-      // self.totalnumOfPic = fileNum;
+      var fileNum = 0
+      self.inspectList.forEach( i => {
+        i.items.forEach(ii => {
+          fileNum += ii.attachFileList.length
+        });
+      })
+      self.totalnumOfPic = fileNum;
 
-      self.totalnumOfPic = self.inspectList[0].items[0].attachFileList.length;
+      // self.totalnumOfPic = self.inspectList[0].items[0].attachFileList.length;
       self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
 
       const storageParams = {};
@@ -3591,14 +3591,24 @@ export default {
       this.showEventNameInfo = false;
     },
 
-    triggerFileSelect(index) {
-      console.log('index :>> ', index);
-      this.$refs.fileInput[index].click();
+    triggerFileSelect(item) {
+      console.log('item :>> ', item);
+      console.log('this.inspectList', this.inspectList)
+
+
+      // 使用 data-testid 找到對應的 input 元素
+      // const fileInput = this.$el.querySelector(`input[data-testid="${item.id}"]`);
+      // if (fileInput) {
+      //   fileInput.click();  // 觸發文件選擇對話框
+      // } else {
+      //   console.error('File input not found for item:', item.id);
+      // }
+
+      // this.$refs.fileInput[index].click();
     },
 
 
     doAddAttachment(e , itemId){
-
       console.log('e :>> ', e);
       console.log('itemId :>> ', itemId);
       const self = this;
@@ -3642,7 +3652,9 @@ export default {
         })
         console.log('this.inspectList :>> ', this.inspectList);
 
-      }else if(files[0].type.includes("video")){
+      }
+
+      else if(files[0].type.includes("video")){
         console.log("choose file:",fileName);
         const safeFilename = files[0].name.replace(/#/g, '_')
         var objvideo={
@@ -3688,8 +3700,8 @@ export default {
     },
 
     getAuditImgList(sourceList , index) {
-      console.log('index :>> ', index);
-      console.log('sourceList :>> ', sourceList);
+      // console.log('index :>> ', index);
+      // console.log('sourceList :>> ', sourceList);
       // const arr = [];
       // let i = 0;
       // for (i; i < this.attachFileList.length; i++) {
