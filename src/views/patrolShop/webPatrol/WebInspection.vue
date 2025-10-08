@@ -110,7 +110,6 @@
               </div>
             </div>
           </div>
-
           <!-- 巡檢項 -->
           <div class="fullWidth rside">
             <div v-if="!showFeedBack" class="padding"
@@ -2537,11 +2536,21 @@ export default {
       //上傳附件
 
       let status = 0;
-      const attachment_des = [];
+
       self.uploadingnumOfPic = 0;
 
 
       // self.inspectList[0].items[0].attachFileList.length
+      console.log('self.inspectList', self.inspectList)
+
+      // var fileNum = 0
+      // self.inspectList.forEach( i => {
+      //   i.items.forEach(ii => {
+      //     fileNum += ii.attachFileList.length
+      //   });
+      // })
+      // self.totalnumOfPic = fileNum;
+
       self.totalnumOfPic = self.inspectList[0].items[0].attachFileList.length;
       self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
 
@@ -2554,23 +2563,72 @@ export default {
         }
       });
 
-      for(let idx=0; idx < self.inspectList[0].items[0].attachFileList.length; idx++){
-        await self.upLoadFile(self.inspectList[0].items[0].attachFileList[idx]).then((url) => {
-          self.uploadingnumOfPic++;
-          const auditImgObj = {
-            mediaType: self.inspectList[0].items[0].attachFileList[idx].type,
-            url: url,
-            ts: Date.now()
-          };
-          attachment_des.push(auditImgObj);
 
-          console.log('attachment_des :>> ', attachment_des);
-          self.inspectList[0].items[0].sourceList = [... attachment_des]
-
-        }).catch((err) => {
-          console.log("uploade file error:",err)
+      const uploadPromises = [];
+      self.inspectList.forEach(i => {
+        i.items.forEach(ii => {
+          for (let idx = 0; idx < ii.attachFileList.length; idx++) {
+            const promise = self.upLoadFile(ii.attachFileList[idx]).then((url) => {
+              // 添加到 sourceList
+              const auditImgObj = {
+                mediaType: ii.attachFileList[idx].type,
+                src: url,
+                ts: Date.now(),
+                hasUrl: true
+              };
+              ii.sourceList.push(auditImgObj);
+            });
+            uploadPromises.push(promise);
+          }
         });
-      }
+      });
+
+
+
+
+      // ????
+      // self.inspectList.forEach( i =>{
+      //   i.items.forEach( ii => {
+      //     var attachment_des = [];
+      //     for(let idx=0; idx < ii.attachFileList.length; idx++){
+      //         self.upLoadFile(ii.attachFileList[idx]).then((url) => {
+      //           self.uploadingnumOfPic++;
+      //           const auditImgObj = {
+      //             mediaType: self.inspectList[0].items[0].attachFileList[idx].type,
+      //             src: url,
+      //             ts: Date.now(),
+      //             hasUrl: true
+
+      //           };
+      //           attachment_des.push(auditImgObj);
+      //           // 放到 sourceList
+
+      //           ii.sourceList = [...ii.sourceList, ... attachment_des]
+      //         }).catch((err) => {
+      //           console.log("uploade file error:",err)
+      //         });
+      //     }
+      //   })
+      // })
+
+      // var attachment_des = [];
+      // for(let idx=0; idx < self.inspectList[0].items[0].attachFileList.length; idx++){
+      //   await self.upLoadFile(self.inspectList[0].items[0].attachFileList[idx]).then((url) => {
+      //     self.uploadingnumOfPic++;
+      //     const auditImgObj = {
+      //       mediaType: self.inspectList[0].items[0].attachFileList[idx].type,
+      //       src: url,
+      //       ts: Date.now(),
+      //       hasUrl: true
+
+      //     };
+      //     attachment_des.push(auditImgObj);
+      //     // 放到 sourceList
+      //     self.inspectList[0].items[0].sourceList = [...self.inspectList[0].items[0].sourceList , ... attachment_des]
+      //   }).catch((err) => {
+      //     console.log("uploade file error:",err)
+      //   });
+      // }
 
 
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
@@ -2725,7 +2783,14 @@ export default {
       // }
 
       console.log('sheetName end:>> ', sheetName);
-      this.resolveConfoirmSummaryData();
+      // 等待所有上傳完成
+      Promise.all(uploadPromises).then(() => {
+        this.resolveConfoirmSummaryData();
+      }).catch(err => {
+        console.log("上傳錯誤:", err);
+        // 可選：處理錯誤後仍保存
+        this.resolveConfoirmSummaryData();
+      });
     },
 
     async resolveConfoirmSummaryData() {
@@ -3562,7 +3627,8 @@ export default {
           url:'',
           file:'',
           type : 2,
-          size:files[0].size
+          size:files[0].size,
+          hasUrl: true,
         };
         self.createFile(files[0],objImg);
         // self.attachFileList.push(objImg);
@@ -3574,10 +3640,7 @@ export default {
             }
           })
         })
-
-
         console.log('this.inspectList :>> ', this.inspectList);
-
 
       }else if(files[0].type.includes("video")){
         console.log("choose file:",fileName);

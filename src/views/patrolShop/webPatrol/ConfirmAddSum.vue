@@ -878,6 +878,7 @@ export default {
       });
 
       console.log('inspect ::::::::::>> ', inspect);
+      // url
       // sourceList
       const temp = [];
       for (const i in inspect) {
@@ -908,19 +909,30 @@ export default {
               for (const k in inspect[i].inspectList[g].items[j].sourceList) {
                 const obj = {};
                 if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 2 || inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 1) {
-                  if(inspect[i].inspectList[g].items[j].sourceList[k].hasUrl){ //已經上傳過的檔案
+                  console.log(' ====> A1',)
+                  if(inspect[i].inspectList[g].items[j].sourceList[k].hasUrl){
+                    //已經上傳過的檔案
+                    console.log(' ====> A2',)
                     self.uploadingnumOfPic++
                     obj.mediaType = inspect[i].inspectList[g].items[j].sourceList[k].mediaType;
                     obj.url = inspect[i].inspectList[g].items[j].sourceList[k].src;
                     obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+
                   }else{
+                    console.log(' ====> B1',)
                     await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]).then((url) => {
                       self.uploadingnumOfPic++;
                       if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 2) {
+
+                        console.log(' ====> B2',)
+                        console.log('====> B2 url', url)
                         obj.mediaType = 2;
                         obj.url = url;
                         obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+
                       } else if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 1) {
+                        console.log(' ====> B3',)
+                        console.log('====> B3 url', url)
                         obj.mediaType = 1;
                         obj.url = url;
                         obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
@@ -935,8 +947,8 @@ export default {
                     }
                   }
                 }
-
                 else {
+                  console.log(' ====> C1',)
                   obj.mediaType = 3;
                   obj.url = inspect[i].inspectList[g].items[j].sourceList[k].src;
                 }
@@ -1875,8 +1887,6 @@ export default {
 
           });//end for 一個類別
 
-
-
           if (p_item.type === 0) {
             p_item['tHeader'] = self.theaderPassFail;
             if (p_item.inspectList.some(x => x.numOfUnqualified !== 0) && dealType.some(x => x === 0) && inspectSettings.dangerousOnFailedItem) {
@@ -1900,7 +1910,6 @@ export default {
         this.hundredMarkType = inspectSettings.hundredMarkType
 
         if (inspect.length === 1 && inspect[0].type === 0) {
-          console.log(1)
           if (inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1') {//加分 or 扣分制
             if (inspectSettings.qualifiedForIgnoredWithType1) {
               s_count = PassFileXN;
