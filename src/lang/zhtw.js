@@ -1910,6 +1910,7 @@ export default {
 
   "webInspection": {
     "backWebInspection": "返回遠端巡檢",
+    "maxImgFileSizeAlert": "圖片檔案不可大於4MB，請重新上傳。",
 
   }
 }

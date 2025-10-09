@@ -324,7 +324,7 @@
                         </div>
                       </div>
 
-                      <div v-if="attFileCount < 10" class="attach-add" @click="triggerFileSelect(item)">
+                      <div v-if="item.attachFileList.length < 10" class="attach-add" @click="triggerFileSelect(item)">
                         <input
                           type="file"
                           style="display: none"
@@ -3602,11 +3602,16 @@ export default {
         return;
       }
       */
+
+      if(self.attFileCount==10){
+        util.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
+        return;
+      }
+
       if(files[0].type.includes("video") && self.videoAttFileCount==2){
         util.notify(self.$t('eventView.maximumAttVedio'), 'warning', 3000);
         return;
       }
-
 
 
       if(files[0].type.includes("image")){
@@ -3620,13 +3625,15 @@ export default {
           size:files[0].size,
           hasUrl: true,
         };
+
+        // 檔案小於 4MB
+        if(objImg.size > maxSize){
+          util.notify(self.$t('webInspection.maxImgFileSizeAlert'), 'error', 3000);
+          return;
+        }
+
+
         self.createFile(files[0],objImg);
-        // self.attachFileList.push(objImg);
-
-
-        console.log('this.sheetName 1=====>>> ', this.sheetName);
-        // console.log('this.inspectList 1 =====>>> ', this.inspectList);
-
         this.sheetName.forEach( t => {
           if(t.inspectList){
             t.inspectList.forEach( i=> {
@@ -3640,9 +3647,7 @@ export default {
 
         })
 
-
         console.log('this.sheetName 2=====>>> ', this.sheetName);
-        // console.log('this.inspectList 2 =====>>> ', this.inspectList);
       }
 
       else if(files[0].type.includes("video")){
