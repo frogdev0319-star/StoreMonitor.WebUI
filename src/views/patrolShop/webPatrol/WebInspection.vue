@@ -1703,7 +1703,7 @@ export default {
               itemObj.memo_is_advanced = _item.memo_is_advanced
               itemObj.memo_options = _item.memo_options
               itemObj.memo_config = _item.memo_config
-
+              itemObj.attachFileList = []
               tempItems.push(itemObj);
             });
             obj.items = tempItems;
@@ -1724,16 +1724,8 @@ export default {
             })
             handleData.push(obj);
           })
-
-
-          handleData[0].subcatergy.forEach( i => {
-            i.items.forEach( ii => {
-              ii.attachFileList = []
-            })
-          })
-
-
           console.log('handleData :::::::::::::::::>> ', handleData);
+
 
           for (let i = 0; i < handleData.length; i++) {
             let count = 0, label = '';
@@ -2540,18 +2532,27 @@ export default {
       self.uploadingnumOfPic = 0;
 
 
-      // self.inspectList[0].items[0].attachFileList.length
-      console.log('self.inspectList', self.inspectList)
+      // console.log('self.inspectList', self.inspectList)
+      // var fileNum = 0
+      // self.inspectList.forEach( i => {
+      //   i.items.forEach(ii => {
+      //     fileNum += ii.attachFileList.length
+      //   });
+      // })
+
+      console.log('this.sheetName', this.sheetName)
 
       var fileNum = 0
-      self.inspectList.forEach( i => {
-        i.items.forEach(ii => {
-          fileNum += ii.attachFileList.length
-        });
+      self.sheetName.forEach( t =>{
+        if(t.inspectList){
+          t.inspectList.forEach( i => {
+            i.items.forEach(ii => {
+              fileNum += ii.attachFileList.length
+            });
+          })
+        }
       })
       self.totalnumOfPic = fileNum;
-
-      // self.totalnumOfPic = self.inspectList[0].items[0].attachFileList.length;
       self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
 
       const storageParams = {};
@@ -2563,53 +2564,30 @@ export default {
         }
       });
 
-
       const uploadPromises = [];
-      self.inspectList.forEach(i => {
-        i.items.forEach(ii => {
-          for (let idx = 0; idx < ii.attachFileList.length; idx++) {
-            const promise = self.upLoadFile(ii.attachFileList[idx]).then((url) => {
-              // 添加到 sourceList
-              const auditImgObj = {
-                mediaType: ii.attachFileList[idx].type,
-                src: url,
-                ts: Date.now(),
-                hasUrl: true
-              };
-              ii.sourceList.push(auditImgObj);
+      self.sheetName.forEach( t =>{
+        if(t.inspectList){
+          t.inspectList.forEach(i => {
+            i.items.forEach(ii => {
+              for (let idx = 0; idx < ii.attachFileList.length; idx++) {
+                const promise = self.upLoadFile(ii.attachFileList[idx]).then((url) => {
+                  // 添加到 sourceList
+                  const auditImgObj = {
+                    mediaType: ii.attachFileList[idx].type,
+                    src: url,
+                    ts: Date.now(),
+                    hasUrl: true
+                  };
+                  ii.sourceList.push(auditImgObj);
+                });
+                uploadPromises.push(promise);
+              }
             });
-            uploadPromises.push(promise);
-          }
-        });
-      });
+          });
+        }
+      })
 
 
-
-
-      // ????
-      // self.inspectList.forEach( i =>{
-      //   i.items.forEach( ii => {
-      //     var attachment_des = [];
-      //     for(let idx=0; idx < ii.attachFileList.length; idx++){
-      //         self.upLoadFile(ii.attachFileList[idx]).then((url) => {
-      //           self.uploadingnumOfPic++;
-      //           const auditImgObj = {
-      //             mediaType: self.inspectList[0].items[0].attachFileList[idx].type,
-      //             src: url,
-      //             ts: Date.now(),
-      //             hasUrl: true
-
-      //           };
-      //           attachment_des.push(auditImgObj);
-      //           // 放到 sourceList
-
-      //           ii.sourceList = [...ii.sourceList, ... attachment_des]
-      //         }).catch((err) => {
-      //           console.log("uploade file error:",err)
-      //         });
-      //     }
-      //   })
-      // })
 
       // var attachment_des = [];
       // for(let idx=0; idx < self.inspectList[0].items[0].attachFileList.length; idx++){
@@ -3597,12 +3575,12 @@ export default {
 
 
       // 使用 data-testid 找到對應的 input 元素
-      // const fileInput = this.$el.querySelector(`input[data-testid="${item.id}"]`);
-      // if (fileInput) {
-      //   fileInput.click();  // 觸發文件選擇對話框
-      // } else {
-      //   console.error('File input not found for item:', item.id);
-      // }
+      const fileInput = this.$el.querySelector(`input[data-testid="${item.id}"]`);
+      if (fileInput) {
+        fileInput.click();  // 觸發文件選擇對話框
+      } else {
+        console.error('File input not found for item:', item.id);
+      }
 
       // this.$refs.fileInput[index].click();
     },
@@ -3628,8 +3606,10 @@ export default {
         util.notify(self.$t('eventView.maximumAttVedio'), 'warning', 3000);
         return;
       }
-      if(files[0].type.includes("image")){
 
+
+
+      if(files[0].type.includes("image")){
         const safeFilename = files[0].name.replace(/#/g, '_')
         var objImg={
           fileName:`${self.bucketImage}/inspect_${util.getCurTimeStr()}_${safeFilename}`,
@@ -3643,15 +3623,26 @@ export default {
         self.createFile(files[0],objImg);
         // self.attachFileList.push(objImg);
 
-        this.inspectList.forEach( i=> {
-          i.items.forEach( ii => {
-            if(ii.id == itemId){
-              ii.attachFileList.push(objImg)
-            }
-          })
-        })
-        console.log('this.inspectList :>> ', this.inspectList);
 
+        console.log('this.sheetName 1=====>>> ', this.sheetName);
+        // console.log('this.inspectList 1 =====>>> ', this.inspectList);
+
+        this.sheetName.forEach( t => {
+          if(t.inspectList){
+            t.inspectList.forEach( i=> {
+              i.items.forEach( ii => {
+                if(ii.id == itemId){
+                  ii.attachFileList.push(objImg)
+                }
+              })
+            })
+          }
+
+        })
+
+
+        console.log('this.sheetName 2=====>>> ', this.sheetName);
+        // console.log('this.inspectList 2 =====>>> ', this.inspectList);
       }
 
       else if(files[0].type.includes("video")){

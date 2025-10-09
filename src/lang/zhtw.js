@@ -1909,7 +1909,7 @@ export default {
   },
 
   "webInspection": {
-
+    "backWebInspection": "返回遠端巡檢",
 
   }
 }

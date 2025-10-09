@@ -10,7 +10,7 @@
             <el-button
               class="storevue-button-search"
               size="'small'" type="primary" @click="goBackRemoteInception">
-              {{ $t('audit.inceptionRpt.backReInspection') }}
+              {{ $t('webInspection.backWebInspection') }}
             </el-button>
             <div v-if="isBindWorkflow" style="width:32px;height:36px;"></div>
             <el-button v-if="isBindWorkflow"
@@ -22,7 +22,7 @@
           <div v-else>
 
             <el-button size="samll" type="primary" class="retry-btn" @click="backToReinspection" v-if="viewReportByTagAuth">
-              {{ $t('audit.inceptionRpt.backReInspection') }}
+              {{ $t('webInspection.backWebInspection') }}
             </el-button>
 
             <el-button size="samll" type="primary" class="retry-btn" @click="reTry" v-else>
@@ -116,7 +116,7 @@ export default {
       }
     },
     goBackRemoteInception(){
-      this.$router.push({ name: 'remotePatrol' });
+      this.$router.push({ name: 'webPatrol' });
     },
     goAuditManagement(){
       this.$router.push({ name: 'SendAuditManage' });
@@ -127,7 +127,7 @@ export default {
     },
     backToReinspection(){
       const self = this;
-      self.$router.push({ name: 'remotePatrol'});
+      self.$router.push({ name: 'webPatrol'});
     }
   }
 };
