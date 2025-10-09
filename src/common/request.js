@@ -12,7 +12,7 @@ const baseUrl = Environment.BASE_URL;
 axios.defaults.withCredentials = true;
 const service = axios.create({
   baseURL: baseUrl,
-  timeout: 60000 //30000
+  timeout: 90000 //30000
 });
 const serviceRpt = axios.create({
   baseURL: baseUrl,
