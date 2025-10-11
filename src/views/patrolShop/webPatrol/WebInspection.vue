@@ -2,7 +2,6 @@
   <div>
     <store-filter
       :multiStore="false"
-      :showFavorite="enableMimicMode?false:true"
       @storeChange="onStoreChange"
     ></store-filter>
     <div class="el-container" style="margin-top: 20px" :class="{'flex-column': isFullScreenMode}">

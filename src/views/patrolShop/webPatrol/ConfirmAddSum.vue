@@ -1106,7 +1106,7 @@ export default {
         feedback: feedEventList,
         isMysteryMode:PermissionHelper.enableMimicMode,
         isCreateEvent:sendEvent,
-        reportType: 1
+        reportType: 2
       };
 
       console.log('params ::::::::::>> ', params);

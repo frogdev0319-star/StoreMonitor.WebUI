@@ -165,8 +165,9 @@
                   <!-- card main -->
                   <div class="card_main">
                     <div class="flex-center margin-bottom-5">
-                      <div class="card-title">{{ item.storeName }}</div>
-                      <img :src="item.mode===1?onsiteIcon:remoteIcon" :height="20" alt="" >
+                      <div class="card-title">{{ item.storeName }} </div>
+
+                      <img :src="item.routeObj.reportType===1?onsiteIcon:remoteIcon" :height="20" alt="" >
                     </div>
                     <div class="margin-bottom-5">{{ item.tagName }}</div>
                     <div class="status-tag_row">
