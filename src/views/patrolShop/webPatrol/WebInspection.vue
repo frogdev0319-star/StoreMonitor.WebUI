@@ -435,7 +435,7 @@
     </el-dialog>
 
 
-    <dialog-pop
+    <!-- <dialog-pop
       v-if="changeInspectObj.dialogCosed"
       :title="changeInspectObj.title"
       :isWarning="changeInspectObj.isWarning"
@@ -446,7 +446,402 @@
       <div class="dialog-slot">
         {{changeInspectObj.showInfo}}
       </div>
-    </dialog-pop>
+    </dialog-pop> -->
+
+
+    <!-- ======= ****** ======= -->
+
+        <el-dialog
+          v-if="showCutDialog"
+          :title="$t('remotePatrol.edit')"
+          :visible.sync="showCutDialog"
+          :close-on-click-modal="false"
+          :width="860*percentHeight+'px'"
+          height="300px"
+          top="5%">
+          <div class="canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
+            <hr class="dialog-hr">
+            <div v-if="showPenBtn" id="iconR" class="icon-right">
+              <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
+              <transition name="fadepen">
+                <div v-if="showPen" class="pen-content">
+                  <div v-for="(item,index) in penList" :key="index" class="content">
+                    <div :class="{colorActive:item.showContent}"/>
+                    <div :id="item.id" class="color" @click="checkPen(item,index)"/>
+                  </div>
+                </div>
+              </transition>
+            </div>
+            <canvas
+              id="icanvas"
+              :width="767*percentHeight"
+              :height="431*percentHeight"
+              @mousedown="mouseDownAction($event)"
+              @mousemove="mouseMoveAction($event)"/>
+            <div
+              v-if="showCancelContent"
+              :style="{'width':767*percentHeight+'px',
+                      'margin-left':47*percentHeight+'px'}"
+              class="cancel-content">
+              <div class="content" @click="cancelEditCanvas">
+                <img :src="clearIconSrc" class="icon-clear" height="22px">
+                <span>{{ $t('remotePatrol.clear') }}</span>
+              </div>
+              <div class="content" @click="confirmEditCanvas">
+                <img :src="removeIconSrc" class="icon-clear" height="22px">
+                <span>{{ $t('remotePatrol.cancel') }}</span>
+              </div>
+            </div>
+          </div>
+          <div slot="footer">
+            <el-button id="cancelBtn" size="mini" @click="showCutDialog = false">{{ $t('remotePatrol.cancel') }}</el-button>
+            <el-button id="confirmBtn" size="mini" type="primary" @click="confirmEdit">{{ $t('remotePatrol.confirm') }}aaa</el-button>
+          </div>
+        </el-dialog>
+
+        <el-dialog
+          v-if="dialogCommentVideo"
+          :title="$t('remotePatrol.view')"
+          :visible.sync="dialogCommentVideo"
+          :close-on-click-modal="false"
+          :width="680*percentHeight+'px'"
+          height="300px"
+          top="5%">
+          <div class="canvas-content">
+            <hr class="dialog-hr">
+            <video
+              id="previewCutVideo"
+              :width="580*percentHeight"
+              :height="420*percentHeight"
+              :src="curVideoSrc"
+              prload
+              controls
+              autoplay/>
+          </div>
+        </el-dialog>
+        <dialog-pop
+          v-if="showAddTextFeedbackDialog"
+          :title="$t('remotePatrol.feedbacks')"
+          :append-to-body="true"
+          :close-on-click-modal="false"
+          :show-close="false"
+          :isWarning="true"
+          :visible="showAddTextFeedbackDialog"
+          @cancelHandler="showAddTextFeedbackDialog = false"
+          @confirmHandler="confirmAddTextFeedback"
+          >
+          <div class="dialog-slot">
+            <div class="dialog-event-content fullWidth">
+              <div class="margin-bottom-sm"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</div>
+              <el-input v-model="eventName" size="mini" class="storevue-input-white" @input="eventNameChanged" @blur="notShowInputRuleTips('eventName')"/>
+              <span v-if="eventNameRuletip" class="rules">{{ $t('remotePatrol.eventNameRuletip') }}</span>
+              <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
+              <div class="margin-bottom-top-sm">{{ $t('remotePatrol.description') }}</div>
+              <div v-for="(_item,_index) in feedbackSourceList" :key="_index" class="source-details">
+                  <div class="flex-center">
+                    <img
+                      :src="deleteInspectIcon"
+                      alt="delete"
+                      @click="deleteFeedbackItemResource(_index)"
+                    />
+                    <div
+                      class="paper flex-center margin-bottom-sm inspect-text"
+                    >
+                      <div style="flex: 1; text-align: left; margin: 5px">
+                        {{ _item.src }}
+                      </div>
+                      <hr class="hr-vertical" />
+                      <img
+                        :src="editInspectIcon"
+                        alt="edit"
+                        style="margin: 5px"
+                        @click="editItemFeedbackResource(_index)"
+                      />
+                    </div>
+                  </div>
+              </div>
+              <div style="position: relative">
+                <el-input
+                  :autosize="{ minRows: 2, maxRows: 7}"
+                  v-model="feedbackInput"
+                  :placeholder="$t('remotePatrol.descPlaceholder')"
+                  size="mini"
+                  class="storevue-textarea-white"
+                  type="textarea"
+                  resize="none"
+                  @input="eventDesChanged"
+                  @blur="notShowInputRuleTips('eventDes')"/>
+
+                <button
+                  class="inspect-btn"
+                  @click="submitFeedbackItemResource()"
+                >
+                  {{$t('remotePatrol.confirm')}}
+                </button>
+              </div>
+              <span v-if="eventDesRuletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
+            </div>
+          </div>
+        </dialog-pop>
+
+        <dialog-pop
+          v-if="showFeedDialog2"
+          :title="$t('remotePatrol.feedbacks')"
+          :append-to-body="true"
+          :close-on-click-modal="false"
+          :isWarning="true"
+          :dialogWidth="860*percentHeight+'px'"
+          :visible="showFeedDialog2"
+          @cancelHandler="showFeedDialog2 = false"
+          @confirmHandler="confirmAddFeedBack2"
+          >
+          <div class="canvas-content  dialog-slot">
+            <div class="feed-canvas-content" v-if="feedbackIndex === -1" @mouseenter="showCancel" @mouseleave="hiddenCancel">
+              <div v-if="showPenBtn" id="iconR" class="icon-right">
+                <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
+                <transition name="fadepen">
+                  <div v-if="showPen" class="pen-content">
+                    <div v-for="(item,index) in penList" :key="index" class="content">
+                      <div :class="{colorActive:item.showContent}"/>
+                      <div :id="item.id" class="color" @click="checkPen(item,index)"/>
+                    </div>
+                  </div>
+                </transition>
+              </div>
+              <canvas
+                id="icanvas"
+                :width="520*percentHeight"
+                :height="340*percentHeight"
+                @mousedown="mouseDownAction($event)"
+                @mousemove="mouseMoveAction($event)"/>
+              <div
+                v-if="showCancelContent"
+                :style="{'width':520*percentHeight+'px',
+                        'margin-left':47*percentHeight+'px'}"
+                class="cancel-content">
+                <div class="content" @click="cancelEditCanvas">
+                  <img :src="clearIconSrc" class="icon-clear" height="22px">
+                  <span>{{ $t('remotePatrol.clear') }}</span>
+                </div>
+                <div class="content" @click="confirmEditCanvas">
+                  <img :src="removeIconSrc" class="icon-clear" height="22px">
+                  <span>{{ $t('remotePatrol.cancel') }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="feed-canvas-content" v-else>
+              <img
+                :width="520*percentHeight"
+                :height="340*percentHeight"
+                class="canvas-img"
+                :src="eventList[feedbackIndex].sourceObj.src">
+            </div>
+            <div class="event-content spacer margin-left-md">
+              <span class="event-title"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</span>
+              <el-input v-model="eventName" size="mini" class="storevue-input-white" @input="eventNameChanged" @blur="notShowInputRuleTips('eventName')"/>
+              <span v-if="eventNameRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.eventNameRuletip') }}</span>
+              <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
+              <span class="event-title">{{ $t('remotePatrol.description') }}</span>
+              <div v-for="(_item,_index) in feedbackSourceList" :key="_index" class="source-details">
+                <div class="flex-center">
+                  <img
+                    :src="deleteInspectIcon"
+                    alt="delete"
+                    @click="deleteFeedbackItemResource(_index)"
+                  />
+                  <div
+                    class="paper flex-center margin-bottom-sm inspect-text"
+                  >
+                    <div style="flex: 1; text-align: left; margin: 5px">
+                      {{ _item.src }}
+                    </div>
+                    <hr class="hr-vertical" />
+                    <img
+                      :src="editInspectIcon"
+                      alt="edit"
+                      style="margin: 5px"
+                      @click="editItemFeedbackResource(_index)"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div style="position: relative">
+                <el-input
+                  :autosize="{ minRows: 2, maxRows: 7}"
+                  v-model="feedbackInput"
+                  :placeholder="$t('remotePatrol.descPlaceholder')"
+                  size="mini"
+                  class="storevue-textarea-white"
+                  type="textarea"
+                  resize="none"
+                  @input="eventDesChanged"
+                  @blur="notShowInputRuleTips('eventDes')"/>
+
+                <button
+                  class="inspect-btn"
+                  @click="submitFeedbackItemResource()"
+                >
+                  {{$t('remotePatrol.confirm')}}
+                </button>
+              </div>
+              <span v-if="eventDesRuletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
+            </div>
+          </div>
+        </dialog-pop>
+
+        <dialog-pop
+          v-if="changeBrandObj.dialogCosed"
+          :title="changeBrandObj.title"
+          :isWarning="changeBrandObj.isWarning"
+          :visible="changeBrandObj.dialogCosed"
+          @cancelHandler="canceldChangeBrand"
+          @confirmHandler="changeBrandDialog"
+          >
+          <div class="dialog-slot">
+            {{changeBrandObj.showInfo}}
+          </div>
+        </dialog-pop>
+        <dialog-pop
+          v-if="EditRptchangeBrandObj.dialogCosed"
+          :title="EditRptchangeBrandObjtitle"
+          :isWarning="EditRptchangeBrandObj.isWarning"
+          :visible="EditRptchangeBrandObj.dialogCosed"
+          :showCancelbtn="false"
+          @confirmHandler="canceldChangeBrand"
+          >
+          <div class="dialog-slot">
+            {{EditRptchangeBrandObj.showInfo}}
+          </div>
+        </dialog-pop>
+        <dialog-pop
+          v-if="changeStoreObj.dialogCosed"
+          :title="changeStoreObj.title"
+          :isWarning="changeStoreObj.isWarning"
+          :visible="changeStoreObj.dialogCosed"
+          @cancelHandler="canceldChangeStore"
+          @confirmHandler="changeStoreDialog"
+          >
+          <div class="dialog-slot">
+            {{changeStoreObj.showInfo}}
+          </div>
+        </dialog-pop>
+        <dialog-pop
+          v-if="changeInspectObj.dialogCosed"
+          :title="changeInspectObj.title"
+          :isWarning="changeInspectObj.isWarning"
+          :visible="changeInspectObj.dialogCosed"
+          @cancelHandler="canceldChangeInspect"
+          @confirmHandler="changeInspectDialog"
+          >
+          <div class="dialog-slot">
+            {{changeInspectObj.showInfo}}
+          </div>
+        </dialog-pop>
+        <dialog-pop
+          v-if="EditRptchangeInspectObj.dialogCosed"
+          :title="EditRptchangeInspectObj.title"
+          :isWarning="EditRptchangeInspectObj.isWarning"
+          :visible="EditRptchangeInspectObj.dialogCosed"
+          :showCancelbtn="false"
+          @confirmHandler="canceldChangeInspect"
+          >
+          <div class="dialog-slot">
+            {{EditRptchangeInspectObj.showInfo}}
+          </div>
+        </dialog-pop>
+        <dialog-pop
+          v-if="noBindDeviceObj.dialogCosed"
+          :title="noBindDeviceObj.title"
+          :isWarning="noBindDeviceObj.isWarning"
+          :visible="noBindDeviceObj.dialogCosed"
+          @cancelHandler="canceldNoBind"
+          @confirmHandler="noBindDeviceDialog"
+          >
+          <div class="dialog-slot">
+            {{noBindDeviceObj.showInfo}}
+          </div>
+        </dialog-pop>
+        <dialog-pop
+          v-if="noAllInspectObj.dialogCosed"
+          :title="noAllInspectObj.title"
+          :isWarning="noAllInspectObj.isWarning"
+          :hasIgnore="!showIgnoreItem"
+          :visible="noAllInspectObj.dialogCosed"
+          @hasIgnoreHandler="hasIgnoreItem"
+          @cancelHandler="canceldNoAllInspect"
+          @confirmHandler="noAllInspectDialog"
+          >
+          <div class="dialog-slot">
+            <div class="padding-vertical-sm">{{noAllInspectObj.showInfo}}</div>
+          </div>
+        </dialog-pop>
+
+        <dialog-pop
+          v-if="requiredObj.dialogCosed"
+          :title="requiredObj.title"
+          :isWarning="requiredObj.isWarning"
+          :visible="requiredObj.dialogCosed"
+          @cancelHandler="requiredObj.dialogCosed = false"
+          @confirmHandler="requiredObj.dialogCosed = false"
+          >
+          <div class="dialog-slot">
+            <div class="padding-vertical-sm">{{requiredObj.showInfo}} </div>
+          </div>
+        </dialog-pop>
+        <dialog-pop
+          v-if="allIgnoreObj.dialogCosed"
+          :title="allIgnoreObj.title"
+          :isWarning="allIgnoreObj.isWarning"
+          :visible="allIgnoreObj.dialogCosed"
+          @cancelHandler="cancelAllIgnore"
+          @confirmHandler="allIgnoreDialog"
+          >
+          <div class="dialog-slot">
+            {{allIgnoreObj.showInfo}}
+          </div>
+        </dialog-pop>
+        <dialog-pop
+          v-if="leaveObj.dialogCosed"
+          :title="leaveObj.title"
+          :isWarning="leaveObj.isWarning"
+          :visible="leaveObj.dialogCosed"
+          @cancelHandler="cancelLeave"
+          @confirmHandler="leaveDialog"
+          >
+          <div class="dialog-slot">
+            {{leaveObj.showInfo}}
+          </div>
+        </dialog-pop>
+
+        <!-- 備註標籤 memoConfigTextObj-->
+        <dialog-pop
+          v-if="memoConfigTextObj.dialogCosed"
+          :title="memoConfigTextObj.title"
+          :isWarning="memoConfigTextObj.isWarning"
+          :visible="memoConfigTextObj.dialogCosed"
+          @cancelHandler="memoConfigTextObj.dialogCosed = false"
+          @confirmHandler="memoConfigTextObj.dialogCosed = false"
+          >
+          <div class="dialog-slot">
+            <div class="padding-vertical-sm">{{memoConfigTextObj.showInfo}} </div>
+          </div>
+        </dialog-pop>
+
+        <dialog-pop
+          v-if="memoConfigMediaObj.dialogCosed"
+          :title="memoConfigMediaObj.title"
+          :isWarning="memoConfigMediaObj.isWarning"
+          :visible="memoConfigMediaObj.dialogCosed"
+          @cancelHandler="memoConfigMediaObj.dialogCosed = false"
+          @confirmHandler="memoConfigMediaObj.dialogCosed = false"
+          >
+          <div class="dialog-slot">
+            <div class="padding-vertical-sm">{{memoConfigMediaObj.showInfo}} </div>
+          </div>
+        </dialog-pop>
+
+
+
 
   </div>
 </template>

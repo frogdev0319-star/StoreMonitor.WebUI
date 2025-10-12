@@ -167,7 +167,7 @@
                     <div class="flex-center margin-bottom-5">
                       <div class="card-title">{{ item.storeName }} </div>
 
-                      <img :src="item.routeObj.reportType===1?onsiteIcon:remoteIcon" :height="20" alt="" >
+                      <img :src="item.routeObj.reportType===1?remoteIcon:onsiteIcon" :height="25" alt="" >
                     </div>
                     <div class="margin-bottom-5">{{ item.tagName }}</div>
                     <div class="status-tag_row">
@@ -330,8 +330,9 @@ export default {
       varyWindowWidth: window.innerWidth,
       varyWindowHeight: window.innerHeight,
       videoSrc: require('../../../static/img/monitor.png'),
-      remoteIcon: require('../../../static/img/remote.png'),
-      onsiteIcon: require('../../../static/img/onsite.png'),
+      onsiteIcon: require('../../../static/img/MdiMonitorDashboard.svg'),
+      remoteIcon: require('../../../static/img/MdiCellphoneAndroid.svg'),
+
       searchContent: false,
       exportPng: require('../../../static/img/excel.png'),
 

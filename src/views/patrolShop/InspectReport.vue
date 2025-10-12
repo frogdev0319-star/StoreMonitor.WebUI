@@ -797,8 +797,8 @@ export default {
       showMaxInfo: false,
 
       videoSrc: require('../../../static/img/monitor.png'),
-      inspectSrc: require('../../../static/img/remote_patrol.png'),
-      insiteInspectSrc: require('../../../static/img/onsite_patrol.png'),
+      inspectSrc: require('../../../static/img/MdiCellphoneAndroid.svg'),
+      insiteInspectSrc: require('../../../static/img/MdiMonitorDashboard.svg'),
       report: null,
       suggest: '',
       totalScore: '',
