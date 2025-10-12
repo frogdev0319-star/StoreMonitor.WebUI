@@ -4,6 +4,8 @@
       :multiStore="false"
       @storeChange="onStoreChange"
     ></store-filter>
+
+
     <div class="el-container" style="margin-top: 20px" :class="{'flex-column': isFullScreenMode}">
 
       <div :style="{'border-top-right-radius': isFullScreenMode ? '0px': 'unset', 'border-top-left-radius': isFullScreenMode ? '0px': 'unset'}"
@@ -35,7 +37,6 @@
               :size="varyWindowWidth>1680?'small':'mini'" type="primary" @click="confirmSummary">
               {{ $t('remotePatrol.confirmSum') }}
             </el-button>
-
           </div>
         </div>
         <hr  class="hr-horizontal" :style="isFullScreenMode?{'margin-bottom': '20px'}:{}">
@@ -432,6 +433,20 @@
         <el-progress :percentage="Math.round(uploadingnumOfPic/totalnumOfPic*100)"/>
       </div>
     </el-dialog>
+
+
+    <dialog-pop
+      v-if="changeInspectObj.dialogCosed"
+      :title="changeInspectObj.title"
+      :isWarning="changeInspectObj.isWarning"
+      :visible="changeInspectObj.dialogCosed"
+      @cancelHandler="canceldChangeInspect"
+      @confirmHandler="changeInspectDialog"
+      >
+      <div class="dialog-slot">
+        {{changeInspectObj.showInfo}}
+      </div>
+    </dialog-pop>
 
   </div>
 </template>
@@ -900,6 +915,8 @@ export default {
 
   async mounted() {
     const self = this;
+
+
     await self.getUserInfo()
     this.enableMimicMode = this.$store.getters.mimicMode;
     const PatrolHistory = self.$store.getters.PatrolHistory;
@@ -1089,7 +1106,6 @@ export default {
         obj.device = [];
         self.saveStoreObj(obj);
       }
-
     },
     changeBrand() {
       const self = this;
@@ -1517,19 +1533,22 @@ export default {
 
     changeInspect(val) {
       const self = this;
-
       sessionStorage.setItem('inspectId', JSON.stringify(val))
-      // console.log(self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 0, self.$store.getters.PatrolHistory != null)
       if (self.$store.getters.editCount > 0) {
         self.changeInspectObj.dialogCosed = true;
         self.beforepatrolstore = val;
-      } if(self.isEditReport){
+        return
+      }
+
+      if(self.isEditReport){
         self.EditRptchangeInspectObj.dialogCosed = true;
         self.beforepatrolstore = val;
       }else {
         self.changeInspectList(val);
       }
     },
+
+
 
     changeInspectList(val) {
       console.log('changeInspectList :::::::::>> ');
@@ -1756,10 +1775,14 @@ export default {
               });
             }
           }
+
           self.sheetName = te_temp.sort((a, b) => {return a.type - b.type});
           self.sheetName[0].isClick = true;
           const isCategory = self.sheetName[0].isCategory;
           self.inspectList = isCategory ? self.sheetName[0].inspectList : self.sheetName[0].inspectList;
+
+          console.log('self.sheetName 1 :::::::::::::::::>> ', self.sheetName);
+
           //bug
           const feedobj = {
             groupId: 'feedBack',
@@ -1781,6 +1804,10 @@ export default {
         }
       })
     },
+
+
+
+
     doFillFeedBackData(){
       this.eventList.map(event=>{
         if(!this.auditCancelable){//不能取消的簽核，不能刪除反饋
