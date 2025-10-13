@@ -1106,7 +1106,21 @@ export default {
         feedback: feedEventList,
         isMysteryMode:PermissionHelper.enableMimicMode,
         isCreateEvent:sendEvent,
-        reportType: 2
+        reportType: 2,
+
+        // ==== 簽名檔案 ====
+        // signatures: [
+        //   {
+        //       "type": 1,
+        //       "content": "https://storevuestorage.blob.core.windows.net/storevue-mgmt-portals/image/20251013/inspect_165938959_BnYYNDtjMdtg_-11.jpg",
+        //       "header": "我是簽名"
+        //   },
+        //   {
+        //       "type": 1,
+        //       "content": "https://storevuestorage.blob.core.windows.net/storevue-mgmt-portals/undefined/inspect_160152_ooo.png",
+        //       "header": "我是簽名"
+        //   }
+        // ],
       };
 
       console.log('params ::::::::::>> ', params);

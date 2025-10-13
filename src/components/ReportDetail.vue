@@ -201,7 +201,7 @@ export default {
     imageStyle() {
       return {
         // 'width': 'calc(130/1920*100vw)',
-        'height': `100px`
+        'height': `75px`
       }
     }
   },

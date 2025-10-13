@@ -434,19 +434,31 @@
       </div>
     </el-dialog>
 
-
-    <!-- <dialog-pop
-      v-if="changeInspectObj.dialogCosed"
-      :title="changeInspectObj.title"
-      :isWarning="changeInspectObj.isWarning"
-      :visible="changeInspectObj.dialogCosed"
-      @cancelHandler="canceldChangeInspect"
-      @confirmHandler="changeInspectDialog"
-      >
-      <div class="dialog-slot">
-        {{changeInspectObj.showInfo}}
-      </div>
-    </dialog-pop> -->
+    <el-dialog
+        v-if="dialogAttachVideo"
+        :title="$t('eventView.view')"
+        :visible.sync="dialogAttachVideo"
+        :close-on-click-modal="false"
+        width="850px"
+        height="834px"
+        top="12%"
+        class="rate-video-dialog"
+        @close="stopCommentVideo">
+        <div slot="title" class="dialog-title">{{$t('eventView.view')}}</div>
+        <div class="video-dialog-content" style="overflow:hidden;">
+          <hr class="dialog-hr">
+          <div class="video-content" >
+            <video
+              id="previewAttVideo"
+              height="83%"
+              width="90%"
+              prload
+              controls
+              autoplay
+              class="video-js vjs-fill"/>
+          </div>
+        </div>
+      </el-dialog>
 
 
     <!-- ======= ****** ======= -->
@@ -843,6 +855,8 @@
 
 
 
+
+
   </div>
 </template>
 <script>
@@ -1157,6 +1171,7 @@ export default {
       totalnumOfPic:0,
       uploadingnumOfPic:0,
       uploadProgress: false,
+      dialogAttachVideo:false,
 
     };
   },
@@ -1210,7 +1225,18 @@ export default {
 
         console.log("Total Source="+total)
         return total;
-    }
+    },
+    imgHeight() {
+      let height = 0;
+      if (this.varyWindowWidth > 1800) {
+        height = this.varyWindowWidth * 0.039;
+      } else if (this.varyWindowWidth > 1400) {
+        height = this.varyWindowWidth * 0.035;
+      } else {
+        height = 75;
+      }
+      return height;
+    },
   },
   watch: {
     accountChanged(val, oldVal) {
@@ -4034,7 +4060,6 @@ export default {
         return;
       }
 
-
       if(files[0].type.includes("image")){
         const safeFilename = files[0].name.replace(/#/g, '_')
         var objImg={
@@ -4052,8 +4077,6 @@ export default {
           util.notify(self.$t('webInspection.maxImgFileSizeAlert'), 'error', 3000);
           return;
         }
-
-
         self.createFile(files[0],objImg);
         this.sheetName.forEach( t => {
           if(t.inspectList){
@@ -4065,12 +4088,8 @@ export default {
               })
             })
           }
-
         })
-
-        console.log('this.sheetName 2=====>>> ', this.sheetName);
       }
-
       else if(files[0].type.includes("video")){
         console.log("choose file:",fileName);
         const safeFilename = files[0].name.replace(/#/g, '_')
@@ -4081,11 +4100,26 @@ export default {
           type:1,
           size:files[0].size,
         }
+
+
         self.createFile(files[0],objvideo);
-        self.attachFileList.push(objvideo);
+
+        // self.attachFileList.push(objvideo);
+        this.sheetName.forEach( t => {
+          if(t.inspectList){
+            t.inspectList.forEach( i=> {
+              i.items.forEach( ii => {
+                if(ii.id == itemId){
+                  ii.attachFileList.push(objvideo)
+                }
+              })
+            })
+          }
+        })
       }
       self.$refs.fileInput.value = '';
     },
+
     createFile(file, objFile) {
       //var image = new Image();
       console.log(objFile);
@@ -4128,6 +4162,19 @@ export default {
       //   }
       // }
       return sourceList.map(source => source.src);
+    },
+
+
+    playAttachVideo(item, index) {
+
+      console.log('item :>> ', item);
+
+      const self = this;
+      self.dialogAttachVideo = true;
+      self.$nextTick(function() {
+        var video = document.getElementById('previewAttVideo');
+        video.setAttribute("src",item.url);
+      });
     },
 
 
@@ -4731,6 +4778,129 @@ export default {
           }
         }
       }
+
+      .video-dialog-content{
+            width:100%;
+            height:100%;
+            margin: auto;
+            // padding: 0 34px 42px 34px;
+            .rate-video-dialog{
+              border-radius: 5px;
+            }
+
+            .dialog-hr{
+                border: none;
+                margin-bottom:10px;
+                bottom: 5px;
+                margin-top: 0;
+            }
+            .video-content{
+                @include point(margin,20);
+                padding-top: 0;
+                position: relative;
+                #channelName{
+                    width: 100%;
+                    color: #fff;
+                    background-color: rgba($color: #24293d, $alpha: 0.6);
+                    height: 40px;
+                    line-height: 40px;
+                    position: absolute;
+                    z-index: 10;
+                    text-align: left;
+                    span{
+                        margin-left: 30px;
+                    }
+                }
+                .icon-footer{
+                    width: 100%;
+                    position: absolute;
+                    bottom: 0px;
+                    color: #fff;
+                    overflow: hidden;
+                    user-select:none;
+                    background-color: rgba($color: #24293d, $alpha: 0.6);
+                    height: 40px;
+                    line-height: 40px;
+                    z-index: 10;
+                    .iconlside{
+                        float: left;
+                        text-align: left;
+                        .iconplay{
+                            font-size: 18px;
+                            cursor: pointer;
+                            float: left;
+                            margin-left: 30px;
+                        }
+
+                    }
+                    .iconrside{
+                        max-width: 500px;
+                        float: right;
+                        position: relative;
+                        span{
+                            font-size: 13px;
+                            margin-right:6px;
+                            margin-left: 20px;
+                        }
+                        .speed-content{
+                            display: inline-block;
+                            span{
+                                position: relative;
+                                bottom:3px;
+                            }
+                        }
+                        .screen-content{
+                            display: inline;
+                            margin-left: 30px;
+                            position: absolute;
+                            right: 20px;
+                            .iconscreen{
+                                font-size: 18px;
+                                position: relative;
+                                cursor: pointer;
+                                margin-right: 20px;
+                                bottom: 3px;
+                            }
+                        }
+                    }
+                }
+            }
+            .channel-content{
+              margin: 20px 30px;
+              padding: 0 34px 42px 34px;
+              position: relative;
+              .radio-group{
+                display: grid;
+                grid-template-columns: 240px 240px;
+                grid-template-rows: 30px;
+              }
+              .radio-class{
+                display: flex;
+                align-items: center;
+                >>> .el-radio__label{
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                }
+                .radio-img{
+                  height: 26px;
+                  width: 26px;
+                  margin-right: 10px;
+                }
+                .radio-span{
+                  display: inline-block;
+                  max-width: 150px;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  font-size: 14px;
+                  color: #94a4b4;
+                }
+              }
+            }
+        }
+
+
       .video-content{
         height: 420px;
         position: relative;
@@ -5722,6 +5892,129 @@ export default {
   $red:#f31d65;
   $black:#484848;
   $border:rgba(172, 174, 177,0.3);
+  @mixin point($poi,$val){
+    #{$poi}:checkRem($val);
+    }
+    .video-dialog-content{
+      width: 100%;
+      height: 100%;
+      margin: auto;
+      // padding: 0 34px 42px 34px;
+      .rate-video-dialog{
+        border-radius: 5px;
+      }
+
+      .dialog-hr{
+          border: none;
+          margin-bottom:10px;
+          bottom: 5px;
+          margin-top: 0;
+      }
+      .video-content{
+          margin: 20px;
+          padding-top: 0;
+          position: relative;
+          #channelName{
+              width: 100%;
+              color: #fff;
+              background-color: rgba($color: #24293d, $alpha: 0.6);
+              height: 40px;
+              line-height: 40px;
+              position: absolute;
+              z-index: 10;
+              text-align: left;
+              span{
+                  margin-left: 30px;
+              }
+          }
+          .icon-footer{
+              width: 100%;
+              position: absolute;
+              bottom: 0px;
+              color: #fff;
+              overflow: hidden;
+              user-select:none;
+              background-color: rgba($color: #24293d, $alpha: 0.6);
+              height: 40px;
+              line-height: 40px;
+              z-index: 10;
+              .iconlside{
+                  float: left;
+                  text-align: left;
+                  .iconplay{
+                      font-size: 18px;
+                      cursor: pointer;
+                      float: left;
+                      margin-left: 30px;
+                  }
+
+              }
+              .iconrside{
+                  max-width: 500px;
+                  float: right;
+                  position: relative;
+                  span{
+                      font-size: 13px;
+                      margin-right:6px;
+                      margin-left: 20px;
+                  }
+                  .speed-content{
+                      display: inline-block;
+                      span{
+                          position: relative;
+                          bottom:3px;
+                      }
+                  }
+                  .screen-content{
+                      display: inline;
+                      margin-left: 30px;
+                      position: absolute;
+                      right: 20px;
+                      .iconscreen{
+                          font-size: 18px;
+                          position: relative;
+                          cursor: pointer;
+                          margin-right: 20px;
+                          bottom: 3px;
+                      }
+                  }
+              }
+          }
+      }
+      .channel-content{
+        margin: 20px 30px;
+        padding: 0 34px 42px 34px;
+        position: relative;
+        .radio-group{
+          display: grid;
+          grid-template-columns: 240px 240px;
+          grid-template-rows: 30px;
+        }
+        .radio-class{
+          display: flex;
+          align-items: center;
+          >>> .el-radio__label{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .radio-img{
+            height: 26px;
+            width: 26px;
+            margin-right: 10px;
+          }
+          .radio-span{
+            display: inline-block;
+            max-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 14px;
+            color: #94a4b4;
+          }
+        }
+      }
+    }
   .attach-area{
     display:flex;
     flex-direction: row;

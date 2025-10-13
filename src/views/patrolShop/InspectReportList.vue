@@ -377,6 +377,9 @@ export default {
         //   'maxWidth': 60,
         //   'isExpand': false
         // },
+
+
+
         {
           'prop': 'storeName',
           'label': this.$t('remotePatrol.patrolStore'),
@@ -420,10 +423,10 @@ export default {
           'width': 100,
           'maxWidth': 100,
           'isExpand': false,
-          // 'hasIcon':{
-          //   icon:require('@/../static/img/table-help.png'),
-          //   tooltipContent : this.$t('remotePatrol.tableInspection')
-          // }
+          'hasIcon':{
+            icon:require('@/../static/img/table-help.png'),
+            tooltipContent : this.$t('remotePatrol.tableInspection')
+          }
         },
         // {
         //   'prop': 'modeText',
@@ -1049,7 +1052,13 @@ export default {
             tableObj.code = item.code ? item.code : '--';
 
             tableObj.modeText = item.mode === 0 ? self.$t('overview.remotePatrol') : self.$t('overview.onsitePatrol')
-            tableObj.tagName = item.tagName ;
+
+            var inspectMethod = ''
+            if(item.reportType == 0) inspectMethod = "現場巡檢"
+            else if(item.reportType == 1) inspectMethod = "網頁巡檢"
+            else if(item.reportType == 2) inspectMethod = "遠端巡檢"
+
+            tableObj.tagName = inspectMethod + '\n' + item.tagName  ;
 
             tableObj.id = item.id;
             tableObj.datestr = util.getDateStr(item.ts);

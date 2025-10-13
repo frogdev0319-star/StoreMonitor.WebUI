@@ -588,7 +588,7 @@ export default {
     "numReports": "reports",
     "tableSection": "Region I | regionII",
     "tableStore": "Site Name | Store Code",
-    "tableInspection": "Inspection List | Inspection Method"
+    "tableInspection": "Inspection Method | Inspection List"
   },
   "eventView": {
     "ClosedEvent": "Closed Events",

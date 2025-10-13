@@ -1,18 +1,18 @@
 <template>
   <div class="toolbar pagination">
     <el-button class="btnArrow" :style="btnStyle" icon="el-icon-arrow-left" :disabled="currentPage==1" @click="handlePrevClick"></el-button>
-    <div class="pageNum">{{currentPage}} </div>
-    <div class="pageNumTotal"> / {{total}}</div>
+    <div class="pageNum">{{currentPage}}</div>
+    <div class="pageNum" style="background-color: unset !important ">/</div>
+    <div class="pageNum" style="background-color: unset !important ">{{total}}</div>
     <el-button class="btnArrow" :style="btnStyle" icon="el-icon-arrow-right" :disabled="currentPage>=total" @click="handleNextClick"></el-button>
     <div v-if="showPageSize" class="pageSizeTitle">{{$t('overview.pageSize')}}</div>
     <div v-if="showPageSize" class="pageSize-select" :class="getLangStyleValue(pageSelectClass)">
           <el-select
             v-model="needPageSize"
             size="medium"
-            class="el-pagesize"
-            @change="handleSizeChange">
-            <el-option
-              v-for="item in pageSizeOption"
+            class="el-pagesize"            @change="handleSizeChange">
+          <el-option
+             v-for="item in pageSizeOption"
               :key="item.value"
               :label="item.label"
               :value="item.value"/>
@@ -190,7 +190,7 @@ export default {
     border: none;
   }
   .pageNum{
-    width: 48px;
+    width: 30px;
     height: 31px;
     padding-top: 8px;
     border-radius: 5px;
@@ -198,7 +198,7 @@ export default {
     color:#2b2b2b;
     font-family: Roboto;
     font-size: 13px;
-    margin-left: 16px;
+    margin-left: 5px;
     text-align: center;
   }
   .pageSizeTitle{

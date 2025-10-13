@@ -589,7 +589,7 @@ export default {
     "numReports": "筆",
     "tableSection": "區域一 | 區域二",
     "tableStore": "巡檢地點 | 地點代碼",
-    "tableInspection": "巡檢表 | 巡檢方式"
+    "tableInspection": "巡檢方式 | 巡檢表"
   },
   "eventView": {
     "ClosedEvent": "已結案事件",
