@@ -63,6 +63,7 @@
         <hr class="hr-horizontal">
         <el-scrollbar :class="showRolesList? 'showlist-el-menuscrollbar' : 'el-menuscrollbar'">
 
+          {{ this.roleNameList[1].children[6] }}
           <div
             v-for="(item,index) in roleNameList"
             :key="index" class="role-group"
@@ -163,6 +164,8 @@ export default {
             }
           ]
         },
+
+        // 巡檢管理/日常巡檢
         {
           roleName: this.$t('route.patrolShop'),
           checked: false,
@@ -179,7 +182,7 @@ export default {
               roleName: this.$t('overview.onsitePatrol'),
               checked: false,
               disabled: false,
-              visabled: true
+              visabled: false
             },
             {
               roleName: this.$t('route.reports'),
@@ -204,6 +207,12 @@ export default {
               checked: false,
               disabled: false,
               visabled: false
+            },
+            {
+              roleName: this.$t('route.webPatrol'),
+              checked: false,
+              disabled: false,
+              visabled: true
             }
           ]
         },
@@ -518,6 +527,7 @@ export default {
       this.roleNameList[1].children[3].checked = !!PermissionHelper.enablePatrolTask();
       this.roleNameList[1].children[4].checked = !!PermissionHelper.enableStoreMonitor();
       this.roleNameList[1].children[5].checked = !!PermissionHelper.enableTransactionPatrol();
+      this.roleNameList[1].children[6].checked = !!PermissionHelper.enableWebPatrol();
 
       this.roleNameList[2].children[0].checked = !!PermissionHelper.enableEventHandle();
       this.roleNameList[2].children[1].checked = !!PermissionHelper.enableEventClose();

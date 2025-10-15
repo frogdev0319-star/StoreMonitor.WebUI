@@ -20,7 +20,7 @@ export default class PermissionHelper {
     if (this.data.length === 0) {
       return true;
     }
-    if(index==6 && this.data.length<7){
+    if (index == 6 && this.data.length < 7) {
       this.data[index] = 274877906944;//全不勾,全勾:274877906951
     }
 
@@ -67,11 +67,15 @@ export default class PermissionHelper {
     return this.enableAuthorities(1, 0x0, 0x20);
   }
 
-  static enableStorePointCheck() {
+  // static enableStorePointCheck() {
+  //   return this.enableAuthorities(1, 0x0, 0x40);
+  // }
+  // static enableCustomers() {
+  //   return this.enableAuthorities(1, 0x0, 0x80);
+  // }
+
+  static enableWebPatrol() {
     return this.enableAuthorities(1, 0x0, 0x40);
-  }
-  static enableCustomers() {
-    return this.enableAuthorities(1, 0x0, 0x80);
   }
 
 
@@ -224,18 +228,18 @@ export default class PermissionHelper {
 
   //秘密客權限
   static enableMimicMode = false;
-  static setShowMimicMode(val){
-    console.log("setShowMimicMode:",val);
+  static setShowMimicMode(val) {
+    console.log("setShowMimicMode:", val);
     this.enableMimicMode = val;
   }
 
   //進階設定
 
-  
+
 
   static advancedMode = false;
-  static setAdvancedModeMode(val){
-    console.log("advancedMode:",val);
+  static setAdvancedModeMode(val) {
+    console.log("advancedMode:", val);
     this.advancedMode = val;
   }
 

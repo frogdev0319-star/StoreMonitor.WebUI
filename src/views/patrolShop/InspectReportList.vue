@@ -167,7 +167,7 @@
                     <div class="flex-center margin-bottom-5">
                       <div class="card-title">{{ item.storeName }} </div>
 
-                      <img :src="item.routeObj.reportType===1?remoteIcon:onsiteIcon" :height="25" alt="" >
+                      <img :src="item.routeObj.reportType=== 0 ? remoteIcon : onsiteIcon" :height="25" alt="" >
                     </div>
                     <div class="margin-bottom-5">{{ item.tagName }}</div>
                     <div class="status-tag_row">

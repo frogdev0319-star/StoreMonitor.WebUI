@@ -41,6 +41,27 @@
           @input="adviceChanged"
           @blur="notShowInputRuleTips"/>
         <span v-if="adviceInfoRuletip" class="rules">{{ $t('remotePatrol.comentRuletip_suggest') }}</span>
+
+
+        <!-- 加入檔案 & 簽名 v-if="isSignature" -->
+        <div class="audit-add-files">
+          <!-- <p style="margin-bottom: 10px"><span style="color: #c60957" >* </span></p> -->
+          <span class="sug-label"> {{$t('audit.auditStatus.addSign')}} </span>
+          <div class="attach-area" >
+            <div v-for="(imgItem,index) in signatureFileList" :key="'img'+index" class="source-details" >
+              <div class="img-content">
+                <i class="el-icon-close icondelete" @click="deleteSign({item:imgItem, index})" />
+                <el-image
+                  :src="imgItem.src"
+                  style="width:auto;height:100px; border:1px solid #dedede; border-radius: 5px;"
+                  :preview-src-list="getAuditImgList(index)"/>
+              </div>
+            </div>
+            <div class="upload-data" @click="showSignaturePad = true" v-if="signatureFileList.length == 0">
+              <i class="iconfont el-icon-document-add iconbangzhu" />  {{$t('audit.auditStatus.sign')}}
+            </div>
+          </div>
+        </div>
       </div>
     </el-col>
 
@@ -499,6 +520,24 @@
         <div class="dialog-content">{{ $t('remotePatrol.systemRejectMsg') }} </div>
       </div>
     </dialog-pop>
+
+    <dialog-pop
+      :title= "$t('audit.auditStatus.pleaseSign')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :visible="showSignaturePad"
+      @cancelHandler="clearSignature"
+      @confirmHandler="signSave"
+    >
+      <div style="padding: 0 20px; height: 300px">
+        <VueSignaturePad
+          id="signature"
+          ref="signaturePad" />
+      </div>
+    </dialog-pop>
+
+
   </el-row>
 </template>
 <script>
@@ -515,7 +554,6 @@ import filterString from '@/common/filterString.js';
 import Database from '@/common/Database.js';
 import PermissionHelper from '@/api/PermissionHelper';
 import DialogPop from '@/components/DialogPop';
-
 export default {
   name: 'ConfirmAddSum',
   components: {DialogPop},
@@ -611,7 +649,10 @@ export default {
       totalScoreSum: 0,
       hundredMarkType: 0,
 
-      isSystemAdvanced: false
+      isSystemAdvanced: false,
+      isSignature: false,
+      signatureFileList:[],
+      showSignaturePad: false,
     };
   },
   computed: {
@@ -777,51 +818,23 @@ export default {
         return `http://${bucketName}.${endpoint}/${fileName}`;
       }
     },
+
     upLoadFile(fileItem) {
       const self = this;
       self.percentage = 0;
-      if (self.oss.ossVendor === null) {
-        self.oss.ossVendor = 1; // 1 -aliyun  2-azure
-      }
-      if (self.oss.ossVendor === 1) {
-        const OSS = require('ali-oss');
-        const client = new OSS({
-          region: self.oss.ossEndPoint.slice(0, self.oss.ossEndPoint.indexOf('.')),
-          accessKeyId: self.oss.ossAccessKeyId,
-          accessKeySecret: self.oss.ossAccessKeySecret,
-          // bucket: 'viumo-'+self.accountId,
-          bucket: self.oss.ossBucketName
-        });
-        const name = fileItem.fileName;
-        return new Promise((resolve, reject) => {
-          client.put(name, fileItem.file, {
-            progress: function * (percentage, cpt) {
-              self.percentage = percentage;
-            }
+      const url = `https://${self.oss.ossEndPoint}/${self.oss.ossBucketName}${self.oss.ossAccessKeySecret}`;
+      const containerURL = new azblob.ContainerURL(url, azblob.StorageURL.newPipeline(new azblob.AnonymousCredential()));
+      const blockBlobURL = azblob.BlockBlobURL.fromContainerURL(containerURL, fileItem.fileName);
+      return new Promise((resolve, reject) => {
+        azblob.uploadBrowserDataToBlockBlob(azblob.Aborter.none, fileItem.file, blockBlobURL)
+          .then((results) => {
+            const url = self.getFileUrl(fileItem.fileName);
+            resolve(url);
           })
-            .then((results) => {
-              const url = self.getFileUrl(results.name);
-              resolve(url);
-            })
-            .catch((err) => {
-              reject(err);
-            });
-        });
-      } else {
-        const url = `https://${self.oss.ossEndPoint}/${self.oss.ossBucketName}${self.oss.ossAccessKeySecret}`;
-        const containerURL = new azblob.ContainerURL(url, azblob.StorageURL.newPipeline(new azblob.AnonymousCredential()));
-        const blockBlobURL = azblob.BlockBlobURL.fromContainerURL(containerURL, fileItem.fileName);
-        return new Promise((resolve, reject) => {
-          azblob.uploadBrowserDataToBlockBlob(azblob.Aborter.none, fileItem.file, blockBlobURL)
-            .then((results) => {
-              const url = self.getFileUrl(fileItem.fileName);
-              resolve(url);
-            })
-            .catch((error) => {
-              reject(error);
-            });
-        });
-      }
+          .catch((error) => {
+            reject(error);
+          });
+      });
     },
 
 
@@ -1092,6 +1105,29 @@ export default {
           return false;
       }
 
+
+      //上傳簽核簽名檔
+      console.log('self.signatureFileList :>> ', self.signatureFileList);
+      var oriSignature = []
+      if(self.signatureFileList.length > 0){
+        for(let idx=0; idx < self.signatureFileList.length; idx++){
+          await self.upLoadFile(self.signatureFileList[idx]).then((url) => {
+            console.log("upload file url:",url);
+            self.uploadingnumOfPic++;
+            const signatureObj = {
+              type: 1,
+              content: url,
+            };
+            oriSignature.push(signatureObj);
+          }).catch((err) => {
+            console.log("uploade file error:",err)
+            upload++;
+          });
+        }
+      }
+
+
+
       let curSumIndex = [];
       curSumIndex = self.resultList.filter(x => x.isActive);
       status = curSumIndex[0].label;
@@ -1106,7 +1142,8 @@ export default {
         feedback: feedEventList,
         isMysteryMode:PermissionHelper.enableMimicMode,
         isCreateEvent:sendEvent,
-        reportType: 2,
+        reportType: 1,
+        signatures : oriSignature
 
         // ==== 簽名檔案 ====
         // signatures: [
@@ -2486,10 +2523,151 @@ export default {
 
         }
       }
-    }
+    },
+
+    signSave() {
+      const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
+      // console.log(isEmpty);
+      // console.log(data);
+      const self = this;
+      if(!isEmpty){
+        var objSignature ={
+          fileName:`${self.bucketImage}/inspect_${util.getCurTimeStr()}_signature.png`,
+          src: data,
+          file: util.base64ToBlob(data),
+          type:'image/png',
+          size: ''
+        };
+        // self.createFile(files[0],objSignature);
+        self.signatureFileList.push(objSignature);
+
+      }
+      console.log('self.signatureFileList :>> ', self.signatureFileList);
+      self.showSignaturePad = false
+    },
+
+    signUndo() {
+      this.$refs.signaturePad.undoSignature();
+    },
+    clearSignature(){
+      this.$refs.signaturePad.clearSignature()
+      this.showSignaturePad = false
+      this.signatureFileList = []
+    },
+
+
+    deleteSign({item, index}) {
+      const self = this;
+      self.signatureFileList = []
+      this.$refs.signaturePad.clearSignature()
+
+    },
+
+
   }
 };
 </script>
+<style lang="sass" scoped>
+  .audit-add-files
+    margin-top: 25px
+    p
+      font-weight: 900
+    .upload-data
+      height: 75px
+      width: 100px
+      border-radius: 10px
+      display: flex
+      flex-direction: row
+      justify-content: center
+      align-items: center
+      cursor: pointer
+
+      font-size: 13px
+      color: #006ab7
+      display: flex
+      flex-direction: row
+      justify-content: center
+      align-items: center
+      box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.2)
+      cursor: pointer
+      i
+        color: #006ab7
+        font-size: 15px
+        margin-right: 3px
+    .upload-imgs
+      img
+        margin-top: 10px
+        margin-right: 10px
+        width: 200px
+        border-radius: 4px
+  .attach-area
+    display: flex
+    flex-wrap: wrap
+    align-content: flex-start
+    align-self: flex-start
+
+    .attach-add
+      height: 100px
+      width: 160px
+      border-radius: 10px
+      box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.2)
+      display: flex
+      flex-direction: row
+      justify-content: center
+      align-items: center
+      cursor: pointer
+      .att-txt
+        font-size: 14px
+        color: #006ab7
+        margin-left: 3px
+    .source-details
+      display: inline-block
+      margin-right: 15px
+      position: relative
+      .icondelete
+        position: absolute
+        font-size: 14px
+        right: 5px
+        margin-top: 8px
+        z-index: 2
+        color: #fff
+        cursor: pointer
+        background-color: rgba(0,0,0, 0.8)
+        border-radius: 50%
+
+      .img-content
+        width: 100%
+        height: 100%
+        position: relative
+
+      .pdf-content
+        width: 140px
+        height: 30px
+        padding: 1px 0px 1px 12px
+        border-radius: 5px
+        box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1)
+        background-color: #fff
+        display: flex
+        flex-direction: row
+        align-items: center
+        justify-content: flex-start
+        span
+          display: block
+          width: 110px
+          white-space: nowrap
+          overflow: hidden
+          text-overflow: ellipsis
+          font-size: 12px
+  #signature
+    width: 500px
+    height: 500px
+    border: 1px solid #ddd
+    border-radius: 5px
+    // background-image: linear-gradient(white, white)
+    // background-origin: border-box
+    // background-clip: content-box, border-box
+
+</style>
 <style lang="scss" scoped>
   $red:#2c90d9;
   $black:#182752;
