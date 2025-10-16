@@ -189,7 +189,7 @@ export const navbarRoute = {
     ) && primaryPathesList.push('/report', '/reportdetails');
 
     // 網頁巡檢
-    !PermissionHelper.advancedMode && (PermissionHelper.enableMimicMode || PermissionHelper.enableRemoteInspect()) && patrolRoute.children.push(
+    !PermissionHelper.advancedMode && (PermissionHelper.enableMimicMode || PermissionHelper.enableWebPatrol()) && patrolRoute.children.push(
       {
         path: '/webinspection',
         name: 'webPatrol',

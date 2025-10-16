@@ -42,41 +42,37 @@ export default class PermissionHelper {
     return this.enableAuthorities(0, 0x0, 0x2);
   }
 
+
+
   // index(1) => ID(2): Inspection
   static enableRemoteInspect() {
     return this.enableAuthorities(1, 0x0, 0x1);
   }
-
   static enableLocalInspect() {
     return this.enableAuthorities(1, 0x0, 0x2);
   }
-
   static enableInspectReport() {
     return this.enableAuthorities(1, 0x0, 0x4);
   }
-
   static enablePatrolTask() {
     return this.enableAuthorities(1, 0x0, 0x8);
   }
-
   static enableStoreMonitor() {
     return this.enableAuthorities(1, 0x0, 0x10);
   }
-
   static enableTransactionPatrol() {
     return this.enableAuthorities(1, 0x0, 0x20);
   }
-
-  // static enableStorePointCheck() {
-  //   return this.enableAuthorities(1, 0x0, 0x40);
-  // }
-  // static enableCustomers() {
-  //   return this.enableAuthorities(1, 0x0, 0x80);
-  // }
-
-  static enableWebPatrol() {
+  static enableStorePointCheck() {
     return this.enableAuthorities(1, 0x0, 0x40);
   }
+  static enableCustomers() {
+    return this.enableAuthorities(1, 0x0, 0x80);
+  }
+  static enableWebPatrol() {
+    return this.enableAuthorities(1, 0x0, 0x100);
+  }
+
 
 
   // index(2) => ID(4): Event
