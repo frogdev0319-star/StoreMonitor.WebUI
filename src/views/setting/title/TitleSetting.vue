@@ -526,7 +526,7 @@ export default {
 
     getAvailableAuthority(authorities, resetFlag = true) {
 
-      console.log('authorities :>> ', authorities);
+      console.log('authorities :::::>> ', authorities);
       PermissionHelper.setData(authorities);
       this.roleNameList[0].children[0].checked = !!PermissionHelper.enableRemoteOverview();
       this.roleNameList[0].children[1].checked = !!PermissionHelper.enableEventOverview();
@@ -727,6 +727,18 @@ export default {
 
       console.log('this.infoForm.authorities[1]', this.infoForm.authorities[1])
 
+    },
+    // ✅ 臨時修正方案：將超大權限值轉為 BigInt 字串避免浮點誤差
+    beforeSaveAuthorities() {
+      if (this.infoForm && Array.isArray(this.infoForm.authorities)) {
+        this.infoForm.authorities = this.infoForm.authorities.map(v => {
+          try {
+            return BigInt(v).toString();
+          } catch (e) {
+            return v.toString();
+          }
+        });
+      }
     },
 
     updateBasicInformation() {

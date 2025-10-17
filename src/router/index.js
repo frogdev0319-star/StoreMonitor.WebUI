@@ -166,6 +166,10 @@ export const navbarRoute = {
 
 
     // 巡檢報告
+
+    console.log('PermissionHelper.enableMimicMode()', PermissionHelper.enableMimicMode)
+    console.log('PermissionHelper.enableWebPatrol()', PermissionHelper.enableWebPatrol())
+
     !PermissionHelper.advancedMode && (PermissionHelper.enableMimicMode || PermissionHelper.enableInspectReport()) && patrolRoute.children.push(
       {
         path: '/report',
