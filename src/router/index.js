@@ -73,6 +73,11 @@ export const navbarRoute = {
       isReadOnly: false,
       children: []
     };
+
+    console.log('PermissionHelper.enableRemoteOverview()', PermissionHelper.enableRemoteOverview())
+    console.log('PermissionHelper.enableEventOverview()', PermissionHelper.enableEventOverview())
+
+
     !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableRemoteOverview() && overviewRoute.children.push({
       path: '/patrolOverview',
       name: 'patrolOverview',
@@ -96,11 +101,6 @@ export const navbarRoute = {
 
   // 巡檢管理
   getPatrolRoute() {
-
-    console.log("PermissionHelper.enableInspectReport()", PermissionHelper.enableInspectReport());
-    console.log("PermissionHelper.advancedMode", PermissionHelper.advancedMode);
-    console.log("PermissionHelper.enableMimicMode", PermissionHelper.enableMimicMode);
-
     const patrolRoute = {
       id: 1,
       path: '/home',
@@ -167,7 +167,11 @@ export const navbarRoute = {
 
     // 巡檢報告
 
-    console.log('PermissionHelper.enableMimicMode()', PermissionHelper.enableMimicMode)
+
+    console.log('PermissionHelper.enableInspectReport()', PermissionHelper.enableInspectReport())
+    console.log('PermissionHelper.enableTransactionPatrol()', PermissionHelper.enableTransactionPatrol())
+    console.log('PermissionHelper.enableStorePointCheck()', PermissionHelper.enableStorePointCheck())
+    console.log('PermissionHelper.enableCustomers()', PermissionHelper.enableCustomers())
     console.log('PermissionHelper.enableWebPatrol()', PermissionHelper.enableWebPatrol())
 
     !PermissionHelper.advancedMode && (PermissionHelper.enableMimicMode || PermissionHelper.enableInspectReport()) && patrolRoute.children.push(

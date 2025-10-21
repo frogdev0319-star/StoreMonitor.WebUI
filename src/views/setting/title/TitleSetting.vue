@@ -542,7 +542,7 @@ export default {
       this.roleNameList[1].children[7].checked = !!PermissionHelper.enableCustomers();
       this.roleNameList[1].children[8].checked = !!PermissionHelper.enableWebPatrol();
 
-      console.log('!!PermissionHelper.enableWebPatrol() :>> ', !!PermissionHelper.enableWebPatrol());
+      console.log('!!PermissionHelper.enableWebPatrol() :>> ', PermissionHelper.enableWebPatrol());
 
       this.roleNameList[2].children[0].checked = !!PermissionHelper.enableEventHandle();
       this.roleNameList[2].children[1].checked = !!PermissionHelper.enableEventClose();
