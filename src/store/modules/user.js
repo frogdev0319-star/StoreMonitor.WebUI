@@ -424,7 +424,7 @@ const user = {
         const accessedRoutes = [];
         // 確保先載入 nfc_checkin 狀態，避免非同步問題
         await dispatch('GetEpaperNfcCheckin');
-        console.log("user.state.authorities:~~~>>>", user.state.authorities);
+        // console.log("user.state.authorities:~~~>>>", user.state.authorities);
         // console.log("user.state:~~~>>>",user.state);
 
         if (user.state.authorities.length > 0) {

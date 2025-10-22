@@ -363,6 +363,8 @@ export default {
       inspectStatus: '',
       selectedInstantStore: [],
       storeList: [],
+      inspectTagId: null
+
 
 
     };
@@ -823,6 +825,9 @@ export default {
       this.timeMode = daysDiff <= 30 ? 1 : 2;
       this.params.beginTs = start;
       this.params.endTs = end;
+      this.params.inspectTagId = this.inspectTagId;
+
+
 
       // 2024 sprint2 新增
       // this.params.storeIds = [];
@@ -963,7 +968,8 @@ export default {
       var overviewParam = {
           beginTs: this.params.beginTs,
           endTs: this.params.endTs,
-          storeIds: this.selectedInstantStore
+          storeIds: this.selectedInstantStore,
+          inspectTagId: this.inspectTagId
       }
       console.log('overviewParam ~~~~>> ', overviewParam);
 
@@ -1026,6 +1032,7 @@ export default {
       this.params.storeIds = this.selectedInstantStore
 
 
+
       try {
         const bestAndWorstStoreRes = await self.getInspectStatsOverStore(this.params);
         const errCode = bestAndWorstStoreRes.errCode;
@@ -1065,7 +1072,8 @@ export default {
       const overviewParam = {
           beginTs: this.params.beginTs,
           endTs: this.params.endTs,
-          storeIds: this.selectedInstantStore
+          storeIds: this.selectedInstantStore,
+          inspectTagId: this.inspectTagId
       }
 
       const inspectItems = await self.getInspectStatsItemInfo(overviewParam);
@@ -1208,6 +1216,9 @@ export default {
       params.lowestFirst = self.isWorstWork;
       params.numOfPerson = 5;
       params.storeIds = this.selectedInstantStore;
+      params.inspectTagId = this.inspectTagId
+
+
       try {
         const result = await self.getInspectStatsOverPerson(params);
         const tempTaskList = [];
@@ -1247,7 +1258,8 @@ export default {
       var overviewParam = {
           beginTs: this.params.beginTs,
           endTs: this.params.endTs,
-          storeIds: this.selectedInstantStore
+          storeIds: this.selectedInstantStore,
+          inspectTagId: this.inspectTagId
       }
       try {
         const result = await self.getPassRateAndInspectRate(overviewParam);
@@ -1581,6 +1593,8 @@ export default {
       params.region = 1;
       params.timeMode = self.timeMode;
       params.storeIds = this.selectedInstantStore
+      params.inspectTagId = this.inspectTagId
+
 
       const result = await self.getInspectResultOverRegion(params);
       if (result.errCode === 0) {
