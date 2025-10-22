@@ -62,7 +62,6 @@
 
         <hr class="hr-horizontal">
         <el-scrollbar :class="showRolesList? 'showlist-el-menuscrollbar' : 'el-menuscrollbar'">
-
           <div
             v-for="(item,index) in roleNameList"
             :key="index" class="role-group"
@@ -163,6 +162,8 @@ export default {
             }
           ]
         },
+
+        // 巡檢管理/日常巡檢
         {
           roleName: this.$t('route.patrolShop'),
           checked: false,
@@ -179,10 +180,10 @@ export default {
               roleName: this.$t('overview.onsitePatrol'),
               checked: false,
               disabled: false,
-              visabled: true
+              visabled: false
             },
             {
-              roleName: this.$t('route.reports'),
+              roleName: this.$t('route.reports'), // 巡檢報告
               checked: false,
               disabled: false,
               visabled: true
@@ -204,6 +205,24 @@ export default {
               checked: false,
               disabled: false,
               visabled: false
+            },
+            {
+              roleName: "temp1",
+              checked: false,
+              disabled: false,
+              visabled: false
+            },
+            {
+              roleName: "temp2",
+              checked: false,
+              disabled: false,
+              visabled: false
+            },
+            {
+              roleName: this.$t('route.webPatrol'), //網頁巡檢
+              checked: false,
+              disabled: false,
+              visabled: true
             }
           ]
         },
@@ -507,17 +526,23 @@ export default {
 
     getAvailableAuthority(authorities, resetFlag = true) {
 
-      console.log('authorities :>> ', authorities);
+      console.log('authorities :::::>> ', authorities);
       PermissionHelper.setData(authorities);
       this.roleNameList[0].children[0].checked = !!PermissionHelper.enableRemoteOverview();
       this.roleNameList[0].children[1].checked = !!PermissionHelper.enableEventOverview();
 
+      // 巡檢管理
       this.roleNameList[1].children[0].checked = !!PermissionHelper.enableRemoteInspect();
       this.roleNameList[1].children[1].checked = !!PermissionHelper.enableLocalInspect();
       this.roleNameList[1].children[2].checked = !!PermissionHelper.enableInspectReport();
       this.roleNameList[1].children[3].checked = !!PermissionHelper.enablePatrolTask();
       this.roleNameList[1].children[4].checked = !!PermissionHelper.enableStoreMonitor();
       this.roleNameList[1].children[5].checked = !!PermissionHelper.enableTransactionPatrol();
+      this.roleNameList[1].children[6].checked = !!PermissionHelper.enableStorePointCheck();
+      this.roleNameList[1].children[7].checked = !!PermissionHelper.enableCustomers();
+      this.roleNameList[1].children[8].checked = !!PermissionHelper.enableWebPatrol();
+
+      console.log('!!PermissionHelper.enableWebPatrol() :>> ', PermissionHelper.enableWebPatrol());
 
       this.roleNameList[2].children[0].checked = !!PermissionHelper.enableEventHandle();
       this.roleNameList[2].children[1].checked = !!PermissionHelper.enableEventClose();
@@ -630,6 +655,10 @@ export default {
     },
 
     saveBasicInfo() {
+
+
+
+
       this.getSelectedAuthorities();
       this.updateBasicInformation().then(res => {
         if (res.errCode === 0) {
@@ -642,16 +671,19 @@ export default {
       }).catch(error => {
         console.log('TitleSetting-updateBasicInformation: ' + error);
       });
+
+      console.log('WebPatrol bit:', this.roleNameList[1].children[8].checked);
+      console.log('authorities[1]:', this.infoForm.authorities[1].toString(2));
     },
 
     getSelectedAuthorities() {
       this.infoForm.authorities = [];
       const decAuthorityNum = Math.pow(2, 32);
       const newAuth = this.roleNameList.slice(0);
-      console.log('newAuth', newAuth)
+      console.log('newAuth[]', newAuth[1])
 
       const auditElement = newAuth.splice(4,2);//將簽核權限,排程管理提出來，往後放 備註:4原本是系統設定
-      console.log('auditElement', auditElement)
+      // console.log('auditElement', auditElement)
 
       newAuth.push.apply(newAuth,auditElement);
       newAuth.forEach((item, index) => {
@@ -665,43 +697,48 @@ export default {
           if(_item.checked){
             if(index === 4 && _index === 0){
               tempAuthorityNum += Math.pow(2, 0);
-              console.log('xdxdxd 0' , tempAuthorityNum)
             }
             else if(index === 4 && _index === 1){
               tempAuthorityNum += Math.pow(2, 1);
-              console.log('xdxdxd 1' , tempAuthorityNum)
             }
             else if(index === 4 && _index === 2){
               tempAuthorityNum += Math.pow(2, 2);
-              console.log('xdxdxd 2' , tempAuthorityNum)
             }
             else if(index === 4 && _index === 4){
               tempAuthorityNum += Math.pow(2, 4);
-              console.log('xdxdxd 4' , tempAuthorityNum)
             }
             else if(index === 4 && _index === 5){
               tempAuthorityNum += Math.pow(2, 5);
-              console.log('xdxdxd 5' , tempAuthorityNum)
             }
             else if(index === 4 && _index === 6){
               tempAuthorityNum += Math.pow(2, 6);
-              console.log('xdxdxd 6' , tempAuthorityNum)
             }
             else {
-              console.log('!!!')
               tempAuthorityNum += Math.pow(2, _index);
             }
           }
         });
-        this.infoForm.authorities.push(tempAuthorityNum);
+        this.infoForm.authorities.push(Number(tempAuthorityNum));
       });
       let videoAndMessNum = Math.pow(2, 5) * decAuthorityNum;
       this.ifAccessVideo && (videoAndMessNum += Math.pow(2, 0));
       this.ifReceiveMes && (videoAndMessNum += Math.pow(2, 1));
       this.infoForm.authorities.push(videoAndMessNum);
 
-      console.log('this.infoForm.authorities', this.infoForm.authorities)
+      console.log('this.infoForm.authorities[1]', this.infoForm.authorities[1])
 
+    },
+    // ✅ 臨時修正方案：將超大權限值轉為 BigInt 字串避免浮點誤差
+    beforeSaveAuthorities() {
+      if (this.infoForm && Array.isArray(this.infoForm.authorities)) {
+        this.infoForm.authorities = this.infoForm.authorities.map(v => {
+          try {
+            return BigInt(v).toString();
+          } catch (e) {
+            return v.toString();
+          }
+        });
+      }
     },
 
     updateBasicInformation() {
@@ -727,7 +764,13 @@ export default {
       });
     },
 
-    checkParentRole(index) {
+    checkParentRole(index , val) {
+
+      // console.log('checkParentRole index :>> ', index);
+      // console.log('checkParentRole val :>> ', val);
+
+      // console.log('this.roleNameList :>> ', this.roleNameList);
+
       const self = this;
       const parentDisable = self.roleNameList[index].disabled;
       let childrenCheckedNum = 0;

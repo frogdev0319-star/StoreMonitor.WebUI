@@ -106,7 +106,9 @@
       </div>
       <div class="splitline" v-if="isAuditMode"></div>
       <div class="left-header">
-        <img :src="report.inspectSrc" :class="isexportPDF ? 'pdf-title-icon' : 'title-icon'">
+
+        <img :src="report.inspectImg" :class="isexportPDF ? 'pdf-title-icon' : 'title-icon'">
+
         <p :class="{'pdf-report-title': isexportPDF, 'report-title': !isexportPDF, 'nochart-report-title': !hasChart}">
           {{ accountName + ' | ' + report.storeName+' '+report.tagName }}
           <span v-if="!isexportPDF">{{ ' ('+report.inspectType+')' }}</span>
@@ -120,24 +122,28 @@
       </div>
       <div class="info-content">
         <div class="pdf_font_24" style="display: flex; flex-direction: row; align-items: center; justify-content: flex-start">
+
+            checkinType:  {{ checkinType }} <br>
             <span class="info-label">{{ $t('remotePatrol.submitter') }}</span>
             <span :class="isexportPDF ? 'pdf-info-value' : 'info-value'">{{ report.submitterName }}</span>
 
             <span class="info-label">{{ $t('remotePatrol.generateTime')+'：' }}</span>
             <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
-
             <span class="ignoreSign" v-if="report.isCheckInIgnore"> {{ $t('addition.skipSignin') }} </span>
 
             <!-- 簽到時間 -->
-            <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.signInTime')+'：' }}</span>
-            <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ signInTime }} </span>
+            <div v-if="report.reportType == 0">
+            <span v-if=" !isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.signInTime')+'：' }}</span>
+            <span v-if=" !isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ signInTime }} </span>
+            </div>
             <!-- 巡檢花費時間 -->
+            <div v-if="report.reportType == 0">
             <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.patrolTime')+'：' }}</span>
             <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">{{ inceptionExecutTime }}</span>
-
+            </div>
 
             <!-- 簽到距離 -->
-            <div v-if="checkinType == 0" style="display: flex; flex-direction: row; align-items: center; justify-content: flex-start">
+            <div v-if="report.reportType == 0" style="display: flex; flex-direction: row; align-items: center; justify-content: flex-start">
               <span v-if="!isexportPDF && hasSignRecord" class="info-label">{{ $t('remotePatrol.signInDistance')+'：' }}</span>
               <span v-if="!isexportPDF && hasSignRecord && signInDistance !== -1">{{ $t('remotePatrol.aroundDistance')  }}</span>
               <span v-if="!isexportPDF && hasSignRecord" :class="isexportPDF ? 'pdf-info-value' : ''">
@@ -797,8 +803,8 @@ export default {
       showMaxInfo: false,
 
       videoSrc: require('../../../static/img/monitor.png'),
-      inspectSrc: require('../../../static/img/remote_patrol.png'),
-      insiteInspectSrc: require('../../../static/img/onsite_patrol.png'),
+      inspectSrc: require('../../../static/img/MdiCellphoneAndroid.svg'),
+      insiteInspectSrc: require('../../../static/img/MdiMonitorDashboard.svg'),
       report: null,
       suggest: '',
       totalScore: '',
@@ -1664,7 +1670,6 @@ export default {
 
       if(routeData && !self.isAuditMode){
         const obj = {};
-        console.log("self.$route.params.reportId:",self.$route.params.reportId);
         obj.reportId = routeData.id;
         obj.storeName = routeData.storeName;
         obj.status = routeData.status;
@@ -1673,18 +1678,18 @@ export default {
         obj.tagName = routeData.tagName;
         obj.iconSrc = this.getIconSrc(routeData.status);
         obj.isCheckInIgnore = routeData.isCheckInIgnore
-        switch (routeData.mode) {
+        switch (routeData.reportType) {
           case 0:
-            obj.inspectSrc = self.inspectSrc;
-            obj.inspectType = self.$t('overview.remotePatrol');
-            break;
-          case 1:
-            obj.inspectSrc = self.insiteInspectSrc;
-            self.isInsiteInspect = true;
+            obj.inspectImg = self.inspectSrc;
             obj.inspectType = self.$t('overview.onsitePatrol');
             break;
+          case 1:
+            obj.inspectImg = self.insiteInspectSrc;
+            self.isInsiteInspect = true;
+            obj.inspectType = self.$t('route.webPatrol');
+            break;
           default:
-            obj.inspectSrc = self.videoSrc;
+            obj.inspectImg = self.videoSrc;
             break;
         }
         self.report = obj;
@@ -1698,7 +1703,7 @@ export default {
         obj.tagName = '';
         obj.iconSrc = '';
         obj.inspectType = self.$t('overview.remotePatrol');
-        obj.inspectSrc = self.inspectSrc;
+        obj.inspectImg = self.inspectSrc;
         self.report = obj;
       }
     },
@@ -1844,20 +1849,20 @@ export default {
       const self = this;
       if (res.errCode === 0 && res.data.length > 0) {
         const data = res.data[0].info;
-
-        switch (data.mode) {
+        switch (data.reportType) {
           case 0:
-            self.report.inspectSrc = self.inspectSrc;
-            self.report.inspectType = self.$t('overview.remotePatrol');
+            self.report.inspectImg = self.inspectSrc;
+            self.report.inspectType = self.$t('overview.onsitePatrol');
             break;
           case 1:
             console.log("data.mode:",data.mode);
-            self.report.inspectSrc = self.insiteInspectSrc;
+            self.report.inspectImg = self.insiteInspectSrc;
             self.isInsiteInspect = true;
-            self.report.inspectType = self.$t('overview.onsitePatrol');
+            self.report.inspectType = self.$t('route.webPatrol');
             self.showEditBtn = false;
             break;
         }
+        console.log('data :>> ', data);
         console.log('this.report :>> ', this.report);
 
 
@@ -1867,6 +1872,8 @@ export default {
         this.report.submitterName = data.submitterName;
         this.report.tagName = data.tagName;
         this.report.iconSrc = this.getIconSrc(data.status);
+        this.report.reportType = data.reportType
+
         //this.getStoreLongitudeLatitude(data.storeId);
         this.totalScore = data.totalScore;
         this.standard = data.standard;

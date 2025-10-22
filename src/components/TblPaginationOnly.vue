@@ -2,16 +2,17 @@
   <div class="toolbar pagination">
     <el-button class="btnArrow" :style="btnStyle" icon="el-icon-arrow-left" :disabled="currentPage==1" @click="handlePrevClick"></el-button>
     <div class="pageNum">{{currentPage}}</div>
+    <div class="pageNum" style="background-color: unset !important ">/</div>
+    <div class="pageNum" style="background-color: unset !important ">{{total}}</div>
     <el-button class="btnArrow" :style="btnStyle" icon="el-icon-arrow-right" :disabled="currentPage>=total" @click="handleNextClick"></el-button>
     <div v-if="showPageSize" class="pageSizeTitle">{{$t('overview.pageSize')}}</div>
     <div v-if="showPageSize" class="pageSize-select" :class="getLangStyleValue(pageSelectClass)">
           <el-select
             v-model="needPageSize"
             size="medium"
-            class="el-pagesize"
-            @change="handleSizeChange">
-            <el-option
-              v-for="item in pageSizeOption"
+            class="el-pagesize"            @change="handleSizeChange">
+          <el-option
+             v-for="item in pageSizeOption"
               :key="item.value"
               :label="item.label"
               :value="item.value"/>
@@ -40,7 +41,7 @@
 <script>
 import util from '@/common/util.js';
 export default {
-  
+
   name:'TblPaginationOnly',
   props: {
     total: {
@@ -90,7 +91,7 @@ export default {
   },
   watch:{
     total:{
-      immediate: false, 
+      immediate: false,
       deep: true,
       handler (val) {
         // console.log("page total:",val);
@@ -100,11 +101,11 @@ export default {
             this.currentPage = this.currentPage-1;
             this.handleCurrentChange(this.currentPage);
           }
-          
+
       }
     },
     currentPage:{
-      immediate: false, 
+      immediate: false,
       deep: true,
       handler (val) {
         if(val>0)this.currentPage = val;
@@ -116,9 +117,9 @@ export default {
     return {
       lang:this.$i18n.locale,
       pageSizeList: [
-        {value:10,label:"10 "+this.$t('overview.pageSizeUnit')}, 
-        {value:20,label:"20 "+this.$t('overview.pageSizeUnit')}, 
-        {value:50,label:"50 "+this.$t('overview.pageSizeUnit')}, 
+        {value:10,label:"10 "+this.$t('overview.pageSizeUnit')},
+        {value:20,label:"20 "+this.$t('overview.pageSizeUnit')},
+        {value:50,label:"50 "+this.$t('overview.pageSizeUnit')},
         {value:100,label:"100 "+this.$t('overview.pageSizeUnit')}
         ],
       pageSelectClass:[
@@ -136,7 +137,7 @@ export default {
     getLangStyleValue(langArray){
       return util.getLangStyleValue(langArray);
     },
-    handleCurrentChange(currentPage) { 
+    handleCurrentChange(currentPage) {
       const pageObj = {
         page: currentPage,
         size: this.pageSize
@@ -147,7 +148,7 @@ export default {
     handleSizeChange(needPageSize) {
       console.log("handleSizeChange:",needPageSize);
       console.log("this.pageSize:",this.pageSize);
-      
+
 
 
       const pageObj = {
@@ -157,7 +158,7 @@ export default {
 
       this.$emit('sizeChange', pageObj);
     },
-    
+
     handlePrevClick(){
       if(this.currentPage>1){
         this.handleCurrentChange(this.currentPage-1)
@@ -189,7 +190,7 @@ export default {
     border: none;
   }
   .pageNum{
-    width: 48px;
+    width: 30px;
     height: 31px;
     padding-top: 8px;
     border-radius: 5px;
@@ -197,7 +198,7 @@ export default {
     color:#2b2b2b;
     font-family: Roboto;
     font-size: 13px;
-    margin-left: 16px;
+    margin-left: 5px;
     text-align: center;
   }
   .pageSizeTitle{
@@ -215,7 +216,7 @@ export default {
     border-radius: 5px;
     background-color: #edf0f2;
     margin-left: 16px;
-    
+
   }
   .en-pageSize-select{
     width:103px;
@@ -246,8 +247,8 @@ export default {
     .el-input__icon{
       line-height: 31px;
     }
-  } 
-  
+  }
+
 </style>
 <style>
   @import "../assets/css/pagination.css";

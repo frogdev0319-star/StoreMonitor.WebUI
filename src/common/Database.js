@@ -44,7 +44,7 @@ export default class Database {
   static removeDataFromDB(Id) {
     return new Promise((resolve, reject) => {
       this.DataBase.get(Id).then(doc => {
-        this.DataBase.remove(doc).then(res=>{
+        this.DataBase.remove(doc).then(res => {
           resolve(0);
         });
       }).catch(err => {
@@ -66,14 +66,14 @@ export default class Database {
           throw err;
         }
       }).then((hasDataFlag) => {
-        console.log("****hasDataFlag:",hasDataFlag);
+        console.log("****hasDataFlag:", hasDataFlag);
         if (hasDataFlag === true) {
           return this.DataBase.put(text);
         } else if (hasDataFlag.data) {
           hasDataFlag.data = text.data;
           hasDataFlag.rule = text.rule;
           return this.DataBase.put(hasDataFlag);
-        } else{
+        } else {
           text['_rev'] = hasDataFlag._rev;
           return this.DataBase.put(text);
         }

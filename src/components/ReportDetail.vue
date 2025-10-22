@@ -200,8 +200,8 @@ export default {
 
     imageStyle() {
       return {
-        'width': 'calc(130/1920*100vw)',
-        'height': `${this.imgHeight}px`
+        // 'width': 'calc(130/1920*100vw)',
+        'height': `75px`
       }
     }
   },
@@ -430,9 +430,9 @@ export default {
               top: 50%;
               transform: translate(-50%,-50%);
             }
-            .imgLittle{
-              min-width: 70px;
-            }
+            // .imgLittle{
+            //   min-width: 70px;
+            // }
           }
           @media screen and (min-width: 1280px) and(max-width: 1366px){
             width: 90px;

@@ -20,18 +20,21 @@ export default class PermissionHelper {
     if (this.data.length === 0) {
       return true;
     }
-    if(index==6 && this.data.length<7){
+    if (index == 6 && this.data.length < 7) {
       this.data[index] = 274877906944;//全不勾,全勾:274877906951
     }
 
     // console.log('bigEndian', bigEndian)
     // console.log('littleEndian', littleEndian)
+    // console.log('this.data :>> ', this.data);
     const authority = new Uint64BE(this.data[index].toString()).toString(10);
     const base = new Uint64BE(bigEndian, littleEndian).toString(10);
+    // console.log('index', index)
     // console.log('authority', authority)
     // console.log('base', base)
     return authority & base;
   }
+
 
   // index(0) => ID(1): Overview
   static enableRemoteOverview() {
@@ -42,37 +45,37 @@ export default class PermissionHelper {
     return this.enableAuthorities(0, 0x0, 0x2);
   }
 
+
+
   // index(1) => ID(2): Inspection
   static enableRemoteInspect() {
     return this.enableAuthorities(1, 0x0, 0x1);
   }
-
   static enableLocalInspect() {
     return this.enableAuthorities(1, 0x0, 0x2);
   }
-
   static enableInspectReport() {
     return this.enableAuthorities(1, 0x0, 0x4);
   }
-
   static enablePatrolTask() {
     return this.enableAuthorities(1, 0x0, 0x8);
   }
-
   static enableStoreMonitor() {
     return this.enableAuthorities(1, 0x0, 0x10);
   }
-
   static enableTransactionPatrol() {
     return this.enableAuthorities(1, 0x0, 0x20);
   }
-
   static enableStorePointCheck() {
     return this.enableAuthorities(1, 0x0, 0x40);
   }
   static enableCustomers() {
     return this.enableAuthorities(1, 0x0, 0x80);
   }
+  static enableWebPatrol() {
+    return this.enableAuthorities(1, 0x0, 0x100);
+  }
+
 
 
   // index(2) => ID(4): Event
@@ -224,18 +227,18 @@ export default class PermissionHelper {
 
   //秘密客權限
   static enableMimicMode = false;
-  static setShowMimicMode(val){
-    console.log("setShowMimicMode:",val);
+  static setShowMimicMode(val) {
+    console.log("setShowMimicMode:", val);
     this.enableMimicMode = val;
   }
 
   //進階設定
 
-  
+
 
   static advancedMode = false;
-  static setAdvancedModeMode(val){
-    console.log("advancedMode:",val);
+  static setAdvancedModeMode(val) {
+    console.log("advancedMode:", val);
     this.advancedMode = val;
   }
 

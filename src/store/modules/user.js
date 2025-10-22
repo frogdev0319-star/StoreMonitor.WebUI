@@ -381,7 +381,7 @@ const user = {
     GetUserAuthorities({ commit }) {
       return new Promise((resolve, reject) => {
         getUserAuthorities().then((res) => {
-          // console.log('@@@@',res.data);
+          // console.log('res.data @@@@', res.data);
           // console.log('@@@@ accountId',res.data.accountId);
 
           var brandList = JSON.parse(sessionStorage.getItem("brandList"));
@@ -424,10 +424,11 @@ const user = {
         const accessedRoutes = [];
         // 確保先載入 nfc_checkin 狀態，避免非同步問題
         await dispatch('GetEpaperNfcCheckin');
-        // console.log("user.state.authorities:~~~>>>",user.state.authorities);
+        console.log("user.state.authorities:~~~>>>", user.state.authorities);
         // console.log("user.state:~~~>>>",user.state);
 
         if (user.state.authorities.length > 0) {
+
 
           PermissionHelper.setData(user.state.authorities);
 

@@ -142,6 +142,7 @@ export default {
     },
 
     handleEmitOperation(methodsAndRowObj) {
+      console.log('methodsAndRowObj :~~~>> ', methodsAndRowObj);
       const method = methodsAndRowObj.method;
       switch (method) {
         case 'set': {

@@ -628,14 +628,14 @@
 
           <!-- right side -->
           <div class="fullWidth rside">
-            
+
             <div v-if="!showFeedBack" class="padding" :class="{flex:isFullScreenMode && $store.getters.collapsed}" style="background-color: rgb(237, 240, 242); height: 60vh; overflow: auto;flex-wrap: wrap; justify-content: space-between">
-              
+
               <div
-                v-if="sourceListLength > 0" 
+                v-if="sourceListLength > 0"
                 style="width: 100%; margin-bottom: 3px; font-size: 12px; text-align: right; color: #989797;"
-                > 
-                目前已附加截圖 {{ totalImageNum }} 張，最多可以附加 {{isSystemAdvanced ? 500 : 120}} 張。 
+                >
+                目前已附加截圖 {{ totalImageNum }} 張，最多可以附加 {{isSystemAdvanced ? 500 : 120}} 張。
               </div>
 
               <div
@@ -654,7 +654,7 @@
                   :style="item.checked?{'background-color':'#f5f7fa'}:{}"
                   @click="clickItem({item,index:showIgnoreItem?item.originIndex:index})"
                   >
-                  
+
                   <div class="flex fullWidth" >
                     <div class="font-15" style="text-align: left; width: calc(20/1920*100vw)" :style="item.checked?{'color':'#006ab7'}:{}">{{(index+1) + '.'}}</div>
                     <div class="flex padding-bottom-sm spacer" >
@@ -668,7 +668,7 @@
                       >
                         <span style="color: #c60957" v-if="item.required">*</span>
                         <span :class= "{ is_important : item.isImportant}"> {{ item.subject }}  </span>
-                        
+
                       </div>
 
                       <!-- dropdown -->
@@ -728,7 +728,7 @@
                             :style="curEditIndex === _index ? {'border':'1px solid #006ab7'}:{'border':'1px solid #e6e6e6'}, /\s/.test(_item.src) ? {'word-break':'normal'} : {'word-break':'break-all'}"
                           >
                             <div style="flex: 1; text-align: left; margin: 5px; font-size: 13px;">
-                              {{ _item.src }} 
+                              {{ _item.src }}
                             </div>
                             <hr v-if="_item.showDelBtn" class="hr-vertical" />
                             <!-- 編輯 -->
@@ -768,7 +768,7 @@
                         </div>
                       </div>
                     </div>
-                    
+
                     <!-- text input -->
                     <div style="position: relative">
                       <el-input
@@ -1459,7 +1459,7 @@ export default {
   },
 
   methods: {
-    
+
     async getUserInfo(){
       const result = await this.$store.dispatch("GetUserAuthorities");
       this.isSystemAdvanced = result.data.isSystemAdvanced
@@ -2232,9 +2232,9 @@ export default {
           self.inspectList = isCategory ? self.sheetName[0].inspectList : self.sheetName[0].inspectList;
           //bug
           const feedobj = {
-            groupId: 'feedBack', 
-            label: self.$t('remotePatrol.feedbacks'), 
-            isClick: false, 
+            groupId: 'feedBack',
+            label: self.$t('remotePatrol.feedbacks'),
+            isClick: false,
             isCategory: true};
           if (self.sheetName.length != 0) {
             self.sheetName.push(feedobj);
@@ -4012,7 +4012,7 @@ export default {
     width: 100%
     padding: 4px
     margin-bottom: 5px
-    
+
     // background: rgb(242, 249, 254)
   .to_delete
     margin-bottom: 5px
@@ -4027,7 +4027,7 @@ export default {
   .is_important
     color: #f31d65
 
-  
+
 
 
 </style>

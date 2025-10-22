@@ -311,6 +311,7 @@ export default {
         this.getStoreListAndGroupAndType();
       }*/
       if(this.$store.getters.editReport){
+
         this.checkCurStoreInFavorite = true;
         this.EditRptchangeStoreObj.dialogCosed = true;
       }
@@ -382,13 +383,13 @@ export default {
       const storeTypePromise = this.getStoreDefineList(0);
       Promise.all([storeListPromise, storeGroupPromise, storeTypePromise]).then(results => {
         var storeList = results[0];
-        
+
         //console.log(storeList)
         var groupList = results[1];
         var typeList = results[2];
 
         console.log('this.storeDataList :>> ', this.storeDataList);
-        console.log('storeList :>>', storeList)  
+        console.log('storeList :>>', storeList)
         console.log('groupList :>> ', groupList);
         console.log('typeList :>> ', typeList);
 
@@ -459,15 +460,22 @@ export default {
       this.$store.dispatch('setEditCount', 0);
 
     },
+
     onChangeSelectedStore(val) {
+      console.log('this.$store.getters.editCount', this.$store.getters.editCount)
+
       if(this.$store.getters.editReport){
+        console.log('1')
         this.curSelectedStore_ = val;
         this.EditRptchangeStoreObj.dialogCosed = true;
       }
       else if(this.$store.getters.editCount != 0) {
+        console.log('2')
         this.curSelectedStore_ = val;
         this.changeStoreObj.dialogCosed = true;
       } else if(this.$store.getters.editCount_storeMonitor!=0){
+
+        console.log('3')
         this.curSelectedStore_ = val;
         this.changeStoreObj.showInfo = this.$t('remotePatrol.confirmSwitch'),
         this.changeStoreObj.dialogCosed = true;
@@ -476,6 +484,10 @@ export default {
         this.emitParams();
       }
     },
+
+
+
+
     getStoreDefineList(type) {
       return new Promise((resolve, reject) => {
         const params = {
@@ -595,7 +607,7 @@ export default {
         }
       }
       self.storeDataList = tempStore;
-    
+
 
       self.storeListLength = this.storeDataList.length;
       let storeArr = [], arr = [];
@@ -658,7 +670,7 @@ export default {
 
       this.curStoreGroup = val;
       if(val.length == 0 && this.curStoreType.length === 0){
-        
+
         console.log('onChangeStoreGroup empty ~~~~>>')
         console.log("this.curCountry :",this.curCountry);
         console.log("this.curProvince :",this.curProvince);
@@ -668,7 +680,7 @@ export default {
 
         var allProvice = this.curProvince.filter( i => i !== '-1')
         var allCity = this.curCity.filter( i => i !== '-1')
-        
+
         var tempStores_country = []
         if(this.curCountry == -1){
           tempStores_country = this.storeList
@@ -705,7 +717,7 @@ export default {
             };
             temp.push(obj);
         });
-        
+
         this.storeDataList = temp;
 
         this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
@@ -728,7 +740,7 @@ export default {
       else {
         this.filterStore();
       }
-        
+
     },
 
     onChangeStoreType(val) {
@@ -798,7 +810,7 @@ export default {
             console.log("**2.select all:",this.curStore);
           }
         }
-        
+
         this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
         if(this.emitChanged){
           console.log('*****emitStoreChange');
@@ -810,7 +822,7 @@ export default {
     },
 
 
-    
+
 
     filterArr(arr1, arr2) {
       let filterArr = [];
@@ -915,7 +927,7 @@ export default {
         console.log("this.curCity :",this.curCity);
         console.log("this.storeList :",this.storeList);
         console.log("this.storeDataList 1:",this.storeDataList);
-        
+
         var allProvice = this.curProvince.filter( i => i !== '-1')
         var allCity = this.curCity.filter( i => i !== '-1')
         console.log("allProvice :", allProvice);
@@ -959,11 +971,11 @@ export default {
             }
           });
         });
-        
+
         this.storeDataList = temp;
         console.log("this.storeDataList 2:",this.storeDataList);
 
-        
+
         filterStoreId = util.getIntersectionOfArrs(this.curStore, filterStoreArray);
         filterStoreId.forEach(storeId => {
           this.storeList.forEach(store => {
@@ -994,18 +1006,18 @@ export default {
           this.curStore.unshift('-1');
         }
         console.log("2.curStore:",this.curStore);
-        
+
         this.storeStr = (filterStoreId.length==0)?allfilterStoreStr.substr(0, filterStoreStr.length - 1) :filterStoreStr.substr(0, filterStoreStr.length - 1);
         this.curSelectedStore = (this.storeDataList.some( st => st.storeId == this.curSelectedStore))?this.curSelectedStore:"";
       }
-        
+
       this.getStoreGroupString();
       this.getStoreTypeString();
       if(this.emitChanged){
           this.$emit('emitStoreChange', this.filterStoreIds);
         }
 
-      
+
       if(this.storeDataList.length == 0){
         // this.curStore = []
         // this.filterStoreId = []

@@ -586,7 +586,7 @@ export default {
     "numReports": "笔",
     "tableSection": "区域一 | 区域二",
     "tableStore": "巡检地点 | 分店代码",
-    "tableInspection": "巡检表 | 巡店方式",
+    "tableInspection": "巡店方式 | 巡检表",
 
 
   },

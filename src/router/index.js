@@ -73,6 +73,7 @@ export const navbarRoute = {
       isReadOnly: false,
       children: []
     };
+
     !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableRemoteOverview() && overviewRoute.children.push({
       path: '/patrolOverview',
       name: 'patrolOverview',
@@ -96,11 +97,6 @@ export const navbarRoute = {
 
   // 巡檢管理
   getPatrolRoute() {
-
-    console.log("PermissionHelper.enableInspectReport()", PermissionHelper.enableInspectReport());
-    console.log("PermissionHelper.advancedMode", PermissionHelper.advancedMode);
-    console.log("PermissionHelper.enableMimicMode", PermissionHelper.enableMimicMode);
-
     const patrolRoute = {
       id: 1,
       path: '/home',
@@ -112,11 +108,16 @@ export const navbarRoute = {
       hidden: false,
       children: []
     };
+
+
+
+
+    // 遠端巡檢
     // !PermissionHelper.advancedMode && (PermissionHelper.enableMimicMode || PermissionHelper.enableRemoteInspect()) && patrolRoute.children.push(
     //   {
     //     path: '/reinspection',
     //     name: 'remotePatrol',
-    //     hidden: true,
+    //     hidden: false,
     //     component: resolve => require(['@/views/patrolShop/ReInspection'], resolve),
     //     meta: {
     //       requireAuth: true,
@@ -137,6 +138,8 @@ export const navbarRoute = {
     //     component: resolve => require(['@/views/patrolShop/ReInspectDealPage'], resolve)
     //   }
     // ) && primaryPathesList.push('/reinspection', '/reinspect/confirmrein', '/reinspect/submit');
+
+
     // !PermissionHelper.advancedMode && !PermissionHelper.enableMimicMode && PermissionHelper.enableStoreMonitor() && patrolRoute.children.push(
     //   {
     //     path: '/storemonitor',
@@ -156,6 +159,9 @@ export const navbarRoute = {
     //     component: resolve => require(['@/views/patrolShop/StoreSuccessPage'], resolve)
     //   }
     // ) && primaryPathesList.push('/storemonitor', '/storemonitor/submit');
+
+
+    // 巡檢報告
     !PermissionHelper.advancedMode && (PermissionHelper.enableMimicMode || PermissionHelper.enableInspectReport()) && patrolRoute.children.push(
       {
         path: '/report',
@@ -177,8 +183,39 @@ export const navbarRoute = {
         component: resolve => require(['@/views/patrolShop/InspectReport'], resolve)
       }
     ) && primaryPathesList.push('/report', '/reportdetails');
+
+    // 網頁巡檢
+    !PermissionHelper.advancedMode && (PermissionHelper.enableMimicMode || PermissionHelper.enableWebPatrol()) && patrolRoute.children.push(
+      {
+        path: '/webinspection',
+        name: 'webPatrol',
+        hidden: false,
+        component: resolve => require(['@/views/patrolShop/webPatrol/WebInspection'], resolve),
+        meta: {
+          requireAuth: true,
+          keepAlive: false
+        },
+        isReadOnly: false
+      },
+      {
+        path: '/webinspection/confirmrein',
+        name: 'confirmSum',
+        hidden: true,
+        component: resolve => require(['@/views/patrolShop/webPatrol/ConfirmAddSum'], resolve)
+      },
+      {
+        path: '/webinspection/submit',
+        name: 'submitEvent',
+        hidden: true,
+        component: resolve => require(['@/views/patrolShop/webPatrol/DealPage'], resolve)
+      }
+    ) && primaryPathesList.push('/webinspection', '/webinspection/confirmrein', '/webinspection/submit');
+
     return patrolRoute;
   },
+
+
+
 
   // 事件管理
   getEventRoute() {

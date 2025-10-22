@@ -165,8 +165,9 @@
                   <!-- card main -->
                   <div class="card_main">
                     <div class="flex-center margin-bottom-5">
-                      <div class="card-title">{{ item.storeName }}</div>
-                      <img :src="item.mode===1?onsiteIcon:remoteIcon" :height="20" alt="" >
+                      <div class="card-title">{{ item.storeName }} </div>
+
+                      <img :src="item.routeObj.reportType=== 0 ? remoteIcon : onsiteIcon" :height="25" alt="" >
                     </div>
                     <div class="margin-bottom-5">{{ item.tagName }}</div>
                     <div class="status-tag_row">
@@ -329,8 +330,9 @@ export default {
       varyWindowWidth: window.innerWidth,
       varyWindowHeight: window.innerHeight,
       videoSrc: require('../../../static/img/monitor.png'),
-      remoteIcon: require('../../../static/img/remote.png'),
-      onsiteIcon: require('../../../static/img/onsite.png'),
+      onsiteIcon: require('../../../static/img/MdiMonitorDashboard.svg'),
+      remoteIcon: require('../../../static/img/MdiCellphoneAndroid.svg'),
+
       searchContent: false,
       exportPng: require('../../../static/img/excel.png'),
 
@@ -375,6 +377,9 @@ export default {
         //   'maxWidth': 60,
         //   'isExpand': false
         // },
+
+
+
         {
           'prop': 'storeName',
           'label': this.$t('remotePatrol.patrolStore'),
@@ -418,10 +423,10 @@ export default {
           'width': 100,
           'maxWidth': 100,
           'isExpand': false,
-          // 'hasIcon':{
-          //   icon:require('@/../static/img/table-help.png'),
-          //   tooltipContent : this.$t('remotePatrol.tableInspection')
-          // }
+          'hasIcon':{
+            icon:require('@/../static/img/table-help.png'),
+            tooltipContent : this.$t('remotePatrol.tableInspection')
+          }
         },
         // {
         //   'prop': 'modeText',
@@ -1047,7 +1052,13 @@ export default {
             tableObj.code = item.code ? item.code : '--';
 
             tableObj.modeText = item.mode === 0 ? self.$t('overview.remotePatrol') : self.$t('overview.onsitePatrol')
-            tableObj.tagName = item.tagName ;
+
+            var inspectMethod = ''
+            if(item.reportType == 0) inspectMethod = "現場巡檢"
+            else if(item.reportType == 1) inspectMethod = "網頁巡檢"
+            else if(item.reportType == 2) inspectMethod = "遠端巡檢"
+
+            tableObj.tagName = inspectMethod + '\n' + item.tagName  ;
 
             tableObj.id = item.id;
             tableObj.datestr = util.getDateStr(item.ts);
@@ -1352,7 +1363,7 @@ export default {
       const newArr = [];
       // const inspectList = [];
 
-      console.log('inspectArr :>> ', inspectArr);
+      // console.log('inspectArr :>> ', inspectArr);
       // inspectArr.forEach(_item => {
       //   if (self.curReportType === -1) {
       //     if (!newArr.includes(_item.id)) {
