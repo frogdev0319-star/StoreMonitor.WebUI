@@ -26,12 +26,12 @@ export default class PermissionHelper {
 
     // console.log('bigEndian', bigEndian)
     // console.log('littleEndian', littleEndian)
-    console.log('this.data :>> ', this.data);
+    // console.log('this.data :>> ', this.data);
     const authority = new Uint64BE(this.data[index].toString()).toString(10);
     const base = new Uint64BE(bigEndian, littleEndian).toString(10);
-    console.log('index', index)
-    console.log('authority', authority)
-    console.log('base', base)
+    // console.log('index', index)
+    // console.log('authority', authority)
+    // console.log('base', base)
     return authority & base;
   }
 

@@ -381,7 +381,7 @@ const user = {
     GetUserAuthorities({ commit }) {
       return new Promise((resolve, reject) => {
         getUserAuthorities().then((res) => {
-          // console.log('@@@@',res.data);
+          // console.log('res.data @@@@', res.data);
           // console.log('@@@@ accountId',res.data.accountId);
 
           var brandList = JSON.parse(sessionStorage.getItem("brandList"));
