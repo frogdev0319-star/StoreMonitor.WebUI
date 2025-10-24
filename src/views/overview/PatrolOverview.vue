@@ -6,12 +6,11 @@
         <!-- {{ $t('overview.totalStore', {storeNum: totalStoreNum}) }} -->
         {{ $t('overview.totalStore', {storeNum: storeList.length}) }}
       </span>
-
       <!-- 選擇地點 -->
       <div class="store_title" style="margin-left: 30px; margin-right: 20px;"  >{{ $t('overview.patrolStore')}}</div>
       <region-multi-select
         ref="multiState"
-        style="width: 30%; "
+        style="width: 18%; margin-right: 20px;"
         :selected="selectedInstantStore"
         :options="storeList"
         :noTextInput = "true"
@@ -19,22 +18,27 @@
         class="position"
         @changeInput="storeChange"
         />
-      <!-- <el-select
-        v-if="isiService"
-        v-model="selectedInstantStore"
-        style="width: 30%;"
-        :placeholder="$t('immediatePush.selectStore')"
-        filterable
-        multiple
-        @change="storeChange"
-        >
-        <el-option
-          v-for="item in storeList"
-          :key="item.storeId"
-          :label="item.name"
-          :value="item.storeId"
-          />
-      </el-select> -->
+
+      <!-- 巡檢表 -->
+      <div class="flex-center" style="margin-left: 30px;">
+        <span style="margin-right: 16px;font-size:calc(15/1920*100vw);">{{ $t('remotePatrol.selectInspect') }}</span>
+        <div class="flex-center report-type-area">
+          <el-select
+            class="el-province"
+            style="width: 100% ; margin-left:0px;border:none;border-radius:0px;"
+            v-model="inspectId"
+            :placeholder="$t('insSettingView.selectPost')"
+            size="mini"
+            @change="getPatrolOverviewData"
+            >
+          <el-option
+            v-for="item in inspectTableList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"/>
+        </el-select>
+        </div>
+      </div>
     </div>
 
     <div class="el-overview">
@@ -251,11 +255,18 @@ import {
   getInspectStatsOverviewWithRegion,
   getInspectStatsOverRegion
 } from '@/api/inspectOverview';
+import {
+    getInspectReportList,
+    GetInspectTagList,
+    downLoadInspectReportEntireDetail,
+    getAllReportIds,
+    GetMysteryInspectTagList ,
+    getInspectStatus,
+    getInspectReportInfo
+  } from '@/api/inspect';
+import PermissionHelper from '@/api/PermissionHelper';
 import { getBriefStoreList } from '@/api/store';
 import { accountInfo } from '@/api/login';
-import {
-    getInspectStatus
-} from '@/api/inspect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import { mapGetters } from 'vuex';
 import resize from '@/components/mixins/echartResize';
@@ -363,8 +374,10 @@ export default {
       inspectStatus: '',
       selectedInstantStore: [],
       storeList: [],
-      inspectTagId: null
+      inspectTagId: null,
 
+      inspectId: '',
+      inspectTableList: [],
 
 
     };
@@ -386,6 +399,7 @@ export default {
 
         await this.getBriefStoreData()
         await self.getInspectStatus();
+        await this.getInspectList()
         await self.getSearchParams();
         await self.getPatrolOverviewData();
         await self.getAccountInfo()
@@ -397,6 +411,7 @@ export default {
   async created() {
     await this.getBriefStoreData()
     await this.getInspectStatus();
+    await this.getInspectList()
     await this.getSearchParams();
     await this.getPatrolOverviewData();
     this.getAccountInfo()
@@ -413,6 +428,46 @@ export default {
   },
 
   methods: {
+    async getInspectList() {
+      const self = this;
+      const inspectArr = PermissionHelper.enableMimicMode ? await self.getTagMytery() : await self.getTagAll();
+      const newArr = [];
+      var inspectList = inspectArr.filter(i => i.mode == 1)
+      self.inspectTableList = inspectList;
+      self.inspectTableList.length > 0 && self.inspectTableList.unshift({ id: null , name: self.$t('remotePatrol.all') });
+      if (inspectList.length !== 0) {
+        self.inspectId = self.ifGetParamsFromCash ? self.inspectCatch : self.inspectTableList[0].id;
+      } else {
+        self.inspectId = '';
+      }
+    },
+
+
+    getTagMytery() {
+      return new Promise((resolve, reject) => {
+        GetMysteryInspectTagList().then(res => {
+          const data = res.data;
+          resolve(data);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
+    getTagAll() {
+      return new Promise((resolve, reject) => {
+        GetInspectTagList().then(res => {
+          const data = res.data;
+          resolve(data);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
+
+
+
     async getAccountInfo(){
       const result = await this.$store.dispatch("GetUserAuthorities");
       const accountId = {
@@ -420,9 +475,9 @@ export default {
       }
       console.log('accountId ****>> ', accountId);
       accountInfo(accountId).then(res => {
-        console.log('res.data !!!', res.data)
-        console.log('res.data.isTransform', res.data.isTransform)
-        console.log('res.data.isiService', res.data.isiService)
+        // console.log('res.data !!!', res.data)
+        // console.log('res.data.isTransform', res.data.isTransform)
+        // console.log('res.data.isiService', res.data.isiService)
 
         this.isiService = res.data.isiService
         this.isTransform = res.data.isTransform
@@ -815,7 +870,6 @@ export default {
     },
 
 
-
     dateChange(val) {
       this.dateValue = val;
       this.currentIndex = 0;
@@ -825,13 +879,10 @@ export default {
       this.timeMode = daysDiff <= 30 ? 1 : 2;
       this.params.beginTs = start;
       this.params.endTs = end;
-      this.params.inspectTagId = this.inspectTagId;
-
-
+      this.params.inspectTagId = this.inspectId;
 
       // 2024 sprint2 新增
       // this.params.storeIds = [];
-
       this.saveSearchParams();
       this.getPatrolOverviewData();
     },
@@ -969,7 +1020,7 @@ export default {
           beginTs: this.params.beginTs,
           endTs: this.params.endTs,
           storeIds: this.selectedInstantStore,
-          inspectTagId: this.inspectTagId
+          inspectTagId: this.inspectId
       }
       console.log('overviewParam ~~~~>> ', overviewParam);
 
@@ -1073,7 +1124,7 @@ export default {
           beginTs: this.params.beginTs,
           endTs: this.params.endTs,
           storeIds: this.selectedInstantStore,
-          inspectTagId: this.inspectTagId
+          inspectTagId: this.inspectId
       }
 
       const inspectItems = await self.getInspectStatsItemInfo(overviewParam);
@@ -1216,7 +1267,7 @@ export default {
       params.lowestFirst = self.isWorstWork;
       params.numOfPerson = 5;
       params.storeIds = this.selectedInstantStore;
-      params.inspectTagId = this.inspectTagId
+      params.inspectTagId = this.inspectId
 
 
       try {
@@ -1259,7 +1310,7 @@ export default {
           beginTs: this.params.beginTs,
           endTs: this.params.endTs,
           storeIds: this.selectedInstantStore,
-          inspectTagId: this.inspectTagId
+          inspectTagId: this.inspectId
       }
       try {
         const result = await self.getPassRateAndInspectRate(overviewParam);
@@ -1593,7 +1644,7 @@ export default {
       params.region = 1;
       params.timeMode = self.timeMode;
       params.storeIds = this.selectedInstantStore
-      params.inspectTagId = this.inspectTagId
+      params.inspectTagId = this.inspectId
 
 
       const result = await self.getInspectResultOverRegion(params);

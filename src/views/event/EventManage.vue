@@ -209,7 +209,7 @@
                   <img v-else-if="scope.row.sourceType === 1" :src="inspectSrc" class="sourceType-icon">
                   <img v-else-if="scope.row.sourceType === 3" :src="immediateInspectSrc" class="sourceType-icon">
                   <img v-else-if="scope.row.sourceType === 4" :src="AIInspectSrc" class="sourceType-icon">
-                  <img v-else :src="insiteInspectSrc" class="sourceType-icon" style="width:15px;">
+                  <img v-else :src="insiteInspectSrc" class="sourceType-icon" style="width:18px;">
                   <span class="event-subject">{{ scope.row.subject }}</span>
                 </template>
               </el-table-column>
@@ -403,7 +403,9 @@ export default {
       immediateInspectSrc: require('../../../static/img/immediate_patrol.png'),
 
       AIInspectSrc: require('../../../static/img/ai_inspection.png'),
-      insiteInspectSrc: require('../../../static/img/onsite_patrol.png'),
+      // insiteInspectSrc: require('../../../static/img/onsite_patrol.png'),
+      insiteInspectSrc: require('../../../static/img/MdiCellphoneAndroid.svg'),
+
       attachmentVideo: require('../../../static/img/photo.png'),
       attachmentImg: require('../../../static/img/photo.png'),
       attachmentAudio: require('../../../static/img/voice.png'),
