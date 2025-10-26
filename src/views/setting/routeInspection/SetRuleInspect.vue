@@ -25,6 +25,16 @@
               </span>
             </el-checkbox>
           </p>
+
+          <!-- 預設顯示合格 -->
+          <p class="rule-item">
+            <el-checkbox class="storevue-checkbox-outlined" v-model="tab1Checked">
+              <span>
+                {{ $t('insSettingView.tab1Checked') }}
+              </span>
+            </el-checkbox>
+          </p>
+
           <p class="rule-item">
             <el-checkbox class="storevue-checkbox-outlined" v-model="qualifiedForIgnoredWithType2">
               <span>{{ $t('insSettingView.tab2IgnoredQualified') }} </span>
@@ -503,6 +513,10 @@ export default {
       maxScore: 100,
       includedInTotalScoreWithType1: false,
       qualifiedForIgnoredWithType1: false,
+
+      tab1Checked: false,
+
+
       qualifiedForIgnoredWithType2: false,
 
       setting_isShowDistrictSum: false,
@@ -772,6 +786,7 @@ export default {
             { name: 'includedInTotalScoreWithType1', value: self.includedInTotalScoreWithType1 },
             { name: 'qualifiedForIgnoredWithType1', value: self.qualifiedForIgnoredWithType1 },
             { name: 'qualifiedForIgnoredWithType2', value: self.qualifiedForIgnoredWithType2 },
+            { name: 'tab1Checked', value: self.tab1Checked },
 
             { name: 'setting_isShowDistrictSum', value: self.setting_isShowDistrictSum },
             { name: 'setting_isShowGroupSum', value: self.setting_isShowGroupSum },
@@ -861,6 +876,8 @@ export default {
       const params = { inspectId: self.inspectId };
       try {
         const res = await self.getInspectRule(params);
+
+        console.log('res --->', res)
         if (res.errCode === 0) {
           res.data.forEach(item => {
             switch (item.name) {
@@ -874,6 +891,12 @@ export default {
               case 'qualifiedForIgnoredWithType1':
                 self.qualifiedForIgnoredWithType1 = item.value;
                 break;
+
+              case 'tab1Checked':
+                self.tab1Checked = item.value;
+                break;
+
+
               case 'qualifiedForIgnoredWithType2':
                 self.qualifiedForIgnoredWithType2 = item.value;
                 break;

@@ -216,8 +216,37 @@
           </div>
         </div>
       </div>
-
     </div>
+
+    <!--  匯出報告設定 -->
+    <div class="page-container report-setting paper" >
+      <div class="setting-titles padding flex-center">
+        {{$t('addition.exportReportSettings')}}
+        <div class="spacer"></div>
+      </div>
+
+      <div v-loading="isLoadingData" class="setting-details self-loading">
+        <div class="template-info">
+          <div class="inspect-basic">
+            <setting-table :table-name="$t('addition.MultipleDetailsFieldSwitch')" style="margin-top: 20px;">
+              <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
+                <div class="overall_options">
+
+                  <div class="overall_row" >
+                    <el-radio-group class="storevue-radio radio_item" v-model="reportDownloadSplit" style="margin-left: 20px;">
+                      <el-radio :label="1" style="  min-width: 60px; text-align: left; margin-right: 50px;" >{{$t('addition.on')}} </el-radio>
+                      <el-radio :label="0" style=" width: fit-content;">{{$t('addition.off')}} </el-radio>
+                    </el-radio-group>
+                  </div>
+                </div>
+              </div>
+            </setting-table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
 
     <!-- 特定巡檢管理功能設定 開關選項 -->
     <!-- <div class="page-container report-setting paper" >
@@ -356,7 +385,8 @@ export default {
       dueDayIsFeatureOn: 1,
       overDueDay: 90,
       disable_skip_check_in: false,
-      biometric_switch:  false
+      biometric_switch:  false,
+      reportDownloadSplit:  0
 
     };
   },
@@ -480,7 +510,7 @@ export default {
 
           this.dueDayIsFeatureOn = res.data.settingContent.general_setting_event_event_over_due_day_config.isFeatureOn == true ? 1 : 0
           this.overDueDay = res.data.settingContent.general_setting_event_event_over_due_day_config.overDueDay
-
+          this.reportDownloadSplit = res.data.settingContent.general_setting_inspect_status_name.is_report_download_split_comment == true ? 1 : 0
 
         }).catch(err => {
           reject(err);
@@ -541,7 +571,9 @@ export default {
           eventOverDueDayConfig:{
             isFeatureOn: this.dueDayIsFeatureOn == 1 ? true : false,
             overDueDay: this.overDueDay
-          }
+          },
+
+          is_report_download_split_comment: this.reportDownloadSplit == 1 ? true : false,
 
       }
 

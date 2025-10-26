@@ -843,6 +843,7 @@ export default {
     "tab1CalculateScore": "When combined with other tabs, the Tab1 (Pass&Fail) project score will participate in the evaluation of the total score calculation",
     "tab1FailedDangeous": "When there are unqualified items in Tab1 (Pass&Fail), the inspection result is: Dangerous.",
     "tab1IgnoredQualified": "Calculate the score of ignored items in Tab1 (Pass&Fail)",
+    "tab1Checked": "Preset qualified in TAB1",
     "tab2IgnoredQualified": "Calculate the score of ignored items in Tab2 (Score)",
     "templateEmpty": "The inspection table cannot be empty!",
     "templateError": "The template of inspection tableis wrong!!",
@@ -1870,6 +1871,9 @@ export default {
     "dataIsEmpty": "The form data is empty! Please search again",
     "comfimDelete": "Once the inspection sheet is deleted, it cannot be restored and the reports and statistical analysis related to the inspection sheet will no longer be available! Please confirm whether to delete it?",
     "passwordToDelete": "Please enter your password to confirm deletion.",
+
+    "exportReportSettings": "Export Report Settings",
+    "MultipleDetailsFieldSwitch": "Multiple details field switch",
 
 
   },

@@ -838,6 +838,7 @@ export default {
     "tab1CalculateScore": "與其他tab組合時，Tab1（Pass&Fail）項目分值參與考評總分運算",
     "tab1FailedDangeous": "Tab1（Pass&Fail）中存在不合格項時，巡檢結果為",
     "tab1IgnoredQualified": "Tab1(Pass&Fail)中忽略項目視同得分",
+    "tab1Checked": "TAB1 中預設合格",
     "tab2IgnoredQualified": "Tab2（Score）中忽略項目視同得分",
     "templateEmpty": "巡檢表不能為空！",
     "templateError": "巡檢表樣版錯誤！",
@@ -1865,6 +1866,11 @@ export default {
     "dataIsEmpty": "表格資料為空！請重新搜尋條件",
     "comfimDelete": "巡檢表刪除後將無法復原，且無法再查看該巡檢表相關之報告與統計分析！請確認是否刪除？",
     "passwordToDelete": "請輸入密碼確認刪除",
+
+    "exportReportSettings": "匯出報告設定",
+    "MultipleDetailsFieldSwitch": "多詳情欄位開關",
+
+
   },
   "epaper": {
     "date": "時間範圍",
@@ -1910,8 +1916,7 @@ export default {
 
   "webInspection": {
     "backWebInspection": "返回遠端巡檢",
-    "maxImgFileSizeAlert": "圖片檔案不可大於4MB，請重新上傳。",
-
+    "maxImgFileSizeAlert": "圖片檔案不可大於4MB，請重新上傳。"
   }
 }
 
