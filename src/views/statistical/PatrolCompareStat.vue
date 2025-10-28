@@ -26,7 +26,11 @@
               @emitSearch = "emitSearch"/>
           </el-col>
           <el-col :span="24">
-            <div id="imgTest_avg" :class="ispdf ? 'statistics-content-pdf':'statistics-content'" style="height: 735px;" >
+            <div id="imgTest_avg"
+                :class="ispdf ? 'statistics-content-pdf':'statistics-content'"
+                style="height: 735px;"
+                v-loading="isLoading"
+              >
                 <div class="head">
                     <el-col :span="17">
                         <div class="region-titles">
@@ -93,7 +97,7 @@
                     </div>
                     <v-chart ref="itemsChart1" autoresize :options="avgChartOption" class="chart-content"/>
                   </div>
-                  
+
                 </div>
             </div>
             <div id="imgTest_assm" v-if="standardRate!='- -'" :class="ispdf ? 'statistics-content-pdf':'statistics-content'" style="height: 700px;margin-top:24px;">
@@ -191,7 +195,7 @@
               </div>
           </div>
           </el-col>
-          
+
           <div v-if="false">
             <el-col :span="24">
             <div id="imgTest_avg1" class="statistics-content-pdf" style="height: 735px;" >
@@ -316,7 +320,7 @@
                         </div>
                       </div>
                     </div>
-                    
+
                     <div class="pct-panel-pdf">
                       <div v-show="showNoData2" style="position: absolute;margin-top:116px;margin-left:503px;width:90px;height:136px;align-item:center;background-color:'gray'">
                         <img src="../../../static/img/statistics/ic_nodata.svg" style="widht:90px;height:81px;" />
@@ -342,8 +346,8 @@
           >
             <p>{{ $t('insSettingView.isExportPDF') }}......</p>
           </dialog-pop>
-        
-    </div>          
+
+    </div>
 </template>
 <script>
 import { mapGetters } from 'vuex';
@@ -381,6 +385,7 @@ export default {
   mixins: [resize],
   data() {
     return {
+        isLoading : true,
         lang: this.$i18n.locale,
         params: {},
         searchParams:{},
@@ -449,7 +454,7 @@ export default {
   },
 
   async created() {
-    
+
     await this.initData();
   },
 
@@ -504,6 +509,7 @@ export default {
     },
     emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
       console.log("emitSearch:",searchParams);
+      this.isLoading = true
       this.storeIds = [];
       this.params = searchParams;
       this.storeIds = this.params.storeIds;
@@ -522,7 +528,7 @@ export default {
       console.log("emitSearch > params",this.params);
       this.curCountry = this.params.curCountry;
       //console.log("emitSearch > inspectId",this.params.inspectId );
-      
+
       this.searchData();
     },
     async searchData() {
@@ -538,11 +544,12 @@ export default {
         this.compareIds2  = this.params.storeIds;
         this.compareType2='stores',*/
         console.log("1.**doGetAverageScore:");
-        this.doGetAverageScore(this.filterDateRange); 
-        this.doGetAssessmentScore(this.filterDateRange2);
+        await this.doGetAverageScore(this.filterDateRange);
+        await this.doGetAssessmentScore(this.filterDateRange2);
         if(this.params.inspectId!=-1){
-          this.doGetAssessmentStandardScore();
+          await this.doGetAssessmentStandardScore();
         }
+        this.isLoading = false
       } else {
         this.compareIds = [];
         this.comapareLabels=[];
@@ -557,8 +564,9 @@ export default {
         this.AssChartOption=null;
         this.standardRate='- -';
         //console.log("1.**doGetAverageScore:");
-        //this.doGetAverageScore(this.filterDateRange); 
-        this.doGetAssessmentScore(this.filterDateRange2);
+        //this.doGetAverageScore(this.filterDateRange);
+        await this.doGetAssessmentScore(this.filterDateRange2);
+        this.isLoading = false
       }
     },
     doGetPre12DateRange(start_date,end_date,range_type){
@@ -576,7 +584,7 @@ export default {
     emitFilterDateRange({start_date,end_date,range_type}){
       //console.log("**1."+start_date+", "+end_date);
       this.doGetPre12DateRange(start_date,end_date,range_type);
-      
+
       this.doGetAverageScore(this.filterDateRange);
     },
     emitTypeChanged({compareType,compareArr,selectedLabels,selStoreIdArr}){ //劃分類型選擇
@@ -587,13 +595,13 @@ export default {
       this.doGetAverageScore(this.filterDateRange);
     },
     async doGetAverageScore(DateRangeFilter){ //同比時間區間選擇
-      
+
       let region = this.areaMode.filter((r)=>{ return r.key==this.compareType});
       this.Avg12Num = [];
       this.avgChartOption = this.getAverageBarchartOption();
       //console.log("this.comapareLabels:",this.comapareLabels);
       //console.log("this.compareIds:",this.compareIds);
-      
+
       if(this.comapareLabels.length>0 && this.inspectId!=-1){
         let Average12;
         if(region[0].value<3){ //store, area1, area2
@@ -601,11 +609,11 @@ export default {
         }else{ //groupType, storeGroup
           Average12 = {beginTs:Date.parse(DateRangeFilter[0].startDate),endTs:Date.parse(DateRangeFilter[11].endDate),groupMode:region[0].value,groupIds:this.compareIds};
         }
-        
+
 
         const areaAverage = await this.getInspectStatsDistributionOverRegion(Average12);
         if(areaAverage.errCode==0){ //上方顯示12周/月 的評均分
-          
+
           this.doParseAverage12Score(areaAverage.data.content);
         }
         let date_xAxis=[];
@@ -666,7 +674,7 @@ export default {
           this.avgChartOption_pdf.xAxis.axisLabel.rotate = 30;
           this.avgChartOption_pdf.xAxis.axisLabel.fontSize = 10;
           this.avgChartOption_pdf.legend.textStyle.fontSize=10;
-      
+
         }).catch(err => {
           console.log('promisesAvgMap - getInspectStatsDistributionOverRegion: ' + err);
         });
@@ -716,8 +724,8 @@ export default {
       this.Ass12Num = [];
       this.AssChartOption = this.getAverageBarchartOption(true);
       //console.log("this.comapareLabels2:",this.comapareLabels2);
-      
-      
+
+
       if(this.comapareLabels2.length>0 && this.inspectId!=-1){
         let Assessment={};
         if(region[0].value<3){ //store, area1, area2
@@ -744,7 +752,7 @@ export default {
           }
           return this.getInspectStatsDistributionOverRegion(params);
         });
-        
+
         Promise.all(promisesAvgMap).then(result=>{
           let AssChartDataset = [];
           AssChartDataset[0] = new Array();
@@ -972,7 +980,7 @@ export default {
             data: [0,0,0,0,0,0,0,0,0,0,0,0],
             color:'#b9c6d2',
             barGap:0,
-            
+
           }
         ],
         itemStyle: {
@@ -988,7 +996,7 @@ export default {
                 }
               }
             }
-        
+
       };
       return chartOption;
     },
@@ -1028,7 +1036,7 @@ export default {
         }, 5000);
       });
     },
-  
+
   }
 }
 </script>
@@ -1055,7 +1063,7 @@ export default {
         align-items: center;
       }
       .avg12item{
-        display:flex; 
+        display:flex;
         flex-direction:row;
         font-size:15px;
         font-weight:600;
@@ -1075,7 +1083,7 @@ export default {
         width: calc(1035px/1440*100vw);
         height: 403px;
         margin-top: 33px;
-        
+
           .chart-content {
             width: 100%;
             height: 100%;
@@ -1089,7 +1097,7 @@ export default {
         width: calc(1035px/1440*100vw);
         height: 403px;
         margin-top: 33px;
-        
+
           .chart-content {
             width: 100%;
             height: 100%;
@@ -1100,11 +1108,11 @@ export default {
           }
       }
 
-      
+
     }
   .date-picker .el-input__inner{
     font-size:13px;
   }
   }
-  
+
 </style>

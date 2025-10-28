@@ -27,12 +27,14 @@
           @exportPdf = "exportPdf"
           @changeDefaultSort="setDefaultSortAndPage"/>
       </el-col>
+
+      <!-- 事件處理狀態 -->
       <el-col :span="24" class="el-overview" >
-        <el-row class="amout_row" id="imgTest_amount" style="box-shadow:none;">
+        <el-row class="amout_row" id="imgTest_amount" style="box-shadow:none;" v-loading="isLoading">
           <el-col :span="24" class="kpi-list">
             <div class="title">{{ $t('statistics.event.eventProcessStatus') }}</div>
           </el-col>
-          <el-col :span="24" class="amount_region">
+          <el-col :span="24" class="amount_region" >
             <div class="region-area" :style="ispdf ? {'width':'220px'}:{}" v-for="(item,index) in eventKPIs" :key="index">
               <div class="num-area">
                 <div style="display:flex;height:84.5px;">
@@ -53,7 +55,7 @@
             </div>
           </el-col>
         </el-row>
-        <el-row class="first-row" id="imgTest_first" style="box-shadow:none;">
+        <el-row class="first-row" id="imgTest_first" style="box-shadow:none;" v-loading="isLoading">
           <el-col :span="24" class="kpi-list">
             <div class="head">
               <div class="title">{{ $t('statistics.event.eventRank') }}</div>
@@ -181,7 +183,7 @@
         </el-row>
 
         <!-- 巡檢項事件 -->
-        <el-row class="second-row" id="imgTest_second" style="box-shadow:none;">
+        <el-row class="second-row" id="imgTest_second" style="box-shadow:none;" v-loading="isLoading">
           <el-col :span="24" class="kpi-list">
             <div class="head">
               <div class="title">{{ $t('statistics.event.incepItemEvent') }}</div>
@@ -369,6 +371,7 @@
         </el-row>
       </el-col>
     </div>
+
     <div id="pdf-area" ref="printPDF" v-if="ispdf">
       <div class="el-overview-content" style="height: 194px;box-shadow:none;">
         <div id="img_amount" class="amout_row">
@@ -770,6 +773,7 @@ export default {
   mixins: [resize],
   data() {
     return {
+      isLoading : true,
       storeIds:[],
       ispdf: false,
       pdfSrc_amount: '',
@@ -1242,6 +1246,7 @@ export default {
     },
     async emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
       //console.log(">>>>eventStatistics > storePatrolLists:",storePatrolLists);
+      this.isLoading = true
       this.params = searchParams;
       this.storeIds = this.params.storeIds;
       this.compareIds = this.compareIds2 = this.params.storeIds;
@@ -1300,7 +1305,8 @@ export default {
         await self.getEventTableData();
         //await self.getAllEventData();
         await self.getEventBarChartData();
-        self.doGetInspecEvenItems();
+        await self.doGetInspecEvenItems();
+        this.isLoading = false
       }
 
 

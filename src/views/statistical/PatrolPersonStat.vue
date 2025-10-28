@@ -25,7 +25,7 @@
             <div class="person-title">
               <el-radio-group v-model="isMystery" style="display:flex;flex-direction:column;height:calc(40/1920*100vw);justify-content: space-between;" @change="onFilterPersonChanged">
                 <div>
-                  <el-radio :label="false" :class="lang === 'en'? 'en-span-class' : ''">{{ $t('statistics.patrolPerson.insPerson') }}</el-radio>  
+                  <el-radio :label="false" :class="lang === 'en'? 'en-span-class' : ''">{{ $t('statistics.patrolPerson.insPerson') }}</el-radio>
                   <!--<span :class="lang === 'en'? 'en-span-class' : ''">{{ $t('statistics.patrolPerson.insPerson') }}<span>-->
                 </div>
                 <div>
@@ -91,7 +91,7 @@
             :highlight-current-row= "true"
             :is-event = "false"
             :default-sort = "defaultSort"
-            :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+            :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}"
             :tableHeight = "610"
             :allowRowExpand = "true"
             expand-component = "TabInceptionDetail"
@@ -125,7 +125,7 @@
               :highlight-current-row= "true"
               :is-event = "false"
               :default-sort = "defaultSort"
-              :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+              :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}"
               :allowRowExpand = "true"
               :isexportPDF = "isexportPDF"
               expand-component = "TabInceptionDetail"
@@ -169,8 +169,8 @@ import {
   getInspectStatsOverPersonV3
 } from '@/api/inspectOverview';
 import {
-  exportStatisticsPerson, 
-  exportStatisticsReportList , 
+  exportStatisticsPerson,
+  exportStatisticsReportList ,
   exportStatisticsEventComment
 } from '@/api/exportExcel';
 
@@ -353,10 +353,10 @@ export default {
     //   this.ifCachedParams = true;
     //   if(params.submitters.length>0)this.userIds = params.submitters;;
     //   if(params.positionIds.length>0)this.positionIds = params.positionIds;
-      
+
     // }
-    
-    
+
+
 
     this.getSearchCondition();
   },
@@ -409,7 +409,7 @@ export default {
 
     onFilterPersonChanged(val){
       console.log("****onFilterPersonChanged:",val);
-      
+
       if(val){
         this.positionDisabled = true;
       }else {
@@ -450,7 +450,7 @@ export default {
           userJson.mystery = user.mystery;
           this.origianlUserList.push(userJson);
           this.userList.push(userJson);
-        
+
       });
         this.userIds = (this.ifCachedParams && this.userIds.length>0) ? this.userIds : this.userList.map(user => user.value);
     },
@@ -485,7 +485,7 @@ export default {
         });
         this.userIds = this.userList.map(user => user.value);
       }
-      
+
     },
 
     handleUserChange(userIds) {
@@ -520,7 +520,7 @@ export default {
         console.log('res :>> ', res);
       })
 
-      
+
 
       // require.ensure([], async() => {
       //   const { export_json_to_excel } = require('@/excel/Export2Excel');
@@ -560,7 +560,7 @@ export default {
       var hour = this.pad2(date.getHours())
       var min = this.pad2(date.getMinutes())
       var sec = this.pad2(date.getSeconds())
-      return year + month + day 
+      return year + month + day
     },
     getOnlyDate(t){
       var date = new Date(t);
@@ -570,13 +570,14 @@ export default {
       var hour = this.pad2(date.getHours())
       var min = this.pad2(date.getMinutes())
       var sec = this.pad2(date.getSeconds())
-      return  month + day 
+      return  month + day
     },
 
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => v[j]));
     },
     async doSearchInsRecordList(){
+      this.isLoading = true
       const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
       const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
       this.componentsProps =  {
@@ -592,7 +593,7 @@ export default {
       this.allInsRecordData = [];
       let param = {beginTs:start,endTs:end,submitters:(this.userIds.length==0)?[' ']:this.userIds,isMysteryMode:this.isMystery};
       let searchParams = {...param};
-      searchParams['positionIds'] = this.positionIds; 
+      searchParams['positionIds'] = this.positionIds;
       const searchConditon = {
         path: 'PatrolPersonStat',
         params: searchParams
@@ -602,7 +603,7 @@ export default {
       /*if(this.userIds.includes("-1")){
         param = {beginTs:start,endTs:end};
       }*/
-      
+
       //console.log("doSearchInsRecordList > params:",this.params);
       let record = await this.getInspectStatsPersonInfo(param);
       this.allInsRecordData = record.data.content;
@@ -652,7 +653,7 @@ export default {
     },
 
     setRecordTableData(){
-      
+
       this.orderAllTableData();
       this.insRecordTableData = [];
       this.insRecordTableData = [...this.allInsRecordData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
@@ -757,7 +758,7 @@ export default {
         justify-content: flex-end;
       }
     }
-      
+
     .person-title{
       display:flex;
         flex-direction:row;
@@ -804,18 +805,18 @@ export default {
         .person{
           display:inline;
           width: calc(223/1440*100vw);
-          
+
           /deep/
           .el-input--medium .el-input__inner{
             border:none;
             line-height: calc(36/1920*100vw);
             height: calc(36/1920*100vw);
-            
+
           }
-          
+
         }
     }
-    
+
     .search-button{
       margin-left:35px;
       width: 102px;

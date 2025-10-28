@@ -29,8 +29,13 @@
       </el-col>
 
     <!-- 巡檢項目得分 -->
-    <div class="statistics-content"   id="imgTest_avg1"   style="height:1110px;margin-top:200px;box-shadow:none;"  :style="{width:ispdf?'1024px':null}">
-          <div class="head">
+    <div class="statistics-content"
+        id="imgTest_avg1"
+        style="height:1110px;margin-top:200px;box-shadow:none;"
+        :style="{width:ispdf?'1024px':null}"
+        v-loading="isLoading"
+      >
+          <div class="head" >
             <div class="region-titles">
                 <span class="title">
                       {{ $t('statistics.titles.inspectItemScores') }}
@@ -53,7 +58,7 @@
           </div>
 
           <!-- 巡檢項目選單 -->
-          <div style="padding:20px">
+          <div style="padding:20px" >
             <InspectItemSelect
                 :inspect-item-list="inspectItemList"
                 @emitItemChanged="emitItemChanged"
@@ -249,6 +254,8 @@ export default {
   mixins: [resize],
   data() {
     return {
+      isLoading : true,
+
       componentsProps: {},
       path:"inspectItemStatistics",
       pdfSrc_avg1:"",
@@ -2617,6 +2624,7 @@ export default {
     async emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
       console.log("Emit Search");
       console.log(searchParams)
+      this.isLoading = true
       this.params = searchParams;
      // this.part2.standardScore=-1;
      // this.part2.standardScore=-1;
@@ -2791,6 +2799,7 @@ export default {
       return new Promise((resolve, reject) => {
         getInspectItemList({inspectId}).then(res => {
           resolve(res);
+          this.isLoading = false
         }).catch(err => {
           reject(err);
         });

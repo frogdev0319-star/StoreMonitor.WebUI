@@ -10,8 +10,9 @@
             </delay-button>
         </div>
     </div>
-    <el-row class="statistics-container">
-        <el-col :span="24">
+
+    <el-row class="statistics-container" >
+        <el-col :span="24" >
             <search-component
                 ref="inspectEvalutionSearch"
                 :is-patrol="false"
@@ -23,7 +24,11 @@
             />
         </el-col>
 
-        <div class="statistics-content" id="imgTest_avg1" style="height:194px;margin-top:200px;box-shadow:none;" :style="{width:ispdf?'1280px':null}">
+        <div class="statistics-content"
+            id="imgTest_avg1" style="height:194px;margin-top:200px;box-shadow:none;"
+            :style="{width:ispdf?'1280px':null}"
+            v-loading="isLoading"
+            >
             <div class="head">
                 <el-col :span="17">
                     <div class="region-titles">
@@ -78,7 +83,11 @@
         </div>
 
         <!-- 考評結果分佈 -->
-        <div class="statistics-content" id="imgTest_avg2" style="height:900px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1280px':null}">
+        <div class="statistics-content"
+            id="imgTest_avg2" style="height:900px;margin-top:18px;box-shadow:none;"
+            :style="{width:ispdf?'1280px':null}"
+            v-loading="isLoading"
+            >
             <div class="head">
                 <div class="region-titles">
                     <span class="title">
@@ -167,10 +176,10 @@
             </div>
             <el-col style="position:absolute;height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc( 100% - 80px )">
                 <div v-if="part1.storeMode==1" style="overflow-y:hidden;overflow-x:auto;height:430px;width:100%" :style="{width:ispdf?'900px':null}">
-                    <!--<div v-if="ispdf" style="height:100%;">
+                    <!-- <div v-if="ispdf" style="height:100%;">
                     <v-chart ref="storeChart" :id="part1-region-line-chart" autoresize :options="part1.barStoreOption"
                     :style="{width:part1.barStoreOption?part1.barStoreOption.width:'100%',height:'100%'}"/>
-                </div>-->
+                </div> -->
                     <div style="height:100%;">
                         <v-chart ref="storeChart" :id="part1-region-line-chart" :options="part1.barStoreOption" autoresize :style="{width:part1.barStoreOption?part1.barStoreOption.width:'100%',height:'100%'}" />
                     </div>
@@ -212,7 +221,11 @@
         </div>
 
         <!-- 考評得分分佈 -->
-        <div class="statistics-content" id="imgTest_avg3" style="height:1010px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1280px':null}">
+        <div class="statistics-content"
+          id="imgTest_avg3" style="height:1010px;margin-top:18px;box-shadow:none;"
+          :style="{width:ispdf?'1280px':null}"
+          v-loading="isLoading"
+          >
             <div class="head">
                 <div class="region-titles">
                     <span class="title">
@@ -539,6 +552,7 @@ export default {
     mixins: [resize],
     data() {
         return {
+            isLoading: true,
             page: null,
             total: null,
             componentsProps: {},
@@ -1744,7 +1758,7 @@ export default {
         },
 
         async searchData() {
-
+            this.isLoading = true
             this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
             this.part1.pieOption = {};
             this.part1.storeTableData = [];
@@ -1763,22 +1777,18 @@ export default {
                 items: -9999,
                 avgScore: -9999
             };
-            console.log('searchData go')
             if (this.params.storeIds.length > 0) {
-
-                // console.log('this.params go ---> ', this.params)
                 await this.dataGetOverview();
                 await this.dataGetPart1();
                 await this.dataGetPart2();
                 await this.dataGetPart3();
-
+                //this.isLoading = false
             } else {
                 if (this.params.storeIds.length === 0) {
                     util.notify(self.$t('overview.emptyStoreList'), 'warning', 3000);
                     return false;
                 }
             }
-
         },
 
         async export2Excel() {
@@ -2202,7 +2212,7 @@ export default {
             });
         },
 
-        // !!!!
+
         getInspectStatsOverviewWithGroup(params) {
             console.log("getInspectStatsOverviewWithGroup", params)
             if (params.filter.size == 0 ) {
@@ -2211,6 +2221,7 @@ export default {
             return new Promise((resolve, reject) => {
                 getInspectStatsOverviewWithGroup(params).then(res => {
                         resolve(res);
+                        this.isLoading = false
                     })
                     .catch(err => {
                         reject(err);
@@ -3851,8 +3862,9 @@ export default {
             regionMode,
             storePatrolLists,
             timeMode ,
-        }) {
+          }) {
             console.log("Emit Search");
+
 
             this.part2.standardScore = -9999;
             this.part3.standardScore = -9999;
@@ -3877,11 +3889,10 @@ export default {
                 params: this.params
             };
 
-            console.log('emitSearch ===' )
-
             // this.ifSaveParams && this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
             this.ifSaveParams = true;
             this.searchData();
+
         },
 
         exportPDF() {
