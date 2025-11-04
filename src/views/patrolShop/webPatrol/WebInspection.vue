@@ -1198,7 +1198,7 @@ export default {
         self.sheetName.forEach((inspectItem, index1) => {
           //  console.log(inspectItem.inspectList)
             if(inspectItem.inspectList){
-            inspectItem.inspectList.forEach((group, index2) => {
+              inspectItem.inspectList.forEach((group, index2) => {
                 if(group.items){
                   group.items.forEach((item, index3) => {
                     item.sourceList.forEach((source, index4) => {
@@ -1209,12 +1209,9 @@ export default {
                     });
                   });
                 }
-            });
-
+              });
             }
-
         });
-
         this.eventList.forEach((event, index1) => {
           if(event.sourceObj){
             total = total +1;
@@ -4194,6 +4191,11 @@ export default {
 </style>
 
 <style lang="sass" scoped>
+  .error-class
+    font-size: 10px
+    margin-top: 5px
+    color: #ff2400
+    display: block
 
   .advance_memo
     font-size: 12px

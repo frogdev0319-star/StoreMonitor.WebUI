@@ -180,7 +180,7 @@ export default {
               roleName: this.$t('overview.onsitePatrol'),
               checked: false,
               disabled: false,
-              visabled: false
+              visabled: true
             },
             {
               roleName: this.$t('route.reports'), // 巡檢報告
