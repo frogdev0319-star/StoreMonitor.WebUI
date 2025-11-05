@@ -1065,6 +1065,11 @@ export default {
           parentBread: { path: "/closeEvents", name: "reportAndEventUpdated" },
         },
 
+        {
+          paths:["/webinspection/confirmrein"],
+          parentBread: { path: "/webinspection", name: "webPatrol" },
+        },
+
       ];
       const pathAndBreadMap = pathAndBreadMaps.find((map) =>
         map.paths.includes(currentRoute)

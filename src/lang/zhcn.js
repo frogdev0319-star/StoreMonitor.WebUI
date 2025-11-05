@@ -437,7 +437,7 @@ export default {
     "maxConcurrency": "同时上线设备超限",
     "maxDeviceNum": "设备连接数超限",
     "maximumAttach": "每个巡检项最多上传10个资源文件​！",
-    "methodI": "方式一：点击右下方新增按钮，进行意见反馈创建！",
+    "methodI": "点击右下方新增按钮，进行意见反馈创建！",
     "methodII": "方式二：通过视频截图进行创建！",
     "more": "更多请查看详情",
     "name": "问题名称",

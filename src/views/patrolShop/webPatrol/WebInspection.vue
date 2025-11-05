@@ -115,8 +115,8 @@
             <div v-if="!showFeedBack" class="padding"
               :class="{flex:isFullScreenMode && $store.getters.collapsed}"
               style="background-color: rgb(237, 240, 242); height: 60vh; overflow: auto;flex-wrap: wrap; justify-content: space-between">
+
               <div
-                v-if="sourceListLength > 0"
                 style="width: 100%; margin-bottom: 3px; font-size: 12px; text-align: right; color: #989797;"
                 >
                 目前已附加截圖 {{ totalImageNum }} 張，最多可以附加 {{isSystemAdvanced ? 500 : 120}} 張。
@@ -352,10 +352,9 @@
               <div v-if="showFeedBackInfo&&showFeedBack" class="item-content paper" style="margin: 20px; height: calc(100% - 40px); position: relative">
                 <div id="feedback-content">
                   <div class="feedback-info">{{ $t('remotePatrol.methodI') }}</div>
-                  <div class="feedback-info">{{ $t('remotePatrol.methodII') }}</div>
                 </div>
-                <img :src="arrows2Src" alt="arrow2" style="position: absolute; bottom: 90px; right: 100px" height="70">
-                <img :src="plusSrc" alt="plusSrc" style="position: absolute; bottom: 20px; right: 20px" @click="addFeedBack">
+                <!-- <img :src="arrows2Src" alt="arrow2" style="position: absolute; bottom: 90px; right: 100px" height="70"> -->
+                <img :src="plusSrc" alt="plusSrc" style="position: absolute; bottom: 20px; right: 20px; cursor: pointer;" @click="addFeedBack">
               </div>
               <div v-if="!showFeedBackInfo&&showFeedBack" class="item-content paper padding-sm margin-md">
                 <div class="feedbacks-content padding-sm ">
@@ -1192,37 +1191,35 @@ export default {
         'ja-storeUp-content': this.lang.indexOf('ja') !== -1
       }
     },
-    totalSourceList(){
-        const self = this;
-        let total = 0;
-        self.sheetName.forEach((inspectItem, index1) => {
-          //  console.log(inspectItem.inspectList)
-            if(inspectItem.inspectList){
-              inspectItem.inspectList.forEach((group, index2) => {
-                if(group.items){
-                  group.items.forEach((item, index3) => {
-                    item.sourceList.forEach((source, index4) => {
-                      console.log("Add source type="+source.mediaType)
-                      if(source.mediaType!=3){
-                        total = total+1;
-                      }
-                    });
-                  });
-                }
-              });
-            }
-        });
-        this.eventList.forEach((event, index1) => {
-          if(event.sourceObj){
-            total = total +1;
-          }
-        });
-
-        this.totalImageNum = +total
-
-        console.log("Total Source="+total)
-        return total;
-    },
+    // totalSourceList(){
+    //     const self = this;
+    //     let total = 0;
+    //     self.sheetName.forEach((inspectItem, index1) => {
+    //       //  console.log(inspectItem.inspectList)
+    //         if(inspectItem.inspectList){
+    //           inspectItem.inspectList.forEach((group, index2) => {
+    //             if(group.items){
+    //               group.items.forEach((item, index3) => {
+    //                 item.sourceList.forEach((source, index4) => {
+    //                   console.log("Add source type="+source.mediaType)
+    //                   if(source.mediaType!=3){
+    //                     total = total+1;
+    //                   }
+    //                 });
+    //               });
+    //             }
+    //           });
+    //         }
+    //     });
+    //     this.eventList.forEach((event, index1) => {
+    //       if(event.sourceObj){
+    //         total = total +1;
+    //       }
+    //     });
+    //     this.totalImageNum = +total
+    //     console.log("Total Source="+total)
+    //     return total;
+    // },
     imgHeight() {
       let height = 0;
       if (this.varyWindowWidth > 1800) {
@@ -2851,6 +2848,7 @@ export default {
       self.sourceListLength = item.sourceList.length;
       console.log("ClickItem")
       console.log("this.sheetName", this.sheetName);
+
       let total = 0;
       self.sheetName.forEach((inspectItem, index1) => {
         //  console.log(inspectItem.inspectList)
@@ -4057,6 +4055,7 @@ export default {
         return;
       }
 
+      let attachFileNums = 0
       if(files[0].type.includes("image")){
         const safeFilename = files[0].name.replace(/#/g, '_')
         var objImg={
@@ -4082,6 +4081,7 @@ export default {
                 if(ii.id == itemId){
                   ii.attachFileList.push(objImg)
                 }
+                attachFileNums += ii.attachFileList.length
               })
             })
           }
@@ -4098,10 +4098,7 @@ export default {
           size:files[0].size,
         }
 
-
         self.createFile(files[0],objvideo);
-
-        // self.attachFileList.push(objvideo);
         this.sheetName.forEach( t => {
           if(t.inspectList){
             t.inspectList.forEach( i=> {
@@ -4109,11 +4106,14 @@ export default {
                 if(ii.id == itemId){
                   ii.attachFileList.push(objvideo)
                 }
+                attachFileNums += ii.attachFileList.length
               })
             })
           }
         })
       }
+
+      this.totalImageNum = attachFileNums
       self.$refs.fileInput.value = '';
     },
 
@@ -4133,18 +4133,27 @@ export default {
     },
 
     deleteAttachImg({item, index}) {
-      // console.log('item :>> ', item);
-      // console.log('this.inspectList :>> ', this.inspectList);
       this.inspectList.forEach( i =>{
         i.items.forEach( ii => {
           ii.attachFileList.forEach( iii =>{
             if( iii.fileName == item.fileName){
-              console.log('iii :>> ', iii);
               ii.attachFileList.splice(index, 1);
             }
           })
         })
       })
+
+      var attachFileNums = 0
+      this.sheetName.forEach( t => {
+        if(t.inspectList){
+          t.inspectList.forEach( i=> {
+            i.items.forEach( ii => {
+              attachFileNums += ii.attachFileList.length
+            })
+          })
+        }
+      })
+      this.totalImageNum = attachFileNums
     },
 
     getAuditImgList(sourceList , index) {
@@ -4262,9 +4271,7 @@ export default {
       color: #006ab7;
       font-size: calc(24/1920*100vw);
       font-weight: bold;
-      &:last-child {
-        margin-top: calc(30/1920*100vw);
-      }
+      // margin-top: calc(30/1920*100vw);
     }
   }
   .fadepen-enter, .fadepen-leave-to{
@@ -5353,9 +5360,7 @@ export default {
               color: #006ab7;
               font-size: calc(18/1920*100vw);
               font-weight: bold;
-              &:last-child{
-                @include point(margin-top,30);
-              }
+
             }
           }
           .feed-arrow{
