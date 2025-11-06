@@ -478,7 +478,7 @@ export default {
     "resultType": "总评类型",
     "return": "{seconds}秒后自动返回远程巡检页面！",
     "returnStoreMonitor": "{seconds}秒后自动返回现场监控页面！",
-    "requiredValid": "尚有必填项目未完成",
+    "requiredValid": "巡检表中尚有必填项目，请继续完成巡检。",
     "score": "得分",
     "scoreU": "单位：个",
     "scoreUnit": "评分：",

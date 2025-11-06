@@ -117,6 +117,7 @@
               style="background-color: rgb(237, 240, 242); height: 60vh; overflow: auto;flex-wrap: wrap; justify-content: space-between">
 
               <div
+                v-if="totalImageNum > 0"
                 style="width: 100%; margin-bottom: 3px; font-size: 12px; text-align: right; color: #989797;"
                 >
                 目前已附加截圖 {{ totalImageNum }} 張，最多可以附加 {{isSystemAdvanced ? 500 : 120}} 張。
@@ -261,7 +262,6 @@
                         :autosize="{ minRows: 2, maxRows: 7 }"
                         v-model="item.inspectInput"
                         :placeholder="$t('remotePatrol.coment')"
-                        :disabled="item.disabled"
                         size="mini"
                         class="force_white"
                         type="textarea"
@@ -3061,7 +3061,7 @@ export default {
 
             item.items.forEach((_item, _index) => {
               if (!_item.manualIgnore && _item.required) {
-              console.log("_item ::::::::>>", _item)
+              // console.log("_item ::::::::>>", _item)
                 if (
                   (_item.itemType === 0 && _item.itemgetScore === '--') ||
                   (_item.itemType === 1 && _item.sourceList.length === 0)

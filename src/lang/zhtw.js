@@ -481,7 +481,7 @@ export default {
     "resultType": "總評類型",
     "return": "{seconds}秒後自動返回遠端巡檢頁面！",
     "returnStoreMonitor": "{seconds}秒後自動返回地點監控頁面！",
-    "requiredValid": "尚有必填項目未完成",
+    "requiredValid": "巡檢表中尚有必填項目，請繼續完成巡檢。",
     "score": "得分",
     "scoreU": "單位：個",
     "scoreUnit": "評分：",
