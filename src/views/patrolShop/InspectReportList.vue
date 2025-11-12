@@ -49,6 +49,7 @@
               </el-select> -->
 
               <!-- <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" /> -->
+
                 <el-select
                   class="el-province"
                   style="width: 100% ; margin-left:0px;border:none;border-radius:0px;"
@@ -753,7 +754,8 @@ export default {
 
     async export2ExcelAll(){
       const self = this;
-      if(self.inspectId == -1 || self.params.inspectTagId==null){
+      // if(self.inspectId == -1 || self.params.inspectTagId == null){
+      if(self.params.inspectTagId == -1 || self.params.inspectTagId == null){
         self.ExportAllMsg = this.$t('remotePatrol.selectOnlyOneInspect');
         self.showExportAllWarn = true;
         return;
@@ -777,6 +779,7 @@ export default {
         beginTs: this.params.beginTs,
         endTs:  this.params.endTs,
         inspectTagId: this.params.inspectTagId,
+        // inspectTagId: this.inspectId,
         clause: this.params.clause,
         reportIds: reportIds,
         filter : {page: 0, size: 99999},
