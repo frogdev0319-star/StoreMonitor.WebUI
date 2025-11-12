@@ -177,7 +177,9 @@
                     :class="item.isClick?'active-color':''"
                     class="item-chart"
                     @click="showItemRadar(item, index)">
-                    <div :class="`item-ranking-${index}`" class="item-ranking">0{{ index + 1 }}</div>
+                    <div :class="`item-ranking-${index}`" class="item-ranking">
+                      <span v-if="index !== 9" style="margin-right: -3px;">0</span>
+                      {{ index + 1 }}</div>
                     <div class="item-titles">
                       <div class="item-title">{{ item.inspectItemName }}</div>
                     </div>
@@ -1146,7 +1148,7 @@ export default {
           resultData.sort((item1, item2) => {
             return item1.numOfUnqualified < item2.numOfUnqualified ? 1 : -1;
           });
-          const topFiveArray = resultData.slice(0, 5);
+          const topFiveArray = resultData.slice(0, 10);
           const firstItem = topFiveArray[0];
           self.curItemId = firstItem.inspectItemId;
           self.curItemName = firstItem.inspectItemName;

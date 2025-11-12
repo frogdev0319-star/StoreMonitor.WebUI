@@ -799,6 +799,20 @@
             <div class="padding-vertical-sm">{{requiredObj.showInfo}} </div>
           </div>
         </dialog-pop>
+
+        <dialog-pop
+          v-if="requiredIgnoreObj.dialogCosed"
+          :title="requiredIgnoreObj.title"
+          :isWarning="requiredIgnoreObj.isWarning"
+          :visible="requiredIgnoreObj.dialogCosed"
+          @cancelHandler="requiredIgnoreObj.dialogCosed = false"
+          @confirmHandler="resolveConfoirmSummaryData()"
+          >
+          <div class="dialog-slot">
+            <div class="padding-vertical-sm">{{requiredIgnoreObj.showInfo}} </div>
+          </div>
+        </dialog-pop>
+
         <dialog-pop
           v-if="allIgnoreObj.dialogCosed"
           :title="allIgnoreObj.title"
@@ -1060,6 +1074,14 @@ export default {
         isWarning: true,
         dialogCosed: false
       },
+
+      requiredIgnoreObj: {
+        title: this.$t('remotePatrol.prompt'),
+        showInfo: "巡檢表中尚有未評項目，請確認是否仍要完成巡檢？",
+        isWarning: true,
+        dialogCosed: false
+      },
+
       EditRptchangeInspectObj: {
         title: this.$t('remotePatrol.prompt'),
         showInfo: this.$t('remotePatrol.cannotSwitchInspect'),
@@ -2965,8 +2987,10 @@ export default {
       let count = 0;
       let dealCount = 0;
       let requiredValid = false;
+      let requiredIgnore = false;
       let memoCheckText = false;
       let memoCheckMedia = false;
+
       //上傳附件
 
       let status = 0;
@@ -3060,14 +3084,20 @@ export default {
           s_item.inspectList.forEach(item => {
 
             item.items.forEach((_item, _index) => {
+
               if (!_item.manualIgnore && _item.required) {
               // console.log("_item ::::::::>>", _item)
                 if (
-                  (_item.itemType === 0 && _item.itemgetScore === '--') ||
-                  (_item.itemType === 1 && _item.sourceList.length === 0)
-                ) {
-                  requiredValid = true
-                }
+                      (_item.itemType === 0 && _item.itemgetScore === '--') ||
+                      (_item.itemType === 1 && _item.sourceList.length === 0)
+                    ) {
+                      requiredValid = true
+                    }
+              }
+
+              if (_item.manualIgnore == false && _item.itemScoreTitle === "--" && _item.itemType == 0)
+              {
+                requiredIgnore = true
               }
 
               if(_item.memo_config !== null){
@@ -3178,6 +3208,11 @@ export default {
 
       if (requiredValid) {
         self.requiredObj.dialogCosed = true;
+        return false;
+      }
+
+      if (requiredIgnore) {
+        self.requiredIgnoreObj.dialogCosed = true;
         return false;
       }
 

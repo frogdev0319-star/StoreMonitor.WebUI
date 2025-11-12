@@ -43,10 +43,10 @@
         <span v-if="adviceInfoRuletip" class="rules">{{ $t('remotePatrol.comentRuletip_suggest') }}</span>
 
 
-        <!-- 加入檔案 & 簽名 v-if="isSignature" -->
+        <!-- 加入檔案 & 簽名 -->
         <div class="audit-add-files">
           <!-- <p style="margin-bottom: 10px"><span style="color: #c60957" >* </span></p> -->
-          <span class="sug-label"> {{$t('audit.auditStatus.addSign')}} </span>
+          <span class="sug-label"> <span v-if="onSiteSignature" style="color: #c60957;">* </span> {{$t('audit.auditStatus.addSign')}} </span>
           <div class="attach-area" >
             <div v-for="(imgItem,index) in signatureFileList" :key="'img'+index" class="source-details" >
               <div class="img-content">
@@ -650,9 +650,11 @@ export default {
       hundredMarkType: 0,
 
       isSystemAdvanced: false,
-      isSignature: false,
+      isSignature: true,
       signatureFileList:[],
       showSignaturePad: false,
+
+      onSiteSignature: false
     };
   },
   computed: {
@@ -859,6 +861,9 @@ export default {
 
     async submit(sendEvent) {
       const self = this;
+
+
+
       let upload = 0;
       const inspect = self.inspectList;
       const eventList = self.eventList;
@@ -876,6 +881,17 @@ export default {
         return false;
       }
       console.log("image file="+self.imgFileList.length + " " + self.pdfFileList.length)
+
+      if(this.onSiteSignature ){
+        if( this.signatureFileList.length == 0){
+          util.notify( "請簽名後再嘗試送出", 'error', 3000);
+        return false;
+        }
+
+      }
+
+
+
       if((self.imgFileList.length  + self.pdfFileList.length)>10){
         util.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
         return false;
@@ -2446,6 +2462,11 @@ export default {
           this.isAutoMappingActivate = res.data.find(i => {
             return i.name == "setting_isAutoMappingActivate"
           })
+
+          this.onSiteSignature = res.data.find(i => {
+            return i.name == "onSiteSignature"
+          }).value
+
 
           this.scoreMiddleLow = this.autoMappingByTotalScore.extra.find(i => i.key === "mappingScore_bottom").value
           this.scoreMiddleHeight = this.autoMappingByTotalScore.extra.find(i => i.key === "mappingScore_top").value
