@@ -754,7 +754,6 @@ export default {
 
     async export2ExcelAll(){
       const self = this;
-      // if(self.inspectId == -1 || self.params.inspectTagId == null){
       if(self.params.inspectTagId == -1 || self.params.inspectTagId == null){
         self.ExportAllMsg = this.$t('remotePatrol.selectOnlyOneInspect');
         self.showExportAllWarn = true;
