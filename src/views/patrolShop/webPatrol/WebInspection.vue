@@ -199,6 +199,9 @@
                     <div v-if="item.lastUnqualifiedNumber > 0" class="details-failed-record margin-bottom-sm">
                       {{ $t('remotePatrol.failedRecord') + item.lastUnqualifiedNumber }}
                     </div>
+
+                    <!-- <pre style="text-align: left; font-size: 10px;">{{ item }}</pre> -->
+
                   </div>
 
                   <!-- comment -->
@@ -278,6 +281,7 @@
                       </button>
                     </div>
 
+
                     <!-- notification -->
                     <div class="advance_memo" v-if="(item.memo_config !== null && item.memo_config.memo_required_type == 1)">
                       {{$t('remotePatrol.pleaseAdd')}} <span v-show="(item.memo_config.memo_check_text == true)"> {{$t('remotePatrol.textItem')}}</span>
@@ -286,7 +290,32 @@
                     </div>
 
                     <div class="advance_memo" v-else-if="( item.memo_config !== null && item.memo_config.memo_required_type == 2)">
-                      <div class="" v-if="(item.qualifiedScore === 0)">
+
+                      <div class="" v-if="item.type == 0 && item.isQualified == false && item.inputCount > 0">
+                      {{$t('remotePatrol.notQualifyAdd')}}
+                          <span v-show="(item.memo_config.memo_check_text == true)"> {{$t('remotePatrol.textItem')}}</span>
+                          <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">, </span>
+                          <span v-show="(item.memo_config.memo_check_media == true)">{{$t('remotePatrol.mediaItem')}}</span> {{$t('remotePatrol.attachments')}}
+                      </div>
+
+                      <div class="" v-if="item.type == 1 && item.inputCount > 0 && item.itemgetScore < item.qualifiedScore ">
+                      {{$t('remotePatrol.notQualifyAdd')}}
+                          <span v-show="(item.memo_config.memo_check_text == true)"> {{$t('remotePatrol.textItem')}}</span>
+                          <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">, </span>
+                          <span v-show="(item.memo_config.memo_check_media == true)">{{$t('remotePatrol.mediaItem')}}</span> {{$t('remotePatrol.attachments')}}
+                      </div>
+
+                      <!-- 附加評分項 -->
+                      <div class="" v-if="item.type == 2 && item.isQualified == false && item.inputCount > 0">
+                      {{$t('remotePatrol.notQualifyAdd')}}
+                          <span v-show="(item.memo_config.memo_check_text == true)"> {{$t('remotePatrol.textItem')}}</span>
+                          <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">, </span>
+                          <span v-show="(item.memo_config.memo_check_media == true)">{{$t('remotePatrol.mediaItem')}}</span> {{$t('remotePatrol.attachments')}}
+                      </div>
+
+
+
+                      <!-- <div class="" v-if="(item.qualifiedScore === 0)">
                       {{$t('remotePatrol.notQualifyAdd')}}
                           <span v-show="(item.memo_config.memo_check_text == true)"> {{$t('remotePatrol.textItem')}}</span>
                           <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">, </span>
@@ -297,8 +326,11 @@
                           <span v-show="(item.memo_config.memo_check_text == true)"> {{$t('remotePatrol.textItem')}}</span>
                           <span v-show="(item.memo_config.memo_check_text == true && item.memo_config.memo_check_media == true)">, </span>
                           <span v-show="(item.memo_config.memo_check_media == true)">{{$t('remotePatrol.mediaItem')}}</span> {{$t('remotePatrol.attachments')}}
-                      </div>
+                      </div> -->
                     </div>
+
+
+
                     <span v-if="item.RuleCountTip" class="rules">{{$t("remotePatrol.commentCountRuleTip")}}</span>
                     <span v-if="item.Ruletip" class="rules">{{$t("remotePatrol.comentRuletip")}} </span>
 
@@ -814,6 +846,19 @@
         </dialog-pop>
 
         <dialog-pop
+          v-if="advanceToAttachObj.dialogCosed"
+          :title="advanceToAttachObj.title"
+          :isWarning="advanceToAttachObj.isWarning"
+          :visible="advanceToAttachObj.dialogCosed"
+          @cancelHandler="advanceToAttachObj.dialogCosed = false"
+          @confirmHandler="resolveConfoirmSummaryData()"
+          >
+          <div class="dialog-slot">
+            <div class="padding-vertical-sm">{{advanceToAttachObj.showInfo}} </div>
+          </div>
+        </dialog-pop>
+
+        <dialog-pop
           v-if="allIgnoreObj.dialogCosed"
           :title="allIgnoreObj.title"
           :isWarning="allIgnoreObj.isWarning"
@@ -1078,6 +1123,13 @@ export default {
       requiredIgnoreObj: {
         title: this.$t('remotePatrol.prompt'),
         showInfo: "巡檢表中尚有未評項目，請確認是否仍要完成巡檢？",
+        isWarning: true,
+        dialogCosed: false
+      },
+
+      advanceToAttachObj: {
+        title: this.$t('remotePatrol.prompt'),
+        showInfo: " 請加入附件!!!!!",
         isWarning: true,
         dialogCosed: false
       },
@@ -2991,6 +3043,9 @@ export default {
       let memoCheckText = false;
       let memoCheckMedia = false;
 
+      let advanceToAttach = false;
+
+
       //上傳附件
 
       let status = 0;
@@ -3086,7 +3141,7 @@ export default {
             item.items.forEach((_item, _index) => {
 
               if (!_item.manualIgnore && _item.required) {
-              // console.log("_item ::::::::>>", _item)
+
                 if (
                       (_item.itemType === 0 && _item.itemgetScore === '--') ||
                       (_item.itemType === 1 && _item.sourceList.length === 0)
@@ -3099,6 +3154,48 @@ export default {
               {
                 requiredIgnore = true
               }
+
+
+              // if (_item.type == 0 && _item.isQualified == false && _item.inputCount > 0)
+              // {
+              //   advanceToAttach = true
+              // }
+
+              console.log("_item ::::::::>>", _item)
+              // console.log('advanceToAttach :>> ', advanceToAttach);
+
+              if(_item.memo_config){
+                if( _item.memo_config.memo_required_type == 0){
+                  if(_item.memo_config.memo_check_text == true){
+                    var aaa = _item.sourceList.find(i => i.mediaType == 3)
+                    console.log('aaa :>> ', aaa);
+                    if(!aaa) {
+                      alert("AAAAA")
+                    }
+
+                  }
+                  // else if(_item.memo_config.memo_check_media == true){
+                  //   alert("BBBB")
+                  // }
+                  // else {
+                  //   alert("CCC")
+                  // }
+
+                }
+
+              }
+
+
+
+
+
+
+              // if (advanceToAttach) {
+              //   self.advanceToAttachObj.dialogCosed = true;
+              //   return false;
+              // }
+
+
 
               if(_item.memo_config !== null){
                 switch (_item.type) {
@@ -3181,8 +3278,8 @@ export default {
         });
       if (self.hasIgnoretemp.length === 0) {
         sheetName.forEach(s_item => {
-          console.log("s_item:",s_item);
-          console.log("s_item.ignoreCount:",(s_item.ignoreCount)?s_item.ignoreCount:0);
+          // console.log("s_item:",s_item);
+          // console.log("s_item.ignoreCount:",(s_item.ignoreCount)?s_item.ignoreCount:0);
           dealCount = dealCount + s_item.dealCount;//+((s_item.ignoreCount)?s_item.ignoreCount:0);
           count = count + s_item.count;
         });
@@ -3206,6 +3303,7 @@ export default {
       }
 
 
+
       if (requiredValid) {
         self.requiredObj.dialogCosed = true;
         return false;
@@ -3215,6 +3313,8 @@ export default {
         self.requiredIgnoreObj.dialogCosed = true;
         return false;
       }
+
+
 
       // 備註標籤文字
       if (memoCheckText) {
