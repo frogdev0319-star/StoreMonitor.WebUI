@@ -3076,67 +3076,7 @@ export default {
       let advanceToAttach = false;
 
 
-      //上傳附件
 
-      let status = 0;
-
-      self.uploadingnumOfPic = 0;
-
-
-      // console.log('self.inspectList', self.inspectList)
-      // var fileNum = 0
-      // self.inspectList.forEach( i => {
-      //   i.items.forEach(ii => {
-      //     fileNum += ii.attachFileList.length
-      //   });
-      // })
-
-      console.log('this.sheetName', this.sheetName)
-
-      var fileNum = 0
-      self.sheetName.forEach( t =>{
-        if(t.inspectList){
-          t.inspectList.forEach( i => {
-            i.items.forEach(ii => {
-              fileNum += ii.attachFileList.length
-            });
-          })
-        }
-      })
-      self.totalnumOfPic = fileNum;
-      self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
-
-      const storageParams = {};
-      // storageParams.storeId = this.event.storeId;
-      console.log('storageParams :>> ', storageParams);
-      await getStorageInfo(storageParams).then(res => {
-        if (res.errCode === 0) {
-          self.oss = res.data;
-        }
-      });
-
-      const uploadPromises = [];
-      self.sheetName.forEach( t =>{
-        if(t.inspectList){
-          t.inspectList.forEach(i => {
-            i.items.forEach(ii => {
-              for (let idx = 0; idx < ii.attachFileList.length; idx++) {
-                const promise = self.upLoadFile(ii.attachFileList[idx]).then((url) => {
-                  // 添加到 sourceList
-                  const auditImgObj = {
-                    mediaType: ii.attachFileList[idx].type,
-                    src: url,
-                    ts: Date.now(),
-                    hasUrl: true
-                  };
-                  ii.sourceList.push(auditImgObj);
-                });
-                uploadPromises.push(promise);
-              }
-            });
-          });
-        }
-      })
 
 
 
@@ -3469,6 +3409,53 @@ export default {
       //   self.noAllInspectObj.dialogCosed = true;
       //   return false;
       // }
+
+       //上傳附件
+      self.uploadingnumOfPic = 0;
+      var fileNum = 0
+      self.sheetName.forEach( t =>{
+        if(t.inspectList){
+          t.inspectList.forEach( i => {
+            i.items.forEach(ii => {
+              fileNum += ii.attachFileList.length
+            });
+          })
+        }
+      })
+      self.totalnumOfPic = fileNum;
+      self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
+
+      const storageParams = {};
+      // storageParams.storeId = this.event.storeId;
+      console.log('storageParams :>> ', storageParams);
+      await getStorageInfo(storageParams).then(res => {
+        if (res.errCode === 0) {
+          self.oss = res.data;
+        }
+      });
+
+      const uploadPromises = [];
+      self.sheetName.forEach( t =>{
+        if(t.inspectList){
+          t.inspectList.forEach(i => {
+            i.items.forEach(ii => {
+              for (let idx = 0; idx < ii.attachFileList.length; idx++) {
+                const promise = self.upLoadFile(ii.attachFileList[idx]).then((url) => {
+                  // 添加到 sourceList
+                  const auditImgObj = {
+                    mediaType: ii.attachFileList[idx].type,
+                    src: url,
+                    ts: Date.now(),
+                    hasUrl: true
+                  };
+                  ii.sourceList.push(auditImgObj);
+                });
+                uploadPromises.push(promise);
+              }
+            });
+          });
+        }
+      })
 
       console.log('sheetName end:>> ', sheetName);
       // 等待所有上傳完成
