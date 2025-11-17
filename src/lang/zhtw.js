@@ -838,7 +838,7 @@ export default {
     "tab1CalculateScore": "與其他tab組合時，Tab1（Pass&Fail）項目分值參與考評總分運算",
     "tab1FailedDangeous": "Tab1（Pass&Fail）中存在不合格項時，巡檢結果為",
     "tab1IgnoredQualified": "Tab1(Pass&Fail)中忽略項目視同得分",
-    "tab1Checked": "TAB1 中預設合格",
+    "tab1Checked": "Tab1 中預設合格",
     "tab2IgnoredQualified": "Tab2（Score）中忽略項目視同得分",
     "templateEmpty": "巡檢表不能為空！",
     "templateError": "巡檢表樣版錯誤！",
