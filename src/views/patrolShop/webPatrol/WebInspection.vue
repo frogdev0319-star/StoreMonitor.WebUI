@@ -1351,16 +1351,26 @@ export default {
   },
 
   beforeRouteEnter(to, from, next) {
-    to.meta.keepAlive = true;
-    next(vm => {
-    // vm 就是組件實例 (this)
-    // 在這裡可以呼叫 methods
+    to.meta.keepAlive = false;
+    console.log("*from.name ~~~~~~:",from.name);
+
     if (from.name === 'confirmSum') {
-      vm.handleBack()
-      // 可以呼叫 methods
-      // vm.someMethod();
+      console.log("1")
+      to.meta.keepAlive = true;
+      next(vm => {
+          // vm 就是組件實例 (this)
+          vm.handleRouteBack()
+      });
     }
-  });
+    else {
+      to.meta.keepAlive = false;
+      next();
+
+    }
+
+
+
+
     // if (from.name === 'confirmSum') {
     //   to.meta.keepAlive = true;
     //   console.log('aaaa :>> ');
@@ -1386,7 +1396,7 @@ export default {
       }).then(() => {
         self.$store.dispatch('setBackPatrolParam', null);
         if (to.name != 'confirmSum') {
-            // from.meta.keepAlive = false;
+            from.meta.keepAlive = false;
           self.playState && self.previewplayer && self.previewplayer.dispose();
           self.$store.dispatch('setPatrolHistory', null);
           self.$store.dispatch('setPatrolComment', null);
@@ -1410,7 +1420,7 @@ export default {
     } else {
       self.$store.dispatch('setBackPatrolParam', null);
       if (to.name != 'confirmSum') {
-        // from.meta.keepAlive=false;
+        from.meta.keepAlive=false;
         this.editCount = 0;
         this.$store.dispatch('setEditCount', this.editCount);
         self.$store.dispatch('setEditReport', false);
@@ -1545,19 +1555,21 @@ export default {
 
   methods: {
 
-    handleBack(){
+    handleRouteBack(){
+      this.$route.meta.keepAlive = true;
       this.sheetName.forEach(s_item => {
         if(s_item.inspectList){
           s_item.inspectList.forEach(item => {
+            var sourceList = []
             item.items.forEach((_item, _index) => {
-              var sourceList = _item.sourceList.filter( i => i.mediaType == 3)
+              _item.sourceList = _item.sourceList.filter( i => i.mediaType == 3)
             });
           });
         }
       });
-
       console.log('this.sheetName :>> ', this.sheetName);
     },
+
 
 
 

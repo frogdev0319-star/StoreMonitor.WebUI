@@ -56,14 +56,21 @@ export default {
       curSecond: 10,
       timeid: 0,
       lang: this.$i18n.locale,
-      isBindWorkflow:false,
+      isBindWorkflow: false,
       viewReportByTagAuth: false
     };
   },
 
+  // beforeRouteEnter(to, from, next) {
+  //   to.meta.keepAlive = false;
+  //   from.meta.keepAlive = false;
+  //   next();
+  // },
+
   beforeRouteLeave(to, from, next) {
     const self = this;
     clearInterval(self.timeid);
+    to.meta.keepAlive = false;
     next();
   },
 
