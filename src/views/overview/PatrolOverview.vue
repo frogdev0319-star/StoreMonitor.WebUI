@@ -164,7 +164,7 @@
             </div>
           </div>
         </el-col>
-        <!-- 缺失項目TOP5 -->
+        <!-- 缺失項目TOP 10 -->
         <el-col :span="18">
           <div class="focus-items paper">
             <div class="title">{{ $t('overview.worstItems') }}  </div>

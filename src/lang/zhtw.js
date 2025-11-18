@@ -307,7 +307,7 @@ export default {
     "unscheduleNum": "計劃外巡檢次數",
     "user": "人員",
     "visitor": "拜訪對象",
-    "worstItems": "缺失項目TOP5",
+    "worstItems": "缺失項目TOP 10",
     "worstPatrol": "巡檢完成最差TOP5",
     "worstRegion": "重點關注區域",
     "customDate": "自定義",

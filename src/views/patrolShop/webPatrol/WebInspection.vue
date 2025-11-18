@@ -32,7 +32,8 @@
             <div class="spacer"></div>
 
             <!-- 完成巡檢 -->
-            <el-button :disabled="(!allRemarkItemsFlag && !isDisabled)||storeStatus==61"
+            <el-button
+              :disabled=" (!tab1Checked && !allRemarkItemsFlag && !isDisabled) || storeStatus==61 "
               class="storevue-button-filled"
               :size="varyWindowWidth>1680?'small':'mini'" type="primary" @click="confirmSummary">
               {{ $t('remotePatrol.confirmSum') }}
@@ -120,6 +121,7 @@
                 v-if="totalImageNum > 0"
                 style="width: 100%; margin-bottom: 3px; font-size: 12px; text-align: right; color: #989797;"
                 >
+
                 目前已附加截圖 {{ totalImageNum }} 張，最多可以附加 {{isSystemAdvanced ? 500 : 120}} 張。
               </div>
               <div
@@ -241,7 +243,8 @@
                       </div>
                     </div>
 
-                    <!-- 評論文字 -->
+
+                    <!-- ????? -->
                     <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="img-source-content">
                       <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details" >
                         <div v-if="_item.mediaType==2" class="img-content">
@@ -259,7 +262,7 @@
                       </div>
                     </div>
 
-                    <!-- text input -->
+                    <!-- 評論文字 text input -->
                     <div style="position: relative">
                       <el-input
                         :autosize="{ minRows: 2, maxRows: 7 }"
@@ -355,22 +358,24 @@
                             />
                         </div>
                       </div>
-
-                      <div v-if="item.attachFileList.length < 10" class="attach-add" @click="triggerFileSelect(item)">
-                        <input
-                          type="file"
-                          style="display: none"
-                          accept="image/png,image/jpeg,video/mp4"
-                          max-size="2"
-                          @change="doAddAttachment($event, item.id)"
-                          ref="fileInput"
-                          :data-testid="item.id"
-                          />
-                        <div style="height:16px;display: flex;flex-direction: row;align-items: center;">
-                          <img :src="addAttIcon" widht="16px" height="16px" style="border-radius:10px;"/>
-                          <div class="att-txt">{{ $t('audit.inceptionRpt.attachment') }}</div>
+                      <div v-if="!isShowAttchBtn">
+                        <div v-if="item.attachFileList.length < 10 " class="attach-add" @click="triggerFileSelect(item)">
+                          <input
+                            type="file"
+                            style="display: none"
+                            accept="image/png,image/jpeg,video/mp4"
+                            max-size="2"
+                            @change="doAddAttachment($event, item.id)"
+                            ref="fileInput"
+                            :data-testid="item.id"
+                            />
+                          <div style="height:16px;display: flex;flex-direction: row;align-items: center;">
+                            <img :src="addAttIcon" widht="16px" height="16px" style="border-radius:10px;"/>
+                            <div class="att-txt">{{ $t('audit.inceptionRpt.attachment') }}</div>
+                          </div>
                         </div>
                       </div>
+
                     </div>
 
 
@@ -838,7 +843,7 @@
           :isWarning="requiredIgnoreObj.isWarning"
           :visible="requiredIgnoreObj.dialogCosed"
           @cancelHandler="requiredIgnoreObj.dialogCosed = false"
-          @confirmHandler="resolveConfoirmSummaryData()"
+          @confirmHandler="uploadPromisesData()"
           >
           <div class="dialog-slot">
             <div class="padding-vertical-sm">{{requiredIgnoreObj.showInfo}} </div>
@@ -1248,6 +1253,8 @@ export default {
       dialogAttachVideo:false,
 
       tab1Checked: false,
+      isShowAttchBtn:  false,
+      fromConfirmSum: false
 
     };
   },
@@ -1343,12 +1350,32 @@ export default {
     }
   },
 
+  beforeRouteEnter(to, from, next) {
+    to.meta.keepAlive = true;
+    next(vm => {
+    // vm 就是組件實例 (this)
+    // 在這裡可以呼叫 methods
+    if (from.name === 'confirmSum') {
+      vm.handleBack()
+      // 可以呼叫 methods
+      // vm.someMethod();
+    }
+  });
+    // if (from.name === 'confirmSum') {
+    //   to.meta.keepAlive = true;
+    //   console.log('aaaa :>> ');
+    //   next();
+
+    // } else {
+    //   to.meta.keepAlive = false;
+    //   next();
+    // }
+  },
+
   beforeRouteLeave(to, from, next) {
     const self = this;
     const canLeave = !self.showGuide && self.$refs.vendorVideo && self.$refs.vendorVideo.editCount !== 0;
     if (canLeave && to.name !== 'confirmSum') {
-
-
       self.$confirm(self.$t('remotePatrol.changPageInfo'), self.$t('remotePatrol.prompt'), {
         confirmButtonText: self.$t('remotePatrol.confirm'),
         cancelButtonText: self.$t('remotePatrol.cancel'),
@@ -1359,7 +1386,7 @@ export default {
       }).then(() => {
         self.$store.dispatch('setBackPatrolParam', null);
         if (to.name != 'confirmSum') {
-          //   from.meta.keepAlive=false;
+            // from.meta.keepAlive = false;
           self.playState && self.previewplayer && self.previewplayer.dispose();
           self.$store.dispatch('setPatrolHistory', null);
           self.$store.dispatch('setPatrolComment', null);
@@ -1369,8 +1396,7 @@ export default {
           self.$store.dispatch('setEditReport', false);
           Database.addDataToDB(self.userId, {data: {}, rule: {}});
         } else {
-          //   from.meta.keepAlive = true;
-
+            // from.meta.keepAlive = true;
           self.$store.dispatch('setStoreList', self.storeList);
           self.$store.dispatch('setPatrolHistory', self.historyObj);
           self.$store.dispatch('setStoreCache', this.curSelStoreId);
@@ -1404,11 +1430,10 @@ export default {
       next();
     }
   },
-
   async mounted() {
+
+
     const self = this;
-
-
     await self.getUserInfo()
     this.enableMimicMode = this.$store.getters.mimicMode;
     const PatrolHistory = self.$store.getters.PatrolHistory;
@@ -1519,6 +1544,22 @@ export default {
   },
 
   methods: {
+
+    handleBack(){
+      this.sheetName.forEach(s_item => {
+        if(s_item.inspectList){
+          s_item.inspectList.forEach(item => {
+            item.items.forEach((_item, _index) => {
+              var sourceList = _item.sourceList.filter( i => i.mediaType == 3)
+            });
+          });
+        }
+      });
+
+      console.log('this.sheetName :>> ', this.sheetName);
+    },
+
+
 
     async getUserInfo(){
       const result = await this.$store.dispatch("GetUserAuthorities");
@@ -2948,6 +2989,7 @@ export default {
 
     clickItem({item, index}) {
       const self = this;
+
       self.sourceList = [];
       self.sourceListLength = item.sourceList.length;
       console.log("ClickItem")
@@ -3075,11 +3117,6 @@ export default {
 
       let advanceToAttach = false;
 
-
-
-
-
-
       // var attachment_des = [];
       // for(let idx=0; idx < self.inspectList[0].items[0].attachFileList.length; idx++){
       //   await self.upLoadFile(self.inspectList[0].items[0].attachFileList[idx]).then((url) => {
@@ -3098,6 +3135,8 @@ export default {
       //     console.log("uploade file error:",err)
       //   });
       // }
+
+
 
 
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
@@ -3258,9 +3297,7 @@ export default {
                 requiredIgnore = true
               }
 
-              console.log("_item ::::::::>>", _item)
-
-
+              // console.log("_item ::::::::>>", _item)
 
 
               if(_item.memo_config !== null){
@@ -3374,21 +3411,14 @@ export default {
         util.notify('尚有必填附件未加入，請確認巡檢項', "error", 3000);
         return false;
       }
-
-
       if (requiredValid) {
         self.requiredObj.dialogCosed = true;
         return false;
       }
-
-
       if (requiredIgnore) {
         self.requiredIgnoreObj.dialogCosed = true;
         return false;
       }
-
-
-
       // 備註標籤文字
       if (memoCheckText) {
         self.memoConfigTextObj.dialogCosed = true;
@@ -3400,7 +3430,6 @@ export default {
         return false;
       }
 
-
       // if(this.allRemarkItemsFlag && dealCount === 0){
       //   util.notify(this.$t('remotePatrol.invalidInspection'), 'warning', 3000);
       //   return false;
@@ -3410,7 +3439,16 @@ export default {
       //   return false;
       // }
 
-       //上傳附件
+
+      this.uploadPromisesData()
+
+    },
+
+
+    async uploadPromisesData(){
+      const self = this;
+
+      //上傳附件
       self.uploadingnumOfPic = 0;
       var fileNum = 0
       self.sheetName.forEach( t =>{
@@ -3426,7 +3464,6 @@ export default {
       self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
 
       const storageParams = {};
-      // storageParams.storeId = this.event.storeId;
       console.log('storageParams :>> ', storageParams);
       await getStorageInfo(storageParams).then(res => {
         if (res.errCode === 0) {
@@ -3457,7 +3494,8 @@ export default {
         }
       })
 
-      console.log('sheetName end:>> ', sheetName);
+      console.log('self.sheetName end:>> ', self.sheetName);
+
       // 等待所有上傳完成
       Promise.all(uploadPromises).then(() => {
         this.resolveConfoirmSummaryData();
@@ -3467,6 +3505,10 @@ export default {
         this.resolveConfoirmSummaryData();
       });
     },
+
+
+
+
 
     async resolveConfoirmSummaryData() {
       const inspectList = [];
@@ -3577,10 +3619,17 @@ export default {
 
       console.log("submit:",this.historyObj);
       await Database.addDataToDB(this.userId, params);
+
+
+
+      this.requiredObj.dialogCosed = false;
+      this.requiredIgnoreObj.dialogCosed = false;
+      this.memoConfigTextObj.dialogCosed = false;
+      this.memoConfigMediaObj.dialogCosed = false;
+      this.uploadProgress = false
+
       this.$router.push({ name: 'confirmSum', params: params });
     },
-
-
 
 
     spreadContent() {
@@ -4369,6 +4418,7 @@ export default {
       }
 
       this.totalImageNum = attachFileNums
+      this.checkTotalImageNum()
       self.$refs.fileInput.value = '';
     },
 
@@ -4409,7 +4459,17 @@ export default {
         }
       })
       this.totalImageNum = attachFileNums
+      this.checkTotalImageNum()
     },
+
+    checkTotalImageNum (){
+      if(this.isSystemAdvanced){
+        this.totalImageNum >= 500 ? (this.isShowAttchBtn = true): (this.isShowAttchBtn = false)
+      } else {
+        this.totalImageNum >= 120 ? this.isShowAttchBtn = true : this.isShowAttchBtn = false
+      }
+    },
+
 
     getAuditImgList(sourceList , index) {
       // console.log('index :>> ', index);
@@ -4427,9 +4487,6 @@ export default {
 
 
     playAttachVideo(item, index) {
-
-      console.log('item :>> ', item);
-
       const self = this;
       self.dialogAttachVideo = true;
       self.$nextTick(function() {
@@ -4437,8 +4494,6 @@ export default {
         video.setAttribute("src",item.url);
       });
     },
-
-
   }
 };
 </script>

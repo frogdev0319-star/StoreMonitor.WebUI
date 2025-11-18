@@ -193,7 +193,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/patrolShop/webPatrol/WebInspection'], resolve),
         meta: {
           requireAuth: true,
-          keepAlive: false
+          keepAlive: true
         },
         isReadOnly: false
       },
