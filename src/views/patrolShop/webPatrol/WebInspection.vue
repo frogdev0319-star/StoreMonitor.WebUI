@@ -186,6 +186,8 @@
                               @click.native="checkScore({item,itemDS: itemDS,index: index, e:1})">{{ itemDS }}</el-dropdown-item>
                           </el-dropdown-menu>
                         </el-dropdown>
+
+                        <!-- 略過 -->
                         <div v-if="!item.required" class="cancel-text"
                           :style="(item.notEdit && isEditReport)?{'pointer-events':'none'}:{'pointer-events':'auto'}"
                           @click="item.manualIgnore ? CancleIgnoreItem({item,index}) : ignoreItem({item,index,e:0})">{{item.manualIgnore ? $t('remotePatrol.cancel') : $t('remotePatrol.ignore')}}</div>
@@ -1857,11 +1859,29 @@ export default {
           })
         })
         if (!item.manualIgnore && self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount === 0) {
+
           this.editCount++;
           this.$store.dispatch('setEditCount', this.editCount);
-          self.sheetName[self.curSheetIndex].dealCount++;
+
+          if(this.tab1Checked && self.sheetName[self.curSheetIndex].type == 0){
+            console.log('no ++ 1:>> ');
+            self.sheetName[self.curSheetIndex].dealCount = self.sheetName[self.curSheetIndex].dealCount
+          }
+          else {
+            console.log('++1 :>> ');
+            self.sheetName[self.curSheetIndex].dealCount++;
+          }
+
+          if(this.tab1Checked && self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].type == 0){
+            console.log('no ++ 2:>> ');
+            self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount = self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount
+          }
+          else {
+            console.log('++ 2:>> ');
+            self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount++;
+          }
+
           self.sheetName[self.curSheetIndex].Effective++;
-          self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount++;
           self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].Effective++;
         }
         self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount++;
@@ -2816,6 +2836,7 @@ export default {
       }
     },
 
+    // dealCount
     handleIgnore() {
       const self = this;
       self.curItem.manualIgnore = true;
@@ -2833,8 +2854,22 @@ export default {
           self.sheetName[self.curSheetIndex].Effective--;
         }
         if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount == 0) {
-          this.sheetName[this.curSheetIndex].dealCount++
-          this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].dealCount++
+
+          if(this.tab1Checked && self.sheetName[self.curSheetIndex].type == 0){
+            self.sheetName[self.curSheetIndex].dealCount = self.sheetName[self.curSheetIndex].dealCount
+          }
+          else {
+            self.sheetName[self.curSheetIndex].dealCount++;
+          }
+          if(this.tab1Checked && self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].type == 0){
+            self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount = self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount
+          }
+          else {
+            self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount++;
+          }
+          // this.sheetName[this.curSheetIndex].dealCount++
+          // this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].dealCount++
+
           this.editCount++;
           this.$store.dispatch('setEditCount', this.editCount);
         }
@@ -2876,11 +2911,24 @@ export default {
     cancleIgnore() {
       const self = this;
       self.curItem.manualIgnore = false;
-      self.sheetName[self.curSheetIndex].dealCount--
-      this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].dealCount--
-      // if (self.sheetName[self.curSheetIndex].dealCount != 0) {
 
-      // }
+      if(this.tab1Checked && self.sheetName[self.curSheetIndex].type == 0){
+        self.sheetName[self.curSheetIndex].dealCount = self.sheetName[self.curSheetIndex].dealCount
+      }
+      else {
+        self.sheetName[self.curSheetIndex].dealCount--;
+      }
+
+      if(this.tab1Checked && self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].type == 0){
+        self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount = self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount
+      }
+      else {
+        self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount--;
+      }
+
+      // self.sheetName[self.curSheetIndex].dealCount--
+      // this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].dealCount--
+
       self.notShowAlert ? self.notShowAlert = false : null;
 
     },
@@ -2895,6 +2943,7 @@ export default {
     ignoreItem({item, index, e}) {
       //console.log("item:",item);
       //console.log(" index:", index);
+
       const self = this;
       self.curItemIndex = index;
       self.sheetName[self.curSheetIndex].inspectList.forEach((inspect, idx) => {
@@ -2919,6 +2968,7 @@ export default {
       // self.$refs.vendorVideo.stopVideoPlay();
       self.handleIgnore();
     },
+
     CancleIgnoreItem({item, index}) {
       const self = this;
       if (self.$refs.vendorVideo) self.$refs.vendorVideo.editCount--;
