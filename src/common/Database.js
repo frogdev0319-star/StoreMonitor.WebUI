@@ -68,6 +68,7 @@ export default class Database {
       }).then((hasDataFlag) => {
         console.log("****hasDataFlag:", hasDataFlag);
         if (hasDataFlag === true) {
+          text['_id'] = userId;  // ✅ 確保新文檔有 _id
           return this.DataBase.put(text);
         } else if (hasDataFlag.data) {
           hasDataFlag.data = text.data;
@@ -79,10 +80,9 @@ export default class Database {
         }
       }).then(() => {
         resolve();
-      })
-        .catch(err => {
-          reject(err);
-        });
+      }).catch(err => {
+        reject(err);
+      });
     });
   }
 }

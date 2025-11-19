@@ -1414,6 +1414,7 @@ export default {
   },
   async mounted() {
     const self = this;
+    const userId = getCookie('UserId');
     await self.getUserInfo()
     this.enableMimicMode = this.$store.getters.mimicMode;
     const PatrolHistory = self.$store.getters.PatrolHistory;
@@ -2196,6 +2197,9 @@ export default {
             } else {
               obj.isClick = false;
             }
+
+            console.log('obj.type :>> ', obj.type);
+
             const btnNameArr = this.getTab1AndTab3BtnName(obj.type);
             const tempItems = [];
             item.items.forEach((_item, _index) => {
@@ -3950,9 +3954,18 @@ export default {
 
     getTab1AndTab3BtnName(type){
       let nameBtnArr = [this.$t('remotePatrol.pass'), this.$t('remotePatrol.failed')];
-      nameBtnArr = type === 0 ?
-        [this.itemOptionsForType1[0].name , this.itemOptionsForType1[1].name] :
-        [this.itemOptionsForType3[0].name , this.itemOptionsForType3[1].name];
+      // nameBtnArr = type === 0 ?
+      //   [this.itemOptionsForType1[0].name , this.itemOptionsForType1[1].name] :
+      //   [this.itemOptionsForType3[0].name , this.itemOptionsForType3[1].name];
+
+
+      console.log('this.itemOptionsForType1 :>> ', this.itemOptionsForType1);
+      // ✅ 加入防護檢查
+      if (type === 0 && this.itemOptionsForType1 && this.itemOptionsForType1.length >= 2) {
+        nameBtnArr = [this.itemOptionsForType1[0].name, this.itemOptionsForType1[1].name];
+      } else if (type !== 0 && this.itemOptionsForType3 && this.itemOptionsForType3.length >= 2) {
+        nameBtnArr = [this.itemOptionsForType3[0].name, this.itemOptionsForType3[1].name];
+      }
       return nameBtnArr;
     },
 
