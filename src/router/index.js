@@ -169,7 +169,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/patrolShop/InspectReportList'], resolve),
         meta: {
           requireAuth: true,
-          keepAlive: true
+          keepAlive: false
         },
         isReadOnly: false
       },
@@ -193,7 +193,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/patrolShop/webPatrol/WebInspection'], resolve),
         meta: {
           requireAuth: true,
-          keepAlive: true
+          keepAlive: false
         },
         isReadOnly: false
       },

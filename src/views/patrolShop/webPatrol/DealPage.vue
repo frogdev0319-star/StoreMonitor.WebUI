@@ -45,7 +45,8 @@
   </div>
 </template>
 <script>
-
+import { getCookie } from '@/common/auth';
+import Database from '@/common/Database.js';
 export default {
   name: 'ReInspectDealPage',
   data() {
@@ -57,25 +58,22 @@ export default {
       timeid: 0,
       lang: this.$i18n.locale,
       isBindWorkflow: false,
-      viewReportByTagAuth: false
+      viewReportByTagAuth: false,
+      userId: '',
+
     };
   },
 
-  // beforeRouteEnter(to, from, next) {
-  //   to.meta.keepAlive = false;
-  //   from.meta.keepAlive = false;
-  //   next();
-  // },
 
   beforeRouteLeave(to, from, next) {
     const self = this;
     clearInterval(self.timeid);
-    to.meta.keepAlive = false;
     next();
   },
 
   mounted() {
     const self = this;
+    self.userId = getCookie('UserId');
     self.getRouterData();
     /*if (!self.isSuccess) {
       self.timeid = setInterval(function() {
@@ -87,6 +85,9 @@ export default {
   methods: {
     getRouterData() {
       const self = this;
+
+      self.userId = getCookie('UserId');
+
       let routeData = self.$route.params.data;
       console.log('routeData :>> ', routeData);
 
@@ -123,6 +124,21 @@ export default {
       }
     },
     goBackRemoteInception(){
+      const self = this;
+      // 清空 Vuex Store 中的暫存資料
+      this.$store.dispatch('setBackPatrolParam', null);
+      this.$store.dispatch('setPatrolHistory', null);
+      this.$store.dispatch('setPatrolComment', null);
+      this.$store.dispatch('setStoreList', []);
+      this.$store.dispatch('setStoreCache', null);
+      this.$store.dispatch('setEditCount', 0);
+      this.$store.dispatch('setEditReport', false);
+
+      // 清空 IndexedDB 中的暫存資料
+      const userId = this.$store.getters.userId || getCookie('UserId');
+      if (userId) {
+        Database.addDataToDB(userId, {data: {}, rule: {}});
+      }
       this.$router.push({ name: 'webPatrol' });
     },
     goAuditManagement(){
@@ -134,6 +150,20 @@ export default {
     },
     backToReinspection(){
       const self = this;
+      // 清空 Vuex Store 中的暫存資料
+      this.$store.dispatch('setBackPatrolParam', null);
+      this.$store.dispatch('setPatrolHistory', null);
+      this.$store.dispatch('setPatrolComment', null);
+      this.$store.dispatch('setStoreList', []);
+      this.$store.dispatch('setStoreCache', null);
+      this.$store.dispatch('setEditCount', 0);
+      this.$store.dispatch('setEditReport', false);
+
+      // 清空 IndexedDB 中的暫存資料
+      const userId = this.$store.getters.userId || getCookie('UserId');
+      if (userId) {
+        Database.addDataToDB(userId, {data: {}, rule: {}});
+      }
       self.$router.push({ name: 'webPatrol'});
     }
   }

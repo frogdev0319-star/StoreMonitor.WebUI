@@ -123,7 +123,6 @@
       <div class="info-content">
         <div class="pdf_font_24" style="display: flex; flex-direction: row; align-items: center; justify-content: flex-start">
 
-            checkinType:  {{ checkinType }} <br>
             <span class="info-label">{{ $t('remotePatrol.submitter') }}</span>
             <span :class="isexportPDF ? 'pdf-info-value' : 'info-value'">{{ report.submitterName }}</span>
 

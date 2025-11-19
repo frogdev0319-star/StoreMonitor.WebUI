@@ -688,7 +688,7 @@ export default {
   beforeRouteLeave(to, from, next) {
     const self = this;
     console.log("beforeRouteLeave:",to.name)
-    if (to.name !== 'remotePatrol') {
+    if (to.name !== 'webPatrol') {
       self.$store.dispatch('setPatrolHistory', null);
       self.$store.dispatch('setPatrolComment', null);
       self.$store.dispatch('setStoreList', []);

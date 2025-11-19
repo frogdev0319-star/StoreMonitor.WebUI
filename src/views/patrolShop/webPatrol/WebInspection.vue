@@ -130,7 +130,7 @@
                 class="inspect-details paper margin-bottom-sm" :style="isFullScreenMode && $store.getters.collapsed?{width: 'calc(50% - 10px)'}:{}">
                 <div  v-if="!showIgnoreItem ||item_.ignoreCount>0" class="flex padding-sm title">
                   <div class="spacer font-13" style="text-align: left; border-left: 4px solid #2c90d9; padding-left: 8px;">{{ item_.groupName }}</div>
-                  <div v-if="!showIgnoreItem ">{{ item_.dealCount+'/'+item_.count }}</div>
+                  <div v-if="!showIgnoreItem ">{{ item_.dealCount+'/'+item_.count }} </div>
                 </div>
 
                 <hr v-if="!showIgnoreItem ||item_.ignoreCount>0"  class="hr-horizontal">
@@ -1350,42 +1350,11 @@ export default {
     }
   },
 
-  beforeRouteEnter(to, from, next) {
-    to.meta.keepAlive = false;
-    console.log("*from.name ~~~~~~:",from.name);
-
-    if (from.name === 'confirmSum') {
-      console.log("1")
-      to.meta.keepAlive = true;
-      next(vm => {
-          // vm 就是組件實例 (this)
-          vm.handleRouteBack()
-      });
-    }
-    else {
-      to.meta.keepAlive = false;
-      next();
-
-    }
-
-
-
-
-    // if (from.name === 'confirmSum') {
-    //   to.meta.keepAlive = true;
-    //   console.log('aaaa :>> ');
-    //   next();
-
-    // } else {
-    //   to.meta.keepAlive = false;
-    //   next();
-    // }
-  },
-
   beforeRouteLeave(to, from, next) {
     const self = this;
     const canLeave = !self.showGuide && self.$refs.vendorVideo && self.$refs.vendorVideo.editCount !== 0;
     if (canLeave && to.name !== 'confirmSum') {
+
       self.$confirm(self.$t('remotePatrol.changPageInfo'), self.$t('remotePatrol.prompt'), {
         confirmButtonText: self.$t('remotePatrol.confirm'),
         cancelButtonText: self.$t('remotePatrol.cancel'),
@@ -1396,7 +1365,7 @@ export default {
       }).then(() => {
         self.$store.dispatch('setBackPatrolParam', null);
         if (to.name != 'confirmSum') {
-            from.meta.keepAlive = false;
+            // from.meta.keepAlive = false;
           self.playState && self.previewplayer && self.previewplayer.dispose();
           self.$store.dispatch('setPatrolHistory', null);
           self.$store.dispatch('setPatrolComment', null);
@@ -1417,10 +1386,11 @@ export default {
       }).catch(() => {
         next(false);
       });
-    } else {
+    }
+    else {
       self.$store.dispatch('setBackPatrolParam', null);
       if (to.name != 'confirmSum') {
-        from.meta.keepAlive=false;
+        // from.meta.keepAlive=false;
         this.editCount = 0;
         this.$store.dispatch('setEditCount', this.editCount);
         self.$store.dispatch('setEditReport', false);
@@ -1441,8 +1411,6 @@ export default {
     }
   },
   async mounted() {
-
-
     const self = this;
     await self.getUserInfo()
     this.enableMimicMode = this.$store.getters.mimicMode;
@@ -1456,8 +1424,22 @@ export default {
     }
     console.log("*BackPatrolParam:",BackPatrolParam);
     console.log("*PatrolHistory:",PatrolHistory);
+
     if (storeListCache) self.storeList = storeListCache
     if (PatrolHistory != null) {
+
+      // 刪掉已經丟到 blob 的圖
+      PatrolHistory.sheetName.forEach(s_item => {
+        if(s_item.inspectList){
+          s_item.inspectList.forEach(item => {
+            var sourceList = []
+            item.items.forEach((_item, _index) => {
+              _item.sourceList = _item.sourceList.filter( i => i.mediaType == 3)
+            });
+          });
+        }
+      });
+
       self.activeIndex = PatrolHistory.activeIndex;
       self.tabList[Number(self.activeIndex)].storeList = PatrolHistory.storeList;
       // self.storeList = PatrolHistory.storeList
@@ -1477,10 +1459,6 @@ export default {
       self.PatrolList = PatrolHistory.PatrolList;
       self.patrolstore = PatrolHistory.patrolstore;
       self.inspectList = PatrolHistory.sheetName[PatrolHistory.curSheetIndex].inspectList;
-
-
-      console.log('self.inspectList ----------:>> ', self.inspectList);
-
       self.showChannelBtns = PatrolHistory.showChannelBtns;
       self.allChannelBtns = PatrolHistory.allChannelBtns;
       self.curSheetIndex = PatrolHistory.curSheetIndex;
@@ -1554,25 +1532,6 @@ export default {
   },
 
   methods: {
-
-    handleRouteBack(){
-      this.$route.meta.keepAlive = true;
-      this.sheetName.forEach(s_item => {
-        if(s_item.inspectList){
-          s_item.inspectList.forEach(item => {
-            var sourceList = []
-            item.items.forEach((_item, _index) => {
-              _item.sourceList = _item.sourceList.filter( i => i.mediaType == 3)
-            });
-          });
-        }
-      });
-      console.log('this.sheetName :>> ', this.sheetName);
-    },
-
-
-
-
     async getUserInfo(){
       const result = await this.$store.dispatch("GetUserAuthorities");
       this.isSystemAdvanced = result.data.isSystemAdvanced
@@ -2343,6 +2302,7 @@ export default {
             this.sheetName.forEach(t =>{
               t.inspectList.forEach( i => {
                 if(i.type == 0){
+                  i.dealCount = i.count
                   i.items.forEach( ii => {
                     ii.itemgetScore = 10
                     ii.isQualified = true
