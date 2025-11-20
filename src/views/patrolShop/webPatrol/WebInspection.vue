@@ -2328,9 +2328,12 @@ export default {
                 if(i.type == 0){
                   i.dealCount = i.count
                   i.items.forEach( ii => {
-                    ii.itemgetScore = 10
                     ii.isQualified = true
-                    ii.itemScoreTitle = "合格"
+                    ii.itemScoreTitle = ii.scoreList[0].scoreTitle
+
+                    ii.itemgetScore = ii.itemScore
+                    ii.isIgnore = false
+                    ii.inputCount = i.items.length
                   })
                 }
 
@@ -3167,7 +3170,6 @@ export default {
 
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
-      console.log('self.sheetName ::::::::>> ', self.sheetName);
       console.log('sheetName ::::::::>> ', sheetName);
 
       sheetName.forEach(s_item => {
@@ -3547,16 +3549,17 @@ export default {
           s_item.inspectList.forEach(item => {
             inspectList.push(item);
             item.items.forEach((_item, _index) => {
+
               if (_item.inputCount === 0) {
-                _item.isIgnore = true;
-                // _item.inspectInput = '';
-                // _item.sourceList = [];
                 if (inspectSettings.qualifiedForIgnoredWithType1 && _item.type === 0
                   || inspectSettings.qualifiedForIgnoredWithType2 && _item.type === 1) {
                   _item.itemgetScore = _item.itemScore;
                 }
+                _item.isIgnore = true;
                 _item.itemgetScore = _item.manualIgnore ? '--' : null;
               }
+
+
             });
           });
         });
